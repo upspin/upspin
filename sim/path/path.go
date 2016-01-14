@@ -1,4 +1,4 @@
-package service
+package path
 
 import (
 	"bytes"
@@ -6,22 +6,25 @@ import (
 	"strings"
 )
 
+type UserName string
+type Name string
+
 // Parsing of file names. File names always start with a user name in mail-address form,
 // followed by a slash and a possibly empty pathname that follows. Thus the root of
 // user@google.com's name space is "user@google.com/".
 
-type parsedPath struct {
-	user  UserName // Must be present and non-empty.
-	elems []string // If empty, refers to the root for the user.
+type Parsed struct {
+	User  UserName // Must be present and non-empty.
+	Elems []string // If empty, refers to the root for the user.
 }
 
-func (p parsedPath) String() string {
+func (p Parsed) String() string {
 	var b bytes.Buffer
-	b.WriteString(string(p.user))
-	if len(p.elems) == 0 {
+	b.WriteString(string(p.User))
+	if len(p.Elems) == 0 {
 		b.WriteByte('/')
 	} else {
-		for _, elem := range p.elems {
+		for _, elem := range p.Elems {
 			b.WriteByte('/')
 			b.WriteString(string(elem))
 		}
@@ -30,7 +33,7 @@ func (p parsedPath) String() string {
 }
 
 var (
-	pn0 = parsedPath{}
+	pn0 = Parsed{}
 )
 
 type NameError struct {
@@ -46,9 +49,9 @@ func (n NameError) Error() string {
 	return n.error
 }
 
-// parse parses a full file name, including the user, validates it,
+// Parse parses a full file name, including the user, validates it,
 // and returns its parsed form.
-func parse(pathName PathName) (parsedPath, error) {
+func Parse(pathName Name) (Parsed, error) {
 	name := string(pathName)
 	// Pull off the user name.
 	slash := strings.IndexByte(name, '/')
@@ -77,13 +80,13 @@ func parse(pathName PathName) (parsedPath, error) {
 			return pn0, NameError{string(pathName), "name element too long"}
 		}
 	}
-	pn := parsedPath{
-		user:  UserName(user),
-		elems: elems,
+	pn := Parsed{
+		User:  UserName(user),
+		Elems: elems,
 	}
 	return pn, nil
 }
 
-func cleanPath(pathName PathName) string {
+func cleanPath(pathName Name) string {
 	return path.Clean(string(pathName))
 }

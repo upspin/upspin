@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"upspin.googlesource.com/upspin.git/sim/directory"
+	"upspin.googlesource.com/upspin.git/sim/path"
+	"upspin.googlesource.com/upspin.git/sim/ref"
+	"upspin.googlesource.com/upspin.git/sim/store"
 )
 
 // Avoid networking for now.
@@ -21,19 +26,19 @@ const (
 
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
-	ss := NewStorageService(Location{testAddr})
-	ds := NewDirectoryService(ss)
-	ref, err := ds.MakeDirectory(user)
+	ss := store.NewService(ref.Location{testAddr})
+	ds := directory.NewService(ss)
+	r, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
-	t.Logf("Ref for root: %v\n", ref)
+	t.Logf("Ref for root: %v\n", r)
 	// Fetch the directory back and inspect it.
-	ciphertext, err := ss.Get(ref.Reference)
+	ciphertext, err := ss.Get(r.Reference)
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}
-	name, clear, err := unpackBlob(ciphertext)
+	name, clear, err := store.UnpackBlob(ciphertext)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -47,8 +52,8 @@ func TestMakeRootDirectory(t *testing.T) {
 }
 
 func TestPutTopLevelFile(t *testing.T) {
-	ss := NewStorageService(Location{testAddr})
-	ds := NewDirectoryService(ss)
+	ss := store.NewService(ref.Location{testAddr})
+	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -66,7 +71,7 @@ func TestPutTopLevelFile(t *testing.T) {
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
-	name, clear, err := unpackBlob(ciphertext)
+	name, clear, err := store.UnpackBlob(ciphertext)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -83,17 +88,17 @@ func TestPutTopLevelFile(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFiles(t *testing.T) {
-	ss := NewStorageService(Location{testAddr})
-	ds := NewDirectoryService(ss)
+	ss := store.NewService(ref.Location{testAddr})
+	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
-	href := make([]HintedReference, nFile)
+	href := make([]ref.HintedReference, nFile)
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
-		fileName := PathName(fmt.Sprintf("%s/file.%d", user, i))
+		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, i))
 		h, err := ds.Put(fileName, []byte(text))
 		if err != nil {
 			t.Fatal("put file:", err)
@@ -104,13 +109,13 @@ func TestPutHundredTopLevelFiles(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
 		text := strings.Repeat(fmt.Sprint(j), j)
-		fileName := PathName(fmt.Sprintf("%s/file.%d", user, j))
+		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
 		ciphertext, err := ss.Get(href[j].Reference)
 		if err != nil {
 			t.Fatalf("%q: get blob: %v", fileName, err)
 		}
-		name, clear, err := unpackBlob(ciphertext)
+		name, clear, err := store.UnpackBlob(ciphertext)
 		if err != nil {
 			t.Fatal("unpack:", err)
 		}
@@ -126,17 +131,17 @@ func TestPutHundredTopLevelFiles(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFiles(t *testing.T) {
-	ss := NewStorageService(Location{testAddr})
-	ds := NewDirectoryService(ss)
+	ss := store.NewService(ref.Location{testAddr})
+	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
-	href := make([]HintedReference, nFile)
+	href := make([]ref.HintedReference, nFile)
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
-		fileName := PathName(fmt.Sprintf("%s/file.%d", user, i))
+		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, i))
 		h, err := ds.Put(fileName, []byte(text))
 		if err != nil {
 			t.Fatal("put file:", err)
@@ -147,7 +152,7 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
 		text := strings.Repeat(fmt.Sprint(j), j)
-		fileName := PathName(fmt.Sprintf("%s/file.%d", user, j))
+		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
 		h, data, err := ds.Get(fileName)
 		if err != nil {

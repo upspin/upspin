@@ -1,4 +1,4 @@
-package service // TODO
+package hash
 
 import (
 	"crypto/sha1"
@@ -65,7 +65,8 @@ func unhex(b uint8) uint8 {
 	return 255
 }
 
-// HashOf returns the SHA-1 hash of the data, as a Hash.
-func HashOf(data []byte) (hash Hash) {
+// Of returns the SHA-1 hash of the data, as a Hash.
+// The odd name works well in the client: hash.Of.
+func Of(data []byte) (hash Hash) {
 	return sha1.Sum(data)
 }
