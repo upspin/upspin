@@ -228,3 +228,111 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 		t.Fatalf("after overwrite expected %q; got %q", text, str)
 	}
 }
+
+/*
+	Tree:
+
+		user@google.com/
+			ten
+				eleven (file)
+				twelve
+					thirteen (file)
+			twenty
+				twentyone (file)
+				twentytwo (file)
+			thirty (dir)
+*/
+
+type globTest struct {
+	// Strings all miss the leading "user@google.com" for brevity.
+	pattern string
+	files   []string
+}
+
+var globTests = []globTest{
+	{"", []string{""}},
+	{"*", []string{"ten", "twenty", "thirty"}},
+	{"ten/eleven/thirteen", []string{}},
+	{"ten/twelve/thirteen", []string{"ten/twelve/thirteen"}},
+	{"ten/*", []string{"ten/twelve", "ten/eleven"}},
+	{"ten/twelve/*", []string{"ten/twelve/thirteen"}},
+	{"twenty/tw*", []string{"twenty/twentyone", "twenty/twentytwo"}},
+	{"*/*", []string{"ten/twelve", "ten/eleven", "twenty/twentyone", "twenty/twentytwo"}},
+}
+
+func TestGlob(t *testing.T) {
+	ss := store.NewService(ref.Location{Addr: testAddr})
+	ds := directory.NewService(ss)
+	// Build the tree.
+	_, err := ds.MakeDirectory(user)
+	if err != nil {
+		t.Fatal("make root:", err)
+	}
+	dirs := []string{
+		"ten",
+		"ten/twelve",
+		"twenty",
+		"thirty",
+	}
+	files := []string{
+		"ten/eleven",
+		"ten/twelve/thirteen",
+		"twenty/twentyone",
+		"twenty/twentytwo",
+	}
+	for _, dir := range dirs {
+		name := path.Name(fmt.Sprintf("%s/%s", user, dir))
+		_, err := ds.MakeDirectory(name)
+		if err != nil {
+			t.Fatalf("make directory: %s: %v", name, err)
+		}
+	}
+	for _, file := range files {
+		name := path.Name(fmt.Sprintf("%s/%s", user, file))
+		_, err := ds.Put(name, []byte(name))
+		if err != nil {
+			t.Fatalf("make file: %s: %v", name, err)
+		}
+	}
+	// Now do the test proper.
+	for _, test := range globTests {
+		name := fmt.Sprintf("%s/%s", user, test.pattern)
+		entries, err := ds.Glob(name)
+		if err != nil {
+			t.Errorf("%s: %v\n", test.pattern, err)
+			continue
+		}
+		for i, f := range test.files {
+			test.files[i] = fmt.Sprintf("%s/%s", user, f)
+		}
+		if len(test.files) != len(entries) {
+			t.Errorf("%s: expected %d results; got %d:", test.pattern, len(test.files), len(entries))
+			for _, e := range entries {
+				t.Errorf("\t%q", e.Name)
+			}
+			continue
+		}
+		t.Log(test.files)
+		// TODO: Order here needs to be sorted to match Glob output when that sorts.
+		for i, f := range test.files {
+			entry := entries[i]
+			if string(entry.Name) != f {
+				t.Errorf("%s: expected %q; got %q", test.pattern, f, entry.Name)
+				continue
+			}
+			// Test that the ref gets the file.
+			if !entry.IsDir {
+				data, err := ds.Fetch(entry.Ref.Reference)
+				if err != nil {
+					t.Errorf("%s: %s: error reading data: %v", test.pattern, entry.Name, err)
+					continue
+				}
+				str := string(data)
+				if str != f {
+					t.Errorf("%s: %s: wrong contents %q", test.pattern, entry.Name, str)
+					continue
+				}
+			}
+		}
+	}
+}
