@@ -85,7 +85,7 @@ func copyOf(in []byte) (out []byte) {
 func (s *Service) Put(ciphertext []byte) (r ref.Reference, err error) {
 	hash := hash.Of(ciphertext)
 	r = ref.Reference{
-		hash,
+		Hash: hash,
 	}
 	s.blob[r] = &Blob{
 		copyOf(ciphertext),
