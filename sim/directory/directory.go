@@ -40,8 +40,8 @@ type Entry struct {
 	ref   ref.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
 }
 
-// mkError creates an os.PathError from the arguments.
-func mkError(op string, name path.Name, err string) *os.PathError {
+// mkStrError creates an os.PathError from the arguments including a string for the error description.
+func mkStrError(op string, name path.Name, err string) *os.PathError {
 	return &os.PathError{
 		Op:   op,
 		Path: string(name),
@@ -49,12 +49,26 @@ func mkError(op string, name path.Name, err string) *os.PathError {
 	}
 }
 
-func (s *Service) Lookup(pathName path.Name) (ref.HintedReference, error) {
-	return hr0, nil
+// mkPathError creates an os.PathError from the arguments.
+func mkError(op string, name path.Name, err error) *os.PathError {
+	return &os.PathError{
+		Op:   op,
+		Path: string(name),
+		Err:  err,
+	}
 }
 
+func (s *Service) Lookup(pathName path.Name) (ref.HintedReference, error) {
+	return hr0, errors.New("unimplemented")
+}
+
+// Glob matches the pattern against the file names of the full rooted tree.
+// That is, the pattern must look like a full path name, but elements of the
+// path may contain metacharacters. Matching is done using Go's path.Match
+// elementwise. The user name must be present in the pattern and is treated
+// as a literal even if it contains metacharacters.
 func (s *Service) Glob(pattern string) ([]Entry, error) {
-	return nil, nil
+	return nil, errors.New("unimplemented")
 }
 
 // MakeDirectory creates a new directory with the given name. The user's root must be present.
@@ -67,20 +81,20 @@ func (s *Service) MakeDirectory(directoryName path.Name) (ref.HintedReference, e
 	// is fine - the path is cleaned.
 	parsed, err := path.Parse(directoryName + "/")
 	if err != nil {
-		return hr0, nil
+		return hr0, err
 	}
 	if len(parsed.Elems) == 0 {
 		// Creating a root: easy!
 		if _, present := s.Root[parsed.User]; present {
-			return hr0, mkError("MakeDirectory", directoryName, "already exists")
+			return hr0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
 		blob := store.MakeBlob(parsed.String(), nil)
 		r, err := s.Store.Put(blob)
 		if err != nil {
-			return hr0, nil
+			return hr0, err
 		}
 		href := ref.HintedReference{
-			Reference: ref.Reference{r.Hash},
+			Reference: ref.Reference{Hash: r.Hash},
 			Location:  s.StoreLocation,
 		}
 		s.Root[parsed.User] = href.Reference
@@ -89,7 +103,7 @@ func (s *Service) MakeDirectory(directoryName path.Name) (ref.HintedReference, e
 	blob := store.MakeBlob(parsed.String(), nil)
 	r, err := s.Store.Put(blob)
 	if err != nil {
-		return hr0, nil
+		return hr0, err
 	}
 	data := newEntryBytes(parsed.Elems[len(parsed.Elems)-1], true, r)
 	return s.put("MakeDirectory", directoryName, true, data)
@@ -112,12 +126,12 @@ func (s *Service) put(op string, pathName path.Name, dataIsDir bool, data []byte
 		return hr0, nil
 	}
 	if len(parsed.Elems) == 0 {
-		return hr0, mkError(op, pathName, "cannot create root with Put; use MakeDirectory")
+		return hr0, mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
 	dirRef, ok := s.Root[parsed.User]
 	if !ok {
 		// Cannot create user root with Put.
-		return hr0, mkError(op, path.Name(parsed.User), "no such user")
+		return hr0, mkStrError(op, path.Name(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
@@ -132,7 +146,7 @@ func (s *Service) put(op string, pathName path.Name, dataIsDir bool, data []byte
 			return hr0, err
 		}
 		if !isDir {
-			return hr0, mkError(op, parsed.First(i+1).Path(), "not a directory")
+			return hr0, mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
 		entries = append(entries, Entry{elem, true, dirRef}) // TODO: IsDir should be checked
 	}
@@ -176,11 +190,11 @@ func (s *Service) Get(pathName path.Name) (ref.HintedReference, []byte, error) {
 		return hr0, nil, nil
 	}
 	if len(parsed.Elems) == 0 {
-		return hr0, nil, mkError("Get", pathName, "cannot use Get on directory; use Glob")
+		return hr0, nil, mkStrError("Get", pathName, "cannot use Get on directory; use Glob")
 	}
 	dirRef, ok := s.Root[parsed.User]
 	if !ok {
-		return hr0, nil, mkError("Get", path.Name(parsed.User), "no such user")
+		return hr0, nil, mkStrError("Get", path.Name(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
@@ -191,7 +205,7 @@ func (s *Service) Get(pathName path.Name) (ref.HintedReference, []byte, error) {
 			return hr0, nil, nil
 		}
 		if !isDir {
-			return hr0, nil, mkError("Get", pathName, "not a directory")
+			return hr0, nil, mkStrError("Get", pathName, "not a directory")
 		}
 	}
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
@@ -201,15 +215,15 @@ func (s *Service) Get(pathName path.Name) (ref.HintedReference, []byte, error) {
 		return hr0, nil, err
 	}
 	if isDir {
-		return hr0, nil, mkError("Get", pathName, "is a directory")
+		return hr0, nil, mkStrError("Get", pathName, "is a directory")
 	}
 	ciphertext, err := s.Store.Get(r)
 	if err != nil {
-		return hr0, nil, &os.PathError{"Get", string(pathName), err}
+		return hr0, nil, mkError("Get", pathName, err)
 	}
 	name, cleartext, err := store.UnpackBlob(ciphertext)
 	if err != nil {
-		return hr0, nil, &os.PathError{"Get", string(pathName), err}
+		return hr0, nil, mkError("Get", pathName, err)
 	}
 	// TODO: Check name.
 	_ = name
@@ -265,20 +279,20 @@ func (s *Service) fetch(dirRef ref.Reference) ([]byte, error) {
 // The boolean is true if the entry iteself describes a directory.
 func dirEntLookup(op string, pathName path.Name, payload []byte, elem string) (ref.Reference, bool, error) {
 	if len(elem) == 0 {
-		return r0, false, mkError(op, pathName+"/", "empty name element")
+		return r0, false, mkStrError(op, pathName+"/", "empty name element")
 	}
 	if len(elem) == 0 || len(elem) > 255 {
-		return r0, false, mkError(op, path.Name(elem), "name element too long")
+		return r0, false, mkStrError(op, path.Name(elem), "name element too long")
 	}
 Loop:
 	for len(payload) > 0 {
 		if len(payload) == 1 {
-			return r0, false, mkError(op, pathName, "internal error: invalid directory")
+			return r0, false, mkStrError(op, pathName, "internal error: invalid directory")
 		}
 		nameLen := int(payload[0])
 		payload = payload[1:]
 		if len(payload) < nameLen+1+sha1.Size {
-			return r0, false, mkError(op, pathName, "internal error: truncated directory")
+			return r0, false, mkStrError(op, pathName, "internal error: truncated directory")
 		}
 		name := payload[:nameLen]
 		payload = payload[nameLen:]
@@ -299,7 +313,7 @@ Loop:
 		copy(r.Hash[:], hash)
 		return r, dirByte == 1, nil
 	}
-	return r0, false, mkError(op, pathName, "no such directory entry: "+elem)
+	return r0, false, mkStrError(op, pathName, "no such directory entry: "+elem)
 }
 
 // installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
@@ -339,7 +353,7 @@ Loop:
 		// We found the reference.
 		// If it's already there and is not expected to be a directory, this is an error.
 		if isDir && !dirOverwriteOK {
-			return r0, mkError(op, path.Name(dirName), "cannot overwrite directory")
+			return r0, mkStrError(op, path.Name(dirName), "cannot overwrite directory")
 		}
 		// Overwrite in place.
 		copy(hash, entry.ref.Hash[:])

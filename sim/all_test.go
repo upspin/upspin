@@ -26,7 +26,7 @@ const (
 
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
-	ss := store.NewService(ref.Location{testAddr})
+	ss := store.NewService(ref.Location{Addr: testAddr})
 	ds := directory.NewService(ss)
 	r, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -52,7 +52,7 @@ func TestMakeRootDirectory(t *testing.T) {
 }
 
 func TestPutTopLevelFile(t *testing.T) {
-	ss := store.NewService(ref.Location{testAddr})
+	ss := store.NewService(ref.Location{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -88,7 +88,7 @@ func TestPutTopLevelFile(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFiles(t *testing.T) {
-	ss := store.NewService(ref.Location{testAddr})
+	ss := store.NewService(ref.Location{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -131,7 +131,7 @@ func TestPutHundredTopLevelFiles(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFiles(t *testing.T) {
-	ss := store.NewService(ref.Location{testAddr})
+	ss := store.NewService(ref.Location{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -159,7 +159,7 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
 		if h != href[j] {
-			t.Fatalf("%q: get file: bad hash")
+			t.Fatalf("%q: get file: bad hash", fileName)
 		}
 		str := string(data)
 		if str != text {
@@ -169,7 +169,7 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	ss := store.NewService(ref.Location{testAddr})
+	ss := store.NewService(ref.Location{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -207,7 +207,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	str := string(data)
 	if str != text {
-		t.Fatal("expected %q; got %q", text, str)
+		t.Fatalf("expected %q; got %q", text, str)
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
@@ -225,6 +225,6 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	str = string(data)
 	if str != text {
-		t.Fatal("after overwrite expected %q; got %q", text, str)
+		t.Fatalf("after overwrite expected %q; got %q", text, str)
 	}
 }
