@@ -72,13 +72,34 @@ func (s *Service) Lookup(pathName path.Name) (ref.HintedReference, error) {
 	return hr0, errors.New("unimplemented")
 }
 
+// step is an internal function that advances one directory entry given the cleartext
+// of the directory's contents.
+func (s *Service) step(op string, pathName path.Name, payload []byte) (remaining []byte, name []byte, hash []byte, isDir bool, err error) {
+	if len(payload) == 1 {
+		err = mkStrError(op, pathName, "internal error: invalid directory")
+		return
+	}
+	nameLen := int(payload[0])
+	payload = payload[1:]
+	if len(payload) < nameLen+1+sha1.Size {
+		err = mkStrError(op, pathName, "internal error: truncated directory")
+		return
+	}
+	name = payload[:nameLen]
+	payload = payload[nameLen:]
+	isDir = payload[0] != 0
+	payload = payload[1:]
+	hash = payload[:sha1.Size]
+	remaining = payload[sha1.Size:]
+	return
+}
+
 // Glob matches the pattern against the file names of the full rooted tree.
 // That is, the pattern must look like a full path name, but elements of the
 // path may contain metacharacters. Matching is done using Go's path.Match
 // elementwise. The user name must be present in the pattern and is treated
 // as a literal even if it contains metacharacters.
 func (s *Service) Glob(pattern string) ([]Entry, error) {
-	fmt.Println("GLOB", pattern)
 	// We can use Parse for this because it's only looking for slashes.
 	parsed, err := path.Parse(path.Name(pattern + "/"))
 	if err != nil {
@@ -108,22 +129,11 @@ func (s *Service) Glob(pattern string) ([]Entry, error) {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
 			for len(payload) > 0 {
-				// TODO: Find a way to make this walking code appear only once.
-				if len(payload) == 1 {
-					return nil, mkStrError("Glob", ent.Name, "internal error: invalid directory")
+				remaining, name, hash, isDir, err := s.step("Get", ent.Name, payload)
+				if err != nil {
+					return nil, err
 				}
-				nameLen := int(payload[0])
-				payload = payload[1:]
-				if len(payload) < nameLen+1+sha1.Size {
-					return nil, mkStrError("Glob", ent.Name, "internal error: truncated directory")
-				}
-				name := payload[:nameLen]
-				payload = payload[nameLen:]
-				dirByte := payload[0]
-				payload = payload[1:]
-				hash := payload[:sha1.Size]
-				payload = payload[sha1.Size:]
-				fmt.Println("IN", ent.Name, "found", string(name))
+				payload = remaining
 				matched, err := goPath.Match(elem, string(name))
 				if err != nil {
 					return nil, mkError("Glob", ent.Name, err)
@@ -135,7 +145,7 @@ func (s *Service) Glob(pattern string) ([]Entry, error) {
 				copy(reference.Hash[:], hash)
 				e := Entry{
 					ent.Name + "/" + path.Name(name),
-					dirByte != 0,
+					isDir,
 					ref.HintedReference{Reference: reference, Location: s.Store.Location},
 				}
 				next = append(next, e)
@@ -148,9 +158,6 @@ func (s *Service) Glob(pattern string) ([]Entry, error) {
 		if e.Name == path.Name(parsed.User) {
 			e.Name += "/"
 		}
-	}
-	for _, e := range next {
-		fmt.Println("Matched:", e.Name)
 	}
 	// TODO: SORT
 	return next, err
@@ -333,7 +340,7 @@ func (s *Service) fetchEntry(op string, name path.Name, dirRef ref.Reference, el
 	if err != nil {
 		return r0, false, err
 	}
-	return dirEntLookup(op, name, payload, elem)
+	return s.dirEntLookup(op, name, payload, elem)
 }
 
 // Fetch returns the decrypted data associated with the reference.
@@ -357,7 +364,7 @@ func (s *Service) Fetch(dirRef ref.Reference) ([]byte, error) {
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry iteself describes a directory.
-func dirEntLookup(op string, pathName path.Name, payload []byte, elem string) (ref.Reference, bool, error) {
+func (s *Service) dirEntLookup(op string, pathName path.Name, payload []byte, elem string) (ref.Reference, bool, error) {
 	if len(elem) == 0 {
 		return r0, false, mkStrError(op, pathName+"/", "empty name element")
 	}
@@ -366,23 +373,13 @@ func dirEntLookup(op string, pathName path.Name, payload []byte, elem string) (r
 	}
 Loop:
 	for len(payload) > 0 {
-		// TODO: Find a way to make this walking code appear only once.
-		if len(payload) == 1 {
-			return r0, false, mkStrError(op, pathName, "internal error: invalid directory")
+		remaining, name, hash, isDir, err := s.step(op, pathName, payload)
+		if err != nil {
+			return r0, false, err
 		}
-		nameLen := int(payload[0])
-		payload = payload[1:]
-		if len(payload) < nameLen+1+sha1.Size {
-			return r0, false, mkStrError(op, pathName, "internal error: truncated directory")
-		}
-		name := payload[:nameLen]
-		payload = payload[nameLen:]
-		dirByte := payload[0]
-		payload = payload[1:]
-		hash := payload[:sha1.Size]
-		payload = payload[sha1.Size:]
+		payload = remaining
 		// Avoid allocation here: don't just convert to string for comparison.
-		if nameLen != len(elem) { // Length check is easy and fast.
+		if len(name) != len(elem) { // Length check is easy and fast.
 			continue Loop
 		}
 		for i, c := range name {
@@ -392,7 +389,7 @@ Loop:
 		}
 		var r ref.Reference
 		copy(r.Hash[:], hash)
-		return r, dirByte == 1, nil
+		return r, isDir, nil
 	}
 	return r0, false, mkStrError(op, pathName, "no such directory entry: "+elem)
 }
@@ -409,22 +406,13 @@ func (s *Service) installEntry(op string, dirName string, dirRef ref.Reference, 
 	// fmt.Printf("\nBEFORE: %s\n%q\n\n", dirName, dirData)
 Loop:
 	for payload := dirData; len(payload) > 0 && !found; {
-		if len(payload) == 1 {
-			return r0, errors.New("invalid directory: no room for name")
+		remaining, name, hash, isDir, err := s.step(op, path.Name(dirName), payload)
+		if err != nil {
+			return r0, err
 		}
-		nameLen := int(payload[0])
-		payload = payload[1:]
-		if len(payload) < nameLen+1+sha1.Size {
-			return r0, errors.New("invalid directory: entry truncated")
-		}
-		name := payload[:nameLen]
-		payload = payload[nameLen:]
-		isDir := payload[0] != 0
-		payload = payload[1:]
-		hash := payload[:sha1.Size]
-		payload = payload[sha1.Size:]
+		payload = remaining
 		// Avoid allocation here: don't just convert to string for comparison.
-		if nameLen != len(ent.elem) { // Length check is easy and fast.
+		if len(name) != len(ent.elem) { // Length check is easy and fast.
 			continue Loop
 		}
 		for i, c := range name {
