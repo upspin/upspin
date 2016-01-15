@@ -1,3 +1,4 @@
+// Package ref defines types for that represent references for the simulator.
 package ref
 
 import (
@@ -15,7 +16,7 @@ type Reference struct {
 // HintedReference attaches a location hint to a Reference.
 type HintedReference struct {
 	Reference
-	Location // TODO: Should be a list of locations, but makes the map harder in DirectoryService (sigh).
+	Location // TODO: Should be a list of locations, but makes the map harder in the Service.
 }
 
 func (hr HintedReference) String() string {

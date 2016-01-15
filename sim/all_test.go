@@ -167,3 +167,64 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateDirectoriesAndAFile(t *testing.T) {
+	ss := store.NewService(ref.Location{testAddr})
+	ds := directory.NewService(ss)
+	_, err := ds.MakeDirectory(user)
+	if err != nil {
+		t.Fatal("make directory:", err)
+	}
+	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/", user)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar", user)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar/asdf", user)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fileName := path.Name(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
+	text := "hello world"
+	ref, err := ds.Put(fileName, []byte(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Read it back.
+	nref, data, err := ds.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ref != nref {
+		t.Fatal("ref mismatch")
+	}
+	str := string(data)
+	if str != text {
+		t.Fatal("expected %q; got %q", text, str)
+	}
+	// Now overwrite it.
+	text = "goodnight mother"
+	ref, err = ds.Put(fileName, []byte(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Read it back.
+	nref, data, err = ds.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ref != nref {
+		t.Fatal("after overwrite ref mismatch")
+	}
+	str = string(data)
+	if str != text {
+		t.Fatal("after overwrite expected %q; got %q", text, str)
+	}
+}

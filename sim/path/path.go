@@ -1,3 +1,4 @@
+// Package path provides tools for parsing and printing file names.
 package path
 
 import (
@@ -6,13 +7,19 @@ import (
 	"strings"
 )
 
+// UserName represents a user's name, such as "user@google.com".
+// It is just a string type that helps make function signatures clearer.
 type UserName string
+
+// Name represents a full path name including the user name prefix.
+// It is just a string type that helps make function signatures clearer.
 type Name string
 
 // Parsing of file names. File names always start with a user name in mail-address form,
 // followed by a slash and a possibly empty pathname that follows. Thus the root of
 // user@google.com's name space is "user@google.com/".
 
+// Parsed represents a successfully parsed path name.
 type Parsed struct {
 	User  UserName // Must be present and non-empty.
 	Elems []string // If empty, refers to the root for the user.
@@ -32,19 +39,27 @@ func (p Parsed) String() string {
 	return b.String()
 }
 
+// Path is a helper that returns the string representation with type Name.
+func (p Parsed) Path() Name {
+	return Name(p.String())
+}
+
 var (
 	pn0 = Parsed{}
 )
 
+// NameError gives information about an erroneous path name, including the name and error description.
 type NameError struct {
 	name  string
 	error string
 }
 
+// Name is the path name that caused the error.
 func (n NameError) Name() string {
 	return n.name
 }
 
+// Error is the implementation of the error interface for NameError.
 func (n NameError) Error() string {
 	return n.error
 }
@@ -89,4 +104,16 @@ func Parse(pathName Name) (Parsed, error) {
 
 func cleanPath(pathName Name) string {
 	return path.Clean(string(pathName))
+}
+
+// First returns a parsed name with only the first n elements after the user name.
+func (p Parsed) First(n int) Parsed {
+	p.Elems = p.Elems[:n]
+	return p
+}
+
+// Drop returns a parsed name with the last n elements dropped.
+func (p Parsed) Drop(n int) Parsed {
+	p.Elems = p.Elems[:len(p.Elems)-n]
+	return p
 }

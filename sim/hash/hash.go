@@ -1,3 +1,4 @@
+// Package hash provides access to the hash function used to make content-addressable references.
 package hash
 
 import (

@@ -1,3 +1,4 @@
+// Package store implements the store service for the simulator.
 package store
 
 import (

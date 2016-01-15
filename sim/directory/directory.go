@@ -1,9 +1,11 @@
+// Package directory implements the directory service for the simulator.
 package directory
 
 import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"os"
 
 	"upspin.googlesource.com/upspin.git/sim/path"
 	"upspin.googlesource.com/upspin.git/sim/ref"
@@ -15,14 +17,14 @@ var (
 	hr0 ref.HintedReference
 )
 
-// Service implements directories. The actual storage may be on the
-// same machine or a different one.
+// Service implements directories and file-level I/O.
 type Service struct {
 	StoreLocation ref.Location
 	Store         *store.Service
 	Root          map[path.UserName]ref.Reference // TODO. No need for hint, they're all on ds.Store.
 }
 
+// NewService returns a new, empty directory server that will store its data in the specified store service.
 func NewService(ss *store.Service) *Service {
 	return &Service{
 		StoreLocation: ss.Location,
@@ -31,35 +33,48 @@ func NewService(ss *store.Service) *Service {
 	}
 }
 
-type DirEntry struct {
-	Name          string
-	ref.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
+// Entry represents the metadata for a file in a directory.
+type Entry struct {
+	Elem  string        // Path element, such as "foo" representing the file a@b.c/a/b/c/foo.
+	IsDir bool          // The referenced item is itself a directory.
+	ref   ref.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
+}
+
+// mkError creates an os.PathError from the arguments.
+func mkError(op string, name path.Name, err string) *os.PathError {
+	return &os.PathError{
+		Op:   op,
+		Path: string(name),
+		Err:  errors.New(err),
+	}
 }
 
 func (s *Service) Lookup(pathName path.Name) (ref.HintedReference, error) {
 	return hr0, nil
 }
 
-func (s *Service) Glob(pattern string) ([]DirEntry, error) {
+func (s *Service) Glob(pattern string) ([]Entry, error) {
 	return nil, nil
 }
 
-// TODO: Get the reference back. Should we be able to use it instead of a path for Put?
-// Would require more self-checks on directories (easy) and would avoid some name lookup (good)
+// MakeDirectory creates a new directory with the given name. The user's root must be present.
+// TODO: For now at least, only the last entry of the path can be created, as in Unix.
+// TODO: We get the reference back. Should we be able to use it instead of a path for Put?
+// That Would require more self-checks on directories (easy) and would avoid some name lookup (good)
 // but is lower-level. Maybe as an efficiency extra in the API.
 func (s *Service) MakeDirectory(directoryName path.Name) (ref.HintedReference, error) {
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
-	path, err := path.Parse(directoryName + "/")
+	parsed, err := path.Parse(directoryName + "/")
 	if err != nil {
 		return hr0, nil
 	}
-	if len(path.Elems) == 0 {
-		// Easy!
-		if _, present := s.Root[path.User]; present {
-			return hr0, fmt.Errorf("directory %q already exists", directoryName)
+	if len(parsed.Elems) == 0 {
+		// Creating a root: easy!
+		if _, present := s.Root[parsed.User]; present {
+			return hr0, mkError("MakeDirectory", directoryName, "already exists")
 		}
-		blob := store.MakeBlob(path.String(), nil)
+		blob := store.MakeBlob(parsed.String(), nil)
 		r, err := s.Store.Put(blob)
 		if err != nil {
 			return hr0, nil
@@ -68,10 +83,16 @@ func (s *Service) MakeDirectory(directoryName path.Name) (ref.HintedReference, e
 			Reference: ref.Reference{r.Hash},
 			Location:  s.StoreLocation,
 		}
-		s.Root[path.User] = href.Reference
+		s.Root[parsed.User] = href.Reference
 		return href, nil
 	}
-	return hr0, fmt.Errorf("TODO: can only make root")
+	blob := store.MakeBlob(parsed.String(), nil)
+	r, err := s.Store.Put(blob)
+	if err != nil {
+		return hr0, nil
+	}
+	data := newEntryBytes(parsed.Elems[len(parsed.Elems)-1], true, r)
+	return s.put("MakeDirectory", directoryName, true, data)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -81,63 +102,67 @@ func (s *Service) MakeDirectory(directoryName path.Name) (ref.HintedReference, e
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDir. Roots are anyway. TODO.
 func (s *Service) Put(pathName path.Name, data []byte) (ref.HintedReference, error) {
-	path, err := path.Parse(pathName)
+	return s.put("Put", pathName, false, data)
+}
+
+// put is the underlying implementation of Put and MakeDirectory.
+func (s *Service) put(op string, pathName path.Name, dataIsDir bool, data []byte) (ref.HintedReference, error) {
+	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return hr0, nil
 	}
-	if len(path.Elems) == 0 {
-		return hr0, fmt.Errorf("cannot create root %q with Put", pathName)
+	if len(parsed.Elems) == 0 {
+		return hr0, mkError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
-	dirRef, ok := s.Root[path.User]
+	dirRef, ok := s.Root[parsed.User]
 	if !ok {
-		// TODO: Make an error type.
-		return hr0, fmt.Errorf("no user %q", path.User) // NOTE: Cannot create user root.
+		// Cannot create user root with Put.
+		return hr0, mkError(op, path.Name(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
+	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
 	// Invariant: dirRef refers to a directory.
 	isDir := true
-	for i := 0; i < len(path.Elems)-1; i++ {
-		fmt.Printf("IN LOOP - SHOULD NOT HAPPEN")
-		dirRef, isDir, err = s.fetchEntry(dirRef, path.Elems[i])
+	entries := make([]Entry, 0, 10) // 0th entry is the root.
+	entries = append(entries, Entry{"", true, dirRef})
+	for i := 0; i < len(parsed.Elems)-1; i++ {
+		elem := parsed.Elems[i]
+		dirRef, isDir, err = s.fetchEntry("Put", pathName, dirRef, parsed.Elems[i])
 		if err != nil {
-			return hr0, nil
+			return hr0, err
 		}
 		if !isDir {
-			return hr0, fmt.Errorf("not a directory: %q", pathName)
+			return hr0, mkError(op, parsed.First(i+1).Path(), "not a directory")
 		}
+		entries = append(entries, Entry{elem, true, dirRef}) // TODO: IsDir should be checked
 	}
-	lastElem := path.Elems[len(path.Elems)-1]
-	// Destination might exist. If so we need to update the parent directory record.
-	// TODO: we just fail now.
-	if _, _, err := s.fetchEntry(dirRef, lastElem); err == nil {
-		return hr0, errors.New("overwriting unimplemented")
-	}
+	lastElem := parsed.Elems[len(parsed.Elems)-1]
+
+	// Create a blob storing the data for this file and store it in storage service.
 	ciphertext := store.MakeBlob(string(pathName), data)
 	r, err := s.Store.Put(ciphertext)
 	// TODO VALIDATE REF
-	// Update directory. TODO: must be atomic.
-	dirData, err := s.fetch(dirRef)
-	if err != nil {
-		return hr0, err
-	}
-	entry := newEntry(lastElem, false, r)
-	dirData = append(dirData, entry...) // TODO: Cannot append if this is an update.
+
+	// Update directory holding the file. TODO: must be atomic.
 	// Need the name of the directory we're updating.
-	dirPath := path
-	dirPath.Elems = dirPath.Elems[:len(dirPath.Elems)-1]
-	blob := store.MakeBlob(dirPath.String(), dirData)
-	dirRef, err = s.Store.Put(blob)
+	dirRef, err = s.installEntry(op, parsed.Drop(1).String(), dirRef, Entry{lastElem, dataIsDir, r}, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return hr0, err
 	}
-	// For now we can only put files in the root.
-	if len(path.Elems) != 1 {
-		panic("TODO: BUBBLE DIRREF TO ROOT")
+	// Rewrite the tree up to the root.
+	// Invariant: dirRef identifies the directory that has just been updated.
+	// i indicates the directory that needs to be updated to store the new dirRef.
+	for i := len(entries) - 2; i >= 0; i-- {
+		// Install into the ith directory the (i+1)th entry.
+		dirRef, err = s.installEntry(op, parsed.String(), entries[i].ref, Entry{entries[i+1].Elem, true, dirRef}, true)
+		if err != nil {
+			// TODO: System is now inconsistent.
+			return hr0, err
+		}
 	}
-	if len(path.Elems) == 1 { // Update root.
-		s.Root[path.User] = dirRef
-	}
+	// Update the root.
+	s.Root[parsed.User] = dirRef
 	href := ref.HintedReference{
 		Reference: r,
 		Location:  s.StoreLocation,
@@ -146,46 +171,45 @@ func (s *Service) Put(pathName path.Name, data []byte) (ref.HintedReference, err
 }
 
 func (s *Service) Get(pathName path.Name) (ref.HintedReference, []byte, error) {
-	path, err := path.Parse(pathName)
+	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return hr0, nil, nil
 	}
-	if len(path.Elems) == 0 {
-		return hr0, nil, fmt.Errorf("cannot Get directory %q", pathName)
+	if len(parsed.Elems) == 0 {
+		return hr0, nil, mkError("Get", pathName, "cannot use Get on directory; use Glob")
 	}
-	dirRef, ok := s.Root[path.User]
+	dirRef, ok := s.Root[parsed.User]
 	if !ok {
-		// TODO: Make an error type.
-		return hr0, nil, fmt.Errorf("no user %q", path.User)
+		return hr0, nil, mkError("Get", path.Name(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
 	isDir := true
-	for i := 0; i < len(path.Elems)-1; i++ {
-		dirRef, isDir, err = s.fetchEntry(dirRef, path.Elems[i])
+	for i := 0; i < len(parsed.Elems)-1; i++ {
+		dirRef, isDir, err = s.fetchEntry("Get", pathName, dirRef, parsed.Elems[i])
 		if err != nil {
 			return hr0, nil, nil
 		}
 		if !isDir {
-			return hr0, nil, fmt.Errorf("not a directory: %q", pathName)
+			return hr0, nil, mkError("Get", pathName, "not a directory")
 		}
 	}
-	lastElem := path.Elems[len(path.Elems)-1]
+	lastElem := parsed.Elems[len(parsed.Elems)-1]
 	// Destination must exist. If so we need to update the parent directory record.
 	var r ref.Reference
-	if r, isDir, err = s.fetchEntry(dirRef, lastElem); err != nil {
+	if r, isDir, err = s.fetchEntry("Get", pathName, dirRef, lastElem); err != nil {
 		return hr0, nil, err
 	}
 	if isDir {
-		return hr0, nil, fmt.Errorf("is a directory: %q", pathName)
+		return hr0, nil, mkError("Get", pathName, "is a directory")
 	}
 	ciphertext, err := s.Store.Get(r)
 	if err != nil {
-		return hr0, nil, fmt.Errorf("get blob: %v", err)
+		return hr0, nil, &os.PathError{"Get", string(pathName), err}
 	}
 	name, cleartext, err := store.UnpackBlob(ciphertext)
 	if err != nil {
-		return hr0, nil, fmt.Errorf("unpack blob: %v", err)
+		return hr0, nil, &os.PathError{"Get", string(pathName), err}
 	}
 	// TODO: Check name.
 	_ = name
@@ -196,27 +220,33 @@ func (s *Service) Get(pathName path.Name) (ref.HintedReference, []byte, error) {
 	return href, cleartext, nil
 }
 
-func newEntry(elem string, isDir bool, ref ref.Reference) []byte {
+func newEntryBytes(elem string, isDir bool, ref ref.Reference) []byte {
 	entry := make([]byte, 0, 1+len(elem)+1+sha1.Size)
 	entry = append(entry, byte(len(elem)))
 	entry = append(entry, elem...)
-	entry = append(entry, 0) // Not a directory
+	dirByte := byte(0)
+	if isDir {
+		dirByte = 1
+	}
+	entry = append(entry, dirByte)
 	entry = append(entry, ref.Hash[:]...)
 	return entry
 }
 
-func (s *Service) fetchEntry(dirRef ref.Reference, elem string) (ref.Reference, bool, error) {
+// fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
+// It reads the whole directory, so avoid calling it repeatedly.
+func (s *Service) fetchEntry(op string, name path.Name, dirRef ref.Reference, elem string) (ref.Reference, bool, error) {
 	payload, err := s.fetch(dirRef)
 	if err != nil {
 		return r0, false, err
 	}
-	return dirEntLookup(payload, elem)
+	return dirEntLookup(op, name, payload, elem)
 }
 
+// fetch returns the decrypted data associated with the reference.
 func (s *Service) fetch(dirRef ref.Reference) ([]byte, error) {
 	ciphertext, err := s.Store.Get(dirRef)
 	if err != nil {
-		fmt.Println("fetch failed", err)
 		return nil, err
 	}
 	_, payload, err := store.UnpackBlob(ciphertext)
@@ -224,24 +254,31 @@ func (s *Service) fetch(dirRef ref.Reference) ([]byte, error) {
 	return payload, nil
 }
 
-// Directory entries.
+// Internal representation of directory entries.
 // A directory entry is stored as:
 //	N length of name, one unsigned byte (255 byte max element name seems fine).
 //	N bytes of name.
 //	One byte. 0 for regular file, 1 for directory. TODO
 //	sha1.Size bytes of Reference.
 
-// The boolean is true if the entry is for a directory.
-func dirEntLookup(payload []byte, elem string) (ref.Reference, bool, error) {
+// dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
+// The boolean is true if the entry iteself describes a directory.
+func dirEntLookup(op string, pathName path.Name, payload []byte, elem string) (ref.Reference, bool, error) {
+	if len(elem) == 0 {
+		return r0, false, mkError(op, pathName+"/", "empty name element")
+	}
+	if len(elem) == 0 || len(elem) > 255 {
+		return r0, false, mkError(op, path.Name(elem), "name element too long")
+	}
 Loop:
 	for len(payload) > 0 {
 		if len(payload) == 1 {
-			return r0, false, errors.New("invalid directory: no room for name")
+			return r0, false, mkError(op, pathName, "internal error: invalid directory")
 		}
 		nameLen := int(payload[0])
 		payload = payload[1:]
 		if len(payload) < nameLen+1+sha1.Size {
-			return r0, false, errors.New("invalid directory: entry truncated")
+			return r0, false, mkError(op, pathName, "internal error: truncated directory")
 		}
 		name := payload[:nameLen]
 		payload = payload[nameLen:]
@@ -262,5 +299,62 @@ Loop:
 		copy(r.Hash[:], hash)
 		return r, dirByte == 1, nil
 	}
-	return r0, false, fmt.Errorf("no such directory entry %q", elem) // TODO build a better error type.
+	return r0, false, mkError(op, pathName, "no such directory entry: "+elem)
+}
+
+// installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
+// entry as required. It returns the ref for the updated directory.
+func (s *Service) installEntry(op string, dirName string, dirRef ref.Reference, entry Entry, dirOverwriteOK bool) (ref.Reference, error) {
+	dirData, err := s.fetch(dirRef)
+	if err != nil {
+		fmt.Println("INSTALL fetch FAILED", err)
+		return r0, err
+	}
+	found := false
+Loop:
+	for payload := dirData; len(payload) > 0 && !found; {
+		if len(payload) == 1 {
+			return r0, errors.New("invalid directory: no room for name")
+		}
+		nameLen := int(payload[0])
+		payload = payload[1:]
+		if len(payload) < nameLen+1+sha1.Size {
+			return r0, errors.New("invalid directory: entry truncated")
+		}
+		name := payload[:nameLen]
+		payload = payload[nameLen:]
+		isDir := payload[0] != 0
+		payload = payload[1:]
+		hash := payload[:sha1.Size]
+		payload = payload[sha1.Size:]
+		// Avoid allocation here: don't just convert to string for comparison.
+		if nameLen != len(entry.Elem) { // Length check is easy and fast.
+			continue Loop
+		}
+		for i, c := range name {
+			if c != entry.Elem[i] {
+				continue Loop
+			}
+		}
+		// We found the reference.
+		// If it's already there and is not expected to be a directory, this is an error.
+		if isDir && !dirOverwriteOK {
+			return r0, mkError(op, path.Name(dirName), "cannot overwrite directory")
+		}
+		// Overwrite in place.
+		copy(hash, entry.ref.Hash[:])
+		found = true
+	}
+	if !found {
+		entry := newEntryBytes(entry.Elem, entry.IsDir, entry.ref)
+		dirData = append(dirData, entry...)
+	}
+	blob := store.MakeBlob(string(dirName), dirData)
+	dirRef, err = s.Store.Put(blob)
+	if err != nil {
+		fmt.Println("INSTALL FAILED", err)
+		// TODO: System is now inconsistent.
+		return r0, err
+	}
+	return dirRef, err
 }

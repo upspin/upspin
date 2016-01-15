@@ -1,3 +1,4 @@
+// Package user implements the user service for the simulator.
 package user
 
 import (
