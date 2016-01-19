@@ -1,0 +1,779 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "676db610_645c9d76",
+        "filename": "store/.gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "this should really be a separate CL but it\u0027s fine as is for now. early days.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a427d5f2",
+        "filename": "store/README",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "delete this. no need for a README. go doc will do (and be more informative)",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_842c59d6",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "use this style so the presentation looks right in godoc:\n\nPackage caches stores blocks....",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 9
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_e421cddd",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "go style rules for all identifiers: Start with the identifier. See https://github.com/golang/go/wiki/CodeReviewComments for more info.\n\nPut stores...",
+      "range": {
+        "startLine": 11,
+        "startChar": 4,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_243bc50d",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "It always. (full sentences please)",
+      "range": {
+        "startLine": 15,
+        "startChar": 38,
+        "endLine": 15,
+        "endChar": 44
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c42651f4",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Rename renames... \n\n(sorry)",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_0438490d",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Get returns",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_6435bd16",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "RandomRef is a helper...",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a48cf522",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "no comment here. only one file in each package gets a package comment",
+      "range": {
+        "startLine": 1,
+        "startChar": 4,
+        "endLine": 1,
+        "endChar": 5
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_e496ed32",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "FileCache implements cache.Interface",
+      "range": {
+        "startLine": 19,
+        "startChar": 3,
+        "endLine": 19,
+        "endChar": 13
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_2480e5e1",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "_, err \u003d io.Copy(f, blob)\nreturn err",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 7
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_047de9be",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "this should be\ndefer f.Close()\nand one line higher",
+      "range": {
+        "startLine": 46,
+        "startChar": 3,
+        "endLine": 46,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_648add01",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "defer newF.Close()\nand delete the close below",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_4487e1f8",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "delete",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_847a99c1",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Put returned error",
+      "range": {
+        "startLine": 18,
+        "startChar": 12,
+        "endLine": 18,
+        "endChar": 21
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_e46f0dff",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "i\u0027d make this two if\u0027s for better messages",
+      "range": {
+        "startLine": 23,
+        "startChar": 13,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c47491d8",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Put returned error",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_246905fa",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "two if\u0027s",
+      "range": {
+        "startLine": 38,
+        "startChar": 9,
+        "endLine": 38,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_0466892a",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Package cloud implements",
+      "range": {
+        "startLine": 1,
+        "startChar": 16,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_6463fd19",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "not a fan of package-level flags. i hear even C++ is moving away from them.\nthese should be arguments to the constructor and flags in main or the test.",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 18,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_4460810b",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "// Cloud is...",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a4d235f7",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "this should take the flags as arguments and be commented",
+      "range": {
+        "startLine": 30,
+        "startChar": 5,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_e4dc2d0c",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "PutBlog puts ...",
+      "range": {
+        "startLine": 36,
+        "startChar": 3,
+        "endLine": 36,
+        "endChar": 7
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c4e131bd",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "It returns...",
+      "range": {
+        "startLine": 37,
+        "startChar": 26,
+        "endLine": 37,
+        "endChar": 91
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_04e329c3",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "Open always returns a PathError so you don\u0027t need to echo the name again - it will be in the error string",
+      "range": {
+        "startLine": 44,
+        "startChar": 6,
+        "endLine": 44,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_64f01d87",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "maybe log.Printf",
+      "range": {
+        "startLine": 48,
+        "startChar": 6,
+        "endLine": 48,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_44ed21aa",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "GetBlob....",
+      "range": {
+        "startLine": 55,
+        "startChar": 8,
+        "endLine": 55,
+        "endChar": 9
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_8400d91e",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "// Connect...",
+      "range": {
+        "startLine": 67,
+        "startChar": 9,
+        "endLine": 67,
+        "endChar": 14
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_040cc953",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "you cannot do this ever. only one call to flag.Parse can exist in the entire program, and it should be in main. if you call it again, disaster will ensue. see comments about the flags above.",
+      "range": {
+        "startLine": 68,
+        "startChar": 6,
+        "endLine": 68,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_64093d43",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "s/s//",
+      "range": {
+        "startLine": 86,
+        "startChar": 4,
+        "endLine": 86,
+        "endChar": 26
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_84a57974",
+        "filename": "store/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "// Package store...",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c4af714e",
+        "filename": "store/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "are these supposed to be exported?",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_24946508",
+        "filename": "store/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "putHandler handles file put requests.",
+      "range": {
+        "startLine": 23,
+        "startChar": 3,
+        "endLine": 23,
+        "endChar": 10
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_04916917",
+        "filename": "store/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "// getHandler ...",
+      "range": {
+        "startLine": 59,
+        "startChar": 5,
+        "endLine": 59,
+        "endChar": 15
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a4c99533",
+        "filename": "store/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-19T23:39:26Z",
+      "side": 1,
+      "message": "it\u0027s more common to put main at the top of the file, so the basic structure is clear. (in go, functions can appear in any order)\nthis is also where flag.Parse should go.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 4
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
