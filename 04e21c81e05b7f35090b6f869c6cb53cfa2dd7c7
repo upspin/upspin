@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "671db61a_363b980e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T18:19:36Z",
+      "side": 1,
+      "message": "should this be a TODO?",
+      "range": {
+        "startLine": 14,
+        "startChar": 4,
+        "endLine": 14,
+        "endChar": 7
+      },
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "671db61a_b68b280a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T18:19:36Z",
+      "side": 1,
+      "message": "above you have Unmarshal with lower case \u0027m\u0027. Suggest doing the same here.",
+      "range": {
+        "startLine": 54,
+        "startChar": 1,
+        "endLine": 54,
+        "endChar": 10
+      },
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "671db61a_b6fa0863",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T18:19:36Z",
+      "side": 1,
+      "message": "I think I understand why Get and Put use different arguments (Location vs Reference). At Put time, I can contact any NetAddr server I want and when one replies with a success, I then have a specific Location for my Reference. At Get time, I use Location as what you had previously called a HintedLocation and if the Reference is not there, the Store may know where it is (and if it does not, likely the data was lost or deleted or the layers above messed up discovering the blob).\n\nIf the above is correct, then the object Store does not represent a single server with a given NetAddr, but instead it is able to multiplex over multiple servers. \n\nI guess what I\u0027m saying is this: either Get should take a Reference and we keep NetAddr() -- meaning Store represents one single server -- or Get can take a Location and Store abstracts away servers, making NetAddr() irrelevant. \n\nDoes this make sense?",
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
