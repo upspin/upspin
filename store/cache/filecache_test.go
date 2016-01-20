@@ -70,3 +70,18 @@ func TestRandomRef(t *testing.T) {
 		t.Errorf("ref1 == ref2: %v", ref1)
 	}
 }
+
+func TestPurge(t *testing.T) {
+	err := fc.Put(ref, strings.NewReader(testString))
+	if err != nil {
+		t.Errorf("Put returned error: %v", err)
+	}
+	err = fc.Purge(ref)
+	if err != nil {
+		t.Errorf("Purge failed: %v", err)
+	}
+	err = fc.Purge(ref)
+	if err == nil {
+		t.Errorf("Purge failed to detect missing ref: %v", err)
+	}
+}

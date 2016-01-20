@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	scope = storage.DevstorageFullControlScope
+	scope         = storage.DevstorageFullControlScope
+	defaultPutACL = "publicRead"
 )
 
 // Cloud is a client connection with Google Cloud Platform.
@@ -37,21 +38,22 @@ func New(projectId, bucketName string) *Cloud {
 // name 'srcBlobName' into our bucket on the cloud store under the
 // given reference 'ref', which is typically a SHA digest of the
 // contents of the blob.  It returns a reference link to the blob
-// directly.
-func (c *Cloud) PutBlob(srcBlobName string, ref string) (refLink string) {
+// directly in case of success, otherwise it sets error to non-nil.
+func (c *Cloud) PutBlob(srcBlobName string, ref string) (refLink string, error error) {
 	// Insert an object into a bucket.
 	object := &storage.Object{Name: ref}
 	file, err := os.Open(srcBlobName)
 	if err != nil {
-		log.Fatalf("Error opening: %v", err)
+		log.Printf("Error opening: %v", err)
+		return "", err
 	}
-	res, err := c.service.Objects.Insert(c.bucketName, object).Media(file).PredefinedAcl("publicRead").Do()
+	res, err := c.service.Objects.Insert(c.bucketName, object).Media(file).PredefinedAcl(defaultPutACL).Do()
 	if err == nil {
 		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
 	} else {
-		log.Fatalf("Objects.Insert failed: %v", err)
+		log.Printf("Objects.Insert failed: %v", err)
 	}
-	return res.MediaLink
+	return res.MediaLink, err
 }
 
 // GetBlob returns a link to the blob identified by ref, or an error if the ref is not found.

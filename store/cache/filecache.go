@@ -56,6 +56,10 @@ func (fc FileCache) RandomRef() string {
 	return f.Name()
 }
 
+func (fc FileCache) Purge(ref string) error {
+	return os.Remove(fc.GetFileLocation(ref))
+}
+
 func (fc FileCache) GetFileLocation(ref string) string {
 	return fmt.Sprintf("%s/%s/blob", fc.cacheRoot, ref)
 }

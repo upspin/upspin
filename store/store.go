@@ -46,18 +46,23 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		panic("cache failed")
 	}
 	// Figure out the appropriate reference for this blob
-	sha512Ref := sha.Base64Sum()
+	ref := sha.Base64Sum()
 
 	// Rename it in the cache
-	fileCache.Rename(sha512Ref, initialRef)
+	fileCache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
-	go cloudClient.PutBlob(fileCache.GetFileLocation(sha512Ref), sha512Ref)
+	go func(ref string) {
+		if _, err := cloudClient.PutBlob(fileCache.GetFileLocation(ref), ref); err == nil {
+			// Remove the locally-cached entry. This is safe to do because FileCache is thread safe.
+			fileCache.Purge(ref)
+		}
+	}(ref)
 
 	// TODO(edpin): some cache management is necessary to remove local copies when the cache is full.
 
 	// Answer something sensible to the client.
-	w.Write([]byte(fmt.Sprintf("{ref=%s, error='ok'}", url.QueryEscape(sha512Ref))))
+	w.Write([]byte(fmt.Sprintf("{ref=%s, error='ok'}", url.QueryEscape(ref))))
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
