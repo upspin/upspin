@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "676db610_5fffae7e",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-20T00:46:19Z",
+      "side": 1,
+      "message": "s/Implements/implements/",
+      "range": {
+        "startLine": 1,
+        "startChar": 17,
+        "endLine": 1,
+        "endChar": 27
+      },
+      "revId": "be23e5be48e14d3ac6659eb2ad5604618e48de02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
