@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_04b68944",
+        "filename": "store/.gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Ok.",
+      "parentUuid": "676db610_645c9d76",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_a427d5f2",
         "filename": "store/README",
         "patchSetId": 1
@@ -36,6 +60,24 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "delete this. no need for a README. go doc will do (and be more informative)",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_24b90534",
+        "filename": "store/README",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_a427d5f2",
       "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_c4ebf129",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_842c59d6",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 9
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_e421cddd",
         "filename": "store/cache/cache.go",
         "patchSetId": 1
@@ -76,6 +142,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "go style rules for all identifiers: Start with the identifier. See https://github.com/golang/go/wiki/CodeReviewComments for more info.\n\nPut stores...",
+      "range": {
+        "startLine": 11,
+        "startChar": 4,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_24d0e57b",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_e421cddd",
       "range": {
         "startLine": 11,
         "startChar": 4,
@@ -134,6 +224,54 @@
     },
     {
       "key": {
+        "uuid": "676db610_64dadd9b",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_c42651f4",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_04cde9e0",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_243bc50d",
+      "range": {
+        "startLine": 15,
+        "startChar": 38,
+        "endLine": 15,
+        "endChar": 44
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_0438490d",
         "filename": "store/cache/cache.go",
         "patchSetId": 1
@@ -145,6 +283,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "Get returns",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a4c515b9",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_0438490d",
       "range": {
         "startLine": 21,
         "startChar": 4,
@@ -180,6 +342,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_e4bf0d19",
+        "filename": "store/cache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_6435bd16",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_a48cf522",
         "filename": "store/cache/filecache.go",
         "patchSetId": 1
@@ -203,6 +389,53 @@
     },
     {
       "key": {
+        "uuid": "676db610_443361ca",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_a48cf522",
+      "range": {
+        "startLine": 1,
+        "startChar": 4,
+        "endLine": 1,
+        "endChar": 5
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_44a9a1f5",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Also got rid of this flag and created a NewFileCache() func.",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 15,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_e496ed32",
         "filename": "store/cache/filecache.go",
         "patchSetId": 1
@@ -214,6 +447,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "FileCache implements cache.Interface",
+      "range": {
+        "startLine": 19,
+        "startChar": 3,
+        "endLine": 19,
+        "endChar": 13
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_64365dbd",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_e496ed32",
       "range": {
         "startLine": 19,
         "startChar": 3,
@@ -249,6 +506,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_242c6569",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_2480e5e1",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 7
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_047de9be",
         "filename": "store/cache/filecache.go",
         "patchSetId": 1
@@ -260,6 +541,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "this should be\ndefer f.Close()\nand one line higher",
+      "range": {
+        "startLine": 46,
+        "startChar": 3,
+        "endLine": 46,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_a46195b8",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_047de9be",
       "range": {
         "startLine": 46,
         "startChar": 3,
@@ -289,6 +594,24 @@
     },
     {
       "key": {
+        "uuid": "676db610_846619cd",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_648add01",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_4487e1f8",
         "filename": "store/cache/filecache_test.go",
         "patchSetId": 1
@@ -300,6 +623,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "delete",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_847c5950",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_4487e1f8",
       "range": {
         "startLine": 1,
         "startChar": 3,
@@ -335,6 +682,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_e471cd77",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_847a99c1",
+      "range": {
+        "startLine": 18,
+        "startChar": 12,
+        "endLine": 18,
+        "endChar": 21
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_e46f0dff",
         "filename": "store/cache/filecache_test.go",
         "patchSetId": 1
@@ -346,6 +717,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "i\u0027d make this two if\u0027s for better messages",
+      "range": {
+        "startLine": 23,
+        "startChar": 13,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_248bc58f",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_e46f0dff",
       "range": {
         "startLine": 23,
         "startChar": 13,
@@ -375,6 +770,24 @@
     },
     {
       "key": {
+        "uuid": "676db610_0488498f",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_c47491d8",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_246905fa",
         "filename": "store/cache/filecache_test.go",
         "patchSetId": 1
@@ -386,6 +799,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "two if\u0027s",
+      "range": {
+        "startLine": 38,
+        "startChar": 9,
+        "endLine": 38,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_44824171",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_246905fa",
       "range": {
         "startLine": 38,
         "startChar": 9,
@@ -421,6 +858,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_44b08145",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_0466892a",
+      "range": {
+        "startLine": 1,
+        "startChar": 16,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_6463fd19",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -432,6 +893,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "not a fan of package-level flags. i hear even C++ is moving away from them.\nthese should be arguments to the constructor and flags in main or the test.",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 18,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c4313197",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_6463fd19",
       "range": {
         "startLine": 18,
         "startChar": 1,
@@ -461,6 +946,24 @@
     },
     {
       "key": {
+        "uuid": "676db610_2436258e",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_4460810b",
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_a4d235f7",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -472,6 +975,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "this should take the flags as arguments and be commented",
+      "range": {
+        "startLine": 30,
+        "startChar": 5,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_64401de9",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_a4d235f7",
       "range": {
         "startLine": 30,
         "startChar": 5,
@@ -507,6 +1034,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_e4454df6",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_e4dc2d0c",
+      "range": {
+        "startLine": 36,
+        "startChar": 3,
+        "endLine": 36,
+        "endChar": 7
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_c4e131bd",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -518,6 +1069,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "It returns...",
+      "range": {
+        "startLine": 37,
+        "startChar": 26,
+        "endLine": 37,
+        "endChar": 91
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c4ff71c8",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_c4e131bd",
       "range": {
         "startLine": 37,
         "startChar": 26,
@@ -553,6 +1128,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_24e4653a",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_04e329c3",
+      "range": {
+        "startLine": 44,
+        "startChar": 6,
+        "endLine": 44,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_64f01d87",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -564,6 +1163,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "maybe log.Printf",
+      "range": {
+        "startLine": 48,
+        "startChar": 6,
+        "endLine": 48,
+        "endChar": 12
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_64ee5d1a",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_64f01d87",
       "range": {
         "startLine": 48,
         "startChar": 6,
@@ -599,6 +1222,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_44eb6107",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_44ed21aa",
+      "range": {
+        "startLine": 55,
+        "startChar": 8,
+        "endLine": 55,
+        "endChar": 9
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_8400d91e",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -610,6 +1257,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "// Connect...",
+      "range": {
+        "startLine": 67,
+        "startChar": 9,
+        "endLine": 67,
+        "endChar": 14
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_e4138de9",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_8400d91e",
       "range": {
         "startLine": 67,
         "startChar": 9,
@@ -645,6 +1316,30 @@
     },
     {
       "key": {
+        "uuid": "676db610_a419950d",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_040cc953",
+      "range": {
+        "startLine": 68,
+        "startChar": 6,
+        "endLine": 68,
+        "endChar": 11
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "676db610_64093d43",
         "filename": "store/cloud/cloud.go",
         "patchSetId": 1
@@ -656,6 +1351,30 @@
       "writtenOn": "2016-01-19T23:39:26Z",
       "side": 1,
       "message": "s/s//",
+      "range": {
+        "startLine": 86,
+        "startChar": 4,
+        "endLine": 86,
+        "endChar": 26
+      },
+      "revId": "21914ae91f5205bd6b6fedb8b4de96814c2ba143",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "676db610_c4181107",
+        "filename": "store/cloud/cloud.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-20T00:51:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "676db610_64093d43",
       "range": {
         "startLine": 86,
         "startChar": 4,
