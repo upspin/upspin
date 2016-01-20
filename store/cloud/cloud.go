@@ -1,8 +1,7 @@
-// Implements a simple interface with Google Cloud Storage, for storing blobs in buckets
+// Package cloud Implements a simple interface with the Google Cloud Storage, for storing blobs in buckets.
 package cloud
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,64 +12,66 @@ import (
 	storage "google.golang.org/api/storage/v1"
 )
 
-var (
-	projectID  = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
-)
-
 const (
 	scope = storage.DevstorageFullControlScope
 )
 
+// Cloud is a client connection with Google Cloud Platform.
 type Cloud struct {
-	client  *http.Client
-	service *storage.Service
+	client     *http.Client
+	service    *storage.Service
+	projectId  string
+	bucketName string
 }
 
-func New() *Cloud {
+// New creates a new Cloud instance associated with the given project id and bucket name.
+func New(projectId, bucketName string) *Cloud {
 	c := &Cloud{}
+	c.projectId = projectId
+	c.bucketName = bucketName
 	c.Connect()
 	return c
 }
 
-// Puts a blob that is already in the local file system with name 'srcBlobName' into our
-// bucket on cloud store. Returns the reference where the blob is stored, which is a SHA512
-// of its contents. Returns the reference link to the file directly.
-func (c *Cloud) PutBlob(srcBlobName string, sha512str string) (refLink string) {
+// PutBlob puts a blob that is already in the local file system with
+// name 'srcBlobName' into our bucket on the cloud store under the
+// given reference 'ref', which is typically a SHA digest of the
+// contents of the blob.  It returns a reference link to the blob
+// directly.
+func (c *Cloud) PutBlob(srcBlobName string, ref string) (refLink string) {
 	// Insert an object into a bucket.
-	object := &storage.Object{Name: sha512str}
+	object := &storage.Object{Name: ref}
 	file, err := os.Open(srcBlobName)
 	if err != nil {
-		log.Fatalf("Error opening %q: %v", srcBlobName, err)
+		log.Fatalf("Error opening: %v", err)
 	}
-	res, err := c.service.Objects.Insert(*bucketName, object).Media(file).PredefinedAcl("publicRead").Do()
+	res, err := c.service.Objects.Insert(c.bucketName, object).Media(file).PredefinedAcl("publicRead").Do()
 	if err == nil {
-		fmt.Printf("Created object %v at location %v\n\n", res.Name, res.SelfLink)
+		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
 	} else {
 		log.Fatalf("Objects.Insert failed: %v", err)
 	}
 	return res.MediaLink
 }
 
-// Given a string of the sha512 in base64 representing the blob name, retrieves a link to the
-// blob.
-func (c *Cloud) GetBlob(sha512str string) (link string, error error) {
+// GetBlob returns a link to the blob identified by ref, or an error if the ref is not found.
+func (c *Cloud) GetBlob(ref string) (link string, error error) {
 	// Get the link of the blob
-	res, err := c.service.Objects.Get(*bucketName, sha512str).Do()
+	res, err := c.service.Objects.Get(c.bucketName, ref).Do()
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("The media download link for %v/%v is %v.\n\n", *bucketName, res.Name, res.MediaLink)
+	fmt.Printf("The media download link for %v/%v is %v.\n\n", c.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
 }
 
+// Connect connects with the Google Cloud Platform, under the given projectId and bucketName.
 func (c *Cloud) Connect() {
-	flag.Parse()
-	if *bucketName == "" {
-		log.Fatalf("Bucket argument is required. See --help.")
+	if c.projectId == "" {
+		log.Fatalf("Project argument is required.")
 	}
-	if *projectID == "" {
-		log.Fatalf("Project argument is required. See --help.")
+	if c.bucketName == "" {
+		log.Fatalf("Bucket argument is required.")
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and
@@ -83,7 +84,7 @@ func (c *Cloud) Connect() {
 	if err != nil {
 		log.Fatalf("Unable to create storage service: %v", err)
 	}
-	// Initializes the object
+	// Initialize the object
 	c.client = client
 	c.service = service
 }

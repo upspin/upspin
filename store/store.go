@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,8 +17,11 @@ const (
 )
 
 var (
+	projectId   = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName  = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
+	tempDir     = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default")
 	cloudClient *cloud.Cloud
-	fileCache   cache.FileCache
+	fileCache   *cache.FileCache
 )
 
 // Handler for receiving file put requests (i.e. storing new blobs).
@@ -75,8 +79,9 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	cloudClient = cloud.New()
-	fileCache = cache.FileCache{}
+	flag.Parse()
+	cloudClient = cloud.New(*projectId, *bucketName)
+	fileCache = cache.NewFileCache(*tempDir)
 	http.HandleFunc("/put", putHandler)
 	http.HandleFunc("/get", getHandler)
 	// TODO(edpin): Implement delete.

@@ -1,4 +1,3 @@
-// Tests for filecache
 package cache
 
 import (
@@ -7,41 +6,47 @@ import (
 )
 
 var (
-	fc         FileCache = FileCache{}
-	ref        string    = "1234"
-	testString string    = "This is a test."
+	fc         *FileCache = NewFileCache("")
+	ref        string     = "1234"
+	testString string     = "This is a test."
 )
 
 func TestPutAndGet(t *testing.T) {
 	err := fc.Put(ref, strings.NewReader(testString))
 	if err != nil {
-		t.Errorf("Filecache returned error: %v", err)
+		t.Errorf("Put returned error: %v", err)
 	}
 	r := fc.Get(ref)
 	buf := make([]byte, 100)
 	n, err := r.Read(buf)
-	if n != len(testString) || err != nil {
-		t.Errorf("Error reading from cache: n=%d, err: %v", n, err)
+	if n != len(testString) {
+		t.Errorf("Error reading bytes from cache: n=%d", n)
+	}
+	if err != nil {
+		t.Errorf("Error in read: %v", err)
 	}
 }
 
 func TestRename(t *testing.T) {
 	err := fc.Put(ref, strings.NewReader(testString))
 	if err != nil {
-		t.Errorf("Filecache returned error: %q", err)
+		t.Errorf("Put returned error: %v", err)
 	}
 	newRef := "00000010101"
 	fc.Rename(newRef, ref)
 	r := fc.Get(newRef)
 	buf := make([]byte, 100)
 	n, err := r.Read(buf)
-	if n != len(testString) || err != nil {
-		t.Errorf("Error reading from cache: n=%d, err: %v", n, err)
+	if n != len(testString) {
+		t.Errorf("Error reading bytes from cache: n=%d", n)
+	}
+	if err != nil {
+		t.Errorf("Error in read: %v", err)
 	}
 	// Old ref does not exist anymore
 	r = fc.Get(ref)
 	if r != nil {
-		t.Errorf("Managed to get an old ref")
+		t.Errorf("Get got an old ref")
 	}
 }
 

@@ -1,9 +1,7 @@
-// A file-based cache
 package cache
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,22 +9,18 @@ import (
 	"os"
 )
 
-var (
-	tempDir   = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default")
-	cacheRoot string
-)
-
-// Implements cache.Interface.
+// FileCache implements a cache.Interface for storing local files.
 type FileCache struct {
+	cacheRoot string
 }
 
 func (fc FileCache) Put(ref string, blob io.Reader) error {
-	f, err := createFile(ref)
+	f, err := fc.createFile(ref)
 	if err != nil {
 		return err
 	}
-	io.Copy(f, blob)
-	return nil
+	_, err = io.Copy(f, blob)
+	return err
 }
 
 func (fc FileCache) Get(ref string) *bufio.Reader {
@@ -42,14 +36,14 @@ func (fc FileCache) Rename(newRef, oldRef string) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	oldName := f.Name()
-	f.Close()
-	newF, err := createFile(newRef)
+	newF, err := fc.createFile(newRef)
 	if err != nil {
 		return err
 	}
+	defer newF.Close()
 	newName := newF.Name()
-	newF.Close()
 	return os.Rename(oldName, newName)
 }
 
@@ -63,7 +57,7 @@ func (fc FileCache) RandomRef() string {
 }
 
 func (fc FileCache) GetFileLocation(ref string) string {
-	return fmt.Sprintf("%s/%s/blob", cacheRoot, ref)
+	return fmt.Sprintf("%s/%s/blob", fc.cacheRoot, ref)
 }
 
 func (fc FileCache) openForRead(ref string) (*os.File, error) {
@@ -71,8 +65,8 @@ func (fc FileCache) openForRead(ref string) (*os.File, error) {
 	return os.Open(location)
 }
 
-func createFile(name string) (*os.File, error) {
-	location := fmt.Sprintf("%s/%s", cacheRoot, name)
+func (fc FileCache) createFile(name string) (*os.File, error) {
+	location := fmt.Sprintf("%s/%s", fc.cacheRoot, name)
 	if err := os.MkdirAll(location, 0755); err != nil {
 		log.Fatalf("Can't MkdirAll %s: %q", location, err)
 		return nil, err
@@ -86,11 +80,14 @@ func createFile(name string) (*os.File, error) {
 	return f, nil
 }
 
-func init() {
-	flag.Parse()
-	var err error
-	cacheRoot, err = ioutil.TempDir(*tempDir, "upspin-cache-")
+// NewFileCache creates a new FileCache rooted under cacheRootDir, if
+// that dir is available. If it's not available, it returns nil. An
+// empty argument uses the system's default location (but it's not guaranteed to succeed).
+func NewFileCache(cacheRootDir string) *FileCache {
+	cacheRoot, err := ioutil.TempDir(cacheRootDir, "upspin-cache-")
 	if err != nil {
-		log.Fatalf("Can't create tempdir: %q", err)
+		log.Fatalf("Can't create tempdir: %v", err)
 	}
+	fc := &FileCache{cacheRoot}
+	return fc
 }
