@@ -62,6 +62,24 @@
       "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "671db61a_d617c4d4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-20T19:29:07Z",
+      "side": 1,
+      "message": "Store is an abstraction. Whether it represents one service or many should be irrelevant to the interface definition. That is, one should be able to build a sharded Store or a striped Store or a replicated Store and the interface will be unaffected.\n\nBut in any case, you need _some_ address to find the server.",
+      "parentUuid": "671db61a_b6fa0863",
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
