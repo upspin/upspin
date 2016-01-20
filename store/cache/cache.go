@@ -23,4 +23,8 @@ type Interface interface {
 
 	// RandomRef returns a unique but random reference.
 	RandomRef() string
+
+	// Purge removes an entry from the cache. It returns an error if
+	// the ref did not previously exist.
+	Purge(ref string) error
 }
