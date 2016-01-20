@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "671db61a_3caed9a2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-20T22:42:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "671db61a_363b980e",
+      "range": {
+        "startLine": 14,
+        "startChar": 4,
+        "endLine": 14,
+        "endChar": 7
+      },
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "671db61a_b68b280a",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-20T18:19:36Z",
       "side": 1,
       "message": "above you have Unmarshal with lower case \u0027m\u0027. Suggest doing the same here.",
+      "range": {
+        "startLine": 54,
+        "startChar": 1,
+        "endLine": 54,
+        "endChar": 10
+      },
+      "revId": "04e21c81e05b7f35090b6f869c6cb53cfa2dd7c7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "671db61a_1cab1d93",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-20T22:42:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "671db61a_b68b280a",
       "range": {
         "startLine": 54,
         "startChar": 1,
