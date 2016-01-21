@@ -46,7 +46,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		panic("cache failed")
 	}
 	// Figure out the appropriate reference for this blob
-	ref := sha.Base64Sum()
+	ref := sha.EncodedSum()
 
 	// Rename it in the cache
 	fileCache.Rename(ref, initialRef)

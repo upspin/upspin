@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"crypto/sha512"
-	"encoding/base64"
+	"crypto/sha256"
+	"encoding/hex"
 	"hash"
 	"io"
 )
@@ -14,7 +14,7 @@ type ShaReader struct {
 }
 
 func NewShaReader(f io.Reader) *ShaReader {
-	return &ShaReader{bufio.NewReader(f), sha512.New()}
+	return &ShaReader{bufio.NewReader(f), sha256.New()}
 }
 
 func (s *ShaReader) Read(p []byte) (n int, err error) {
@@ -30,6 +30,6 @@ func (s *ShaReader) Sum() []byte {
 	return s.sha.Sum(nil)
 }
 
-func (s *ShaReader) Base64Sum() string {
-	return base64.StdEncoding.EncodeToString(s.Sum())
+func (s *ShaReader) EncodedSum() string {
+	return hex.EncodeToString(s.Sum())
 }
