@@ -84,12 +84,12 @@ type User interface {
 
 // The Directory service manages the name space for one or more users.
 type Directory interface {
-	Get(name PathName) ([]Location, error)
+	// Lookup returns the directory entry for the named file.
+	Lookup(name PathName) (*DirEntry, error)
 
 	// Put stores the data at the given name. If something is already
 	// stored with that name, it is replaced with the new data.
-	// TODO: How is metadata handled?
-	Put(name PathName, data, metadata []byte) (Location, error)
+	Put(name PathName, data []byte) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
@@ -102,12 +102,31 @@ type Directory interface {
 	// path may contain metacharacters. Matching is done using Go's path.Match
 	// elementwise. The user name must be present in the pattern and is treated as
 	// a literal even if it contains metacharacters.
-	Glob(pattern string) ([]DirEntry, error)
+	Glob(pattern string) ([]*DirEntry, error)
 }
 
+// DirEntry represents the directory information for a file.
 type DirEntry struct {
-	Name     string // The full path name of the item.
-	Location Location
+	Name     string   // The full path name of the file.
+	Location Location // The location of the file.
+	Metadata Metadata // Metadata, including wrapped keys for decrypting file (if necessary).
+}
+
+// Metadata stores (among other things? TODO) the keys that enable the
+// file to be decrypted by the appropriate recipient.
+type Metadata struct {
+	Sequence    int64  // The sequence (version) number of the item.
+	Signature   []byte // The ECDSA signature of TODO.
+	WrappedKeys []WrappedKey
+}
+
+// A WrappedKey holds a key that will decrypt the file contents. The key is in turn
+// encrypted with some user's private key. The 16-bit XOR of the user's public
+// key is stored alongside to make it easier to find which key to use if many are
+// present.
+type WrappedKey struct {
+	Hash      [2]byte // 16-bit hash of public key for user.
+	Encrypted []byte  // Key used to decrypt contents, itself encrypted with private key for user.
 }
 
 // Store service.
