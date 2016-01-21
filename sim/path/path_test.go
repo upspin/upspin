@@ -1,9 +1,13 @@
 package path
 
-import "testing"
+import (
+	"testing"
+
+	"upspin.googlesource.com/upspin.git/upspin"
+)
 
 type parseTest struct {
-	path  Name
+	path  upspin.PathName
 	parse Parsed
 }
 
@@ -43,7 +47,7 @@ func (p Parsed) Equal(q Parsed) bool {
 	return true
 }
 
-var badParseTests = []Name{
+var badParseTests = []upspin.PathName{
 	"u@google.com", // No slash.
 	"u@x/a/b",      // User name too short.
 	"user/a/b",     // Invalid user name.

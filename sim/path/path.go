@@ -5,15 +5,9 @@ import (
 	"bytes"
 	"path"
 	"strings"
+
+	"upspin.googlesource.com/upspin.git/upspin"
 )
-
-// UserName represents a user's name, such as "user@google.com".
-// It is just a string type that helps make function signatures clearer.
-type UserName string
-
-// Name represents a full path name including the user name prefix.
-// It is just a string type that helps make function signatures clearer.
-type Name string
 
 // Parsing of file names. File names always start with a user name in mail-address form,
 // followed by a slash and a possibly empty pathname that follows. Thus the root of
@@ -21,8 +15,8 @@ type Name string
 
 // Parsed represents a successfully parsed path name.
 type Parsed struct {
-	User  UserName // Must be present and non-empty.
-	Elems []string // If empty, refers to the root for the user.
+	User  upspin.UserName // Must be present and non-empty.
+	Elems []string        // If empty, refers to the root for the user.
 }
 
 func (p Parsed) String() string {
@@ -40,8 +34,8 @@ func (p Parsed) String() string {
 }
 
 // Path is a helper that returns the string representation with type Name.
-func (p Parsed) Path() Name {
-	return Name(p.String())
+func (p Parsed) Path() upspin.PathName {
+	return upspin.PathName(p.String())
 }
 
 var (
@@ -66,7 +60,7 @@ func (n NameError) Error() string {
 
 // Parse parses a full file name, including the user, validates it,
 // and returns its parsed form.
-func Parse(pathName Name) (Parsed, error) {
+func Parse(pathName upspin.PathName) (Parsed, error) {
 	name := string(pathName)
 	// Pull off the user name.
 	slash := strings.IndexByte(name, '/')
@@ -96,13 +90,13 @@ func Parse(pathName Name) (Parsed, error) {
 		}
 	}
 	pn := Parsed{
-		User:  UserName(user),
+		User:  upspin.UserName(user),
 		Elems: elems,
 	}
 	return pn, nil
 }
 
-func cleanPath(pathName Name) string {
+func cleanPath(pathName upspin.PathName) string {
 	return path.Clean(string(pathName))
 }
 

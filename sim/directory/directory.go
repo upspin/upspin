@@ -11,47 +11,42 @@ import (
 	"upspin.googlesource.com/upspin.git/sim/path"
 	"upspin.googlesource.com/upspin.git/sim/ref"
 	"upspin.googlesource.com/upspin.git/sim/store"
+	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 var (
-	r0  ref.Reference
-	hr0 ref.HintedReference
+	r0   upspin.Reference
+	loc0 upspin.Location
+	de0  upspin.DirEntry
 )
 
 // Service implements directories and file-level I/O.
 type Service struct {
-	StoreLocation ref.Location
-	Store         *store.Service
-	Root          map[path.UserName]ref.Reference // TODO. No need for hint, they're all on ds.Store.
+	StoreAddr upspin.NetAddr
+	Store     upspin.Store
+	Root      map[upspin.UserName]upspin.Reference // TODO. No need for hint, they're all on ds.Store.
 }
+
+var _ upspin.Directory = (*Service)(nil)
 
 // NewService returns a new, empty directory server that will store its data in the specified store service.
 func NewService(ss *store.Service) *Service {
 	return &Service{
-		StoreLocation: ss.Location,
-		Store:         ss,
-		Root:          make(map[path.UserName]ref.Reference),
+		StoreAddr: ss.NetAddr(),
+		Store:     ss,
+		Root:      make(map[upspin.UserName]upspin.Reference),
 	}
 }
 
 // entry represents the metadata for a file in a directory.
 type entry struct {
-	elem  string        // Path element, such as "foo" representing the file a@b.c/a/b/c/foo.
-	isDir bool          // The referenced item is itself a directory.
-	ref   ref.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
-}
-
-// Entry represents the metadata for a file in a directory for presentation to callers.
-// It differs from the internal type in that the name is rooted, not just an element,
-// and the location information is hinted.
-type Entry struct {
-	Name  path.Name           // Full path name: user@foop.com/a/b/c/foo.
-	IsDir bool                // The referenced item is a directory.
-	Ref   ref.HintedReference // How to get its contents.
+	elem  string           // Path element, such as "foo" representing the file a@b.c/a/b/c/foo.
+	isDir bool             // The referenced item is itself a directory.
+	ref   upspin.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
 }
 
 // mkStrError creates an os.PathError from the arguments including a string for the error description.
-func mkStrError(op string, name path.Name, err string) *os.PathError {
+func mkStrError(op string, name upspin.PathName, err string) *os.PathError {
 	return &os.PathError{
 		Op:   op,
 		Path: string(name),
@@ -60,7 +55,7 @@ func mkStrError(op string, name path.Name, err string) *os.PathError {
 }
 
 // mkPathError creates an os.PathError from the arguments.
-func mkError(op string, name path.Name, err error) *os.PathError {
+func mkError(op string, name upspin.PathName, err error) *os.PathError {
 	return &os.PathError{
 		Op:   op,
 		Path: string(name),
@@ -68,8 +63,8 @@ func mkError(op string, name path.Name, err error) *os.PathError {
 	}
 }
 
-func (s *Service) Lookup(pathName path.Name) (ref.HintedReference, error) {
-	return hr0, errors.New("unimplemented")
+func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	return de0, errors.New("unimplemented")
 }
 
 // step is an internal function that advances one directory entry given the cleartext
@@ -99,7 +94,7 @@ func (s *Service) step(op string, pathName path.Name, payload []byte) (remaining
 // path may contain metacharacters. Matching is done using Go's path.Match
 // elementwise. The user name must be present in the pattern and is treated
 // as a literal even if it contains metacharacters.
-func (s *Service) Glob(pattern string) ([]Entry, error) {
+func (s *Service) Glob(pattern string) ([]upspin.DirEntry, error) {
 	// We can use Parse for this because it's only looking for slashes.
 	parsed, err := path.Parse(path.Name(pattern + "/"))
 	if err != nil {
