@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	testString   string = "This is a not-so-long blob."
-	base64Sha512 string = "0IyeCjiRJh0lOLVvmQVUmJaftiLdjZ9T/XcbHTXUCB+cyMvpaCDf5lmusrvtoAgusScVIxoH8nq7kCwwL6ew6w=="
+	testString string = "This is a not-so-long blob."
+	encodedSha string = "bb6c37813ee84e08b1d1638f6121a77d1b117891c8c4af955d4f5e8643e576c1"
 )
 
 func TestByte64Sum(t *testing.T) {
@@ -20,8 +20,8 @@ func TestByte64Sum(t *testing.T) {
 		total += n
 	}
 	log.Printf("Read %d bytes\n", total)
-	ret := sr.Base64Sum()
-	if ret != base64Sha512 {
-		t.Errorf("Sha digests differ. Got %v expected %v", ret, base64Sha512)
+	ret := sr.EncodedSum()
+	if ret != encodedSha {
+		t.Errorf("Sha digests differ. Got %v expected %v", ret, encodedSha)
 	}
 }
