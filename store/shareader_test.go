@@ -9,7 +9,7 @@ import (
 
 var (
 	testString   string = "This is a not-so-long blob."
-	base64Sha512 string = "0IyeCjiRJh0lOLVvmQVUmJaftiLdjZ9T/XcbHTXUCB+cyMvpaCDf5lmusrvtoAgusScVIxoH8nq7kCwwL6ew6w=="
+	base64Sha512 string = "u2w3gT7oTgix0WOPYSGnfRsReJHIxK-VXU9ehkPldsE="
 )
 
 func TestByte64Sum(t *testing.T) {
