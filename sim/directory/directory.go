@@ -8,8 +8,8 @@ import (
 	"os"
 	goPath "path"
 
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/sim/hash"
-	"upspin.googlesource.com/upspin.git/sim/path"
 	"upspin.googlesource.com/upspin.git/sim/store"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
