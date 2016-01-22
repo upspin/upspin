@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "94b81aa8_6a1f97ef",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-22T21:27:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94b81aa8_8acd2b8d",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 19
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94b81aa8_0af5bba7",
         "filename": "store/cache/filecache_test.go",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "94b81aa8_cae6c344",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-22T21:27:36Z",
+      "side": 1,
+      "message": "Done here and above and below. \n\nThis was left over from when I was playing with bufio composition and embedding.",
+      "parentUuid": "94b81aa8_0af5bba7",
+      "range": {
+        "startLine": 35,
+        "startChar": 26,
+        "endLine": 35,
+        "endChar": 35
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94b81aa8_aaca6f70",
         "filename": "store/cache/filecache_test.go",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2016-01-22T19:28:10Z",
       "side": 1,
       "message": "you probably mean Fatalf here, since you shouldn\u0027t proceed if it\u0027s already cached. same below.",
+      "range": {
+        "startLine": 95,
+        "startChar": 4,
+        "endLine": 95,
+        "endChar": 10
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94b81aa8_4a1ad300",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-22T21:27:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94b81aa8_aaca6f70",
       "range": {
         "startLine": 95,
         "startChar": 4,
