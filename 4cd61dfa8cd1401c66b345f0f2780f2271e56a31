@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94b81aa8_8acd2b8d",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-22T19:28:10Z",
+      "side": 1,
+      "message": "delete",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 19
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94b81aa8_0af5bba7",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-22T19:28:10Z",
+      "side": 1,
+      "message": "no need for bufio wrapping StringReader is there?",
+      "range": {
+        "startLine": 35,
+        "startChar": 26,
+        "endLine": 35,
+        "endChar": 35
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94b81aa8_aaca6f70",
+        "filename": "store/cache/filecache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-22T19:28:10Z",
+      "side": 1,
+      "message": "you probably mean Fatalf here, since you shouldn\u0027t proceed if it\u0027s already cached. same below.",
+      "range": {
+        "startLine": 95,
+        "startChar": 4,
+        "endLine": 95,
+        "endChar": 10
+      },
+      "revId": "4cd61dfa8cd1401c66b345f0f2780f2271e56a31",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
