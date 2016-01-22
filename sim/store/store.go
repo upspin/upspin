@@ -2,7 +2,6 @@
 package store
 
 import (
-	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -66,7 +65,7 @@ type Service struct {
 var _ upspin.Store = (*Service)(nil)
 
 func blobKey(ref *upspin.Reference) string {
-	return fmt.Sprintf("%d:%x", ref.Protocol, ref.Key)
+	return fmt.Sprintf("%d:%s", ref.Protocol, ref.Key)
 }
 
 func NewService(addr upspin.NetAddr) *Service {
@@ -97,7 +96,7 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 		return upspin.Location{}, errors.New("unrecognized protocol")
 	}
 	hash := hash.Of(ciphertext)
-	if !bytes.Equal(ref.Key, hash[:]) {
+	if !hash.EqualString(ref.Key) {
 		return upspin.Location{}, errors.New("external hash mismatch in Store.Put")
 	}
 	s.blob[blobKey(&ref)] = &Blob{
@@ -124,7 +123,7 @@ func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Lo
 	if hash.Of(blob.data) != blob.hash {
 		return nil, nil, errors.New("internal hash mismatch in Store.Get")
 	}
-	if !bytes.Equal(loc.Reference.Key, blob.hash[:]) {
+	if !blob.hash.EqualString(loc.Reference.Key) {
 		return nil, nil, errors.New("external hash mismatch in Store.Get")
 	}
 	return copyOf(blob.data), nil, nil
