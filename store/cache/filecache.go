@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 // FileCache implements a cache.Interface for storing local files.
@@ -19,12 +20,13 @@ func (fc FileCache) Put(ref string, blob io.Reader) error {
 	if err != nil {
 		return err
 	}
-	_, err = io.Copy(f, blob)
+	n, err := io.Copy(f, blob)
+	fmt.Printf("Copied %d bytes!\n", n)
 	return err
 }
 
 func (fc FileCache) Get(ref string) *bufio.Reader {
-	f, err := fc.openForRead(ref)
+	f, err := fc.OpenRefForRead(ref)
 	if err != nil {
 		return nil
 	}
@@ -32,7 +34,7 @@ func (fc FileCache) Get(ref string) *bufio.Reader {
 }
 
 func (fc FileCache) Rename(newRef, oldRef string) error {
-	f, err := fc.openForRead(oldRef)
+	f, err := fc.OpenRefForRead(oldRef)
 	if err != nil {
 		return err
 	}
@@ -48,37 +50,40 @@ func (fc FileCache) Rename(newRef, oldRef string) error {
 }
 
 func (fc FileCache) RandomRef() string {
-	f, err := ioutil.TempFile("", "")
+	f, err := ioutil.TempFile(fc.cacheRoot, "upload-")
 	if err != nil {
 		panic("Can't create a tempfile")
 	}
 	defer f.Close()
-	return f.Name()
+	_, fname := filepath.Split(f.Name())
+	return fname
 }
 
 func (fc FileCache) Purge(ref string) error {
 	return os.Remove(fc.GetFileLocation(ref))
 }
 
-func (fc FileCache) GetFileLocation(ref string) string {
-	return fmt.Sprintf("%s/%s/blob", fc.cacheRoot, ref)
+func (fc FileCache) IsCached(ref string) bool {
+	fname := fc.GetFileLocation(ref)
+	fi, err := os.Stat(fname)
+	return err == nil && fi.Mode().IsRegular()
 }
 
-func (fc FileCache) openForRead(ref string) (*os.File, error) {
+func (fc FileCache) GetFileLocation(ref string) string {
+	return fmt.Sprintf("%s/%s", fc.cacheRoot, ref)
+}
+
+func (fc FileCache) OpenRefForRead(ref string) (*os.File, error) {
 	location := fc.GetFileLocation(ref)
 	return os.Open(location)
 }
 
 func (fc FileCache) createFile(name string) (*os.File, error) {
 	location := fmt.Sprintf("%s/%s", fc.cacheRoot, name)
-	if err := os.MkdirAll(location, 0755); err != nil {
-		log.Fatalf("Can't MkdirAll %s: %q", location, err)
-		return nil, err
-	}
-	dst := fmt.Sprintf("%s/blob", location)
-	f, err := os.Create(dst)
+	log.Printf("Creating file %v\n", location)
+	f, err := os.Create(location)
 	if err != nil {
-		log.Fatalf("Can't create: %q", dst)
+		log.Fatalf("Can't create: %q", location)
 		return nil, err
 	}
 	return f, nil

@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"bufio"
 	"strings"
 	"testing"
 )
@@ -12,11 +13,14 @@ var (
 )
 
 func TestPutAndGet(t *testing.T) {
-	err := fc.Put(ref, strings.NewReader(testString))
+	err := fc.Put(ref, bufio.NewReader(strings.NewReader(testString)))
 	if err != nil {
 		t.Errorf("Put returned error: %v", err)
 	}
 	r := fc.Get(ref)
+	if r == nil {
+		t.Fatalf("Can't get ref %v", ref)
+	}
 	buf := make([]byte, 100)
 	n, err := r.Read(buf)
 	if n != len(testString) {
@@ -28,7 +32,7 @@ func TestPutAndGet(t *testing.T) {
 }
 
 func TestRename(t *testing.T) {
-	err := fc.Put(ref, strings.NewReader(testString))
+	err := fc.Put(ref, bufio.NewReader(strings.NewReader(testString)))
 	if err != nil {
 		t.Errorf("Put returned error: %v", err)
 	}
@@ -72,7 +76,7 @@ func TestRandomRef(t *testing.T) {
 }
 
 func TestPurge(t *testing.T) {
-	err := fc.Put(ref, strings.NewReader(testString))
+	err := fc.Put(ref, bufio.NewReader(strings.NewReader(testString)))
 	if err != nil {
 		t.Errorf("Put returned error: %v", err)
 	}
@@ -83,5 +87,22 @@ func TestPurge(t *testing.T) {
 	err = fc.Purge(ref)
 	if err == nil {
 		t.Errorf("Purge failed to detect missing ref: %v", err)
+	}
+}
+
+func TestIsCached(t *testing.T) {
+	if fc.IsCached(ref) {
+		t.Errorf("Ref is already cached!")
+	}
+	err := fc.Put(ref, bufio.NewReader(strings.NewReader(testString)))
+	if err != nil {
+		t.Errorf("Put returned error: %v", err)
+	}
+	if !fc.IsCached(ref) {
+		t.Errorf("Ref was never cached")
+	}
+	fc.Purge(ref)
+	if fc.IsCached(ref) {
+		t.Errorf("Ref remains cached?")
 	}
 }
