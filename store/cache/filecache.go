@@ -20,8 +20,7 @@ func (fc FileCache) Put(ref string, blob io.Reader) error {
 	if err != nil {
 		return err
 	}
-	n, err := io.Copy(f, blob)
-	fmt.Printf("Copied %d bytes!\n", n)
+	_, err = io.Copy(f, blob)
 	return err
 }
 
