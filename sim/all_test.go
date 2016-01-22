@@ -6,9 +6,8 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/sim/directory"
-	"upspin.googlesource.com/upspin.git/sim/path"
-	"upspin.googlesource.com/upspin.git/sim/ref"
 	"upspin.googlesource.com/upspin.git/sim/store"
+	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 // Avoid networking for now.
@@ -24,17 +23,20 @@ const (
 	root = user + "/"
 )
 
+// TODO: Move these tests into the directory directory.
+// TODO: Write a client and tests for the client interface.
+
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
-	ss := store.NewService(ref.Location{Addr: testAddr})
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
-	r, err := ds.MakeDirectory(user)
+	loc, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
-	t.Logf("Ref for root: %v\n", r)
+	t.Logf("loc for root: %v\n", loc)
 	// Fetch the directory back and inspect it.
-	ciphertext, err := ss.Get(r.Reference)
+	ciphertext, _, err := ss.Get(loc)
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}
@@ -51,8 +53,8 @@ func TestMakeRootDirectory(t *testing.T) {
 	}
 }
 
-func TestPutTopLevelFile(t *testing.T) {
-	ss := store.NewService(ref.Location{Addr: testAddr})
+func TestPutTopLevelFileUsingDirectory(t *testing.T) {
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -62,12 +64,12 @@ func TestPutTopLevelFile(t *testing.T) {
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	href, err := ds.Put(fileName, []byte(text))
+	loc, err := ds.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
 	// Fetch the data back and inspect it.
-	ciphertext, err := ss.Get(href.Reference)
+	ciphertext, _, err := ss.Get(loc)
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
@@ -87,31 +89,31 @@ func TestPutTopLevelFile(t *testing.T) {
 
 const nFile = 100
 
-func TestPutHundredTopLevelFiles(t *testing.T) {
-	ss := store.NewService(ref.Location{Addr: testAddr})
+func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
-	href := make([]ref.HintedReference, nFile)
+	locs := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
-		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, i))
-		h, err := ds.Put(fileName, []byte(text))
+		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
+		loc, err := ds.Put(fileName, []byte(text))
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
-		href[i] = h
+		locs[i] = loc
 	}
 	// Read them all back in funny order.
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
 		text := strings.Repeat(fmt.Sprint(j), j)
-		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, j))
+		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		ciphertext, err := ss.Get(href[j].Reference)
+		ciphertext, _, err := ss.Get(locs[j])
 		if err != nil {
 			t.Fatalf("%q: get blob: %v", fileName, err)
 		}
@@ -130,18 +132,18 @@ func TestPutHundredTopLevelFiles(t *testing.T) {
 	}
 }
 
-func TestGetHundredTopLevelFiles(t *testing.T) {
-	ss := store.NewService(ref.Location{Addr: testAddr})
+func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
-	href := make([]ref.HintedReference, nFile)
+	href := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
-		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, i))
+		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		h, err := ds.Put(fileName, []byte(text))
 		if err != nil {
 			t.Fatal("put file:", err)
@@ -152,14 +154,22 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
 		text := strings.Repeat(fmt.Sprint(j), j)
-		fileName := path.Name(fmt.Sprintf("%s/file.%d", user, j))
+		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		h, data, err := ds.Get(fileName)
+		entry, err := ds.Lookup(fileName)
+		if err != nil {
+			t.Fatalf("%q: lookup file: %v", fileName, err)
+		}
+		cipher, _, err := ss.Get(entry.Location)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
-		if h != href[j] {
-			t.Fatalf("%q: get file: bad hash", fileName)
+		name, data, err := store.UnpackBlob(cipher)
+		if err != nil {
+			t.Fatalf("%q: unpack file: %v", fileName, err)
+		}
+		if name != fileName {
+			t.Fatalf("%q: got wrong file name: %s", fileName, name)
 		}
 		str := string(data)
 		if str != text {
@@ -169,41 +179,49 @@ func TestGetHundredTopLevelFiles(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	ss := store.NewService(ref.Location{Addr: testAddr})
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
-	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/", user)))
+	_, err = ds.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar", user)))
+	_, err = ds.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar/asdf", user)))
+	_, err = ds.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = ds.MakeDirectory(path.Name(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
+	_, err = ds.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	fileName := path.Name(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
+	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	ref, err := ds.Put(fileName, []byte(text))
+	_, err = ds.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Read it back.
-	nref, data, err := ds.Get(fileName)
+	entry, err := ds.Lookup(fileName)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%q: lookup file: %v", fileName, err)
 	}
-	if ref != nref {
-		t.Fatal("ref mismatch")
+	cipher, _, err := ss.Get(entry.Location)
+	if err != nil {
+		t.Fatalf("%q: get file: %v", fileName, err)
+	}
+	name, data, err := store.UnpackBlob(cipher)
+	if err != nil {
+		t.Fatalf("%q: unpack file: %v", fileName, err)
+	}
+	if name != fileName {
+		t.Fatalf("%q: got wrong file name: %s", fileName, name)
 	}
 	str := string(data)
 	if str != text {
@@ -211,17 +229,25 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	ref, err = ds.Put(fileName, []byte(text))
+	_, err = ds.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Read it back.
-	nref, data, err = ds.Get(fileName)
+	entry, err = ds.Lookup(fileName)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%q: second lookup file: %v", fileName, err)
 	}
-	if ref != nref {
-		t.Fatal("after overwrite ref mismatch")
+	cipher, _, err = ss.Get(entry.Location)
+	if err != nil {
+		t.Fatalf("%q: second get file: %v", fileName, err)
+	}
+	name, data, err = store.UnpackBlob(cipher)
+	if err != nil {
+		t.Fatalf("%q: second unpack file: %v", fileName, err)
+	}
+	if name != fileName {
+		t.Fatalf("%q: got wrong second file name: %s", fileName, name)
 	}
 	str = string(data)
 	if str != text {
@@ -261,7 +287,7 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
-	ss := store.NewService(ref.Location{Addr: testAddr})
+	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	// Build the tree.
 	_, err := ds.MakeDirectory(user)
@@ -281,14 +307,14 @@ func TestGlob(t *testing.T) {
 		"twenty/twentytwo",
 	}
 	for _, dir := range dirs {
-		name := path.Name(fmt.Sprintf("%s/%s", user, dir))
+		name := upspin.PathName(fmt.Sprintf("%s/%s", user, dir))
 		_, err := ds.MakeDirectory(name)
 		if err != nil {
 			t.Fatalf("make directory: %s: %v", name, err)
 		}
 	}
 	for _, file := range files {
-		name := path.Name(fmt.Sprintf("%s/%s", user, file))
+		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
 		_, err := ds.Put(name, []byte(name))
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
@@ -321,8 +347,8 @@ func TestGlob(t *testing.T) {
 				continue
 			}
 			// Test that the ref gets the file.
-			if !entry.IsDir {
-				data, err := ds.Fetch(entry.Ref.Reference)
+			if !entry.Metadata.IsDir {
+				data, err := ds.Fetch(entry.Location.Reference)
 				if err != nil {
 					t.Errorf("%s: %s: error reading data: %v", test.pattern, entry.Name, err)
 					continue
