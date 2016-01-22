@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94b81aa8_cabfa3e6",
+        "filename": "store/cache/filecache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-22T21:32:22Z",
+      "side": 1,
+      "message": "show the err, not the file name. the error will be os.PathError and contain the name.\n\nlog.Fatal(err)\n\nis all you really need.",
+      "range": {
+        "startLine": 85,
+        "startChar": 20,
+        "endLine": 85,
+        "endChar": 26
+      },
+      "revId": "a7d9ef1d6db23ce9397d61e70af281f8cd1b33b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
