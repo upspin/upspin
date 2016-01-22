@@ -50,7 +50,7 @@ type NetAddr struct {
 // such as a hash of the contents and a Protocol defining how to unpack it.
 type Reference struct {
 	// Key identifies the data.
-	Key []byte
+	Key string
 
 	// Protocol identifies how to recover the original data using this Reference.
 	Protocol Protocol
