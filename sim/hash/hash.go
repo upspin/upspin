@@ -23,7 +23,19 @@ type Hash [HashSize]byte // SHA-1 hash always 20 bytes
 
 // String returns a hexadecimal representation of the hash.
 func (hash Hash) String() string {
-	return fmt.Sprintf("[%X]", hash[:])
+	return BytesString(hash[:])
+}
+
+// BytesString returns a string representation of the hash that is represented in bytes.
+func BytesString(hash []byte) string {
+	return fmt.Sprintf("[%X]", hash)
+}
+
+// EqualString compares the byte-level representation of a hash with its hex string representation,
+// avoiding allocation.
+func (hash Hash) EqualString(b string) bool {
+	h, err := Parse(b)
+	return err == nil && h == hash
 }
 
 // Parse returns the hash whose standard format (possibly absent the brackets) is the value of str.

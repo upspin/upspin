@@ -64,7 +64,7 @@ func mkError(op string, name upspin.PathName, err error) *os.PathError {
 
 // step is an internal function that advances one directory entry given the cleartext
 // of the directory's contents.
-func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hash []byte, isDir bool, err error) {
+func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hashBytes []byte, isDir bool, err error) {
 	if len(payload) == 1 {
 		err = mkStrError(op, pathName, "internal error: invalid directory")
 		return
@@ -79,7 +79,7 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	payload = payload[nameLen:]
 	isDir = payload[0] != 0
 	payload = payload[1:]
-	hash = payload[:sha1.Size]
+	hashBytes = payload[:sha1.Size]
 	remaining = payload[sha1.Size:]
 	return
 }
@@ -125,7 +125,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
 			for len(payload) > 0 {
-				remaining, name, hash, isDir, err := s.step("Get", ent.Name, payload)
+				remaining, name, hashBytes, isDir, err := s.step("Get", ent.Name, payload)
 				if err != nil {
 					return nil, err
 				}
@@ -142,7 +142,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					Location: upspin.Location{
 						NetAddr: s.StoreAddr,
 						Reference: upspin.Reference{
-							Key:      hash,
+							Key:      hash.BytesString(hashBytes),
 							Protocol: upspin.Debug,
 						},
 					},
@@ -184,7 +184,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		blob := store.MakeBlob(parsed.String(), nil)
 		shaHash := hash.Of(blob)
 		ref := upspin.Reference{
-			Key:      shaHash[:],
+			Key:      shaHash.String(),
 			Protocol: upspin.Debug,
 		}
 		loc, err := s.Store.Put(ref, blob)
@@ -244,7 +244,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	ciphertext := store.MakeBlob(string(pathName), data)
 	shaHash := hash.Of(ciphertext)
 	ref := upspin.Reference{
-		Key:      shaHash[:],
+		Key:      shaHash.String(),
 		Protocol: upspin.Debug,
 	}
 	loc, err := s.Store.Put(ref, ciphertext)
@@ -343,7 +343,11 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
 		dirByte = 1
 	}
 	entry = append(entry, dirByte)
-	entry = append(entry, ref.Key...)
+	key, err := hash.Parse(ref.Key)
+	if err != nil {
+		panic(err)
+	}
+	entry = append(entry, key[:]...)
 	return entry
 }
 
@@ -391,7 +395,7 @@ func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []by
 	}
 Loop:
 	for len(payload) > 0 {
-		remaining, name, hash, isDir, err := s.step(op, pathName, payload)
+		remaining, name, hashBytes, isDir, err := s.step(op, pathName, payload)
 		if err != nil {
 			return r0, false, err
 		}
@@ -406,7 +410,7 @@ Loop:
 			}
 		}
 		r := upspin.Reference{
-			Key:      hash,
+			Key:      hash.BytesString(hashBytes),
 			Protocol: upspin.Debug,
 		}
 		return r, isDir, nil
@@ -426,7 +430,7 @@ func (s *Service) installEntry(op string, dirName string, dirRef upspin.Referenc
 	// fmt.Printf("\nBEFORE: %s\n%q\n\n", dirName, dirData)
 Loop:
 	for payload := dirData; len(payload) > 0 && !found; {
-		remaining, name, hash, isDir, err := s.step(op, upspin.PathName(dirName), payload)
+		remaining, name, hashBytes, isDir, err := s.step(op, upspin.PathName(dirName), payload)
 		if err != nil {
 			return r0, err
 		}
@@ -446,7 +450,11 @@ Loop:
 			return r0, mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
 		// Overwrite in place.
-		copy(hash, ent.ref.Key)
+		h, err := hash.Parse(ent.ref.Key)
+		if err != nil {
+			return r0, err
+		}
+		copy(hashBytes, h[:])
 		found = true
 	}
 	if !found {
@@ -457,7 +465,7 @@ Loop:
 	blob := store.MakeBlob(string(dirName), dirData)
 	shaHash := hash.Of(blob)
 	ref := upspin.Reference{
-		Key:      shaHash[:],
+		Key:      shaHash.String(),
 		Protocol: upspin.Debug,
 	}
 	loc, err := s.Store.Put(ref, blob)
