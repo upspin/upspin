@@ -27,4 +27,7 @@ type Interface interface {
 	// Purge removes an entry from the cache. It returns an error if
 	// the ref did not previously exist.
 	Purge(ref string) error
+
+	// IsCached returns true if a reference is in the cache, false otherwise.
+	IsCached(ref string) bool
 }
