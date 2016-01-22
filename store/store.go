@@ -1,19 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 
 	"upspin.googlesource.com/upspin.git/store/cache"
 	"upspin.googlesource.com/upspin.git/store/cloud"
+	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 const (
-	MultiPartMemoryBuffer int64  = 10 << 20 // 10MB buffer for file transfers
-	DefaultTempDir        string = ""       // Use the system's default
+	MultiPartMemoryBuffer int64 = 10 << 20 // 10MB buffer for file transfers
 )
 
 var (
@@ -54,33 +54,86 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	// Now go store it in the cloud.
 	go func(ref string) {
 		if _, err := cloudClient.PutBlob(fileCache.GetFileLocation(ref), ref); err == nil {
-			// Remove the locally-cached entry. This is safe to do because FileCache is thread safe.
+			// Remove the locally-cached entry so we never
+			// keep files locally, as we're a tiny server
+			// compared with our much better-provisioned
+			// storage backend.  This is safe to do
+			// because FileCache is thread safe.
 			fileCache.Purge(ref)
 		}
 	}(ref)
 
-	// TODO(edpin): some cache management is necessary to remove local copies when the cache is full.
-
 	// Answer something sensible to the client.
-	w.Write([]byte(fmt.Sprintf("{ref=%s, error='ok'}", url.QueryEscape(ref))))
+	location := upspin.Location{}
+	location.Reference.Key = ref
+	location.Reference.Protocol = upspin.HTTP
+	// Leave location.NetAddr empty for now (does it make sense to
+	// be the NetAddr of the GCE storage server, if we're not yet
+	// providing the user with a direct link?)
+	fmt.Printf("Replying to client with location: %v. Ref:%v\n", location, ref)
+	sendJSONReply(w, location)
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
-	blob := r.FormValue("ref")
-	if blob == "" {
-		w.Write([]byte("Invalid empty blob"))
+	ref := r.FormValue("ref")
+	if ref == "" {
+		sendJSONErrorString(w, "Invalid empty 'ref'")
 		return
 	}
-	fmt.Println("Trying to get blob: %v", blob)
+	fmt.Printf("Trying to get ref: %v\n", ref)
 
-	// TODO(edpin): check whether the blob is already local. If so, just return it.
+	file, err := fileCache.OpenRefForRead(ref)
+	if err == nil {
+		// Ref is in the local cache. Send the file and be done.
+		fmt.Printf("ref %v is in local cache. Returning it as file: %v\n", ref, file.Name())
+		defer file.Close()
+		http.ServeFile(w, r, file.Name())
+		return
+	}
 
-	link, err := cloudClient.GetBlob(blob)
+	// File is not local, try to get it from our storage.
+	fmt.Printf("Looking up on storage backend...\n")
+	link, err := cloudClient.GetBlob(ref)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		sendJSONError(w, err)
 		return
 	}
-	w.Write([]byte(fmt.Sprintf("Getting blob: %v, which is in: %v", blob, link)))
+
+	location := upspin.Location{}
+	location.Reference.Key = link
+	fmt.Printf("Got link: %v\n", link)
+	// Do we need to be precise and say HTTPS here? Probably not,
+	// as the Key already specifies "https://" to indicate the
+	// right protocol.
+	location.Reference.Protocol = upspin.HTTP
+	// Leave location.NetAddr empty for now. It could probably be
+	// what "www.googleapis.com" resolves to at this moment, but
+	// the Key contains all info needed for clients to find it
+	// ("https://www.googleapis.com...")
+	sendJSONReply(w, location)
+}
+
+func sendJSONError(w http.ResponseWriter, error error) {
+	sendJSONErrorString(w, error.Error())
+}
+
+func sendJSONErrorString(w http.ResponseWriter, error string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(fmt.Sprintf("{error='%s'}", error)))
+}
+
+// sendJSONReply encodes a reply and sends it out on w as a JSON
+// object. Make sure the reply type, if it's a struct (which it most
+// likely will be) has *public* fields or nothing will be sent (just
+// '{}').
+func sendJSONReply(w http.ResponseWriter, reply interface{}) {
+	js, err := json.Marshal(reply)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
 
 func main() {

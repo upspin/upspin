@@ -12,7 +12,7 @@ var (
 	encodedSha string = "bb6c37813ee84e08b1d1638f6121a77d1b117891c8c4af955d4f5e8643e576c1"
 )
 
-func TestByte64Sum(t *testing.T) {
+func TestEncodedSum(t *testing.T) {
 	sr := NewShaReader(strings.NewReader(testString))
 	p := make([]byte, 10)
 	total := 0

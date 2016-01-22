@@ -9,7 +9,7 @@ import (
 )
 
 type ShaReader struct {
-	*bufio.Reader
+	rd  *bufio.Reader
 	sha hash.Hash
 }
 
@@ -18,7 +18,7 @@ func NewShaReader(f io.Reader) *ShaReader {
 }
 
 func (s *ShaReader) Read(p []byte) (n int, err error) {
-	n, err = s.Reader.Read(p)
+	n, err = s.rd.Read(p)
 	if n > 0 {
 		slice := p[:n]
 		s.sha.Write(slice)

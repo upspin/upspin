@@ -17,6 +17,9 @@ func TestPutAndGet(t *testing.T) {
 		t.Errorf("Put returned error: %v", err)
 	}
 	r := fc.Get(ref)
+	if r == nil {
+		t.Fatalf("Can't get ref %v", ref)
+	}
 	buf := make([]byte, 100)
 	n, err := r.Read(buf)
 	if n != len(testString) {
@@ -83,5 +86,22 @@ func TestPurge(t *testing.T) {
 	err = fc.Purge(ref)
 	if err == nil {
 		t.Errorf("Purge failed to detect missing ref: %v", err)
+	}
+}
+
+func TestIsCached(t *testing.T) {
+	if fc.IsCached(ref) {
+		t.Fatalf("Ref is already cached!")
+	}
+	err := fc.Put(ref, strings.NewReader(testString))
+	if err != nil {
+		t.Fatalf("Put returned error: %v", err)
+	}
+	if !fc.IsCached(ref) {
+		t.Errorf("Ref was never cached")
+	}
+	fc.Purge(ref)
+	if fc.IsCached(ref) {
+		t.Errorf("Ref remains cached?")
 	}
 }
