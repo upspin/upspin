@@ -10,7 +10,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/sim/hash"
-	"upspin.googlesource.com/upspin.git/sim/store"
+	"upspin.googlesource.com/upspin.git/store/teststore" // TODO: for MakeBlob only.
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -29,7 +29,7 @@ type Service struct {
 var _ upspin.Directory = (*Service)(nil)
 
 // NewService returns a new, empty directory server that will store its data in the specified store service.
-func NewService(ss *store.Service) *Service {
+func NewService(ss upspin.Store) *Service {
 	return &Service{
 		StoreAddr: ss.NetAddr(),
 		Store:     ss,
@@ -181,7 +181,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob := store.MakeBlob(parsed.String(), nil)
+		blob := teststore.MakeBlob(parsed.String(), nil)
 		shaHash := hash.Of(blob)
 		ref := upspin.Reference{
 			Key:      shaHash.String(),
@@ -241,7 +241,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
 	// Create a blob storing the data for this file and store it in storage service.
-	ciphertext := store.MakeBlob(string(pathName), data)
+	ciphertext := teststore.MakeBlob(string(pathName), data)
 	shaHash := hash.Of(ciphertext)
 	ref := upspin.Reference{
 		Key:      shaHash.String(),
@@ -372,7 +372,7 @@ func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, payload, err := store.UnpackBlob(ciphertext)
+	_, payload, err := teststore.UnpackBlob(ciphertext)
 	// TODO check path.
 	return payload, nil
 }
@@ -462,7 +462,7 @@ Loop:
 		dirData = append(dirData, entry...)
 	}
 	// fmt.Printf("\n%s\n%q\n\n", dirName, dirData)
-	blob := store.MakeBlob(string(dirName), dirData)
+	blob := teststore.MakeBlob(string(dirName), dirData)
 	shaHash := hash.Of(blob)
 	ref := upspin.Reference{
 		Key:      shaHash.String(),

@@ -1,5 +1,5 @@
-// Package store implements the store service for the simulator.
-package store
+// Package teststore implements a simple non-persistent in-memory store service.
+package teststore
 
 import (
 	"encoding/binary"
@@ -10,7 +10,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Blobs. TODO: Belongs in another package?
+// Blobs. TODO: Move to a test client package once one is created.
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
 
 func MakeBlob(path string, payload []byte) []byte {
@@ -62,6 +62,7 @@ type Service struct {
 	blob    map[string]*Blob // Key created by blobKey.
 }
 
+// This package (well, the Servie type) implements the upspin.Store interface.
 var _ upspin.Store = (*Service)(nil)
 
 func blobKey(ref *upspin.Reference) string {
@@ -111,7 +112,7 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 	return loc, nil
 }
 
-// TODO: API should provide alternate location if missing.
+// TODO: Function should provide alternate location if missing.
 func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Location, err error) {
 	if loc.Reference.Protocol != 0 { // TODO
 		return nil, nil, errors.New("unrecognized protocol")
