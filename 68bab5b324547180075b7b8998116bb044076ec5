@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_f6689e37",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T23:21:58Z",
+      "side": 1,
+      "message": "`{\"A\":\"foo\",\"b\":32}`",
+      "parentUuid": "14beeac6_36269660",
+      "range": {
+        "startLine": 55,
+        "startChar": 41,
+        "endLine": 55,
+        "endChar": 46
+      },
+      "revId": "68bab5b324547180075b7b8998116bb044076ec5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_562b1227",
         "filename": "cloud/netutil/netutil_test.go",
         "patchSetId": 6
