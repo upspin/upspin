@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_531404d0",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T22:42:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_f35270b6",
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_13f36c07",
         "filename": "cloud/netutil/netutil.go",
         "patchSetId": 2
@@ -30,6 +48,30 @@
       "writtenOn": "2016-01-25T21:34:56Z",
       "side": 1,
       "message": "what happens if the error contains a quote?",
+      "range": {
+        "startLine": 20,
+        "startChar": 35,
+        "endLine": 20,
+        "endChar": 38
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_366136e7",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T22:42:20Z",
+      "side": 1,
+      "message": "Fixed to use %q.",
+      "parentUuid": "14beeac6_13f36c07",
       "range": {
         "startLine": 20,
         "startChar": 35,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_96884ade",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T22:42:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d3f014f6",
+      "range": {
+        "startLine": 25,
+        "startChar": 24,
+        "endLine": 25,
+        "endChar": 30
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_f3ed101f",
         "filename": "cloud/netutil/netutil.go",
         "patchSetId": 2
@@ -76,6 +142,30 @@
       "writtenOn": "2016-01-25T21:34:56Z",
       "side": 1,
       "message": "are these imperative sentences describing the implementation or the user? sounds like implementation, which means they don\u0027t belong in the doc comment, which is for users. move them inside the function.",
+      "range": {
+        "startLine": 37,
+        "startChar": 62,
+        "endLine": 37,
+        "endChar": 65
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_765bae38",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T22:42:20Z",
+      "side": 1,
+      "message": "Changed and simplified.",
+      "parentUuid": "14beeac6_f3ed101f",
       "range": {
         "startLine": 37,
         "startChar": 62,
