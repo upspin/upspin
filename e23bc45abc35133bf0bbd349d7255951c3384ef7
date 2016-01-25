@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_f35270b6",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T21:34:56Z",
+      "side": 1,
+      "message": "s/Sends/SendJSONError sends/\nhere and below.\n\ns/json/JSON/ here and below",
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_13f36c07",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T21:34:56Z",
+      "side": 1,
+      "message": "what happens if the error contains a quote?",
+      "range": {
+        "startLine": 20,
+        "startChar": 35,
+        "endLine": 20,
+        "endChar": 38
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d3f014f6",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T21:34:56Z",
+      "side": 1,
+      "message": "s/*public*/exported/\n\nalthough i\u0027d drop this sentence. it\u0027s a general condition of Go interfaces to JSON etc. and is well-known. no need to remind everyone everywhere.",
+      "range": {
+        "startLine": 25,
+        "startChar": 24,
+        "endLine": 25,
+        "endChar": 30
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f3ed101f",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T21:34:56Z",
+      "side": 1,
+      "message": "are these imperative sentences describing the implementation or the user? sounds like implementation, which means they don\u0027t belong in the doc comment, which is for users. move them inside the function.",
+      "range": {
+        "startLine": 37,
+        "startChar": 62,
+        "endLine": 37,
+        "endChar": 65
+      },
+      "revId": "e23bc45abc35133bf0bbd349d7255951c3384ef7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
