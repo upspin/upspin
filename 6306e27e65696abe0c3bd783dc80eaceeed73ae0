@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_334ce87b",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T20:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_b393981c",
+      "range": {
+        "startLine": 1,
+        "startChar": 61,
+        "endLine": 1,
+        "endChar": 66
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_93969c0d",
         "filename": "cloud/gcp/gcp.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-25T20:51:58Z",
       "side": 1,
       "message": "s/type/types/",
+      "range": {
+        "startLine": 2,
+        "startChar": 53,
+        "endLine": 2,
+        "endChar": 57
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_5351640e",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T20:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_93969c0d",
       "range": {
         "startLine": 2,
         "startChar": 53,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_132e0c82",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T20:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_33cf883a",
+      "range": {
+        "startLine": 77,
+        "startChar": 14,
+        "endLine": 77,
+        "endChar": 16
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_93bdbc81",
         "filename": "cloud/gcp/gcp.go",
         "patchSetId": 2
@@ -88,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_333308e7",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T20:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_93bdbc81",
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_d3b7349b",
         "filename": "cloud/gcp/gcp_test.go",
         "patchSetId": 2
@@ -99,6 +189,30 @@
       "writtenOn": "2016-01-25T20:51:58Z",
       "side": 1,
       "message": "t.Errorf(\"Data mismatch. Expected %q got %q\", testData, data)",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 10
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_732d8081",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T20:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d3b7349b",
       "range": {
         "startLine": 51,
         "startChar": 4,
