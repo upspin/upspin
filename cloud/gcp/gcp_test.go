@@ -48,6 +48,6 @@ func TestPutAndGet(t *testing.T) {
 		t.Fatalf("Can't read http body: %v", err)
 	}
 	if string(data) != string(testData) {
-		t.Errorf("Data mismatch. Expected '%v' got '%v'", string(testData), string(data))
+		t.Errorf("Data mismatch. Expected '%q' got '%q'", string(testData), string(data))
 	}
 }

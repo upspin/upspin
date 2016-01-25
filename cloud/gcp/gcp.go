@@ -1,5 +1,5 @@
-// Package gcp implements a simple interface with the Google Cloud Platform,
-// for storing blobs in buckets and performing other type of maintenance on GCP.
+// Package gcp implements a simple interface with the Google Cloud Platform
+// for storing blobs in buckets and performing other types of maintenance on GCP.
 package gcp
 
 import (
@@ -79,6 +79,7 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 		log.Printf("Error opening: %v", err)
 		return "", err
 	}
+	defer file.Close()
 	acl := string(gcp.defaultWriteACL)
 	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(acl).Do()
 	if err == nil {
@@ -111,13 +112,13 @@ func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	if err != nil {
 		return "", err
 	}
+	defer f.Close()
 	name := f.Name()
 	defer os.Remove(name)
 	n, err := f.Write(contents)
 	if err != nil || n != len(contents) {
 		return "", err
 	}
-	f.Close()
 	link, err := gcp.PutLocalFile(name, ref)
 
 	return link, err
