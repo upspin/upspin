@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/gcp"
+	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/store/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
 )

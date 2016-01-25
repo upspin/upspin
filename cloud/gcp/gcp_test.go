@@ -1,10 +1,12 @@
 package gcp
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 )
 
 const (
@@ -13,8 +15,9 @@ const (
 )
 
 var (
-	client   *GCP = New(projectId, bucketName, DefaultWriteACL)
-	testData      = []byte("This is a test")
+	client *GCP = New(projectId, bucketName, DefaultWriteACL)
+	// The time is important because we never delete this file, but instead overwrite it.
+	testData = []byte(fmt.Sprintf("This is test at %v", time.Now()))
 )
 
 // This is more of a regression test as it uses the running cloud
