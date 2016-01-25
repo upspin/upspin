@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_b393981c",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T20:51:58Z",
+      "side": 1,
+      "message": "s/,$//",
+      "range": {
+        "startLine": 1,
+        "startChar": 61,
+        "endLine": 1,
+        "endChar": 66
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_93969c0d",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T20:51:58Z",
+      "side": 1,
+      "message": "s/type/types/",
+      "range": {
+        "startLine": 2,
+        "startChar": 53,
+        "endLine": 2,
+        "endChar": 57
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_33cf883a",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T20:51:58Z",
+      "side": 1,
+      "message": "don\u0027t you need to close file?",
+      "range": {
+        "startLine": 77,
+        "startChar": 14,
+        "endLine": 77,
+        "endChar": 16
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_93bdbc81",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T20:51:58Z",
+      "side": 1,
+      "message": "this should be defer f.Close() and done after line 113. as written, if there\u0027s an error you\u0027ll leak an FD.",
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d3b7349b",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T20:51:58Z",
+      "side": 1,
+      "message": "t.Errorf(\"Data mismatch. Expected %q got %q\", testData, data)",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 10
+      },
+      "revId": "6306e27e65696abe0c3bd783dc80eaceeed73ae0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
