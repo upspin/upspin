@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/sim/directory"
-	"upspin.googlesource.com/upspin.git/sim/store"
+	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -28,7 +28,7 @@ const (
 
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	loc, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -40,7 +40,7 @@ func TestMakeRootDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}
-	name, clear, err := store.UnpackBlob(ciphertext)
+	name, clear, err := teststore.UnpackBlob(ciphertext)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -54,7 +54,7 @@ func TestMakeRootDirectory(t *testing.T) {
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -73,7 +73,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
-	name, clear, err := store.UnpackBlob(ciphertext)
+	name, clear, err := teststore.UnpackBlob(ciphertext)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -90,7 +90,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -117,7 +117,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%q: get blob: %v", fileName, err)
 		}
-		name, clear, err := store.UnpackBlob(ciphertext)
+		name, clear, err := teststore.UnpackBlob(ciphertext)
 		if err != nil {
 			t.Fatal("unpack:", err)
 		}
@@ -133,7 +133,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -164,7 +164,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
-		name, data, err := store.UnpackBlob(cipher)
+		name, data, err := teststore.UnpackBlob(cipher)
 		if err != nil {
 			t.Fatalf("%q: unpack file: %v", fileName, err)
 		}
@@ -179,7 +179,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
@@ -216,7 +216,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
 	}
-	name, data, err := store.UnpackBlob(cipher)
+	name, data, err := teststore.UnpackBlob(cipher)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -242,7 +242,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
 	}
-	name, data, err = store.UnpackBlob(cipher)
+	name, data, err = teststore.UnpackBlob(cipher)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
 	}
@@ -287,7 +287,7 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
-	ss := store.NewService(upspin.NetAddr{Addr: testAddr})
+	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
 	ds := directory.NewService(ss)
 	// Build the tree.
 	_, err := ds.MakeDirectory(user)
