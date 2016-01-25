@@ -1,6 +1,6 @@
-// Package GCP implements a simple interface with the Google Cloud Platform,
+// Package gcp implements a simple interface with the Google Cloud Platform,
 // for storing blobs in buckets and performing other type of maintenange on GCP.
-package GCP
+package gcp
 
 import (
 	"fmt"
@@ -37,7 +37,7 @@ const (
 	Private           WriteACL = "private"
 	ProjectPrivate    WriteACL = "projectPrivate"
 	PublicReadWrite   WriteACL = "publicReadWrite"
-	DefaultACL        WriteACL = PublicRead
+	DefaultWriteACL   WriteACL = PublicRead
 )
 
 // GCP is a client connection with Google Cloud Platform.
@@ -55,10 +55,10 @@ func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
 	gcp.projectId = projectId
 	gcp.bucketName = bucketName
 	switch defaultWriteACL {
-	case PublicRead, AuthenticatedRead, Private, ProjectPrivate, PublicReadWrite, DefaultACL:
+	case PublicRead, AuthenticatedRead, Private, ProjectPrivate, PublicReadWrite:
 		gcp.defaultWriteACL = defaultWriteACL
 	default:
-		gcp.defaultWriteACL = DefaultACL
+		gcp.defaultWriteACL = DefaultWriteACL
 	}
 	gcp.Connect()
 	return gcp
@@ -79,7 +79,8 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 		log.Printf("Error opening: %v", err)
 		return "", err
 	}
-	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(defaultPutACL).Do()
+	acl := string(gcp.defaultWriteACL)
+	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(acl).Do()
 	if err == nil {
 		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
 	} else {
@@ -89,7 +90,7 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 }
 
 // Get returns a direct link to the ref on cloud store, or an error if the ref is not found.
-func (gce *GCP) Get(ref string) (link string, error error) {
+func (gcp *GCP) Get(ref string) (link string, error error) {
 	// Get the link of the blob
 	res, err := gcp.service.Objects.Get(gcp.bucketName, ref).Do()
 	if err != nil {
@@ -102,11 +103,11 @@ func (gce *GCP) Get(ref string) (link string, error error) {
 // Put stores the contents into the given ref on our bucket on cloud
 // store. It returns a link to the permanent location on of the ref on
 // cloud store or an error if it couldn't be stored.
-func (gce *GCP) Put(ref string, contents []byte) (refLink string, error error) {
+func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	// TODO(edpin): this is not super safe, given the file has
 	// permissions 0666. But for now the contents are always
 	// public on cloud store, so it doesn't matter.
-	f, err := os.Create(ioutil.TempDir("", "upload-"))
+	f, err := ioutil.TempFile("", "upload-gcp-blob-")
 	if err != nil {
 		return "", err
 	}

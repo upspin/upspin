@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"upspin.googlesource.com/upspin.git/gcp"
 	"upspin.googlesource.com/upspin.git/store/cache"
-	"upspin.googlesource.com/upspin.git/store/cloud"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -20,7 +20,7 @@ var (
 	projectId   = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName  = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
 	tempDir     = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default")
-	cloudClient *cloud.Cloud
+	cloudClient *gcp.GCP
 	fileCache   *cache.FileCache
 )
 
@@ -53,7 +53,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Now go store it in the cloud.
 	go func(ref string) {
-		if _, err := cloudClient.PutBlob(fileCache.GetFileLocation(ref), ref); err == nil {
+		if _, err := cloudClient.PutLocalFile(fileCache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
 			// compared with our much better-provisioned
@@ -93,7 +93,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 
 	// File is not local, try to get it from our storage.
 	fmt.Printf("Looking up on storage backend...\n")
-	link, err := cloudClient.GetBlob(ref)
+	link, err := cloudClient.Get(ref)
 	if err != nil {
 		sendJSONError(w, err)
 		return
@@ -138,7 +138,7 @@ func sendJSONReply(w http.ResponseWriter, reply interface{}) {
 
 func main() {
 	flag.Parse()
-	cloudClient = cloud.New(*projectId, *bucketName)
+	cloudClient = gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL)
 	fileCache = cache.NewFileCache(*tempDir)
 	http.HandleFunc("/put", putHandler)
 	http.HandleFunc("/get", getHandler)
