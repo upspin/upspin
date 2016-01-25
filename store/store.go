@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
+	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/store/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -71,13 +71,13 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	// be the NetAddr of the GCE storage server, if we're not yet
 	// providing the user with a direct link?)
 	fmt.Printf("Replying to client with location: %v. Ref:%v\n", location, ref)
-	sendJSONReply(w, location)
+	netutil.SendJSONReply(w, location)
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
-		sendJSONErrorString(w, "Invalid empty 'ref'")
+		netutil.SendJSONErrorString(w, "Invalid empty 'ref'")
 		return
 	}
 	fmt.Printf("Trying to get ref: %v\n", ref)
@@ -95,7 +95,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Looking up on storage backend...\n")
 	link, err := cloudClient.Get(ref)
 	if err != nil {
-		sendJSONError(w, err)
+		netutil.SendJSONError(w, "get error:", err)
 		return
 	}
 
@@ -110,30 +110,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	// what "www.googleapis.com" resolves to at this moment, but
 	// the Key contains all info needed for clients to find it
 	// ("https://www.googleapis.com...")
-	sendJSONReply(w, location)
-}
-
-func sendJSONError(w http.ResponseWriter, error error) {
-	sendJSONErrorString(w, error.Error())
-}
-
-func sendJSONErrorString(w http.ResponseWriter, error string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(fmt.Sprintf("{error='%s'}", error)))
-}
-
-// sendJSONReply encodes a reply and sends it out on w as a JSON
-// object. Make sure the reply type, if it's a struct (which it most
-// likely will be) has *public* fields or nothing will be sent (just
-// '{}').
-func sendJSONReply(w http.ResponseWriter, reply interface{}) {
-	js, err := json.Marshal(reply)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	netutil.SendJSONReply(w, location)
 }
 
 func main() {
