@@ -1,8 +1,10 @@
-// Package cloud implements a simple interface with the Google Cloud Storage, for storing blobs in buckets.
-package cloud
+// Package GCP implements a simple interface with the Google Cloud Platform,
+// for storing blobs in buckets and performing other type of maintenange on GCP.
+package GCP
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,41 +15,71 @@ import (
 )
 
 const (
-	scope         = storage.DevstorageFullControlScope
-	defaultPutACL = "publicRead"
+	scope = storage.DevstorageFullControlScope
 )
 
-// Cloud is a client connection with Google Cloud Platform.
-type Cloud struct {
-	client     *http.Client
-	service    *storage.Service
-	projectId  string
-	bucketName string
+// ACLs for writing data to Cloud Store.
+// Definitions according to https://github.com/google/google-api-go-client/blob/master/storage/v1/storage-gen.go:
+//   "authenticatedRead" - Project team owners get OWNER access, and
+//       allAuthenticatedUsers get READER access.
+//   "private" - Project team owners get OWNER access.
+//   "projectPrivate" - Project team members get access according to
+//       their roles.
+//   "publicRead" - Project team owners get OWNER access, and allUsers
+//       get READER access.
+//   "publicReadWrite" - Project team owners get OWNER access, and
+//       allUsers get WRITER access.
+type WriteACL string
+
+const (
+	PublicRead        WriteACL = "publicRead"
+	AuthenticatedRead WriteACL = "authenticatedRead"
+	Private           WriteACL = "private"
+	ProjectPrivate    WriteACL = "projectPrivate"
+	PublicReadWrite   WriteACL = "publicReadWrite"
+	DefaultACL        WriteACL = PublicRead
+)
+
+// GCP is a client connection with Google Cloud Platform.
+type GCP struct {
+	client          *http.Client
+	service         *storage.Service
+	projectId       string
+	bucketName      string
+	defaultWriteACL WriteACL
 }
 
-// New creates a new Cloud instance associated with the given project id and bucket name.
-func New(projectId, bucketName string) *Cloud {
-	c := &Cloud{}
-	c.projectId = projectId
-	c.bucketName = bucketName
-	c.Connect()
-	return c
+// New creates a new GCP instance associated with the given project id and bucket name.
+func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
+	gcp := &GCP{}
+	gcp.projectId = projectId
+	gcp.bucketName = bucketName
+	switch defaultWriteACL {
+	case PublicRead, AuthenticatedRead, Private, ProjectPrivate, PublicReadWrite, DefaultACL:
+		gcp.defaultWriteACL = defaultWriteACL
+	default:
+		gcp.defaultWriteACL = DefaultACL
+	}
+	gcp.Connect()
+	return gcp
 }
 
-// PutBlob puts a blob that is already in the local file system with
-// name 'srcBlobName' into our bucket on the cloud store under the
-// given reference 'ref', which is typically a SHA digest of the
-// contents of the blob.  It returns a reference link to the blob
-// directly in case of success, otherwise it sets error to non-nil.
-func (c *Cloud) PutBlob(srcBlobName string, ref string) (refLink string, error error) {
+// PutLocalFile puts the contents of a file that is already in the
+// local file system with name 'srcLocalFilename' into our bucket on
+// the cloud store under the given name 'ref', which can be any string
+// or directory path (in case of the Store server it is a SHA digest
+// of the contents of the file).  It returns a reference link to the
+// stored file directly in case of success, otherwise it sets error to
+// non-nil.
+func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// Insert an object into a bucket.
 	object := &storage.Object{Name: ref}
-	file, err := os.Open(srcBlobName)
+	file, err := os.Open(srcLocalFilename)
 	if err != nil {
 		log.Printf("Error opening: %v", err)
 		return "", err
 	}
-	res, err := c.service.Objects.Insert(c.bucketName, object).Media(file).PredefinedAcl(defaultPutACL).Do()
+	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(defaultPutACL).Do()
 	if err == nil {
 		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
 	} else {
@@ -56,23 +88,44 @@ func (c *Cloud) PutBlob(srcBlobName string, ref string) (refLink string, error e
 	return res.MediaLink, err
 }
 
-// GetBlob returns a link to the blob identified by ref, or an error if the ref is not found.
-func (c *Cloud) GetBlob(ref string) (link string, error error) {
+// Get returns a direct link to the ref on cloud store, or an error if the ref is not found.
+func (gce *GCP) Get(ref string) (link string, error error) {
 	// Get the link of the blob
-	res, err := c.service.Objects.Get(c.bucketName, ref).Do()
+	res, err := gcp.service.Objects.Get(gcp.bucketName, ref).Do()
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("The media download link for %v/%v is %v.\n\n", c.bucketName, res.Name, res.MediaLink)
+	fmt.Printf("The media download link for %v/%v is %v.\n\n", gcp.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
 }
 
+// Put stores the contents into the given ref on our bucket on cloud
+// store. It returns a link to the permanent location on of the ref on
+// cloud store or an error if it couldn't be stored.
+func (gce *GCP) Put(ref string, contents []byte) (refLink string, error error) {
+	// TODO(edpin): this is not super safe, given the file has
+	// permissions 0666. But for now the contents are always
+	// public on cloud store, so it doesn't matter.
+	f, err := os.Create(ioutil.TempDir("", "upload-"))
+	if err != nil {
+		return "", err
+	}
+	n, err := f.Write(contents)
+	if err != nil || n != len(contents) {
+		return "", err
+	}
+	name := f.Name()
+	link, err := gcp.PutLocalFile(name, ref)
+	os.Remove(name)
+	return link, err
+}
+
 // Connect connects with the Google Cloud Platform, under the given projectId and bucketName.
-func (c *Cloud) Connect() {
-	if c.projectId == "" {
+func (gcp *GCP) Connect() {
+	if gcp.projectId == "" {
 		log.Fatalf("Project argument is required.")
 	}
-	if c.bucketName == "" {
+	if gcp.bucketName == "" {
 		log.Fatalf("Bucket argument is required.")
 	}
 
@@ -87,6 +140,6 @@ func (c *Cloud) Connect() {
 		log.Fatalf("Unable to create storage service: %v", err)
 	}
 	// Initialize the object
-	c.client = client
-	c.service = service
+	gcp.client = client
+	gcp.service = service
 }
