@@ -82,7 +82,7 @@ func (fc FileCache) createFile(name string) (*os.File, error) {
 	log.Printf("Creating file %v\n", location)
 	f, err := os.Create(location)
 	if err != nil {
-		log.Fatalf(err)
+		log.Fatal(err)
 		return nil, err
 	}
 	return f, nil
