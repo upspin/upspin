@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_f6189e61",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T22:50:13Z",
+      "side": 1,
+      "message": "you don\u0027t need the single quotes because %q already puts the quotes in, safely. that\u0027s what it\u0027s for.",
+      "revId": "118276c796d2078ad28118d48284958ffccc23ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_163b5aa8",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T22:50:13Z",
+      "side": 1,
+      "message": "this is fine but more idiomatic is\n resp :\u003d \u0026ExpectingResponseWriter{\n  header: make(http.Header),\n  expectedResponse: expected,\n}",
+      "range": {
+        "startLine": 37,
+        "startChar": 6,
+        "endLine": 37,
+        "endChar": 22
+      },
+      "revId": "118276c796d2078ad28118d48284958ffccc23ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f64c1e50",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T22:50:13Z",
+      "side": 1,
+      "message": "don\u0027t ignore errors, especially in tests. and in production.",
+      "range": {
+        "startLine": 68,
+        "startChar": 7,
+        "endLine": 68,
+        "endChar": 8
+      },
+      "revId": "118276c796d2078ad28118d48284958ffccc23ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_369216ce",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T22:50:13Z",
+      "side": 1,
+      "message": "drop single quotes",
+      "range": {
+        "startLine": 74,
+        "startChar": 23,
+        "endLine": 74,
+        "endChar": 24
+      },
+      "revId": "118276c796d2078ad28118d48284958ffccc23ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_168d1ab1",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-25T22:50:13Z",
+      "side": 1,
+      "message": "don\u0027t ignore error",
+      "revId": "118276c796d2078ad28118d48284958ffccc23ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
