@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_b9db773d",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T23:27:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_f6689e37",
+      "range": {
+        "startLine": 55,
+        "startChar": 41,
+        "endLine": 55,
+        "endChar": 46
+      },
+      "revId": "68bab5b324547180075b7b8998116bb044076ec5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_562b1227",
         "filename": "cloud/netutil/netutil_test.go",
         "patchSetId": 6
@@ -60,6 +84,30 @@
       "writtenOn": "2016-01-25T23:01:22Z",
       "side": 1,
       "message": "always include the error in the message",
+      "range": {
+        "startLine": 71,
+        "startChar": 9,
+        "endLine": 71,
+        "endChar": 11
+      },
+      "revId": "68bab5b324547180075b7b8998116bb044076ec5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d9e833d1",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T23:27:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_562b1227",
       "range": {
         "startLine": 71,
         "startChar": 9,
@@ -95,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_f9e5eff5",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T23:27:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_b631c692",
+      "range": {
+        "startLine": 75,
+        "startChar": 12,
+        "endLine": 75,
+        "endChar": 18
+      },
+      "revId": "68bab5b324547180075b7b8998116bb044076ec5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_9634ca83",
         "filename": "cloud/netutil/netutil_test.go",
         "patchSetId": 6
@@ -106,6 +178,30 @@
       "writtenOn": "2016-01-25T23:01:22Z",
       "side": 1,
       "message": "include error",
+      "range": {
+        "startLine": 87,
+        "startChar": 4,
+        "endLine": 87,
+        "endChar": 9
+      },
+      "revId": "68bab5b324547180075b7b8998116bb044076ec5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_1912aba6",
+        "filename": "cloud/netutil/netutil_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-25T23:27:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_9634ca83",
       "range": {
         "startLine": 87,
         "startChar": 4,
