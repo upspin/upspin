@@ -1,5 +1,5 @@
-// Package directory implements the directory service for the simulator.
-package directory
+// Package testdir implements a simple, non-persistent, in-memory directory service.
+package testdir
 
 import (
 	"crypto/sha1"

@@ -1,11 +1,10 @@
-package service
+package testdir
 
 import (
 	"fmt"
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/sim/directory"
 	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -29,7 +28,7 @@ const (
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	loc, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -55,7 +54,7 @@ func TestMakeRootDirectory(t *testing.T) {
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -91,7 +90,7 @@ const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -134,7 +133,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -180,7 +179,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
@@ -288,7 +287,7 @@ var globTests = []globTest{
 
 func TestGlob(t *testing.T) {
 	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	ds := directory.NewService(ss)
+	ds := NewService(ss)
 	// Build the tree.
 	_, err := ds.MakeDirectory(user)
 	if err != nil {
