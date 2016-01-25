@@ -111,13 +111,15 @@ func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	if err != nil {
 		return "", err
 	}
+	name := f.Name()
+	defer os.Remove(name)
 	n, err := f.Write(contents)
 	if err != nil || n != len(contents) {
 		return "", err
 	}
-	name := f.Name()
+	f.Close()
 	link, err := gcp.PutLocalFile(name, ref)
-	os.Remove(name)
+
 	return link, err
 }
 
