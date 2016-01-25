@@ -1,5 +1,5 @@
-// Package user implements the user service for the simulator.
-package user
+// Package testuser implements a non-persistent, memory-resident user service.
+package tesetuser
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 )
 
 // Service maps user names to potential machines holdining root of the user's tree.
+// It implements the upspin.User interface.
 type Service struct {
 	root map[upspin.UserName][]upspin.NetAddr
 }
