@@ -22,6 +22,30 @@
       "revId": "9fd109dfdac4bc4618de0e9bb4ce283335ee12e9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_67cf7ab0",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T17:54:33Z",
+      "side": 1,
+      "message": "I wrote a package \u0027path\u0027 that has a parser, cleaner, and printer.\nSo yes, there is syntax and there is a checker.\n\ngo doc upspin.googlesource.com/upspin.git/path",
+      "parentUuid": "14beeac6_0705e698",
+      "range": {
+        "startLine": 75,
+        "startChar": 5,
+        "endLine": 75,
+        "endChar": 13
+      },
+      "revId": "9fd109dfdac4bc4618de0e9bb4ce283335ee12e9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
