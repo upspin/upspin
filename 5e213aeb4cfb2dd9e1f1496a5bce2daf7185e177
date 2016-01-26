@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_077fa63d",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T17:24:31Z",
+      "side": 1,
+      "message": "DirPath seems like the wrong name to me. It sounds like the directory name of the file, so DirPath(/a/b/c) is /a/b.\n\nFilePath seems a better name.",
+      "revId": "5e213aeb4cfb2dd9e1f1496a5bce2daf7185e177",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
