@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_28eb8fd2",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_8dee753d",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 17
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_6de91936",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "errors should start Err. also although it\u0027s not a problem i wouldn\u0027t put the Cloud in the name - once this is a package, it\u0027ll be obvious.\n\nvar ErrEntryNotFound \u003d ...",
+      "range": {
+        "startLine": 34,
+        "startChar": 1,
+        "endLine": 34,
+        "endChar": 19
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_68f587a7",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_6de91936",
       "range": {
         "startLine": 34,
         "startChar": 1,
@@ -88,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_a8debf2d",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Yup. Somehow I keep thinking Go passes these by reference, but then I knew they\u0027re not modifiable. Not sure what I was thinking. It\u0027s clear now. Thanks.",
+      "parentUuid": "14beeac6_6d14b9d0",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_0d050599",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -99,6 +165,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "it\u0027s fine to save a len() result like this for clean code, but for the record len is extremely effiicent - it\u0027s just a MOVL. no need to do so for efficiency reasons.",
+      "range": {
+        "startLine": 78,
+        "startChar": 10,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_0d698539",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s more for short code. Noted for the future. Thanks.",
+      "parentUuid": "14beeac6_0d050599",
       "range": {
         "startLine": 78,
         "startChar": 10,
@@ -134,6 +224,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_e8e8b7d0",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done. Will take me a while to get used to this one. :-)",
+      "parentUuid": "14beeac6_6dcf59b0",
+      "range": {
+        "startLine": 87,
+        "startChar": 9,
+        "endLine": 87,
+        "endChar": 25
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_8dd4b540",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -145,6 +259,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "not a fan of \u0027try\u0027 methods. just call it createDirEntry. it returns an error if it fails, so it\u0027s clear from the signature that it tries.",
+      "range": {
+        "startLine": 128,
+        "startChar": 3,
+        "endLine": 128,
+        "endChar": 6
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2812afa6",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Yeah, I don\u0027t love it either. Fixed.\n\n\"Do or not do. There is no try\" -- Yoda",
+      "parentUuid": "14beeac6_8dd4b540",
       "range": {
         "startLine": 128,
         "startChar": 3,
@@ -180,6 +318,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_08b413ee",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "No, it\u0027s just a way to update. If I get a second put for the same directory, the second one is updating it (perhaps adding or removing wrapped keys).",
+      "parentUuid": "14beeac6_ede2891d",
+      "range": {
+        "startLine": 150,
+        "startChar": 14,
+        "endLine": 150,
+        "endChar": 22
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_2d480110",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -203,6 +365,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_881103a1",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_2d480110",
+      "range": {
+        "startLine": 162,
+        "startChar": 24,
+        "endLine": 162,
+        "endChar": 30
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_6d42f9ef",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -214,6 +400,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "i think you want\n\nif l \u003c\u003d 1 {\n// The root directory is always writable (modulo ACLs).",
+      "range": {
+        "startLine": 170,
+        "startChar": 5,
+        "endLine": 170,
+        "endChar": 13
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_48428b98",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Good catch. I had a slightly different thing before. Fixed.",
+      "parentUuid": "14beeac6_6d42f9ef",
       "range": {
         "startLine": 170,
         "startChar": 5,
@@ -272,6 +482,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_a8507f5a",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_edb3694e",
+      "range": {
+        "startLine": 186,
+        "startChar": 11,
+        "endLine": 186,
+        "endChar": 18
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_ad341183",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -312,6 +546,48 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_e8319728",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_6d2bd927",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_082fb3c7",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_ad341183",
+      "range": {
+        "startLine": 187,
+        "startChar": 34,
+        "endLine": 187,
+        "endChar": 42
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_0db18546",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -329,6 +605,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_288f0f1b",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Fixed. This was the only one.",
+      "parentUuid": "14beeac6_0db18546",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_cdcf8ddb",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -340,6 +634,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "you wouldn\u0027t need the comment if this was path upspin.PathName. that type name serves as documentation plus clarity of design plus error-checking in a way.",
+      "range": {
+        "startLine": 216,
+        "startChar": 24,
+        "endLine": 216,
+        "endChar": 30
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_48944b29",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_cdcf8ddb",
       "range": {
         "startLine": 216,
         "startChar": 24,
@@ -375,6 +693,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_889e6347",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_0dda6598",
+      "range": {
+        "startLine": 220,
+        "startChar": 9,
+        "endLine": 220,
+        "endChar": 14
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_4dcb7dcc",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 2
@@ -386,6 +728,30 @@
       "writtenOn": "2016-01-26T22:31:30Z",
       "side": 1,
       "message": "be consistent throughout: put a space after the colon in error messages",
+      "range": {
+        "startLine": 226,
+        "startChar": 34,
+        "endLine": 226,
+        "endChar": 41
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_088a5302",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:10:45Z",
+      "side": 1,
+      "message": "I was consistent by not putting the space anywhere else. :-)\n\nLeaving as is for now unless you really want a space there.",
+      "parentUuid": "14beeac6_4dcb7dcc",
       "range": {
         "startLine": 226,
         "startChar": 34,
