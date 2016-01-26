@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_6214c8d0",
+        "filename": "directory/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T20:30:13Z",
+      "side": 1,
+      "message": "this shouldn\u0027t be a main, it should be a package, an implementation of upspin.Directory.\nmain should be a separate program over in upspin.git/cmd/something that imports this package",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 7
+      },
+      "revId": "633a09178e072f28a89d701013e04cfb5a168721",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
