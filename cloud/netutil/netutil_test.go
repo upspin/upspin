@@ -5,54 +5,24 @@ import (
 	"io"
 	"net/http"
 	"testing"
+
+	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 )
 
-type ExpectingResponseWriter struct {
-	expectedResponse string
-	response         string
-	header           http.Header
-}
-
-func (e *ExpectingResponseWriter) Write(response []byte) (n int, err error) {
-	e.response = string(response)
-	return len(response), nil
-}
-
-func (e *ExpectingResponseWriter) Header() http.Header {
-	return e.header
-}
-
-func (e *ExpectingResponseWriter) WriteHeader(int) {
-}
-
-func (e *ExpectingResponseWriter) Verify(t *testing.T) {
-	if e.expectedResponse != e.response {
-		t.Errorf("Expected %q got %q", e.expectedResponse, e.response)
-	}
-}
-
-func NewExpectingResponseWriter(expected string) *ExpectingResponseWriter {
-	resp := &ExpectingResponseWriter{
-		header:           make(http.Header),
-		expectedResponse: expected,
-	}
-	return resp
-}
-
 func TestSendJSONErrorString(t *testing.T) {
-	resp := NewExpectingResponseWriter(`{error:"Something bad happened"}`)
+	resp := nettest.NewExpectingResponseWriter(`{error:"Something bad happened"}`)
 	SendJSONErrorString(resp, "Something bad happened")
 	resp.Verify(t)
 }
 
 func TestSendJSONError(t *testing.T) {
-	resp := NewExpectingResponseWriter(`{error:"error reading:EOF"}`)
+	resp := nettest.NewExpectingResponseWriter(`{error:"error reading:EOF"}`)
 	SendJSONError(resp, "error reading:", io.EOF)
 	resp.Verify(t)
 }
 
 func TestSendJSONReply(t *testing.T) {
-	resp := NewExpectingResponseWriter(`{"A":"foo","B":32}`)
+	resp := nettest.NewExpectingResponseWriter(`{"A":"foo","B":32}`)
 	SendJSONReply(resp, &struct {
 		A string
 		B int
@@ -65,7 +35,7 @@ var (
 )
 
 func TestBufferRequest(t *testing.T) {
-	resp := NewExpectingResponseWriter("") // Nothing is sent
+	resp := nettest.NewExpectingResponseWriter("") // Nothing is sent
 	req, err := http.NewRequest("POST", "http://localhost:8080/put", bytes.NewBufferString(data))
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
@@ -81,7 +51,7 @@ func TestBufferRequest(t *testing.T) {
 }
 
 func TestBufferRequestTooBig(t *testing.T) {
-	resp := NewExpectingResponseWriter(`{error:"Invalid request"}`) // Request is too big
+	resp := nettest.NewExpectingResponseWriter(`{error:"Invalid request"}`) // Request is too big
 	req, err := http.NewRequest("POST", "http://localhost:8080/put", bytes.NewBufferString(data))
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
