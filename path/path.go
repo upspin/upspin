@@ -22,15 +22,27 @@ type Parsed struct {
 func (p Parsed) String() string {
 	var b bytes.Buffer
 	b.WriteString(string(p.User))
-	if len(p.Elems) == 0 {
-		b.WriteByte('/')
-	} else {
-		for _, elem := range p.Elems {
+	p.filePath(&b)
+	return b.String()
+}
+
+// FilePath returns just the path under the root directory part of the
+// pathname, i.e. without the leading username.
+func (p Parsed) FilePath() string {
+	var b bytes.Buffer
+	p.filePath(&b)
+	return b.String()
+}
+
+func (p Parsed) filePath(b *bytes.Buffer) {
+	b.WriteByte('/')
+	lim := len(p.Elems) - 1
+	for i, elem := range p.Elems {
+		b.WriteString(string(elem))
+		if i < lim {
 			b.WriteByte('/')
-			b.WriteString(string(elem))
 		}
 	}
-	return b.String()
 }
 
 // Path is a helper that returns the string representation with type Name.
