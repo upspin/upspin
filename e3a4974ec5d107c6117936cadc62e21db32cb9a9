@@ -761,6 +761,30 @@
       "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_c8085b46",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T23:20:52Z",
+      "side": 1,
+      "message": "I really want a space there :) I was hoping consistency would carry the day. (Actually you weren\u0027t consistent.)",
+      "parentUuid": "14beeac6_088a5302",
+      "range": {
+        "startLine": 226,
+        "startChar": 34,
+        "endLine": 226,
+        "endChar": 41
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
