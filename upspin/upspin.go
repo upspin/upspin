@@ -1,7 +1,9 @@
 // Package upspin contains global interface and other definitions for the components of the system.
 package upspin
 
-import "net"
+import (
+	"net"
+)
 
 // A Protocol identifies the technique for turning a reference into the user's data.
 // Secondary data, metadata, may be required to implement the protocol.
@@ -185,8 +187,11 @@ type Client interface {
 	MakeDirectory(dirName PathName) (Location, error)
 
 	// File-like methods similar to Go's os.File API.
-	Create(name string) (File, error)
-	Open(name string) (File, error)
+	// The name, however, is a fully-qualified upspin PathName.
+	// TODO: Should there be a concept of current directory and
+	// local names?
+	Create(name PathName) (File, error)
+	Open(name PathName) (File, error)
 }
 
 // The File interface has semantics and API that parallels a subset
@@ -194,7 +199,7 @@ type Client interface {
 // method set, is that a Read will only return once the entire contents
 // have been decrypted and verified.
 type File interface {
-	Name() string
+	Name() PathName
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)
