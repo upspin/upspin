@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_68282773",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:29:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_48a8cb4b",
+      "range": {
+        "startLine": 100,
+        "startChar": 14,
+        "endLine": 100,
+        "endChar": 22
+      },
+      "revId": "0de6a893f03d2bcd50d6a5472cf80760bd150fb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_a896bf0c",
         "filename": "directory/cmd/server/server.go",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-26T23:20:52Z",
       "side": 1,
       "message": "this comment is fine but seems unnecessary",
+      "range": {
+        "startLine": 137,
+        "startChar": 4,
+        "endLine": 137,
+        "endChar": 12
+      },
+      "revId": "0de6a893f03d2bcd50d6a5472cf80760bd150fb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_c81e9b4e",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T23:29:01Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "14beeac6_a896bf0c",
       "range": {
         "startLine": 137,
         "startChar": 4,
