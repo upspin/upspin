@@ -199,10 +199,25 @@ type Client interface {
 // method set, is that a Read will only return once the entire contents
 // have been decrypted and verified.
 type File interface {
+	// Close releases the resources. For a writable file, it also
+	// writes the accumulated data in a Store server. After a
+	// Close, successful or not, all methods of File except Name
+	// will fail.
+	Close() error
+
+	// Name returns the full path name of the File.
 	Name() PathName
+
+	// Read, ReadAt, Write, WriteAt and Seek implement
+	// the standard Go interfaces io.Reader, etc.
+	// Because of the nature of upsin storage, the entire
+	// item might need to be read into memory by the
+	// implementation before Read can return any data.
+	// Similarly, Write might accumulate all data and only
+	// flush to storage once Close is called.
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
-	Seek(offset int64, whence int) (ret int64, err error)
 	Write(b []byte) (n int, err error)
 	WriteAt(b []byte, off int64) (n int, err error)
+	Seek(offset int64, whence int) (ret int64, err error)
 }
