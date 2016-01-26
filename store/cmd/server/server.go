@@ -8,7 +8,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/store/cache"
+	"upspin.googlesource.com/upspin.git/store/cmd/server/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
