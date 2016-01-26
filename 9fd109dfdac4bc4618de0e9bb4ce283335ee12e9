@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_0705e698",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-26T17:52:50Z",
+      "side": 1,
+      "message": "Is there any syntax?  For example is #//////# a legal pathname?  If not, should we have something that checks?",
+      "range": {
+        "startLine": 75,
+        "startChar": 5,
+        "endLine": 75,
+        "endChar": 13
+      },
+      "revId": "9fd109dfdac4bc4618de0e9bb4ce283335ee12e9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
