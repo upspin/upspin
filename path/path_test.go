@@ -7,15 +7,17 @@ import (
 )
 
 type parseTest struct {
-	path  upspin.PathName
-	parse Parsed
+	path    upspin.PathName
+	parse   Parsed
+	dirPath string
 }
 
 var goodParseTests = []parseTest{
-	{"u@google.com/", Parsed{"u@google.com", []string{}}},
-	{"u@google.com/a", Parsed{"u@google.com", []string{"a"}}},
-	{"u@google.com/a/", Parsed{"u@google.com", []string{"a"}}},
-	{"u@google.com/a///b/c/d/", Parsed{"u@google.com", []string{"a", "b", "c", "d"}}},
+	{"u@google.com/", Parsed{"u@google.com", []string{}}, "/"},
+	{"u@google.com/a", Parsed{"u@google.com", []string{"a"}}, "/a"},
+	{"u@google.com/a/", Parsed{"u@google.com", []string{"a"}}, "/a"},
+	{"u@google.com/a///b/c/d/", Parsed{"u@google.com", []string{"a", "b", "c", "d"}}, "/a/b/c/d"},
+	{"u@google.com//a///b/c/d//", Parsed{"u@google.com", []string{"a", "b", "c", "d"}}, "/a/b/c/d"},
 }
 
 func TestParse(t *testing.T) {
@@ -28,6 +30,10 @@ func TestParse(t *testing.T) {
 		if !pn.Equal(test.parse) {
 			t.Errorf("%q: expected %v got %v", test.path, test.parse, pn)
 			continue
+		}
+		dirPath := pn.DirPath()
+		if dirPath != test.dirPath {
+			t.Errorf("%q: DirPath expected %v got %v", test.path, test.dirPath, dirPath)
 		}
 	}
 }
