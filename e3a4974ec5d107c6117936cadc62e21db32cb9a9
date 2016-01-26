@@ -1,0 +1,400 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_8dee753d",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "will these constants be part of the interface when it\u0027s a package?\nif not, they should not be capitalized.",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 17
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6de91936",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "errors should start Err. also although it\u0027s not a problem i wouldn\u0027t put the Cloud in the name - once this is a package, it\u0027ll be obvious.\n\nvar ErrEntryNotFound \u003d ...",
+      "range": {
+        "startLine": 34,
+        "startChar": 1,
+        "endLine": 34,
+        "endChar": 19
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2d1ac1ff",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "you should include the path name in the structure and use it in the String method.\nor maybe even just use an os.PathError. see mkStrError etc. in directory/testdir. maybe even put them in a public package to share.",
+      "range": {
+        "startLine": 37,
+        "startChar": 5,
+        "endLine": 37,
+        "endChar": 18
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6d14b9d0",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "*upspin.DirEntry. These are big.",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_0d050599",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "it\u0027s fine to save a len() result like this for clean code, but for the record len is extremely effiicent - it\u0027s just a MOVL. no need to do so for efficiency reasons.",
+      "range": {
+        "startLine": 78,
+        "startChar": 10,
+        "endLine": 78,
+        "endChar": 14
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6dcf59b0",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "rob\u0027s funny style: i prefer this kind of test to group the test. this also makes the signs go the same way:\n\nif l \u003c WrappedKeyMinLen || WrappedKeyMaxLen \u003c l",
+      "range": {
+        "startLine": 87,
+        "startChar": 9,
+        "endLine": 87,
+        "endChar": 25
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_8dd4b540",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "not a fan of \u0027try\u0027 methods. just call it createDirEntry. it returns an error if it fails, so it\u0027s clear from the signature that it tries.",
+      "range": {
+        "startLine": 128,
+        "startChar": 3,
+        "endLine": 128,
+        "endChar": 6
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_ede2891d",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "you shouldn\u0027t be attempting to overwrite a directory at all.",
+      "range": {
+        "startLine": 150,
+        "startChar": 14,
+        "endLine": 150,
+        "endChar": 22
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2d480110",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "verifyParentWritable returns an error if the parent dir of a path cannot be written to.",
+      "range": {
+        "startLine": 162,
+        "startChar": 24,
+        "endLine": 162,
+        "endChar": 30
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6d42f9ef",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "i think you want\n\nif l \u003c\u003d 1 {\n// The root directory is always writable (modulo ACLs).",
+      "range": {
+        "startLine": 170,
+        "startChar": 5,
+        "endLine": 170,
+        "endChar": 13
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2df3a107",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "dirEntry, err :\u003d getMeta(path.Drop(1).String())\n\nit\u0027ll be .Path() if you change the signature as suggested",
+      "range": {
+        "startLine": 176,
+        "startChar": 9,
+        "endLine": 176,
+        "endChar": 10
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_edb3694e",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "you don\u0027t need to say \u0027or an error\u0027 in these doc comments. the existence of an error in the signature is enough information. it\u0027s clear.",
+      "range": {
+        "startLine": 186,
+        "startChar": 11,
+        "endLine": 186,
+        "endChar": 18
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_ad341183",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "might want to return *DirEntry. it could be a very big structure.\n\nthen you only need nil below for the error case",
+      "range": {
+        "startLine": 187,
+        "startChar": 34,
+        "endLine": 187,
+        "endChar": 42
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6d2bd927",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "use upspin.PathName. see below.",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_0db18546",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "s/%s/%q/ here and elsewhere for path names.",
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_cdcf8ddb",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "you wouldn\u0027t need the comment if this was path upspin.PathName. that type name serves as documentation plus clarity of design plus error-checking in a way.",
+      "range": {
+        "startLine": 216,
+        "startChar": 24,
+        "endLine": 216,
+        "endChar": 30
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_0dda6598",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "s/empty/nil/ here and throughout. you don\u0027t need the empty variable.",
+      "range": {
+        "startLine": 220,
+        "startChar": 9,
+        "endLine": 220,
+        "endChar": 14
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_4dcb7dcc",
+        "filename": "directory/cmd/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T22:31:30Z",
+      "side": 1,
+      "message": "be consistent throughout: put a space after the colon in error messages",
+      "range": {
+        "startLine": 226,
+        "startChar": 34,
+        "endLine": 226,
+        "endChar": 41
+      },
+      "revId": "e3a4974ec5d107c6117936cadc62e21db32cb9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
