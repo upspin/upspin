@@ -22,6 +22,30 @@
       "revId": "633a09178e072f28a89d701013e04cfb5a168721",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_62cf68b0",
+        "filename": "directory/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-26T20:37:38Z",
+      "side": 1,
+      "message": "Sure, no problem. But note that as we discussed, this does not implement upspin.Directory. This is the stuff that handles http requests. Should it all be moved to cmd/ until I have an implementation of upspin.Directory? \n\nIn other words, my refactor will be moving this code into directory/cmd. Sounds correct?",
+      "parentUuid": "14beeac6_6214c8d0",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 7
+      },
+      "revId": "633a09178e072f28a89d701013e04cfb5a168721",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
