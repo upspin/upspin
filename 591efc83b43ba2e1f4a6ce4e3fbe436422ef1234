@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_27482210",
+        "filename": "path/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-26T17:40:17Z",
+      "side": 1,
+      "message": "drop the latinate and make user name two words:\n\npathname, that is, the part without the leading user name.",
+      "range": {
+        "startLine": 30,
+        "startChar": 15,
+        "endLine": 30,
+        "endChar": 16
+      },
+      "revId": "591efc83b43ba2e1f4a6ce4e3fbe436422ef1234",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
