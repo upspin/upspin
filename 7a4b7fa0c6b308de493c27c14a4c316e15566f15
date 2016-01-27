@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_12eefd1a",
+        "filename": "client/testclient/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T19:41:57Z",
+      "side": 1,
+      "message": "Should everything up to here be a helper function or two? You use it twice. It would make new tests shorter and easier to write.",
+      "revId": "7a4b7fa0c6b308de493c27c14a4c316e15566f15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_7242d1ef",
+        "filename": "client/testclient/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T19:41:57Z",
+      "side": 1,
+      "message": "should this be capitalized like the one above it?",
+      "range": {
+        "startLine": 43,
+        "startChar": 29,
+        "endLine": 43,
+        "endChar": 33
+      },
+      "revId": "7a4b7fa0c6b308de493c27c14a4c316e15566f15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
