@@ -1,9 +1,7 @@
 // Package upspin contains global interface and other definitions for the components of the system.
 package upspin
 
-import (
-	"net"
-)
+import "net"
 
 // A Protocol identifies the technique for turning a reference into the user's data.
 // Secondary data, metadata, may be required to implement the protocol.

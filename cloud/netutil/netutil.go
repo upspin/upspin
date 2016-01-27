@@ -1,4 +1,4 @@
-// Package netutil implements http request/response, networking, and json-related utility functions
+// Package netutil implements http request/response, networking, and JSON-related utility functions
 package netutil
 
 import (
@@ -8,15 +8,25 @@ import (
 	"net/http"
 )
 
-// SendJSONError sends an error in a json struct with an error message
+const (
+	// Constants that may appear in HTTP headers
+	ContentType   = "Content-Type"
+	ContentLength = "Content-Length"
+
+	// HTTP Methods
+	Get  = "GET"
+	Post = "POST"
+)
+
+// SendJSONError sends an error in a JSON struct with an error message
 // composed of a prefix and the actual error message.
 func SendJSONError(resp http.ResponseWriter, prefix string, error error) {
 	SendJSONErrorString(resp, fmt.Sprintf("%s%v", prefix, error.Error()))
 }
 
-// SendJSONErrorString sends a free-form error string in a json struct.
+// SendJSONErrorString sends a free-form error string in a JSON struct.
 func SendJSONErrorString(resp http.ResponseWriter, error string) {
-	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set(ContentType, "application/json")
 	resp.Write([]byte(fmt.Sprintf("{error:%q}", error)))
 }
 
@@ -30,7 +40,7 @@ func SendJSONReply(resp http.ResponseWriter, reply interface{}) {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set(ContentType, "application/json")
 	resp.Write(js)
 }
 
