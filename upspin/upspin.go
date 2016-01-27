@@ -2,6 +2,7 @@
 package upspin
 
 import (
+	"fmt"
 	"net"
 )
 
@@ -45,6 +46,16 @@ func (Location) Unmarshal([]byte) error {
 // Perhaps it's even just a piece of text.
 type NetAddr struct {
 	net.Addr
+	Server string
+	Port   int16
+}
+
+func (n NetAddr) Network() string {
+	return fmt.Sprintf("%s:%d", n.Server, n.Port)
+}
+
+func (n NetAddr) String() string {
+	return n.Network()
 }
 
 // A Reference is the key to find a piece of data in a Store. It is decoupled
