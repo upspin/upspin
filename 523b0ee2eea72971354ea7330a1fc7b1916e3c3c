@@ -1,0 +1,405 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_35ebe3d2",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "s/http/HTTP/\ns/Http/HTTP/ everywhere. Go style. See https://g3doc.corp.google.com/go/g3doc/go-readability-review-comments.md?cl\u003dhead#TOC-Initialisms",
+      "range": {
+        "startLine": 8,
+        "startChar": 30,
+        "endLine": 8,
+        "endChar": 34
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_55f05fb8",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "TODO?",
+      "range": {
+        "startLine": 11,
+        "startChar": 35,
+        "endLine": 11,
+        "endChar": 36
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b5de132e",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "HTTP",
+      "range": {
+        "startLine": 19,
+        "startChar": 25,
+        "endLine": 19,
+        "endChar": 29
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_75f55ba7",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "how do you make one? It seems like this should be part of the setup/constructor",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 4
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_95faf796",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "HTTP",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_351203a7",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "i don\u0027t see much reason that this should be in netutil. it\u0027s simple go plumbing. not sure it needs to be canonicalized anywhere. wrapping a Reader to make a ReadCloser is simple common stuff.",
+      "range": {
+        "startLine": 35,
+        "startChar": 3,
+        "endLine": 35,
+        "endChar": 25
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f5cdeb8b",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "Please say HTTP and JSON",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_15cb4777",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "do these need to be exported?",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_55177f95",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "needs to say what\u0027s special about it, that it\u0027s a GCP intermediary",
+      "range": {
+        "startLine": 1,
+        "startChar": 17,
+        "endLine": 1,
+        "endChar": 27
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d5346f1b",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "StoreClient is an implementation of upspin.Store that uses GCP to manage its storage.",
+      "range": {
+        "startLine": 18,
+        "startChar": 7,
+        "endLine": 18,
+        "endChar": 15
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f5ffab7b",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "MockHTTPClient. see elsewhere",
+      "range": {
+        "startLine": 25,
+        "startChar": 18,
+        "endLine": 25,
+        "endChar": 32
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d502af52",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "this long string is used twice (and should be more). make it a const",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_15fd0784",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "expected, got ?",
+      "range": {
+        "startLine": 36,
+        "startChar": 17,
+        "endLine": 36,
+        "endChar": 23
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_353da30b",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "s/://",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_55421f98",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "ditto about const",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_75471ba7",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "ditto about expected.",
+      "range": {
+        "startLine": 76,
+        "startChar": 4,
+        "endLine": 76,
+        "endChar": 10
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_954cb7cb",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 94,
+        "startChar": 4,
+        "endLine": 94,
+        "endChar": 10
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b537f31d",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "Set up\n\nit\u0027s a verb phrase not a noun",
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b5d3732d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T20:31:14Z",
+      "side": 1,
+      "message": "I am not a fan of these being fields. It\u0027s too specific. net.Addr doesn\u0027t have these concepts. Let\u0027s talk about this at the meeting today.",
+      "range": {
+        "startLine": 49,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 7
+      },
+      "revId": "523b0ee2eea72971354ea7330a1fc7b1916e3c3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
