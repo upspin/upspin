@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_b0c9c133",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Oops, you\u0027re right.\n\nThe test passes because this is only *saving* the requests. The tests as written were only depending on the responses.\n\nAnd was never inspecting that the requests were as expected. Only responses mattered and responses didn\u0027t have the same bug.\n\nI\u0027ve fixed the problem and added a check that the request was as expected (though, that is not very interesting because we only care we got what we wanted, not *how* we got it).\n\nThanks for the catch.",
+      "parentUuid": "14beeac6_7029e9c6",
+      "range": {
+        "startLine": 35,
+        "startChar": 2,
+        "endLine": 35,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_1032752c",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "fmt.Sprint(len(data))",
+      "range": {
+        "startLine": 48,
+        "startChar": 12,
+        "endLine": 48,
+        "endChar": 19
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d0bd5d80",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_1032752c",
       "range": {
         "startLine": 48,
         "startChar": 12,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_10b8b58b",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_f034191b",
+      "range": {
+        "startLine": 49,
+        "startChar": 14,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_302f71c8",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 3
@@ -88,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_907f6589",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "I was tempted, but thought you\u0027d say it was superfluous. (I shouldn\u0027t second-guess you anymore...:-))",
+      "parentUuid": "14beeac6_302f71c8",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_d0371d1d",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 3
@@ -99,6 +189,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "this is a perfect use for embedding. here is the full implementation (untested, i admit).\n\n// readCloser adds a Close method to a reader.\ntype readCloser struct {\n  io.Reader\n}\n\nfunc (r readCloser) Close() error {\n  return nil\n}\n\nthen up top you say\n  Body: readCloser{bytes.Reader(data)}",
+      "range": {
+        "startLine": 75,
+        "startChar": 3,
+        "endLine": 75,
+        "endChar": 13
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b08461ca",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Awesome! Thanks.\n\nDone.",
+      "parentUuid": "14beeac6_d0371d1d",
       "range": {
         "startLine": 75,
         "startChar": 3,
@@ -134,6 +248,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_d08abd44",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_707ba9c6",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 1
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_70948929",
         "filename": "store/gcp/store.go",
         "patchSetId": 3
@@ -145,6 +283,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "s/suffices/satisfies the interface/",
+      "range": {
+        "startLine": 25,
+        "startChar": 8,
+        "endLine": 25,
+        "endChar": 14
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_503b0da7",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_70948929",
       "range": {
         "startLine": 25,
         "startChar": 8,
@@ -180,6 +342,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_7040091f",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_108d151b",
+      "range": {
+        "startLine": 30,
+        "startChar": 3,
+        "endLine": 30,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_d069ddfd",
         "filename": "store/gcp/store.go",
         "patchSetId": 3
@@ -197,6 +383,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_b04aa13c",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d069ddfd",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_90ada55d",
         "filename": "store/gcp/store.go",
         "patchSetId": 3
@@ -208,6 +412,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "this never gets written so i will give these a more obviously explanatory name, like loc0 or zeroLoc and say\n  var zeroLoc upspin.Location // The zero value.",
+      "range": {
+        "startLine": 112,
+        "startChar": 8,
+        "endLine": 112,
+        "endChar": 9
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d02e3d65",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_90ada55d",
       "range": {
         "startLine": 112,
         "startChar": 8,
@@ -243,6 +471,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_50622dbd",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_30ecd1b1",
+      "range": {
+        "startLine": 114,
+        "startChar": 9,
+        "endLine": 114,
+        "endChar": 14
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_b0f70177",
         "filename": "store/gcp/store.go",
         "patchSetId": 3
@@ -254,6 +506,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "not sure. is there a need to check errors here? i think so.",
+      "range": {
+        "startLine": 120,
+        "startChar": 4,
+        "endLine": 120,
+        "endChar": 8
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_905cc502",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_b0f70177",
       "range": {
         "startLine": 120,
         "startChar": 4,
@@ -289,6 +565,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_b061c1b6",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d00b9d3f",
+      "range": {
+        "startLine": 125,
+        "startChar": 47,
+        "endLine": 125,
+        "endChar": 54
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_d0963d0e",
         "filename": "store/gcp/store.go",
         "patchSetId": 3
@@ -300,6 +600,24 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "newLoc may be nil, and you will crash. sorry",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_30a851f5",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d0963d0e",
       "revId": "98047c12104e68192e9360f8389fd9686a585935",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -323,6 +641,24 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_b019c109",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Agreed offline to use \u0027key\u0027.",
+      "parentUuid": "14beeac6_b0e0e1b9",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_d082bdeb",
         "filename": "store/gcp/store_test.go",
         "patchSetId": 3
@@ -334,6 +670,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "if err is nil, this will crash. you need to test that first",
+      "range": {
+        "startLine": 89,
+        "startChar": 8,
+        "endLine": 89,
+        "endChar": 13
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f00a59ab",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_d082bdeb",
       "range": {
         "startLine": 89,
         "startChar": 8,
@@ -369,6 +729,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_50c5cd8e",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_f07fb9b4",
+      "range": {
+        "startLine": 109,
+        "startChar": 4,
+        "endLine": 109,
+        "endChar": 7
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_105b557e",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -380,6 +764,30 @@
       "writtenOn": "2016-01-27T22:46:52Z",
       "side": 1,
       "message": "this comment is now out of date.\n// A NetAddr (TODO: Change name?) identifies an instance of a running service.\n// The exact interface is under design and will change.",
+      "range": {
+        "startLine": 46,
+        "startChar": 3,
+        "endLine": 46,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_10ba75f5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-27T23:50:03Z",
+      "side": 1,
+      "message": "I decided it was easier to ignore this for now. I reverted this. We can put it back in again when we have David\u0027s proposal. Sorry for the trouble.",
+      "parentUuid": "14beeac6_105b557e",
       "range": {
         "startLine": 46,
         "startChar": 3,
