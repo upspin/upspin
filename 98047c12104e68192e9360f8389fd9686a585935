@@ -1,0 +1,394 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_7029e9c6",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "i am pretty sure you mean\nmake([]*http.Request, 0, 5)\n\nyou want length 0 but capacity to grow to 5. otherwise the call to append on lines 65-68 will get the wrong answer. if the test passes as written, something is wrong, possibly my understanding",
+      "range": {
+        "startLine": 35,
+        "startChar": 2,
+        "endLine": 35,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_1032752c",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "fmt.Sprint(len(data))",
+      "range": {
+        "startLine": 48,
+        "startChar": 12,
+        "endLine": 48,
+        "endChar": 19
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f034191b",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "fmt.Sprint(statusCode)",
+      "range": {
+        "startLine": 49,
+        "startChar": 14,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_302f71c8",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "could use  a doc comment even though it\u0027s an interface satisfier.\n// Do is analogous to HTTPClient.Do and satisfies HTTPClientInterface.",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d0371d1d",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "this is a perfect use for embedding. here is the full implementation (untested, i admit).\n\n// readCloser adds a Close method to a reader.\ntype readCloser struct {\n  io.Reader\n}\n\nfunc (r readCloser) Close() error {\n  return nil\n}\n\nthen up top you say\n  Body: readCloser{bytes.Reader(data)}",
+      "range": {
+        "startLine": 75,
+        "startChar": 3,
+        "endLine": 75,
+        "endChar": 13
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_707ba9c6",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "this should just be called Store. Then in user code it will look like gcp.Store and all will be clear. also assert that it satisfies the interface:\n\nvar _ upspin.Store \u003d (*Store)(nil)",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 1
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_70948929",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "s/suffices/satisfies the interface/",
+      "range": {
+        "startLine": 25,
+        "startChar": 8,
+        "endLine": 25,
+        "endChar": 14
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_108d151b",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "New returns\n\ns/url/URL/\n\nalso explain what client is for.",
+      "range": {
+        "startLine": 30,
+        "startChar": 3,
+        "endLine": 30,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d069ddfd",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "up to you, but you can do this in one expression and that is often done. you nest the addr expression inside.",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_90ada55d",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "this never gets written so i will give these a more obviously explanatory name, like loc0 or zeroLoc and say\n  var zeroLoc upspin.Location // The zero value.",
+      "range": {
+        "startLine": 112,
+        "startChar": 8,
+        "endLine": 112,
+        "endChar": 9
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_30ecd1b1",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "i would write\nvar body bytes.Buffer\nit\u0027s more common i think, but i may be wrong.",
+      "range": {
+        "startLine": 114,
+        "startChar": 9,
+        "endLine": 114,
+        "endChar": 14
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b0f70177",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "not sure. is there a need to check errors here? i think so.",
+      "range": {
+        "startLine": 120,
+        "startChar": 4,
+        "endLine": 120,
+        "endChar": 8
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d00b9d3f",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "either\nfmt.Sprintf(\"%s/put\", s.addr) (.String is assumed)\nor\ns.addr.String() + \"/put\" (less code but maybe not as pretty)",
+      "range": {
+        "startLine": 125,
+        "startChar": 47,
+        "endLine": 125,
+        "endChar": 54
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d0963d0e",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "newLoc may be nil, and you will crash. sorry",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_b0e0e1b9",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "it would be a great service if this error type included the path name of the problematic file.\ni am referring to os.PathError again and suggest you just use that.",
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_d082bdeb",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "if err is nil, this will crash. you need to test that first",
+      "range": {
+        "startLine": 89,
+        "startChar": 8,
+        "endLine": 89,
+        "endChar": 13
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_f07fb9b4",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 109,
+        "startChar": 4,
+        "endLine": 109,
+        "endChar": 7
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_105b557e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-27T22:46:52Z",
+      "side": 1,
+      "message": "this comment is now out of date.\n// A NetAddr (TODO: Change name?) identifies an instance of a running service.\n// The exact interface is under design and will change.",
+      "range": {
+        "startLine": 46,
+        "startChar": 3,
+        "endLine": 46,
+        "endChar": 10
+      },
+      "revId": "98047c12104e68192e9360f8389fd9686a585935",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
