@@ -33,14 +33,15 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 }
 
 // FIle is a test implementation of upspin.File.
+// It always keeps the whole file in memory under the assumption
+// that it is encrypted and must be read and written atomically.
 type File struct {
-	client   *Client // Client the File belongs to.
-	closed   bool    // Whether the file has been closed, preventing further operations.
-	name     upspin.PathName
-	loc      upspin.Location
-	writable bool
-	offset   int
-	data     []byte
+	client   *Client         // Client the File belongs to.
+	closed   bool            // Whether the file has been closed, preventing further operations.
+	name     upspin.PathName // Full path name.
+	writable bool            // File is writable (made with Create, not Open).
+	offset   int             // File location for next read or write operation.
+	data     []byte          // Contents of file.
 }
 
 var _ upspin.File = (*File)(nil)
@@ -51,7 +52,7 @@ func (f *File) Name() upspin.PathName {
 
 func (f *File) Read(b []byte) (n int, err error) {
 	n, err = f.readAt("Read", b, int64(f.offset))
-	if err != nil {
+	if err == nil {
 		// TODO: overflow
 		f.offset += n
 	}
@@ -59,7 +60,7 @@ func (f *File) Read(b []byte) (n int, err error) {
 }
 
 func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
-	return f.readAt("ReadAt", b, int64(f.offset))
+	return f.readAt("ReadAt", b, off)
 }
 
 func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
@@ -75,7 +76,7 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 	if off >= int64(len(f.data)) {
 		return 0, io.EOF
 	}
-	n = copy(b, f.data)
+	n = copy(b, f.data[off:])
 	return n, nil
 }
 
@@ -97,12 +98,14 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	if ret < 0 || ret > int64(len(f.data)) {
 		return 0, errors.New("bad seek offset")
 	}
+	// TODO: overflow
+	f.offset = int(ret)
 	return ret, nil
 }
 
 func (f *File) Write(b []byte) (n int, err error) {
 	n, err = f.writeAt("Write", b, int64(f.offset))
-	if err != nil {
+	if err == nil {
 		// TODO: overflow
 		f.offset += n
 	}
@@ -110,7 +113,7 @@ func (f *File) Write(b []byte) (n int, err error) {
 }
 
 func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
-	return f.writeAt("WriteAt", b, int64(f.offset))
+	return f.writeAt("WriteAt", b, off)
 }
 
 func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
