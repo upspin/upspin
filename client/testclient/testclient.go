@@ -9,7 +9,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Ciient is a simple non-persisitent implementation of upspin.Client suitable for testing.
+// Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
 	dir   upspin.Directory
 	store upspin.Store
