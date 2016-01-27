@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	goPath "path"
+	"sort"
 
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/sim/hash"
@@ -160,9 +161,16 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			e.Name += "/"
 		}
 	}
-	// TODO: SORT
+	sort.Sort(dirEntrySlice(next))
 	return next, err
 }
+
+// For sorting.
+type dirEntrySlice []*upspin.DirEntry
+
+func (d dirEntrySlice) Len() int           { return len(d) }
+func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
+func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // MakeDirectory creates a new directory with the given name. The user's root must be present.
 // TODO: For now at least, only the last entry of the path can be created, as in Unix.

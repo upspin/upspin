@@ -2,6 +2,7 @@ package testdir
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"testing"
 
@@ -21,9 +22,6 @@ const (
 	user = "user@google.com"
 	root = user + "/"
 )
-
-// TODO: Move these tests into the directory directory.
-// TODO: Write a client and tests for the client interface.
 
 func TestMakeRootDirectory(t *testing.T) {
 	t.Logf("test addr: %s\n", testAddr)
@@ -338,7 +336,8 @@ func TestGlob(t *testing.T) {
 			continue
 		}
 		t.Log(test.files)
-		// TODO: Order here needs to be sorted to match Glob output when that sorts.
+		// Sort so they match the output of Glob.
+		sort.Strings(test.files)
 		for i, f := range test.files {
 			entry := entries[i]
 			if string(entry.Name) != f {
