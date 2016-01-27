@@ -98,12 +98,12 @@ func (s *StoreClient) parseLocationResponse(body []byte) (*upspin.Location, erro
 	err := json.Unmarshal(body, &loc)
 	if err != nil {
 		fmt.Printf("Error in unmarshal: %v", err)
-		srverr := &struct{ error string }{}
+		srverr := &struct{ Error string }{}
 		err = json.Unmarshal(body, &srverr)
 		if err != nil {
 			return nil, StoreError{"Can't parse reply from server"}
 		}
-		return nil, StoreError{srverr.error}
+		return nil, StoreError{srverr.Error}
 	}
 	return &loc, nil
 }

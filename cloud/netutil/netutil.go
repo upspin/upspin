@@ -26,7 +26,7 @@ func SendJSONError(resp http.ResponseWriter, prefix string, error error) {
 // SendJSONErrorString sends a free-form error string in a json struct.
 func SendJSONErrorString(resp http.ResponseWriter, error string) {
 	resp.Header().Set(ContentType, "application/json")
-	resp.Write([]byte(fmt.Sprintf("{error:%q}", error)))
+	resp.Write([]byte(fmt.Sprintf(`{"error":%q}`, error)))
 }
 
 // SendJSONReply encodes a reply and sends it out on w as a JSON
