@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_a57fc088",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T18:55:37Z",
+      "side": 1,
+      "message": "s/e.g., /such as its/",
+      "range": {
+        "startLine": 228,
+        "startChar": 59,
+        "endLine": 228,
+        "endChar": 61
+      },
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_c584bccb",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T18:55:37Z",
+      "side": 1,
+      "message": "one space after period throughout",
+      "range": {
+        "startLine": 229,
+        "startChar": 25,
+        "endLine": 229,
+        "endChar": 34
+      },
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_e588d8de",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T18:55:37Z",
+      "side": 1,
+      "message": "maybe TODO so we don\u0027t miss it",
+      "range": {
+        "startLine": 229,
+        "startChar": 25,
+        "endLine": 229,
+        "endChar": 34
+      },
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2593b00d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T18:55:37Z",
+      "side": 1,
+      "message": "nice short names but is there a reason not to give them full names? we haven\u0027t been especially concise in our naming up to now",
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
