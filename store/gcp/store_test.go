@@ -119,7 +119,7 @@ func TestStoreGetErrorWrongPacking(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
-		Packing: upspin.Protocol(99),
+		Packing: upspin.Packing(99),
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -130,7 +130,7 @@ func TestStoreGetErrorWrongPacking(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := "Can't figure out the protocol"
+	expected := "Can't figure out the packing"
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
