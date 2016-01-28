@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_5add758f",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:02:24Z",
+      "side": 1,
+      "message": "json.Unmrshal was failing. Apparently Go\u0027s json parsing is more strict than other implementations (I think most are forgiving with key names not being quoted).",
+      "parentUuid": "94065ace_b72de886",
+      "range": {
+        "startLine": 30,
+        "startChar": 34,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94065ace_37227891",
         "filename": "store/cmd/cli/client.go",
         "patchSetId": 2
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_1aba1d28",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:02:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94065ace_37227891",
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94065ace_171f744b",
         "filename": "store/cmd/cli/client.go",
         "patchSetId": 2
@@ -53,6 +95,30 @@
       "writtenOn": "2016-01-28T20:23:43Z",
       "side": 1,
       "message": "can\u0027t understand what?\nanother good opportunity for a Usage function",
+      "range": {
+        "startLine": 42,
+        "startChar": 19,
+        "endLine": 42,
+        "endChar": 29
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_3ab7e13e",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:02:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94065ace_171f744b",
       "range": {
         "startLine": 42,
         "startChar": 19,
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_ba25b154",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:02:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94065ace_771cf054",
+      "range": {
+        "startLine": 60,
+        "startChar": 27,
+        "endLine": 60,
+        "endChar": 33
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "94065ace_5719ec62",
         "filename": "store/cmd/cli/client.go",
         "patchSetId": 2
@@ -99,6 +189,30 @@
       "writtenOn": "2016-01-28T20:23:43Z",
       "side": 1,
       "message": "we really need to sort this out....",
+      "range": {
+        "startLine": 109,
+        "startChar": 12,
+        "endLine": 109,
+        "endChar": 18
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_9ac54dba",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:02:24Z",
+      "side": 1,
+      "message": "ack.",
+      "parentUuid": "94065ace_5719ec62",
       "range": {
         "startLine": 109,
         "startChar": 12,
