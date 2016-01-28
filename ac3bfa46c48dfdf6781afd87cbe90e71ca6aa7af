@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_c6d3e72c",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:35:41Z",
+      "side": 1,
+      "message": "usually this goes after the struct. also s/Asserts/Assert/ or maybe /Guarantee/",
+      "revId": "ac3bfa46c48dfdf6781afd87cbe90e71ca6aa7af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_26cbbb77",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:35:41Z",
+      "side": 1,
+      "message": "ok, and you log, but i bet it\u0027s an error",
+      "revId": "ac3bfa46c48dfdf6781afd87cbe90e71ca6aa7af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
