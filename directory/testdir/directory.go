@@ -143,8 +143,8 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					Location: upspin.Location{
 						NetAddr: s.StoreAddr,
 						Reference: upspin.Reference{
-							Key:      hash.BytesString(hashBytes),
-							Protocol: upspin.Debug,
+							Key:     hash.BytesString(hashBytes),
+							Packing: upspin.Debug,
 						},
 					},
 					Metadata: upspin.Metadata{
@@ -192,8 +192,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		blob := teststore.MakeBlob(parsed.String(), nil)
 		shaHash := hash.Of(blob)
 		ref := upspin.Reference{
-			Key:      shaHash.String(),
-			Protocol: upspin.Debug,
+			Key:     shaHash.String(),
+			Packing: upspin.Debug,
 		}
 		loc, err := s.Store.Put(ref, blob)
 		if err != nil {
@@ -252,8 +252,8 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	ciphertext := teststore.MakeBlob(string(pathName), data)
 	shaHash := hash.Of(ciphertext)
 	ref := upspin.Reference{
-		Key:      shaHash.String(),
-		Protocol: upspin.Debug,
+		Key:     shaHash.String(),
+		Packing: upspin.Debug,
 	}
 	loc, err := s.Store.Put(ref, ciphertext)
 	// TODO VALIDATE REF
@@ -330,8 +330,8 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		Location: upspin.Location{
 			NetAddr: s.StoreAddr,
 			Reference: upspin.Reference{
-				Key:      r.Key,
-				Protocol: upspin.Debug,
+				Key:     r.Key,
+				Packing: upspin.Debug,
 			},
 		},
 		Metadata: upspin.Metadata{
@@ -398,7 +398,7 @@ func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []by
 	if len(elem) == 0 {
 		return r0, false, mkStrError(op, pathName+"/", "empty name element")
 	}
-	if len(elem) == 0 || len(elem) > 255 {
+	if len(elem) > 255 {
 		return r0, false, mkStrError(op, upspin.PathName(elem), "name element too long")
 	}
 Loop:
@@ -418,8 +418,8 @@ Loop:
 			}
 		}
 		r := upspin.Reference{
-			Key:      hash.BytesString(hashBytes),
-			Protocol: upspin.Debug,
+			Key:     hash.BytesString(hashBytes),
+			Packing: upspin.Debug,
 		}
 		return r, isDir, nil
 	}
@@ -473,8 +473,8 @@ Loop:
 	blob := teststore.MakeBlob(string(dirName), dirData)
 	shaHash := hash.Of(blob)
 	ref := upspin.Reference{
-		Key:      shaHash.String(),
-		Protocol: upspin.Debug,
+		Key:     shaHash.String(),
+		Packing: upspin.Debug,
 	}
 	loc, err := s.Store.Put(ref, blob)
 	if err != nil {

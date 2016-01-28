@@ -52,8 +52,8 @@ func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err erro
 	if err != nil {
 		return
 	}
-	// Checks the protocol
-	switch dirEntry.Location.Reference.Protocol {
+	// Checks the packing
+	switch dirEntry.Location.Reference.Packing {
 	case upspin.HTTP:
 		err = verifyUrl(dirEntry.Location.Reference.Key)
 		if err != nil {
@@ -62,7 +62,7 @@ func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err erro
 	case upspin.EllipticalEric, upspin.Debug:
 		log.Println("Not implemented, but ok for now")
 	default:
-		err = DirEntryError{fmt.Sprintf("unknown protocol: %v", dirEntry.Location.Reference.Protocol)}
+		err = DirEntryError{fmt.Sprintf("unknown packing: %v", dirEntry.Location.Reference.Packing)}
 		return
 	}
 	// Checks the metadata
