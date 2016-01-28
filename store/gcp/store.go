@@ -3,7 +3,6 @@ package store
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,6 +11,7 @@ import (
 	"net/http"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/parsers"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -73,9 +73,9 @@ func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error)
 	switch answerType {
 	case "application/json":
 		// This is either a re-location reply or an error.
-		loc, err := s.parseLocationResponse(key, body)
+		loc, err := parsers.LocationResponse(body)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, NewStoreError(err.Error(), key)
 		}
 		locs := []upspin.Location{*loc}
 		return nil, locs, nil
@@ -90,25 +90,6 @@ func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error)
 		return body, nil, nil
 	}
 	// NOT REACHED
-}
-
-// parseLocationResponse interprets the body of an HTTP response as
-// Location and returns it. If it's not a Location, it tries to read
-// an error message from the server. A key is given for purposes of
-// setting the "path" of the error, if necessary.
-func (s *Store) parseLocationResponse(key string, body []byte) (*upspin.Location, error) {
-	var loc upspin.Location
-	err := json.Unmarshal(body, &loc)
-	if err != nil {
-		fmt.Printf("Error in unmarshal: %v", err)
-		srverr := &struct{ error string }{}
-		err = json.Unmarshal(body, &srverr)
-		if err != nil {
-			return nil, NewStoreError("Can't parse reply from server", key)
-		}
-		return nil, NewStoreError(srverr.error, key)
-	}
-	return &loc, nil
 }
 
 func (s *Store) Put(ref upspin.Reference, data []byte) (upspin.Location, error) {
@@ -154,9 +135,12 @@ func (s *Store) Put(ref upspin.Reference, data []byte) (upspin.Location, error) 
 	}
 
 	// Parse the response
-	newLoc, err := s.parseLocationResponse(ref.Key, respBody)
+	newLoc, err := parsers.LocationResponse(respBody)
+	if err != nil {
+		return zeroLoc, NewStoreError(err.Error(), ref.Key)
+	}
 	if newLoc == nil {
-		return zeroLoc, err
+		return zeroLoc, NewStoreError("null location", ref.Key)
 	}
 	return *newLoc, err
 }
