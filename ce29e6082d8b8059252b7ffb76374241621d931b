@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_c66927fe",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-28T01:50:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_0b95e85f",
+      "range": {
+        "startLine": 48,
+        "startChar": 26,
+        "endLine": 48,
+        "endChar": 27
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_2b92a477",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -94,6 +118,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_c637671d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-28T01:50:36Z",
+      "side": 1,
+      "message": "yech, OK",
+      "parentUuid": "14beeac6_eb6eec43",
+      "range": {
+        "startLine": 239,
+        "startChar": 4,
+        "endLine": 239,
+        "endChar": 11
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_0b6c084a",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -117,6 +165,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_268adb02",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-28T01:50:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_0b6c084a",
+      "range": {
+        "startLine": 243,
+        "startChar": 4,
+        "endLine": 243,
+        "endChar": 10
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_2b69c439",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -128,6 +200,24 @@
       "writtenOn": "2016-01-28T01:31:21Z",
       "side": 1,
       "message": "doesn\u0027t this install a transport, not an access method?",
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_86700fe1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-28T01:50:36Z",
+      "side": 1,
+      "message": "Oops, I changed the name halfway through.  Fixed.",
+      "parentUuid": "14beeac6_2b69c439",
       "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
