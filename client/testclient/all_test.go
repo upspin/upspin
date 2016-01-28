@@ -62,7 +62,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	_, err = client.Put(fileName, []byte(text), nil) // TODO: Metadata? Protocol?
+	_, err = client.Put(fileName, []byte(text), nil) // TODO: Metadata? Packing?
 	if err != nil {
 		t.Fatal("put file:", err)
 	}

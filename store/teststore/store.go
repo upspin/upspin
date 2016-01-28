@@ -66,7 +66,7 @@ type Service struct {
 var _ upspin.Store = (*Service)(nil)
 
 func blobKey(ref *upspin.Reference) string {
-	return fmt.Sprintf("%d:%s", ref.Protocol, ref.Key)
+	return fmt.Sprintf("%d:%s", ref.Packing, ref.Key)
 }
 
 func NewService(addr upspin.NetAddr) *Service {
@@ -93,8 +93,8 @@ func (s *Service) NetAddr() upspin.NetAddr {
 }
 
 func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location, error) {
-	if ref.Protocol != 0 { // TODO
-		return upspin.Location{}, errors.New("unrecognized protocol")
+	if ref.Packing != upspin.Debug { // TODO
+		return upspin.Location{}, errors.New("unrecognized packing")
 	}
 	hash := hash.Of(ciphertext)
 	if !hash.EqualString(ref.Key) {
@@ -114,8 +114,8 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 
 // TODO: Function should provide alternate location if missing.
 func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Location, err error) {
-	if loc.Reference.Protocol != 0 { // TODO
-		return nil, nil, errors.New("unrecognized protocol")
+	if loc.Reference.Packing != upspin.Debug { // TODO
+		return nil, nil, errors.New("unrecognized packing")
 	}
 	blob, ok := s.blob[blobKey(&loc.Reference)]
 	if !ok {

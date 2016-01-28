@@ -3,19 +3,21 @@ package upspin
 
 import "net"
 
-// A Protocol identifies the technique for turning a reference into the user's data.
-// Secondary data, metadata, may be required to implement the protocol.
-type Protocol uint8
+// A Packing identifies the technique for turning the data pointed to by
+// a reference into the user's data. This may involve checksum verification,
+// decrypting, signature checking, or nothing at all.
+// Secondary data, metadata, may be required to implement the packing.
+type Packing uint8
 
 // TODO: These constants are just placeholders.
 const (
-	// The Debug protocol is available for use in tests for any purpose. Never used in production.
-	Debug Protocol = iota
+	// The Debug packing is available for use in tests for any purpose. Never used in production.
+	Debug Packing = iota
 
-	// The HTTP protocol uses a URL as a reference.
+	// HTTP uses a URL as a reference. TODO: This isn't about the packing at all.
 	HTTP
 
-	// The EllipticalEric protocol stores data using encryption defined by XXX.
+	// The EllipticalEric packing stores data using encryption defined by XXX.
 	EllipticalEric
 )
 
@@ -47,13 +49,13 @@ type NetAddr struct {
 
 // A Reference is the key to find a piece of data in a Store. It is decoupled
 // from the address of the Store itself, but contains a unique identifier key
-// such as a hash of the contents and a Protocol defining how to unpack it.
+// such as a hash of the contents and a Packing defining how to unpack it.
 type Reference struct {
 	// Key identifies the data.
 	Key string
 
-	// Protocol identifies how to recover the original data using this Reference.
-	Protocol Protocol
+	// Packing identifies how to unpack the original data using this Reference.
+	Packing Packing
 }
 
 // Marshal packs the Reference into a byte slice for transport.
@@ -150,7 +152,7 @@ type Store interface {
 	// TODO: Does argument Location need to refer to this Store?
 	Get(location Location) ([]byte, []Location, error)
 
-	// Put puts the data into the store. If the protocol for the
+	// Put puts the data into the store. If the packing for the
 	// Reference involves a content-addressable key, the
 	// value computed from the data must match the supplied
 	// Reference and the Put may return an error if

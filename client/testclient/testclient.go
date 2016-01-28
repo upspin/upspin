@@ -54,7 +54,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		if locs == nil && err == nil {
 			// Encrypted data was found.
 			// Need to unpack it.
-			// TODO: Where is Protocol defined? We assume the debug protocol.
+			// TODO: Where is Packing defined? We assume the debug packing.
 			blobName, data, err := teststore.UnpackBlob(cipher)
 			if err != nil {
 				return nil, err

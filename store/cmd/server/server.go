@@ -66,7 +66,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	// Answer something sensible to the client.
 	location := upspin.Location{}
 	location.Reference.Key = ref
-	location.Reference.Protocol = upspin.HTTP
+	location.Reference.Packing = upspin.HTTP
 	// Leave location.NetAddr empty for now (does it make sense to
 	// be the NetAddr of the GCE storage server, if we're not yet
 	// providing the user with a direct link?)
@@ -104,8 +104,8 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Got link: %v\n", link)
 	// Do we need to be precise and say HTTPS here? Probably not,
 	// as the Key already specifies "https://" to indicate the
-	// right protocol.
-	location.Reference.Protocol = upspin.HTTP
+	// right packing.
+	location.Reference.Packing = upspin.HTTP
 	// Leave location.NetAddr empty for now. It could probably be
 	// what "www.googleapis.com" resolves to at this moment, but
 	// the Key contains all info needed for clients to find it
