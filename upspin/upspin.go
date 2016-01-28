@@ -23,6 +23,9 @@ const (
 
 // A Location describes how to retrieve a piece of data (a "blob") from the Store service.
 type Location struct {
+	// AccessMethod name.
+	AccessMethodName string
+
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr
 
@@ -220,4 +223,41 @@ type File interface {
 	Write(b []byte) (n int, err error)
 	WriteAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)
+}
+
+// ClientContext contains information about the client, e.g., name and how to
+// access private keys.  Specifics will be filled in as we decide more about
+// security/encryption.
+type ClientContext interface {
+	Name() string
+}
+
+// An AccessMethod defines a specific set of upspin interfaces.  Each AccessMethod
+// corresponds to a type of implementation; in process, networked using TLS over HTTP, etc.
+// If the AccessMethod requires a network, then this interface points to stubs to protect
+// and marshal the data across the network.
+type AccessMethod interface {
+	// The stubs (or direct calls) for the service implementations.
+	Directory
+	Store
+	User
+
+	// Connect connects to the service and returns an AccessMethod instance that
+	// contains the connection information.
+	Connect(Location) (AccessMethod, error)
+
+	// ServerUserName returns the authenticated user name of the server.
+	// If there is none, or the server is not authenticated, <THIS HAPPENS>.
+	ServerUserName() string
+}
+
+// An AccessSwitch manages AccessMethods. There will be only one global AccessSwitch
+// per process and each AccessMethod linked into the binary will use its Init function
+// to install itself in the AccessSwitch.
+type AccessSwitch interface {
+	// Install installs an AccessMethod.
+	Install(string, AccessMethod)
+
+	// Bind looks up the AccessMethod using the name in Location, calls its Connect routine.
+	Bind(ClientContext, Location) (AccessMethod, error)
 }
