@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_0b95e85f",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "this comment is out of date",
+      "range": {
+        "startLine": 48,
+        "startChar": 26,
+        "endLine": 48,
+        "endChar": 27
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2b92a477",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "s/tls/TLS/\ns/http/HTTP/",
+      "range": {
+        "startLine": 230,
+        "startChar": 72,
+        "endLine": 230,
+        "endChar": 75
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_6b83bc2b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "s/marshall/marshal/",
+      "range": {
+        "startLine": 232,
+        "startChar": 7,
+        "endLine": 232,
+        "endChar": 16
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_eb6eec43",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "Connect connects ...\n\nyeah, i know, sorry. those are the go style rules and it does help the generated documentation tools",
+      "range": {
+        "startLine": 239,
+        "startChar": 4,
+        "endLine": 239,
+        "endChar": 11
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_0b6c084a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "// RemoteUser is the authenticated remote user name (if any).\n\nbut remote with respect to whom? how is remote user different from user?",
+      "range": {
+        "startLine": 243,
+        "startChar": 4,
+        "endLine": 243,
+        "endChar": 10
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_2b69c439",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T01:31:21Z",
+      "side": 1,
+      "message": "doesn\u0027t this install a transport, not an access method?",
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
