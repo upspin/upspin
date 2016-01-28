@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_01ab09f4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T17:30:50Z",
+      "side": 1,
+      "message": "You can drop the Authenticated from the name - it only needs to be in the comment. And Of is too Java.\n\n// ServerUserName returns the authenticated user name of the server.\n// If there is none, or the server is not authenticated, \u003cTHIS HAPPENS\u003e.\nServerUserName() string",
+      "range": {
+        "startLine": 241,
+        "startChar": 1,
+        "endLine": 241,
+        "endChar": 30
+      },
+      "revId": "656dd7b2340d9e4450a5304cc356b2ee55260761",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_41742166",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T17:30:50Z",
+      "side": 1,
+      "message": "what does TPC mean?",
+      "revId": "656dd7b2340d9e4450a5304cc356b2ee55260761",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
