@@ -30,14 +30,14 @@ func Put(t *testing.T, dirEntry upspin.DirEntry, errorExpected string) {
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, upspin.DirEntry{}, `{error:"dir entry verification failed: no slash in path"}`)
+	Put(t, upspin.DirEntry{}, `{"error":"dir entry verification failed: no slash in path"}`)
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, dir, `{error:"dir entry verification failed: no user name in path"}`)
+	Put(t, dir, `{"error":"dir entry verification failed: no user name in path"}`)
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -59,7 +59,7 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, dir, `{error:"dir entry verification failed: invalid sequence number"}`)
+	Put(t, dir, `{"error":"dir entry verification failed: invalid sequence number"}`)
 }
 
 func TestPutErrorInvalidSignature(t *testing.T) {
@@ -69,7 +69,7 @@ func TestPutErrorInvalidSignature(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, dir, `{error:"dir entry verification failed: signature is invalid"}`)
+	Put(t, dir, `{"error":"dir entry verification failed: signature is invalid"}`)
 }
 
 func TestPutErrorNoKeys(t *testing.T) {
@@ -79,7 +79,7 @@ func TestPutErrorNoKeys(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, dir, `{error:"dir entry verification failed: need at least one wrapped key"}`)
+	Put(t, dir, `{"error":"dir entry verification failed: need at least one wrapped key"}`)
 }
 
 func TestPutErrorInvalidKey(t *testing.T) {
@@ -89,7 +89,7 @@ func TestPutErrorInvalidKey(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, dir, `{error:"dir entry verification failed: invalid wrapped key"}`)
+	Put(t, dir, `{"error":"dir entry verification failed: invalid wrapped key"}`)
 }
 
 // From here on, we need a connection to GCP
@@ -107,7 +107,7 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: makeValidMeta(),
 	}
-	ConnectedPut(t, dir, `{error:"path is not writable"}`)
+	ConnectedPut(t, dir, `{"error":"path is not writable"}`)
 }
 
 // Further connected tests require that we fix the TODO above, which
