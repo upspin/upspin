@@ -17,8 +17,8 @@ const (
 
 var (
 	newReference = upspin.Reference{
-		Key:      "newKey",
-		Protocol: upspin.HTTP,
+		Key:     "newKey",
+		Packing: upspin.HTTP,
 	}
 	newLocation = upspin.Location{
 		Reference: newReference,
@@ -35,8 +35,8 @@ func TestStorePutError(t *testing.T) {
 
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
-		Key:      "1234",
-		Protocol: upspin.HTTP,
+		Key:     "1234",
+		Packing: upspin.HTTP,
 	}
 
 	_, err := s.Put(ref, []byte("contents"))
@@ -53,8 +53,8 @@ func TestStorePut(t *testing.T) {
 
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
-		Key:      "1234",
-		Protocol: upspin.HTTP,
+		Key:     "1234",
+		Packing: upspin.HTTP,
 	}
 
 	loc, err := s.Put(ref, []byte("contents"))
@@ -95,8 +95,8 @@ func TestStoreGetError(t *testing.T) {
 
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
-		Key:      "1234",
-		Protocol: upspin.HTTP,
+		Key:     "1234",
+		Packing: upspin.HTTP,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -113,13 +113,13 @@ func TestStoreGetError(t *testing.T) {
 	}
 }
 
-func TestStoreGetErrorWrongProtocol(t *testing.T) {
+func TestStoreGetErrorWrongPacking(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil)
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
-		Key:      "1234",
-		Protocol: upspin.Protocol(99),
+		Key:     "1234",
+		Packing: upspin.Protocol(99),
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -143,8 +143,8 @@ func TestStoreGetRedirect(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 
 	ref := upspin.Reference{
-		Key:      "XX some hash XX",
-		Protocol: upspin.EllipticalEric,
+		Key:     "XX some hash XX",
+		Packing: upspin.EllipticalEric,
 	}
 	loc := upspin.Location{
 		Reference: ref,
