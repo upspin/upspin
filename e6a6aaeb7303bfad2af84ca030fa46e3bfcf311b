@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_5af1f5f6",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T23:08:51Z",
+      "side": 1,
+      "message": "flag.Arg(0)",
+      "range": {
+        "startLine": 36,
+        "startChar": 29,
+        "endLine": 36,
+        "endChar": 33
+      },
+      "revId": "e6a6aaeb7303bfad2af84ca030fa46e3bfcf311b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_7aeeb91b",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T23:08:51Z",
+      "side": 1,
+      "message": "flag.Arg(1) here and below",
+      "range": {
+        "startLine": 38,
+        "startChar": 10,
+        "endLine": 38,
+        "endChar": 11
+      },
+      "revId": "e6a6aaeb7303bfad2af84ca030fa46e3bfcf311b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_ba1e91f0",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T23:08:51Z",
+      "side": 1,
+      "message": "should probably check errors",
+      "revId": "e6a6aaeb7303bfad2af84ca030fa46e3bfcf311b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
