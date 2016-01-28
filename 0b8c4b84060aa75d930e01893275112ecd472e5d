@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94065ace_b72de886",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:23:43Z",
+      "side": 1,
+      "message": "no problem with this but why?",
+      "range": {
+        "startLine": 30,
+        "startChar": 34,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94065ace_37227891",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:23:43Z",
+      "side": 1,
+      "message": "you shouldn\u0027t be printing error messages to stdout, especially for a CLI tool. that\u0027s what stderr is for (google practice is just insane).\n\nbut the right way to do this is to write a proper, complete usage message, set it up with the flag package, and call it here as well. have a look at go/src/cmd/vet/main.go and its Usage function for an example",
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94065ace_171f744b",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:23:43Z",
+      "side": 1,
+      "message": "can\u0027t understand what?\nanother good opportunity for a Usage function",
+      "range": {
+        "startLine": 42,
+        "startChar": 19,
+        "endLine": 42,
+        "endChar": 29
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94065ace_771cf054",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:23:43Z",
+      "side": 1,
+      "message": "stdout !",
+      "range": {
+        "startLine": 60,
+        "startChar": 27,
+        "endLine": 60,
+        "endChar": 33
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94065ace_5719ec62",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:23:43Z",
+      "side": 1,
+      "message": "we really need to sort this out....",
+      "range": {
+        "startLine": 109,
+        "startChar": 12,
+        "endLine": 109,
+        "endChar": 18
+      },
+      "revId": "0b8c4b84060aa75d930e01893275112ecd472e5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
