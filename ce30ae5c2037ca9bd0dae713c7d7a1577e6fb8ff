@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94065ace_173814c5",
+        "filename": "cloud/netutil/parsers/parsers.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T20:19:49Z",
+      "side": 1,
+      "message": "the plural is unnecessary. i\u0027d rename the directory and the package just parser.",
+      "range": {
+        "startLine": 1,
+        "startChar": 8,
+        "endLine": 1,
+        "endChar": 15
+      },
+      "revId": "ce30ae5c2037ca9bd0dae713c7d7a1577e6fb8ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
