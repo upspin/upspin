@@ -34,6 +34,23 @@
       "revId": "9cd182415b757092ba5b4cc9bf1299705ff47e95",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_65f8486b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T18:43:13Z",
+      "side": 1,
+      "message": "See my comment in the other CL. I don\u0027t understand what this means nor where it will be used.",
+      "revId": "9cd182415b757092ba5b4cc9bf1299705ff47e95",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
