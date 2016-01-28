@@ -250,7 +250,6 @@ type AccessSwitch interface {
 	// Install an AccessMethod.
 	Install(string, Transport)
 
-	// Bind looks up the AccessMethod using the name in Location, calls its Connect routine,
-	// and returns the AccessMethod implementation which will contain
+	// Bind looks up the AccessMethod using the name in Location, calls its Connect routine.
 	Bind(Location) (AccessMethod, error)
 }
