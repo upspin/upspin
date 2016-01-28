@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
+)
+
+const (
+	errSomethingBad = "Something bad happened on the internet"
+	errBrokenPipe   = "The internet has a broken pipe"
 )
 
 var (
@@ -22,9 +26,14 @@ var (
 )
 
 func TestStorePutError(t *testing.T) {
-	mock := &nettest.MockHttpClient{}
-	mock.SetResponse(nil, errors.New("Something bad happened on the internet"))
-	s := New("http://localhost", 8080, mock)
+	// The server will error out.
+	resp := nettest.MockHTTPResponse{
+		Error:    errors.New(errSomethingBad),
+		Response: nil,
+	}
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+
+	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:      "1234",
 		Protocol: upspin.HTTP,
@@ -32,18 +41,17 @@ func TestStorePutError(t *testing.T) {
 
 	_, err := s.Put(ref, []byte("contents"))
 
-	if err.Error() != "Error putting data to server: Something bad happened on the internet" {
-		t.Fatalf("Test failed: %v", err)
+	expected := fmt.Sprintf("Error putting data to server: %s", errSomethingBad)
+	if err.Error() != expected {
+		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
 }
 
 func TestStorePut(t *testing.T) {
-	// The "server" will respond with a location for the object
-	resp := createMockResponse(t)
-	mock := &nettest.MockHttpClient{}
-	mock.SetResponse(resp, nil)
+	// The server will respond with a location for the object.
+	mock := nettest.NewMockHTTPClient(createMockResponse(t))
 
-	s := New("http://localhost", 8080, mock)
+	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:      "1234",
 		Protocol: upspin.HTTP,
@@ -54,14 +62,38 @@ func TestStorePut(t *testing.T) {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 	if loc != newLocation {
-		t.Fatalf("Server gave us wrong location. Expected: %v, got: %v", newLocation, loc)
+		t.Fatalf("Server gave us wrong location. Expected %v, got %v", newLocation, loc)
 	}
+	// Verifies the server received the proper request
+	reqs := mock.Requests()
+	if len(reqs) != 1 {
+		t.Fatalf("Sent more requests than necessary. Expected 1, got %v", len(reqs))
+	}
+	u := reqs[0].URL
+	if u.Scheme != "http" {
+		t.Fatalf("Expected http request, got %v", u.Scheme)
+	}
+	if u.Host != "localhost:8080" {
+		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
+	}
+	if u.Path != "/put" {
+		t.Fatalf("Expected request to /put, got %v", u.Path)
+	}
+	if u.RawQuery != "" {
+		t.Fatalf("Expected no query params, got %v", u.RawQuery)
+	}
+
 }
 
 func TestStoreGetError(t *testing.T) {
-	mock := &nettest.MockHttpClient{}
-	mock.SetResponse(nil, errors.New("Net has broken pipes"))
-	s := New("http://localhost", 8080, mock)
+	// The server will error out.
+	resp := nettest.MockHTTPResponse{
+		Error:    errors.New(errBrokenPipe),
+		Response: nil,
+	}
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+
+	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:      "1234",
 		Protocol: upspin.HTTP,
@@ -72,14 +104,19 @@ func TestStoreGetError(t *testing.T) {
 
 	_, _, err := s.Get(loc)
 
-	if err.Error() != "Error getting data from server: Net has broken pipes" {
-		t.Fatalf("Test failed: %v", err)
+	if err == nil {
+		t.Fatalf("Expected an error, got nil")
+	}
+	expected := fmt.Sprintf("Error getting data from server: %s", errBrokenPipe)
+	if err.Error() != expected {
+		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
 }
 
 func TestStoreGetErrorWrongProtocol(t *testing.T) {
-	mock := &nettest.MockHttpClient{}
-	s := New("http://localhost", 8080, mock)
+	// Our request is invalid.
+	mock := nettest.NewMockHTTPClient(nil)
+	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:      "1234",
 		Protocol: upspin.Protocol(99),
@@ -90,22 +127,24 @@ func TestStoreGetErrorWrongProtocol(t *testing.T) {
 
 	_, _, err := s.Get(loc)
 
-	if err.Error() != "Can't figure out the protocol" {
-		t.Fatalf("Test failed: %v", err)
+	if err == nil {
+		t.Fatalf("Expected an error, got nil")
+	}
+	expected := "Can't figure out the protocol"
+	if err.Error() != expected {
+		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
 }
 
 func TestStoreGetRedirect(t *testing.T) {
-	// Setup the server to redirect the client to a new location
-	resp := createMockResponse(t)
-	mock := &nettest.MockHttpClient{}
-	mock.SetResponse(resp, nil)
+	// The server will redirect the client to a new location
+	mock := nettest.NewMockHTTPClient(createMockResponse(t))
 
-	s := New("http://localhost", 8080, mock)
+	s := New("http://localhost:8080", mock)
 
 	ref := upspin.Reference{
 		Key:      "XX some hash XX",
-		Protocol: upspin.HTTP,
+		Protocol: upspin.EllipticalEric,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -123,23 +162,34 @@ func TestStoreGetRedirect(t *testing.T) {
 		t.Fatalf("Expected 1 location, got %d", len(locs))
 	}
 	if locs[0] != newLocation {
-		t.Fatalf("Server gave us wrong location. Expected: %v, got: %v", newLocation, locs[0])
+		t.Fatalf("Server gave us wrong location. Expected %v, got %v", newLocation, locs[0])
+	}
+	// Verifies request was sent correctly
+	reqs := mock.Requests()
+	if len(reqs) != 1 {
+		t.Fatalf("Sent more requests than necessary. Expected 1, got %v", len(reqs))
+	}
+	u := reqs[0].URL
+	if u.Scheme != "http" {
+		t.Fatalf("Expected http request, got %v", u.Scheme)
+	}
+	if u.Host != "localhost:8080" {
+		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
+	}
+	if u.Path != "/get" {
+		t.Fatalf("Expected request to /get, got %v", u.Path)
+	}
+	expectedQuery := "ref=XX some hash XX"
+	if u.RawQuery != expectedQuery {
+		t.Fatalf("Wrong query params: expected %v, got %v", expectedQuery, u.RawQuery)
 	}
 }
 
-func createMockResponse(t *testing.T) *http.Response {
+func createMockResponse(t *testing.T) []nettest.MockHTTPResponse {
 	newLoc, err := json.Marshal(newLocation)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	header := http.Header{}
-	header.Add("Content-Type", "application/json")
-	header.Add("Content-Length", fmt.Sprintf("%d", len(newLoc)))
-	resp := http.Response{
-		Status:     "200",
-		StatusCode: 200,
-		Header:     header,
-		Body:       nettest.NewStringBufferReadCloser(string(newLoc)),
-	}
-	return &resp
+	resp := nettest.NewMockHTTPResponse(200, "application/json", newLoc)
+	return []nettest.MockHTTPResponse{resp}
 }

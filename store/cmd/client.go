@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	Store upspin.Store = store.New("http://localhost", 8080, &http.Client{})
+	Store upspin.Store = store.New("http://localhost:8080", &http.Client{})
 
 	inFile  = flag.String("in", "", "input file")
 	outFile = flag.String("out", "", "output file")
