@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14beeac6_2532d02c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-01-28T18:33:58Z",
+      "side": 1,
+      "message": "With this CL, should HTTP change to Cleartext?",
+      "revId": "9cd182415b757092ba5b4cc9bf1299705ff47e95",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
