@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "14beeac6_61159d1c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T17:21:31Z",
+      "side": 1,
+      "message": "This could be a bit more helpful comment. Is this like a URL? Or is this just the name of the method, such as \"http\"? What does it include? And how do I look it up? What\u0027s the relationship between this name and the AccessMethod interface below?",
+      "range": {
+        "startLine": 26,
+        "startChar": 4,
+        "endLine": 26,
+        "endChar": 16
+      },
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_0b95e85f",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -218,6 +241,24 @@
       "side": 1,
       "message": "Oops, I changed the name halfway through.  Fixed.",
       "parentUuid": "14beeac6_2b69c439",
+      "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_61403d1f",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T17:21:31Z",
+      "side": 1,
+      "message": "Is the string here the name above on line 27?",
+      "parentUuid": "14beeac6_86700fe1",
       "revId": "ce29e6082d8b8059252b7ffb76374241621d931b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
