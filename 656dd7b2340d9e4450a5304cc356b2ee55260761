@@ -39,6 +39,24 @@
       "revId": "656dd7b2340d9e4450a5304cc356b2ee55260761",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_010869b1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T17:52:16Z",
+      "side": 1,
+      "message": "OK, I see, but this is a little confusing.\nhow about\n\nAn AccessSwitch manages AccessMethods. There will be only one global AccessSwitch per process and each AccessMethod linked into\nthe binary will use its Init function to install itself in the AccessSwitch.\n\nI think you can drop the example for now.",
+      "parentUuid": "14beeac6_41742166",
+      "revId": "656dd7b2340d9e4450a5304cc356b2ee55260761",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
