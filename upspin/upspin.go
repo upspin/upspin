@@ -43,11 +43,8 @@ func (Location) Unmarshal([]byte) error {
 	panic("unimplemented")
 }
 
-// A NetAddr is a network address.
-// It probably isn't just a net.Addr, but that will do for now.
-// Perhaps it's even just a piece of text.
+// A NetAddr is a network address
 type NetAddr struct {
-	Transport string
 	net.Addr
 }
 
@@ -227,30 +224,29 @@ type File interface {
 }
 
 // An AccessMethod defines a specific set of upspin interfaces.  Each AccessMethod
-// corresponds to a type of implementation; in process, networked using tls over http, etc.
+// corresponds to a type of implementation; in process, networked using TLS over HTTP, etc.
 // If the AccessMethod requires a network, then this interface points to stubs to protect
-// and marshall the data across the network.
+// and marshal the data across the network.
 type AccessMethod interface {
 	// The stubs (or direct calls) for the service implementations.
 	Directory
 	Store
 	User
 
-	// Connect to the service and return an AccessMethod instance that
+	// Connect connects to the service and returns an AccessMethod instance that
 	// contains the connection information.
 	Connect(Location) (AccessMethod, error)
 
-	// Return the authenticated remote user name (if any)
-	RemoteUser() string
+	// AuthenticatedUserNameOfServer returns the server's authenticated user name (if any)
+	AuthenticatedUserNameOfServer() string
 }
 
 // AccessMethods are named and can be installed into an AccessSwitch.  There will normally
 // be only one per process.
 type AccessSwitch interface {
-	// Install an AccessMethod.
-	Install(string, Transport)
+	// Install installs an AccessMethod.
+	Install(string, AccessMethod)
 
-	// Bind looks up the AccessMethod using the name in Location, calls its Connect routine,
-	// and returns the AccessMethod implementation which will contain
+	// Bind looks up the AccessMethod using the name in Location, calls its Connect routine.
 	Bind(Location) (AccessMethod, error)
 }
