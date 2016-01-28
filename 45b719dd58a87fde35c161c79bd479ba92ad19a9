@@ -16,6 +16,24 @@
       "revId": "45b719dd58a87fde35c161c79bd479ba92ad19a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_9a7d4dfd",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-28T23:16:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_3a0b61b2",
+      "revId": "45b719dd58a87fde35c161c79bd479ba92ad19a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
