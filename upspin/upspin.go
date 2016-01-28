@@ -23,6 +23,9 @@ const (
 
 // A Location describes how to retrieve a piece of data (a "blob") from the Store service.
 type Location struct {
+	// AccessMethod name.
+	AccessMethodName string
+
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr
 
@@ -220,4 +223,64 @@ type File interface {
 	Write(b []byte) (n int, err error)
 	WriteAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)
+}
+
+// ClientContext contains information about the client such as its name and how to
+// access private keys.
+// TODO(p): fill in as we decide more about security/encryption.
+type ClientContext interface {
+	Name() string
+}
+
+// Access defines how to connect and authenticate to a server.
+type Access interface {
+	// Dial connects to the service and performs any needed authentication.
+	Dial(ClientContext, Location) error
+
+	// ServerUserName returns the authenticated user name of the server.
+	// If there is no authenticated name an empty string is returned.
+	// TODO(p): Should I distinquish a server which didn't pass authentication
+	// from one which has no user name?
+	ServerUserName() string
+}
+
+// UserAccess defines Access for the User interface.
+type UserAccess interface {
+	User
+	Access
+}
+
+// StoreAccess defines Access for the Store interface.
+type StoreAccess interface {
+	Store
+	Access
+}
+
+// DirectoryAccess defines Access for the Directory interface.
+type DirectoryAccess interface {
+	Directory
+	Access
+}
+
+// An AccessSwitch manages accessing service interfaces. There will be only one global
+// AccessSwitch per process and each interface implementation linked into the binary
+// will use its Init function to install itself in the AccessSwitch.
+type AccessSwitch interface {
+	// BindUser connects to the User server and returns a UserAccess interface.
+	BindUser(ClientContext, Location) (User, error)
+
+	// BindStore connects to the Store server and returns a StoreAccess interface.
+	BindStore(ClientContext, Location) (Store, error)
+
+	// BindDirectory connects to the Directory server and returns a DirectoryAccess interface.
+	BindDirectory(ClientContext, Location) (Directory, error)
+
+	// InstallUser installs an Access and interface and a User interface
+	InstallUser(string, UserAccess)
+
+	// InstallStore installs an Access for the Store interface.
+	InstallStore(string, StoreAccess)
+
+	// InstallDirectory installs an Access for the Directory interface.
+	InstallDirectory(string, DirectoryAccess)
 }
