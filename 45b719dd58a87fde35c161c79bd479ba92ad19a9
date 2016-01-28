@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_3a0b61b2",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-28T23:10:43Z",
+      "side": 1,
+      "message": "parser not parsers here and above\n\ncheck that it builds!",
+      "revId": "45b719dd58a87fde35c161c79bd479ba92ad19a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
