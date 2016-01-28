@@ -1,8 +1,6 @@
 // Package upspin contains global interface and other definitions for the components of the system.
 package upspin
 
-import "net"
-
 // A Packing identifies the technique for turning the data pointed to by
 // a reference into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
@@ -23,6 +21,9 @@ const (
 
 // A Location describes how to retrieve a piece of data (a "blob") from the Store service.
 type Location struct {
+	// Access name.
+	AccessName string
+
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr
 
@@ -40,12 +41,8 @@ func (Location) Unmarshal([]byte) error {
 	panic("unimplemented")
 }
 
-// A NetAddr is a network address.
-// It probably isn't just a net.Addr, but that will do for now.
-// Perhaps it's even just a piece of text.
-type NetAddr struct {
-	net.Addr
-}
+// A NetAddr is a network address interpreted by Access.Dial.
+type NetAddr string
 
 // A Reference is the key to find a piece of data in a Store. It is decoupled
 // from the address of the Store itself, but contains a unique identifier key
@@ -79,6 +76,8 @@ type PathName string
 // User service.
 
 type User interface {
+	UserAccess
+
 	// Lookup returns a list of addresses of Directory services that may
 	// have the root directory for the named user. Those earlier in the
 	// list are better places to look.
@@ -89,6 +88,8 @@ type User interface {
 
 // The Directory service manages the name space for one or more users.
 type Directory interface {
+	DirectoryAccess
+
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
 
@@ -140,6 +141,8 @@ type WrappedKey struct {
 
 // The Store service saves and retrieves data without interpretation.
 type Store interface {
+	StoreAccess
+
 	// Get attempts to retrieve the data stored at the Location.
 	// Three things might happen:
 	// 1. The data is in this Store. It is returned. The Location slice
@@ -220,4 +223,70 @@ type File interface {
 	Write(b []byte) (n int, err error)
 	WriteAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)
+}
+
+// ClientContext contains information about the client such as its name and how to
+// access private keys.
+// TODO(p): fill in as we decide more about security/encryption.
+type ClientContext interface {
+	Name() string
+}
+
+// UserAccess defines how to connect and authenticate to a user server.
+type UserAccess interface {
+	// Dial connects to the service and performs any needed authentication.
+	Dial(ClientContext, Location) (User, error)
+
+	// ServerUserName returns the authenticated user name of the server.
+	// If there is no authenticated name an empty string is returned.
+	// TODO(p): Should I distinquish a server which didn't pass authentication
+	// from one which has no user name?
+	ServerUserName() string
+}
+
+// StoreAccess defines how to connect and authenticate to a user server.
+type StoreAccess interface {
+	// Dial connects to the service and performs any needed authentication.
+	Dial(ClientContext, Location) (Store, error)
+
+	// ServerStoreName returns the authenticated user name of the server.
+	// If there is no authenticated name an empty string is returned.
+	// TODO(p): Should I distinquish a server which didn't pass authentication
+	// from one which has no user name?
+	ServerUserName() string
+}
+
+// DirectoryAccess defines how to connect and authenticate to a user server.
+type DirectoryAccess interface {
+	// Dial connects to the service and performs any needed authentication.
+	Dial(ClientContext, Location) (Directory, error)
+
+	// ServerDirectoryName returns the authenticated user name of the server.
+	// If there is no authenticated name an empty string is returned.
+	// TODO(p): Should I distinquish a server which didn't pass authentication
+	// from one which has no user name?
+	ServerUserName() string
+}
+
+// An AccessSwitch manages accessing service interfaces. There will be only one global
+// AccessSwitch per process and each interface implementation linked into the binary
+// will use its Init function to install itself in the AccessSwitch.
+type AccessSwitch interface {
+	// BindUser connects to the User server and returns a User instance.
+	BindUser(ClientContext, Location) (User, error)
+
+	// BindStore connects to the Store server and returns a Store instance.
+	BindStore(ClientContext, Location) (Store, error)
+
+	// BindDirectory connects to the Directory server and returns a Directory instance.
+	BindDirectory(ClientContext, Location) (Directory, error)
+
+	// RegisterUser registers an interface and a User interface
+	RegisterUser(string, User) error
+
+	// RegisterStore registers an interface for the Store interface.
+	RegisterStore(string, Store) error
+
+	// RegisterDirectory registers an interface for the Directory interface.
+	RegisterDirectory(string, Directory) error
 }
