@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_14abccaf",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T23:42:25Z",
+      "side": 1,
+      "message": "Done here and below.",
+      "parentUuid": "f465d6c4_f413b8e6",
+      "revId": "48ba2106e5cc491317693a538e4843ce42087360",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_740888b3",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_34c0d073",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T23:42:25Z",
+      "side": 1,
+      "message": "Ah, yeah, it implements String(). Done.",
+      "parentUuid": "f465d6c4_740888b3",
+      "revId": "48ba2106e5cc491317693a538e4843ce42087360",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_b4c4e094",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-01-29T23:38:41Z",
       "side": 1,
       "message": "i wouldn\u0027t bother folding the line, and you didn\u0027t on 71. whatever you decide, be consistent.",
+      "revId": "48ba2106e5cc491317693a538e4843ce42087360",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_54bd44ec",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T23:42:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_b4c4e094",
       "revId": "48ba2106e5cc491317693a538e4843ce42087360",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
