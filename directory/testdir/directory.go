@@ -108,6 +108,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	next[0] = &upspin.DirEntry{
 		Name: upspin.PathName(parsed.User),
 		Location: upspin.Location{
+			Transport: transport,
 			NetAddr:   s.StoreAddr,
 			Reference: dirRef,
 		},
@@ -142,7 +143,8 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				e := &upspin.DirEntry{
 					Name: ent.Name + "/" + upspin.PathName(name),
 					Location: upspin.Location{
-						NetAddr: s.StoreAddr,
+						Transport: transport,
+						NetAddr:   s.StoreAddr,
 						Reference: upspin.Reference{
 							Key:     hash.BytesString(hashBytes),
 							Packing: upspin.Debug,
@@ -290,6 +292,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	// Update the root.
 	s.Root[parsed.User] = dirRef
 	href := upspin.Location{
+		Transport: transport,
 		NetAddr:   s.StoreAddr,
 		Reference: loc.Reference,
 	}
@@ -329,7 +332,8 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name: parsed.Path(),
 		Location: upspin.Location{
-			NetAddr: s.StoreAddr,
+			Transport: transport,
+			NetAddr:   s.StoreAddr,
 			Reference: upspin.Reference{
 				Key:     r.Key,
 				Packing: upspin.Debug,
@@ -374,6 +378,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 // TODO: For test but is it genuinely valuable?
 func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
 	loc := upspin.Location{
+		Transport: transport,
 		NetAddr:   s.StoreAddr,
 		Reference: dirRef,
 	}
@@ -504,6 +509,8 @@ func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (inter
 	return NewService(store), nil
 }
 
+const transport = "in-process"
+
 func init() {
-	access.Switch.RegisterDirectory("in-process", &Service{})
+	access.Switch.RegisterDirectory(transport, &Service{})
 }

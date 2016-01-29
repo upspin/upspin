@@ -5,19 +5,60 @@ import (
 	"math/rand"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	_ "upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
+
 // Avoid networking for now.
-type testAddrType struct{}
+const testAddr = "test:0.0.0.0"
 
-func (testAddrType) Network() string { return "test" }
-func (testAddrType) String() string  { return "test:0.0.0.0" }
+type Context string
 
-var testAddr testAddrType
+func (c Context) Name() string {
+	return string(c)
+}
+
+var _ upspin.ClientContext = (*Context)(nil)
+
+type Setup struct {
+	upspin.User
+	upspin.Store
+	upspin.Directory
+}
+
+func setup() (*Setup, error) {
+	ctxt := Context("testcontext")
+	loc := upspin.Location{
+		Transport: "in-process",
+		NetAddr:   testAddr,
+		Reference: upspin.Reference{
+			Key:     "unused",
+			Packing: upspin.Debug,
+		},
+	}
+	us, err := access.Switch.BindUser(ctxt, loc)
+	if err != nil {
+		return nil, err
+	}
+	ds, err := access.Switch.BindDirectory(ctxt, loc)
+	if err != nil {
+		return nil, err
+	}
+	// HACK: We set the store for the blobs to be the same as for the directory.
+	return &Setup{
+		User:      us,
+		Store:     ds.(*testdir.Service).Store,
+		Directory: ds,
+	}, nil
+}
+
+// TODO: End of copied code.
 
 const (
 	user = "user@google.com"
@@ -25,16 +66,18 @@ const (
 )
 
 func TestMakeRootDirectory(t *testing.T) {
-	t.Logf("test addr: %s\n", testAddr)
-	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	client := New(testdir.NewService(ss), ss)
+	s, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := New(s.Directory, s.Store)
 	loc, err := client.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
 	t.Logf("loc for root: %v\n", loc)
 	// Fetch the directory back and inspect it.
-	ciphertext, _, err := ss.Get(loc)
+	ciphertext, _, err := s.Store.Get(loc)
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}
@@ -52,9 +95,12 @@ func TestMakeRootDirectory(t *testing.T) {
 }
 
 func TestPutGetTopLevelFile(t *testing.T) {
-	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	client := New(testdir.NewService(ss), ss)
-	_, err := client.MakeDirectory(user)
+	s, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := New(s.Directory, s.Store)
+	_, err = client.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
@@ -81,9 +127,12 @@ const (
 )
 
 func setupFileIO(t *testing.T) (*Client, upspin.File, []byte) {
-	ss := teststore.NewService(upspin.NetAddr{Addr: testAddr})
-	client := New(testdir.NewService(ss), ss)
-	_, err := client.MakeDirectory(user)
+	s, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := New(s.Directory, s.Store)
+	_, err = client.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}

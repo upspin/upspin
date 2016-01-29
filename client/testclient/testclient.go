@@ -2,7 +2,6 @@
 package testclient
 
 import (
-	"errors"
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/store/teststore"
@@ -39,9 +38,13 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
 		// TODO: Be able to connect to another Store.
-		// TODO: Need an == for NetAddr and for Location.
-		if loc.NetAddr.Addr.String() != c.store.NetAddr().Addr.String() {
-			return nil, errors.New("TODO: testclient can't handle different store")
+		if loc.NetAddr != c.store.NetAddr() {
+			return nil, fmt.Errorf("TODO: testclient can't handle different store address: %q %q", loc.NetAddr, c.store.NetAddr())
+		}
+		// TODO: Be able to connect to another Store. Plus don't hack in "in-process".
+		if loc.Transport != "in-process" {
+			fmt.Printf("%+v\n", loc)
+			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Transport, "in-process")
 		}
 		cipher, locs, err := c.store.Get(entry.Location)
 		if err != nil {
@@ -64,9 +67,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			}
 			return data, nil
 		}
-		// Add new locs to the list
-		// TODO: avoid dups, need == for location.
-		where = append(where, locs...)
+		// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
+		for _, newLoc := range locs {
+			for _, oldLoc := range where {
+				if newLoc != oldLoc {
+					where = append(where, newLoc)
+				}
+			}
+		}
 	}
 	// TODO: custom error types.
 	if firstError != nil {
