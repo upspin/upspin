@@ -10,13 +10,13 @@ import (
 )
 
 func TestSendJSONErrorString(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{error:"Something bad happened"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"Something bad happened"}`)
 	SendJSONErrorString(resp, "Something bad happened")
 	resp.Verify(t)
 }
 
 func TestSendJSONError(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{error:"error reading:EOF"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"error reading:EOF"}`)
 	SendJSONError(resp, "error reading:", io.EOF)
 	resp.Verify(t)
 }
@@ -51,7 +51,7 @@ func TestBufferRequest(t *testing.T) {
 }
 
 func TestBufferRequestTooBig(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{error:"Invalid request"}`) // Request is too big
+	resp := nettest.NewExpectingResponseWriter(`{"error":"Invalid request"}`) // Request is too big
 	req, err := http.NewRequest("POST", "http://localhost:8080/put", bytes.NewBufferString(data))
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)

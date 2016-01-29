@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/netconst"
 )
 
 // MockHTTPClient is a simple HTTP client that saves the Request given
@@ -45,8 +45,8 @@ func NewMockHTTPClient(responsesToSend []MockHTTPResponse) *MockHTTPClient {
 // necessary to fine-tune it.
 func NewMockHTTPResponse(statusCode int, bodyType string, data []byte) MockHTTPResponse {
 	header := http.Header{}
-	header.Add(netutil.ContentType, bodyType)
-	header.Add(netutil.ContentLength, fmt.Sprint(len(data)))
+	header.Add(netconst.ContentType, bodyType)
+	header.Add(netconst.ContentLength, fmt.Sprint(len(data)))
 	status := fmt.Sprint(statusCode)
 	resp := &http.Response{
 		Status:     status,
