@@ -92,6 +92,16 @@ func TestPutErrorInvalidKey(t *testing.T) {
 	Put(t, dir, `{"error":"dir entry verification failed: invalid wrapped key"}`)
 }
 
+func TestLookupPathError(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"missing pathname in request"}`)
+	req, err := http.NewRequest("GET", "http://localhost:8080/get", nil)
+	if err != nil {
+		t.Fatalf("Can't make new request: %v", err)
+	}
+	getHandler(resp, req)
+	resp.Verify(t)
+}
+
 // From here on, we need a connection to GCP
 func ConnectedPut(t *testing.T, dirEntry upspin.DirEntry, errorExpected string) {
 	// Re-using the same bucket is dangerous because of leftover
@@ -108,6 +118,17 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Metadata: makeValidMeta(),
 	}
 	ConnectedPut(t, dir, `{"error":"path is not writable"}`)
+}
+
+func TestLookupPathNotFound(t *testing.T) {
+	configureCloudClient("upspin", "upspin-test")
+	resp := nettest.NewExpectingResponseWriter(`{"error":"get: pathname not found"}`)
+	req, err := http.NewRequest("GET", "http://localhost:8080/get?pathname=o@foo.bar/invalid/invalid/invalid", nil)
+	if err != nil {
+		t.Fatalf("Can't make new request: %v", err)
+	}
+	getHandler(resp, req)
+	resp.Verify(t)
 }
 
 // Further connected tests require that we fix the TODO above, which
