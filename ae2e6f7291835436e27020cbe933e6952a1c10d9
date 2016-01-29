@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_a35bc83a",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T16:58:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_608d261a",
+      "range": {
+        "startLine": 35,
+        "startChar": 3,
+        "endLine": 35,
+        "endChar": 10
+      },
+      "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_a0757ed3",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 1
@@ -36,6 +60,24 @@
       "writtenOn": "2016-01-29T01:41:45Z",
       "side": 1,
       "message": "s/mkdir/MakeDirectory/\nwhy not be precise?",
+      "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_c360bce5",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T16:58:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_a0757ed3",
       "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_e355c004",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T16:58:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_a0d01eef",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 109,
+        "endChar": 11
+      },
+      "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_00754ace",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 1
@@ -76,6 +142,30 @@
       "writtenOn": "2016-01-29T01:41:45Z",
       "side": 1,
       "message": "wrong name in comment",
+      "range": {
+        "startLine": 112,
+        "startChar": 3,
+        "endLine": 112,
+        "endChar": 24
+      },
+      "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_8367a4f4",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T16:58:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_00754ace",
       "range": {
         "startLine": 112,
         "startChar": 3,
@@ -127,6 +217,30 @@
         "startChar": 5,
         "endLine": 126,
         "endChar": 13
+      },
+      "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_a346685a",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T16:58:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_e0da160d",
+      "range": {
+        "startLine": 126,
+        "startChar": 29,
+        "endLine": 126,
+        "endChar": 30
       },
       "revId": "ae2e6f7291835436e27020cbe933e6952a1c10d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
