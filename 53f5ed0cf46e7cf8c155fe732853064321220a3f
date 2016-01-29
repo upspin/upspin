@@ -16,6 +16,58 @@
       "revId": "53f5ed0cf46e7cf8c155fe732853064321220a3f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_004aaa3e",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T03:11:06Z",
+      "side": 1,
+      "message": "What do you mean they\u0027re not used. See below.",
+      "parentUuid": "f465d6c4_5d6c8f4a",
+      "revId": "53f5ed0cf46e7cf8c155fe732853064321220a3f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_202fae62",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T03:11:06Z",
+      "side": 1,
+      "message": "Used here.",
+      "revId": "53f5ed0cf46e7cf8c155fe732853064321220a3f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_402ca26b",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-01-29T03:11:06Z",
+      "side": 1,
+      "message": "Used here.",
+      "revId": "53f5ed0cf46e7cf8c155fe732853064321220a3f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
