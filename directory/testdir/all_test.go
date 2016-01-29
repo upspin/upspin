@@ -38,18 +38,17 @@ type Setup struct {
 func setup() (*Setup, error) {
 	ctxt := Context("testcontext")
 	loc := upspin.Location{
-		NetAddr: testAddr,
+		Transport: "in-process",
+		NetAddr:   testAddr,
 		Reference: upspin.Reference{
 			Key:     "unused",
 			Packing: upspin.Debug,
 		},
 	}
-	loc.AccessName = "testuser"
 	us, err := access.Switch.BindUser(ctxt, loc)
 	if err != nil {
 		return nil, err
 	}
-	loc.AccessName = "testdir"
 	ds, err := access.Switch.BindDirectory(ctxt, loc)
 	if err != nil {
 		return nil, err

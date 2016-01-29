@@ -39,5 +39,5 @@ func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (inter
 }
 
 func init() {
-	access.Switch.RegisterUser("testuser", &Service{})
+	access.Switch.RegisterUser("in-process", &Service{})
 }

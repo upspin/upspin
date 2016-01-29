@@ -21,8 +21,9 @@ const (
 
 // A Location describes how to retrieve a piece of data (a "blob") from the Store service.
 type Location struct {
-	// Access name.
-	AccessName string
+	// Transport defines the mechanism used to access the service, such as "http"
+	// or "in-process". TODO: Largely unspecified.
+	Transport string
 
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr

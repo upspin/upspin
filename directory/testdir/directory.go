@@ -494,7 +494,6 @@ func (s *Service) ServerUserName() string {
 
 func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
 	sloc := loc
-	sloc.AccessName = "teststore" // TODO HACK.
 	// TODO: This package only works if the same Store instance is used for data and
 	// to store its own DirEntries. It should be improved, but at the moment the only
 	// addresses it knows about come from its Store.
@@ -506,5 +505,5 @@ func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (inter
 }
 
 func init() {
-	access.Switch.RegisterDirectory("testdir", &Service{})
+	access.Switch.RegisterDirectory("in-process", &Service{})
 }

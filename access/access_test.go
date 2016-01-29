@@ -32,14 +32,14 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := access.Switch.BindStore(nil, upspin.Location{AccessName: "dummy", NetAddr: "addr1"})
-	s2, _ := access.Switch.BindStore(nil, upspin.Location{AccessName: "dummy", NetAddr: "addr2"})
+	s1, _ := access.Switch.BindStore(nil, upspin.Location{Transport: "dummy", NetAddr: "addr1"})
+	s2, _ := access.Switch.BindStore(nil, upspin.Location{Transport: "dummy", NetAddr: "addr2"})
 	if s1.NetAddr() != "addr1" || s2.NetAddr() != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.NetAddr(), s2.NetAddr())
 	}
 
 	// This should fail.
-	if _, err := access.Switch.BindStore(nil, upspin.Location{AccessName: "undefined"}); err == nil {
+	if _, err := access.Switch.BindStore(nil, upspin.Location{Transport: "undefined"}); err == nil {
 		t.Errorf("expected BindStore of undefined to fail")
 	}
 }

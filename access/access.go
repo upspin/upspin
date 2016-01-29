@@ -48,9 +48,9 @@ func (as *accessSwitch) RegisterStore(name string, store upspin.Store) error {
 
 // BindUser implements upspin.AccessSwitch.BindUser
 func (as *accessSwitch) BindUser(cc upspin.ClientContext, loc upspin.Location) (upspin.User, error) {
-	u, ok := as.user[loc.AccessName]
+	u, ok := as.user[loc.Transport]
 	if !ok {
-		return nil, fmt.Errorf("User interface not registered: %s", loc.AccessName)
+		return nil, fmt.Errorf("User service with transport %q not registered", loc.Transport)
 	}
 	x, err := u.Dial(cc, loc)
 	if err != nil {
@@ -61,9 +61,9 @@ func (as *accessSwitch) BindUser(cc upspin.ClientContext, loc upspin.Location) (
 
 // BindStore implements upspin.AccessSwitch.BindStore
 func (as *accessSwitch) BindStore(cc upspin.ClientContext, loc upspin.Location) (upspin.Store, error) {
-	s, ok := as.store[loc.AccessName]
+	s, ok := as.store[loc.Transport]
 	if !ok {
-		return nil, fmt.Errorf("Store interface not registered: %s", loc.AccessName)
+		return nil, fmt.Errorf("Store service with transport %q not registered", loc.Transport)
 	}
 	x, err := s.Dial(cc, loc)
 	if err != nil {
@@ -74,9 +74,9 @@ func (as *accessSwitch) BindStore(cc upspin.ClientContext, loc upspin.Location) 
 
 // BindDirectory implements upspin.AccessSwitch.BindDirectory
 func (as *accessSwitch) BindDirectory(cc upspin.ClientContext, loc upspin.Location) (upspin.Directory, error) {
-	d, ok := as.directory[loc.AccessName]
+	d, ok := as.directory[loc.Transport]
 	if !ok {
-		return nil, fmt.Errorf("Directory interface not registered: %s", loc.AccessName)
+		return nil, fmt.Errorf("Directory service with transport %q not registered", loc.Transport)
 	}
 	x, err := d.Dial(cc, loc)
 	if err != nil {
