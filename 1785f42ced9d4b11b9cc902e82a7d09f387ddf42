@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_8e042bf6",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-01-29T19:25:07Z",
+      "side": 1,
+      "message": "s/32/64\n\nThe ECDSA signature is two 256bit integers.",
+      "range": {
+        "startLine": 23,
+        "startChar": 20,
+        "endLine": 23,
+        "endChar": 22
+      },
+      "revId": "1785f42ced9d4b11b9cc902e82a7d09f387ddf42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_8e1b4b4c",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-01-29T19:25:07Z",
+      "side": 1,
+      "message": "s/512/65\n\nAt my (limited) understanding of the RFC, a minimum payload for the wrapped key is 515 bits.",
+      "range": {
+        "startLine": 25,
+        "startChar": 20,
+        "endLine": 25,
+        "endChar": 23
+      },
+      "revId": "1785f42ced9d4b11b9cc902e82a7d09f387ddf42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
