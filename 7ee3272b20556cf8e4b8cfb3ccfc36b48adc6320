@@ -16,6 +16,24 @@
       "revId": "7ee3272b20556cf8e4b8cfb3ccfc36b48adc6320",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_c0c4326d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T01:12:16Z",
+      "side": 1,
+      "message": "II can live with the interface{} version.   Then I can have BindUser etc do the type cast and the user doesn\u0027t have to see it.\n\nI wasn\u0027t at all happy with the intersecting Sever definition whch was where I started.",
+      "parentUuid": "f465d6c4_9d7d47fd",
+      "revId": "7ee3272b20556cf8e4b8cfb3ccfc36b48adc6320",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
