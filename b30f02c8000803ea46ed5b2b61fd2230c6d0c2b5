@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_a98c89b5",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T21:47:34Z",
+      "side": 1,
+      "message": "Stupid of me.   Thanks.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 28
+      },
+      "revId": "b30f02c8000803ea46ed5b2b61fd2230c6d0c2b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_29887994",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T21:47:34Z",
+      "side": 1,
+      "message": "Same comment as for the other services.",
+      "revId": "b30f02c8000803ea46ed5b2b61fd2230c6d0c2b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_e96da19b",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T21:47:34Z",
+      "side": 1,
+      "message": "Same as my other comments.  Why bother, this never gets used.  Its basically a way to refer to the correct Dial routine.  If there were only one of these (i.e. Dial always returns the same struct) then the initialization would make sense",
+      "revId": "b30f02c8000803ea46ed5b2b61fd2230c6d0c2b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_29a15914",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T21:47:34Z",
+      "side": 1,
+      "message": "Do you even have to initialize the map since it never gets returned to anyone?",
+      "revId": "b30f02c8000803ea46ed5b2b61fd2230c6d0c2b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
