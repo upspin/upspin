@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_20888e94",
+        "filename": "access/access.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-29T04:07:38Z",
+      "side": 1,
+      "message": "// Switch is the global accessor for services.",
+      "revId": "f01c6b5f304c9c09be8cbab67ab6b4c5c8c6d602",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
