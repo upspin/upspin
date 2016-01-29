@@ -15,7 +15,7 @@ const (
 
 var (
 	errBadConnection      = errors.New("bad internet connection")
-	errMkdirBadConnection = NewError("mkdir", pathName, errBadConnection)
+	errMkdirBadConnection = newError("MakeDirectory", pathName, errBadConnection)
 	reference             = upspin.Reference{
 		Key:     "the key",
 		Packing: upspin.HTTP,
