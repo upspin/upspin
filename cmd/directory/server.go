@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	MaxBuffSizePerReq = 1 << 20 // 1MB max buff size per request
+	maxBuffSizePerReq = 1 << 20 // 1MB max buff size per request
 
 	// TODO(ehg): review these numbers. They're are random guesses for now.
-	signatureMinLen  = 32
-	signatureMaxLen  = 128
-	wrappedKeyMinLen = 512
+	signatureMinLen  = 64
+	signatureMaxLen  = 64
+	wrappedKeyMinLen = 65
 	wrappedKeyMaxLen = 2048
 )
 
@@ -31,7 +31,7 @@ var (
 	bucketName  = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
 	cloudClient *gcp.GCP
 
-	errEntryNotFound = DirEntryError{"not found"}
+	errEntryNotFound = DirEntryError{"pathname not found"}
 )
 
 type DirEntryError struct {
@@ -105,7 +105,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
 		return
 	}
-	buf := netutil.BufferRequest(w, r, MaxBuffSizePerReq) // closes r.Body
+	buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
 	if buf == nil {
 		// Request was invalid and was closed. Nothing else to do.
 		return
@@ -116,12 +116,13 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		netutil.SendJSONError(w, "error unmarshaling:", err)
 		return
 	}
+	// TODO: verify ACLs before applying put.
 	err = createDirEntry(dirEntry)
 	if err != nil {
 		netutil.SendJSONError(w, "", err)
 		return
 	}
-	netutil.SendJSONReply(w, `{error:"Success"}`)
+	netutil.SendJSONReply(w, `{"error":"Success"}`)
 }
 
 // createDirEntry will attempt to write a new dirEntry to the back
@@ -218,6 +219,38 @@ func getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return buf, nil
 }
 
+func getHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL == nil {
+		// This is so bad it's probably a panic at this point. URL should never be nil.
+		netutil.SendJSONErrorString(w, "server error: invalid URL")
+		return
+	}
+	context := "get: "
+	err := r.ParseForm()
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	pathName := r.FormValue("pathname")
+	if pathName == "" {
+		netutil.SendJSONErrorString(w, "missing pathname in request")
+		return
+	}
+	dirEntry, err := getMeta(upspin.PathName(pathName))
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// We have a dirEntry. Marshal it and send it back.
+	// TODO: verify ACLs before replying.
+	dirEntryJson, err := json.Marshal(dirEntry)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+	}
+
+	netutil.SendJSONReply(w, dirEntryJson)
+}
+
 func configureCloudClient(projectId, bucketName string) {
 	cloudClient = gcp.New(projectId, bucketName, gcp.DefaultWriteACL)
 }
@@ -226,8 +259,7 @@ func main() {
 	flag.Parse()
 	configureCloudClient(*projectId, *bucketName)
 	http.HandleFunc("/put", putHandler)
-	// TODO /get, for retrieving information about a file or dir.
-
+	http.HandleFunc("/get", getHandler)
 	log.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
