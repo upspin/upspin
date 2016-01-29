@@ -142,5 +142,5 @@ func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (inter
 }
 
 func init() {
-	access.Switch.RegisterStore("teststore", &Service{})
+	access.Switch.RegisterStore("in-process", &Service{})
 }
