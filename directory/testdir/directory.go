@@ -9,6 +9,7 @@ import (
 	goPath "path"
 	"sort"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/sim/hash"
 	"upspin.googlesource.com/upspin.git/store/teststore" // TODO: for MakeBlob only.
@@ -483,4 +484,27 @@ Loop:
 		return r0, err
 	}
 	return loc.Reference, err
+}
+
+// Methods to implement upspin.Access
+
+func (s *Service) ServerUserName() string {
+	return "testuser"
+}
+
+func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
+	sloc := loc
+	sloc.AccessName = "teststore" // TODO HACK.
+	// TODO: This package only works if the same Store instance is used for data and
+	// to store its own DirEntries. It should be improved, but at the moment the only
+	// addresses it knows about come from its Store.
+	store, err := access.Switch.BindStore(context, sloc)
+	if err != nil {
+		return nil, err
+	}
+	return NewService(store), nil
+}
+
+func init() {
+	access.Switch.RegisterDirectory("testdir", &Service{})
 }

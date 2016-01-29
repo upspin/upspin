@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/sim/hash"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -128,4 +129,18 @@ func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Lo
 		return nil, nil, errors.New("external hash mismatch in Store.Get")
 	}
 	return copyOf(blob.data), nil, nil
+}
+
+// Methods to implement upspin.Access
+
+func (s *Service) ServerUserName() string {
+	return "testuser"
+}
+
+func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
+	return NewService(loc.NetAddr), nil
+}
+
+func init() {
+	access.Switch.RegisterStore("teststore", &Service{})
 }
