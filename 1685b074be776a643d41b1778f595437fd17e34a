@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_54faa427",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T23:04:16Z",
+      "side": 1,
+      "message": "Where does \u0027transport\u0027 come from?",
+      "revId": "1685b074be776a643d41b1778f595437fd17e34a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
