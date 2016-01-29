@@ -3,7 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	"fmt"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -15,13 +15,25 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 	var loc upspin.Location
 	err := json.Unmarshal(body, &loc)
 	if err != nil {
-		log.Printf("Error in unmarshal: %v", err)
-		srverr := &struct{ error string }{}
-		err = json.Unmarshal(body, &srverr)
-		if err != nil {
-			return nil, errors.New("Can't parse reply from server")
-		}
-		return nil, errors.New(srverr.error)
+		return nil, parseError(body)
 	}
 	return &loc, nil
+}
+
+func DirEntryResponse(body []byte) (*upspin.DirEntry, error) {
+	var dir upspin.DirEntry
+	err := json.Unmarshal(body, &dir)
+	if err != nil {
+		return nil, parseError(body)
+	}
+	return &dir, nil
+}
+
+func parseError(body []byte) error {
+	srverr := &struct{ Error string }{}
+	err := json.Unmarshal(body, &srverr)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Can't parse reply from server: %v", err))
+	}
+	return errors.New(srverr.Error)
 }

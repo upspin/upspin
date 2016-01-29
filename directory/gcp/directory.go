@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
@@ -41,7 +42,40 @@ func New(serverURL string, client HTTPClientInterface) *Directory {
 }
 
 func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, newError("Lookup", name, errors.New("Lookup unimplemented"))
+	op := "Lookup"
+	// Prepare a get request to the server
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/get?pathname=%s", d.serverURL, string(name)), nil)
+	if err != nil {
+		return nil, newError(op, name, err)
+	}
+	resp, err := d.client.Do(req)
+	if err != nil {
+		return nil, newError(op, name, err)
+	}
+	// Check the response
+	if resp.StatusCode != http.StatusOK {
+		return nil, newError(op, name,
+			errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
+	}
+	// Check the payload
+	defer resp.Body.Close()
+	// TODO(edpin): maybe add a limit here to the size of bytes we
+	// read and return?
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	// Check the content type
+	answerType := resp.Header.Get(netutil.ContentType)
+	if !strings.HasPrefix(answerType, "application/json") {
+		return nil, newError(op, name, errors.New(fmt.Sprintf("Invalid response format: %v", answerType)))
+	}
+	// Interpret the JSON returned
+	dirEntry, err := parser.DirEntryResponse(body)
+	if err != nil {
+		return nil, err
+	}
+	return dirEntry, nil
 }
 
 func (d *Directory) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
@@ -129,7 +163,7 @@ func (d *Directory) fetchKeys(dirName upspin.PathName) []upspin.WrappedKey {
 
 // signDirectoryEntry uses this client's private key to sign the directory entry.
 func (d *Directory) signDirectoryEntry(dirName upspin.PathName) []byte {
-	return make([]byte, 32) // TODO: implement
+	return make([]byte, 64) // TODO: implement
 }
 
 func newError(op string, path upspin.PathName, err error) *os.PathError {
