@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_5d6c8f4a",
+        "filename": "store/cmd/cli/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-29T01:03:22Z",
+      "side": 1,
+      "message": "these flags are not used. delete these declarations",
+      "revId": "53f5ed0cf46e7cf8c155fe732853064321220a3f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
