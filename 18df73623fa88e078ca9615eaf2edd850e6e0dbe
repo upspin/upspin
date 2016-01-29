@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_053874c4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T01:12:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_a57fc088",
+      "range": {
+        "startLine": 228,
+        "startChar": 59,
+        "endLine": 228,
+        "endChar": 61
+      },
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_c584bccb",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -71,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "14beeac6_e53a98be",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T01:12:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14beeac6_e588d8de",
+      "range": {
+        "startLine": 229,
+        "startChar": 25,
+        "endLine": 229,
+        "endChar": 34
+      },
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14beeac6_2593b00d",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -82,6 +130,24 @@
       "writtenOn": "2016-01-28T18:55:37Z",
       "side": 1,
       "message": "nice short names but is there a reason not to give them full names? we haven\u0027t been especially concise in our naming up to now",
+      "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14beeac6_4567ccf5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-01-29T01:12:16Z",
+      "side": 1,
+      "message": "We\u0027ll be typing these a lot, they will literally be in every rpc.  I really don\u0027t want this to look like java but if you insist, I can live with Directory(), Store(),and User().",
+      "parentUuid": "14beeac6_2593b00d",
       "revId": "18df73623fa88e078ca9615eaf2edd850e6e0dbe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
