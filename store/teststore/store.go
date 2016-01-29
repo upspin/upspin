@@ -107,6 +107,7 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 		[]byte("metadata"), // TODO: probably want defaults.
 	}
 	loc := upspin.Location{
+		Transport: transport,
 		NetAddr:   s.netAddr,
 		Reference: ref,
 	}
@@ -115,6 +116,9 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 
 // TODO: Function should provide alternate location if missing.
 func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Location, err error) {
+	if loc.Transport != transport {
+		return nil, nil, errors.New("unrecognized transport: " + loc.Transport)
+	}
 	if loc.Reference.Packing != upspin.Debug { // TODO
 		return nil, nil, errors.New("unrecognized packing")
 	}
@@ -141,6 +145,8 @@ func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (inter
 	return NewService(loc.NetAddr), nil
 }
 
+const transport = "in-process"
+
 func init() {
-	access.Switch.RegisterStore("in-process", &Service{})
+	access.Switch.RegisterStore(transport, &Service{})
 }
