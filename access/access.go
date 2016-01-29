@@ -53,7 +53,10 @@ func (as *accessSwitch) BindUser(cc upspin.ClientContext, loc upspin.Location) (
 		return nil, fmt.Errorf("User interface not registered: %s", loc.AccessName)
 	}
 	x, err := u.Dial(cc, loc)
-	return x.(upspin.User), err
+	if err != nil {
+		return nil, err
+	}
+	return x.(upspin.User), nil
 }
 
 // BindStore implements upspin.AccessSwitch.BindStore
@@ -63,7 +66,10 @@ func (as *accessSwitch) BindStore(cc upspin.ClientContext, loc upspin.Location) 
 		return nil, fmt.Errorf("Store interface not registered: %s", loc.AccessName)
 	}
 	x, err := s.Dial(cc, loc)
-	return x.(upspin.Store), err
+	if err != nil {
+		return nil, err
+	}
+	return x.(upspin.Store), nil
 }
 
 // BindDirectory implements upspin.AccessSwitch.BindDirectory
@@ -73,7 +79,10 @@ func (as *accessSwitch) BindDirectory(cc upspin.ClientContext, loc upspin.Locati
 		return nil, fmt.Errorf("Directory interface not registered: %s", loc.AccessName)
 	}
 	x, err := d.Dial(cc, loc)
-	return x.(upspin.Directory), err
+	if err != nil {
+		return nil, err
+	}
+	return x.(upspin.Directory), nil
 }
 
 func init() {

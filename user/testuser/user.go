@@ -4,6 +4,7 @@ package tesetuser
 import (
 	"errors"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -23,4 +24,23 @@ func (s *Service) Lookup(name upspin.UserName) ([]upspin.NetAddr, error) {
 		return nil, errors.New("no such user")
 	}
 	return locs, nil
+}
+
+// Methods to implement upspin.Access
+
+func (s *Service) ServerUserName() string {
+	return "testuser"
+}
+
+func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
+	return &Service{
+		root: make(map[upspin.UserName][]upspin.NetAddr),
+	}, nil
+}
+
+func init() {
+	service := &Service{
+		root: make(map[upspin.UserName][]upspin.NetAddr),
+	}
+	access.Switch.RegisterUser("testuser", service)
 }
