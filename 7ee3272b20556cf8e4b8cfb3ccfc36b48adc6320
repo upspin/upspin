@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_9d7d47fd",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-01-29T01:01:23Z",
+      "side": 1,
+      "message": "I wonder if you need all three. We could define a Server as an interface intersecting User, Store, and Client, or even just interface{} or some asserting name like Upspin(). then these types wouldn\u0027t need to be distinguished. they could just be Access and the embedding works beautifully. it would require either the caller to do a type assertion (no big deal) to narrow the type.\n\nwhat do you think?",
+      "revId": "7ee3272b20556cf8e4b8cfb3ccfc36b48adc6320",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
