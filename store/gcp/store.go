@@ -40,6 +40,14 @@ func New(serverURL string, client HTTPClientInterface) *Store {
 	}
 }
 
+func (s *Store) Dial(upspin.ClientContext, upspin.Location) (interface{}, error) {
+	return nil, NewStoreError("not implemented yet", "")
+}
+
+func (s *Store) ServerUserName() string {
+	return "NOT IMPLEMENTED YET"
+}
+
 func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error) {
 	if location.Reference.Key == "" {
 		return nil, nil, NewStoreError("Key can't be empty", "")
