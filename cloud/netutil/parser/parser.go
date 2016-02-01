@@ -15,25 +15,33 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 	var loc upspin.Location
 	err := json.Unmarshal(body, &loc)
 	if err != nil {
-		return nil, parseError(body)
+		return nil, ErrorResponse(body)
 	}
 	return &loc, nil
 }
 
+// DirEntryResponse interprets the body of an HTTP response as
+// DirEntry and returns it. If it's not a DirEntry, it tries to read
+// an error message instead.
 func DirEntryResponse(body []byte) (*upspin.DirEntry, error) {
 	var dir upspin.DirEntry
 	err := json.Unmarshal(body, &dir)
 	if err != nil {
-		return nil, parseError(body)
+		return nil, ErrorResponse(body)
 	}
 	return &dir, nil
 }
 
-func parseError(body []byte) error {
-	srverr := &struct{ Error string }{}
-	err := json.Unmarshal(body, &srverr)
+// ErrorResponse interprets the body of an HTTP response as a server
+// error (which could contain the string "Success" for successful
+// operations that do not return data).
+func ErrorResponse(body []byte) error {
+	serverErr := &struct {
+		Error string
+	}{}
+	err := json.Unmarshal(body, serverErr)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Can't parse reply from server: %v", err))
+		return errors.New(fmt.Sprintf("Can't parse reply from server: %v, %v", err, string(body)))
 	}
-	return errors.New(srverr.Error)
+	return errors.New(serverErr.Error)
 }
