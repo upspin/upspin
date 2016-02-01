@@ -214,7 +214,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDir. Roots are anyway. TODO.
-func (s *Service) Put(pathName upspin.PathName, data []byte) (upspin.Location, error) {
+func (s *Service) Put(pathName upspin.PathName, data, packdata []byte) (upspin.Location, error) {
 	return s.put("Put", pathName, false, data)
 }
 

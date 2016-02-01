@@ -83,9 +83,8 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	return nil, fmt.Errorf("%q not found on any store server", name)
 }
 
-func (c *Client) Put(name upspin.PathName, data, metadata []byte) (upspin.Location, error) {
-	// TODO: What to do with metadata?
-	return c.dir.Put(name, data)
+func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+	return c.dir.Put(name, data, nil)
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
