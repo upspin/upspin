@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f465d6c4_97043bf6",
+        "filename": "client/eeclient/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-01T21:46:17Z",
+      "side": 1,
+      "message": "this is fine (and a good package comment) but i believe the breakdown is wrong. i believe we need a collection of packing libraries (pack packages?) that do this work, and that if that were done this client would be trivial or maybe even unnecessary. of course, most of the new code in this client would end up in the EndToEnd packing library.",
+      "range": {
+        "startLine": 5,
+        "startChar": 3,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_17f82b2f",
+        "filename": "client/eeclient/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-01T21:46:17Z",
+      "side": 1,
+      "message": "File",
+      "range": {
+        "startLine": 35,
+        "startChar": 3,
+        "endLine": 35,
+        "endChar": 7
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_d7edd374",
+        "filename": "client/testclient/testclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-01T21:46:17Z",
+      "side": 1,
+      "message": "// TODO: packdata",
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_b7e85f66",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-01T21:46:17Z",
+      "side": 1,
+      "message": "s/ECDH wrapped/ECDH-wrapped/",
+      "range": {
+        "startLine": 18,
+        "startChar": 74,
+        "endLine": 18,
+        "endChar": 81
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_174aeb3e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-01T21:46:17Z",
+      "side": 1,
+      "message": "s/End2End/EndToEnd/ No need for the l33tsp34k.",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 11
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
