@@ -15,8 +15,8 @@ const (
 	// HTTP uses a URL as a reference. TODO: This isn't about the packing at all.
 	HTTP
 
-	// The EllipticalEric packing stores data using encryption defined by XXX.
-	EllipticalEric
+	// End2End packing stores AES-encrypted data; dir has ECDSA sig and ECDH wrapped keys.
+	End2End
 )
 
 // A Location describes how to retrieve a piece of data (a "blob") from the Store service.
@@ -96,7 +96,7 @@ type Directory interface {
 
 	// Put stores the data at the given name. If something is already
 	// stored with that name, it is replaced with the new data.
-	Put(name PathName, data []byte) (Location, error)
+	Put(name PathName, data []byte, packdata []byte) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
@@ -117,25 +117,15 @@ type Directory interface {
 type DirEntry struct {
 	Name     PathName // The full path name of the file.
 	Location Location // The location of the file.
-	Metadata Metadata // Metadata, including wrapped keys for decrypting file (if necessary).
+	Metadata Metadata
 }
 
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir       bool   // The file is a directory.
-	Sequence    int64  // The sequence (version) number of the item.
-	Signature   []byte // The ECDSA signature of path name and contents.
-	WrappedKeys []WrappedKey
-}
-
-// A WrappedKey holds a key that will decrypt the file contents. The key is in turn
-// encrypted with some user's private key. The 16-bit XOR of the user's public
-// key is stored alongside to make it easier to find which key to use if many are
-// present.
-type WrappedKey struct {
-	Hash      [2]byte // 16-bit hash of public key for user.
-	Encrypted []byte  // Key used to decrypt contents, itself encrypted with public key for user.
+	IsDir    bool   // The file is a directory.
+	Sequence int64  // The sequence (version) number of the item.
+	PackData []byte // Packing specific metadata, interpreted by Client.
 }
 
 // Store service.
@@ -181,8 +171,7 @@ type Client interface {
 	// stored with that name, it is replaced with the new data.
 	// Like Get, it is not the usual access method. The file-like API
 	// is preferred.
-	// TODO: How is metadata handled?
-	Put(name PathName, data, metadata []byte) (Location, error)
+	Put(name PathName, data []byte) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
