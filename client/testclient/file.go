@@ -32,7 +32,7 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	return f, nil
 }
 
-// FIle is a test implementation of upspin.File.
+// File is a test implementation of upspin.File.
 // It always keeps the whole file in memory under the assumption
 // that it is encrypted and must be read and written atomically.
 type File struct {
@@ -151,7 +151,7 @@ func (f *File) Close() error {
 		f.data = nil // Might as well release it early.
 		return nil
 	}
-	_, err := f.client.Put(f.name, f.data, nil)
+	_, err := f.client.Put(f.name, f.data)
 	f.data = nil // Might as well release it early.
 	return err
 }
