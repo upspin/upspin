@@ -1,4 +1,4 @@
-package testclient
+package eeclient
 
 import (
 	"errors"
