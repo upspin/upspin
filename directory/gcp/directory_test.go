@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
+	store "upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -18,8 +19,10 @@ var (
 	errBadConnection       = errors.New("bad internet connection")
 	errMkdirBadConnection  = newError("MakeDirectory", pathName, errBadConnection)
 	errLookupBadConnection = newError("Lookup", pathName, errBadConnection)
+	errPutBadConnection    = newError("Put", pathName, errBadConnection)
+	key                    = "the key"
 	reference              = upspin.Reference{
-		Key:     "the key",
+		Key:     key,
 		Packing: upspin.HTTP,
 	}
 	location = upspin.Location{
@@ -41,14 +44,7 @@ var (
 )
 
 func TestMkdirError(t *testing.T) {
-	// The server will error out.
-	resp := nettest.MockHTTPResponse{
-		Error:    errBadConnection,
-		Response: nil,
-	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
-
-	d := New("http://localhost:8080", mock)
+	d := makeErroringDirectoryClient()
 
 	_, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err == nil {
@@ -62,7 +58,7 @@ func TestMkdirError(t *testing.T) {
 func TestMkdir(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(createMockMkdirResponse(t))
 
-	d := New("http://localhost:8080", mock)
+	d := New("http://localhost:8080", nil, mock)
 
 	loc, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err != nil {
@@ -95,12 +91,15 @@ func TestMkdir(t *testing.T) {
 }
 
 func createMockMkdirResponse(t *testing.T) []nettest.MockHTTPResponse {
+	return []nettest.MockHTTPResponse{createMockLocationResponse(t)}
+}
+
+func createMockLocationResponse(t *testing.T) nettest.MockHTTPResponse {
 	loc, err := json.Marshal(location)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	resp := nettest.NewMockHTTPResponse(200, "application/json", loc)
-	return []nettest.MockHTTPResponse{resp}
+	return nettest.NewMockHTTPResponse(200, "application/json", loc)
 }
 
 func createMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -113,13 +112,7 @@ func createMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
 }
 
 func TestLookupError(t *testing.T) {
-	resp := nettest.MockHTTPResponse{
-		Error:    errBadConnection,
-		Response: nil,
-	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
-
-	d := New("http://localhost:8080", mock)
+	d := makeErroringDirectoryClient()
 
 	_, err := d.Lookup(upspin.PathName(pathName))
 	if err == nil {
@@ -133,7 +126,7 @@ func TestLookupError(t *testing.T) {
 func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(createMockLookupResponse(t))
 
-	d := New("http://localhost:8080", mock)
+	d := New("http://localhost:8080", nil, mock)
 
 	dir, err := d.Lookup(pathName)
 	if err != nil {
@@ -184,4 +177,62 @@ func dirEntryEquals(a, b *upspin.DirEntry) bool {
 		}
 	}
 	return true
+}
+
+func makeErroringDirectoryClient() *Directory {
+	resp := nettest.MockHTTPResponse{
+		Error:    errBadConnection,
+		Response: nil,
+	}
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+
+	return New("http://localhost:8080", nil, mock)
+}
+
+// makeDirectoryClientWithStoreClient creates an upspin.Directory that
+// contains a valid upspin.Store which replies successfully to a Put
+// request. The dirClientResponse is loaded onto the Directory client
+// for testing.
+func makeDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) *Directory {
+	// The HTTP client will return a sequence of responses, the first
+	// one will be to the Store.Put request, then the second to
+	// the Directory.Put request.
+	// Setup the mock client
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{createMockLocationResponse(t), dirClientResponse})
+
+	// Get a Store client
+	s := store.New("http://localhost:8080", mock)
+
+	// Get a Directory client
+	return New("http://localhost:9090", s, mock)
+}
+
+func TestPutError(t *testing.T) {
+	d := makeDirectoryClientWithStoreClient(t, nettest.MockHTTPResponse{
+		Error:    errBadConnection,
+		Response: nil,
+	})
+
+	_, err := d.Put(upspin.PathName(pathName), []byte("contents"))
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	if err.Error() != errPutBadConnection.Error() {
+		t.Fatalf("Expected error %v, got %v", errPutBadConnection, err)
+	}
+}
+
+func TestPut(t *testing.T) {
+	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))
+
+	d := makeDirectoryClientWithStoreClient(t, respSuccess)
+
+	// Issue the put request
+	loc, err := d.Put(upspin.PathName("foo@bar.com/mydir/myfile.txt"), []byte("contents of file"))
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	if loc.Reference.Key != key {
+		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
+	}
 }
