@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_977fdb3b",
+        "filename": "client/eeclient/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-01T22:02:44Z",
+      "side": 1,
+      "message": "Agreed.   This main intended as my way of confirming I didn\u0027t need any other changes to upspin.go or access.go.   (Until I flesh out factotum and keyserver, won\u0027t be sure, but fine for now.)\n\nI\u0027m happy to do grunge work of the refactoring but don\u0027t trust my knowledge of Go to be the designer of it.",
+      "parentUuid": "f465d6c4_97043bf6",
+      "range": {
+        "startLine": 5,
+        "startChar": 3,
+        "endLine": 5,
+        "endChar": 12
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_17f82b2f",
         "filename": "client/eeclient/file.go",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_b7de9f91",
+        "filename": "client/eeclient/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-01T22:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_17f82b2f",
+      "range": {
+        "startLine": 35,
+        "startChar": 3,
+        "endLine": 35,
+        "endChar": 7
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_d7edd374",
         "filename": "client/testclient/testclient.go",
         "patchSetId": 2
@@ -59,6 +107,24 @@
       "writtenOn": "2016-02-01T21:46:17Z",
       "side": 1,
       "message": "// TODO: packdata",
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_17ee6b3e",
+        "filename": "client/testclient/testclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-01T22:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_d7edd374",
       "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -104,6 +170,30 @@
         "startChar": 4,
         "endLine": 18,
         "endChar": 11
+      },
+      "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_97da7b97",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-01T22:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_b7e85f66",
+      "range": {
+        "startLine": 18,
+        "startChar": 74,
+        "endLine": 18,
+        "endChar": 81
       },
       "revId": "2577fef5d3db68445d31144ff388006d57382b3a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
