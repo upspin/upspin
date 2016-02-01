@@ -4,18 +4,43 @@ package upspin
 // A Packing identifies the technique for turning the data pointed to by
 // a reference into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
-// Secondary data, metadata, may be required to implement the packing.
+// Secondary data, callled packdata below, may be required to implement the packing.
 type Packing uint8
+
+// Packer provides the implementation of a Packing. The pack package binds
+// Packing values to the concrete implementations of this interface.
+type Packer interface {
+	// Packing returns the integer identifier of this Packing algorithm.
+	Packing() Packing
+
+	// Pack takes "cleartext" data and packing metadata and returns the
+	// "ciphertext" version in the supplied slice, which must be large enough.
+	// The returned count is the length of the ciphertext.
+	Pack(cipher, clear, packdata []byte) (int, error)
+
+	// Unpack takes "ciphertext" data and packing metadata and returns the
+	// "cleartext" version in the supplied slice, which must be large enough.
+	// The returned count is the length of the cleartext.
+	Unpack(cipher, clear, packdata []byte) (int, error)
+
+	// String returns the human-readable name of this Packing algorithm.
+	String() string
+}
 
 // TODO: These constants are just placeholders.
 const (
 	// The Debug packing is available for use in tests for any purpose. Never used in production.
 	Debug Packing = iota
 
+	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
+	PlainPack
+
 	// HTTP uses a URL as a reference. TODO: This isn't about the packing at all.
+	// TODO: Call this HTTPPack.
 	HTTP
 
 	// EndToEnd packing stores AES-encrypted data; dir has ECDSA sig and ECDH-wrapped keys.
+	// TODO: Call this EndToEndPack.
 	EndToEnd
 )
 
