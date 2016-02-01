@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_7ae30e23",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-01T23:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_9a42a240",
+      "revId": "796453a180b59b22a21c451429dd0e0d1e03545d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_bae84666",
         "filename": "cloud/netutil/parser/parser.go",
         "patchSetId": 3
@@ -30,6 +48,30 @@
       "writtenOn": "2016-02-01T23:02:48Z",
       "side": 1,
       "message": "i don\u0027t think this will be robust enough in the long run, but it\u0027s ok for now.",
+      "range": {
+        "startLine": 25,
+        "startChar": 12,
+        "endLine": 25,
+        "endChar": 19
+      },
+      "revId": "796453a180b59b22a21c451429dd0e0d1e03545d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_9ae0e216",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-01T23:47:20Z",
+      "side": 1,
+      "message": "Ack. See below for a discussion on this.",
+      "parentUuid": "f465d6c4_bae84666",
       "range": {
         "startLine": 25,
         "startChar": 12,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "f465d6c4_faa55eda",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-01T23:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f465d6c4_9a0462f6",
+      "range": {
+        "startLine": 93,
+        "startChar": 11,
+        "endLine": 93,
+        "endChar": 17
+      },
+      "revId": "796453a180b59b22a21c451429dd0e0d1e03545d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f465d6c4_7a1eae3e",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 3
@@ -76,6 +142,24 @@
       "writtenOn": "2016-02-01T23:02:48Z",
       "side": 1,
       "message": "i don\u0027t like this - error should be nil or maybe empty. i missed where this is happening.",
+      "revId": "796453a180b59b22a21c451429dd0e0d1e03545d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_d5114ba3",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-01T23:47:20Z",
+      "side": 1,
+      "message": "The server returns a struct like this: {\"error\": \u003cdescription|Success\u003e}. It\u0027s common for REST apis to do that. Some prefer to return two states: {\"status\":\u003c\"ok\"|\"error\"\u003e, \"detail\":\u003cdescription\u003e}\n\nI don\u0027t like the extra verbosity, so my server has been using the first form.\n\nA common alternative is to return nothing, in which case just the status code \"200 OK\" would be enough. I can live with this, but I often worry if a programming error could (where we forget to send the payload) could trick us into accepting bad data.\n\nAnother alternative (which I don\u0027t like much) is to just return \"ok\". The reason I don\u0027t like it is that is not parseable JSON, so we\u0027d have to look at the raw payload and if it\u0027s not \"ok\", then unmarshal it.\n\nFor now, I\u0027ve changed the parser to interpret the Success string itself, but I don\u0027t think that\u0027s a great solution in the long run. I\u0027ll probably change the server to return nothing on success, unless you have a better suggestion.",
+      "parentUuid": "f465d6c4_7a1eae3e",
       "revId": "796453a180b59b22a21c451429dd0e0d1e03545d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
