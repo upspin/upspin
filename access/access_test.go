@@ -91,7 +91,7 @@ func (d *dummyStore) ServerUserName() string {
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.Lookup not implemented")
 }
-func (d *dummyDirectory) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+func (d *dummyDirectory) Put(name upspin.PathName, data, packdata []byte) (upspin.Location, error) {
 	return upspin.Location{}, errors.New("dummyDirectory.Lookup not implemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
