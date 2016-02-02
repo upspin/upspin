@@ -93,6 +93,30 @@
       "revId": "f336dbff7c331eb23f4eaa0e583cbb0a2063c934",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_2913c9ac",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-02T18:56:00Z",
+      "side": 1,
+      "message": "Yes, I understood that;  hence my observation that metadata isn\u0027t fixed at time of Pack() call.  How about having PackLen and UnpackLen return two lengths rather than one?   The EndToEnd version of PackLen() will still need to get the userlist from the parent directory;  I\u0027m not sure yet how that happens.\n\nWe could require the encrypt+compress function to store a uint64 prefix so that UnpackLen can compute the expanded size from ciphertext before actually doing the expansion.",
+      "parentUuid": "711bb8b8_a9ab3993",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 33,
+        "endChar": 16
+      },
+      "revId": "f336dbff7c331eb23f4eaa0e583cbb0a2063c934",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
