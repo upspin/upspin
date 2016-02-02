@@ -22,6 +22,30 @@
       "revId": "855d3646e2e6ab1faadacad8c8f5b56a08745b5b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f465d6c4_b5905700",
+        "filename": "pack/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-02T00:03:51Z",
+      "side": 1,
+      "message": "Yes. Go handles this correctly.",
+      "parentUuid": "f465d6c4_35f7e778",
+      "range": {
+        "startLine": 20,
+        "startChar": 28,
+        "endLine": 20,
+        "endChar": 69
+      },
+      "revId": "855d3646e2e6ab1faadacad8c8f5b56a08745b5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
