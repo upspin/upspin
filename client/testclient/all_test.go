@@ -35,7 +35,7 @@ type Setup struct {
 func setup() (*Setup, error) {
 	ctxt := Context("testcontext")
 	e := upspin.Endpoint{
-		Transport: "in-process",
+		Transport: upspin.InProcess,
 		NetAddr:   testAddr,
 	}
 	us, err := access.Switch.BindUser(ctxt, e)

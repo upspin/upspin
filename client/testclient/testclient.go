@@ -42,7 +42,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			return nil, fmt.Errorf("TODO: testclient can't handle different store address: %v %v", loc.Endpoint, c.store.Endpoint())
 		}
 		// TODO: Be able to connect to another Store. Plus don't hack in "in-process".
-		if loc.Endpoint.Transport != "in-process" {
+		if loc.Endpoint.Transport != upspin.InProcess {
 			fmt.Printf("%+v\n", loc)
 			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Endpoint.Transport, "in-process")
 		}

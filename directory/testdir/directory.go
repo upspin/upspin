@@ -504,7 +504,7 @@ func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interfa
 	return NewService(store), nil
 }
 
-const transport = "in-process"
+const transport = upspin.InProcess
 
 func init() {
 	access.Switch.RegisterDirectory(transport, &Service{})
