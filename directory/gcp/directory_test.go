@@ -23,7 +23,7 @@ var (
 	key                    = "the key"
 	reference              = upspin.Reference{
 		Key:     key,
-		Packing: upspin.HTTP,
+		Packing: upspin.PlainPack,
 	}
 	location = upspin.Location{
 		Reference: reference,
@@ -31,15 +31,10 @@ var (
 	dirEntry = upspin.DirEntry{
 		Name: pathName,
 		Metadata: upspin.Metadata{
-			IsDir:     false,
-			Sequence:  17,
-			Signature: []byte("This is a sig!"),
-			WrappedKeys: []upspin.WrappedKey{
-				upspin.WrappedKey{
-					Hash:      [2]byte{1, 3},
-					Encrypted: []byte("cipher"),
-				},
-			}},
+			IsDir:    false,
+			Sequence: 17,
+			PackData: []byte("Packed metadata"),
+		},
 	}
 )
 
@@ -153,26 +148,9 @@ func dirEntryEquals(a, b *upspin.DirEntry) bool {
 		log.Println("Sequences differ")
 		return false
 	}
-	if string(a.Metadata.Signature) != string(b.Metadata.Signature) {
-		log.Println("Signatures differ")
-		return false
-	}
-	if string(a.Metadata.Signature) != string(b.Metadata.Signature) {
-		log.Println("Signatures differ")
-		return false
-	}
-	if len(a.Metadata.WrappedKeys) != len(b.Metadata.WrappedKeys) {
-		log.Println("WrappedKeys len differ")
-		return false
-	}
-	for i, k := range a.Metadata.WrappedKeys {
-		if k.Hash[0] != b.Metadata.WrappedKeys[i].Hash[0] ||
-			k.Hash[1] != b.Metadata.WrappedKeys[i].Hash[1] {
-			log.Println("Hashes differ")
-			return false
-		}
-		if string(k.Encrypted) != string(b.Metadata.WrappedKeys[i].Encrypted) {
-			log.Println("Encrypted keys differ")
+	for i, k := range a.Metadata.PackData {
+		if k != b.Metadata.PackData[i] {
+			log.Println("PackData differ")
 			return false
 		}
 	}
@@ -213,7 +191,7 @@ func TestPutError(t *testing.T) {
 		Response: nil,
 	})
 
-	_, err := d.Put(upspin.PathName(pathName), []byte("contents"))
+	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte("Packed metadata"))
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -228,7 +206,7 @@ func TestPut(t *testing.T) {
 	d := newDirectoryClientWithStoreClient(t, respSuccess)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName("foo@bar.com/mydir/myfile.txt"), []byte("contents of file"))
+	loc, err := d.Put(upspin.PathName("foo@bar.com/mydir/myfile.txt"), []byte("contents of file"), []byte("Packed metadata"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}

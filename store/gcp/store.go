@@ -54,13 +54,11 @@ func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error)
 	}
 	key := location.Reference.Key
 	var request string
-	switch location.Reference.Packing {
-	case upspin.HTTP:
+	switch location.Endpoint.Transport {
+	case "HTTP":
 		request = location.Reference.Key
-	case upspin.EllipticalEric:
-		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, key)
 	default:
-		return nil, nil, NewStoreError("Can't figure out the packing", key)
+		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, key)
 	}
 	httpReq, err := http.NewRequest(netutil.Get, request, nil)
 	if err != nil {

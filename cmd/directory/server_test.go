@@ -10,10 +10,6 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-var (
-	validSignature = make([]byte, signatureMinLen)
-)
-
 func Put(t *testing.T, dirEntry upspin.DirEntry, errorExpected string) {
 	resp := nettest.NewExpectingResponseWriter(errorExpected)
 	jsonStr, err := json.Marshal(dirEntry)
@@ -41,14 +37,9 @@ func TestPutErrorParseUser(t *testing.T) {
 }
 
 func makeValidMeta() upspin.Metadata {
-	keys := make([]upspin.WrappedKey, 2)
-	keys[0].Encrypted = make([]byte, wrappedKeyMinLen)
-	keys[1].Encrypted = make([]byte, wrappedKeyMaxLen)
 	return upspin.Metadata{
-		IsDir:       true,
-		Sequence:    0,
-		Signature:   validSignature,
-		WrappedKeys: keys,
+		IsDir:    true,
+		Sequence: 0,
 	}
 }
 
@@ -60,36 +51,6 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Metadata: meta,
 	}
 	Put(t, dir, `{"error":"dir entry verification failed: invalid sequence number"}`)
-}
-
-func TestPutErrorInvalidSignature(t *testing.T) {
-	meta := makeValidMeta()
-	meta.Signature = []byte("short sig!")
-	dir := upspin.DirEntry{
-		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
-		Metadata: meta,
-	}
-	Put(t, dir, `{"error":"dir entry verification failed: signature is invalid"}`)
-}
-
-func TestPutErrorNoKeys(t *testing.T) {
-	meta := makeValidMeta()
-	meta.WrappedKeys = nil
-	dir := upspin.DirEntry{
-		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
-		Metadata: meta,
-	}
-	Put(t, dir, `{"error":"dir entry verification failed: need at least one wrapped key"}`)
-}
-
-func TestPutErrorInvalidKey(t *testing.T) {
-	meta := makeValidMeta()
-	meta.WrappedKeys[1].Encrypted = make([]byte, wrappedKeyMinLen-1)
-	dir := upspin.DirEntry{
-		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
-		Metadata: meta,
-	}
-	Put(t, dir, `{"error":"dir entry verification failed: invalid wrapped key"}`)
 }
 
 func TestLookupPathError(t *testing.T) {

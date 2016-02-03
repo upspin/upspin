@@ -55,7 +55,7 @@ func Usage() {
 func get(refStr string) {
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EllipticalEric,
+		Packing: upspin.EndToEnd,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -92,7 +92,7 @@ func innerGet(loc upspin.Location, count int) ([]byte, []upspin.Location, error)
 		log.Fatalf("Error getting from server: %v", err)
 	}
 	if locs != nil {
-		log.Println("We got redirected. Following...")
+		log.Println("We got redirected. Following new location: %v", locs[0])
 		buf, locs, err = innerGet(locs[0], count+1)
 	}
 	return buf, locs, err
@@ -118,7 +118,7 @@ func put(refStr string) {
 
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EllipticalEric,
+		Packing: upspin.EndToEnd,
 	}
 
 	loc, err := Store.Put(ref, data)
