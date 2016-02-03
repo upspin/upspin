@@ -16,6 +16,69 @@
       "revId": "4bcc0ad0ddb06f05dfc1607d7db38c50863a7164",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_1591bec9",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-03T17:21:08Z",
+      "side": 1,
+      "message": "Did you mean to swap the order of ciphertext and cleartext here?  I thought I heard you say you prefer that the destination is consistently the first argument.",
+      "revId": "4bcc0ad0ddb06f05dfc1607d7db38c50863a7164",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_959c8ede",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-03T17:21:08Z",
+      "side": 1,
+      "message": "I had been assuming Unpack would get the PathName out of DirEntry, not ciphertext.   That way, we can rename a file without touching the big blob on storage.   Verification of the signature requires PathName.",
+      "range": {
+        "startLine": 29,
+        "startChar": 55,
+        "endLine": 29,
+        "endChar": 63
+      },
+      "revId": "4bcc0ad0ddb06f05dfc1607d7db38c50863a7164",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_756f5293",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-03T17:21:08Z",
+      "side": 1,
+      "message": "or EEp256 (to be followed later by things like EEed25519 and EElwe)\n\nYou can think of EE as EllipticalEric if you want and I\u0027ll think of it as End-to-End Encrypted, i.e. Google doesn\u0027t escrow the keys)",
+      "range": {
+        "startLine": 56,
+        "startChar": 20,
+        "endLine": 56,
+        "endChar": 32
+      },
+      "revId": "4bcc0ad0ddb06f05dfc1607d7db38c50863a7164",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
