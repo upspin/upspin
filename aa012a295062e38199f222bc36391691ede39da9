@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_7b7103e4",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-03T20:20:28Z",
+      "side": 1,
+      "message": "you could use nil instead here and elsewhere. no need to allocate an empty slice",
+      "revId": "aa012a295062e38199f222bc36391691ede39da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_1b7c4fbc",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-03T20:20:28Z",
+      "side": 1,
+      "message": "does this mean anything in particular?",
+      "range": {
+        "startLine": 156,
+        "startChar": 6,
+        "endLine": 156,
+        "endChar": 7
+      },
+      "revId": "aa012a295062e38199f222bc36391691ede39da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
