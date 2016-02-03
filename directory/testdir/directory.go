@@ -145,7 +145,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 						Endpoint: s.StoreEndpoint,
 						Reference: upspin.Reference{
 							Key:     hash.BytesString(hashBytes),
-							Packing: upspin.Debug,
+							Packing: upspin.DebugPack,
 						},
 					},
 					Metadata: upspin.Metadata{
@@ -194,7 +194,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		shaHash := hash.Of(blob)
 		ref := upspin.Reference{
 			Key:     shaHash.String(),
-			Packing: upspin.Debug,
+			Packing: upspin.DebugPack,
 		}
 		loc, err := s.Store.Put(ref, blob)
 		if err != nil {
@@ -254,7 +254,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	shaHash := hash.Of(ciphertext)
 	ref := upspin.Reference{
 		Key:     shaHash.String(),
-		Packing: upspin.Debug,
+		Packing: upspin.DebugPack,
 	}
 	loc, err := s.Store.Put(ref, ciphertext)
 	// TODO VALIDATE REF
@@ -332,7 +332,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 			Endpoint: s.StoreEndpoint,
 			Reference: upspin.Reference{
 				Key:     r.Key,
-				Packing: upspin.Debug,
+				Packing: upspin.DebugPack,
 			},
 		},
 		Metadata: upspin.Metadata{
@@ -420,7 +420,7 @@ Loop:
 		}
 		r := upspin.Reference{
 			Key:     hash.BytesString(hashBytes),
-			Packing: upspin.Debug,
+			Packing: upspin.DebugPack,
 		}
 		return r, isDir, nil
 	}
@@ -475,7 +475,7 @@ Loop:
 	shaHash := hash.Of(blob)
 	ref := upspin.Reference{
 		Key:     shaHash.String(),
-		Packing: upspin.Debug,
+		Packing: upspin.DebugPack,
 	}
 	loc, err := s.Store.Put(ref, blob)
 	if err != nil {

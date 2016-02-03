@@ -55,7 +55,7 @@ func Usage() {
 func get(refStr string) {
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EndToEnd,
+		Packing: upspin.EEp256Pack,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -121,7 +121,7 @@ func put(refStr string) {
 
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EndToEnd,
+		Packing: upspin.EEp256Pack,
 	}
 
 	loc, err := Store.Put(ref, data)
