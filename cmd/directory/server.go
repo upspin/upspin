@@ -48,7 +48,7 @@ func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err erro
 	}
 	// Checks the transport
 	switch dirEntry.Location.Endpoint.Transport {
-	case "HTTP":
+	case upspin.HTTP:
 		err = verifyUrl(dirEntry.Location.Reference.Key)
 		if err != nil {
 			return

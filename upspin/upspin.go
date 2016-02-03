@@ -50,20 +50,30 @@ const (
 	// No path name is recorded.
 	PlainPack
 
-	// HTTP uses a URL as a reference. TODO: This isn't about the packing at all.
-	// TODO: Call this HTTPPack.
-	HTTP
-
 	// EndToEnd packing stores AES-encrypted data; dir has ECDSA sig and ECDH-wrapped keys.
 	// TODO: Call this EEp256Pack.
 	EndToEnd
 )
 
+// Transport identifies how storage contents are identified.
+type Transport uint8
+
+const (
+	// InProcess indicates that contents are located in the current process, typically in memory.
+	InProcess Transport = iota
+
+	// SHA256 is the SHA256 digest of the contents of the stored blob.
+	SHA256
+
+	// HTTP is a URL-encoded address.
+	HTTP
+)
+
 // An Endpoint describes how to connect to and transfer data to/from a service.
 type Endpoint struct {
-	// Transport defines the mechanism used to access the service, such as "http"
-	// or "in-process". TODO: Largely unspecified.
-	Transport string
+	// Transport defines the mechanism used to access the service, such as HTTP
+	// or InProcess
+	Transport Transport
 
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr
@@ -295,11 +305,11 @@ type AccessSwitch interface {
 	BindDirectory(ClientContext, Endpoint) (Directory, error)
 
 	// RegisterUser registers an interface and a User interface
-	RegisterUser(string, User) error
+	RegisterUser(Transport, User) error
 
 	// RegisterStore registers an interface for the Store interface.
-	RegisterStore(string, Store) error
+	RegisterStore(Transport, Store) error
 
 	// RegisterDirectory registers an interface for the Directory interface.
-	RegisterDirectory(string, Directory) error
+	RegisterDirectory(Transport, Directory) error
 }

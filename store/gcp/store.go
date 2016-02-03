@@ -55,10 +55,13 @@ func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error)
 	key := location.Reference.Key
 	var request string
 	switch location.Endpoint.Transport {
-	case "HTTP":
+	case upspin.HTTP:
 		request = location.Reference.Key
-	default:
+	case upspin.SHA256:
 		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, key)
+	default:
+		log.Printf("Unknwon transport %v. Treating as HTTP.", location.Endpoint.Transport)
+		request = location.Reference.Key
 	}
 	httpReq, err := http.NewRequest(netutil.Get, request, nil)
 	if err != nil {

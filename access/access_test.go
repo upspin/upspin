@@ -10,36 +10,36 @@ import (
 
 func TestSwitch(t *testing.T) {
 	// These should succeed.
-	if err := access.Switch.RegisterUser("dummy", &dummyUser{}); err != nil {
+	if err := access.Switch.RegisterUser(upspin.InProcess, &dummyUser{}); err != nil {
 		t.Errorf("registerUser failed")
 	}
-	if err := access.Switch.RegisterStore("dummy", &dummyStore{}); err != nil {
+	if err := access.Switch.RegisterStore(upspin.InProcess, &dummyStore{}); err != nil {
 		t.Errorf("registerStore failed")
 	}
-	if err := access.Switch.RegisterDirectory("dummy", &dummyDirectory{}); err != nil {
+	if err := access.Switch.RegisterDirectory(upspin.InProcess, &dummyDirectory{}); err != nil {
 		t.Errorf("registerDirectory failed")
 	}
 
 	// These should fail.
-	if err := access.Switch.RegisterUser("dummy", &dummyUser{}); err == nil {
+	if err := access.Switch.RegisterUser(upspin.InProcess, &dummyUser{}); err == nil {
 		t.Errorf("registerUser should have failed")
 	}
-	if err := access.Switch.RegisterStore("dummy", &dummyStore{}); err == nil {
+	if err := access.Switch.RegisterStore(upspin.InProcess, &dummyStore{}); err == nil {
 		t.Errorf("registerStore should have failed")
 	}
-	if err := access.Switch.RegisterDirectory("dummy", &dummyDirectory{}); err == nil {
+	if err := access.Switch.RegisterDirectory(upspin.InProcess, &dummyDirectory{}); err == nil {
 		t.Errorf("registerDirectory should have failed")
 	}
 
 	// These should return different NetAddrs
-	s1, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "dummy", NetAddr: "addr1"})
-	s2, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "dummy", NetAddr: "addr2"})
+	s1, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	s2, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
 	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "undefined"}); err == nil {
+	if _, err := access.Switch.BindStore(nil, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
 		t.Errorf("expected BindStore of undefined to fail")
 	}
 }

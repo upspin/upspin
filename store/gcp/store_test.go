@@ -21,7 +21,7 @@ var (
 		Packing: upspin.PlainPack,
 	}
 	newEndpoint = upspin.Endpoint{
-		Transport: "HTTP",
+		Transport: upspin.HTTP,
 	}
 	newLocation = upspin.Location{
 		Reference: newReference,
@@ -153,7 +153,7 @@ func TestStoreGetRedirect(t *testing.T) {
 	loc := upspin.Location{
 		Reference: ref,
 		Endpoint: upspin.Endpoint{
-			Transport: "Upspin",
+			Transport: upspin.SHA256,
 		},
 	}
 
