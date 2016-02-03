@@ -66,9 +66,9 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	// Answer something sensible to the client.
 	location := upspin.Location{}
 	location.Reference.Key = ref
-	location.Reference.Packing = upspin.HTTP
-	// Leave location.Endpoint empty for now (does it make sense to
-	// be the Endpoint of the GCE storage server, if we're not yet
+	location.Endpoint.Transport = "HTTP" // TODO(edpin): specify or use a constant
+	// Leave location.Endpoint.NetAddr empty for now (does it make sense to
+	// be the NetAddr of the GCE storage server, if we're not yet
 	// providing the user with a direct link?)
 	fmt.Printf("Replying to client with location: %v. Ref:%v\n", location, ref)
 	netutil.SendJSONReply(w, location)
