@@ -55,7 +55,7 @@ func Usage() {
 func get(refStr string) {
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EllipticalEric,
+		Packing: upspin.EndToEnd,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -118,7 +118,7 @@ func put(refStr string) {
 
 	ref := upspin.Reference{
 		Key:     refStr,
-		Packing: upspin.EllipticalEric,
+		Packing: upspin.EndToEnd,
 	}
 
 	loc, err := Store.Put(ref, data)
