@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_9bbddfef",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-03T21:50:23Z",
+      "side": 1,
+      "message": "This can\u0027t be right. What if I have an in-process server that uses SHA255 keys? I think you\u0027ve conflated transport and key type.\n\nTo identify a blob, we need:\n\nA mechanism through which we will contact the server (Transport)\nA way to contact the server (NetAddr)\nA way to interpret the key (I think missing from our plan, although possibly allied with transport)\nA way to interpret the blob (Packing)\n\nI cannot see a world in which in-process and SHA256 are of the same category",
+      "range": {
+        "startLine": 66,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 7
+      },
+      "revId": "ccc1bfe7122615015815fdfbd4ebc4c38dba1e75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
