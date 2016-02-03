@@ -32,27 +32,27 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := access.Switch.BindStore(nil, upspin.Location{Transport: "dummy", NetAddr: "addr1"})
-	s2, _ := access.Switch.BindStore(nil, upspin.Location{Transport: "dummy", NetAddr: "addr2"})
-	if s1.NetAddr() != "addr1" || s2.NetAddr() != "addr2" {
-		t.Errorf("got %s %s, expected addr1 addr2", s1.NetAddr(), s2.NetAddr())
+	s1, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "dummy", NetAddr: "addr1"})
+	s2, _ := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "dummy", NetAddr: "addr2"})
+	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
+		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := access.Switch.BindStore(nil, upspin.Location{Transport: "undefined"}); err == nil {
+	if _, err := access.Switch.BindStore(nil, upspin.Endpoint{Transport: "undefined"}); err == nil {
 		t.Errorf("expected BindStore of undefined to fail")
 	}
 }
 
 // Some dummy interfaces.
 type dummyUser struct {
-	loc upspin.Location
+	endpoint upspin.Endpoint
 }
 type dummyStore struct {
-	loc upspin.Location
+	endpoint upspin.Endpoint
 }
 type dummyDirectory struct {
-	loc upspin.Location
+	endpoint upspin.Endpoint
 }
 type dummyContext int
 
@@ -60,11 +60,11 @@ func (d *dummyContext) Name() string {
 	return "george"
 }
 
-func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.NetAddr, error) {
+func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, error) {
 	return nil, errors.New("dummyUser.Lookup not implemented")
 }
-func (d *dummyUser) Dial(cc upspin.ClientContext, loc upspin.Location) (interface{}, error) {
-	user := &dummyUser{loc: loc}
+func (d *dummyUser) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	user := &dummyUser{endpoint: e}
 	return user, nil
 }
 func (d *dummyUser) ServerUserName() string {
@@ -75,14 +75,14 @@ func (d *dummyStore) Get(location upspin.Location) ([]byte, []upspin.Location, e
 	return nil, nil, errors.New("dummyStore.Get not implemented")
 }
 func (d *dummyStore) Put(ref upspin.Reference, data []byte) (upspin.Location, error) {
-	return d.loc, errors.New("dummyStore.Put not implemented")
+	return upspin.Location{}, errors.New("dummyStore.Put not implemented")
 }
-func (d *dummyStore) Dial(cc upspin.ClientContext, loc upspin.Location) (interface{}, error) {
-	store := &dummyStore{loc: loc}
+func (d *dummyStore) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	store := &dummyStore{endpoint: e}
 	return store, nil
 }
-func (d *dummyStore) NetAddr() upspin.NetAddr {
-	return d.loc.NetAddr
+func (d *dummyStore) Endpoint() upspin.Endpoint {
+	return d.endpoint
 }
 func (d *dummyStore) ServerUserName() string {
 	return "userStore"
@@ -100,8 +100,8 @@ func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location
 func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.GLob not implemented")
 }
-func (d *dummyDirectory) Dial(cc upspin.ClientContext, loc upspin.Location) (interface{}, error) {
-	dir := &dummyDirectory{loc: loc}
+func (d *dummyDirectory) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }
 func (d *dummyDirectory) ServerUserName() string {

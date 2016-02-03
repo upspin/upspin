@@ -38,13 +38,13 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
 		// TODO: Be able to connect to another Store.
-		if loc.NetAddr != c.store.NetAddr() {
-			return nil, fmt.Errorf("TODO: testclient can't handle different store address: %q %q", loc.NetAddr, c.store.NetAddr())
+		if loc.Endpoint != c.store.Endpoint() {
+			return nil, fmt.Errorf("TODO: testclient can't handle different store address: %v %v", loc.Endpoint, c.store.Endpoint())
 		}
 		// TODO: Be able to connect to another Store. Plus don't hack in "in-process".
-		if loc.Transport != "in-process" {
+		if loc.Endpoint.Transport != "in-process" {
 			fmt.Printf("%+v\n", loc)
-			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Transport, "in-process")
+			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Endpoint.Transport, "in-process")
 		}
 		cipher, locs, err := c.store.Get(entry.Location)
 		if err != nil {

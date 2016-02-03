@@ -59,8 +59,8 @@ func UnpackBlob(data []byte) (upspin.PathName, []byte, error) {
 
 // Service returns data and metadata referenced by the request.
 type Service struct {
-	netAddr upspin.NetAddr
-	blob    map[string]*Blob // Key created by blobKey.
+	endpoint upspin.Endpoint
+	blob     map[string]*Blob // Key created by blobKey.
 }
 
 // This package (well, the Servie type) implements the upspin.Store interface.
@@ -70,10 +70,10 @@ func blobKey(ref *upspin.Reference) string {
 	return fmt.Sprintf("%d:%s", ref.Packing, ref.Key)
 }
 
-func NewService(addr upspin.NetAddr) *Service {
+func NewService(e upspin.Endpoint) *Service {
 	return &Service{
-		netAddr: addr,
-		blob:    make(map[string]*Blob),
+		endpoint: e,
+		blob:     make(map[string]*Blob),
 	}
 }
 
@@ -89,8 +89,8 @@ func copyOf(in []byte) (out []byte) {
 	return out
 }
 
-func (s *Service) NetAddr() upspin.NetAddr {
-	return s.netAddr
+func (s *Service) Endpoint() upspin.Endpoint {
+	return s.endpoint
 }
 
 func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location, error) {
@@ -107,8 +107,7 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 		[]byte("metadata"), // TODO: probably want defaults.
 	}
 	loc := upspin.Location{
-		Transport: transport,
-		NetAddr:   s.netAddr,
+		Endpoint:  s.endpoint,
 		Reference: ref,
 	}
 	return loc, nil
@@ -116,8 +115,8 @@ func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location,
 
 // TODO: Function should provide alternate location if missing.
 func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Location, err error) {
-	if loc.Transport != transport {
-		return nil, nil, errors.New("unrecognized transport: " + loc.Transport)
+	if loc.Endpoint.Transport != transport {
+		return nil, nil, errors.New("unrecognized transport: " + loc.Endpoint.Transport)
 	}
 	if loc.Reference.Packing != upspin.Debug { // TODO
 		return nil, nil, errors.New("unrecognized packing")
@@ -141,8 +140,8 @@ func (s *Service) ServerUserName() string {
 	return "testuser"
 }
 
-func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
-	return NewService(loc.NetAddr), nil
+func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	return NewService(e), nil
 }
 
 const transport = "in-process"

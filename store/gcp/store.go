@@ -40,7 +40,7 @@ func New(serverURL string, client HTTPClientInterface) *Store {
 	}
 }
 
-func (s *Store) Dial(upspin.ClientContext, upspin.Location) (interface{}, error) {
+func (s *Store) Dial(upspin.ClientContext, upspin.Endpoint) (interface{}, error) {
 	return nil, NewStoreError("not implemented yet", "")
 }
 
@@ -153,7 +153,7 @@ func (s *Store) Put(ref upspin.Reference, data []byte) (upspin.Location, error) 
 	return *newLoc, err
 }
 
-func (s *Store) NetAddr() upspin.NetAddr {
+func (s *Store) Endpoint() upspin.Endpoint {
 	panic("not defined yet")
 }
 

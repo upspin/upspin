@@ -47,12 +47,12 @@ func (as *accessSwitch) RegisterStore(name string, store upspin.Store) error {
 }
 
 // BindUser implements upspin.AccessSwitch.BindUser
-func (as *accessSwitch) BindUser(cc upspin.ClientContext, loc upspin.Location) (upspin.User, error) {
-	u, ok := as.user[loc.Transport]
+func (as *accessSwitch) BindUser(cc upspin.ClientContext, e upspin.Endpoint) (upspin.User, error) {
+	u, ok := as.user[e.Transport]
 	if !ok {
-		return nil, fmt.Errorf("User service with transport %q not registered", loc.Transport)
+		return nil, fmt.Errorf("User service with transport %q not registered", e.Transport)
 	}
-	x, err := u.Dial(cc, loc)
+	x, err := u.Dial(cc, e)
 	if err != nil {
 		return nil, err
 	}
@@ -60,12 +60,12 @@ func (as *accessSwitch) BindUser(cc upspin.ClientContext, loc upspin.Location) (
 }
 
 // BindStore implements upspin.AccessSwitch.BindStore
-func (as *accessSwitch) BindStore(cc upspin.ClientContext, loc upspin.Location) (upspin.Store, error) {
-	s, ok := as.store[loc.Transport]
+func (as *accessSwitch) BindStore(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error) {
+	s, ok := as.store[e.Transport]
 	if !ok {
-		return nil, fmt.Errorf("Store service with transport %q not registered", loc.Transport)
+		return nil, fmt.Errorf("Store service with transport %q not registered", e.Transport)
 	}
-	x, err := s.Dial(cc, loc)
+	x, err := s.Dial(cc, e)
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +73,12 @@ func (as *accessSwitch) BindStore(cc upspin.ClientContext, loc upspin.Location) 
 }
 
 // BindDirectory implements upspin.AccessSwitch.BindDirectory
-func (as *accessSwitch) BindDirectory(cc upspin.ClientContext, loc upspin.Location) (upspin.Directory, error) {
-	d, ok := as.directory[loc.Transport]
+func (as *accessSwitch) BindDirectory(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Directory, error) {
+	d, ok := as.directory[e.Transport]
 	if !ok {
-		return nil, fmt.Errorf("Directory service with transport %q not registered", loc.Transport)
+		return nil, fmt.Errorf("Directory service with transport %q not registered", e.Transport)
 	}
-	x, err := d.Dial(cc, loc)
+	x, err := d.Dial(cc, e)
 	if err != nil {
 		return nil, err
 	}

@@ -59,14 +59,20 @@ const (
 	EndToEnd
 )
 
-// A Location describes how to retrieve a piece of data (a "blob") from the Store service.
-type Location struct {
+// An Endpoint describes how to connect to and transfer data to/from a service.
+type Endpoint struct {
 	// Transport defines the mechanism used to access the service, such as "http"
 	// or "in-process". TODO: Largely unspecified.
 	Transport string
 
 	// NetAddr returns the network address of the data.
 	NetAddr NetAddr
+}
+
+// A Location describes how to retrieve a piece of data (a "blob") from the Store service.
+type Location struct {
+	// Endpoint of the storage service.
+	Endpoint Endpoint
 
 	// Reference returns the reference information for the data.
 	Reference Reference
@@ -119,10 +125,10 @@ type PathName string
 type User interface {
 	Access
 
-	// Lookup returns a list of addresses of Directory services that may
+	// Lookup returns a list of endpoints of Directory services that may
 	// have the root directory for the named user. Those earlier in the
 	// list are better places to look.
-	Lookup(userName UserName) ([]NetAddr, error)
+	Lookup(userName UserName) ([]Endpoint, error)
 }
 
 // Directory service.
@@ -195,8 +201,8 @@ type Store interface {
 	// under the Reference is replaced.
 	Put(ref Reference, data []byte) (Location, error)
 
-	// NetAddr returns the network address of the server.
-	NetAddr() NetAddr
+	// Endpoint returns the network endpoint of the server.
+	Endpoint() Endpoint
 }
 
 // Client API.
@@ -266,7 +272,7 @@ type ClientContext interface {
 // Access defines how to connect and authenticate to a server.
 type Access interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(ClientContext, Location) (interface{}, error)
+	Dial(ClientContext, Endpoint) (interface{}, error)
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.
@@ -280,13 +286,13 @@ type Access interface {
 // will use its Init function to install itself in the AccessSwitch.
 type AccessSwitch interface {
 	// BindUser connects to the User server and returns a User instance.
-	BindUser(ClientContext, Location) (User, error)
+	BindUser(ClientContext, Endpoint) (User, error)
 
 	// BindStore connects to the Store server and returns a Store instance.
-	BindStore(ClientContext, Location) (Store, error)
+	BindStore(ClientContext, Endpoint) (Store, error)
 
 	// BindDirectory connects to the Directory server and returns a Directory instance.
-	BindDirectory(ClientContext, Location) (Directory, error)
+	BindDirectory(ClientContext, Endpoint) (Directory, error)
 
 	// RegisterUser registers an interface and a User interface
 	RegisterUser(string, User) error

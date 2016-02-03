@@ -23,9 +23,9 @@ var (
 
 // Service implements directories and file-level I/O.
 type Service struct {
-	StoreAddr upspin.NetAddr
-	Store     upspin.Store
-	Root      map[upspin.UserName]upspin.Reference // TODO. No need for hint, they're all on ds.Store.
+	StoreEndpoint upspin.Endpoint
+	Store         upspin.Store
+	Root          map[upspin.UserName]upspin.Reference // TODO. No need for hint, they're all on ds.Store.
 }
 
 var _ upspin.Directory = (*Service)(nil)
@@ -33,9 +33,9 @@ var _ upspin.Directory = (*Service)(nil)
 // NewService returns a new, empty directory server that will store its data in the specified store service.
 func NewService(ss upspin.Store) *Service {
 	return &Service{
-		StoreAddr: ss.NetAddr(),
-		Store:     ss,
-		Root:      make(map[upspin.UserName]upspin.Reference),
+		StoreEndpoint: ss.Endpoint(),
+		Store:         ss,
+		Root:          make(map[upspin.UserName]upspin.Reference),
 	}
 }
 
@@ -108,8 +108,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	next[0] = &upspin.DirEntry{
 		Name: upspin.PathName(parsed.User),
 		Location: upspin.Location{
-			Transport: transport,
-			NetAddr:   s.StoreAddr,
+			Endpoint:  s.StoreEndpoint,
 			Reference: dirRef,
 		},
 		Metadata: upspin.Metadata{
@@ -143,8 +142,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				e := &upspin.DirEntry{
 					Name: ent.Name + "/" + upspin.PathName(name),
 					Location: upspin.Location{
-						Transport: transport,
-						NetAddr:   s.StoreAddr,
+						Endpoint: s.StoreEndpoint,
 						Reference: upspin.Reference{
 							Key:     hash.BytesString(hashBytes),
 							Packing: upspin.Debug,
@@ -292,8 +290,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	// Update the root.
 	s.Root[parsed.User] = dirRef
 	href := upspin.Location{
-		Transport: transport,
-		NetAddr:   s.StoreAddr,
+		Endpoint:  s.StoreEndpoint,
 		Reference: loc.Reference,
 	}
 	return href, nil
@@ -332,8 +329,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name: parsed.Path(),
 		Location: upspin.Location{
-			Transport: transport,
-			NetAddr:   s.StoreAddr,
+			Endpoint: s.StoreEndpoint,
 			Reference: upspin.Reference{
 				Key:     r.Key,
 				Packing: upspin.Debug,
@@ -378,8 +374,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 // TODO: For test but is it genuinely valuable?
 func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
 	loc := upspin.Location{
-		Transport: transport,
-		NetAddr:   s.StoreAddr,
+		Endpoint:  s.StoreEndpoint,
 		Reference: dirRef,
 	}
 	ciphertext, _, err := s.Store.Get(loc)
@@ -497,12 +492,12 @@ func (s *Service) ServerUserName() string {
 	return "testuser"
 }
 
-func (s *Service) Dial(context upspin.ClientContext, loc upspin.Location) (interface{}, error) {
-	sloc := loc
+func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	se := e
 	// TODO: This package only works if the same Store instance is used for data and
 	// to store its own DirEntries. It should be improved, but at the moment the only
 	// addresses it knows about come from its Store.
-	store, err := access.Switch.BindStore(context, sloc)
+	store, err := access.Switch.BindStore(context, se)
 	if err != nil {
 		return nil, err
 	}
