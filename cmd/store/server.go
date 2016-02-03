@@ -67,8 +67,8 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	location := upspin.Location{}
 	location.Reference.Key = ref
 	location.Reference.Packing = upspin.HTTP
-	// Leave location.NetAddr empty for now (does it make sense to
-	// be the NetAddr of the GCE storage server, if we're not yet
+	// Leave location.Endpoint empty for now (does it make sense to
+	// be the Endpoint of the GCE storage server, if we're not yet
 	// providing the user with a direct link?)
 	fmt.Printf("Replying to client with location: %v. Ref:%v\n", location, ref)
 	netutil.SendJSONReply(w, location)
@@ -106,7 +106,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	// as the Key already specifies "https://" to indicate the
 	// right packing.
 	location.Reference.Packing = upspin.HTTP
-	// Leave location.NetAddr empty for now. It could probably be
+	// Leave location.Endpoint empty for now. It could probably be
 	// what "www.googleapis.com" resolves to at this moment, but
 	// the Key contains all info needed for clients to find it
 	// ("https://www.googleapis.com...")
