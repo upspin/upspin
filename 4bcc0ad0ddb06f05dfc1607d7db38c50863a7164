@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_1516de2a",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-03T16:44:13Z",
+      "side": 1,
+      "message": "Should you test Pack and Upack here as well?",
+      "revId": "4bcc0ad0ddb06f05dfc1607d7db38c50863a7164",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
