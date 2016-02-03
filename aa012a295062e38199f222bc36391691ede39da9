@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "711bb8b8_dbeab794",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-03T20:27:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "711bb8b8_7b7103e4",
+      "revId": "aa012a295062e38199f222bc36391691ede39da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "711bb8b8_1b7c4fbc",
         "filename": "store/gcp/store_test.go",
         "patchSetId": 3
@@ -30,6 +48,30 @@
       "writtenOn": "2016-02-03T20:20:28Z",
       "side": 1,
       "message": "does this mean anything in particular?",
+      "range": {
+        "startLine": 156,
+        "startChar": 6,
+        "endLine": 156,
+        "endChar": 7
+      },
+      "revId": "aa012a295062e38199f222bc36391691ede39da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_bbe37bc4",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-03T20:27:52Z",
+      "side": 1,
+      "message": "No. But I\u0027m proposing it means our protocol, using a SHA as the Reference.Key. Just sent email about this.",
+      "parentUuid": "711bb8b8_1b7c4fbc",
       "range": {
         "startLine": 156,
         "startChar": 6,
