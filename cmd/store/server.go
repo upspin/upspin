@@ -66,7 +66,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 	// Answer something sensible to the client.
 	location := upspin.Location{}
 	location.Reference.Key = ref
-	location.Endpoint.Transport = "HTTP" // TODO(edpin): specify or use a constant
+	location.Endpoint.Transport = upspin.GCP // We hold the reference in this server
 	// Leave location.Endpoint.NetAddr empty for now (does it make sense to
 	// be the NetAddr of the GCE storage server, if we're not yet
 	// providing the user with a direct link?)
@@ -101,7 +101,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 
 	location := upspin.Location{}
 	location.Reference.Key = link
-	location.Endpoint.Transport = "HTTP" // Go fetch using the provided link.
+	location.Endpoint.Transport = upspin.HTTP // Go fetch using the provided link.
 	fmt.Printf("Got link: %v\n", link)
 	netutil.SendJSONReply(w, location)
 }

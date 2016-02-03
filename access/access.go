@@ -11,38 +11,38 @@ import (
 var Switch upspin.AccessSwitch
 
 type accessSwitch struct {
-	user      map[string]upspin.User
-	directory map[string]upspin.Directory
-	store     map[string]upspin.Store
+	user      map[upspin.Transport]upspin.User
+	directory map[upspin.Transport]upspin.Directory
+	store     map[upspin.Transport]upspin.Store
 }
 
 // RegisterUser implements upspin.AccessSwitch.RegisterUser
-func (as *accessSwitch) RegisterUser(name string, user upspin.User) error {
-	_, ok := as.user[name]
+func (as *accessSwitch) RegisterUser(transport upspin.Transport, user upspin.User) error {
+	_, ok := as.user[transport]
 	if ok {
-		return fmt.Errorf("cannot override User interface: %s", name)
+		return fmt.Errorf("cannot override User interface: %v", transport)
 	}
-	as.user[name] = user
+	as.user[transport] = user
 	return nil
 }
 
 // RegisterDirectory implements upspin.AccessSwitch.RegisterDirectory
-func (as *accessSwitch) RegisterDirectory(name string, dir upspin.Directory) error {
-	_, ok := as.directory[name]
+func (as *accessSwitch) RegisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
+	_, ok := as.directory[transport]
 	if ok {
-		return fmt.Errorf("cannot override Directory interface: %s", name)
+		return fmt.Errorf("cannot override Directory interface: %v", transport)
 	}
-	as.directory[name] = dir
+	as.directory[transport] = dir
 	return nil
 }
 
 // RegisterStore implements upspin.AccessSwitch.RegisterStore
-func (as *accessSwitch) RegisterStore(name string, store upspin.Store) error {
-	_, ok := as.store[name]
+func (as *accessSwitch) RegisterStore(transport upspin.Transport, store upspin.Store) error {
+	_, ok := as.store[transport]
 	if ok {
-		return fmt.Errorf("cannot override Store interface: %s", name)
+		return fmt.Errorf("cannot override Store interface: %v", transport)
 	}
-	as.store[name] = store
+	as.store[transport] = store
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (as *accessSwitch) BindDirectory(cc upspin.ClientContext, e upspin.Endpoint
 }
 
 func init() {
-	Switch = &accessSwitch{user: make(map[string]upspin.User),
-		store:     make(map[string]upspin.Store),
-		directory: make(map[string]upspin.Directory)}
+	Switch = &accessSwitch{user: make(map[upspin.Transport]upspin.User),
+		store:     make(map[upspin.Transport]upspin.Store),
+		directory: make(map[upspin.Transport]upspin.Directory)}
 }

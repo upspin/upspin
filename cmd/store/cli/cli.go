@@ -59,6 +59,9 @@ func get(refStr string) {
 	}
 	loc := upspin.Location{
 		Reference: ref,
+		Endpoint: upspin.Endpoint{
+			Transport: upspin.GCP,
+		},
 	}
 
 	buf, _, err := innerGet(loc, 0)
