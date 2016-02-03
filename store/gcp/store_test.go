@@ -148,7 +148,7 @@ func TestStoreGetRedirect(t *testing.T) {
 
 	ref := upspin.Reference{
 		Key:     "XX some hash XX",
-		Packing: upspin.EndToEnd,
+		Packing: upspin.EEp256Pack,
 	}
 	loc := upspin.Location{
 		Reference: ref,

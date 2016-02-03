@@ -15,7 +15,8 @@ type Packer interface {
 
 	// Pack takes cleartext data, metadata and path name and
 	// stores the ciphertext encoding in the supplied slice.
-	// It might update the metadata.
+	// The ciphertext and cleartext slices must not overlap.
+	// Pack might update the metadata.
 	// The slice must be large enough; the PackLen method may be used to
 	// find a suitable allocation size.
 	// The returned count is the length of the ciphertext.
@@ -23,11 +24,12 @@ type Packer interface {
 
 	// Unpack takes ciphertext data and packing metadata and stores the
 	// cleartext version in the supplied slice, which must be large enough.
-	// It might update the metadata.
+	// The ciphertext and cleartext slices must not overlap.
+	// Unpack might update the metadata.
 	// It returns the path name and the number of bytes written to the slice.
 	// The returned name will be empty if the ciphertext does not contain one.
 	// TODO: Do we get a path name here?
-	Unpack(cleartext, ciphertext []byte, meta *Metadata) (PathName, int, error)
+	Unpack(cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
 	// PackLen returns an upper bound of the number of bytes required
 	// to store the cleartext after packing. It might update the metadata.
@@ -40,19 +42,16 @@ type Packer interface {
 	UnpackLen(ciphertext []byte, meta *Metadata) int
 }
 
-// TODO: These constants are just placeholders.
 const (
 	// The Debug packing is available for use in tests for any purpose. Never used in production.
-	// TODO: DebugPack? It is in the top-level space of this package.
-	Debug Packing = iota
+	DebugPack Packing = iota
 
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
 	// No path name is recorded.
 	PlainPack
 
-	// EndToEnd packing stores AES-encrypted data; dir has ECDSA sig and ECDH-wrapped keys.
-	// TODO: Call this EEp256Pack.
-	EndToEnd
+	// EEp256Pack packing stores AES-encrypted data; dir has ECDSA sig and ECDH-wrapped keys.
+	EEp256Pack
 )
 
 // Transport identifies how storage contents are identified.

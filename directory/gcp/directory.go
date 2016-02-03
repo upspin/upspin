@@ -86,7 +86,7 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 	// First, store the data itself, to find a location.
 	ref := upspin.Reference{
 		Key:     "", // The server will compute one. But we should request exactly what we expect when we have crypto here
-		Packing: upspin.EndToEnd,
+		Packing: upspin.EEp256Pack,
 	}
 	loc, err := d.storeService.Put(ref, data)
 	if err != nil {
