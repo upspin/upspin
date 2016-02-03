@@ -35,7 +35,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	_, m, err = packer.Unpack(clear, cipher, nil)
+	m, err = packer.Unpack(clear, cipher, nil, name)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}

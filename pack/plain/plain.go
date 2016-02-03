@@ -30,11 +30,11 @@ func (plainPack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, name 
 	return copy(ciphertext, cleartext), nil
 }
 
-func (plainPack) Unpack(clear, cipher []byte, meta *upspin.Metadata) (upspin.PathName, int, error) {
-	if len(clear) < len(cipher) {
-		return "", 0, errTooShort
+func (plainPack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if len(cleartext) < len(ciphertext) {
+		return 0, errTooShort
 	}
-	return "", copy(clear, cipher), nil
+	return copy(cleartext, ciphertext), nil
 }
 
 func (plainPack) PackLen(cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {

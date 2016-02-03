@@ -94,7 +94,7 @@ func (s *Service) Endpoint() upspin.Endpoint {
 }
 
 func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location, error) {
-	if ref.Packing != upspin.Debug { // TODO
+	if ref.Packing != upspin.DebugPack { // TODO
 		return upspin.Location{}, errors.New("unrecognized packing")
 	}
 	hash := hash.Of(ciphertext)
@@ -118,7 +118,7 @@ func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Lo
 	if loc.Endpoint.Transport != transport {
 		return nil, nil, errors.New("unrecognized transport: " + string(loc.Endpoint.Transport))
 	}
-	if loc.Reference.Packing != upspin.Debug { // TODO
+	if loc.Reference.Packing != upspin.DebugPack { // TODO
 		return nil, nil, errors.New("unrecognized packing")
 	}
 	blob, ok := s.blob[blobKey(&loc.Reference)]
