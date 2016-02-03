@@ -18,12 +18,6 @@ import (
 
 const (
 	maxBuffSizePerReq = 1 << 20 // 1MB max buff size per request
-
-	// TODO(ehg): review these numbers. They're are random guesses for now.
-	signatureMinLen  = 64
-	signatureMaxLen  = 64
-	wrappedKeyMinLen = 65
-	wrappedKeyMaxLen = 2048
 )
 
 var (
@@ -52,18 +46,16 @@ func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err erro
 	if err != nil {
 		return
 	}
-	// Checks the packing
-	switch dirEntry.Location.Reference.Packing {
-	case upspin.HTTP:
+	// Checks the transport
+	switch dirEntry.Location.Endpoint.Transport {
+	case "HTTP":
 		err = verifyUrl(dirEntry.Location.Reference.Key)
 		if err != nil {
 			return
 		}
-	case upspin.EllipticalEric, upspin.Debug:
-		log.Println("Not implemented, but ok for now")
 	default:
-		err = DirEntryError{fmt.Sprintf("unknown packing: %v", dirEntry.Location.Reference.Packing)}
-		return
+		log.Println("Not implemented, but ok for now")
+
 	}
 	// Checks the metadata
 	return parsedPath, verifyMetadata(dirEntry.Metadata)
@@ -74,19 +66,6 @@ func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err erro
 func verifyMetadata(meta upspin.Metadata) error {
 	if meta.Sequence < 0 {
 		return DirEntryError{"invalid sequence number"}
-	}
-	l := len(meta.Signature)
-	if l > signatureMaxLen || l < signatureMinLen {
-		return DirEntryError{"signature is invalid"}
-	}
-	if len(meta.WrappedKeys) < 1 {
-		return DirEntryError{"need at least one wrapped key"}
-	}
-	for _, k := range meta.WrappedKeys {
-		l = len(k.Encrypted)
-		if l < wrappedKeyMinLen || wrappedKeyMaxLen < l {
-			return DirEntryError{"invalid wrapped key"}
-		}
 	}
 	return nil
 }

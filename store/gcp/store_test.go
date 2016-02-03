@@ -18,10 +18,14 @@ const (
 var (
 	newReference = upspin.Reference{
 		Key:     "newKey",
-		Packing: upspin.HTTP,
+		Packing: upspin.PlainPack,
+	}
+	newEndpoint = upspin.Endpoint{
+		Transport: "HTTP",
 	}
 	newLocation = upspin.Location{
 		Reference: newReference,
+		Endpoint:  newEndpoint,
 	}
 )
 
@@ -36,7 +40,7 @@ func TestStorePutError(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
-		Packing: upspin.HTTP,
+		Packing: upspin.PlainPack,
 	}
 
 	_, err := s.Put(ref, []byte("contents"))
@@ -54,7 +58,7 @@ func TestStorePut(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
-		Packing: upspin.HTTP,
+		Packing: upspin.PlainPack,
 	}
 
 	loc, err := s.Put(ref, []byte("contents"))
@@ -96,7 +100,7 @@ func TestStoreGetError(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
-		Packing: upspin.HTTP,
+		Packing: upspin.PlainPack,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -113,13 +117,13 @@ func TestStoreGetError(t *testing.T) {
 	}
 }
 
-func TestStoreGetErrorWrongPacking(t *testing.T) {
+func TestStoreGetErrorEmptyKey(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil)
 	s := New("http://localhost:8080", mock)
 	ref := upspin.Reference{
-		Key:     "1234",
-		Packing: upspin.Packing(99),
+		Key:     "",
+		Packing: upspin.PlainPack,
 	}
 	loc := upspin.Location{
 		Reference: ref,
@@ -130,7 +134,7 @@ func TestStoreGetErrorWrongPacking(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := "Can't figure out the packing"
+	expected := "Key can't be empty"
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -144,10 +148,13 @@ func TestStoreGetRedirect(t *testing.T) {
 
 	ref := upspin.Reference{
 		Key:     "XX some hash XX",
-		Packing: upspin.EllipticalEric,
+		Packing: upspin.EndToEnd,
 	}
 	loc := upspin.Location{
 		Reference: ref,
+		Endpoint: upspin.Endpoint{
+			Transport: "Upspin",
+		},
 	}
 
 	data, locs, err := s.Get(loc)
