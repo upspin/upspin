@@ -6,101 +6,66 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/directory/testdir"
-	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
+	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
 
-// Avoid networking for now.
-const testAddr = "test:0.0.0.0"
-
-type Context string
-
-func (c Context) Name() string {
-	return string(c)
-}
-
-var _ upspin.ClientContext = (*Context)(nil)
-
 type Setup struct {
 	upspin.User
-	upspin.Store
 	upspin.Directory
+	upspin.Store
 }
 
 func setup() (*Setup, error) {
-	ctxt := Context("testcontext")
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
-		NetAddr:   testAddr,
+		NetAddr:   "",
 	}
-	us, err := access.BindUser(ctxt, e)
+	us, err := access.BindUser(testContext, e)
 	if err != nil {
 		return nil, err
 	}
-	ds, err := access.BindDirectory(ctxt, e)
+	ds, err := access.BindDirectory(testContext, e)
 	if err != nil {
 		return nil, err
 	}
-	// HACK: We set the store for the blobs to be the same as for the directory.
+	ss, err := access.BindStore(testContext, e)
+	if err != nil {
+		return nil, err
+	}
 	return &Setup{
 		User:      us,
-		Store:     ds.(*testdir.Service).Store,
 		Directory: ds,
+		Store:     ss,
 	}, nil
 }
 
 // TODO: End of copied code.
 
-const (
-	user = "user@google.com"
-	root = user + "/"
-)
-
-func TestMakeRootDirectory(t *testing.T) {
-	s, err := setup()
+// installUser installs the named user into the User service with root directory in
+// the Directory service. TODO: A bit of a hack.
+func installUser(user upspin.User, dir upspin.Directory, userName upspin.UserName) {
+	err := user.(*testuser.Service).Install(userName, dir)
 	if err != nil {
-		t.Fatal(err)
-	}
-	client := New(s.Directory, s.Store)
-	loc, err := client.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
-	}
-	t.Logf("loc for root: %v\n", loc)
-	// Fetch the directory back and inspect it.
-	// TODO: Here and below, do not use s.Store but dial the location.
-	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
-	if err != nil {
-		t.Fatal("get directory:", err)
-	}
-	name, clear, err := teststore.UnpackBlob(ciphertext)
-	if err != nil {
-		t.Fatal("unpack:", err)
-	}
-	t.Logf("%q: [% x]\n", name, clear)
-	if name != root {
-		t.Fatalf("get of root: should have name %q; has %q", root, name)
-	}
-	if len(clear) != 0 {
-		t.Fatalf("get of root: non-empty payload")
+		panic(err)
 	}
 }
 
 func TestPutGetTopLevelFile(t *testing.T) {
+	const (
+		user = "user1@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal(err)
 	}
-	client := New(s.Directory, s.Store)
-	_, err = client.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
-	}
+	installUser(s.User, s.Directory, user)
+	client := New(s.User, s.Store)
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -119,20 +84,16 @@ func TestPutGetTopLevelFile(t *testing.T) {
 }
 
 const (
-	Max      = 100 * 1000 // Must be > 100.
-	fileName = root + "file"
+	Max = 100 * 1000 // Must be > 100.
 )
 
-func setupFileIO(t *testing.T) (*Client, upspin.File, []byte) {
+func setupFileIO(user upspin.UserName, fileName upspin.PathName, t *testing.T) (*Client, upspin.File, []byte) {
 	s, err := setup()
 	if err != nil {
 		t.Fatal(err)
 	}
-	client := New(s.Directory, s.Store)
-	_, err = client.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
-	}
+	installUser(s.User, s.Directory, user)
+	client := New(s.User, s.Store)
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -147,7 +108,12 @@ func setupFileIO(t *testing.T) (*Client, upspin.File, []byte) {
 }
 
 func TestFileSequentialAccess(t *testing.T) {
-	client, f, data := setupFileIO(t)
+	const (
+		user     = "user3@google.com"
+		root     = user + "/"
+		fileName = user + "/" + "file"
+	)
+	client, f, data := setupFileIO(user, fileName, t)
 
 	// Write the file in randomly sized chunks until it's full.
 	for offset, length := 0, 0; offset < Max; offset += length {
@@ -197,7 +163,12 @@ func TestFileSequentialAccess(t *testing.T) {
 }
 
 func TestFileRandomAccess(t *testing.T) {
-	client, f, data := setupFileIO(t)
+	const (
+		user     = "user4@google.com"
+		root     = user + "/"
+		fileName = root + "file"
+	)
+	client, f, data := setupFileIO(user, fileName, t)
 
 	// Use WriteAt at random offsets and random sizes to create file.
 	// Start with a map of bools (easy) saying the byte has been written.

@@ -13,21 +13,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Avoid networking for now.
-const testAddr = "test:0.0.0.0"
-
-const (
-	user = "user@google.com"
-	root = user + "/"
-)
-
-type Context string
-
-func (c Context) Name() string {
-	return string(c)
-}
-
-var _ upspin.ClientContext = (*Context)(nil)
+// TODO: Test with different locations.
 
 type Setup struct {
 	upspin.User
@@ -36,16 +22,15 @@ type Setup struct {
 }
 
 func setup() (*Setup, error) {
-	ctxt := Context("testcontext")
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
-		NetAddr:   testAddr,
+		NetAddr:   "",
 	}
-	us, err := access.BindUser(ctxt, e)
+	us, err := access.BindUser(testcontext, e)
 	if err != nil {
 		return nil, err
 	}
-	ds, err := access.BindDirectory(ctxt, e)
+	ds, err := access.BindDirectory(testcontext, e)
 	if err != nil {
 		return nil, err
 	}
@@ -58,6 +43,12 @@ func setup() (*Setup, error) {
 }
 
 func TestMakeRootDirectory(t *testing.T) {
+	// Each test creates the root for a different user, so each test
+	// gets a different root directory.
+	const (
+		user = "user0@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)
@@ -86,6 +77,10 @@ func TestMakeRootDirectory(t *testing.T) {
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
+	const (
+		user = "user1@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)
@@ -124,6 +119,10 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
+	const (
+		user = "user2@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)
@@ -169,6 +168,10 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
+	const (
+		user = "user3@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)
@@ -217,6 +220,10 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
+	const (
+		user = "user4@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)
@@ -327,6 +334,10 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
+	const (
+		user = "user5@google.com"
+		root = user + "/"
+	)
 	s, err := setup()
 	if err != nil {
 		t.Fatal("setup:", err)

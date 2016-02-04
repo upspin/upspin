@@ -4,28 +4,71 @@ package testclient
 import (
 	"fmt"
 
+	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
-	dir   upspin.Directory
+	user  upspin.User
 	store upspin.Store
 }
 
 var _ upspin.Client = (*Client)(nil)
 
-// TODO: Signature should just be a User, or maybe not even that.
-func New(dir upspin.Directory, store upspin.Store) *Client {
+var loc0 = upspin.Location{}
+
+// TODO: Where does the client get the context?
+type Context string
+
+func (c Context) Name() string {
+	return string(c)
+}
+
+var testContext = Context("testcontext")
+
+var _ upspin.ClientContext = (*Context)(nil)
+
+// New returns a new Client. The arguments are the user service to look up root
+// directories for users and the store service in which to store files.
+func New(user upspin.User, store upspin.Store) *Client {
 	return &Client{
-		dir:   dir,
+		user:  user,
 		store: store,
 	}
 }
 
+func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
+	// Add a final slash in case it's just a user name and we're referencing the root.
+	parsed, err := path.Parse(name + "/")
+	if err != nil {
+		return nil, err
+	}
+	endpoints, err := c.user.Lookup(upspin.UserName(parsed.User))
+	if err != nil {
+		return nil, err
+	}
+	var dir upspin.Directory
+	for _, e := range endpoints {
+		dir, err = access.BindDirectory(testContext, e)
+		if dir != nil {
+			return dir, nil
+		}
+	}
+	if err == nil {
+		err = fmt.Errorf("testclient: no such user %q", parsed.User)
+	}
+	return nil, err
+}
+
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	entry, err := c.dir.Lookup(name)
+	dir, err := c.rootDir(name)
+	if err != nil {
+		return nil, err
+	}
+	entry, err := dir.Lookup(name)
 	if err != nil {
 		return nil, err
 	}
@@ -84,9 +127,17 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 }
 
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
-	return c.dir.Put(name, data, nil) // TODO packdata
+	dir, err := c.rootDir(name)
+	if err != nil {
+		return loc0, err
+	}
+	return dir.Put(name, data, nil) // TODO packdata
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return c.dir.MakeDirectory(dirName)
+	dir, err := c.rootDir(dirName)
+	if err != nil {
+		return loc0, err
+	}
+	return dir.MakeDirectory(dirName)
 }
