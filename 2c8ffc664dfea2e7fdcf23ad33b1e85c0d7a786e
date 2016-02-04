@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_5c7fdaf2",
+        "filename": "cmd/directory/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-04T23:27:45Z",
+      "side": 1,
+      "message": "if you put a comment above main, it becomes the godoc output. As it stands, one must read the source to see this line of information.",
+      "range": {
+        "startLine": 3,
+        "startChar": 34,
+        "endLine": 3,
+        "endChar": 35
+      },
+      "revId": "2c8ffc664dfea2e7fdcf23ad33b1e85c0d7a786e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_3c849e33",
+        "filename": "cmd/directory/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-04T23:27:45Z",
+      "side": 1,
+      "message": "i would make empty the default.",
+      "range": {
+        "startLine": 26,
+        "startChar": 30,
+        "endLine": 26,
+        "endChar": 32
+      },
+      "revId": "2c8ffc664dfea2e7fdcf23ad33b1e85c0d7a786e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_7c7e16f5",
+        "filename": "cmd/directory/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-04T23:27:45Z",
+      "side": 1,
+      "message": "what if the user doesn\u0027t exist? you must need something to set up a user in the user service. is that done offline?",
+      "revId": "2c8ffc664dfea2e7fdcf23ad33b1e85c0d7a786e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
