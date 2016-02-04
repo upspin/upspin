@@ -289,26 +289,3 @@ type Access interface {
 	// from one which has no user name?
 	ServerUserName() string
 }
-
-// An AccessSwitch manages accessing service interfaces. There will be only one global
-// AccessSwitch per process and each interface implementation linked into the binary
-// will use its Init function to install itself in the AccessSwitch.
-type AccessSwitch interface {
-	// BindUser connects to the User server and returns a User instance.
-	BindUser(ClientContext, Endpoint) (User, error)
-
-	// BindStore connects to the Store server and returns a Store instance.
-	BindStore(ClientContext, Endpoint) (Store, error)
-
-	// BindDirectory connects to the Directory server and returns a Directory instance.
-	BindDirectory(ClientContext, Endpoint) (Directory, error)
-
-	// RegisterUser registers an interface and a User interface
-	RegisterUser(Transport, User) error
-
-	// RegisterStore registers an interface for the Store interface.
-	RegisterStore(Transport, Store) error
-
-	// RegisterDirectory registers an interface for the Directory interface.
-	RegisterDirectory(Transport, Directory) error
-}

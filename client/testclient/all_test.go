@@ -38,11 +38,11 @@ func setup() (*Setup, error) {
 		Transport: upspin.InProcess,
 		NetAddr:   testAddr,
 	}
-	us, err := access.Switch.BindUser(ctxt, e)
+	us, err := access.BindUser(ctxt, e)
 	if err != nil {
 		return nil, err
 	}
-	ds, err := access.Switch.BindDirectory(ctxt, e)
+	ds, err := access.BindDirectory(ctxt, e)
 	if err != nil {
 		return nil, err
 	}
