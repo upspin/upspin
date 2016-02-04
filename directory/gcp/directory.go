@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -33,8 +34,22 @@ type HTTPClientInterface interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-// New returns a concrete implementation of Directory, pointing to a server at a given URL and port.
-func New(serverURL string, storeService upspin.Store, client HTTPClientInterface) *Directory {
+// Context implements upspin.ClientContext for use in dialing a specific Directory server
+type Context struct {
+	ServerURL    string
+	Client       HTTPClientInterface
+	StoreService upspin.Store
+}
+
+// Guarantee we implement the ClientContext interface
+var _ upspin.ClientContext = (*Context)(nil)
+
+func (c Context) Name() string {
+	return "GCP Directory ClientContext"
+}
+
+// new returns a concrete implementation of Directory, pointing to a server at a given URL and port.
+func new(serverURL string, storeService upspin.Store, client HTTPClientInterface) *Directory {
 	return &Directory{
 		serverURL:    serverURL,
 		storeService: storeService,
@@ -196,12 +211,16 @@ func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, newError("Glob", "", errors.New("Glob unimplemented"))
 }
 
-func (d *Directory) Dial(upspin.ClientContext, upspin.Endpoint) (interface{}, error) {
-	return nil, newError("Dial", "", errors.New("Dial unimplemented"))
+func (d *Directory) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	cc, ok := context.(Context)
+	if !ok {
+		return nil, newError("Dial", "", errors.New("Dial requires a ClientContext of type GCP Directory Context"))
+	}
+	return new(cc.ServerURL, cc.StoreService, cc.Client), nil
 }
 
 func (d *Directory) ServerUserName() string {
-	return "Not sure what to return here yet. Next CL will fix it."
+	return "GCP Directory"
 }
 
 func newError(op string, path upspin.PathName, err error) *os.PathError {
@@ -210,4 +229,8 @@ func newError(op string, path upspin.PathName, err error) *os.PathError {
 		Path: string(path),
 		Err:  err,
 	}
+}
+
+func init() {
+	access.RegisterDirectory(upspin.GCP, &Directory{})
 }

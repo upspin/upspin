@@ -6,6 +6,7 @@ import (
 	"log"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	store "upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -53,7 +54,7 @@ func TestMkdirError(t *testing.T) {
 func TestMkdir(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockMkdirResponse(t))
 
-	d := New("http://localhost:8080", nil, mock)
+	d := newDirectory("http://localhost:8080", nil, mock)
 
 	loc, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err != nil {
@@ -121,7 +122,7 @@ func TestLookupError(t *testing.T) {
 func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t))
 
-	d := New("http://localhost:8080", nil, mock)
+	d := newDirectory("http://localhost:8080", nil, mock)
 
 	dir, err := d.Lookup(pathName)
 	if err != nil {
@@ -157,21 +158,36 @@ func dirEntryEquals(a, b *upspin.DirEntry) bool {
 	return true
 }
 
-func newErroringDirectoryClient() *Directory {
+func newErroringDirectoryClient() upspin.Directory {
 	resp := nettest.MockHTTPResponse{
 		Error:    errBadConnection,
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
 
-	return New("http://localhost:8080", nil, mock)
+	return newDirectory("http://localhost:8080", nil, mock)
+}
+
+func newStore(client store.HTTPClientInterface) upspin.Store {
+	context := store.Context{
+		ServerURL: "http://localhost:8080",
+		Client:    client,
+	}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+	}
+	s, err := access.BindStore(context, e)
+	if err != nil {
+		log.Fatalf("Can't bind: %v", err)
+	}
+	return s
 }
 
 // newDirectoryClientWithStoreClient creates an upspin.Directory that
 // contains a valid upspin.Store which replies successfully to a Put
 // request. The dirClientResponse is loaded onto the Directory client
 // for testing.
-func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) *Directory {
+func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) upspin.Directory {
 	// The HTTP client will return a sequence of responses, the first
 	// one will be to the Store.Put request, then the second to
 	// the Directory.Put request.
@@ -179,10 +195,10 @@ func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.M
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{newMockLocationResponse(t), dirClientResponse})
 
 	// Get a Store client
-	s := store.New("http://localhost:8080", mock)
+	s := newStore(mock)
 
 	// Get a Directory client
-	return New("http://localhost:9090", s, mock)
+	return newDirectory("http://localhost:9090", s, mock)
 }
 
 func TestPutError(t *testing.T) {
@@ -213,4 +229,20 @@ func TestPut(t *testing.T) {
 	if loc.Reference.Key != key {
 		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
 	}
+}
+
+func newDirectory(serverURL string, storeService upspin.Store, client HTTPClientInterface) upspin.Directory {
+	context := Context{
+		ServerURL:    serverURL,
+		StoreService: storeService,
+		Client:       client,
+	}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+	}
+	dir, err := access.BindDirectory(context, e)
+	if err != nil {
+		log.Fatalf("Can't BindDirectory: %v", err)
+	}
+	return dir
 }

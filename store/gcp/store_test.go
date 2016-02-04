@@ -211,9 +211,9 @@ func newStore(serverURL string, client HTTPClientInterface) upspin.Store {
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 	}
-	s, err := access.Switch.BindStore(context, e)
+	s, err := access.BindStore(context, e)
 	if err != nil {
-		log.Fatal("Can't bind: %v", err)
+		log.Fatalf("Can't bind: %v", err)
 	}
 	return s
 }

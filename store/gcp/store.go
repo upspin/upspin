@@ -198,5 +198,5 @@ func NewStoreError(error string, key string) *StoreError {
 }
 
 func init() {
-	access.Switch.RegisterStore(upspin.GCP, &Store{})
+	access.RegisterStore(upspin.GCP, &Store{})
 }
