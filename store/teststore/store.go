@@ -147,5 +147,5 @@ func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interfa
 const transport = upspin.InProcess
 
 func init() {
-	access.Switch.RegisterStore(transport, &Service{})
+	access.RegisterStore(transport, &Service{})
 }

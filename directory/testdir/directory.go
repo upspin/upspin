@@ -497,7 +497,7 @@ func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interfa
 	// TODO: This package only works if the same Store instance is used for data and
 	// to store its own DirEntries. It should be improved, but at the moment the only
 	// addresses it knows about come from its Store.
-	store, err := access.Switch.BindStore(context, se)
+	store, err := access.BindStore(context, se)
 	if err != nil {
 		return nil, err
 	}
@@ -507,5 +507,5 @@ func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interfa
 const transport = upspin.InProcess
 
 func init() {
-	access.Switch.RegisterDirectory(transport, &Service{})
+	access.RegisterDirectory(transport, &Service{})
 }
