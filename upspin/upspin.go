@@ -190,7 +190,7 @@ type Metadata struct {
 type Store interface {
 	Access
 
-	// Get attempts to retrieve the data stored at the Location.
+	// Get attempts to retrieve the data identified by the key.
 	// Three things might happen:
 	// 1. The data is in this Store. It is returned. The Location slice
 	// and error are nil.
@@ -199,16 +199,11 @@ type Store interface {
 	// is returned. The data slice and error are nil.
 	// 3. An error occurs. The data and Location slices are nil
 	// and the error describes the problem.
-	// TODO: Does argument Location need to refer to this Store?
-	Get(location Location) ([]byte, []Location, error)
+	Get(key string) ([]byte, []Location, error)
 
-	// Put puts the data into the store. If the packing for the
-	// Reference involves a content-addressable key, the
-	// value computed from the data must match the supplied
-	// Reference and the Put may return an error if
-	// the data is already known. Otherwise the value stored
-	// under the Reference is replaced.
-	Put(ref Reference, data []byte) (Location, error)
+	// Put puts the data into the store and returns the key
+	// to be used to retrieve it.
+	Put(data []byte) (string, error)
 
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint

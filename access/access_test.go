@@ -71,11 +71,11 @@ func (d *dummyUser) ServerUserName() string {
 	return "userUser"
 }
 
-func (d *dummyStore) Get(location upspin.Location) ([]byte, []upspin.Location, error) {
+func (d *dummyStore) Get(key string) ([]byte, []upspin.Location, error) {
 	return nil, nil, errors.New("dummyStore.Get not implemented")
 }
-func (d *dummyStore) Put(ref upspin.Reference, data []byte) (upspin.Location, error) {
-	return upspin.Location{}, errors.New("dummyStore.Put not implemented")
+func (d *dummyStore) Put(data []byte) (string, error) {
+	return "", errors.New("dummyStore.Put not implemented")
 }
 func (d *dummyStore) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	store := &dummyStore{endpoint: e}
