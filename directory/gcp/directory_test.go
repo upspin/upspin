@@ -30,7 +30,8 @@ var (
 		Reference: reference,
 	}
 	dirEntry = upspin.DirEntry{
-		Name: pathName,
+		Name:     pathName,
+		Location: location,
 		Metadata: upspin.Metadata{
 			IsDir:    false,
 			Sequence: 17,
@@ -96,6 +97,14 @@ func newMockLocationResponse(t *testing.T) nettest.MockHTTPResponse {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
 	return nettest.NewMockHTTPResponse(200, "application/json", loc)
+}
+
+func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
+	keyJSON, err := json.Marshal(&struct{ Key string }{Key: key})
+	if err != nil {
+		t.Fatalf("JSON marshal failed: %v", err)
+	}
+	return nettest.NewMockHTTPResponse(200, "application/json", keyJSON)
 }
 
 func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -186,23 +195,23 @@ func newStore(client store.HTTPClientInterface) upspin.Store {
 // newDirectoryClientWithStoreClient creates an upspin.Directory that
 // contains a valid upspin.Store which replies successfully to a Put
 // request. The dirClientResponse is loaded onto the Directory client
-// for testing.
-func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) upspin.Directory {
-	// The HTTP client will return a sequence of responses, the first
-	// one will be to the Store.Put request, then the second to
-	// the Directory.Put request.
-	// Setup the mock client
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{newMockLocationResponse(t), dirClientResponse})
+// for testing. Returns the Directory as well as the mock client for
+// post-request inspections.
+func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) (upspin.Directory, *nettest.MockHTTPClient) {
+	// The HTTP client will return a sequence of responses, the
+	// first one will be to the Store.Put request, then the second
+	// to the Directory.Put request.  Setup the mock client
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{newMockKeyResponse(t), dirClientResponse})
 
 	// Get a Store client
 	s := newStore(mock)
 
 	// Get a Directory client
-	return newDirectory("http://localhost:9090", s, mock)
+	return newDirectory("http://localhost:9090", s, mock), mock
 }
 
 func TestPutError(t *testing.T) {
-	d := newDirectoryClientWithStoreClient(t, nettest.MockHTTPResponse{
+	d, _ := newDirectoryClientWithStoreClient(t, nettest.MockHTTPResponse{
 		Error:    errBadConnection,
 		Response: nil,
 	})
@@ -219,15 +228,58 @@ func TestPutError(t *testing.T) {
 func TestPut(t *testing.T) {
 	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))
 
-	d := newDirectoryClientWithStoreClient(t, respSuccess)
+	d, mock := newDirectoryClientWithStoreClient(t, respSuccess)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName("foo@bar.com/mydir/myfile.txt"), []byte("contents of file"), []byte("Packed metadata"))
+	loc, err := d.Put(upspin.PathName(pathName), []byte("contents of file"), []byte("Packed metadata"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if loc.Reference.Key != key {
 		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
+	}
+	// Verify we sent to the Directory service the Reference.Key we got back from the Store server
+	reqs := mock.Requests()
+	if len(reqs) != 2 {
+		t.Fatalf("Sent wrong number of requests. Expected 2, got %v", len(reqs))
+	}
+	// Look at the second request, which is the one that went to the Directory.
+	u := reqs[1].URL
+	if u.Scheme != "http" {
+		t.Fatalf("Expected http request, got %v", u.Scheme)
+	}
+	if u.Host != "localhost:9090" {
+		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
+	}
+	if u.Path != "/put" {
+		t.Fatalf("Expected request to /put, got %v", u.Path)
+	}
+	if u.RawQuery != "" {
+		t.Fatalf("Expected no query, got %v", u.RawQuery)
+	}
+	minLen := len(pathName) + len(loc.Reference.Key) + 2 // 2 bytes for IsDir + Sequence.
+	if reqs[1].ContentLength < int64(minLen) {
+		t.Fatalf("Request body too small. Expect at least %d, got %d", len(pathName), reqs[1].ContentLength)
+	}
+	// Read the request buffer (since it was never really consumed by the mock) to see if it was created correctly.
+	buf := make([]byte, reqs[1].ContentLength)
+	n, err := reqs[1].Body.Read(buf)
+	if err != nil {
+		t.Fatalf("Can't read buf: %v", buf)
+	}
+	defer reqs[1].Body.Close()
+	buf = buf[:n] // Re-slice
+	var de upspin.DirEntry
+	err = json.Unmarshal(buf, &de)
+	if err != nil {
+		t.Fatalf("Error unmarshaling: %v", err)
+	}
+	// Check that dirEntry matches our expectations of what should have been written
+	if string(de.Name) != string(dirEntry.Name) {
+		t.Errorf("Invalid pathname. Expected %v, got %v", dirEntry.Name, de.Name)
+	}
+	if string(de.Location.Reference.Key) != string(dirEntry.Location.Reference.Key) {
+		t.Errorf("Invalid key. Expected %v, got %v", dirEntry.Location.Reference.Key, de.Location.Reference.Key)
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -66,20 +67,15 @@ func (s *Store) ServerUserName() string {
 	return "GPC Store"
 }
 
-func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error) {
-	if location.Reference.Key == "" {
+func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
+	if key == "" {
 		return nil, nil, NewStoreError("Key can't be empty", "")
 	}
-	key := location.Reference.Key
 	var request string
-	switch location.Endpoint.Transport {
-	case upspin.HTTP:
-		request = location.Reference.Key
-	case upspin.GCP:
+	if strings.HasPrefix(key, "http://") || strings.HasPrefix(key, "https://") {
+		request = key
+	} else {
 		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, key)
-	default:
-		log.Printf("Unknwon transport %v. Treating as HTTP.", location.Endpoint.Transport)
-		request = location.Reference.Key
 	}
 	httpReq, err := http.NewRequest(netutil.Get, request, nil)
 	if err != nil {
@@ -119,38 +115,38 @@ func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error)
 	// NOT REACHED
 }
 
-func (s *Store) Put(ref upspin.Reference, data []byte) (upspin.Location, error) {
-	var zeroLoc upspin.Location // The zero value.
+func (s *Store) Put(data []byte) (string, error) {
+	var zeroKey string
 	bufFrom := bytes.NewBuffer(data)
 	var body bytes.Buffer
 	w := multipart.NewWriter(&body)
-	fw, err := w.CreateFormFile("file", ref.Key)
+	fw, err := w.CreateFormFile("file", "dummy")
 	if err != nil {
-		return zeroLoc, NewStoreError("Can't create multi-part form to upload", ref.Key)
+		return zeroKey, NewStoreError("Can't create multi-part form to upload", "")
 	}
 	_, err = io.Copy(fw, bufFrom)
 	if err != nil {
-		return zeroLoc, err
+		return zeroKey, err
 	}
 	err = w.Close()
 	if err != nil {
-		return zeroLoc, err
+		return zeroKey, err
 	}
 	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", s.serverURL), &body)
 	if err != nil {
-		return zeroLoc, err
+		return zeroKey, err
 	}
 	req.Header.Set(netutil.ContentType, w.FormDataContentType())
 
 	// Submit the request
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return zeroLoc, NewStoreError(fmt.Sprintf("Error putting data to server: %v", err), ref.Key)
+		return zeroKey, NewStoreError(fmt.Sprintf("Error putting data to server: %v", err), "")
 	}
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
-		return zeroLoc, NewStoreError(fmt.Sprintf("error uploading to server: %v", resp.StatusCode), ref.Key)
+		return zeroKey, NewStoreError(fmt.Sprintf("error uploading to server: %v", resp.StatusCode), "")
 	}
 
 	// Read the body of the response
@@ -158,22 +154,25 @@ func (s *Store) Put(ref upspin.Reference, data []byte) (upspin.Location, error) 
 	// TODO(edpin): maybe add a limit here to the size of bytes we return?
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return zeroLoc, err
+		return zeroKey, err
 	}
 
 	// Parse the response
-	newLoc, err := parser.LocationResponse(respBody)
+	key, err := parser.KeyResponse(respBody)
 	if err != nil {
-		return zeroLoc, NewStoreError(err.Error(), ref.Key)
+		return zeroKey, NewStoreError(err.Error(), "")
 	}
-	if newLoc == nil {
-		return zeroLoc, NewStoreError("null location", ref.Key)
+	if key == "" {
+		return zeroKey, NewStoreError("null key returned", "")
 	}
-	return *newLoc, err
+	return key, nil
 }
 
 func (s *Store) Endpoint() upspin.Endpoint {
-	panic("not defined yet")
+	return upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(s.serverURL),
+	}
 }
 
 // Implements Error
