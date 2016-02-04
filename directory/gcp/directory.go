@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -98,13 +99,10 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 	var zeroLoc upspin.Location
 	const op = "Put"
 
-	// First, store the data itself, to find a location.
-	ref := upspin.Reference{
-		Key:     "", // The server will compute one. But we should request exactly what we expect when we have crypto here
-		Packing: upspin.EEp256Pack,
-	}
-	loc, err := d.storeService.Put(ref, data)
+	// First, store the data itself, to find the key
+	key, err := d.storeService.Put(data)
 	if err != nil {
+		log.Printf("storeService returned error: %v", err)
 		return zeroLoc, err
 	}
 	// We now have a final Location in loc. We now create a
@@ -114,6 +112,13 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 	// later.
 	dirEntry := upspin.DirEntry{
 		Name: name,
+		Location: upspin.Location{
+			Reference: upspin.Reference{
+				Key: key,
+				// TODO: how do we know the packing at this level?
+			},
+			Endpoint: d.storeService.Endpoint(),
+		},
 		Metadata: upspin.Metadata{
 			IsDir:    false,
 			Sequence: 0, // TODO: server does not increment currently
@@ -128,7 +133,7 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 	}
 
 	// Prepare a put request to the server
-	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
+	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
 	if err != nil {
 		return zeroLoc, newError(op, name, err)
 	}
@@ -154,7 +159,7 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 		return zeroLoc, newError(op, name, err)
 	}
 
-	return loc, nil
+	return dirEntry.Location, nil
 }
 
 func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
