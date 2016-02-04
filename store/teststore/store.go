@@ -4,7 +4,6 @@ package teststore
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/sim/hash"
@@ -60,27 +59,17 @@ func UnpackBlob(data []byte) (upspin.PathName, []byte, error) {
 // Service returns data and metadata referenced by the request.
 type Service struct {
 	endpoint upspin.Endpoint
-	blob     map[string]*Blob // Key created by blobKey.
+	blob     map[string][]byte // string is key made from SHA1 hash of data.
 }
 
 // This package (well, the Servie type) implements the upspin.Store interface.
 var _ upspin.Store = (*Service)(nil)
 
-func blobKey(ref *upspin.Reference) string {
-	return fmt.Sprintf("%d:%s", ref.Packing, ref.Key)
-}
-
 func NewService(e upspin.Endpoint) *Service {
 	return &Service{
 		endpoint: e,
-		blob:     make(map[string]*Blob),
+		blob:     make(map[string][]byte),
 	}
-}
-
-type Blob struct {
-	data     []byte
-	hash     hash.Hash
-	metadata []byte // Not sure what this looks like; includes keys, owner, ???
 }
 
 func copyOf(in []byte) (out []byte) {
@@ -93,45 +82,22 @@ func (s *Service) Endpoint() upspin.Endpoint {
 	return s.endpoint
 }
 
-func (s *Service) Put(ref upspin.Reference, ciphertext []byte) (upspin.Location, error) {
-	if ref.Packing != upspin.DebugPack { // TODO
-		return upspin.Location{}, errors.New("unrecognized packing")
-	}
-	hash := hash.Of(ciphertext)
-	if !hash.EqualString(ref.Key) {
-		return upspin.Location{}, errors.New("external hash mismatch in Store.Put")
-	}
-	s.blob[blobKey(&ref)] = &Blob{
-		copyOf(ciphertext),
-		hash,
-		[]byte("metadata"), // TODO: probably want defaults.
-	}
-	loc := upspin.Location{
-		Endpoint:  s.endpoint,
-		Reference: ref,
-	}
-	return loc, nil
+func (s *Service) Put(ciphertext []byte) (string, error) {
+	key := hash.Of(ciphertext).String()
+	s.blob[key] = ciphertext
+	return key, nil
 }
 
 // TODO: Function should provide alternate location if missing.
-func (s *Service) Get(loc upspin.Location) (ciphertext []byte, other []upspin.Location, err error) {
-	if loc.Endpoint.Transport != transport {
-		return nil, nil, errors.New("unrecognized transport: " + string(loc.Endpoint.Transport))
-	}
-	if loc.Reference.Packing != upspin.DebugPack { // TODO
-		return nil, nil, errors.New("unrecognized packing")
-	}
-	blob, ok := s.blob[blobKey(&loc.Reference)]
+func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, err error) {
+	data, ok := s.blob[key]
 	if !ok {
 		return nil, nil, errors.New("no such blob")
 	}
-	if hash.Of(blob.data) != blob.hash {
+	if hash.Of(data).String() != key {
 		return nil, nil, errors.New("internal hash mismatch in Store.Get")
 	}
-	if !blob.hash.EqualString(loc.Reference.Key) {
-		return nil, nil, errors.New("external hash mismatch in Store.Get")
-	}
-	return copyOf(blob.data), nil, nil
+	return copyOf(data), nil, nil
 }
 
 // Methods to implement upspin.Access

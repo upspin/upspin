@@ -68,7 +68,7 @@ func TestMakeRootDirectory(t *testing.T) {
 	}
 	t.Logf("loc for root: %v\n", loc)
 	// Fetch the directory back and inspect it.
-	ciphertext, _, err := s.Store.Get(loc)
+	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}
@@ -103,7 +103,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		t.Fatal("put file:", err)
 	}
 	// Fetch the data back and inspect it.
-	ciphertext, _, err := s.Store.Get(loc)
+	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
@@ -149,7 +149,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		ciphertext, _, err := s.Store.Get(locs[j])
+		ciphertext, _, err := s.Store.Get(locs[j].Reference.Key)
 		if err != nil {
 			t.Fatalf("%q: get blob: %v", fileName, err)
 		}
@@ -198,7 +198,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%q: lookup file: %v", fileName, err)
 		}
-		cipher, _, err := s.Store.Get(entry.Location)
+		cipher, _, err := s.Store.Get(entry.Location.Reference.Key)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
@@ -252,7 +252,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: lookup file: %v", fileName, err)
 	}
-	cipher, _, err := s.Store.Get(entry.Location)
+	cipher, _, err := s.Store.Get(entry.Location.Reference.Key)
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
 	}
@@ -278,7 +278,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: second lookup file: %v", fileName, err)
 	}
-	cipher, _, err = s.Store.Get(entry.Location)
+	cipher, _, err = s.Store.Get(entry.Location.Reference.Key)
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
 	}

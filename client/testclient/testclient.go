@@ -46,7 +46,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			fmt.Printf("%+v\n", loc)
 			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Endpoint.Transport, "in-process")
 		}
-		cipher, locs, err := c.store.Get(entry.Location)
+		cipher, locs, err := c.store.Get(entry.Location.Reference.Key)
 		if err != nil {
 			// An error occurred. Remember the first error we see.
 			if firstError == nil {

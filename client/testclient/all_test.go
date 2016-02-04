@@ -73,7 +73,8 @@ func TestMakeRootDirectory(t *testing.T) {
 	}
 	t.Logf("loc for root: %v\n", loc)
 	// Fetch the directory back and inspect it.
-	ciphertext, _, err := s.Store.Get(loc)
+	// TODO: Here and below, do not use s.Store but dial the location.
+	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
 	if err != nil {
 		t.Fatal("get directory:", err)
 	}

@@ -191,16 +191,19 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
 		blob := teststore.MakeBlob(parsed.String(), nil)
-		shaHash := hash.Of(blob)
-		ref := upspin.Reference{
-			Key:     shaHash.String(),
-			Packing: upspin.DebugPack,
-		}
-		loc, err := s.Store.Put(ref, blob)
+		key, err := s.Store.Put(blob)
 		if err != nil {
 			return loc0, err
 		}
-		s.Root[parsed.User] = loc.Reference
+		ref := upspin.Reference{
+			Key:     key,
+			Packing: upspin.DebugPack,
+		}
+		s.Root[parsed.User] = ref
+		loc := upspin.Location{
+			Endpoint:  s.StoreEndpoint,
+			Reference: ref,
+		}
 		return loc, nil
 	}
 	return s.put("MakeDirectory", directoryName, true, nil)
@@ -251,20 +254,22 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 
 	// Create a blob storing the data for this file and store it in storage service.
 	ciphertext := teststore.MakeBlob(string(pathName), data)
-	shaHash := hash.Of(ciphertext)
+	key, err := s.Store.Put(ciphertext)
 	ref := upspin.Reference{
-		Key:     shaHash.String(),
+		Key:     key,
 		Packing: upspin.DebugPack,
 	}
-	loc, err := s.Store.Put(ref, ciphertext)
-	// TODO VALIDATE REF
+	loc := upspin.Location{
+		Endpoint:  s.StoreEndpoint,
+		Reference: ref,
+	}
 
 	// Update directory holding the file. TODO: must be atomic.
 	// Need the name of the directory we're updating.
 	ent := entry{
 		elem:  lastElem,
 		isDir: dataIsDir,
-		ref:   loc.Reference,
+		ref:   ref,
 	}
 	dirRef, err = s.installEntry(op, parsed.Drop(1).String(), dirRef, ent, false)
 	if err != nil {
@@ -373,11 +378,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 // Fetch returns the decrypted data associated with the reference.
 // TODO: For test but is it genuinely valuable?
 func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
-	loc := upspin.Location{
-		Endpoint:  s.StoreEndpoint,
-		Reference: dirRef,
-	}
-	ciphertext, _, err := s.Store.Get(loc)
+	ciphertext, _, err := s.Store.Get(dirRef.Key)
 	if err != nil {
 		return nil, err
 	}
@@ -472,18 +473,17 @@ Loop:
 	}
 	// fmt.Printf("\n%s\n%q\n\n", dirName, dirData)
 	blob := teststore.MakeBlob(string(dirName), dirData)
-	shaHash := hash.Of(blob)
-	ref := upspin.Reference{
-		Key:     shaHash.String(),
-		Packing: upspin.DebugPack,
-	}
-	loc, err := s.Store.Put(ref, blob)
+	key, err := s.Store.Put(blob)
 	if err != nil {
 		fmt.Println("INSTALL FAILED", err)
 		// TODO: System is now inconsistent.
 		return r0, err
 	}
-	return loc.Reference, err
+	ref := upspin.Reference{
+		Key:     key,
+		Packing: upspin.DebugPack,
+	}
+	return ref, err
 }
 
 // Methods to implement upspin.Access
