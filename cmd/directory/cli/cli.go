@@ -1,6 +1,5 @@
-package main
-
 // Simple command line utility for using a GCP Directory interface on the command line.
+package main
 
 import (
 	"flag"
