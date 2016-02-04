@@ -1,4 +1,7 @@
 // Package testdir implements a simple, non-persistent, in-memory directory service.
+// It stores its directory entries, including user roots, in the in-memory teststore,
+// but allows Put operations to place data in arbitrary locations. (TODO: Not yet)
+// TODO: Don't assume blobs are in same store as directory entries.
 package testdir
 
 import (
@@ -16,6 +19,17 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+// TODO: This should be in a testcontext somewhere.
+type Context string
+
+func (c Context) Name() string {
+	return string(c)
+}
+
+var _ upspin.ClientContext = (*Context)(nil)
+
+var testcontext = Context("testcontext")
+
 var (
 	r0   upspin.Reference
 	loc0 upspin.Location
@@ -23,21 +37,13 @@ var (
 
 // Service implements directories and file-level I/O.
 type Service struct {
+	endpoint      upspin.Endpoint
 	StoreEndpoint upspin.Endpoint
 	Store         upspin.Store
-	Root          map[upspin.UserName]upspin.Reference // TODO. No need for hint, they're all on ds.Store.
+	Root          map[upspin.UserName]upspin.Reference // All inside Service.Store
 }
 
 var _ upspin.Directory = (*Service)(nil)
-
-// NewService returns a new, empty directory server that will store its data in the specified store service.
-func NewService(ss upspin.Store) *Service {
-	return &Service{
-		StoreEndpoint: ss.Endpoint(),
-		Store:         ss,
-		Root:          make(map[upspin.UserName]upspin.Reference),
-	}
-}
 
 // entry represents the metadata for a file in a directory.
 type entry struct {
@@ -492,20 +498,31 @@ func (s *Service) ServerUserName() string {
 	return "testuser"
 }
 
+// Dial always returns the same instance, so there is only one instance of the service
+// running in the address space. It ignores the address within the endpoint but
+// requires that the transport be InProcess.
 func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
-	se := e
-	// TODO: This package only works if the same Store instance is used for data and
-	// to store its own DirEntries. It should be improved, but at the moment the only
-	// addresses it knows about come from its Store.
-	store, err := access.BindStore(context, se)
-	if err != nil {
-		return nil, err
+	if e.Transport != upspin.InProcess {
+		return nil, errors.New("testdir: unrecognized transport")
 	}
-	return NewService(store), nil
+	return s, nil
 }
 
 const transport = upspin.InProcess
 
 func init() {
-	access.RegisterDirectory(transport, &Service{})
+	endpoint := upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // Ignored.
+	}
+	store, err := access.BindStore(testcontext, endpoint)
+	if err != nil {
+		panic("testdir: cannot access in-process store service:" + err.Error())
+	}
+	s := &Service{
+		endpoint: endpoint,
+		Store:    store,
+		Root:     make(map[upspin.UserName]upspin.Reference),
+	}
+	access.RegisterDirectory(transport, s)
 }
