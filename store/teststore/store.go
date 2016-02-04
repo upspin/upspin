@@ -65,13 +65,6 @@ type Service struct {
 // This package (well, the Servie type) implements the upspin.Store interface.
 var _ upspin.Store = (*Service)(nil)
 
-func NewService(e upspin.Endpoint) *Service {
-	return &Service{
-		endpoint: e,
-		blob:     make(map[string][]byte),
-	}
-}
-
 func copyOf(in []byte) (out []byte) {
 	out = make([]byte, len(in))
 	copy(out, in)
@@ -106,12 +99,25 @@ func (s *Service) ServerUserName() string {
 	return "testuser"
 }
 
+// Dial always returns the same instance, so there is only one instance of the service
+// running in the address space. It ignores the address within the endpoint but
+// requires that the transport be InProcess.
 func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
-	return NewService(e), nil
+	if e.Transport != upspin.InProcess {
+		return nil, errors.New("teststore: unrecognized transport")
+	}
+	return s, nil
 }
 
 const transport = upspin.InProcess
 
 func init() {
-	access.RegisterStore(transport, &Service{})
+	s := &Service{
+		endpoint: upspin.Endpoint{
+			Transport: upspin.InProcess,
+			NetAddr:   "", // Ignored.
+		},
+		blob: make(map[string][]byte),
+	}
+	access.RegisterStore(transport, s)
 }
