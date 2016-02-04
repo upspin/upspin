@@ -14,12 +14,13 @@ import (
 	"os"
 	"strings"
 
-	store "upspin.googlesource.com/upspin.git/store/gcp"
+	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 var (
-	Store upspin.Store = store.New("http://localhost:8080", &http.Client{})
+	Store upspin.Store = newStore()
 
 	inFile  = flag.String("in", "", "input file")
 	outFile = flag.String("out", "", "output file")
@@ -52,6 +53,21 @@ func Usage() {
 	os.Exit(2)
 }
 
+func newStore() upspin.Store {
+	context := store.Context{
+		ServerURL: "http://localhost:8080",
+		Client:    &http.Client{},
+	}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+	}
+	s, err := access.BindStore(context, e)
+	if err != nil {
+		log.Fatalf("Can't bind: %v", err)
+	}
+	return s
+}
+
 func get(refStr string) {
 	ref := upspin.Reference{
 		Key:     refStr,
@@ -82,7 +98,7 @@ func get(refStr string) {
 	}
 	_, err = io.Copy(output, bytes.NewReader(buf))
 	if err != nil {
-		log.Fatal("Copying to output failed: %v", err)
+		log.Fatalf("Copying to output failed: %v", err)
 	}
 }
 
@@ -95,7 +111,7 @@ func innerGet(loc upspin.Location, count int) ([]byte, []upspin.Location, error)
 		log.Fatalf("Error getting from server: %v", err)
 	}
 	if locs != nil {
-		log.Println("We got redirected. Following new location: %v", locs[0])
+		log.Printf("We got redirected. Following new location: %v", locs[0])
 		buf, locs, err = innerGet(locs[0], count+1)
 	}
 	return buf, locs, err
