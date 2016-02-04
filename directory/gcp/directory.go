@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -37,7 +38,6 @@ type HTTPClientInterface interface {
 
 // Context implements upspin.ClientContext for use in dialing a specific Directory server
 type Context struct {
-	ServerURL    string
 	Client       HTTPClientInterface
 	StoreService upspin.Store
 }
@@ -217,11 +217,16 @@ func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 }
 
 func (d *Directory) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+	const op = "Dial"
 	cc, ok := context.(Context)
 	if !ok {
-		return nil, newError("Dial", "", errors.New("Dial requires a ClientContext of type GCP Directory Context"))
+		return nil, newError(op, "", errors.New("Dial requires a ClientContext of type GCP Directory Context"))
 	}
-	return new(cc.ServerURL, cc.StoreService, cc.Client), nil
+	serverURL, err := url.Parse(string(e.NetAddr))
+	if err != nil {
+		return nil, newError(op, "", errors.New(fmt.Sprintf("Require an endpoint with a valid http address: %v", err)))
+	}
+	return new(serverURL.String(), cc.StoreService, cc.Client), nil
 }
 
 func (d *Directory) ServerUserName() string {
