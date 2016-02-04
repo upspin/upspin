@@ -61,11 +61,11 @@ func Usage() {
 
 func newStore() upspin.Store {
 	context := store.Context{
-		ServerURL: "http://localhost:8080",
-		Client:    &http.Client{},
+		Client: &http.Client{},
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr("http://localhost:8080"),
 	}
 	s, err := access.BindStore(context, e)
 	if err != nil {
