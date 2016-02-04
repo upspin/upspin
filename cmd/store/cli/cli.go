@@ -30,15 +30,21 @@ func main() {
 	flag.Usage = Usage
 	flag.Parse()
 
-	if len(flag.Args()) != 2 {
+	if len(flag.Args()) < 1 {
 		Usage()
 	}
 
 	switch strings.ToLower(flag.Arg(0)) {
 	case "get":
+		if len(flag.Args()) < 2 {
+			Usage()
+		}
 		get(flag.Arg(1))
 	case "put":
-		put(flag.Arg(1))
+		if len(flag.Args()) > 1 {
+			Usage()
+		}
+		put()
 	default:
 		log.Println("Can't understand command. Use GET or PUT")
 		Usage()
@@ -47,7 +53,7 @@ func main() {
 
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <GET|PUT> <ref>\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <GET|PUT> [<ref>]\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -68,19 +74,8 @@ func newStore() upspin.Store {
 	return s
 }
 
-func get(refStr string) {
-	ref := upspin.Reference{
-		Key:     refStr,
-		Packing: upspin.EEp256Pack,
-	}
-	loc := upspin.Location{
-		Reference: ref,
-		Endpoint: upspin.Endpoint{
-			Transport: upspin.GCP,
-		},
-	}
-
-	buf, _, err := innerGet(loc, 0)
+func get(key string) {
+	buf, _, err := innerGet(key, 0)
 
 	if err != nil {
 		log.Fatal(err)
@@ -102,22 +97,22 @@ func get(refStr string) {
 	}
 }
 
-func innerGet(loc upspin.Location, count int) ([]byte, []upspin.Location, error) {
+func innerGet(key string, count int) ([]byte, []upspin.Location, error) {
 	if count > 3 {
 		return nil, nil, errors.New("Too many redirections")
 	}
-	buf, locs, err := Store.Get(loc)
+	buf, locs, err := Store.Get(key)
 	if err != nil {
 		log.Fatalf("Error getting from server: %v", err)
 	}
 	if locs != nil {
 		log.Printf("We got redirected. Following new location: %v", locs[0])
-		buf, locs, err = innerGet(locs[0], count+1)
+		buf, locs, err = innerGet(locs[0].Reference.Key, count+1)
 	}
 	return buf, locs, err
 }
 
-func put(refStr string) {
+func put() {
 	var input *os.File
 	var err error
 	if *inFile == "" {
@@ -135,14 +130,9 @@ func put(refStr string) {
 		log.Fatal(err)
 	}
 
-	ref := upspin.Reference{
-		Key:     refStr,
-		Packing: upspin.EEp256Pack,
-	}
-
-	loc, err := Store.Put(ref, data)
+	key, err := Store.Put(data)
 	if err != nil {
 		log.Fatalf("Error putting to server: %v", err)
 	}
-	log.Printf("Put file to storage. Location: %v", loc)
+	log.Printf("Put file to storage. Key: %v", key)
 }

@@ -15,19 +15,16 @@ import (
 const (
 	errSomethingBad = "Something bad happened on the internet"
 	errBrokenPipe   = "The internet has a broken pipe"
+	contentKey      = "my key"
 )
 
 var (
-	newReference = upspin.Reference{
-		Key:     "newKey",
-		Packing: upspin.PlainPack,
-	}
-	newEndpoint = upspin.Endpoint{
-		Transport: upspin.HTTP,
-	}
+	keyStruct = struct{ Key string }{Key: contentKey}
+
 	newLocation = upspin.Location{
-		Reference: newReference,
-		Endpoint:  newEndpoint,
+		Reference: upspin.Reference{
+			Key: "new key",
+		},
 	}
 )
 
@@ -38,14 +35,9 @@ func TestStorePutError(t *testing.T) {
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
-
 	s := newStore("http://localhost:8080", mock)
-	ref := upspin.Reference{
-		Key:     "1234",
-		Packing: upspin.PlainPack,
-	}
 
-	_, err := s.Put(ref, []byte("contents"))
+	_, err := s.Put([]byte("contents"))
 
 	expected := fmt.Sprintf("Error putting data to server: %s", errSomethingBad)
 	if err.Error() != expected {
@@ -55,20 +47,15 @@ func TestStorePutError(t *testing.T) {
 
 func TestStorePut(t *testing.T) {
 	// The server will respond with a location for the object.
-	mock := nettest.NewMockHTTPClient(createMockResponse(t))
-
+	mock := nettest.NewMockHTTPClient(createMockPutResponse(t))
 	s := newStore("http://localhost:8080", mock)
-	ref := upspin.Reference{
-		Key:     "1234",
-		Packing: upspin.PlainPack,
-	}
 
-	loc, err := s.Put(ref, []byte("contents"))
+	key, err := s.Put([]byte("contents"))
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
-	if loc != newLocation {
-		t.Fatalf("Server gave us wrong location. Expected %v, got %v", newLocation, loc)
+	if key != contentKey {
+		t.Fatalf("Server gave us wrong location. Expected %v, got %v", contentKey, key)
 	}
 	// Verifies the server received the proper request
 	reqs := mock.Requests()
@@ -88,7 +75,6 @@ func TestStorePut(t *testing.T) {
 	if u.RawQuery != "" {
 		t.Fatalf("Expected no query params, got %v", u.RawQuery)
 	}
-
 }
 
 func TestStoreGetError(t *testing.T) {
@@ -98,17 +84,9 @@ func TestStoreGetError(t *testing.T) {
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
-
 	s := newStore("http://localhost:8080", mock)
-	ref := upspin.Reference{
-		Key:     "1234",
-		Packing: upspin.PlainPack,
-	}
-	loc := upspin.Location{
-		Reference: ref,
-	}
 
-	_, _, err := s.Get(loc)
+	_, _, err := s.Get("1234")
 
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
@@ -123,15 +101,8 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil)
 	s := newStore("http://localhost:8080", mock)
-	ref := upspin.Reference{
-		Key:     "",
-		Packing: upspin.PlainPack,
-	}
-	loc := upspin.Location{
-		Reference: ref,
-	}
 
-	_, _, err := s.Get(loc)
+	_, _, err := s.Get("")
 
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
@@ -144,22 +115,12 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 
 func TestStoreGetRedirect(t *testing.T) {
 	// The server will redirect the client to a new location
-	mock := nettest.NewMockHTTPClient(createMockResponse(t))
+	mock := nettest.NewMockHTTPClient(createMockGetResponse(t))
 
 	s := newStore("http://localhost:8080", mock)
 
-	ref := upspin.Reference{
-		Key:     "XX some hash XX",
-		Packing: upspin.EEp256Pack,
-	}
-	loc := upspin.Location{
-		Reference: ref,
-		Endpoint: upspin.Endpoint{
-			Transport: upspin.GCP,
-		},
-	}
-
-	data, locs, err := s.Get(loc)
+	const LookupKey = "XX some hash XX"
+	data, locs, err := s.Get(LookupKey)
 
 	if data != nil {
 		t.Fatal("Got data when we expected to get redirected")
@@ -188,18 +149,27 @@ func TestStoreGetRedirect(t *testing.T) {
 	if u.Path != "/get" {
 		t.Fatalf("Expected request to /get, got %v", u.Path)
 	}
-	expectedQuery := "ref=XX some hash XX"
+	expectedQuery := fmt.Sprintf("ref=%s", LookupKey)
 	if u.RawQuery != expectedQuery {
 		t.Fatalf("Wrong query params: expected %v, got %v", expectedQuery, u.RawQuery)
 	}
 }
 
-func createMockResponse(t *testing.T) []nettest.MockHTTPResponse {
-	newLoc, err := json.Marshal(newLocation)
+func createMockGetResponse(t *testing.T) []nettest.MockHTTPResponse {
+	newLocJSON, err := json.Marshal(newLocation)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	resp := nettest.NewMockHTTPResponse(200, "application/json", newLoc)
+	resp := nettest.NewMockHTTPResponse(200, "application/json", newLocJSON)
+	return []nettest.MockHTTPResponse{resp}
+}
+
+func createMockPutResponse(t *testing.T) []nettest.MockHTTPResponse {
+	keyStructJSON, err := json.Marshal(keyStruct)
+	if err != nil {
+		t.Fatalf("JSON marshal failed: %v", err)
+	}
+	resp := nettest.NewMockHTTPResponse(200, "application/json", keyStructJSON)
 	return []nettest.MockHTTPResponse{resp}
 }
 

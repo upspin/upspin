@@ -101,7 +101,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		netutil.SendJSONError(w, "", err)
 		return
 	}
-	netutil.SendJSONReply(w, `{"error":"Success"}`)
+	netutil.SendJSONReply(w, &struct{ Error string }{Error: "Success"})
 }
 
 // createDirEntry will attempt to write a new dirEntry to the back
@@ -222,12 +222,8 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// We have a dirEntry. Marshal it and send it back.
 	// TODO: verify ACLs before replying.
-	dirEntryJson, err := json.Marshal(dirEntry)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-	}
-
-	netutil.SendJSONReply(w, dirEntryJson)
+	log.Printf("Got dir entry for %v: %v", pathName, dirEntry)
+	netutil.SendJSONReply(w, dirEntry)
 }
 
 func configureCloudClient(projectId, bucketName string) {
@@ -240,5 +236,5 @@ func main() {
 	http.HandleFunc("/put", putHandler)
 	http.HandleFunc("/get", getHandler)
 	log.Println("Starting server...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }

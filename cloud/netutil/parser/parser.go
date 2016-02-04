@@ -20,6 +20,20 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 	return &loc, nil
 }
 
+// KeyResponse interprets the body of an HTTP response as a key in a
+// proper JSON structure (example "{key:'foo'}"). If it's not in the
+// format of a key, it tries to read an error message instead.
+func KeyResponse(body []byte) (string, error) {
+	keyStruct := &struct {
+		Key string
+	}{}
+	err := json.Unmarshal(body, &keyStruct)
+	if err != nil {
+		return "", ErrorResponse(body)
+	}
+	return keyStruct.Key, nil
+}
+
 // DirEntryResponse interprets the body of an HTTP response as
 // a DirEntry and returns it. If it's not a DirEntry, it tries to read
 // an error message instead.
