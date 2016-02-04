@@ -102,11 +102,11 @@ func lookup(pathName upspin.PathName) {
 // server, using an http.Client as transport.
 func newStore(client *http.Client) upspin.Store {
 	context := store.Context{
-		ServerURL: *storeLocation,
-		Client:    client,
+		Client: client,
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(*storeLocation),
 	}
 	s, err := access.BindStore(context, e)
 	if err != nil {
@@ -119,12 +119,12 @@ func newStore(client *http.Client) upspin.Store {
 // server, using an http.Client as transport.
 func newDirectory(client *http.Client) upspin.Directory {
 	context := dir.Context{
-		ServerURL:    *dirLocation,
 		StoreService: newStore(client),
 		Client:       client,
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(*dirLocation),
 	}
 	d, err := access.BindDirectory(context, e)
 	if err != nil {

@@ -175,11 +175,11 @@ func createMockPutResponse(t *testing.T) []nettest.MockHTTPResponse {
 
 func newStore(serverURL string, client HTTPClientInterface) upspin.Store {
 	context := Context{
-		ServerURL: serverURL,
-		Client:    client,
+		Client: client,
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(serverURL),
 	}
 	s, err := access.BindStore(context, e)
 	if err != nil {
