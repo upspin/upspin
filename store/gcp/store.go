@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -30,22 +31,38 @@ type HTTPClientInterface interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-// New returns a concrete implementation of Store, pointing to a
+type Context struct {
+	ServerURL string
+	Client    HTTPClientInterface
+}
+
+// Guarantee we implement the ClientContext interface
+var _ upspin.ClientContext = (*Context)(nil)
+
+func (c Context) Name() string {
+	return "GCP Store ClientContext"
+}
+
+// new returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
 // Put requests on blocks of data.
-func New(serverURL string, client HTTPClientInterface) *Store {
+func new(serverURL string, client HTTPClientInterface) *Store {
 	return &Store{
 		serverURL: serverURL,
 		client:    client,
 	}
 }
 
-func (s *Store) Dial(upspin.ClientContext, upspin.Endpoint) (interface{}, error) {
-	return nil, NewStoreError("not implemented yet", "")
+func (s *Store) Dial(context upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
+	cc, ok := context.(Context)
+	if !ok {
+		return nil, NewStoreError("Require a ClientContext of type GCP Store ClientContext", "")
+	}
+	return new(cc.ServerURL, cc.Client), nil
 }
 
 func (s *Store) ServerUserName() string {
-	return "NOT IMPLEMENTED YET"
+	return "GPC Store"
 }
 
 func (s *Store) Get(location upspin.Location) ([]byte, []upspin.Location, error) {
@@ -177,4 +194,8 @@ func NewStoreError(error string, key string) *StoreError {
 		error: error,
 		key:   key,
 	}
+}
+
+func init() {
+	access.Switch.RegisterStore(upspin.GCP, &Store{})
 }
