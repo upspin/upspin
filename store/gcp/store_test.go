@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -37,7 +39,7 @@ func TestStorePutError(t *testing.T) {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
 
-	s := New("http://localhost:8080", mock)
+	s := newStore("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
 		Packing: upspin.PlainPack,
@@ -55,7 +57,7 @@ func TestStorePut(t *testing.T) {
 	// The server will respond with a location for the object.
 	mock := nettest.NewMockHTTPClient(createMockResponse(t))
 
-	s := New("http://localhost:8080", mock)
+	s := newStore("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
 		Packing: upspin.PlainPack,
@@ -97,7 +99,7 @@ func TestStoreGetError(t *testing.T) {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
 
-	s := New("http://localhost:8080", mock)
+	s := newStore("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "1234",
 		Packing: upspin.PlainPack,
@@ -120,7 +122,7 @@ func TestStoreGetError(t *testing.T) {
 func TestStoreGetErrorEmptyKey(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil)
-	s := New("http://localhost:8080", mock)
+	s := newStore("http://localhost:8080", mock)
 	ref := upspin.Reference{
 		Key:     "",
 		Packing: upspin.PlainPack,
@@ -144,7 +146,7 @@ func TestStoreGetRedirect(t *testing.T) {
 	// The server will redirect the client to a new location
 	mock := nettest.NewMockHTTPClient(createMockResponse(t))
 
-	s := New("http://localhost:8080", mock)
+	s := newStore("http://localhost:8080", mock)
 
 	ref := upspin.Reference{
 		Key:     "XX some hash XX",
@@ -199,4 +201,19 @@ func createMockResponse(t *testing.T) []nettest.MockHTTPResponse {
 	}
 	resp := nettest.NewMockHTTPResponse(200, "application/json", newLoc)
 	return []nettest.MockHTTPResponse{resp}
+}
+
+func newStore(serverURL string, client HTTPClientInterface) upspin.Store {
+	context := Context{
+		ServerURL: serverURL,
+		Client:    client,
+	}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+	}
+	s, err := access.Switch.BindStore(context, e)
+	if err != nil {
+		log.Fatal("Can't bind: %v", err)
+	}
+	return s
 }
