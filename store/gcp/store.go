@@ -9,6 +9,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
@@ -34,8 +35,7 @@ type HTTPClientInterface interface {
 
 // Context implements upspin.ClientContext for use in dialing a specific Store server.
 type Context struct {
-	ServerURL string
-	Client    HTTPClientInterface
+	Client HTTPClientInterface
 }
 
 // Guarantee we implement the ClientContext interface
@@ -60,7 +60,11 @@ func (s *Store) Dial(context upspin.ClientContext, endpoint upspin.Endpoint) (in
 	if !ok {
 		return nil, NewStoreError("Require a ClientContext of type GCP Store ClientContext", "")
 	}
-	return new(cc.ServerURL, cc.Client), nil
+	serverURL, err := url.Parse(string(endpoint.NetAddr))
+	if err != nil {
+		return nil, NewStoreError(fmt.Sprintf("Require an endpoint with a valid http address: %v", err), "")
+	}
+	return new(serverURL.String(), cc.Client), nil
 }
 
 func (s *Store) ServerUserName() string {
