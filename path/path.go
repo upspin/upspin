@@ -3,7 +3,6 @@ package path
 
 import (
 	"bytes"
-	"path"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -84,32 +83,55 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 		// No user name. Must be at least "u@x.co". Silly test - do more.
 		return pn0, NameError{string(pathName), "no user name in path"}
 	}
-	user, name := name[:slash], path.Clean(name[slash:])
+	user, name := name[:slash], name[slash:]
 	if strings.Count(user, "@") != 1 {
 		// User name must contain exactly one "@".
 		return pn0, NameError{string(pathName), "bad user name in path"}
 	}
-	elems := strings.Split(name, "/") // Include the slash - it's rooted.
-	// First element will be empty because we start with a slash: empty string before it.
-	elems = elems[1:]
-	// There will be a trailing empty element if the name is just /, the root.
-	if name == "/" {
-		elems = elems[1:]
+	p := Parsed{
+		User: upspin.UserName(user),
+	}
+	// Allocate the elems slice all at once, to avoid reallocation in append.
+	elems := make([]string, 0, strings.Count(string(pathName), "/"))
+	// Split into elements. Don't call strings.Split because it allocates. Also we
+	// can process . and .. in this loop.
+	for {
+		for len(name) > 0 && name[0] == '/' {
+			name = name[1:]
+		}
+		if name == "" {
+			break
+		}
+		var i int
+		for i = 0; i < len(name); i++ {
+			if name[i] == '/' {
+				break
+			}
+		}
+		// Handle "." and "..".
+		switch name[:i] {
+		case ".":
+			// Do nothing.
+		case "..":
+			// Drop previous element.
+			if len(elems) > 0 {
+				elems = elems[:len(elems)-1]
+			}
+		default:
+			elems = append(elems, name[:i])
+		}
+		name = name[i:]
+		if name == "" {
+			break
+		}
 	}
 	for _, elem := range elems {
 		if len(elem) > 255 {
 			return pn0, NameError{string(pathName), "name element too long"}
 		}
 	}
-	pn := Parsed{
-		User:  upspin.UserName(user),
-		Elems: elems,
-	}
-	return pn, nil
-}
-
-func cleanPath(pathName upspin.PathName) string {
-	return path.Clean(string(pathName))
+	p.Elems = elems
+	return p, nil
 }
 
 // First returns a parsed name with only the first n elements after the user name.
