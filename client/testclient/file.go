@@ -8,6 +8,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+// maxInt is the int64 representation of the maximum value of an int.
+// It allows us to verify that an int64 value never exceeds the length of a slice.
+// In the tests, we cut it down to manageable size for overflow checking.
+var maxInt = int64(^uint(0) >> 1)
+
 func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 	// TODO: Make sure directory exists?
 	f := &File{
@@ -40,7 +45,7 @@ type File struct {
 	closed   bool            // Whether the file has been closed, preventing further operations.
 	name     upspin.PathName // Full path name.
 	writable bool            // File is writable (made with Create, not Open).
-	offset   int             // File location for next read or write operation.
+	offset   int64           // File location for next read or write operation. Constrained to <= maxInt.
 	data     []byte          // Contents of file.
 }
 
@@ -51,10 +56,9 @@ func (f *File) Name() upspin.PathName {
 }
 
 func (f *File) Read(b []byte) (n int, err error) {
-	n, err = f.readAt("Read", b, int64(f.offset))
+	n, err = f.readAt("Read", b, f.offset)
 	if err == nil {
-		// TODO: overflow
-		f.offset += n
+		f.offset += int64(n)
 	}
 	return n, err
 }
@@ -88,26 +92,23 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	case 0:
 		ret = offset
 	case 1:
-		ret = int64(f.offset) + offset
+		ret = f.offset + offset
 	case 2:
 		ret = int64(len(f.data)) + offset
 	default:
 		return 0, errors.New("bad seek whence")
 	}
-	// TODO: Do we zero-fill?
-	if ret < 0 || ret > int64(len(f.data)) {
+	if ret < 0 || offset > maxInt {
 		return 0, errors.New("bad seek offset")
 	}
-	// TODO: overflow
-	f.offset = int(ret)
+	f.offset = ret
 	return ret, nil
 }
 
 func (f *File) Write(b []byte) (n int, err error) {
-	n, err = f.writeAt("Write", b, int64(f.offset))
+	n, err = f.writeAt("Write", b, f.offset)
 	if err == nil {
-		// TODO: overflow
-		f.offset += n
+		f.offset += int64(n)
 	}
 	return n, err
 }
@@ -126,16 +127,23 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 	if off < 0 {
 		return 0, fmt.Errorf("%s: %q: negative offset", op, f.name)
 	}
-	// TODO: overflow
-	end := int(off) + len(b)
-	if end > cap(f.data) {
+	end := off + int64(len(b))
+	if end > maxInt {
+		return 0, fmt.Errorf("%s: %q: file too long", op, f.name)
+	}
+	if end > int64(cap(f.data)) {
 		// Grow the capacity of f.data but keep length the same.
-		ndata := make([]byte, len(f.data), end*3/2)
+		// Be careful not to ask for more than an int's worth of length.
+		nLen := end * 3 / 2
+		if nLen > maxInt {
+			nLen = maxInt
+		}
+		ndata := make([]byte, len(f.data), nLen)
 		copy(ndata, f.data)
 		f.data = ndata
 	}
 	// Capacity is OK now. Fix the length if necessary.
-	if end > len(f.data) {
+	if end > int64(len(f.data)) {
 		f.data = f.data[:end]
 	}
 	copy(f.data[off:], b)
