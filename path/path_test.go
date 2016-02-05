@@ -6,6 +6,13 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+func newP(elems []string) Parsed {
+	return Parsed{
+		User:  "u@google.com",
+		Elems: elems,
+	}
+}
+
 type parseTest struct {
 	path     upspin.PathName
 	parse    Parsed
@@ -13,11 +20,23 @@ type parseTest struct {
 }
 
 var goodParseTests = []parseTest{
-	{"u@google.com/", Parsed{"u@google.com", []string{}}, "/"},
-	{"u@google.com/a", Parsed{"u@google.com", []string{"a"}}, "/a"},
-	{"u@google.com/a/", Parsed{"u@google.com", []string{"a"}}, "/a"},
-	{"u@google.com/a///b/c/d/", Parsed{"u@google.com", []string{"a", "b", "c", "d"}}, "/a/b/c/d"},
-	{"u@google.com//a///b/c/d//", Parsed{"u@google.com", []string{"a", "b", "c", "d"}}, "/a/b/c/d"},
+	{"u@google.com/", newP([]string{}), "/"},
+	{"u@google.com/a", newP([]string{"a"}), "/a"},
+	{"u@google.com/a/", newP([]string{"a"}), "/a"},
+	{"u@google.com/a///b/c/d/", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
+	{"u@google.com//a///b/c/d//", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
+	// Longer than the backing array in Parsed.
+	{"u@google.com/a/b/c/d/e/f/g/h/i/j/k/l/m",
+		newP([]string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"}),
+		"/a/b/c/d/e/f/g/h/i/j/k/l/m"},
+	// Dot.
+	{"u@google.com/.", newP([]string{}), "/"},
+	{"u@google.com/a/../b", newP([]string{"b"}), "/b"},
+	{"u@google.com/./a///b/./c/d/./.", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
+	// Dot-Dot.
+	{"u@google.com/..", newP([]string{}), "/"},
+	{"u@google.com/a/../b", newP([]string{"b"}), "/b"},
+	{"u@google.com/../a///b/../c/d/..", newP([]string{"a", "c"}), "/a/c"},
 }
 
 func TestParse(t *testing.T) {
@@ -35,6 +54,19 @@ func TestParse(t *testing.T) {
 		if filePath != test.filePath {
 			t.Errorf("%q: DirPath expected %v got %v", test.path, test.filePath, filePath)
 		}
+	}
+}
+
+func TestCountMallocs(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping malloc count in short mode")
+	}
+	parse := func() {
+		Parse("u@google.com/a/b/c/d/e/f/g")
+	}
+	mallocs := testing.AllocsPerRun(100, parse)
+	if mallocs > 1 {
+		t.Errorf("got %d allocs, want <=1", mallocs)
 	}
 }
 
