@@ -2,11 +2,12 @@
 package testclient
 
 import (
+	"errors"
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -98,17 +99,23 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			continue // locs guaranteed to be nil.
 		}
 		if locs == nil && err == nil {
-			// Encrypted data was found.
-			// Need to unpack it.
-			// TODO: Where is Packing defined? We assume the debug packing.
-			blobName, data, err := teststore.UnpackBlob(cipher)
+			// Encrypted data was found. Need to unpack it.
+			packer := pack.Lookup(entry.Location.Reference.Packing)
+			if packer == nil {
+				return nil, fmt.Errorf("testclient: unrecognized Packing %d", entry.Location.Reference.Packing)
+			}
+			clearLen := packer.UnpackLen(cipher, nil)
+			if clearLen < 0 {
+				return nil, errors.New("testclient: UnpackLen failed")
+			}
+			cleartext := make([]byte, clearLen)
+			// Must use a canonicalized name. TODO: Put this in package path?
+			parsed, _ := path.Parse(name) // Known to be error-free.
+			n, err := packer.Unpack(cleartext, cipher, nil, parsed.Path())
 			if err != nil {
 				return nil, err
 			}
-			if blobName != name {
-				return nil, fmt.Errorf("%q: got wrong file name: %s", name, blobName)
-			}
-			return data, nil
+			return cleartext[:n], nil
 		}
 		// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
 		for _, newLoc := range locs {
