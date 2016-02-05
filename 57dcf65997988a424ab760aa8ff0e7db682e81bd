@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_b7bd47ef",
+        "filename": "cmd/store/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-05T00:43:47Z",
+      "side": 1,
+      "message": "Not sure if this is right. Maybe it\u0027s just localhost:8080 and the transport provides the extra piece. Dave?",
+      "revId": "57dcf65997988a424ab760aa8ff0e7db682e81bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
