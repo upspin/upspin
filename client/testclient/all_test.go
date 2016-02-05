@@ -3,6 +3,7 @@ package testclient
 import (
 	"bytes"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
@@ -87,7 +88,7 @@ const (
 	Max = 100 * 1000 // Must be > 100.
 )
 
-func setupFileIO(user upspin.UserName, fileName upspin.PathName, t *testing.T) (*Client, upspin.File, []byte) {
+func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (*Client, upspin.File, []byte) {
 	s, err := setup()
 	if err != nil {
 		t.Fatal(err)
@@ -100,7 +101,7 @@ func setupFileIO(user upspin.UserName, fileName upspin.PathName, t *testing.T) (
 	}
 
 	// Create a data set with each byte equal to its offset.
-	data := make([]byte, Max)
+	data := make([]byte, max)
 	for i := range data {
 		data[i] = uint8(i)
 	}
@@ -113,7 +114,7 @@ func TestFileSequentialAccess(t *testing.T) {
 		root     = user + "/"
 		fileName = user + "/" + "file"
 	)
-	client, f, data := setupFileIO(user, fileName, t)
+	client, f, data := setupFileIO(user, fileName, Max, t)
 
 	// Write the file in randomly sized chunks until it's full.
 	for offset, length := 0, 0; offset < Max; offset += length {
@@ -168,7 +169,7 @@ func TestFileRandomAccess(t *testing.T) {
 		root     = user + "/"
 		fileName = root + "file"
 	)
-	client, f, data := setupFileIO(user, fileName, t)
+	client, f, data := setupFileIO(user, fileName, Max, t)
 
 	// Use WriteAt at random offsets and random sizes to create file.
 	// Start with a map of bools (easy) saying the byte has been written.
@@ -252,5 +253,125 @@ func TestFileRandomAccess(t *testing.T) {
 		for i := offset; i < offset+length; i++ {
 			read[i] = true
 		}
+	}
+}
+
+func TestFileZeroFill(t *testing.T) {
+	const (
+		user     = "zerofill@google.com"
+		root     = user + "/"
+		fileName = user + "/" + "file"
+	)
+	client, f, _ := setupFileIO(user, fileName, 0, t)
+	// Create and write one byte 100 bytes out.
+	f, err := client.Create(fileName)
+	if err != nil {
+		t.Fatal("create file:", err)
+	}
+	const N = 100
+	n64, err := f.Seek(N, 0)
+	if err != nil {
+		t.Fatal("seek file:", err)
+	}
+	if n64 != N {
+		t.Fatalf("seek file: expected %d got %d", N, n64)
+	}
+	n, err := f.Write([]byte{'x'})
+	if err != nil {
+		t.Fatal("write file:", err)
+	}
+	if n != 1 {
+		t.Fatalf("write file: expected %d got %d", 1, n)
+	}
+	f.Close()
+	// Read it back.
+	f, err = client.Open(fileName)
+	if err != nil {
+		t.Fatal("open file:", err)
+	}
+	defer f.Close()
+	buf := make([]byte, 2*N) // Much more than was written.
+	n, err = f.Read(buf)
+	if err != nil {
+		t.Fatal("read file:", err)
+	}
+	if n != N+1 {
+		t.Fatalf("read file: expected %d got %d", N+1, n)
+	}
+	for i := 0; i < N; i++ {
+		if buf[i] != 0 {
+			t.Errorf("byte %d should be 0 is %#.2x", i, buf[i])
+		}
+	}
+	if buf[N] != 'x' {
+		t.Errorf("byte %d should be 'x' is %#.2x", N, buf[N])
+	}
+}
+
+func TestFileOverflow(t *testing.T) {
+	maxInt = 100
+	defer func() { maxInt = int64(^uint(0) >> 1) }()
+	const (
+		user     = "overflow@google.com"
+		root     = user + "/"
+		fileName = user + "/" + "file"
+	)
+	client, f, _ := setupFileIO(user, fileName, 0, t)
+	// Write.
+	f, err := client.Create(fileName)
+	if err != nil {
+		t.Fatal("create file:", err)
+	}
+	defer f.Close()
+	buf := make([]byte, maxInt)
+	n, err := f.Write(buf)
+	if err != nil {
+		t.Fatal("write file:", err)
+	}
+	if n != int(maxInt) {
+		t.Fatalf("write file: expected %d got %d", maxInt, n)
+	}
+	n, err = f.Write(make([]byte, maxInt))
+	if err == nil {
+		t.Fatal("write file: expected overflow")
+	}
+	if !strings.Contains(err.Error(), "overflow") {
+		t.Fatal("write file: expected overflow error, got", err)
+	}
+	// Seek.
+	n64, err := f.Seek(0, 0)
+	if err != nil {
+		t.Fatal("seek file:", err)
+	}
+	if n64 != 0 {
+		t.Fatalf("seek begin file: expected 0 got %d", n64)
+	}
+	n64, err = f.Seek(maxInt, 0)
+	if err != nil {
+		t.Fatal("seek end file:", err)
+	}
+	if n64 != maxInt {
+		t.Fatalf("seek file: expected %d got %d", maxInt, n64)
+	}
+	n64, err = f.Seek(maxInt+1, 0)
+	if err == nil {
+		t.Fatal("seek past file: expected error")
+	}
+	// One more trick: Create empty file, then check seek.
+	f, err = client.Create(fileName + "x")
+	if err != nil {
+		t.Fatal("create filex:", err)
+	}
+	defer f.Close()
+	n64, err = f.Seek(maxInt, 0)
+	if err != nil {
+		t.Fatal("seek maxInt filex:", err)
+	}
+	if n64 != maxInt {
+		t.Fatalf("seek filex: expected %d got %d", maxInt, n64)
+	}
+	n64, err = f.Seek(maxInt+1, 0)
+	if err == nil {
+		t.Fatal("seek maxint+1 filex: expected error")
 	}
 }
