@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	_ "upspin.googlesource.com/upspin.git/user/testuser" // TODO: Unused except in Setup
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 // TODO: Test with different locations.
@@ -21,7 +21,7 @@ type Setup struct {
 	upspin.Directory
 }
 
-func setup() (*Setup, error) {
+func setup(userName upspin.UserName) (*Setup, error) {
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
@@ -34,46 +34,19 @@ func setup() (*Setup, error) {
 	if err != nil {
 		return nil, err
 	}
-	// HACK: We set the store for the blobs to be the same as for the directory.
+	ss, err := access.BindStore(testcontext, e)
+	if err != nil {
+		return nil, err
+	}
+	err = us.(*testuser.Service).Install(userName, ds)
+	if err != nil {
+		return nil, err
+	}
 	return &Setup{
 		User:      us,
-		Store:     ds.(*Service).Store,
+		Store:     ss,
 		Directory: ds,
 	}, nil
-}
-
-func TestMakeRootDirectory(t *testing.T) {
-	// Each test creates the root for a different user, so each test
-	// gets a different root directory.
-	const (
-		user = "user0@google.com"
-		root = user + "/"
-	)
-	s, err := setup()
-	if err != nil {
-		t.Fatal("setup:", err)
-	}
-	loc, err := s.Directory.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
-	}
-	t.Logf("loc for root: %v\n", loc)
-	// Fetch the directory back and inspect it.
-	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
-	if err != nil {
-		t.Fatal("get directory:", err)
-	}
-	name, clear, err := teststore.UnpackBlob(ciphertext)
-	if err != nil {
-		t.Fatal("unpack:", err)
-	}
-	t.Logf("%q: [% x]\n", name, clear)
-	if name != root {
-		t.Fatalf("get of root: should have name %q; has %q", root, name)
-	}
-	if len(clear) != 0 {
-		t.Fatalf("get of root: non-empty payload")
-	}
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
@@ -81,13 +54,9 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
+	s, err := setup(user)
 	if err != nil {
 		t.Fatal("setup:", err)
-	}
-	_, err = s.Directory.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
 	}
 	const (
 		fileName = root + "file"
@@ -97,18 +66,24 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
+
+	// Test that Lookup returns the same locaiton.
+	entry, err := s.Directory.Lookup(fileName) // TODO.
+	if err != nil {
+		t.Fatal("put file:", err)
+	}
+	if loc != entry.Location {
+		t.Error("Lookup's referene does not match Put's reference")
+	}
+
 	// Fetch the data back and inspect it.
 	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
-	name, clear, err := teststore.UnpackBlob(ciphertext)
+	clear, err := unpackBlob(ciphertext, fileName)
 	if err != nil {
 		t.Fatal("unpack:", err)
-	}
-	t.Logf("%q: [% x]\n", name, clear)
-	if name != fileName {
-		t.Fatalf("get of %q has name %q", fileName, name)
 	}
 	str := string(clear)
 	if str != text {
@@ -123,13 +98,9 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		user = "user2@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
+	s, err := setup(user)
 	if err != nil {
 		t.Fatal("setup:", err)
-	}
-	_, err = s.Directory.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
 	locs := make([]upspin.Location, nFile)
@@ -152,13 +123,9 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%q: get blob: %v", fileName, err)
 		}
-		name, clear, err := teststore.UnpackBlob(ciphertext)
+		clear, err := unpackBlob(ciphertext, fileName)
 		if err != nil {
 			t.Fatal("unpack:", err)
-		}
-		t.Logf("%q: [% x]\n", name, clear)
-		if name != fileName {
-			t.Fatalf("get of %q has name %q", fileName, name)
 		}
 		str := string(clear)
 		if str != text {
@@ -172,13 +139,9 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		user = "user3@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
+	s, err := setup(user)
 	if err != nil {
 		t.Fatal("setup:", err)
-	}
-	_, err = s.Directory.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make directory:", err)
 	}
 	// Create a hundred files.
 	href := make([]upspin.Location, nFile)
@@ -199,18 +162,15 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		// Fetch the data back and inspect it.
 		entry, err := s.Directory.Lookup(fileName)
 		if err != nil {
-			t.Fatalf("%q: lookup file: %v", fileName, err)
+			t.Fatalf("#%d: %q: lookup file: %v", i, fileName, err)
 		}
 		cipher, _, err := s.Store.Get(entry.Location.Reference.Key)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
-		name, data, err := teststore.UnpackBlob(cipher)
+		data, err := unpackBlob(cipher, fileName)
 		if err != nil {
 			t.Fatalf("%q: unpack file: %v", fileName, err)
-		}
-		if name != fileName {
-			t.Fatalf("%q: got wrong file name: %s", fileName, name)
 		}
 		str := string(data)
 		if str != text {
@@ -224,11 +184,10 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 		user = "user4@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
+	s, err := setup(user)
 	if err != nil {
 		t.Fatal("setup:", err)
 	}
-	_, err = s.Directory.MakeDirectory(user)
 	if err != nil {
 		t.Fatal("make directory:", err)
 	}
@@ -263,12 +222,9 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
 	}
-	name, data, err := teststore.UnpackBlob(cipher)
+	data, err := unpackBlob(cipher, fileName)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
-	}
-	if name != fileName {
-		t.Fatalf("%q: got wrong file name: %s", fileName, name)
 	}
 	str := string(data)
 	if str != text {
@@ -289,12 +245,9 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
 	}
-	name, data, err = teststore.UnpackBlob(cipher)
+	data, err = unpackBlob(cipher, fileName)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
-	}
-	if name != fileName {
-		t.Fatalf("%q: got wrong second file name: %s", fileName, name)
 	}
 	str = string(data)
 	if str != text {
@@ -338,15 +291,11 @@ func TestGlob(t *testing.T) {
 		user = "user5@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
+	s, err := setup(user)
 	if err != nil {
 		t.Fatal("setup:", err)
 	}
 	// Build the tree.
-	_, err = s.Directory.MakeDirectory(user)
-	if err != nil {
-		t.Fatal("make root:", err)
-	}
 	dirs := []string{
 		"ten",
 		"ten/twelve",
@@ -361,6 +310,7 @@ func TestGlob(t *testing.T) {
 	}
 	for _, dir := range dirs {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, dir))
+		t.Log(name)
 		_, err := s.Directory.MakeDirectory(name)
 		if err != nil {
 			t.Fatalf("make directory: %s: %v", name, err)

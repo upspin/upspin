@@ -2,6 +2,7 @@
 // It stores its directory entries, including user roots, in the in-memory teststore,
 // but allows Put operations to place data in arbitrary locations. (TODO: Not yet)
 // TODO: Don't assume blobs are in same store as directory entries.
+// TODO: Make concurrency-safe.
 package testdir
 
 import (
@@ -11,12 +12,17 @@ import (
 	"os"
 	goPath "path"
 	"sort"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/sim/hash"
-	"upspin.googlesource.com/upspin.git/store/teststore" // TODO: for MakeBlob only.
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	"upspin.googlesource.com/upspin.git/pack"
+
+	_ "upspin.googlesource.com/upspin.git/pack/testpack" // Binds upspin.DebugPack.
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 // TODO: This should be in a testcontext somewhere.
@@ -92,6 +98,36 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	return
 }
 
+var packer = pack.Lookup(upspin.DebugPack)
+
+func packBlob(cleartext []byte, name upspin.PathName) ([]byte, error) {
+	// TODO: Metadata.
+	cipherLen := packer.PackLen(cleartext, nil, name)
+	if cipherLen < 0 {
+		return nil, errors.New("testpack.PackLen failed")
+	}
+	ciphertext := make([]byte, cipherLen)
+	n, err := packer.Pack(ciphertext, cleartext, nil, name)
+	if err != nil {
+		return nil, err
+	}
+	return ciphertext[:n], nil
+}
+
+func unpackBlob(ciphertext []byte, name upspin.PathName) ([]byte, error) {
+	// TODO: Metadata.
+	clearLen := packer.UnpackLen(ciphertext, nil)
+	if clearLen < 0 {
+		return nil, errors.New("testpack.UnpackLen failed")
+	}
+	cleartext := make([]byte, clearLen)
+	n, err := packer.Unpack(cleartext, ciphertext, nil, name)
+	if err != nil {
+		return nil, err
+	}
+	return cleartext[:n], nil
+}
+
 // Glob matches the pattern against the file names of the full rooted tree.
 // That is, the pattern must look like a full path name, but elements of the
 // path may contain metacharacters. Matching is done using Go's path.Match
@@ -112,7 +148,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	this := make([]*upspin.DirEntry, 0, 100)
 	next := make([]*upspin.DirEntry, 1, 100)
 	next[0] = &upspin.DirEntry{
-		Name: upspin.PathName(parsed.User),
+		Name: parsed.First(0).Path(), // The root.
 		Location: upspin.Location{
 			Endpoint:  s.StoreEndpoint,
 			Reference: dirRef,
@@ -128,7 +164,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			if !ent.Metadata.IsDir {
 				continue
 			}
-			payload, err := s.Fetch(ent.Location.Reference)
+			payload, err := s.Fetch(ent.Location.Reference, ent.Name)
 			if err != nil {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
@@ -145,8 +181,12 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				if !matched {
 					continue
 				}
+				dirPath := string(ent.Name)
+				if !strings.HasSuffix(dirPath, "/") {
+					dirPath += "/"
+				}
 				e := &upspin.DirEntry{
-					Name: ent.Name + "/" + upspin.PathName(name),
+					Name: upspin.PathName(dirPath + string(name)),
 					Location: upspin.Location{
 						Endpoint: s.StoreEndpoint,
 						Reference: upspin.Reference{
@@ -181,9 +221,6 @@ func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // MakeDirectory creates a new directory with the given name. The user's root must be present.
 // TODO: For now at least, only the last entry of the path can be created, as in Unix.
-// TODO: We get the reference back. Should we be able to use it instead of a path for Put?
-// That Would require more self-checks on directories (easy) and would avoid some name lookup (good)
-// but is lower-level. Maybe as an efficiency extra in the API.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
@@ -196,7 +233,10 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob := teststore.MakeBlob(parsed.String(), nil)
+		blob, err := packBlob(nil, parsed.Path())
+		if err != nil {
+			return loc0, err
+		}
 		key, err := s.Store.Put(blob)
 		if err != nil {
 			return loc0, err
@@ -247,7 +287,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	entries = append(entries, entry{"", true, dirRef})
 	for i := 0; i < len(parsed.Elems)-1; i++ {
 		elem := parsed.Elems[i]
-		dirRef, isDir, err = s.fetchEntry("Put", pathName, dirRef, parsed.Elems[i])
+		dirRef, isDir, err = s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return loc0, err
 		}
@@ -259,14 +299,17 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
 	// Create a blob storing the data for this file and store it in storage service.
-	ciphertext := teststore.MakeBlob(string(pathName), data)
+	ciphertext, err := packBlob(data, parsed.Path()) // parsed.Path() will be clean.
+	if err != nil {
+		return loc0, err
+	}
 	key, err := s.Store.Put(ciphertext)
 	ref := upspin.Reference{
 		Key:     key,
 		Packing: upspin.DebugPack,
 	}
 	loc := upspin.Location{
-		Endpoint:  s.StoreEndpoint,
+		Endpoint:  s.Store.Endpoint(),
 		Reference: ref,
 	}
 
@@ -277,7 +320,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		isDir: dataIsDir,
 		ref:   ref,
 	}
-	dirRef, err = s.installEntry(op, parsed.Drop(1).String(), dirRef, ent, false)
+	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, ent, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return loc0, err
@@ -292,7 +335,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 			isDir: true,
 			ref:   dirRef,
 		}
-		dirRef, err = s.installEntry(op, parsed.String(), entries[i].ref, ent, true)
+		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].ref, ent, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
 			return loc0, err
@@ -300,11 +343,9 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	}
 	// Update the root.
 	s.Root[parsed.User] = dirRef
-	href := upspin.Location{
-		Endpoint:  s.StoreEndpoint,
-		Reference: loc.Reference,
-	}
-	return href, nil
+
+	// Return the reference to the file.
+	return loc, nil
 }
 
 func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
@@ -323,7 +364,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// Invariant: dirRef refers to a directory.
 	isDir := true
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		dirRef, isDir, err = s.fetchEntry("Lookup", pathName, dirRef, parsed.Elems[i])
+		dirRef, isDir, err = s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return nil, err
 		}
@@ -334,7 +375,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 	// Destination must exist. If so we need to update the parent directory record.
 	var r upspin.Reference
-	if r, isDir, err = s.fetchEntry("Lookup", pathName, dirRef, lastElem); err != nil {
+	if r, isDir, err = s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem); err != nil {
 		return nil, err
 	}
 	entry := &upspin.DirEntry{
@@ -374,7 +415,7 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
 // It reads the whole directory, so avoid calling it repeatedly.
 func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (upspin.Reference, bool, error) {
-	payload, err := s.Fetch(dirRef)
+	payload, err := s.Fetch(dirRef, name)
 	if err != nil {
 		return r0, false, err
 	}
@@ -383,14 +424,16 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 
 // Fetch returns the decrypted data associated with the reference.
 // TODO: For test but is it genuinely valuable?
-func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
+func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
 	ciphertext, _, err := s.Store.Get(dirRef.Key)
 	if err != nil {
 		return nil, err
 	}
-	_, payload, err := teststore.UnpackBlob(ciphertext)
-	// TODO check path.
-	return payload, nil
+	if dirRef.Packing != upspin.DebugPack {
+		return nil, fmt.Errorf("testdir: unexpected packing %d in Fetch", dirRef.Packing)
+	}
+	payload, err := unpackBlob(ciphertext, name)
+	return payload, err
 }
 
 // Internal representation of directory entries.
@@ -401,7 +444,7 @@ func (s *Service) Fetch(dirRef upspin.Reference) ([]byte, error) {
 //	sha1.Size bytes of Reference.
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
-// The boolean is true if the entry iteself describes a directory.
+// The boolean is true if the entry itself describes a directory.
 func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (upspin.Reference, bool, error) {
 	if len(elem) == 0 {
 		return r0, false, mkStrError(op, pathName+"/", "empty name element")
@@ -436,14 +479,12 @@ Loop:
 
 // installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
-func (s *Service) installEntry(op string, dirName string, dirRef upspin.Reference, ent entry, dirOverwriteOK bool) (upspin.Reference, error) {
-	dirData, err := s.Fetch(dirRef)
+func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, ent entry, dirOverwriteOK bool) (upspin.Reference, error) {
+	dirData, err := s.Fetch(dirRef, dirName)
 	if err != nil {
-		fmt.Println("INSTALL fetch FAILED", err)
 		return r0, err
 	}
 	found := false
-	// fmt.Printf("\nBEFORE: %s\n%q\n\n", dirName, dirData)
 Loop:
 	for payload := dirData; len(payload) > 0 && !found; {
 		remaining, name, hashBytes, isDir, err := s.step(op, upspin.PathName(dirName), payload)
@@ -477,11 +518,12 @@ Loop:
 		entry := newEntryBytes(ent.elem, ent.isDir, ent.ref)
 		dirData = append(dirData, entry...)
 	}
-	// fmt.Printf("\n%s\n%q\n\n", dirName, dirData)
-	blob := teststore.MakeBlob(string(dirName), dirData)
+	blob, err := packBlob(dirData, dirName)
+	if err != nil {
+		return r0, err
+	}
 	key, err := s.Store.Put(blob)
 	if err != nil {
-		fmt.Println("INSTALL FAILED", err)
 		// TODO: System is now inconsistent.
 		return r0, err
 	}
