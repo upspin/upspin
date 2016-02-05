@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "315940ea_24e5d2f5",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-05T18:00:17Z",
+      "side": 1,
+      "message": "It\u0027s a TODO that says when there\u0027s metadata, it must flow through here. See the nil on the next line.",
+      "parentUuid": "711bb8b8_1404162d",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "711bb8b8_54a7ae7c",
         "filename": "directory/testdir/directory.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "315940ea_a411c2a1",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-05T18:00:17Z",
+      "side": 1,
+      "message": "The directory server can store its data any way it likes, but if it stores its data on the server encrypted (which I would like to do), it will need to have the keys to manage that. I suspect this detail will be important to the ACL story.",
+      "parentUuid": "711bb8b8_54a7ae7c",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "711bb8b8_34a0325e",
         "filename": "pack/testpack/testpack_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-02-05T17:06:50Z",
       "side": 1,
       "message": "these consts could be global, to avoid repetition.",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "315940ea_64042a60",
+        "filename": "pack/testpack/testpack_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-05T18:00:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "711bb8b8_34a0325e",
       "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
