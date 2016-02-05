@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "711bb8b8_1404162d",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-05T17:06:50Z",
+      "side": 1,
+      "message": "Why this TODO here? packBlob only deals with blobs, not metadata, right?",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_54a7ae7c",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-05T17:06:50Z",
+      "side": 1,
+      "message": "From an earlier conversation with Eric, I thought we were not going to do any kind of packing on the directory structure.",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711bb8b8_34a0325e",
+        "filename": "pack/testpack/testpack_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-05T17:06:50Z",
+      "side": 1,
+      "message": "these consts could be global, to avoid repetition.",
+      "revId": "a529fa2b596017a27c3cb9b4b673b8876006eab9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
