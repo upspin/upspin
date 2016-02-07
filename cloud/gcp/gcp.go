@@ -124,6 +124,47 @@ func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	return link, err
 }
 
+// List returns all the filenames stored inside a given path prefix. It
+// returns two parallel slices containing the name of the file and an
+// url-encoded link to it or it returns an error.
+func (gcp *GCP) List(prefix string) (name []string, link []string, err error) {
+	nextPageToken := ""
+	for {
+		moreNames, moreLinks, nextPageToken, err := gcp.innerList(prefix, nextPageToken)
+		if err != nil {
+			return nil, nil, err
+		}
+		name = append(name, moreNames...)
+		link = append(link, moreLinks...)
+		if nextPageToken == "" {
+			break
+		}
+	}
+	return
+}
+
+// innerList is an internal function that does what List does, except
+// it accepts a continuation token and possibly returns one if there
+// are more objects to retrieve.
+func (gcp *GCP) innerList(prefix, pageToken string) (name []string, link []string, nextPageToken string, error error) {
+	objs, err := gcp.service.Objects.List(gcp.bucketName).Prefix(prefix).Fields("items(name,mediaLink),nextPageToken").PageToken(pageToken).Do()
+	if err != nil {
+		return nil, nil, "", err
+	}
+	// objs.Items is a slice of Objects.
+
+	// Allocate space for all returned objects in this call.
+	name = make([]string, len(objs.Items))
+	link = make([]string, len(objs.Items))
+
+	for i, o := range objs.Items {
+		name[i] = o.Name
+		link[i] = o.MediaLink
+	}
+
+	return name, link, objs.NextPageToken, nil
+}
+
 // Connect connects with the Google Cloud Platform, under the given projectId and bucketName.
 func (gcp *GCP) Connect() {
 	if gcp.projectId == "" {

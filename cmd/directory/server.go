@@ -226,6 +226,31 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, dirEntry)
 }
 
+func listHandler(w http.ResponseWriter, r *http.Request) {
+	context := "list: "
+	err := r.ParseForm()
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	prefix := r.FormValue("prefix")
+	if prefix == "" {
+		netutil.SendJSONErrorString(w, "missing prefix in request")
+		return
+	}
+	_, err = path.Parse(upspin.PathName(prefix))
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	names, _, err := cloudClient.List(prefix)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
+}
+
 func configureCloudClient(projectId, bucketName string) {
 	cloudClient = gcp.New(projectId, bucketName, gcp.DefaultWriteACL)
 }
@@ -235,6 +260,7 @@ func main() {
 	configureCloudClient(*projectId, *bucketName)
 	http.HandleFunc("/put", putHandler)
 	http.HandleFunc("/get", getHandler)
+	http.HandleFunc("/list", listHandler)
 	log.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }

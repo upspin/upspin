@@ -51,3 +51,19 @@ func TestPutAndGet(t *testing.T) {
 		t.Errorf("Data mismatch. Expected '%q' got '%q'", string(testData), string(data))
 	}
 }
+
+func TestList(t *testing.T) {
+	names, links, err := client.List("test-f") // prefix for "test-file" above
+	if err != nil {
+		t.Fatalf("Error in client.List: %v", err)
+	}
+	if len(names) != 1 {
+		t.Fatalf("Invalid length of results. Expected 1, got %d", len(names))
+	}
+	if names[0] != "test-file" {
+		t.Errorf("Invalid file name. Expected test-file, got %v", names[0])
+	}
+	if !strings.HasPrefix(links[0], "https://") {
+		t.Errorf("Invalid download link. Expected at least an https:// prefix, got %v", links[0])
+	}
+}
