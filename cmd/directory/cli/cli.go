@@ -41,6 +41,8 @@ func main() {
 		put(path)
 	case "lookup":
 		lookup(path)
+	case "list":
+		list(path)
 	default:
 		fmt.Fprintf(os.Stderr, "Can't understand command: %v", flag.Arg(0))
 		Usage()
@@ -53,6 +55,15 @@ func Usage() {
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+// list shows the contents of a given prefix path
+func list(prefix upspin.PathName) {
+	entries, err := d.Glob(string(prefix))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("%+v", entries)
 }
 
 // mkdir creates a new directory on GCP.

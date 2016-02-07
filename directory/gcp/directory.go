@@ -11,11 +11,13 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	goPath "path"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -65,27 +67,9 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, newError(op, name, err)
 	}
-	resp, err := d.client.Do(req)
-	if err != nil {
-		return nil, newError(op, name, err)
-	}
-	// Check the response
-	if resp.StatusCode != http.StatusOK {
-		return nil, newError(op, name,
-			errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
-	}
-	// Check the payload
-	defer resp.Body.Close()
-	// TODO(edpin): maybe add a limit here to the size of bytes we
-	// read and return?
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := d.requestAndReadResponseBody(op, name, req)
 	if err != nil {
 		return nil, err
-	}
-	// Check the content type
-	answerType := resp.Header.Get(netutil.ContentType)
-	if !strings.HasPrefix(answerType, "application/json") {
-		return nil, newError(op, name, errors.New(fmt.Sprintf("Invalid response format: %v", answerType)))
 	}
 	// Interpret the JSON returned
 	dirEntry, err := parser.DirEntryResponse(body)
@@ -137,22 +121,9 @@ func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Loc
 	if err != nil {
 		return zeroLoc, newError(op, name, err)
 	}
-	resp, err := d.client.Do(req)
+	respBody, err := d.requestAndReadResponseBody(op, name, req)
 	if err != nil {
-		return zeroLoc, newError(op, name, err)
-	}
-
-	// Get response.
-	if resp.StatusCode != http.StatusOK {
-		return zeroLoc, newError(op, name, errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
-	}
-
-	// Read the body of the response
-	defer resp.Body.Close()
-	// TODO(edpin): maybe add a limit here to the size of bytes we return?
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return zeroLoc, newError(op, name, err)
+		return zeroLoc, err
 	}
 	err = parser.ErrorResponse(respBody)
 	if err != nil {
@@ -184,22 +155,9 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	if err != nil {
 		return zeroLoc, newError(op, dirName, err)
 	}
-	resp, err := d.client.Do(req)
+	respBody, err := d.requestAndReadResponseBody(op, dirName, req)
 	if err != nil {
-		return zeroLoc, newError(op, dirName, err)
-	}
-
-	// Check the response
-	if resp.StatusCode != http.StatusOK {
-		return zeroLoc, newError(op, dirName, errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
-	}
-
-	// Read the body of the response
-	defer resp.Body.Close()
-	// TODO(edpin): maybe add a limit here to the size of bytes we return?
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return zeroLoc, newError(op, dirName, err)
+		return zeroLoc, err
 	}
 	loc, err := parser.LocationResponse(respBody)
 	if err != nil {
@@ -212,8 +170,105 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	return *loc, nil
 }
 
+// Glob traverses the directory structure looking for entries that
+// match a given pattern. The pattern must be a full pathname,
+// including the user name, which may not contain metacharacters (they
+// will be treated literally).
 func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	return nil, newError("Glob", "", errors.New("Glob unimplemented"))
+	op := "Glob"
+	// Check if pattern is a valid upspin path
+	pathPattern := upspin.PathName(pattern)
+	parsed, err := path.Parse(pathPattern)
+	if err != nil {
+		return nil, newError(op, pathPattern, err)
+	}
+	// Check if pattern is a valid go path pattern
+	_, err = goPath.Match(parsed.FilePath(), "")
+	if err != nil {
+		return nil, newError(op, pathPattern, err)
+	}
+
+	// As an optimization, we look for the longest prefix that
+	// does not contain a metacharacter -- this saves us from
+	// doing a full list operation if the matter of interest is
+	// deep in a sub directory.
+	clear := len(parsed.Elems)
+	for i, elem := range parsed.Elems {
+		if strings.IndexAny(elem, "*?[]^") != -1 {
+			clear = i
+			break
+		}
+	}
+	prefix := parsed.First(clear).String()
+	log.Printf("Globing prefix %v with pattern %v\n", prefix, pattern)
+
+	// Issue request
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/list?prefix=%s", d.serverURL, prefix), nil)
+	if err != nil {
+		return nil, err
+	}
+	body, err := d.requestAndReadResponseBody(op, pathPattern, req)
+	if err != nil {
+		return nil, err
+	}
+	// Interpret bytes as an annonymous JSON struct
+	dirs := &struct{ Names []string }{}
+	err = json.Unmarshal(body, dirs)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("To be globbed: %v", dirs)
+
+	dirEntries := make([]*upspin.DirEntry, 0, len(dirs.Names))
+	// Now do the actual globing.
+	var firstError error
+	for _, path := range dirs.Names {
+		// error is ignored as pattern is known valid
+		if match, _ := goPath.Match(pattern, path); match {
+			// Now fetch each DirEntry we need
+			log.Printf("Looking up: %v", path)
+			de, err := d.Lookup(upspin.PathName(path))
+			if err != nil {
+				// Save the error but keep going
+				if firstError == nil {
+					firstError = err
+				}
+				continue
+			}
+			dirEntries = append(dirEntries, de)
+		}
+	}
+
+	return dirEntries, firstError
+}
+
+// requestAndReadResponseBody is an internal helper function that
+// sends a given request over the http client and parses the body of
+// the reply, using op and path to build errors if they are
+// encountered along the way
+func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, req *http.Request) ([]byte, error) {
+	resp, err := d.client.Do(req)
+	if err != nil {
+		return nil, newError(op, path, err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, newError(op, path, errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
+	}
+	// Check the content type
+	answerType := resp.Header.Get(netutil.ContentType)
+	if !strings.HasPrefix(answerType, "application/json") {
+		return nil, newError(op, path, errors.New(fmt.Sprintf("Invalid response format: %v", answerType)))
+	}
+
+	// Read the body of the response
+	defer resp.Body.Close()
+	// TODO(edpin): maybe add a limit here to the size of bytes we return?
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, newError(op, path, err)
+	}
+
+	return respBody, nil
 }
 
 func (d *Directory) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
