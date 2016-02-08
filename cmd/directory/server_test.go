@@ -63,6 +63,26 @@ func TestLookupPathError(t *testing.T) {
 	resp.Verify(t)
 }
 
+func TestListMissingPrefix(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"missing prefix in request"}`)
+	req, err := http.NewRequest("GET", "http://localhost:8080/list", nil)
+	if err != nil {
+		t.Fatalf("Can't make new request: %v", err)
+	}
+	listHandler(resp, req)
+	resp.Verify(t)
+}
+
+func TestListBadPath(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"list: bad user name in path"}`)
+	req, err := http.NewRequest("GET", "http://localhost:8080/list?prefix=missing/email/dir/file", nil)
+	if err != nil {
+		t.Fatalf("Can't make new request: %v", err)
+	}
+	listHandler(resp, req)
+	resp.Verify(t)
+}
+
 // From here on, we need a connection to GCP
 func ConnectedPut(t *testing.T, dirEntry upspin.DirEntry, errorExpected string) {
 	// Re-using the same bucket is dangerous because of leftover
@@ -89,6 +109,17 @@ func TestLookupPathNotFound(t *testing.T) {
 		t.Fatalf("Can't make new request: %v", err)
 	}
 	getHandler(resp, req)
+	resp.Verify(t)
+}
+
+func TestList(t *testing.T) {
+	configureCloudClient("upspin", "upspin-test")
+	resp := nettest.NewExpectingResponseWriter(`{"Names":["testuser@google.com/subdir/","testuser@google.com/subdir/test.txt"]}`)
+	req, err := http.NewRequest("GET", "http://localhost:8080/list?prefix=testuser@google.com/sub", nil)
+	if err != nil {
+		t.Fatalf("Can't make new request: %v", err)
+	}
+	listHandler(resp, req)
 	resp.Verify(t)
 }
 
