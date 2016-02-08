@@ -34,7 +34,7 @@ func (e *ExpectingResponseWriter) WriteHeader(int) {
 // the test.
 func (e *ExpectingResponseWriter) Verify(t *testing.T) {
 	if e.expectedResponse != e.response {
-		t.Errorf("Expected %q got %q", e.expectedResponse, e.response)
+		t.Errorf("Expected %v got %v", e.expectedResponse, e.response)
 	}
 }
 
