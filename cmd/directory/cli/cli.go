@@ -41,18 +41,29 @@ func main() {
 		put(path)
 	case "lookup":
 		lookup(path)
+	case "glob":
+		glob(path)
 	default:
-		fmt.Fprintf(os.Stderr, "Can't understand command: %v", flag.Arg(0))
+		fmt.Fprintf(os.Stderr, "Can't understand command: %v\n", flag.Arg(0))
 		Usage()
 	}
 }
 
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|lookup> <path>\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|lookup|glob> <path>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+// glob shows the contents of a path that match a pattern.
+func glob(pattern upspin.PathName) {
+	entries, err := d.Glob(string(pattern))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("%+v", entries)
 }
 
 // mkdir creates a new directory on GCP.
