@@ -3,38 +3,48 @@ package directory
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	store "upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 const (
-	pathName = "bob@jones.com/myroot/mysubdir"
+	pathName    = "bob@jones.com/myroot/mysubdir"
+	badPathName = "invalid/path/name"
 )
 
 var (
 	errBadConnection       = errors.New("bad internet connection")
+	errBadPatternUserName  = errors.New("bad user name in path")
 	errMkdirBadConnection  = newError("MakeDirectory", pathName, errBadConnection)
 	errLookupBadConnection = newError("Lookup", pathName, errBadConnection)
 	errPutBadConnection    = newError("Put", pathName, errBadConnection)
+	errGlobBadPattern      = newError("Glob", badPathName, errBadPatternUserName)
 	key                    = "the key"
+	fileContents           = []byte("contents of file")
 	reference              = upspin.Reference{
-		Key:     key,
-		Packing: upspin.PlainPack,
+		Key: key,
 	}
 	location = upspin.Location{
 		Reference: reference,
+		Endpoint: upspin.Endpoint{
+			Transport: upspin.GCP,
+			NetAddr:   upspin.NetAddr("http://localhost:8080"),
+		},
 	}
 	dirEntry = upspin.DirEntry{
 		Name:     pathName,
 		Location: location,
 		Metadata: upspin.Metadata{
 			IsDir:    false,
-			Sequence: 17,
+			Sequence: 0,
 			PackData: []byte("Packed metadata"),
 		},
 	}
@@ -65,26 +75,12 @@ func TestMkdir(t *testing.T) {
 		t.Fatalf("Location differs. Expected %v, got %v", location, loc)
 	}
 	// Verifies request was sent correctly
-	reqs := mock.Requests()
-	if len(reqs) != 1 {
-		t.Fatalf("Sent more requests than necessary. Expected 1, got %v", len(reqs))
-	}
-	u := reqs[0].URL
-	if u.Scheme != "http" {
-		t.Fatalf("Expected http request, got %v", u.Scheme)
-	}
-	if u.Host != "localhost:8080" {
-		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
-	}
-	if u.Path != "/put" {
-		t.Fatalf("Expected request to /put, got %v", u.Path)
-	}
-	if u.RawQuery != "" {
-		t.Fatalf("Expected no query, got %v", u.RawQuery)
-	}
-	if reqs[0].ContentLength < int64(len(pathName)) {
-		t.Fatalf("Request body too small. Expect at least %d, got %d", len(pathName), reqs[0].ContentLength)
-	}
+	mkdirEntry := dirEntry
+	mkdirEntry.Location = upspin.Location{}
+	mkdirEntry.Metadata.IsDir = true
+	mkdirEntry.Metadata.PackData = nil
+	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
+	mock.Verify(t, []*http.Request{request})
 }
 
 func newMockMkdirResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -96,7 +92,7 @@ func newMockLocationResponse(t *testing.T) nettest.MockHTTPResponse {
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	return nettest.NewMockHTTPResponse(200, "application/json", loc)
+	return newResp(loc)
 }
 
 func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
@@ -104,7 +100,7 @@ func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	return nettest.NewMockHTTPResponse(200, "application/json", keyJSON)
+	return newResp(keyJSON)
 }
 
 func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -112,7 +108,7 @@ func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	resp := nettest.NewMockHTTPResponse(200, "application/json", dir)
+	resp := newResp(dir)
 	return []nettest.MockHTTPResponse{resp}
 }
 
@@ -231,56 +227,102 @@ func TestPut(t *testing.T) {
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), []byte("contents of file"), []byte("Packed metadata"))
+	loc, err := d.Put(upspin.PathName(pathName), fileContents, []byte("Packed metadata"))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if loc.Reference.Key != key {
 		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
 	}
+	// In the first request we don't care to match the body
+	// exactly, since that's what Store sent to the server and
+	// Store has been tested elsewhere.
+	storeRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+
 	// Verify we sent to the Directory service the Reference.Key we got back from the Store server
-	reqs := mock.Requests()
-	if len(reqs) != 2 {
-		t.Fatalf("Sent wrong number of requests. Expected 2, got %v", len(reqs))
+	dirEntryJSON := toJSON(t, dirEntry)
+	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
+
+	mock.Verify(t, []*http.Request{storeRequest, expectedRequest})
+}
+
+func TestGlobBadPattern(t *testing.T) {
+	resp := nettest.MockHTTPResponse{
+		Error:    errGlobBadPattern,
+		Response: nil,
 	}
-	// Look at the second request, which is the one that went to the Directory.
-	u := reqs[1].URL
-	if u.Scheme != "http" {
-		t.Fatalf("Expected http request, got %v", u.Scheme)
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+
+	d := newDirectory("http://localhost:8080", nil, mock)
+
+	_, err := d.Glob(badPathName)
+	if err == nil {
+		t.Fatal("Expected error, got none")
 	}
-	if u.Host != "localhost:9090" {
-		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
+	if err.Error() != errGlobBadPattern.Error() {
+		t.Fatalf("Expected error %q, got %q", errGlobBadPattern, err)
 	}
-	if u.Path != "/put" {
-		t.Fatalf("Expected request to /put, got %v", u.Path)
+}
+
+func TestGlob(t *testing.T) {
+	// Set up all the responses from the server:
+	// First, the server will give us 3 paths from a /list request.
+	// Then it will send two DirEntry due to our two Lookup requests.
+	// We later check that we issued one list request and two Lookup requests.
+
+	const (
+		path0 = "a@b.co/dir1/file1.txt"
+		path1 = "a@b.co/dir1/file2.txt"
+	)
+	responses := []nettest.MockHTTPResponse{
+		newResp([]byte(fmt.Sprintf(`{ "Names": ["%v","%v","a@b.co/dir1/file3.pdf"]}`, path0, path1))),
+		newResp(toJSON(t, newDirEntry(upspin.PathName(path0)))),
+		newResp(toJSON(t, newDirEntry(upspin.PathName(path1)))),
 	}
-	if u.RawQuery != "" {
-		t.Fatalf("Expected no query, got %v", u.RawQuery)
+	expectedRequests := []*http.Request{
+		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/list?prefix=a@b.co/dir1", nil),
+		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path0), nil),
+		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path1), nil),
 	}
-	minLen := len(pathName) + len(loc.Reference.Key) + 2 // 2 bytes for IsDir + Sequence.
-	if reqs[1].ContentLength < int64(minLen) {
-		t.Fatalf("Request body too small. Expect at least %d, got %d", len(pathName), reqs[1].ContentLength)
-	}
-	// Read the request buffer (since it was never really consumed by the mock) to see if it was created correctly.
-	buf := make([]byte, reqs[1].ContentLength)
-	n, err := reqs[1].Body.Read(buf)
+
+	mock := nettest.NewMockHTTPClient(responses)
+	d := newDirectory("http://localhost:9090", nil, mock)
+
+	dirEntries, err := d.Glob("a@b.co/dir1/*.txt")
 	if err != nil {
-		t.Fatalf("Can't read buf: %v", buf)
+		t.Fatalf("Unexpected error occurred: %v", err)
 	}
-	defer reqs[1].Body.Close()
-	buf = buf[:n] // Re-slice
-	var de upspin.DirEntry
-	err = json.Unmarshal(buf, &de)
+	if len(dirEntries) != 2 {
+		t.Fatalf("Expected 2 results, got %d", len(dirEntries))
+	}
+	if string(dirEntries[0].Name) != path0 {
+		t.Errorf("Expected 0th entry %v, got %v", path0, dirEntries[0].Name)
+	}
+	if string(dirEntries[1].Name) != path1 {
+		t.Errorf("Expected 1st entry %v, got %v", path1, dirEntries[1].Name)
+	}
+	mock.Verify(t, expectedRequests)
+}
+
+// newDirEntry creates a new DirEntry with the given path name
+func newDirEntry(pathName upspin.PathName) *upspin.DirEntry {
+	return &upspin.DirEntry{
+		Name: pathName,
+	}
+}
+
+// toJSON is a convenience function for marshaling data into JSON
+func toJSON(t *testing.T, data interface{}) []byte {
+	d, err := json.Marshal(data)
 	if err != nil {
-		t.Fatalf("Error unmarshaling: %v", err)
+		t.Fatalf("Can't marshal to JSON: %v", err)
 	}
-	// Check that dirEntry matches our expectations of what should have been written
-	if string(de.Name) != string(dirEntry.Name) {
-		t.Errorf("Invalid pathname. Expected %v, got %v", dirEntry.Name, de.Name)
-	}
-	if string(de.Location.Reference.Key) != string(dirEntry.Location.Reference.Key) {
-		t.Errorf("Invalid key. Expected %v, got %v", dirEntry.Location.Reference.Key, de.Location.Reference.Key)
-	}
+	return d
+}
+
+// newResp is a convenience function that creates a successful MockHTTPResponse with JSON data.
+func newResp(data []byte) nettest.MockHTTPResponse {
+	return nettest.NewMockHTTPResponse(200, "application/json", data)
 }
 
 func newDirectory(serverURL string, storeService upspin.Store, client HTTPClientInterface) upspin.Directory {
