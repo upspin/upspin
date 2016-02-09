@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_800738b0",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_83ce1e79",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_23e5aaf6",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "s/()//\n(go style doesn\u0027t put the parens on function names in prose)",
+      "range": {
+        "startLine": 145,
+        "startChar": 40,
+        "endLine": 145,
+        "endChar": 46
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_600cacd4",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_23e5aaf6",
       "range": {
         "startLine": 145,
         "startChar": 40,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_60230c40",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_03ea2ec6",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_c3c8166e",
         "filename": "cloud/netutil/nettest/mockhttpclient_test.go",
         "patchSetId": 1
@@ -70,6 +130,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "for the record, i\u0027m fine with you writing this kind of mock but i find them exhausting to write, review, test, use, and maintain.",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_c01780d7",
+        "filename": "cloud/netutil/nettest/mockhttpclient_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Agreed. But this is just the test of the mock. Once written, the mock works and it greatly helps with testing. I think it was worth it.",
+      "parentUuid": "dd0f1877_c3c8166e",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_a014f4d3",
+        "filename": "cmd/directory/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_e3cb9267",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_23be4ade",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 1
@@ -110,6 +206,24 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_001208e6",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_23be4ade",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_03c34e56",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 1
@@ -121,6 +235,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "s/Globing/Globbing/",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_40cb7097",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_03c34e56",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -150,6 +282,30 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_20d0e441",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_63b842ef",
+      "range": {
+        "startLine": 223,
+        "startChar": 22,
+        "endLine": 223,
+        "endChar": 29
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_43bd46dd",
         "filename": "directory/gcp/directory.go",
         "patchSetId": 1
@@ -161,6 +317,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "there is a question here about whether metadata should be included in the returned direntry. i\u0027m not sure what the right answer is and i think it\u0027s subtle.\n// TODO: should we include metadata?",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_80d57834",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_43bd46dd",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -190,6 +364,30 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_60daec63",
+        "filename": "directory/gcp/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_a3d19a1d",
+      "range": {
+        "startLine": 246,
+        "startChar": 34,
+        "endLine": 246,
+        "endChar": 38
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_039cee86",
         "filename": "directory/gcp/directory_test.go",
         "patchSetId": 1
@@ -201,6 +399,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "this isn\u0027t for a bad path, but a bad pattern. the error is misnamed and the message inaccurate",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_a0db5463",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_039cee86",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -230,6 +446,30 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_00e968fc",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_63a162bf",
+      "range": {
+        "startLine": 237,
+        "startChar": 4,
+        "endLine": 237,
+        "endChar": 7
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_43a6e6d8",
         "filename": "directory/gcp/directory_test.go",
         "patchSetId": 1
@@ -241,6 +481,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "BadPattern",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_e0e55c20",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_43a6e6d8",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -270,6 +528,30 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_40b25031",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_a3aa3a99",
+      "range": {
+        "startLine": 258,
+        "startChar": 18,
+        "endLine": 258,
+        "endChar": 29
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_83a73ed1",
         "filename": "directory/gcp/directory_test.go",
         "patchSetId": 1
@@ -281,6 +563,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "simpler:\n\nExpected error %v, got %v\n\ni might use %q instead, to make the output easier to parse",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_20b74421",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_83a73ed1",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -310,6 +610,30 @@
     },
     {
       "key": {
+        "uuid": "1d3ff0e9_80ac58d2",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_e3b43200",
+      "range": {
+        "startLine": 268,
+        "startChar": 4,
+        "endLine": 268,
+        "endChar": 9
+      },
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd0f1877_c3b1360e",
         "filename": "directory/gcp/directory_test.go",
         "patchSetId": 1
@@ -321,6 +645,24 @@
       "writtenOn": "2016-02-08T23:58:19Z",
       "side": 1,
       "message": "again, the first sentence adds little.\nExpected 2 entries, got %d.\nsimilarly below.",
+      "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3ff0e9_60b14c28",
+        "filename": "directory/gcp/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T01:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd0f1877_c3b1360e",
       "revId": "12dbf843f7e81ecdc30b903dc274a3535a02a42d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
