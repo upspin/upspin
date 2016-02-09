@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1d89b03a_130c548e",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_c61da258",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_e61a9e5d",
         "filename": "cloud/gcp/gcp_test.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-09T20:08:05Z",
       "side": 1,
       "message": "ditto.",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d89b03a_331150a7",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_e61a9e5d",
       "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1d89b03a_5306dc6d",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_06e7ba8f",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_46f1b248",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-09T20:08:05Z",
       "side": 1,
       "message": "there is a testing.TB, which would work fine. please explain why you want this special interface. (it\u0027s not a problem at all, it\u0027s just worth saying what it buys you.)",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d89b03a_131a94b5",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "I didn\u0027t know about TB. I can use that. But this makes implementing the tests for this mock easier because I only want two methods, Errorf and Fatalf. What I\u0027m using this for is for capturing error messages. Hence why I need a return after Fatalf below. \n\nI\u0027ve clarified the comments some more, I hope this helps. Let me know please.",
+      "parentUuid": "3d775410_46f1b248",
       "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1d89b03a_336dd006",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "Since this is a local function that is not exported, I thought it would be okay to be a bit odd, instead of breaking this up into different functions.\n\nI\u0027ve clarified this in the comments. I hope it\u0027s okay now.",
+      "parentUuid": "3d775410_66f6ae43",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_a6f7c63a",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 2
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "1d89b03a_b358e060",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "It depends what version of TestingInterface I pass. In the one that I use for testing this mock, I do not abort the goroutine because I want the rest of the test to check whether the logged errors happened.",
+      "parentUuid": "3d775410_a6f7c63a",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_c604c2fa",
         "filename": "cloud/netutil/nettest/mockhttpclient.go",
         "patchSetId": 2
@@ -115,6 +223,24 @@
       "writtenOn": "2016-02-09T20:08:05Z",
       "side": 1,
       "message": "i wouldn\u0027t print all of them; it could be a huge list if there\u0027s a displalcement. maybe print the first one, or the first ten, with an indicator there are more.",
+      "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d89b03a_d3556c27",
+        "filename": "cloud/netutil/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-09T21:22:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_c604c2fa",
       "revId": "9f545543c83c9a5c009a404c14409a4db19b0c8a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
