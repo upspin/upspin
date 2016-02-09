@@ -22,8 +22,9 @@ var (
 // TODO(edpin): investigate how to do proper mock-style matching.
 type MockHTTPClient struct {
 	http.Client
-	requests  []*http.Request
-	responses []MockHTTPResponse
+	requestsReceived []*http.Request
+	requestsExpected []*http.Request
+	responses        []MockHTTPResponse
 }
 
 // MockHTTPResponse contains either an error or an actual
@@ -34,13 +35,22 @@ type MockHTTPResponse struct {
 }
 
 // NewMockHTTPClient creates an instance pre-loaded with the responses
-// that will be returned when Do() is invoked on the HTTP client, in order.
-// To make a new Response, use helper method NewMockHTTPResponse below.
-func NewMockHTTPClient(responsesToSend []MockHTTPResponse) *MockHTTPClient {
-	return &MockHTTPClient{
-		requests:  make([]*http.Request, 0, 5),
-		responses: responsesToSend,
+// that will be returned when Do is invoked on the HTTP client, in
+// order and the expected requests that generate the responses. After
+// using the mock, call Verify to check that the expected requests
+// were actually sent. To make a new Response, use helper method
+// NewMockHTTPResponse. Both slices are copied so further
+// modifications after creation are not reflected in the mock.
+func NewMockHTTPClient(responsesToSend []MockHTTPResponse, requestsExpected []*http.Request) *MockHTTPClient {
+	mock := MockHTTPClient{
+		requestsReceived: make([]*http.Request, 0, len(requestsExpected)),
+		requestsExpected: make([]*http.Request, len(requestsExpected)),
+		responses:        make([]MockHTTPResponse, len(responsesToSend)),
 	}
+	// We make copies to avoid bugs with subsequent slice manipulation by callers.
+	copy(mock.requestsExpected, requestsExpected)
+	copy(mock.responses, responsesToSend)
+	return &mock
 }
 
 // NewMockHTTPResponse creates a MockHTTPResponse with a nil error and
@@ -64,12 +74,12 @@ func NewMockHTTPResponse(statusCode int, bodyType string, data []byte) MockHTTPR
 
 // Request returns the request sent to the http client.
 func (m *MockHTTPClient) Requests() []*http.Request {
-	return m.requests
+	return m.requestsReceived
 }
 
 // Do is analogous to HTTPClient.Do and satisfies HTTPClientInterface.
 func (m *MockHTTPClient) Do(request *http.Request) (resp *http.Response, err error) {
-	m.requests = append(m.requests, request)
+	m.requestsReceived = append(m.requestsReceived, request)
 	if len(m.responses) == 0 {
 		log.Fatal("Not enough mock responses exist")
 	}
@@ -97,8 +107,9 @@ type TestingInterface interface {
 // TODO(edpin): t and expected should be provided at constructor time
 // and received. In order to make this change, we have to refactor
 // some other tests and this will come in another CL.
-func (m *MockHTTPClient) Verify(t TestingInterface, expected []*http.Request) {
+func (m *MockHTTPClient) Verify(t TestingInterface) {
 	received := m.Requests()
+	expected := m.requestsExpected
 	if len(expected) != len(received) {
 		t.Fatalf("Length of expected requests does not match. Expected %d, got %d", len(expected), len(received))
 		return

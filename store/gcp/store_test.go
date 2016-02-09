@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -34,7 +36,7 @@ func TestStorePutError(t *testing.T) {
 		Error:    errors.New(errSomethingBad),
 		Response: nil,
 	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 	s := newStore("http://localhost:8080", mock)
 
 	_, err := s.Put([]byte("contents"))
@@ -43,37 +45,31 @@ func TestStorePutError(t *testing.T) {
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
+
+	mock.Verify(t)
 }
 
 func TestStorePut(t *testing.T) {
 	// The server will respond with a location for the object.
-	mock := nettest.NewMockHTTPClient(createMockPutResponse(t))
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+	mock := nettest.NewMockHTTPClient(createMockPutResponse(t), []*http.Request{req})
 	s := newStore("http://localhost:8080", mock)
 
-	key, err := s.Put([]byte("contents"))
+	contents := []byte("contents")
+	key, err := s.Put(contents)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 	if key != contentKey {
 		t.Fatalf("Server gave us wrong location. Expected %v, got %v", contentKey, key)
 	}
-	// Verifies the server received the proper request
-	reqs := mock.Requests()
-	if len(reqs) != 1 {
-		t.Fatalf("Sent more requests than necessary. Expected 1, got %v", len(reqs))
-	}
-	u := reqs[0].URL
-	if u.Scheme != "http" {
-		t.Fatalf("Expected http request, got %v", u.Scheme)
-	}
-	if u.Host != "localhost:8080" {
-		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
-	}
-	if u.Path != "/put" {
-		t.Fatalf("Expected request to /put, got %v", u.Path)
-	}
-	if u.RawQuery != "" {
-		t.Fatalf("Expected no query params, got %v", u.RawQuery)
+	// Verify the server received the proper request
+	mock.Verify(t)
+
+	// Further ensure we sent the right number of bytes
+	bytesSent := mock.Requests()[0].ContentLength
+	if bytesSent != 245 {
+		t.Errorf("Wrong number of bytes sent. Expected 245, got %v", bytesSent)
 	}
 }
 
@@ -83,7 +79,7 @@ func TestStoreGetError(t *testing.T) {
 		Error:    errors.New(errBrokenPipe),
 		Response: nil,
 	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 	s := newStore("http://localhost:8080", mock)
 
 	_, _, err := s.Get("1234")
@@ -95,11 +91,12 @@ func TestStoreGetError(t *testing.T) {
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
+	mock.Verify(t)
 }
 
 func TestStoreGetErrorEmptyKey(t *testing.T) {
 	// Our request is invalid.
-	mock := nettest.NewMockHTTPClient(nil)
+	mock := nettest.NewMockHTTPClient(nil, nil)
 	s := newStore("http://localhost:8080", mock)
 
 	_, _, err := s.Get("")
@@ -115,11 +112,13 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 
 func TestStoreGetRedirect(t *testing.T) {
 	// The server will redirect the client to a new location
-	mock := nettest.NewMockHTTPClient(createMockGetResponse(t))
+	const LookupKey = "XX some hash XX"
+	mock := nettest.NewMockHTTPClient(createMockGetResponse(t), []*http.Request{
+		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%s", LookupKey), nil),
+	})
 
 	s := newStore("http://localhost:8080", mock)
 
-	const LookupKey = "XX some hash XX"
 	data, locs, err := s.Get(LookupKey)
 
 	if data != nil {
@@ -135,24 +134,7 @@ func TestStoreGetRedirect(t *testing.T) {
 		t.Fatalf("Server gave us wrong location. Expected %v, got %v", newLocation, locs[0])
 	}
 	// Verifies request was sent correctly
-	reqs := mock.Requests()
-	if len(reqs) != 1 {
-		t.Fatalf("Sent more requests than necessary. Expected 1, got %v", len(reqs))
-	}
-	u := reqs[0].URL
-	if u.Scheme != "http" {
-		t.Fatalf("Expected http request, got %v", u.Scheme)
-	}
-	if u.Host != "localhost:8080" {
-		t.Fatalf("Expected request to localhost:8080, got %v", u.Host)
-	}
-	if u.Path != "/get" {
-		t.Fatalf("Expected request to /get, got %v", u.Path)
-	}
-	expectedQuery := fmt.Sprintf("ref=%s", LookupKey)
-	if u.RawQuery != expectedQuery {
-		t.Fatalf("Wrong query params: expected %v, got %v", expectedQuery, u.RawQuery)
-	}
+	mock.Verify(t)
 }
 
 func createMockGetResponse(t *testing.T) []nettest.MockHTTPResponse {
