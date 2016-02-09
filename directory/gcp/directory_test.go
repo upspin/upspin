@@ -63,7 +63,12 @@ func TestMkdirError(t *testing.T) {
 }
 
 func TestMkdir(t *testing.T) {
-	mock := nettest.NewMockHTTPClient(newMockMkdirResponse(t))
+	mkdirEntry := dirEntry
+	mkdirEntry.Location = upspin.Location{}
+	mkdirEntry.Metadata.IsDir = true
+	mkdirEntry.Metadata.PackData = nil
+	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
+	mock := nettest.NewMockHTTPClient(newMockMkdirResponse(t), []*http.Request{request})
 
 	d := newDirectory("http://localhost:8080", nil, mock)
 
@@ -75,12 +80,7 @@ func TestMkdir(t *testing.T) {
 		t.Fatalf("Location differs. Expected %v, got %v", location, loc)
 	}
 	// Verifies request was sent correctly
-	mkdirEntry := dirEntry
-	mkdirEntry.Location = upspin.Location{}
-	mkdirEntry.Metadata.IsDir = true
-	mkdirEntry.Metadata.PackData = nil
-	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
-	mock.Verify(t, []*http.Request{request})
+	mock.Verify(t)
 }
 
 func newMockMkdirResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -125,7 +125,7 @@ func TestLookupError(t *testing.T) {
 }
 
 func TestLookup(t *testing.T) {
-	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t))
+	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t), []*http.Request{nettest.AnyRequest})
 
 	d := newDirectory("http://localhost:8080", nil, mock)
 
@@ -139,6 +139,7 @@ func TestLookup(t *testing.T) {
 	if !dirEntryEquals(&dirEntry, dir) {
 		t.Fatalf("Invalid dirEntry. Expected %v, got %v", dirEntry, dir)
 	}
+	mock.Verify(t)
 }
 
 func dirEntryEquals(a, b *upspin.DirEntry) bool {
@@ -168,7 +169,7 @@ func newErroringDirectoryClient() upspin.Directory {
 		Error:    errBadConnection,
 		Response: nil,
 	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 
 	return newDirectory("http://localhost:8080", nil, mock)
 }
@@ -191,13 +192,19 @@ func newStore(client store.HTTPClientInterface) upspin.Store {
 // newDirectoryClientWithStoreClient creates an upspin.Directory that
 // contains a valid upspin.Store which replies successfully to a Put
 // request. The dirClientResponse is loaded onto the Directory client
-// for testing. Returns the Directory as well as the mock client for
-// post-request inspections.
-func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse) (upspin.Directory, *nettest.MockHTTPClient) {
+// for testing and we expect a dirClientRequest to trigger it. Returns
+// the Directory as well as the mock client for post-request
+// inspections.
+func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse, dirClientRequest *http.Request) (upspin.Directory, *nettest.MockHTTPClient) {
 	// The HTTP client will return a sequence of responses, the
 	// first one will be to the Store.Put request, then the second
-	// to the Directory.Put request.  Setup the mock client
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{newMockKeyResponse(t), dirClientResponse})
+	// to the Directory.Put request. We set up the requests and
+	// responses accordingly.  The first request is for Store. We
+	// don't check the body matches.
+	storeRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+	mock := nettest.NewMockHTTPClient(
+		[]nettest.MockHTTPResponse{newMockKeyResponse(t), dirClientResponse},
+		[]*http.Request{storeRequest, dirClientRequest})
 
 	// Get a Store client
 	s := newStore(mock)
@@ -210,7 +217,7 @@ func TestPutError(t *testing.T) {
 	d, _ := newDirectoryClientWithStoreClient(t, nettest.MockHTTPResponse{
 		Error:    errBadConnection,
 		Response: nil,
-	})
+	}, nettest.AnyRequest)
 
 	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte("Packed metadata"))
 	if err == nil {
@@ -224,7 +231,10 @@ func TestPutError(t *testing.T) {
 func TestPut(t *testing.T) {
 	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))
 
-	d, mock := newDirectoryClientWithStoreClient(t, respSuccess)
+	dirEntryJSON := toJSON(t, dirEntry)
+	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
+
+	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
 
 	// Issue the put request
 	loc, err := d.Put(upspin.PathName(pathName), fileContents, []byte("Packed metadata"))
@@ -234,24 +244,14 @@ func TestPut(t *testing.T) {
 	if loc.Reference.Key != key {
 		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
 	}
-	// In the first request we don't care to match the body
-	// exactly, since that's what Store sent to the server and
-	// Store has been tested elsewhere.
-	storeRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
 
 	// Verify we sent to the Directory service the Reference.Key we got back from the Store server
-	dirEntryJSON := toJSON(t, dirEntry)
-	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
-
-	mock.Verify(t, []*http.Request{storeRequest, expectedRequest})
+	mock.Verify(t)
 }
 
 func TestGlobBadPattern(t *testing.T) {
-	resp := nettest.MockHTTPResponse{
-		Error:    errGlobBadPattern,
-		Response: nil,
-	}
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp})
+	// No requests are issued
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 
 	d := newDirectory("http://localhost:8080", nil, mock)
 
@@ -260,8 +260,9 @@ func TestGlobBadPattern(t *testing.T) {
 		t.Fatal("Expected error, got none")
 	}
 	if err.Error() != errGlobBadPattern.Error() {
-		t.Fatalf("Expected error %q, got %q", errGlobBadPattern, err)
+		t.Fatalf("Invalid error. Expected %v, got %v", errGlobBadPattern, err)
 	}
+	mock.Verify(t)
 }
 
 func TestGlob(t *testing.T) {
@@ -285,7 +286,7 @@ func TestGlob(t *testing.T) {
 		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path1), nil),
 	}
 
-	mock := nettest.NewMockHTTPClient(responses)
+	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
 	d := newDirectory("http://localhost:9090", nil, mock)
 
 	dirEntries, err := d.Glob("a@b.co/dir1/*.txt")
@@ -301,7 +302,7 @@ func TestGlob(t *testing.T) {
 	if string(dirEntries[1].Name) != path1 {
 		t.Errorf("Expected 1st entry %v, got %v", path1, dirEntries[1].Name)
 	}
-	mock.Verify(t, expectedRequests)
+	mock.Verify(t)
 }
 
 // newDirEntry creates a new DirEntry with the given path name

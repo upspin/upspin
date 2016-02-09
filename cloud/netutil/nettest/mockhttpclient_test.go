@@ -9,27 +9,26 @@ import (
 )
 
 func TestVerifyWildcardRequest(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp(), newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com/url", []byte("content")),
 		AnyRequest,
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp(), newResp()}, expected)
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/url", []byte("content")))
 	mock.Do(NewRequest(t, netutil.Get, "http://anothersite.com", []byte("something else")))
-	mock.Verify(t, expected)
+	mock.Verify(t)
 }
 
 func TestVerifyBodyComparison(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	differentPayload := NewRequest(t, netutil.Post, "http://foo.com", []byte("1230"))
 	mock.Do(differentPayload)
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 	// Verify that Verify() failed correctly
 	if len(newT.LogMessages) != 2 {
 		t.Fatalf("Expected 2 errors,  %d found", len(newT.LogMessages))
@@ -45,16 +44,16 @@ func TestVerifyBodyComparison(t *testing.T) {
 }
 
 func TestVerifyIncorrectNumberOfRequests(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com", []byte("1234")),
 		NewRequest(t, netutil.Post, "http://foo.com/get", nil),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", nil))
 
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 
 	if len(newT.LogMessages) != 1 {
 		t.Fatalf("Verify logged more than one error: %v found", len(newT.LogMessages))
@@ -69,26 +68,26 @@ func TestVerifyIncorrectNumberOfRequests(t *testing.T) {
 }
 
 func TestVerifyMatchesWildcardURL(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "*", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
 
-	mock.Verify(t, expected)
+	mock.Verify(t)
 }
 
 func TestVerifyCatchesMismatchedURLQuery(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com/get?bar=soap", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get?bar=whiskey", []byte("1234")))
 
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 
 	if len(newT.LogMessages) != 1 {
 		t.Fatalf("Verify logged more than one error: %v found", len(newT.LogMessages))
@@ -100,15 +99,15 @@ func TestVerifyCatchesMismatchedURLQuery(t *testing.T) {
 }
 
 func TestVerifyCatchesMismatchedURLScheme(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "https://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 
 	if len(newT.LogMessages) != 1 {
 		t.Fatalf("Verify logged more than one error: %v found", len(newT.LogMessages))
@@ -120,15 +119,15 @@ func TestVerifyCatchesMismatchedURLScheme(t *testing.T) {
 }
 
 func TestVerifyCatchesMismatchedRequestType(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Get, "http://foo.com/get", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 
 	if len(newT.LogMessages) != 1 {
 		t.Fatalf("Verify logged more than one error: %v found", len(newT.LogMessages))
@@ -140,45 +139,45 @@ func TestVerifyCatchesMismatchedRequestType(t *testing.T) {
 }
 
 func TestVerifyWildcardRequestType(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, "*", "http://foo.com/get", []byte("1234")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
-	mock.Verify(t, expected)
+	mock.Verify(t)
 }
 
 func TestVerifyNilBody(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com", nil),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com", nil))
-	mock.Verify(t, expected)
+	mock.Verify(t)
 }
 
 func TestVerifyNilBodyMatchesWildcard(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com", []byte("*")),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com", nil))
-	mock.Verify(t, expected)
+	mock.Verify(t)
 }
 
 func TestVerifyCachesNonNilBody(t *testing.T) {
-	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()})
-
 	expected := []*http.Request{
 		NewRequest(t, netutil.Post, "http://foo.com/get", nil),
 	}
+	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
+
 	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
-	mock.Verify(newT, expected) // will fail.
+	mock.Verify(newT) // will fail.
 
 	if len(newT.LogMessages) != 2 {
 		t.Fatalf("Verify logged incorrect number of errors: expected 2, got %v", len(newT.LogMessages))
