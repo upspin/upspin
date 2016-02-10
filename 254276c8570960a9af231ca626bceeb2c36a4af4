@@ -137,6 +137,24 @@
     },
     {
       "key": {
+        "uuid": "3d775410_a666e693",
+        "filename": "path/path_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-10T21:32:06Z",
+      "side": 1,
+      "message": "Odd. I was sure I both tested this and vetted it many times.\n\nAnyway, your solution is fine.",
+      "parentUuid": "3dacb4b4_580565f2",
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_0656daa8",
         "filename": "store/gcp/store.go",
         "patchSetId": 2
