@@ -172,6 +172,42 @@ func (s *Store) Put(data []byte) (string, error) {
 	return key, nil
 }
 
+func (s *Store) Delete(key string) error {
+	// TODO: check if we own the file or otherwise are allowed to delete it.
+	if key == "" {
+		return NewStoreError("Key can't be empty", "")
+	}
+	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, key), nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return NewStoreError(fmt.Sprintf("Error deleting: %v", err), key)
+	}
+
+	// Check the response
+	if resp.StatusCode != http.StatusOK {
+		return NewStoreError(fmt.Sprintf("Server error: %v", resp.StatusCode), key)
+	}
+
+	// Read the body of the response
+	defer resp.Body.Close()
+	// TODO(edpin): maybe add a limit here to the size of bytes we return?
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Parse the response for any errors
+	err = parser.ErrorResponse(respBody)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Store) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{
 		Transport: upspin.GCP,

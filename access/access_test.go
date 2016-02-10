@@ -87,6 +87,9 @@ func (d *dummyStore) Endpoint() upspin.Endpoint {
 func (d *dummyStore) ServerUserName() string {
 	return "userStore"
 }
+func (d *dummyStore) Delete(key string) error {
+	return errors.New("dummyStore.Delete not implemented")
+}
 
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.Lookup not implemented")

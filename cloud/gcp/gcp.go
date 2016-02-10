@@ -40,6 +40,30 @@ const (
 	DefaultWriteACL   WriteACL = PublicRead
 )
 
+// Interface is how GCP clients talk to GCP.
+type Interface interface {
+	// PutLocalFile copies a local file to GCP using ref as its
+	// name. It returns a direct link for downloading the file
+	// from GCP.
+	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
+
+	// Get returns a link for downloading ref from GCP.
+	Get(ref string) (link string, error error)
+
+	// Put stores the contents given as ref on GCP.
+	Put(ref string, contents []byte) (refLink string, error error)
+
+	// List returns all the filenames stored inside a given path prefix. It
+	List(prefix string) (name []string, link []string, err error)
+
+	// Delete permanently removes all storage space associated
+	// with a ref.
+	Delete(ref string) error
+
+	// Connect connects with the Google Cloud Platform.
+	Connect()
+}
+
 // GCP is a client connection with Google Cloud Platform.
 type GCP struct {
 	client          *http.Client
@@ -48,6 +72,8 @@ type GCP struct {
 	bucketName      string
 	defaultWriteACL WriteACL
 }
+
+var _ Interface = (*GCP)(nil)
 
 // New creates a new GCP instance associated with the given project id and bucket name.
 func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
@@ -163,6 +189,17 @@ func (gcp *GCP) innerList(prefix, pageToken string) (name []string, link []strin
 	}
 
 	return name, link, objs.NextPageToken, nil
+}
+
+// Delete permanently removes all storage space associated
+// with a ref. After Delete, subsequent calls to Get a given ref
+// will fail.
+func (gcp *GCP) Delete(ref string) error {
+	err := gcp.service.Objects.Delete(gcp.bucketName, ref).Do()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Connect connects with the Google Cloud Platform, under the given projectId and bucketName.
