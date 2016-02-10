@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d775410_e649be08",
+        "filename": "cmd/store/cache/filecache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-10T20:51:49Z",
+      "side": 1,
+      "message": "DeleteFileCache removes...",
+      "range": {
+        "startLine": 103,
+        "startChar": 3,
+        "endLine": 103,
+        "endChar": 10
+      },
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4650d2a9",
+        "filename": "cmd/store/server_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-10T20:51:49Z",
+      "side": 1,
+      "message": "always print what the error is when you have one.",
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_265bd6d1",
+        "filename": "path/path_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-10T20:51:49Z",
+      "side": 1,
+      "message": "why? %d is fine here.\n\na lot of people use %v everywhere because it\u0027s easy, bur it is also weaker. it tells the human reader nothing about the type and can also affect vet\u0027s abilities to detect errors in the format. so i accept it everywhere but use it only for complex items.\n\ni\u0027d say use %v where you want but don\u0027t install it where is already an existing correct format.",
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_0656daa8",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-10T20:51:49Z",
+      "side": 1,
+      "message": "s/http/HTTP/",
+      "range": {
+        "startLine": 70,
+        "startChar": 72,
+        "endLine": 70,
+        "endChar": 76
+      },
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
