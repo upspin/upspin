@@ -68,3 +68,15 @@ func TestList(t *testing.T) {
 		t.Errorf("Expected download link prefix https:// prefix, got %v", links[0])
 	}
 }
+
+func TestDelete(t *testing.T) {
+	err := client.Delete("test-file")
+	if err != nil {
+		t.Fatalf("Expected no errors, got %v", err)
+	}
+	// Test the side effect after Delete.
+	_, err = client.Get("test-file")
+	if err == nil {
+		t.Fatal("Expected an error, but got none")
+	}
+}

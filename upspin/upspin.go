@@ -205,6 +205,12 @@ type Store interface {
 	// to be used to retrieve it.
 	Put(data []byte) (string, error)
 
+	// Delete permanently removes all storage space associated
+	// with key. After a successful Delete, calls to Get with the
+	// same key will fail. If a key is not found, an error is
+	// returned.
+	Delete(key string) error
+
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint
 }

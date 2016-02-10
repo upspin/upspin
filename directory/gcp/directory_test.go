@@ -260,7 +260,7 @@ func TestGlobBadPattern(t *testing.T) {
 		t.Fatal("Expected error, got none")
 	}
 	if err.Error() != errGlobBadPattern.Error() {
-		t.Fatalf("Invalid error. Expected %v, got %v", errGlobBadPattern, err)
+		t.Fatalf("Expected error %q, got %q", errGlobBadPattern, err)
 	}
 	mock.Verify(t)
 }

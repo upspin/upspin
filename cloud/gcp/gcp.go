@@ -40,7 +40,34 @@ const (
 	DefaultWriteACL   WriteACL = PublicRead
 )
 
-// GCP is a client connection with Google Cloud Platform.
+// Interface is how GCP clients talk to GCP.
+type Interface interface {
+	// PutLocalFile copies a local file to GCP using ref as its
+	// name. It returns a direct link for downloading the file
+	// from GCP.
+	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
+
+	// Get returns a link for downloading ref from GCP.
+	Get(ref string) (link string, error error)
+
+	// Put stores the contents given as ref on GCP.
+	Put(ref string, contents []byte) (refLink string, error error)
+
+	// List returns all the filenames stored inside a given path
+	// prefix.  If successful, it returns two parallel slices
+	// containing for each file its name and a URL-encoded link to
+	// it.
+	List(prefix string) (name []string, link []string, err error)
+
+	// Delete permanently removes all storage space associated
+	// with a ref.
+	Delete(ref string) error
+
+	// Connect connects with the Google Cloud Platform.
+	Connect()
+}
+
+// GCP is an implementation of Interface that connects to a live GCP instance.
 type GCP struct {
 	client          *http.Client
 	service         *storage.Service
@@ -48,6 +75,9 @@ type GCP struct {
 	bucketName      string
 	defaultWriteACL WriteACL
 }
+
+// Guarantee we implement the interface.
+var _ Interface = (*GCP)(nil)
 
 // New creates a new GCP instance associated with the given project id and bucket name.
 func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
@@ -64,13 +94,6 @@ func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
 	return gcp
 }
 
-// PutLocalFile puts the contents of a file that is already in the
-// local file system with name 'srcLocalFilename' into our bucket on
-// the cloud store under the given name 'ref', which can be any string
-// or directory path (in case of the Store server it is a SHA digest
-// of the contents of the file).  It returns a reference link to the
-// stored file directly in case of success, otherwise it sets error to
-// non-nil.
 func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// Insert an object into a bucket.
 	object := &storage.Object{Name: ref}
@@ -90,7 +113,6 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 	return res.MediaLink, err
 }
 
-// Get returns a direct link to the ref on cloud store, or an error if the ref is not found.
 func (gcp *GCP) Get(ref string) (link string, error error) {
 	// Get the link of the blob
 	res, err := gcp.service.Objects.Get(gcp.bucketName, ref).Do()
@@ -101,9 +123,6 @@ func (gcp *GCP) Get(ref string) (link string, error error) {
 	return res.MediaLink, nil
 }
 
-// Put stores the contents into the given ref on our bucket on cloud
-// store. It returns a link to the permanent location on of the ref on
-// cloud store or an error if it couldn't be stored.
 func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	// TODO(edpin): this is not super safe, given the file has
 	// permissions 0666. But for now the contents are always
@@ -124,9 +143,6 @@ func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	return link, err
 }
 
-// List returns all the filenames stored inside a given path prefix. It
-// returns two parallel slices containing the name of the file and an
-// url-encoded link to it or it returns an error.
 func (gcp *GCP) List(prefix string) (name []string, link []string, err error) {
 	nextPageToken := ""
 	for {
@@ -165,7 +181,14 @@ func (gcp *GCP) innerList(prefix, pageToken string) (name []string, link []strin
 	return name, link, objs.NextPageToken, nil
 }
 
-// Connect connects with the Google Cloud Platform, under the given projectId and bucketName.
+func (gcp *GCP) Delete(ref string) error {
+	err := gcp.service.Objects.Delete(gcp.bucketName, ref).Do()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (gcp *GCP) Connect() {
 	if gcp.projectId == "" {
 		log.Fatalf("Project argument is required.")

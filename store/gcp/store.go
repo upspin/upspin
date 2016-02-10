@@ -18,6 +18,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+const (
+	serverError     = "server error: %v"
+	invalidKeyError = "invalid key"
+)
+
 // Store is an implementation of upspin.Store that uses GCP to manage its storage.
 type Store struct {
 	serverURL string
@@ -73,7 +78,7 @@ func (s *Store) ServerUserName() string {
 
 func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	if key == "" {
-		return nil, nil, NewStoreError("Key can't be empty", "")
+		return nil, nil, NewStoreError(invalidKeyError, "")
 	}
 	var request string
 	if strings.HasPrefix(key, "http://") || strings.HasPrefix(key, "https://") {
@@ -87,7 +92,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := s.client.Do(httpReq)
 	if err != nil {
-		return nil, nil, NewStoreError(fmt.Sprintf("Error getting data from server: %v", err), key)
+		return nil, nil, NewStoreError(fmt.Sprintf(serverError, err), key)
 	}
 	defer resp.Body.Close()
 	// TODO(edpin): maybe add a limit here to the size of bytes we
@@ -126,7 +131,7 @@ func (s *Store) Put(data []byte) (string, error) {
 	w := multipart.NewWriter(&body)
 	fw, err := w.CreateFormFile("file", "dummy")
 	if err != nil {
-		return zeroKey, NewStoreError("Can't create multi-part form to upload", "")
+		return zeroKey, NewStoreError(fmt.Sprintf("multi-part form error: %v", err), "")
 	}
 	_, err = io.Copy(fw, bufFrom)
 	if err != nil {
@@ -145,12 +150,12 @@ func (s *Store) Put(data []byte) (string, error) {
 	// Submit the request
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return zeroKey, NewStoreError(fmt.Sprintf("Error putting data to server: %v", err), "")
+		return zeroKey, NewStoreError(fmt.Sprintf(serverError, err), "")
 	}
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
-		return zeroKey, NewStoreError(fmt.Sprintf("error uploading to server: %v", resp.StatusCode), "")
+		return zeroKey, NewStoreError(fmt.Sprintf(serverError, resp.StatusCode), "")
 	}
 
 	// Read the body of the response
@@ -167,9 +172,45 @@ func (s *Store) Put(data []byte) (string, error) {
 		return zeroKey, NewStoreError(err.Error(), "")
 	}
 	if key == "" {
-		return zeroKey, NewStoreError("null key returned", "")
+		return zeroKey, NewStoreError(invalidKeyError, "")
 	}
 	return key, nil
+}
+
+func (s *Store) Delete(key string) error {
+	if key == "" {
+		return NewStoreError(invalidKeyError, "")
+	}
+	// TODO: check if we own the file or otherwise are allowed to delete it.
+	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, key), nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return NewStoreError(fmt.Sprintf("delete: %v", err), key)
+	}
+
+	// Check the response
+	if resp.StatusCode != http.StatusOK {
+		return NewStoreError(fmt.Sprintf(serverError, resp.StatusCode), key)
+	}
+
+	// Read the body of the response
+	defer resp.Body.Close()
+	// TODO(edpin): maybe add a limit here to the size of bytes we return?
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Parse the response for any errors
+	err = parser.ErrorResponse(respBody)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Store) Endpoint() upspin.Endpoint {
