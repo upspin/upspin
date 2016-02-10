@@ -16,10 +16,9 @@ var (
 )
 
 // MockHTTPClient is a simple HTTP client that saves the Request given
-// to it and always responds with the preset Response. (In an ideal
-// world, we'd compare if expectations match and then issue the
-// correct response as a real mock. We're not doing this here. Yet.)
-// TODO(edpin): investigate how to do proper mock-style matching.
+// to it and always responds with the preset Response. It then allows
+// a verification step to check whether the expected requests match
+// the ones received.
 type MockHTTPClient struct {
 	http.Client
 	requestsReceived []*http.Request
@@ -103,10 +102,6 @@ type TestingInterface interface {
 // equivalent, by checking their URL fields, type of request
 // (GET/POST) and payload, if any. It calls Fatal and Error on t if
 // any mismatches are encountered.
-//
-// TODO(edpin): t and expected should be provided at constructor time
-// and received. In order to make this change, we have to refactor
-// some other tests and this will come in another CL.
 func (m *MockHTTPClient) Verify(t TestingInterface) {
 	received := m.Requests()
 	expected := m.requestsExpected
