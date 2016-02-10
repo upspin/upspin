@@ -57,7 +57,7 @@ func BufferRequest(resp http.ResponseWriter, req *http.Request, maxBufLen int64)
 			buf = make([]byte, req.ContentLength)
 		} else {
 			// Return an error
-			SendJSONErrorString(resp, "Invalid request")
+			SendJSONErrorString(resp, "invalid request")
 			return nil
 		}
 	} else {
@@ -65,7 +65,7 @@ func BufferRequest(resp http.ResponseWriter, req *http.Request, maxBufLen int64)
 	}
 	n, err := req.Body.Read(buf)
 	if err != nil && err != io.EOF {
-		SendJSONError(resp, "reading request:", err)
+		SendJSONError(resp, "read:", err)
 		return nil
 	}
 	return buf[:n]

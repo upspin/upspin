@@ -105,3 +105,8 @@ func TestIsCached(t *testing.T) {
 		t.Errorf("Ref remains cached?")
 	}
 }
+
+func TestMain(m *testing.M) {
+	m.Run()
+	DeleteFileCache(fc)
+}
