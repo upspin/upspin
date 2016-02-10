@@ -1,10 +1,73 @@
-// Package upspin contains global interface and other definitions for the components of the system.
 package upspin
 
+// A UserName is just a string representing a user.
+// It is given a unique type so the API is clear.
+// Example: gopher@google.com
+type UserName string
+
+// A PathName is just a string representing a full path name.
+// It is given a unique type so the API is clear.
+// Example: gopher@google.com/burrow/hoard
+type PathName string
+
+// Transport identifies the type of access required to reach the data, that is, the
+// realm in which the network address within a Location is to be interpreted.
+type Transport uint8
+
+const (
+	// InProcess indicates that contents are located in the current process,
+	// typically in memory.
+	InProcess Transport = iota
+
+	// GCP indicates a Google Cloud Store instance.
+	GCP
+
+	// HTTP is a URL-encoded address.
+	HTTP
+)
+
+// A Location identifies where a piece of data is stored and how to retrieve it.
+type Location struct {
+	// Endpoint identifies the machine or service where the data resides.
+	Endpoint Endpoint
+
+	// Reference is the key that will retrieve the data from the endpoint.
+	Reference Reference
+}
+
+// An Endpoint identifies an instance of a service, encompassing an address
+// such as a domain name and information (the Transport) about how to interpret
+// that address.
+type Endpoint struct {
+	// Transport specifies how the network address is to be interpreted,
+	// for instance that it is the URL of an HTTP service.
+	Transport Transport
+
+	// NetAddr returns the (typically) network address of the data.
+	NetAddr NetAddr
+}
+
+// A NetAddr is the network address of service. It is interpreted by Access's
+// Dial method to connect to the service.
+type NetAddr string
+
+// A Reference is the key to find a piece of data in a given Store. It is decoupled
+// from the address of the Store itself, but contains a unique identifier key
+// such as a hash of the contents and a Packing defining how to unpack it.
+type Reference struct {
+	// Key identifies the data within the Store.
+	Key string
+
+	// Packing identifies how to unpack the original data using this Reference.
+	Packing Packing
+}
+
 // A Packing identifies the technique for turning the data pointed to by
-// a reference into the user's data. This may involve checksum verification,
+// a Reference into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
-// Secondary data, callled packdata below, may be required to implement the packing.
+// Secondary data such as encryption keys may be required to implement
+// the packing. That data appears in the API as arguments and struct fields
+// called packdata.
 type Packing uint8
 
 // Packer provides the implementation of a Packing. The pack package binds
@@ -28,114 +91,40 @@ type Packer interface {
 	// Unpack might update the metadata.
 	// It returns the path name and the number of bytes written to the slice.
 	// The returned name will be empty if the ciphertext does not contain one.
-	// TODO: Do we get a path name here?
 	Unpack(cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
-	// PackLen returns an upper bound of the number of bytes required
+	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing. It might update the metadata.
 	// Returns -1 if there is an error.
 	PackLen(cleartext []byte, meta *Metadata, name PathName) int
 
-	// UnpackLen returns an upper bound of the number of bytes required
+	// UnpackLen returns an upper bound on the number of bytes required
 	// to store the unpacked cleartext. It might update the metadata.
 	// Returns -1 if there is an error.
 	UnpackLen(ciphertext []byte, meta *Metadata) int
 }
 
 const (
-	// The Debug packing is available for use in tests for any purpose. Never used in production.
+	// The DebugPack packing is available for use in tests for any purpose.
+	// It is never used in production.
 	DebugPack Packing = iota
 
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
-	// No path name is recorded.
 	PlainPack
 
-	// EEp256Pack packing stores AES-encrypted data; dir has ECDSA sig and ECDH-wrapped keys.
+	// EEp256Pack packing stores AES-encrypted data.
+	// The associated metadata has an ECDSA signature and ECDH-wrapped keys.
 	EEp256Pack
 )
 
-// Transport identifies how storage contents are identified.
-type Transport uint8
-
-const (
-	// InProcess indicates that contents are located in the current process, typically in memory.
-	InProcess Transport = iota
-
-	// GCP indicates a Google Cloud Store instance.
-	GCP
-
-	// HTTP is a URL-encoded address.
-	HTTP
-)
-
-// An Endpoint describes how to connect to and transfer data to/from a service.
-type Endpoint struct {
-	// Transport defines the mechanism used to access the service, such as HTTP
-	// or InProcess
-	Transport Transport
-
-	// NetAddr returns the network address of the data.
-	NetAddr NetAddr
-}
-
-// A Location describes how to retrieve a piece of data (a "blob") from the Store service.
-type Location struct {
-	// Endpoint of the storage service.
-	Endpoint Endpoint
-
-	// Reference returns the reference information for the data.
-	Reference Reference
-}
-
-// Marshal packs the Location into a byte slice for transport.
-func (Location) Marshal([]byte) error {
-	panic("unimplemented")
-}
-
-// Unmarshal unpacks the byte slice to recover the encoded Location.
-func (Location) Unmarshal([]byte) error {
-	panic("unimplemented")
-}
-
-// A NetAddr is a network address interpreted by Access.Dial.
-type NetAddr string
-
-// A Reference is the key to find a piece of data in a Store. It is decoupled
-// from the address of the Store itself, but contains a unique identifier key
-// such as a hash of the contents and a Packing defining how to unpack it.
-type Reference struct {
-	// Key identifies the data.
-	Key string
-
-	// Packing identifies how to unpack the original data using this Reference.
-	Packing Packing
-}
-
-// Marshal packs the Reference into a byte slice for transport.
-func (Reference) Marshal([]byte) error {
-	panic("unimplemented")
-}
-
-// Unmarshal unpacks the byte slice to recover the encoded Reference.
-func (Reference) Unmarshal([]byte) error {
-	panic("unimplemented")
-}
-
-// A UserName is just a string representing a user, but given a unique type so the API is clear.
-// Example: gopher@google.com
-type UserName string
-
-// A PathName is just a string representing a full path name, but given a unique type so the API is clear.
-// Example: gopher@google.com/burrow/hoard
-type PathName string
-
 // User service.
 
+// The User interface provides access to public information about users.
 type User interface {
 	Access
 
-	// Lookup returns a list of endpoints of Directory services that may
-	// have the root directory for the named user. Those earlier in the
+	// Lookup returns a list (slice) of Endpoints of Directory services that may
+	// hold the root directory for the named user. Those earlier in the
 	// list are better places to look.
 	Lookup(userName UserName) ([]Endpoint, error)
 }
@@ -211,6 +200,8 @@ type Store interface {
 
 // Client API.
 
+// The Client interface provides a higher-level API suitable for applications
+// that wish to access Upspin's name space.
 type Client interface {
 	// Get returns the clear, decrypted data stored under the given name.
 	// It is intended only for special purposes, since it will allocate memory
@@ -273,14 +264,18 @@ type ClientContext interface {
 	Name() string
 }
 
-// Access defines how to connect and authenticate to a server.
+// Access defines how to connect and authenticate to a server. Each
+// service type (User, Directory, Store) implements the methods of
+// the Access interface. These methods are not used directly by
+// clients. Instead, clients should use the various Bind methods of
+// the Upspin "access" package to connect to services.
 type Access interface {
 	// Dial connects to the service and performs any needed authentication.
 	Dial(ClientContext, Endpoint) (interface{}, error)
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.
-	// TODO(p): Should I distinquish a server which didn't pass authentication
+	// TODO(p): Should I distinguish a server which didn't pass authentication
 	// from one which has no user name?
 	ServerUserName() string
 }
