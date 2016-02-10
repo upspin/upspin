@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d89b03a_3ce4bdc8",
+        "filename": "upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T04:11:41Z",
+      "side": 1,
+      "message": "\"format\" seems more accurate to me than \"syntax\".",
+      "revId": "5226d573062c109f67b763efed7dcff5e10e8750",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d89b03a_bc58ad60",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T04:11:41Z",
+      "side": 1,
+      "message": "\"It is given\"?",
+      "range": {
+        "startLine": 4,
+        "startChar": 3,
+        "endLine": 4,
+        "endChar": 5
+      },
+      "revId": "5226d573062c109f67b763efed7dcff5e10e8750",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d89b03a_1cdf01f7",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T04:11:41Z",
+      "side": 1,
+      "message": "This reminds me we haven\u0027t fully decided what fits here and what doesn\u0027t. Dave\u0027s input was asked elsewhere. Is \"http://foo.com:8000\" allowed or just \"foo.com:8000\"?",
+      "revId": "5226d573062c109f67b763efed7dcff5e10e8750",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
