@@ -99,3 +99,14 @@ func NewFileCache(cacheRootDir string) *FileCache {
 	fc := &FileCache{cacheRoot}
 	return fc
 }
+
+// DeleteFileCache removes all files from the cache and invalidates
+// it. Further calls to any FileCache methods may fail unpredictably
+// or silently.
+func DeleteFileCache(fc *FileCache) {
+	err := os.RemoveAll(fc.cacheRoot)
+	if err != nil {
+		log.Fatalf("Can't delete cache dir: %v", err)
+	}
+	fc.cacheRoot = "/dev/null"
+}

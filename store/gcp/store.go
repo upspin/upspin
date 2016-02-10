@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	serverError     = "server error: %v"
+	serverError     = "%v: server error: %v"
 	invalidKeyError = "invalid key"
 )
 
@@ -63,11 +63,11 @@ func new(serverURL string, client HTTPClientInterface) *Store {
 func (s *Store) Dial(context upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
 	cc, ok := context.(Context)
 	if !ok {
-		return nil, NewStoreError("Require a ClientContext of type GCP Store ClientContext", "")
+		return nil, NewStoreError("required ClientContext of type GCP Store ClientContext", "")
 	}
 	serverURL, err := url.Parse(string(endpoint.NetAddr))
 	if err != nil {
-		return nil, NewStoreError(fmt.Sprintf("Require an endpoint with a valid http address: %v", err), "")
+		return nil, NewStoreError(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err), "")
 	}
 	return new(serverURL.String(), cc.Client), nil
 }
@@ -92,7 +92,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := s.client.Do(httpReq)
 	if err != nil {
-		return nil, nil, NewStoreError(fmt.Sprintf(serverError, err), key)
+		return nil, nil, NewStoreError(fmt.Sprintf(serverError, "Get", err), key)
 	}
 	defer resp.Body.Close()
 	// TODO(edpin): maybe add a limit here to the size of bytes we
@@ -125,13 +125,14 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 }
 
 func (s *Store) Put(data []byte) (string, error) {
+	const op = "Put"
 	var zeroKey string
 	bufFrom := bytes.NewBuffer(data)
 	var body bytes.Buffer
 	w := multipart.NewWriter(&body)
 	fw, err := w.CreateFormFile("file", "dummy")
 	if err != nil {
-		return zeroKey, NewStoreError(fmt.Sprintf("multi-part form error: %v", err), "")
+		return zeroKey, NewStoreError(fmt.Sprintf("%v: multi-part form error: %v", op, err), "")
 	}
 	_, err = io.Copy(fw, bufFrom)
 	if err != nil {
@@ -148,20 +149,7 @@ func (s *Store) Put(data []byte) (string, error) {
 	req.Header.Set(netutil.ContentType, w.FormDataContentType())
 
 	// Submit the request
-	resp, err := s.client.Do(req)
-	if err != nil {
-		return zeroKey, NewStoreError(fmt.Sprintf(serverError, err), "")
-	}
-
-	// Check the response
-	if resp.StatusCode != http.StatusOK {
-		return zeroKey, NewStoreError(fmt.Sprintf(serverError, resp.StatusCode), "")
-	}
-
-	// Read the body of the response
-	defer resp.Body.Close()
-	// TODO(edpin): maybe add a limit here to the size of bytes we return?
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := s.requestAndReadResponseBody(op, "", req)
 	if err != nil {
 		return zeroKey, err
 	}
@@ -169,7 +157,7 @@ func (s *Store) Put(data []byte) (string, error) {
 	// Parse the response
 	key, err := parser.KeyResponse(respBody)
 	if err != nil {
-		return zeroKey, NewStoreError(err.Error(), "")
+		return zeroKey, NewStoreError(fmt.Sprintf(serverError, op, err), "")
 	}
 	if key == "" {
 		return zeroKey, NewStoreError(invalidKeyError, "")
@@ -187,20 +175,7 @@ func (s *Store) Delete(key string) error {
 		return err
 	}
 
-	resp, err := s.client.Do(req)
-	if err != nil {
-		return NewStoreError(fmt.Sprintf("delete: %v", err), key)
-	}
-
-	// Check the response
-	if resp.StatusCode != http.StatusOK {
-		return NewStoreError(fmt.Sprintf(serverError, resp.StatusCode), key)
-	}
-
-	// Read the body of the response
-	defer resp.Body.Close()
-	// TODO(edpin): maybe add a limit here to the size of bytes we return?
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := s.requestAndReadResponseBody("Delete", key, req)
 	if err != nil {
 		return err
 	}
@@ -211,6 +186,31 @@ func (s *Store) Delete(key string) error {
 		return err
 	}
 	return nil
+}
+
+// requestAndReadResponseBody is an internal helper function that
+// sends a given request over the HTTP client and parses the body of
+// the reply, using op and key to build an error if one is
+// encountered along the way.
+func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Request) ([]byte, error) {
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, NewStoreError(fmt.Sprintf("%v: %v", op, err), key)
+	}
+
+	// Check the response
+	if resp.StatusCode != http.StatusOK {
+		return nil, NewStoreError(fmt.Sprintf(serverError, op, resp.StatusCode), key)
+	}
+
+	// Read the body of the response
+	defer resp.Body.Close()
+	// TODO(edpin): maybe add a limit here to the size of bytes we return?
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, NewStoreError(fmt.Sprintf("%v: %v", op, err), key)
+	}
+	return respBody, nil
 }
 
 func (s *Store) Endpoint() upspin.Endpoint {

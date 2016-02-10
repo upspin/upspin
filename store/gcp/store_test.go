@@ -43,7 +43,7 @@ func TestStorePutError(t *testing.T) {
 
 	_, err := s.Put([]byte("contents"))
 
-	expected := fmt.Sprintf(serverError, errSomethingBad)
+	expected := fmt.Sprintf("Put: %v", errSomethingBad)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -89,7 +89,7 @@ func TestStoreGetError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := fmt.Sprintf(serverError, errBrokenPipe)
+	expected := fmt.Sprintf(serverError, "Get", errBrokenPipe)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -159,7 +159,7 @@ func TestStoreDeleteInvalidKey(t *testing.T) {
 func TestStoreDelete(t *testing.T) {
 	const Key = "xyz"
 	mock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))},
+		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))},
 		[]*http.Request{nettest.NewRequest(t, netutil.Post, fmt.Sprintf("http://localhost:8080/delete?ref=%s", Key), nil)})
 
 	s := newStore("http://localhost:8080", mock)
