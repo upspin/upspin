@@ -55,9 +55,9 @@ func ErrorResponse(body []byte) error {
 	}{}
 	err := json.Unmarshal(body, serverErr)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Can't parse reply from server: %v, %v", err, string(body)))
+		return errors.New(fmt.Sprintf("can't parse reply from server: %v, %v", err, string(body)))
 	}
-	if serverErr.Error == "Success" {
+	if serverErr.Error == "success" {
 		return nil
 	}
 	return errors.New(serverErr.Error)

@@ -52,7 +52,7 @@ func TestBufferRequest(t *testing.T) {
 }
 
 func TestBufferRequestTooBig(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"Invalid request"}`) // Request is too big
+	resp := nettest.NewExpectingResponseWriter(`{"error":"invalid request"}`) // Request is too big
 	req, err := http.NewRequest("POST", "http://localhost:8080/put", bytes.NewBufferString(data))
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
