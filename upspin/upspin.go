@@ -112,9 +112,12 @@ const (
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
 	PlainPack
 
-	// EEp256Pack packing stores AES-encrypted data.
-	// The associated metadata has an ECDSA signature and ECDH-wrapped keys.
+	// The following store AES encrypted data, with metadata including
+	// ECDSA signature and ECDH-wrapped keys.
+	// EEp256Pack packing uses AES-128, SHA-256, and curve P256.
 	EEp256Pack
+	// EEp521Pack packing uses AES-256, SHA-512, and curve P521.
+	EEp521Pack
 )
 
 // User service.
