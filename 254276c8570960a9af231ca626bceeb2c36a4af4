@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_d8cdf531",
+        "filename": "cmd/store/cache/filecache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T21:14:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_e649be08",
+      "range": {
+        "startLine": 103,
+        "startChar": 3,
+        "endLine": 103,
+        "endChar": 10
+      },
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_4650d2a9",
         "filename": "cmd/store/server_test.go",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2016-02-10T20:51:49Z",
       "side": 1,
       "message": "always print what the error is when you have one.",
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_f8d8b1f5",
+        "filename": "cmd/store/server_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T21:14:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_4650d2a9",
       "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_38bf3984",
+        "filename": "path/path_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T21:14:41Z",
+      "side": 1,
+      "message": "mallocs is a float64, so go vet complains. I\u0027ve changed it to %f.",
+      "parentUuid": "3d775410_265bd6d1",
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_0656daa8",
         "filename": "store/gcp/store.go",
         "patchSetId": 2
@@ -70,6 +130,30 @@
       "writtenOn": "2016-02-10T20:51:49Z",
       "side": 1,
       "message": "s/http/HTTP/",
+      "range": {
+        "startLine": 70,
+        "startChar": 72,
+        "endLine": 70,
+        "endChar": 76
+      },
+      "revId": "254276c8570960a9af231ca626bceeb2c36a4af4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_187b5d9f",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T21:14:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_0656daa8",
       "range": {
         "startLine": 70,
         "startChar": 72,
