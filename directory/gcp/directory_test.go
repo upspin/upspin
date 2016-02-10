@@ -77,7 +77,7 @@ func TestMkdir(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	if loc != location {
-		t.Fatalf("Location differs. Expected %v, got %v", location, loc)
+		t.Fatalf("Expected location %v, got %v", location, loc)
 	}
 	// Verifies request was sent correctly
 	mock.Verify(t)
@@ -137,7 +137,7 @@ func TestLookup(t *testing.T) {
 		t.Fatal("Got a nil dirEntry")
 	}
 	if !dirEntryEquals(&dirEntry, dir) {
-		t.Fatalf("Invalid dirEntry. Expected %v, got %v", dirEntry, dir)
+		t.Fatalf("Expected dirEntry %v, got %v", dirEntry, dir)
 	}
 	mock.Verify(t)
 }
@@ -229,7 +229,7 @@ func TestPutError(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))
+	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))
 
 	dirEntryJSON := toJSON(t, dirEntry)
 	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
@@ -242,7 +242,7 @@ func TestPut(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if loc.Reference.Key != key {
-		t.Fatalf("Invalid key in location. Expected %v, got %v", key, loc.Reference.Key)
+		t.Fatalf("Expected key %v, got %v", key, loc.Reference.Key)
 	}
 
 	// Verify we sent to the Directory service the Reference.Key we got back from the Store server

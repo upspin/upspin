@@ -66,7 +66,7 @@ func TestCountMallocs(t *testing.T) {
 	}
 	mallocs := testing.AllocsPerRun(100, parse)
 	if mallocs > 1 {
-		t.Errorf("got %d allocs, want <=1", mallocs)
+		t.Errorf("got %v allocs, want <=1", mallocs)
 	}
 }
 

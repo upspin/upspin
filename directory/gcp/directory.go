@@ -21,6 +21,10 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+const (
+	serverError = "server error: %v"
+)
+
 // Directory is an implementation of upspin.Directory that uses GCP to store its data.
 type Directory struct {
 	serverURL    string
@@ -164,7 +168,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 		return zeroLoc, newError(op, dirName, err)
 	}
 	if loc == nil {
-		return zeroLoc, newError(op, dirName, errors.New("server returned null Location"))
+		return zeroLoc, newError(op, dirName, errors.New(fmt.Sprintf(serverError, "null Location")))
 	}
 
 	return *loc, nil
@@ -253,12 +257,12 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 		return nil, newError(op, path, err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, newError(op, path, errors.New(fmt.Sprintf("server error: %v", resp.StatusCode)))
+		return nil, newError(op, path, errors.New(fmt.Sprintf(serverError, resp.StatusCode)))
 	}
 	// Check the content type
 	answerType := resp.Header.Get(netutil.ContentType)
 	if !strings.HasPrefix(answerType, "application/json") {
-		return nil, newError(op, path, errors.New(fmt.Sprintf("Invalid response format: %v", answerType)))
+		return nil, newError(op, path, errors.New(fmt.Sprintf("invalid response format: %v", answerType)))
 	}
 
 	// Read the body of the response
@@ -276,11 +280,11 @@ func (d *Directory) Dial(context upspin.ClientContext, e upspin.Endpoint) (inter
 	const op = "Dial"
 	cc, ok := context.(Context)
 	if !ok {
-		return nil, newError(op, "", errors.New("Dial requires a ClientContext of type GCP Directory Context"))
+		return nil, newError(op, "", errors.New("required ClientContext of type GCP Directory Context"))
 	}
 	serverURL, err := url.Parse(string(e.NetAddr))
 	if err != nil {
-		return nil, newError(op, "", errors.New(fmt.Sprintf("Require an endpoint with a valid HTTP address: %v", err)))
+		return nil, newError(op, "", errors.New(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err)))
 	}
 	return new(serverURL.String(), cc.StoreService, cc.Client), nil
 }

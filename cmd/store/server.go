@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	MultiPartMemoryBuffer int64 = 10 << 20 // 10MB buffer for file transfers
+	multiPartMemoryBuffer int64 = 10 << 20 // 10MB buffer for file transfers
+
+	invalidRefError = "invalid ref"
 )
 
 var (
@@ -30,14 +32,15 @@ type StoreServer struct {
 // Handler for receiving file put requests (i.e. storing new blobs).
 // Requests must contain a 'file' form entry.
 func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("method:", r.Method)
+	const op = "putHandler: "
 	if r.Method != "POST" && r.Method != "PUT" {
-		log.Fatal("Only handles PUT/POST http requests")
+		netutil.SendJSONErrorString(w, "post or put request expected")
+		return
 	}
-	r.ParseMultipartForm(MultiPartMemoryBuffer)
+	r.ParseMultipartForm(multiPartMemoryBuffer)
 	file, _, err := r.FormFile("file")
 	if err != nil {
-		fmt.Println(err)
+		netutil.SendJSONError(w, op, err)
 		return
 	}
 	defer file.Close()
@@ -45,8 +48,8 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 	initialRef := s.fileCache.RandomRef()
 	err = s.fileCache.Put(initialRef, sha)
 	if err != nil {
-		// TODO(edpin): handle this
-		panic("cache failed")
+		netutil.SendJSONError(w, op, err)
+		return
 	}
 	// Figure out the appropriate reference for this blob
 	ref := sha.EncodedSum()
@@ -72,29 +75,29 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Key: ref,
 	}
-	fmt.Printf("Replying to client with:%v\n", keyStruct)
+	log.Printf("Replying to client with:%v\n", keyStruct)
 	netutil.SendJSONReply(w, keyStruct)
 }
 
 func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
-		netutil.SendJSONErrorString(w, "Invalid empty 'ref'")
+		netutil.SendJSONErrorString(w, invalidRefError)
 		return
 	}
-	fmt.Printf("Trying to get ref: %v\n", ref)
+	log.Printf("Trying to get ref: %v\n", ref)
 
 	file, err := s.fileCache.OpenRefForRead(ref)
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
-		fmt.Printf("ref %v is in local cache. Returning it as file: %v\n", ref, file.Name())
+		log.Printf("ref %v is in local cache. Returning it as file: %v\n", ref, file.Name())
 		defer file.Close()
 		http.ServeFile(w, r, file.Name())
 		return
 	}
 
 	// File is not local, try to get it from our storage.
-	fmt.Printf("Looking up on storage backend...\n")
+	log.Printf("Looking up on storage backend...\n")
 	link, err := s.cloudClient.Get(ref)
 	if err != nil {
 		netutil.SendJSONError(w, "get error:", err)
@@ -104,14 +107,14 @@ func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	location := upspin.Location{}
 	location.Reference.Key = link
 	location.Endpoint.Transport = upspin.HTTP // Go fetch using the provided link.
-	fmt.Printf("Got link: %v\n", link)
+	log.Printf("Got link: %v\n", link)
 	netutil.SendJSONReply(w, location)
 }
 
 func (s *StoreServer) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
-		netutil.SendJSONErrorString(w, "invalid ref")
+		netutil.SendJSONErrorString(w, invalidRefError)
 		return
 	}
 	if r.Method != "POST" {
@@ -121,10 +124,10 @@ func (s *StoreServer) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: verify ownership and proper ACLs to delete blob
 	err := s.cloudClient.Delete(ref)
 	if err != nil {
-		netutil.SendJSONError(w, fmt.Sprintf("Delete %v: ", ref), err)
+		netutil.SendJSONError(w, fmt.Sprintf("delete %v: ", ref), err)
 		return
 	}
-	netutil.SendJSONErrorString(w, "Success")
+	netutil.SendJSONErrorString(w, "success")
 }
 
 func main() {
