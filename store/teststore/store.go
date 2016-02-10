@@ -34,6 +34,10 @@ func (s *Service) Put(ciphertext []byte) (string, error) {
 	return key, nil
 }
 
+func (s *Service) Delete(key string) error {
+	return errors.New("Not implemented yet")
+}
+
 // TODO: Function should provide alternate location if missing.
 func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, err error) {
 	data, ok := s.blob[key]

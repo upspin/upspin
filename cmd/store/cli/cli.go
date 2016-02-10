@@ -45,15 +45,20 @@ func main() {
 			Usage()
 		}
 		put()
+	case "delete":
+		if len(flag.Args()) < 2 {
+			Usage()
+		}
+		delete(flag.Arg(1))
 	default:
-		log.Println("Can't understand command. Use GET or PUT")
+		fmt.Fprintf(os.Stderr, "Can't understand command %q. Use GET, PUT or DELETE\n", flag.Arg(0))
 		Usage()
 	}
 }
 
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <GET|PUT> [<ref>]\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <GET|PUT|DELETE> [<ref>]\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -135,4 +140,11 @@ func put() {
 		log.Fatalf("Error putting to server: %v", err)
 	}
 	log.Printf("Put file to storage. Key: %v", key)
+}
+
+func delete(key string) {
+	err := Store.Delete(key)
+	if err != nil {
+		log.Fatalf("Error deleting %v: %v", key, err)
+	}
 }

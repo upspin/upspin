@@ -28,6 +28,8 @@ var (
 			Key: "new key",
 		},
 	}
+
+	errInvalidKey = NewStoreError("Key can't be empty", "")
 )
 
 func TestStorePutError(t *testing.T) {
@@ -134,6 +136,37 @@ func TestStoreGetRedirect(t *testing.T) {
 		t.Fatalf("Server gave us wrong location. Expected %v, got %v", newLocation, locs[0])
 	}
 	// Verifies request was sent correctly
+	mock.Verify(t)
+}
+
+func TestStoreDeleteInvalidKey(t *testing.T) {
+	// No requests are sent
+	mock := nettest.NewMockHTTPClient(
+		[]nettest.MockHTTPResponse{},
+		[]*http.Request{})
+
+	s := newStore("http://localhost:8080", mock)
+	err := s.Delete("")
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if err.Error() != errInvalidKey.Error() {
+		t.Fatalf("Expected error %v, got %v", errInvalidKey, err)
+	}
+	mock.Verify(t)
+}
+
+func TestStoreDelete(t *testing.T) {
+	const Key = "xyz"
+	mock := nettest.NewMockHTTPClient(
+		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"Success"}`))},
+		[]*http.Request{nettest.NewRequest(t, netutil.Post, fmt.Sprintf("http://localhost:8080/delete?ref=%s", Key), nil)})
+
+	s := newStore("http://localhost:8080", mock)
+	err := s.Delete(Key)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 	mock.Verify(t)
 }
 
