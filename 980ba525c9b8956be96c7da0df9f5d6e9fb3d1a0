@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_070e5c17",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_065c1af8",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_266116b1",
         "filename": "cloud/gcp/gcp.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-10T02:00:34Z",
       "side": 1,
       "message": "copy from edited text in upspin.go.\nor you could say nothing, as it\u0027s clear from above that this is part of the Store implementation. or you could say something like\n// Delete is a method in upspin.Store.",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_e712503b",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_266116b1",
       "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_2719585a",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_a625068b",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_e62ffe66",
         "filename": "cmd/store/server.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-10T02:00:34Z",
       "side": 1,
       "message": "\"success\" ? will require updating recipient.",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_07353cbf",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "This requires that I touch more files. Will do in the next CL.",
+      "parentUuid": "3d775410_e62ffe66",
       "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_a743281b",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done. Fixed them all here. Will fix the other files in a new CL.",
+      "parentUuid": "3d775410_263af6b0",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_463ff29f",
         "filename": "store/gcp/store.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-02-10T02:00:34Z",
       "side": 1,
       "message": "\"deleting: %v\"",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_87294c69",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_463ff29f",
       "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_67264097",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_6644ee23",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_0635fabf",
         "filename": "store/gcp/store_test.go",
         "patchSetId": 2
@@ -132,6 +258,24 @@
       "writtenOn": "2016-02-10T02:00:34Z",
       "side": 1,
       "message": "error messages should not start with capital letters because the are often embedded in other errors. similarly, they shouldn\u0027t be a full sentence.\n\nthere are number of these throughout, including in previous code. i should have caught them earlier. please fix them in a followup CL\n\n\"empty key\" or \"invalid key\" is all you need here. i would go with \"invalid key\"",
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_e787f08f",
+        "filename": "store/gcp/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Fixed all here and will fix others in a new CL.",
+      "parentUuid": "3d775410_0635fabf",
       "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -161,6 +305,30 @@
     },
     {
       "key": {
+        "uuid": "3dacb4b4_2775d858",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_c61be251",
+      "range": {
+        "startLine": 209,
+        "startChar": 28,
+        "endLine": 209,
+        "endChar": 38
+      },
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_e618de57",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -172,6 +340,30 @@
       "writtenOn": "2016-02-10T02:00:34Z",
       "side": 1,
       "message": "need to define what happens if we attempt to delete an existing key.",
+      "range": {
+        "startLine": 210,
+        "startChar": 4,
+        "endLine": 210,
+        "endChar": 8
+      },
+      "revId": "980ba525c9b8956be96c7da0df9f5d6e9fb3d1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3dacb4b4_e7d5b063",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-10T17:49:40Z",
+      "side": 1,
+      "message": "It\u0027s an error too. Key not found. Added documentation.",
+      "parentUuid": "3d775410_e618de57",
       "range": {
         "startLine": 210,
         "startChar": 4,
