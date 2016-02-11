@@ -12,8 +12,7 @@ import (
 
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
-	user  upspin.User
-	store upspin.Store
+	user upspin.User
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -31,12 +30,11 @@ var testContext = Context("testcontext")
 
 var _ upspin.ClientContext = (*Context)(nil)
 
-// New returns a new Client. The arguments are the user service to look up root
-// directories for users and the store service in which to store files.
-func New(user upspin.User, store upspin.Store) *Client {
+// New returns a new Client. The argument is the user service to use to look up root
+// directories for users.
+func New(user upspin.User) *Client {
 	return &Client{
-		user:  user,
-		store: store,
+		user: user,
 	}
 }
 
@@ -75,26 +73,27 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 
 	// firstError remembers the first error we saw. If we fail completely we return it.
 	var firstError error
+	// isError reports whether err is non-nil and remembers it if it is.
+	isError := func(err error) bool {
+		if err == nil {
+			return false
+		}
+		if firstError == nil {
+			firstError = err
+		}
+		return true
+	}
 
 	// where is the list of locations to examine. It is updated in the loop.
 	where := []upspin.Location{entry.Location}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
-		// TODO: Be able to connect to another Store.
-		if loc.Endpoint != c.store.Endpoint() {
-			return nil, fmt.Errorf("TODO: testclient can't handle different store address: %v %v", loc.Endpoint, c.store.Endpoint())
+		store, err := access.BindStore(testContext, loc.Endpoint) // TODO: do context right.
+		if isError(err) {
+			continue
 		}
-		// TODO: Be able to connect to another Store. Plus don't hack in "in-process".
-		if loc.Endpoint.Transport != upspin.InProcess {
-			fmt.Printf("%+v\n", loc)
-			return nil, fmt.Errorf("TODO: testclient can't handle different store transport: %q %q", loc.Endpoint.Transport, "in-process")
-		}
-		cipher, locs, err := c.store.Get(entry.Location.Reference.Key)
-		if err != nil {
-			// An error occurred. Remember the first error we see.
-			if firstError == nil {
-				firstError = err
-			}
+		cipher, locs, err := store.Get(entry.Location.Reference.Key)
+		if isError(err) {
 			continue // locs guaranteed to be nil.
 		}
 		if locs == nil && err == nil {
@@ -112,7 +111,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			parsed, _ := path.Parse(name) // Known to be error-free.
 			n, err := packer.Unpack(cleartext, cipher, nil, parsed.Path())
 			if err != nil {
-				return nil, err
+				return nil, err // Showstopper.
 			}
 			return cleartext[:n], nil
 		}

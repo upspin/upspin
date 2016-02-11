@@ -67,7 +67,7 @@ func BindUser(cc upspin.ClientContext, e upspin.Endpoint) (upspin.User, error) {
 	return x.(upspin.User), nil
 }
 
-// BindStore returns a Client interface bound to the endpoint.
+// BindStore returns a Store interface bound to the endpoint.
 func BindStore(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error) {
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
@@ -82,7 +82,7 @@ func BindStore(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error)
 	return x.(upspin.Store), nil
 }
 
-// BindDirectory implements upspin.AccessSwitch.BindDirectory
+// BindDirectory returns a Directory interface bound to the endpoint.
 func BindDirectory(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Directory, error) {
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]

@@ -18,7 +18,6 @@ import (
 type Setup struct {
 	upspin.User
 	upspin.Directory
-	upspin.Store
 }
 
 func setup() (*Setup, error) {
@@ -34,14 +33,9 @@ func setup() (*Setup, error) {
 	if err != nil {
 		return nil, err
 	}
-	ss, err := access.BindStore(testContext, e)
-	if err != nil {
-		return nil, err
-	}
 	return &Setup{
 		User:      us,
 		Directory: ds,
-		Store:     ss,
 	}, nil
 }
 
@@ -66,7 +60,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	installUser(s.User, s.Directory, user)
-	client := New(s.User, s.Store)
+	client := New(s.User)
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -94,7 +88,7 @@ func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *tes
 		t.Fatal(err)
 	}
 	installUser(s.User, s.Directory, user)
-	client := New(s.User, s.Store)
+	client := New(s.User)
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
