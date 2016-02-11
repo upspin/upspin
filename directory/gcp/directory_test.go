@@ -326,7 +326,7 @@ func newResp(data []byte) nettest.MockHTTPResponse {
 	return nettest.NewMockHTTPResponse(200, "application/json", data)
 }
 
-func newDirectory(serverURL string, storeService upspin.Store, client HTTPClientInterface) upspin.Directory {
+func newDirectory(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) upspin.Directory {
 	context := Context{
 		StoreService: storeService,
 		Client:       client,
