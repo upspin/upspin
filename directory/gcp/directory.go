@@ -29,22 +29,15 @@ const (
 type Directory struct {
 	serverURL    string
 	storeService upspin.Store
-	client       HTTPClientInterface
+	client       netutil.HTTPClientInterface
 }
 
 // Guarantee we implement the interface
 var _ upspin.Directory = (*Directory)(nil)
 
-// HTTPClientInterface is a minimal HTTP client interface. An instance of
-// http.Client suffices.
-// TODO(edpin): this should move somewhere, probably cloud/netutil.
-type HTTPClientInterface interface {
-	Do(req *http.Request) (resp *http.Response, err error)
-}
-
 // Context implements upspin.ClientContext for use in dialing a specific Directory server
 type Context struct {
-	Client       HTTPClientInterface
+	Client       netutil.HTTPClientInterface
 	StoreService upspin.Store
 }
 
@@ -56,7 +49,7 @@ func (c Context) Name() string {
 }
 
 // new returns a concrete implementation of Directory, pointing to a server at a given URL and port.
-func new(serverURL string, storeService upspin.Store, client HTTPClientInterface) *Directory {
+func new(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) *Directory {
 	return &Directory{
 		serverURL:    serverURL,
 		storeService: storeService,

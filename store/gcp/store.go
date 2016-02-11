@@ -26,21 +26,15 @@ const (
 // Store is an implementation of upspin.Store that uses GCP to manage its storage.
 type Store struct {
 	serverURL string
-	client    HTTPClientInterface
+	client    netutil.HTTPClientInterface
 }
 
 // Guarantee we implement the interface
 var _ upspin.Store = (*Store)(nil)
 
-// HTTPClientInterface is a minimal HTTP client interface. An instance of
-// http.Client satisfies the interface.
-type HTTPClientInterface interface {
-	Do(req *http.Request) (resp *http.Response, err error)
-}
-
 // Context implements upspin.ClientContext for use in dialing a specific Store server.
 type Context struct {
-	Client HTTPClientInterface
+	Client netutil.HTTPClientInterface
 }
 
 // Guarantee we implement the ClientContext interface
@@ -53,7 +47,7 @@ func (c Context) Name() string {
 // new returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
 // Put requests on blocks of data.
-func new(serverURL string, client HTTPClientInterface) *Store {
+func new(serverURL string, client netutil.HTTPClientInterface) *Store {
 	return &Store{
 		serverURL: serverURL,
 		client:    client,
