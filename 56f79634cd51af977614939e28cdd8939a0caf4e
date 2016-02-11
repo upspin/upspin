@@ -1,0 +1,181 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ddaf464_548ae447",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "I think as per Go standards this should be lowercase.",
+      "range": {
+        "startLine": 37,
+        "startChar": 30,
+        "endLine": 37,
+        "endChar": 36
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_89aadd99",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "The convention here is also to not make whole phrases. So, maybe \"invalid metadata buffer\" or even \"nil buffer\" could suffice.",
+      "range": {
+        "startLine": 38,
+        "startChar": 27,
+        "endLine": 38,
+        "endChar": 29
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_49ef05d6",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "This is not your problem, but one of API that I\u0027d like to discuss: if we pick an encryption key here, then the only way for use to share a file with someone else later is if we decrypt the metadata and then re-encrypt the cleartext again with a new key, because we can\u0027t call Pack with a preset encryption key currently.\n\nOne way forward that would keep the signature of this function the same is to handle various use cases for a call to Pack.\n\nFor example, if \u0027cleartext\u0027 is nil and a non-empty \u0027meta\u0027 parameter is given this function would essentially do something different. It would 1) unpack the current meta, 2) append the new key for the new user \u0027name\u0027 in the metadata and then re-generate the meta in place (into param \u0027meta\u0027).\n\nBut that seems like much abuse of this function\u0027s signature. \n\nIn summary, we probably need a Repack() function in Packer, to avoid having to decrypt potentially huge amounts of data or making a cumbersome Pack().\n\nThoughts?",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_69bda1dd",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "I think this is correct. Any string that describes this packer.",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_89d1fd1d",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "Or you could return an error: \n\nreturn 0, errors.New(\"unimplemented key type\")",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_a9ceb978",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "same here, just return 0, err",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_c9cbf567",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "same as above",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_09334d4d",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "why not use PackLen() here, to test that too?",
+      "range": {
+        "startLine": 29,
+        "startChar": 24,
+        "endLine": 29,
+        "endChar": 28
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_29380927",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-11T18:55:29Z",
+      "side": 1,
+      "message": "Same here, use UnpackLen() if possible.",
+      "range": {
+        "startLine": 38,
+        "startChar": 23,
+        "endLine": 38,
+        "endChar": 27
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
