@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3d775410_a97239b1",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "For consistency with ../plain/plain.go, this is the iota const from upspin.go.  The correct value would be EEp256Pack, but I currently envision that ee.go will implement both that and EEp386Pack, so chose a more abstract string.",
+      "parentUuid": "3ddaf464_548ae447",
+      "range": {
+        "startLine": 37,
+        "startChar": 30,
+        "endLine": 37,
+        "endChar": 36
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_89aadd99",
         "filename": "pack/ee/ee.go",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2016-02-11T18:55:29Z",
       "side": 1,
       "message": "The convention here is also to not make whole phrases. So, maybe \"invalid metadata buffer\" or even \"nil buffer\" could suffice.",
+      "range": {
+        "startLine": 38,
+        "startChar": 27,
+        "endLine": 38,
+        "endChar": 29
+      },
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4953850e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_89aadd99",
       "range": {
         "startLine": 38,
         "startChar": 27,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "3d775410_a9f7993a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "Repack() sounds good to me.   By the way, it is not only addition and deletion of usernames, but renaming of the file and perhaps even changing the owner of the file.  Agreed that we want an API to leave the Location intact and only modify or add a directory entry.",
+      "parentUuid": "3d775410_49ef05d6",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_69bda1dd",
         "filename": "pack/ee/ee.go",
         "patchSetId": 3
@@ -76,6 +142,24 @@
       "writtenOn": "2016-02-11T18:55:29Z",
       "side": 1,
       "message": "I think this is correct. Any string that describes this packer.",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_c904d5fa",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_69bda1dd",
       "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -99,6 +183,24 @@
     },
     {
       "key": {
+        "uuid": "3d775410_2913a940",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_89d1fd1d",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_a9ceb978",
         "filename": "pack/ee/ee.go",
         "patchSetId": 3
@@ -116,6 +218,24 @@
     },
     {
       "key": {
+        "uuid": "3d775410_09350dc0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "I\u0027ve read crypto/aes/cipher.go and NewCipher() should never return nil here.  I\u0027d like to get a call in the middle of the night if it ever happens.",
+      "parentUuid": "3d775410_a9ceb978",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_c9cbf567",
         "filename": "pack/ee/ee.go",
         "patchSetId": 3
@@ -127,6 +247,24 @@
       "writtenOn": "2016-02-11T18:55:29Z",
       "side": 1,
       "message": "same as above",
+      "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_a925d98a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-11T20:25:47Z",
+      "side": 1,
+      "message": "Copied len(dkey) test here, so same comment as above.",
+      "parentUuid": "3d775410_c9cbf567",
       "revId": "56f79634cd51af977614939e28cdd8939a0caf4e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
