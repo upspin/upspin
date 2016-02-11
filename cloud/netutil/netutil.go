@@ -18,6 +18,12 @@ const (
 	Post = "POST"
 )
 
+// HTTPClientInterface is a minimal HTTP client interface. An instance of
+// http.Client implements this interface.
+type HTTPClientInterface interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+}
+
 // SendJSONError sends an error in a JSON struct with an error message
 // composed of a prefix and the actual error message.
 func SendJSONError(resp http.ResponseWriter, prefix string, error error) {

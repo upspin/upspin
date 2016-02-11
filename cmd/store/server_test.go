@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -11,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
+	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
@@ -67,7 +66,7 @@ func TestGetRemoteFile(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%v", Key), nil)
 
 	ss := NewStoreServer()
-	ss.cloudClient = &expectGetGCP{ref: Key, link: RetLink}
+	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: Key, Link: RetLink}
 
 	ss.getHandler(resp, req)
 	resp.Verify(t)
@@ -137,53 +136,9 @@ func TestMain(m *testing.M) {
 	cache.DeleteFileCache(fileCache)
 }
 
-// dummyGCP is a dummy version of gcp.Interface that does nothing.
-type dummyGCP struct {
-}
-
-var _ gcp.Interface = (*dummyGCP)(nil)
-
 func NewStoreServer() *StoreServer {
 	return &StoreServer{
-		cloudClient: &dummyGCP{},
+		cloudClient: &gcptest.DummyGCP{},
 		fileCache:   fileCache,
 	}
-}
-
-func (m *dummyGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	return "", nil
-}
-
-func (m *dummyGCP) Get(ref string) (link string, error error) {
-	return "", nil
-}
-
-func (m *dummyGCP) Put(ref string, contents []byte) (refLink string, error error) {
-	return "", nil
-}
-
-func (m *dummyGCP) List(prefix string) (name []string, link []string, err error) {
-	return []string{}, []string{}, nil
-}
-
-func (m *dummyGCP) Delete(ref string) error {
-	return nil
-}
-
-func (m *dummyGCP) Connect() {
-}
-
-// expectGetGCP is a dummyGCP that expects Get will be called with a
-// given ref and when it does, it replies with the preset link.
-type expectGetGCP struct {
-	dummyGCP
-	ref  string
-	link string
-}
-
-func (e *expectGetGCP) Get(ref string) (link string, error error) {
-	if ref == e.ref {
-		return e.link, nil
-	}
-	return "", errors.New("not found")
 }

@@ -188,7 +188,7 @@ func createMockPutResponse(t *testing.T) []nettest.MockHTTPResponse {
 	return []nettest.MockHTTPResponse{resp}
 }
 
-func newStore(serverURL string, client HTTPClientInterface) upspin.Store {
+func newStore(serverURL string, client netutil.HTTPClientInterface) upspin.Store {
 	context := Context{
 		Client: client,
 	}

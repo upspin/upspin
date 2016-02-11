@@ -21,12 +21,16 @@ const (
 )
 
 var (
-	projectId   = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName  = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
-	cloudClient *gcp.GCP
+	projectId  = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
 
 	errEntryNotFound = DirEntryError{"pathname not found"}
 )
+
+type DirServer struct {
+	cloudClient gcp.Interface
+	httpClient  netutil.HTTPClientInterface
+}
 
 type DirEntryError struct {
 	error string
@@ -78,7 +82,7 @@ func verifyUrl(urlStr string) error {
 
 // putHandler handles file put requests, for storing or updating
 // metadata information.
-func putHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) putHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("In handler for /put")
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
@@ -96,17 +100,17 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: verify ACLs before applying put.
-	err = createDirEntry(dirEntry)
+	err = d.createDirEntry(dirEntry)
 	if err != nil {
 		netutil.SendJSONError(w, "", err)
 		return
 	}
-	netutil.SendJSONReply(w, &struct{ Error string }{Error: "Success"})
+	netutil.SendJSONErrorString(w, "success")
 }
 
 // createDirEntry will attempt to write a new dirEntry to the back
 // end, provided several checks have passed first.
-func createDirEntry(dirEntry *upspin.DirEntry) error {
+func (d *DirServer) createDirEntry(dirEntry *upspin.DirEntry) error {
 	parsedPath, err := verifyDirEntry(dirEntry)
 	if err != nil {
 		return DirEntryError{fmt.Sprintf("dir entry verification failed: %v", err)}
@@ -114,7 +118,7 @@ func createDirEntry(dirEntry *upspin.DirEntry) error {
 	// All checks passed so far. Now go put the object into GCE.
 	fmt.Printf("Got valid dir entry for path: %v\n", parsedPath)
 
-	err = verifyParentWritable(parsedPath)
+	err = d.verifyParentWritable(parsedPath)
 	if err != nil {
 		return DirEntryError{"path is not writable"}
 	}
@@ -124,7 +128,7 @@ func createDirEntry(dirEntry *upspin.DirEntry) error {
 	// with a file. That's probably not what the user wanted
 	// anyway.
 	path := parsedPath.Path()
-	otherDir, err := getMeta(path)
+	otherDir, err := d.getMeta(path)
 	if err != errEntryNotFound {
 		if otherDir.Metadata.IsDir && !dirEntry.Metadata.IsDir {
 			return DirEntryError{"Overwriting dir with file"}
@@ -135,11 +139,11 @@ func createDirEntry(dirEntry *upspin.DirEntry) error {
 	}
 
 	// Writes the entry
-	return putMeta(path, dirEntry)
+	return d.putMeta(path, dirEntry)
 }
 
 // verifyParentWritable returns an error if the parent dir of a path cannot be written to.
-func verifyParentWritable(path path.Parsed) error {
+func (d *DirServer) verifyParentWritable(path path.Parsed) error {
 	l := len(path.Elems)
 	if l <= 1 {
 		// The root is a writable directory (modulo ACLs).
@@ -147,7 +151,7 @@ func verifyParentWritable(path path.Parsed) error {
 	}
 	// Check that the last entry before the one we're trying to
 	// create is already a directory.
-	dirEntry, err := getMeta(path.Drop(1).Path())
+	dirEntry, err := d.getMeta(path.Drop(1).Path())
 	if err != nil {
 		return err
 	}
@@ -158,10 +162,10 @@ func verifyParentWritable(path path.Parsed) error {
 }
 
 // getMeta returns the metadata for the given path.
-func getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
+func (d *DirServer) getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
 	log.Printf("Looking up dir entry %q on storage backend\n", path)
 	var dirEntry upspin.DirEntry
-	buf, err := getCloudBytes(path)
+	buf, err := d.getCloudBytes(path)
 	if err != nil {
 		return &dirEntry, err
 	}
@@ -174,23 +178,30 @@ func getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
 
 // putMeta forcibly writes the given dirEntry to the path on the
 // backend without checking anything.
-func putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) error {
+func (d *DirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) error {
 	jsonBuf, err := json.Marshal(dirEntry)
 	if err != nil {
 		return DirEntryError{fmt.Sprintf("conversion to json failed: %v", err)}
 	}
-	_, err = cloudClient.Put(string(path), jsonBuf)
+	_, err = d.cloudClient.Put(string(path), jsonBuf)
 	return err
 }
 
 // getCloudBytes fetches the path from the storage backend.
-func getCloudBytes(path upspin.PathName) ([]byte, error) {
-	link, err := cloudClient.Get(string(path))
+func (d *DirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
+	link, err := d.cloudClient.Get(string(path))
 	if err != nil {
 		return nil, errEntryNotFound
 	}
 	// Now use the link to retrieve the metadata.
-	resp, err := http.Get(link)
+	req, err := http.NewRequest(netutil.Get, link, nil)
+	if err != nil {
+		return nil, DirEntryError{err.Error()}
+	}
+	resp, err := d.httpClient.Do(req)
+	if err != nil {
+		return nil, DirEntryError{err.Error()}
+	}
 	buf, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, DirEntryError{fmt.Sprintf("error reading cloud: %v", err)}
@@ -198,7 +209,7 @@ func getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return buf, nil
 }
 
-func getHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL == nil {
 		// This is so bad it's probably a panic at this point. URL should never be nil.
 		netutil.SendJSONErrorString(w, "server error: invalid URL")
@@ -215,7 +226,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		netutil.SendJSONErrorString(w, "missing pathname in request")
 		return
 	}
-	dirEntry, err := getMeta(upspin.PathName(pathName))
+	dirEntry, err := d.getMeta(upspin.PathName(pathName))
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
@@ -226,7 +237,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, dirEntry)
 }
 
-func listHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) listHandler(w http.ResponseWriter, r *http.Request) {
 	context := "list: "
 	err := r.ParseForm()
 	if err != nil {
@@ -243,7 +254,7 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	names, _, err := cloudClient.List(prefix)
+	names, _, err := d.cloudClient.List(prefix)
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
@@ -251,16 +262,20 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
-func configureCloudClient(projectId, bucketName string) {
-	cloudClient = gcp.New(projectId, bucketName, gcp.DefaultWriteACL)
+func new(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *DirServer {
+	d := &DirServer{
+		cloudClient: cloudClient,
+		httpClient:  httpClient,
+	}
+	return d
 }
 
 func main() {
 	flag.Parse()
-	configureCloudClient(*projectId, *bucketName)
-	http.HandleFunc("/put", putHandler)
-	http.HandleFunc("/get", getHandler)
-	http.HandleFunc("/list", listHandler)
+	d := new(gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL), &http.Client{})
+	http.HandleFunc("/put", d.putHandler)
+	http.HandleFunc("/get", d.getHandler)
+	http.HandleFunc("/list", d.listHandler)
 	log.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
