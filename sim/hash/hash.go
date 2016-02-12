@@ -2,7 +2,7 @@
 package hash
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 )
@@ -12,14 +12,14 @@ var (
 )
 
 // HashSize is the number of bytes in a hash.
-const HashSize = sha1.Size
+const HashSize = sha256.Size
 
 // ZeroHash is the zero-valued hash.
 var ZeroHash Hash
 
-// Hash represents a SHA-1 hash code. It is always 20 bytes long.
+// Hash represents a SHA-2 hash code. It is always XX? bytes long.
 // Its representation is an array so it can be treated as a value.
-type Hash [HashSize]byte // SHA-1 hash always 20 bytes
+type Hash [HashSize]byte // SHA-2 hash always XX? bytes
 
 // String returns a hexadecimal representation of the hash.
 func (hash Hash) String() string {
@@ -28,7 +28,7 @@ func (hash Hash) String() string {
 
 // BytesString returns a string representation of the hash that is represented in bytes.
 func BytesString(hash []byte) string {
-	return fmt.Sprintf("[%X]", hash)
+	return fmt.Sprintf("%x", hash)
 }
 
 // EqualString compares the byte-level representation of a hash with its hex string representation,
@@ -78,8 +78,8 @@ func unhex(b uint8) uint8 {
 	return 255
 }
 
-// Of returns the SHA-1 hash of the data, as a Hash.
+// Of returns the SHA-2 hash of the data, as a Hash.
 // The odd name works well in the client: hash.Of.
 func Of(data []byte) (hash Hash) {
-	return sha1.Sum(data)
+	return sha256.Sum256(data)
 }

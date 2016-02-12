@@ -6,9 +6,11 @@
 package testdir
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	goPath "path"
 	"sort"
@@ -22,6 +24,7 @@ import (
 	"upspin.googlesource.com/upspin.git/pack"
 
 	_ "upspin.googlesource.com/upspin.git/pack/testpack" // Binds upspin.DebugPack.
+	"upspin.googlesource.com/upspin.git/store/gcp"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
@@ -85,7 +88,7 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	}
 	nameLen := int(payload[0])
 	payload = payload[1:]
-	if len(payload) < nameLen+1+sha1.Size {
+	if len(payload) < nameLen+1+sha256.Size {
 		err = mkStrError(op, pathName, "internal error: truncated directory")
 		return
 	}
@@ -93,8 +96,8 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	payload = payload[nameLen:]
 	isDir = payload[0] != 0
 	payload = payload[1:]
-	hashBytes = payload[:sha1.Size]
-	remaining = payload[sha1.Size:]
+	hashBytes = payload[:sha256.Size]
+	remaining = payload[sha256.Size:]
 	return
 }
 
@@ -118,7 +121,7 @@ func unpackBlob(ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
 	clearLen := packer.UnpackLen(ciphertext, nil)
 	if clearLen < 0 {
-		return nil, errors.New("testpack.UnpackLen failed")
+		return nil, fmt.Errorf("testpack.UnpackLen failed. Cipher contents: %v", ciphertext)
 	}
 	cleartext := make([]byte, clearLen)
 	n, err := packer.Unpack(cleartext, ciphertext, nil, name)
@@ -238,6 +241,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 			return loc0, err
 		}
 		key, err := s.Store.Put(blob)
+		log.Printf("Mkdir: store.Put: Key: %v", key)
 		if err != nil {
 			return loc0, err
 		}
@@ -309,7 +313,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		Packing: upspin.DebugPack,
 	}
 	loc := upspin.Location{
-		Endpoint:  s.Store.Endpoint(),
+		Endpoint:  s.StoreEndpoint, // doesn't matter, but more direct that s.Store.Endpoint()
 		Reference: ref,
 	}
 
@@ -396,7 +400,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
-	entry := make([]byte, 0, 1+len(elem)+1+sha1.Size)
+	entry := make([]byte, 0, 1+len(elem)+1+sha256.Size)
 	entry = append(entry, byte(len(elem)))
 	entry = append(entry, elem...)
 	dirByte := byte(0)
@@ -425,9 +429,17 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 // Fetch returns the decrypted data associated with the reference.
 // TODO: For test but is it genuinely valuable?
 func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	ciphertext, _, err := s.Store.Get(dirRef.Key)
+	log.Printf("Store.Get: Key=%q", dirRef.Key)
+	ciphertext, locs, err := s.Store.Get(dirRef.Key)
 	if err != nil {
 		return nil, err
+	}
+	if locs != nil && len(locs) > 0 {
+		log.Printf("New loc: Store.Get: Key=%q", locs[0].Reference.Key)
+		ciphertext, _, err = s.Store.Get(locs[0].Reference.Key)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if dirRef.Packing != upspin.DebugPack {
 		return nil, fmt.Errorf("testdir: unexpected packing %d in Fetch", dirRef.Packing)
@@ -441,7 +453,7 @@ func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, 
 //	N length of name, one unsigned byte (255 byte max element name seems fine).
 //	N bytes of name.
 //	One byte. 0 for regular file, 1 for directory. TODO
-//	sha1.Size bytes of Reference.
+//	sha256.Size bytes of Reference.
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
@@ -557,14 +569,23 @@ func init() {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // Ignored.
 	}
-	store, err := access.BindStore(testcontext, endpoint)
+	// The directory implicitly binds to a Store instead of taking a ClientContext and using the same Store implementation. We need to simplify this.
+	eLocalGCP := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr("http://localhost:8080"),
+	}
+	storeContext := store.Context{
+		Client: &http.Client{},
+	}
+	store, err := access.BindStore(storeContext, eLocalGCP)
 	if err != nil {
 		panic("testdir: cannot access in-process store service:" + err.Error())
 	}
 	s := &Service{
-		endpoint: endpoint,
-		Store:    store,
-		Root:     make(map[upspin.UserName]upspin.Reference),
+		endpoint:      endpoint,
+		Store:         store,
+		StoreEndpoint: eLocalGCP,
+		Root:          make(map[upspin.UserName]upspin.Reference),
 	}
 	access.RegisterDirectory(transport, s)
 }

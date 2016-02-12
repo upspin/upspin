@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -100,8 +101,12 @@ func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Looking up on storage backend...\n")
 	link, err := s.cloudClient.Get(ref)
 	if err != nil {
+		log.Printf("ref %v not found. Sending error: %v", ref, err)
 		netutil.SendJSONError(w, "get error:", err)
 		return
+	}
+	if !(strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://")) {
+		log.Fatalf("Crappy link returned %q. Something is wrong. Aborting...")
 	}
 
 	location := upspin.Location{}
