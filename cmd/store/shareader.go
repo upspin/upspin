@@ -1,11 +1,14 @@
 package main
 
+// TODO: Perhaps move this functionality into sha256key.
+
 import (
 	"bufio"
 	"crypto/sha256"
-	"encoding/hex"
 	"hash"
 	"io"
+
+	"upspin.googlesource.com/upspin.git/key/sha256key"
 )
 
 type ShaReader struct {
@@ -31,5 +34,5 @@ func (s *ShaReader) Sum() []byte {
 }
 
 func (s *ShaReader) EncodedSum() string {
-	return hex.EncodeToString(s.Sum())
+	return sha256key.BytesString(s.sha.Sum(nil))
 }

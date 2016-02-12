@@ -73,7 +73,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		t.Fatal("put file:", err)
 	}
 	if loc != entry.Location {
-		t.Error("Lookup's referene does not match Put's reference")
+		t.Error("Lookup's reference does not match Put's reference:\t%v\n\t%v", loc, entry.Location)
 	}
 
 	// Fetch the data back and inspect it.
