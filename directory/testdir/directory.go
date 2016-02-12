@@ -6,7 +6,6 @@
 package testdir
 
 import (
-	"crypto/sha1"
 	"errors"
 	"fmt"
 	"os"
@@ -15,8 +14,8 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/sim/hash"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	"upspin.googlesource.com/upspin.git/pack"
@@ -85,7 +84,7 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	}
 	nameLen := int(payload[0])
 	payload = payload[1:]
-	if len(payload) < nameLen+1+sha1.Size {
+	if len(payload) < nameLen+1+sha256key.Size {
 		err = mkStrError(op, pathName, "internal error: truncated directory")
 		return
 	}
@@ -93,8 +92,8 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	payload = payload[nameLen:]
 	isDir = payload[0] != 0
 	payload = payload[1:]
-	hashBytes = payload[:sha1.Size]
-	remaining = payload[sha1.Size:]
+	hashBytes = payload[:sha256key.Size]
+	remaining = payload[sha256key.Size:]
 	return
 }
 
@@ -190,7 +189,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					Location: upspin.Location{
 						Endpoint: s.StoreEndpoint,
 						Reference: upspin.Reference{
-							Key:     hash.BytesString(hashBytes),
+							Key:     sha256key.BytesString(hashBytes),
 							Packing: upspin.DebugPack,
 						},
 					},
@@ -396,7 +395,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
-	entry := make([]byte, 0, 1+len(elem)+1+sha1.Size)
+	entry := make([]byte, 0, 1+len(elem)+1+sha256key.Size)
 	entry = append(entry, byte(len(elem)))
 	entry = append(entry, elem...)
 	dirByte := byte(0)
@@ -404,7 +403,7 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
 		dirByte = 1
 	}
 	entry = append(entry, dirByte)
-	key, err := hash.Parse(ref.Key)
+	key, err := sha256key.Parse(ref.Key)
 	if err != nil {
 		panic(err)
 	}
@@ -441,7 +440,7 @@ func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, 
 //	N length of name, one unsigned byte (255 byte max element name seems fine).
 //	N bytes of name.
 //	One byte. 0 for regular file, 1 for directory. TODO
-//	sha1.Size bytes of Reference.
+//	sha256.Size bytes of Reference.
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
@@ -469,7 +468,7 @@ Loop:
 			}
 		}
 		r := upspin.Reference{
-			Key:     hash.BytesString(hashBytes),
+			Key:     sha256key.BytesString(hashBytes),
 			Packing: upspin.DebugPack,
 		}
 		return r, isDir, nil
@@ -507,7 +506,7 @@ Loop:
 			return r0, mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
 		// Overwrite in place.
-		h, err := hash.Parse(ent.ref.Key)
+		h, err := sha256key.Parse(ent.ref.Key)
 		if err != nil {
 			return r0, err
 		}

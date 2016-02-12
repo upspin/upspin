@@ -5,14 +5,14 @@ import (
 	"errors"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/sim/hash"
+	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 // Service returns data and metadata referenced by the request.
 type Service struct {
 	endpoint upspin.Endpoint
-	blob     map[string][]byte // string is key made from SHA1 hash of data.
+	blob     map[string][]byte // string is key made from SHA256 hash of data.
 }
 
 // This package (well, the Servie type) implements the upspin.Store interface.
@@ -29,7 +29,7 @@ func (s *Service) Endpoint() upspin.Endpoint {
 }
 
 func (s *Service) Put(ciphertext []byte) (string, error) {
-	key := hash.Of(ciphertext).String()
+	key := sha256key.Of(ciphertext).String()
 	s.blob[key] = ciphertext
 	return key, nil
 }
@@ -44,7 +44,7 @@ func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, e
 	if !ok {
 		return nil, nil, errors.New("no such blob")
 	}
-	if hash.Of(data).String() != key {
+	if sha256key.Of(data).String() != key {
 		return nil, nil, errors.New("internal hash mismatch in Store.Get")
 	}
 	return copyOf(data), nil, nil
