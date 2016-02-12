@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -12,9 +13,9 @@ import (
 // Location and returns it. If it's not a Location, it tries to read
 // an error message instead.
 func LocationResponse(body []byte) (*upspin.Location, error) {
-	var loc upspin.Location
+	var loc, zeroLoc upspin.Location
 	err := json.Unmarshal(body, &loc)
-	if err != nil {
+	if err != nil || loc == zeroLoc {
 		return nil, ErrorResponse(body)
 	}
 	return &loc, nil
@@ -24,14 +25,15 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 // proper JSON structure (example "{key:'foo'}"). If it's not in the
 // format of a key, it tries to read an error message instead.
 func KeyResponse(body []byte) (string, error) {
-	keyStruct := &struct {
+	type KeyMessage struct {
 		Key string
-	}{}
-	err := json.Unmarshal(body, &keyStruct)
-	if err != nil {
+	}
+	var key, zeroKey KeyMessage
+	err := json.Unmarshal(body, &key)
+	if err != nil || key == zeroKey {
 		return "", ErrorResponse(body)
 	}
-	return keyStruct.Key, nil
+	return key.Key, nil
 }
 
 // DirEntryResponse interprets the body of an HTTP response as
@@ -40,7 +42,7 @@ func KeyResponse(body []byte) (string, error) {
 func DirEntryResponse(body []byte) (*upspin.DirEntry, error) {
 	var dir upspin.DirEntry
 	err := json.Unmarshal(body, &dir)
-	if err != nil {
+	if err != nil || (dir.Name == "" && dir.Location.Reference.Key == "") {
 		return nil, ErrorResponse(body)
 	}
 	return &dir, nil
@@ -50,12 +52,19 @@ func DirEntryResponse(body []byte) (*upspin.DirEntry, error) {
 // error (which could contain the string "Success" for successful
 // operations that do not return data).
 func ErrorResponse(body []byte) error {
-	serverErr := &struct {
+	type ErrorMessage struct {
 		Error string
-	}{}
-	err := json.Unmarshal(body, serverErr)
-	if err != nil {
-		return errors.New(fmt.Sprintf("can't parse reply from server: %v, %v", err, string(body)))
+	}
+	var serverErr, zeroErr ErrorMessage
+	err := json.Unmarshal(body, &serverErr)
+	if err != nil || serverErr == zeroErr {
+		// This is likely a serious problem because the server
+		// returns one of the other structures or an
+		// ErrorMessage. If none of them parse, there's likely
+		// a client/server version mismatch somewhere.
+		strErr := fmt.Sprintf("can't parse reply from server: %v, %v", err, string(body))
+		log.Println(strErr)
+		return errors.New(strErr)
 	}
 	if serverErr.Error == "success" {
 		return nil
