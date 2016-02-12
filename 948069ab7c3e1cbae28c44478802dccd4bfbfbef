@@ -1,0 +1,300 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d775410_2c3ad7b0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "why are these commented out?\n\nperhaps you don\u0027t know about goimports.\nhttps://godoc.org/golang.org/x/tools/cmd/goimports",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8c282b64",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "group these:\n\nvar (\n  errTooShort \u003d\n  errMetaNil \u003d \n)",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_cc3223d2",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "one space after period. we are aiming for consistency",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_ec2fdf66",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "i am surprised to see this and its fields exported. it should be internal to the package.",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_0c5c3bf8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_2c61f7b0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "don\u0027t need so much info. \nreturn 0, err\nshould do, or maybe\nreturn 0, fmt.Errorf(\"EEPack: %v\", err)",
+      "range": {
+        "startLine": 85,
+        "startChar": 15,
+        "endLine": 85,
+        "endChar": 16
+      },
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4c5633d8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 121,
+        "startChar": 32,
+        "endLine": 121,
+        "endChar": 40
+      },
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6c5beffe",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "indeed,although i suspect hex.Decode is faster than Scanf",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8c4f4b37",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "maybe errMismatch",
+      "range": {
+        "startLine": 144,
+        "startChar": 3,
+        "endLine": 144,
+        "endChar": 11
+      },
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_ec46ff1e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "log is probably better. you should certainly not be writing to stdout, and you should be returning an error to the user as well.",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_0c835b87",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6c920fd3",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "why not return 0, err?\nit\u0027s very bad policy to panic in a library",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8c966bc3",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8c210b88",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "use PackLen to see how long cipher should be. that\u0027s what it\u0027s for.",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 7
+      },
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4c08f308",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "this is fine, for clarity maybe even right. but just so you know: as the code exists now it would be fine to use \u0027nil\u0027 in the calls and not even declare \"meta\"",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_cc1b0352",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-12T01:04:20Z",
+      "side": 1,
+      "message": "use UnpackLen",
+      "revId": "948069ab7c3e1cbae28c44478802dccd4bfbfbef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
