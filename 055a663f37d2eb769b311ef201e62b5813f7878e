@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dd7ab832_b422463a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "move up to the var(...) section?",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_34941668",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "I don\u0027t understand the need for this. It seems not to be used anyway. Can you give us an intuition for what this would be used for?",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_1f99f332",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "But you also don\u0027t need a nonce here yet. You only seem to definitely need it after you have an AEAD object. For the hash on lines 79-81, it\u0027s optional, if I\u0027m reading the documentation correctly. That just adds some entropy but is not needed. (So, on line 79, you can just have ciphersuite+w.keyhash). Am I reading this right?",
+      "range": {
+        "startLine": 69,
+        "startChar": 65,
+        "endLine": 69,
+        "endChar": 92
+      },
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_b4d9e66f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "What\u0027s the empty string for? Did you mean it to be a placeholder for something else later or a divider, such as \":\" or \"-\"?\n\nAlso, you don\u0027t need to convert to string to then convert to byte, just use R.X.Bytes().",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_7fa837a2",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "Can this 16 and the one below be a const so it\u0027s easier to follow. Are they the \"same\" 16?",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_bfbc5fe2",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "The package recommends using hash().Size() random bytes here. Maybe add a TODO?\n\nBut more importantly, S should not be nil. I think you want rand.Read(S) here, where S :\u003d make([]byte, 16). But I admit I\u0027m confused, so, maybe not.",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_bff3ffc0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T22:57:27Z",
+      "side": 1,
+      "message": "For clarity, I suggest putting steps 1 and 2 of this func into separate funcs.  Step 2 could be split into 2a. and 2b. In this case, 2a would be publicKeyHash() and 2b would be a new functioncalled genKey().",
+      "range": {
+        "startLine": 88,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 24
+      },
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
