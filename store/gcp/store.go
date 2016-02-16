@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -112,7 +111,6 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 		// We go on a limb here and assume it was some other
 		// valid type that we don't know about such as an
 		// unencrypted image or a pdf file.
-		log.Printf("%s: %v", netutil.ContentType, answerType)
 		return body, nil, nil
 	}
 	// NOT REACHED
