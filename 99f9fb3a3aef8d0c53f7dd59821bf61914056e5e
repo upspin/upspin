@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d775410_4f3f05a0",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:04:49Z",
+      "side": 1,
+      "message": "maybe make zeroLoc, zeroKey etc global vars.",
+      "range": {
+        "startLine": 23,
+        "startChar": 10,
+        "endLine": 23,
+        "endChar": 17
+      },
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6f44c123",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:04:49Z",
+      "side": 1,
+      "message": "errors are interfaces so there\u0027s no need for zeroErr. just check for nil",
+      "range": {
+        "startLine": 74,
+        "startChar": 16,
+        "endLine": 74,
+        "endChar": 23
+      },
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8f281d64",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:04:49Z",
+      "side": 1,
+      "message": "returned",
+      "range": {
+        "startLine": 78,
+        "startChar": 5,
+        "endLine": 78,
+        "endChar": 12
+      },
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_af25d98a",
+        "filename": "cloud/netutil/parser/parser_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:04:49Z",
+      "side": 1,
+      "message": "really?\n\nmaybe just\n\nif strings.HasPrefix(err.Error(), \"can\u0027t parse reply from server\")\n\nsimilarly below",
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
