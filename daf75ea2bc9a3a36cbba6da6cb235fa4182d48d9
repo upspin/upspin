@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dd7ab832_3fa38f0d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-16T23:24:25Z",
+      "side": 1,
+      "message": "I can\u0027t decide if we should guarantee Location will not change and hence return just an error. Maybe we want to update the Key at some point. But updating the Key typically implies copying data, which is what Update is trying to avoid. \n\nIn most cases though, Location will be exactly the same. This is just reserving the right to update it in case we want snapshots not only of content, but also of [content, metadata] pairs.",
+      "range": {
+        "startLine": 153,
+        "startChar": 30,
+        "endLine": 154,
+        "endChar": 31
+      },
+      "revId": "daf75ea2bc9a3a36cbba6da6cb235fa4182d48d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
