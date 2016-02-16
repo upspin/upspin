@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "3d775410_cf493532",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:30:44Z",
+      "side": 1,
+      "message": "I understand the meaning but \"packdata portion of a name\" is confusing wording. Maybe \"packdata associated with the name\".\n\nBut I was expecting a *Metadata here.",
+      "revId": "daf75ea2bc9a3a36cbba6da6cb235fa4182d48d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_ef46f11e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:30:44Z",
+      "side": 1,
+      "message": "Names don\u0027t have locations, they are just strings. Again, the wording needs adjustment.\n\nI do like the idea that the location cannot change, although I\u0027m not quite certain it\u0027s OK. I believe it is.",
+      "revId": "daf75ea2bc9a3a36cbba6da6cb235fa4182d48d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_3fa38f0d",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
