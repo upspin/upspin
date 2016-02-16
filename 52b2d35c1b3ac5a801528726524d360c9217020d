@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d775410_cfa0551a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "Diffie-Hellman, no?\n\nAlso might as well make these sentences.\n\nStep 1. Create ... secret.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6f692187",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "how about\nerr \u003d binary.BigEndian.PutUint64(buf, uint64(len(wrap))\na write with an integer final argument like this is confusing.\n\nbut if you prefer to leave it as is for consistency, which is fine, add a comment.\n\n// Encode the length.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_0f6a6d7f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "s/n/0/ the variable adds nothing.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4f6465b0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "n is zero. this can\u0027t be right.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_2f6f2990",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "n is zero. this can\u0027t be right.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_ef9d11df",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "This is a hack anyway. I\u0027d just put the strings in the code.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_2f8809a1",
+        "filename": "pack/ee/public.P-256",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "what is this? why is it a file?\n\nalso upper-case file names may be problematic\nalso in general minus signs in file names may be problematic\n\nwelcome to the new portable world, where there is a system somewhere that breaks any assumption",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4f8d45b0",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "what does this program do? comments are permitted in cryptographic code even if error messages are not.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6f9201d3",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be fatal?",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8f965dc3",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "log.Fatal is fine, but make it nicer by saying at the top\n\nlog.SetFlags(0)\nlog.SetPrefix(\"keygen: \")",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_af9319d2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:49:04Z",
+      "side": 1,
+      "message": "s/The following/EEp256Pack and EEp521Pack/\n\ns/store/stores/",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
