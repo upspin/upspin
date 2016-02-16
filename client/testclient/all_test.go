@@ -7,10 +7,9 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
-
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
@@ -29,7 +28,11 @@ func setup() (*Setup, error) {
 	if err != nil {
 		return nil, err
 	}
-	ds, err := access.BindDirectory(testContext, e)
+	dirContext := testdir.DirTestContext{
+		StoreContext:  nil, // ignored for in-process testing
+		StoreEndpoint: e,
+	}
+	ds, err := access.BindDirectory(dirContext, e)
 	if err != nil {
 		return nil, err
 	}
