@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -101,6 +102,13 @@ func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	link, err := s.cloudClient.Get(ref)
 	if err != nil {
 		netutil.SendJSONError(w, "get error:", err)
+		return
+	}
+	// GCP should return an http link
+	if !strings.HasPrefix(link, "http") {
+		errMsg := fmt.Sprintf("invalid link returned from GCP: %v", link)
+		netutil.SendJSONErrorString(w, errMsg)
+		log.Println(errMsg)
 		return
 	}
 

@@ -1,11 +1,20 @@
 package testdir
 
+// This test uses an in-process Store service for the underlying
+// storage. To run this test against a GCP Store, start a GCP store
+// locally and run this test with flag
+// -use_gcp_store=http://localhost:8080. It may take up to a minute
+// to run.
+
 import (
+	"flag"
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"testing"
 
+	gcpStore "upspin.googlesource.com/upspin.git/store/gcp"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 
 	"upspin.googlesource.com/upspin.git/access"
@@ -13,28 +22,52 @@ import (
 	"upspin.googlesource.com/upspin.git/user/testuser"
 )
 
-// TODO: Test with different locations.
-
 type Setup struct {
 	upspin.User
 	upspin.Store
 	upspin.Directory
 }
 
+var (
+	useGCPStore      = "" // leave empty for in-process. see init below
+	inProcessContext = DirTestContext{
+		StoreContext: nil, // testStore ignores it
+		StoreEndpoint: upspin.Endpoint{
+			Transport: upspin.InProcess,
+			NetAddr:   "", // ignored
+		},
+	}
+)
+
 func setup(userName upspin.UserName) (*Setup, error) {
+	var context DirTestContext
+	if strings.HasPrefix(useGCPStore, "http") {
+		gcpStoreContext := DirTestContext{
+			StoreContext: gcpStore.Context{
+				Client: &http.Client{},
+			},
+			StoreEndpoint: upspin.Endpoint{
+				Transport: upspin.GCP,
+				NetAddr:   upspin.NetAddr(useGCPStore),
+			},
+		}
+		context = gcpStoreContext
+	} else {
+		context = inProcessContext
+	}
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	us, err := access.BindUser(testcontext, e)
+	us, err := access.BindUser(context, e)
 	if err != nil {
 		return nil, err
 	}
-	ds, err := access.BindDirectory(testcontext, e)
+	ds, err := access.BindDirectory(context, e)
 	if err != nil {
 		return nil, err
 	}
-	ss, err := access.BindStore(testcontext, e)
+	ss, err := access.BindStore(context.StoreContext, context.StoreEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +106,19 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		t.Fatal("put file:", err)
 	}
 	if loc != entry.Location {
-		t.Error("Lookup's reference does not match Put's reference:\t%v\n\t%v", loc, entry.Location)
+		t.Errorf("Lookup's reference does not match Put's reference:\t%v\n\t%v", loc, entry.Location)
 	}
 
 	// Fetch the data back and inspect it.
-	ciphertext, _, err := s.Store.Get(loc.Reference.Key)
+	ciphertext, locs, err := s.Store.Get(loc.Reference.Key)
 	if err != nil {
 		t.Fatal("get blob:", err)
+	}
+	if locs != nil {
+		ciphertext, _, err = s.Store.Get(locs[0].Reference.Key)
+		if err != nil {
+			t.Fatal("get redirected blob:", err)
+		}
 	}
 	clear, err := unpackBlob(ciphertext, fileName)
 	if err != nil {
@@ -119,9 +158,15 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		ciphertext, _, err := s.Store.Get(locs[j].Reference.Key)
+		ciphertext, newLocs, err := s.Store.Get(locs[j].Reference.Key)
 		if err != nil {
-			t.Fatalf("%q: get blob: %v", fileName, err)
+			t.Fatalf("%q: get blob: %v, key: %v", fileName, err, locs[j].Reference.Key)
+		}
+		if newLocs != nil {
+			ciphertext, _, err = s.Store.Get(newLocs[0].Reference.Key)
+			if err != nil {
+				t.Fatalf("%q: get redirected blob: %v", fileName, err)
+			}
 		}
 		clear, err := unpackBlob(ciphertext, fileName)
 		if err != nil {
@@ -164,9 +209,15 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: %q: lookup file: %v", i, fileName, err)
 		}
-		cipher, _, err := s.Store.Get(entry.Location.Reference.Key)
+		cipher, locs, err := s.Store.Get(entry.Location.Reference.Key)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
+		}
+		if locs != nil {
+			cipher, _, err = s.Store.Get(locs[0].Reference.Key)
+			if err != nil {
+				t.Fatalf("%q: get redirected file: %v", fileName, err)
+			}
 		}
 		data, err := unpackBlob(cipher, fileName)
 		if err != nil {
@@ -218,9 +269,15 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: lookup file: %v", fileName, err)
 	}
-	cipher, _, err := s.Store.Get(entry.Location.Reference.Key)
+	cipher, locs, err := s.Store.Get(entry.Location.Reference.Key)
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
+	}
+	if locs != nil {
+		cipher, _, err = s.Store.Get(locs[0].Reference.Key)
+		if err != nil {
+			t.Fatalf("%q: get redirected file: %v", fileName, err)
+		}
 	}
 	data, err := unpackBlob(cipher, fileName)
 	if err != nil {
@@ -241,9 +298,15 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: second lookup file: %v", fileName, err)
 	}
-	cipher, _, err = s.Store.Get(entry.Location.Reference.Key)
+	cipher, locs, err = s.Store.Get(entry.Location.Reference.Key)
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
+	}
+	if locs != nil {
+		cipher, _, err = s.Store.Get(locs[0].Reference.Key)
+		if err != nil {
+			t.Fatalf("%q: second get redirected file: %v", fileName, err)
+		}
 	}
 	data, err = unpackBlob(cipher, fileName)
 	if err != nil {
@@ -366,4 +429,8 @@ func TestGlob(t *testing.T) {
 			*/
 		}
 	}
+}
+
+func init() {
+	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
 }
