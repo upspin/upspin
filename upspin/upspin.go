@@ -93,6 +93,12 @@ type Packer interface {
 	// The returned name will be empty if the ciphertext does not contain one.
 	Unpack(cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
+	// Repack updates the metadata without changing the ciphertext
+	// previously packed. Repack may be used because the name
+	// changed or because the cipher-independent part of metadata
+	// changed, for example due to sharing a file with more people.
+	Repack(meta *Metadata, name PathName) (int, error)
+
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing. It might update the metadata.
 	// Returns -1 if there is an error.
@@ -142,6 +148,11 @@ type Directory interface {
 	// If something is already stored with that name, the new data and
 	// packdata replace the old.
 	Put(name PathName, data []byte, packdata []byte) (Location, error)
+
+	// Update updates the packdata portion of a name without
+	// changing its contents. It returns the new location of name,
+	// which replaces the old one.
+	Update(name PathName, packdata []byte) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
