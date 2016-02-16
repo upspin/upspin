@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_df2feb85",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd7ab832_b422463a",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_34941668",
         "filename": "pack/ee/ee.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-16T22:57:27Z",
       "side": 1,
       "message": "I don\u0027t understand the need for this. It seems not to be used anyway. Can you give us an intuition for what this would be used for?",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_7ff8372c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "eV will be used in the (uncompleted) Step 1 of aeswrap and passed to step 1 of aesunwrap.",
+      "parentUuid": "dd7ab832_34941668",
       "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_7f1fd740",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "My crypto guru told me to keep it in line 79.  Some of the subtle considerations in the background here are to allow for replacing Step 1 by a different key agreement primitive in the future.\n\nI\u0027ll return to this after I\u0027ve settled whether to get rid of Signature altogether with a revised aeswrap().",
+      "parentUuid": "dd7ab832_1f99f332",
+      "range": {
+        "startLine": 69,
+        "startChar": 65,
+        "endLine": 69,
+        "endChar": 92
+      },
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_b4d9e66f",
         "filename": "pack/ee/ee.go",
         "patchSetId": 7
@@ -70,6 +130,24 @@
       "writtenOn": "2016-02-16T22:57:27Z",
       "side": 1,
       "message": "What\u0027s the empty string for? Did you mean it to be a placeholder for something else later or a divider, such as \":\" or \"-\"?\n\nAlso, you don\u0027t need to convert to string to then convert to byte, just use R.X.Bytes().",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_bf5a1ff9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "Good catch.  That was meant to be \" \" not \"\".  I\u0027ve been serializing PublicKey as a space-separated pair of decimal bigintegers, for human readability.  If space and time turn out to matter, I\u0027ll change to a binary encoding.",
+      "parentUuid": "dd7ab832_b4d9e66f",
       "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_df828b82",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "It really is supposed to be the function call, so that crypto/cipher can adapt the size based on aes bit strength.  But their implementation at the moment is a constant and this let me work around the compiler warning for the moment, with this TODO to remind me to fix properly later.",
+      "parentUuid": "dd7ab832_7fa837a2",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_bfbc5fe2",
         "filename": "pack/ee/ee.go",
         "patchSetId": 7
@@ -110,6 +206,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_5f977bc0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "I\u0027m unclear if I really need a salt here or if so how large it needs to be.   I\u0027ve added an explicit TODO.\n\nS will come from the ephemeral DH computation.",
+      "parentUuid": "dd7ab832_bfbc5fe2",
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_bff3ffc0",
         "filename": "pack/ee/ee.go",
         "patchSetId": 7
@@ -121,6 +235,30 @@
       "writtenOn": "2016-02-16T22:57:27Z",
       "side": 1,
       "message": "For clarity, I suggest putting steps 1 and 2 of this func into separate funcs.  Step 2 could be split into 2a. and 2b. In this case, 2a would be publicKeyHash() and 2b would be a new functioncalled genKey().",
+      "range": {
+        "startLine": 88,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 24
+      },
+      "revId": "055a663f37d2eb769b311ef201e62b5813f7878e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_bfdf7f81",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-16T23:25:35Z",
+      "side": 1,
+      "message": "I\u0027m trying to find (or if I must, write) a mathematical English description of the wrapping.  When I do, I\u0027ll try to make the code follow the paper for clarity.",
+      "parentUuid": "dd7ab832_bff3ffc0",
       "range": {
         "startLine": 88,
         "startChar": 4,
