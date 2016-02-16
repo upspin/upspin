@@ -25,15 +25,16 @@ import (
 )
 
 // TODO: This should be in a testcontext somewhere.
-type Context string
-
-func (c Context) Name() string {
-	return string(c)
+type DirTestContext struct {
+	StoreContext  upspin.ClientContext
+	StoreEndpoint upspin.Endpoint
 }
 
-var _ upspin.ClientContext = (*Context)(nil)
+func (c DirTestContext) Name() string {
+	return "DirTestContext"
+}
 
-var testcontext = Context("testcontext")
+var _ upspin.ClientContext = (*DirTestContext)(nil)
 
 var (
 	r0   upspin.Reference
@@ -424,9 +425,15 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 // Fetch returns the decrypted data associated with the reference.
 // TODO: For test but is it genuinely valuable?
 func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	ciphertext, _, err := s.Store.Get(dirRef.Key)
+	ciphertext, locs, err := s.Store.Get(dirRef.Key)
 	if err != nil {
 		return nil, err
+	}
+	if locs != nil {
+		ciphertext, _, err = s.Store.Get(locs[0].Reference.Key)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if dirRef.Packing != upspin.DebugPack {
 		return nil, fmt.Errorf("testdir: unexpected packing %d in Fetch", dirRef.Packing)
@@ -546,23 +553,28 @@ func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interfa
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testdir: unrecognized transport")
 	}
+
+	// Dial the right Store.
+	dirContext, ok := context.(DirTestContext)
+	if !ok {
+		panic("Not a DirTestContext")
+	}
+	store, err := access.BindStore(dirContext.StoreContext, dirContext.StoreEndpoint)
+	if err != nil {
+		panic("testdir: cannot access store service:" + err.Error())
+	}
+	s.Store = store
+	s.StoreEndpoint = dirContext.StoreEndpoint
+	s.endpoint = e
 	return s, nil
 }
 
 const transport = upspin.InProcess
 
 func init() {
-	endpoint := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "", // Ignored.
-	}
-	store, err := access.BindStore(testcontext, endpoint)
-	if err != nil {
-		panic("testdir: cannot access in-process store service:" + err.Error())
-	}
 	s := &Service{
-		endpoint: endpoint,
-		Store:    store,
+		endpoint: upspin.Endpoint{}, // uninitialized until Dial time.
+		Store:    nil,               // uninitialized until Dial time.
 		Root:     make(map[upspin.UserName]upspin.Reference),
 	}
 	access.RegisterDirectory(transport, s)
