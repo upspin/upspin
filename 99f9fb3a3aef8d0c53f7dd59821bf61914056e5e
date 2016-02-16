@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "3d775410_af7a394a",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:50:34Z",
+      "side": 1,
+      "message": "Sorry, you\u0027re right. But is it necessary even to have this type? (Real question, I am not a JSON expert.)",
+      "parentUuid": "dd7ab832_df236b41",
+      "range": {
+        "startLine": 74,
+        "startChar": 16,
+        "endLine": 74,
+        "endChar": 23
+      },
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_8f281d64",
         "filename": "cloud/netutil/parser/parser.go",
         "patchSetId": 3
