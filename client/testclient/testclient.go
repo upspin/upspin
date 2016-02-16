@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -50,7 +51,11 @@ func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var dir upspin.Directory
 	for _, e := range endpoints {
-		dir, err = access.BindDirectory(testContext, e)
+		dirContext := testdir.DirTestContext{
+			StoreContext:  nil, // ignored for testing
+			StoreEndpoint: e,
+		}
+		dir, err = access.BindDirectory(dirContext, e)
 		if dir != nil {
 			return dir, nil
 		}
