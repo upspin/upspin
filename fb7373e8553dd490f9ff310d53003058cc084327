@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d775410_ef2fd166",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:13:28Z",
+      "side": 1,
+      "message": "s/Testing/test/",
+      "range": {
+        "startLine": 7,
+        "startChar": 8,
+        "endLine": 7,
+        "endChar": 9
+      },
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8f4f3d37",
+        "filename": "directory/testdir/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:13:28Z",
+      "side": 1,
+      "message": "this won\u0027t work, or will work by accident at best. don\u0027t call flag.Parse in tests because the test main will already have called it.",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_6f5be1fe",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:13:28Z",
+      "side": 1,
+      "message": "not happy with this at all. what\u0027s there was no better, but i find this uglier because it\u0027s pretending all is well when it\u0027s still an ugly hack under the covers.\n\nwe need to understand contexts.",
+      "range": {
+        "startLine": 558,
+        "startChar": 1,
+        "endLine": 558,
+        "endChar": 11
+      },
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_2f61e9b0",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:13:28Z",
+      "side": 1,
+      "message": "return nil, errors.New(\"context not a DirTestContext\")\n\ndo not panic in libraries unless the program can no longer function",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_4f5625d8",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-16T23:13:28Z",
+      "side": 1,
+      "message": "return nil, err",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
