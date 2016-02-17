@@ -61,7 +61,7 @@ func (s *Service) ServerUserName() string {
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
-func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testuser: unrecognized transport")
 	}

@@ -54,16 +54,11 @@ type dummyStore struct {
 type dummyDirectory struct {
 	endpoint upspin.Endpoint
 }
-type dummyContext int
-
-func (d *dummyContext) Name() string {
-	return "george"
-}
 
 func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, error) {
 	return nil, errors.New("dummyUser.Lookup not implemented")
 }
-func (d *dummyUser) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyUser) Dial(cc *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	user := &dummyUser{endpoint: e}
 	return user, nil
 }
@@ -77,7 +72,7 @@ func (d *dummyStore) Get(key string) ([]byte, []upspin.Location, error) {
 func (d *dummyStore) Put(data []byte) (string, error) {
 	return "", errors.New("dummyStore.Put not implemented")
 }
-func (d *dummyStore) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyStore) Dial(cc *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	store := &dummyStore{endpoint: e}
 	return store, nil
 }
@@ -103,7 +98,7 @@ func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location
 func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.GLob not implemented")
 }
-func (d *dummyDirectory) Dial(cc upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyDirectory) Dial(cc *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }

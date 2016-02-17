@@ -59,7 +59,7 @@ func (s *Service) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("teststore: unrecognized transport")
 	}

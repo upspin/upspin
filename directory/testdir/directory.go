@@ -24,18 +24,6 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
-// TODO: This should be in a testcontext somewhere.
-type DirTestContext struct {
-	StoreContext  upspin.ClientContext
-	StoreEndpoint upspin.Endpoint
-}
-
-func (c DirTestContext) Name() string {
-	return "DirTestContext"
-}
-
-var _ upspin.ClientContext = (*DirTestContext)(nil)
-
 var (
 	r0   upspin.Reference
 	loc0 upspin.Location
@@ -549,22 +537,13 @@ func (s *Service) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testdir: unrecognized transport")
 	}
 
-	// Dial the right Store.
-	dirContext, ok := context.(DirTestContext)
-	if !ok {
-		return nil, errors.New("Not a DirTestContext")
-	}
-	store, err := access.BindStore(dirContext.StoreContext, dirContext.StoreEndpoint)
-	if err != nil {
-		return nil, fmt.Errorf("testdir: cannot access store service: %v", err.Error())
-	}
-	s.Store = store
-	s.StoreEndpoint = dirContext.StoreEndpoint
+	s.Store = context.Store
+	s.StoreEndpoint = context.Store.Endpoint()
 	s.endpoint = e
 	return s, nil
 }
