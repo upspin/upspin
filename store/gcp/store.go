@@ -24,45 +24,33 @@ const (
 
 // Store is an implementation of upspin.Store that uses GCP to manage its storage.
 type Store struct {
-	serverURL string
-	client    netutil.HTTPClientInterface
+	serverURL  string
+	httpClient netutil.HTTPClientInterface
 }
 
 // Guarantee we implement the interface
 var _ upspin.Store = (*Store)(nil)
 
-// Context implements upspin.ClientContext for use in dialing a specific Store server.
-type Context struct {
-	Client netutil.HTTPClientInterface
-}
-
-// Guarantee we implement the ClientContext interface
-var _ upspin.ClientContext = (*Context)(nil)
-
-func (c Context) Name() string {
-	return "GCP Store ClientContext"
-}
-
-// new returns a concrete implementation of Store, pointing to a
+// New returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
-// Put requests on blocks of data.
-func new(serverURL string, client netutil.HTTPClientInterface) *Store {
+// Put requests on blocks of data. Use this only for testing.
+func New(serverURL string, httpClient netutil.HTTPClientInterface) *Store {
 	return &Store{
-		serverURL: serverURL,
-		client:    client,
+		serverURL:  serverURL,
+		httpClient: httpClient,
 	}
 }
 
-func (s *Store) Dial(context upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
-	cc, ok := context.(Context)
-	if !ok {
-		return nil, NewStoreError("required ClientContext of type GCP Store ClientContext", "")
+func (s *Store) Dial(context *upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
+	if context == nil {
+		return nil, NewStoreError("nil context", "")
 	}
 	serverURL, err := url.Parse(string(endpoint.NetAddr))
 	if err != nil {
-		return nil, NewStoreError(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err), "")
+		return nil, NewStoreError(fmt.Sprintf("invalid HTTP address for endpoint: %v", err), "")
 	}
-	return new(serverURL.String(), cc.Client), nil
+	s.serverURL = serverURL.String()
+	return s, nil
 }
 
 func (s *Store) ServerUserName() string {
@@ -83,7 +71,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	resp, err := s.client.Do(httpReq)
+	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
 		return nil, nil, NewStoreError(fmt.Sprintf(serverError, "Get", err), key)
 	}
@@ -185,7 +173,7 @@ func (s *Store) Delete(key string) error {
 // the reply, using op and key to build an error if one is
 // encountered along the way.
 func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Request) ([]byte, error) {
-	resp, err := s.client.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, NewStoreError(fmt.Sprintf("%v: %v", op, err), key)
 	}
@@ -234,5 +222,6 @@ func NewStoreError(error string, key string) *StoreError {
 }
 
 func init() {
-	access.RegisterStore(upspin.GCP, &Store{})
+	// By default, set up only the HTTP client. The server URL gets bound at Dial time.
+	access.RegisterStore(upspin.GCP, New("", &http.Client{}))
 }
