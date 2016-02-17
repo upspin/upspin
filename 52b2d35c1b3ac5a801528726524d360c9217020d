@@ -2,6 +2,69 @@
   "comments": [
     {
       "key": {
+        "uuid": "3d775410_6f55a198",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-17T05:29:45Z",
+      "side": 1,
+      "message": "this is fine but structs are more often seen unfolded onto multiple lines",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_8f69fd68",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-17T05:29:45Z",
+      "side": 1,
+      "message": "the name eV seems contradictory to its purpose",
+      "range": {
+        "startLine": 51,
+        "startChar": 1,
+        "endLine": 51,
+        "endChar": 3
+      },
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d775410_0ffd0dd1",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-17T05:29:45Z",
+      "side": 1,
+      "message": "Define two types.\n\ntype eep256 struct{}\ntype eep521 struct{}\n\nthen the obvious Packing method for each, plus registration.\n\nthe methods can be simple wrappers:\n\nfunc (e *eep256) Pack(...) { return pack(256, ...) }  // Or maybe a boolean.",
+      "range": {
+        "startLine": 56,
+        "startChar": 23,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_cfa0551a",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
