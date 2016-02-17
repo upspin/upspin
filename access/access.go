@@ -53,7 +53,7 @@ func RegisterStore(transport upspin.Transport, store upspin.Store) error {
 }
 
 // BindUser returns a User interface bound to the endpoint.
-func BindUser(cc upspin.ClientContext, e upspin.Endpoint) (upspin.User, error) {
+func BindUser(cc *upspin.ClientContext, e upspin.Endpoint) (upspin.User, error) {
 	mu.Lock()
 	u, ok := userMap[e.Transport]
 	mu.Unlock()
@@ -68,7 +68,7 @@ func BindUser(cc upspin.ClientContext, e upspin.Endpoint) (upspin.User, error) {
 }
 
 // BindStore returns a Store interface bound to the endpoint.
-func BindStore(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error) {
+func BindStore(cc *upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error) {
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
 	mu.Unlock()
@@ -83,7 +83,7 @@ func BindStore(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Store, error)
 }
 
 // BindDirectory returns a Directory interface bound to the endpoint.
-func BindDirectory(cc upspin.ClientContext, e upspin.Endpoint) (upspin.Directory, error) {
+func BindDirectory(cc *upspin.ClientContext, e upspin.Endpoint) (upspin.Directory, error) {
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
 	mu.Unlock()
