@@ -109,6 +109,7 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
 	} else {
 		log.Printf("Objects.Insert failed: %v", err)
+		return "", err
 	}
 	return res.MediaLink, err
 }
