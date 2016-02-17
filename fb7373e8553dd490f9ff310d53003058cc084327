@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_fa1e75a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:08:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_ef2fd166",
+      "range": {
+        "startLine": 7,
+        "startChar": 8,
+        "endLine": 7,
+        "endChar": 9
+      },
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_8f4f3d37",
         "filename": "directory/testdir/all_test.go",
         "patchSetId": 3
@@ -36,6 +60,24 @@
       "writtenOn": "2016-02-16T23:13:28Z",
       "side": 1,
       "message": "this won\u0027t work, or will work by accident at best. don\u0027t call flag.Parse in tests because the test main will already have called it.",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_5a00e94d",
+        "filename": "directory/testdir/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:08:53Z",
+      "side": 1,
+      "message": "Without it, it doesn\u0027t work. I think test main is calling it *after* this init().\n\nI\u0027ve moved the check to setup time so it works without flags.Parse() and is actually a little simpler.\n\nDone.",
+      "parentUuid": "3d775410_8f4f3d37",
       "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_7a2b65c7",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:08:53Z",
+      "side": 1,
+      "message": "Yeah, agreed. We talked offline about this.",
+      "parentUuid": "3d775410_6f5be1fe",
+      "range": {
+        "startLine": 558,
+        "startChar": 1,
+        "endLine": 558,
+        "endChar": 11
+      },
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_2f61e9b0",
         "filename": "directory/testdir/directory.go",
         "patchSetId": 3
@@ -82,6 +148,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_fa6c350b",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:08:53Z",
+      "side": 1,
+      "message": "I was just following what was there before. I assumed it was okay because of the testing nature. But yeah, better this way. Fixed.",
+      "parentUuid": "3d775410_2f61e9b0",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_4f5625d8",
         "filename": "directory/testdir/directory.go",
         "patchSetId": 3
@@ -93,6 +177,24 @@
       "writtenOn": "2016-02-16T23:13:28Z",
       "side": 1,
       "message": "return nil, err",
+      "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_9a617112",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:08:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_4f5625d8",
       "revId": "fb7373e8553dd490f9ff310d53003058cc084327",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
