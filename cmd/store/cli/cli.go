@@ -10,17 +10,16 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 var (
-	Store upspin.Store = newStore()
+	store upspin.Store = newStore()
 
 	inFile  = flag.String("in", "", "input file")
 	outFile = flag.String("out", "", "output file")
@@ -65,9 +64,7 @@ func Usage() {
 }
 
 func newStore() upspin.Store {
-	context := store.Context{
-		Client: &http.Client{},
-	}
+	context := &upspin.ClientContext{}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr("http://localhost:8080"),
@@ -106,7 +103,7 @@ func innerGet(key string, count int) ([]byte, []upspin.Location, error) {
 	if count > 3 {
 		return nil, nil, errors.New("Too many redirections")
 	}
-	buf, locs, err := Store.Get(key)
+	buf, locs, err := store.Get(key)
 	if err != nil {
 		log.Fatalf("Error getting from server: %v", err)
 	}
@@ -135,7 +132,7 @@ func put() {
 		log.Fatal(err)
 	}
 
-	key, err := Store.Put(data)
+	key, err := store.Put(data)
 	if err != nil {
 		log.Fatalf("Error putting to server: %v", err)
 	}
@@ -143,7 +140,7 @@ func put() {
 }
 
 func delete(key string) {
-	err := Store.Delete(key)
+	err := store.Delete(key)
 	if err != nil {
 		log.Fatalf("Error deleting %v: %v", key, err)
 	}

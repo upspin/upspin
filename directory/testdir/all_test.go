@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	_ "upspin.googlesource.com/upspin.git/store/gcp"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 
 	"upspin.googlesource.com/upspin.git/access"
@@ -31,20 +32,14 @@ func setupContext() {
 		return
 	}
 
+	storeEndpoint := upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // ignored
+	}
+
 	if strings.HasPrefix(useGCPStore, "http") {
-		panic("TODO: GCP unimplemented in test")
-		/*
-			gcpStoreContext := DirTestContext{
-				StoreContext: gcpStore.Context{
-					Client: &http.Client{},
-				},
-				StoreEndpoint: upspin.Endpoint{
-					Transport: upspin.GCP,
-					NetAddr:   upspin.NetAddr(useGCPStore),
-				},
-			}
-			context = gcpStoreContext
-		*/
+		storeEndpoint.Transport = upspin.GCP
+		storeEndpoint.NetAddr = upspin.NetAddr(useGCPStore)
 	}
 
 	endpoint := upspin.Endpoint{
@@ -60,7 +55,7 @@ func setupContext() {
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = access.BindStore(context, endpoint)
+	context.Store, err = access.BindStore(context, storeEndpoint)
 	if err != nil {
 		panic(err)
 	}
