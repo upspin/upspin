@@ -7,68 +7,67 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
+
+	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
 
-type Setup struct {
-	upspin.User
-	upspin.Directory
-}
+var context *upspin.ClientContext
 
-func setup() (*Setup, error) {
-	e := upspin.Endpoint{
+func setupContext() {
+	if context != nil {
+		return
+	}
+
+	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
-		NetAddr:   "",
+		NetAddr:   "", // ignored
 	}
-	us, err := access.BindUser(testContext, e)
-	if err != nil {
-		return nil, err
-	}
-	dirContext := testdir.DirTestContext{
-		StoreContext:  nil, // ignored for in-process testing
-		StoreEndpoint: e,
-	}
-	ds, err := access.BindDirectory(dirContext, e)
-	if err != nil {
-		return nil, err
-	}
-	return &Setup{
-		User:      us,
-		Directory: ds,
-	}, nil
-}
 
-// TODO: End of copied code.
-
-// installUser installs the named user into the User service with root directory in
-// the Directory service. TODO: A bit of a hack.
-func installUser(user upspin.User, dir upspin.Directory, userName upspin.UserName) {
-	err := user.(*testuser.Service).Install(userName, dir)
+	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
+	context = new(upspin.ClientContext)
+	context.Packing = upspin.PlainPack // TODO.
+	var err error
+	context.User, err = access.BindUser(context, endpoint)
+	if err != nil {
+		panic(err)
+	}
+	context.Store, err = access.BindStore(context, endpoint)
+	if err != nil {
+		panic(err)
+	}
+	context.Directory, err = access.BindDirectory(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
 }
+
+func setup(userName upspin.UserName) {
+	setupContext()
+	context.UserName = userName
+	err := context.User.(*testuser.Service).Install(userName, context.Directory)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// TODO: End of copied code.
 
 func TestPutGetTopLevelFile(t *testing.T) {
 	const (
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	s, err := setup()
-	if err != nil {
-		t.Fatal(err)
-	}
-	installUser(s.User, s.Directory, user)
-	client := New(s.User)
+	setup(user)
+	client := New(context)
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	_, err = client.Put(fileName, []byte(text)) // TODO: Packing?
+	_, err := client.Put(fileName, []byte(text)) // TODO: Packing?
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -86,12 +85,8 @@ const (
 )
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (*Client, upspin.File, []byte) {
-	s, err := setup()
-	if err != nil {
-		t.Fatal(err)
-	}
-	installUser(s.User, s.Directory, user)
-	client := New(s.User)
+	setup(user)
+	client := New(context)
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)

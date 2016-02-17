@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -13,6 +12,7 @@ import (
 
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
+	ctxt *upspin.ClientContext
 	user upspin.User
 }
 
@@ -20,22 +20,12 @@ var _ upspin.Client = (*Client)(nil)
 
 var loc0 = upspin.Location{}
 
-// TODO: Where does the client get the context?
-type Context string
-
-func (c Context) Name() string {
-	return string(c)
-}
-
-var testContext = Context("testcontext")
-
-var _ upspin.ClientContext = (*Context)(nil)
-
 // New returns a new Client. The argument is the user service to use to look up root
 // directories for users.
-func New(user upspin.User) *Client {
+func New(ctxt *upspin.ClientContext) *Client {
 	return &Client{
-		user: user,
+		ctxt: ctxt,
+		user: ctxt.User,
 	}
 }
 
@@ -51,11 +41,7 @@ func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var dir upspin.Directory
 	for _, e := range endpoints {
-		dirContext := testdir.DirTestContext{
-			StoreContext:  nil, // ignored for testing
-			StoreEndpoint: e,
-		}
-		dir, err = access.BindDirectory(dirContext, e)
+		dir, err = access.BindDirectory(c.ctxt, e)
 		if dir != nil {
 			return dir, nil
 		}
@@ -93,7 +79,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	where := []upspin.Location{entry.Location}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
-		store, err := access.BindStore(testContext, loc.Endpoint) // TODO: do context right.
+		store, err := access.BindStore(c.ctxt, loc.Endpoint)
 		if isError(err) {
 			continue
 		}

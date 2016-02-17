@@ -263,11 +263,30 @@ type File interface {
 	Seek(offset int64, whence int) (ret int64, err error)
 }
 
-// ClientContext contains information about the client such as its name and how to
-// access private keys.
-// TODO(p): fill in as we decide more about security/encryption.
-type ClientContext interface {
-	Name() string
+// ClientContext contains information such as the user's keys and
+// preferred User, Directory, and Store servers.
+type ClientContext struct {
+	// The name of the user requesting access.
+	UserName UserName
+
+	// PrivateKey holds the user's private cryptographic keys.
+	// The public key is accessible through the data held here.
+	PrivateKey interface{}
+
+	// Packing is the default Packing to use when creating new data items.
+	// It may be overridden by circumstances such as preferences related
+	// to the directory.
+	Packing Packing
+
+	// User is the User service to contact when evaluating names.
+	User User
+
+	// Directory is the Directory in which to place new data items,
+	// usually the location of the user's root.
+	Directory Directory
+
+	// Store is the Store in which to place new data items.
+	Store Store
 }
 
 // Access defines how to connect and authenticate to a server. Each
@@ -277,7 +296,7 @@ type ClientContext interface {
 // the Upspin "access" package to connect to services.
 type Access interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(ClientContext, Endpoint) (interface{}, error)
+	Dial(*ClientContext, Endpoint) (interface{}, error)
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.
