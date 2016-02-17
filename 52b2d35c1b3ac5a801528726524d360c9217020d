@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_94262594",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_6f55a198",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_8f69fd68",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
@@ -30,6 +48,30 @@
       "writtenOn": "2016-02-17T05:29:45Z",
       "side": 1,
       "message": "the name eV seems contradictory to its purpose",
+      "range": {
+        "startLine": 51,
+        "startChar": 1,
+        "endLine": 51,
+        "endChar": 3
+      },
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_5430bdc8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "I haven\u0027t made up my mind yet on names in code and in the mathematical English doc, but have left myself a TODO to revisit.",
+      "parentUuid": "3d775410_8f69fd68",
       "range": {
         "startLine": 51,
         "startChar": 1,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_1711d7a6",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_0ffd0dd1",
+      "range": {
+        "startLine": 56,
+        "startChar": 23,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_cfa0551a",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
@@ -76,6 +142,24 @@
       "writtenOn": "2016-02-16T23:49:04Z",
       "side": 1,
       "message": "Diffie-Hellman, no?\n\nAlso might as well make these sentences.\n\nStep 1. Create ... secret.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_f45be9ff",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_cfa0551a",
       "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -99,6 +183,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_f780cbeb",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_6f692187",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_0f6a6d7f",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
@@ -110,6 +212,24 @@
       "writtenOn": "2016-02-16T23:49:04Z",
       "side": 1,
       "message": "s/n/0/ the variable adds nothing.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_b78a4308",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Fixed;  I meant \u0026n so I can learn the number of wrapped keys to read next.",
+      "parentUuid": "3d775410_0f6a6d7f",
       "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -133,6 +253,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_577c3fbd",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_4f6465b0",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_2f6f2990",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
@@ -150,6 +288,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_f7676b24",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_2f6f2990",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_ef9d11df",
         "filename": "pack/ee/ee.go",
         "patchSetId": 8
@@ -161,6 +317,24 @@
       "writtenOn": "2016-02-16T23:49:04Z",
       "side": 1,
       "message": "This is a hack anyway. I\u0027d just put the strings in the code.",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_f7052b32",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Agreed, it\u0027s a hacky temporary solution to keep me from stalling on the ssh-agent issue.   But putting a key in code, even intending to change it later, has led to a lot of problems in the past at Google.\n\nStoring the private key in local storage chmod 0400 is tolerable to me for now.\n\nI\u0027ve fixed the filename characters.",
+      "parentUuid": "3d775410_ef9d11df",
       "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -201,6 +375,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_b45561cb",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_4f8d45b0",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_6f9201d3",
         "filename": "pack/keygen/keygen.go",
         "patchSetId": 8
@@ -212,6 +404,24 @@
       "writtenOn": "2016-02-16T23:49:04Z",
       "side": 1,
       "message": "shouldn\u0027t this be fatal?",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_d45a6dfa",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_6f9201d3",
       "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -235,6 +445,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_745059d8",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d775410_8f965dc3",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_af9319d2",
         "filename": "upspin/upspin.go",
         "patchSetId": 8
@@ -246,6 +474,24 @@
       "writtenOn": "2016-02-16T23:49:04Z",
       "side": 1,
       "message": "s/The following/EEp256Pack and EEp521Pack/\n\ns/store/stores/",
+      "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_d72eef87",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:11:40Z",
+      "side": 1,
+      "message": "Done.\n\n(Sorry, missed this in the CL I just sent, but it will get picked up at next change.",
+      "parentUuid": "3d775410_af9319d2",
       "revId": "52b2d35c1b3ac5a801528726524d360c9217020d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
