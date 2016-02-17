@@ -31,38 +31,26 @@ type Store struct {
 // Guarantee we implement the interface
 var _ upspin.Store = (*Store)(nil)
 
-// Context implements upspin.ClientContext for use in dialing a specific Store server.
-type Context struct {
-	Client netutil.HTTPClientInterface
-}
-
-// Guarantee we implement the ClientContext interface
-var _ upspin.ClientContext = (*Context)(nil)
-
-func (c Context) Name() string {
-	return "GCP Store ClientContext"
-}
-
-// new returns a concrete implementation of Store, pointing to a
+// New returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
-// Put requests on blocks of data.
-func new(serverURL string, client netutil.HTTPClientInterface) *Store {
+// Put requests on blocks of data. Use this only for testing.
+func New(serverURL string, client netutil.HTTPClientInterface) *Store {
 	return &Store{
 		serverURL: serverURL,
 		client:    client,
 	}
 }
 
-func (s *Store) Dial(context upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
-	cc, ok := context.(Context)
-	if !ok {
-		return nil, NewStoreError("required ClientContext of type GCP Store ClientContext", "")
+func (s *Store) Dial(context *upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
+	if context == nil {
+		return nil, NewStoreError("nil context", "")
 	}
 	serverURL, err := url.Parse(string(endpoint.NetAddr))
 	if err != nil {
 		return nil, NewStoreError(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err), "")
 	}
-	return new(serverURL.String(), cc.Client), nil
+	s.serverURL = serverURL.String()
+	return s, nil
 }
 
 func (s *Store) ServerUserName() string {
@@ -234,5 +222,6 @@ func NewStoreError(error string, key string) *StoreError {
 }
 
 func init() {
-	access.RegisterStore(upspin.GCP, &Store{})
+	// By default, set up only the http client. The server URL gets bound at Dial time.
+	access.RegisterStore(upspin.GCP, New("", &http.Client{}))
 }

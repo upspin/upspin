@@ -5,20 +5,19 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"strings"
 
 	"log"
 
 	"upspin.googlesource.com/upspin.git/access"
-	dir "upspin.googlesource.com/upspin.git/directory/gcp"
-	store "upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/directory/gcp"
+	_ "upspin.googlesource.com/upspin.git/store/gcp"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 var (
-	d upspin.Directory = newDirectory(&http.Client{})
+	d upspin.Directory = newDirectory()
 
 	dirLocation   = flag.String("directory", "http://localhost:8081", "URL of the directory service location")
 	storeLocation = flag.String("store", "http://localhost:8080", "URL of the store service location")
@@ -111,10 +110,7 @@ func lookup(pathName upspin.PathName) {
 
 // newStore creates a new upspin.Store client for talking to a GCP
 // server, using an http.Client as transport.
-func newStore(client *http.Client) upspin.Store {
-	context := store.Context{
-		Client: client,
-	}
+func newStore(context *upspin.ClientContext) upspin.Store {
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*storeLocation),
@@ -128,11 +124,9 @@ func newStore(client *http.Client) upspin.Store {
 
 // newDirectory creates a new upspin.Directory client for talking to a GCP
 // server, using an http.Client as transport.
-func newDirectory(client *http.Client) upspin.Directory {
-	context := dir.Context{
-		StoreService: newStore(client),
-		Client:       client,
-	}
+func newDirectory() upspin.Directory {
+	context := &upspin.ClientContext{}
+	context.Store = newStore(context)
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*dirLocation),
