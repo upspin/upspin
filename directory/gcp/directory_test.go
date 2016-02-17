@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	store "upspin.googlesource.com/upspin.git/store/gcp"
@@ -70,7 +69,7 @@ func TestMkdir(t *testing.T) {
 	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
 	mock := nettest.NewMockHTTPClient(newMockMkdirResponse(t), []*http.Request{request})
 
-	d := newDirectory("http://localhost:8080", nil, mock)
+	d := new("http://localhost:8080", nil, mock)
 
 	loc, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err != nil {
@@ -127,7 +126,7 @@ func TestLookupError(t *testing.T) {
 func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t), []*http.Request{nettest.AnyRequest})
 
-	d := newDirectory("http://localhost:8080", nil, mock)
+	d := new("http://localhost:8080", nil, mock)
 
 	dir, err := d.Lookup(pathName)
 	if err != nil {
@@ -171,22 +170,11 @@ func newErroringDirectoryClient() upspin.Directory {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 
-	return newDirectory("http://localhost:8080", nil, mock)
+	return new("http://localhost:8080", nil, mock)
 }
 
 func newStore(client netutil.HTTPClientInterface) upspin.Store {
-	context := store.Context{
-		Client: client,
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr("http://localhost:8080"),
-	}
-	s, err := access.BindStore(context, e)
-	if err != nil {
-		log.Fatalf("Can't bind: %v", err)
-	}
-	return s
+	return store.New("http://localhost:8080", client)
 }
 
 // newDirectoryClientWithStoreClient creates an upspin.Directory that
@@ -210,7 +198,7 @@ func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.M
 	s := newStore(mock)
 
 	// Get a Directory client
-	return newDirectory("http://localhost:9090", s, mock), mock
+	return new("http://localhost:9090", s, mock), mock
 }
 
 func TestPutError(t *testing.T) {
@@ -253,7 +241,7 @@ func TestGlobBadPattern(t *testing.T) {
 	// No requests are issued
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 
-	d := newDirectory("http://localhost:8080", nil, mock)
+	d := new("http://localhost:8080", nil, mock)
 
 	_, err := d.Glob(badPathName)
 	if err == nil {
@@ -287,7 +275,7 @@ func TestGlob(t *testing.T) {
 	}
 
 	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
-	d := newDirectory("http://localhost:9090", nil, mock)
+	d := new("http://localhost:9090", nil, mock)
 
 	dirEntries, err := d.Glob("a@b.co/dir1/*.txt")
 	if err != nil {
@@ -324,20 +312,4 @@ func toJSON(t *testing.T, data interface{}) []byte {
 // newResp is a convenience function that creates a successful MockHTTPResponse with JSON data.
 func newResp(data []byte) nettest.MockHTTPResponse {
 	return nettest.NewMockHTTPResponse(200, "application/json", data)
-}
-
-func newDirectory(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) upspin.Directory {
-	context := Context{
-		StoreService: storeService,
-		Client:       client,
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr(serverURL),
-	}
-	dir, err := access.BindDirectory(context, e)
-	if err != nil {
-		log.Fatalf("Can't BindDirectory: %v", err)
-	}
-	return dir
 }
