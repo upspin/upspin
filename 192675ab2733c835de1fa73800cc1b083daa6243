@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_77acdbfe",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:34:25Z",
+      "side": 1,
+      "message": "[]byte is fine.  For now, I\u0027m assuming the Packing field below can be relied on and I\u0027m doing a very simple marshaling of the bigInts into the byte array.\n\nIt is also ok with me to assume that PrivateKey includes PublicKey, as the Go crypto package has done.",
+      "parentUuid": "dd7ab832_40bd5cf8",
+      "revId": "192675ab2733c835de1fa73800cc1b083daa6243",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd7ab832_a079a00c",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -47,6 +65,23 @@
       "writtenOn": "2016-02-17T07:29:12Z",
       "side": 1,
       "message": "Maybe add to the comment that this is the default packing if there\u0027s no overriding packing depending on the situation. For example, if the user is creating a file in a \"public\" directory that requires plain packing, the \"inherited\" packing via the directory structure will override this. Is that your expectation too?\n\nSuggested edit: \n\n// Packing is the Packing to use when creating new data items when no overriding packing is present via the directory structure [or ACLs?]",
+      "revId": "192675ab2733c835de1fa73800cc1b083daa6243",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd7ab832_d754af9e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-17T19:34:25Z",
+      "side": 1,
+      "message": "add   UserName UserName",
       "revId": "192675ab2733c835de1fa73800cc1b083daa6243",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
