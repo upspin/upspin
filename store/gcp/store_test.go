@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -39,7 +37,7 @@ func TestStorePutError(t *testing.T) {
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 
 	_, err := s.Put([]byte("contents"))
 
@@ -55,7 +53,7 @@ func TestStorePut(t *testing.T) {
 	// The server will respond with a location for the object.
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
 	mock := nettest.NewMockHTTPClient(createMockPutResponse(t), []*http.Request{req})
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 
 	contents := []byte("contents")
 	key, err := s.Put(contents)
@@ -82,7 +80,7 @@ func TestStoreGetError(t *testing.T) {
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 
 	_, _, err := s.Get("1234")
 
@@ -99,7 +97,7 @@ func TestStoreGetError(t *testing.T) {
 func TestStoreGetErrorEmptyKey(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 
 	_, _, err := s.Get("")
 
@@ -119,7 +117,7 @@ func TestStoreGetRedirect(t *testing.T) {
 		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%s", LookupKey), nil),
 	})
 
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 
 	data, locs, err := s.Get(LookupKey)
 
@@ -145,7 +143,7 @@ func TestStoreDeleteInvalidKey(t *testing.T) {
 		[]nettest.MockHTTPResponse{},
 		[]*http.Request{})
 
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 	err := s.Delete("")
 	if err == nil {
 		t.Fatal("Expected error, got none")
@@ -162,7 +160,7 @@ func TestStoreDelete(t *testing.T) {
 		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))},
 		[]*http.Request{nettest.NewRequest(t, netutil.Post, fmt.Sprintf("http://localhost:8080/delete?ref=%s", Key), nil)})
 
-	s := newStore("http://localhost:8080", mock)
+	s := New("http://localhost:8080", mock)
 	err := s.Delete(Key)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
@@ -186,19 +184,4 @@ func createMockPutResponse(t *testing.T) []nettest.MockHTTPResponse {
 	}
 	resp := nettest.NewMockHTTPResponse(200, "application/json", keyStructJSON)
 	return []nettest.MockHTTPResponse{resp}
-}
-
-func newStore(serverURL string, client netutil.HTTPClientInterface) upspin.Store {
-	context := Context{
-		Client: client,
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr(serverURL),
-	}
-	s, err := access.BindStore(context, e)
-	if err != nil {
-		log.Fatalf("Can't bind: %v", err)
-	}
-	return s
 }

@@ -35,19 +35,6 @@ type Directory struct {
 // Guarantee we implement the interface
 var _ upspin.Directory = (*Directory)(nil)
 
-// Context implements upspin.ClientContext for use in dialing a specific Directory server
-type Context struct {
-	Client       netutil.HTTPClientInterface
-	StoreService upspin.Store
-}
-
-// Guarantee we implement the ClientContext interface
-var _ upspin.ClientContext = (*Context)(nil)
-
-func (c Context) Name() string {
-	return "GCP Directory ClientContext"
-}
-
 // new returns a concrete implementation of Directory, pointing to a server at a given URL and port.
 func new(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) *Directory {
 	return &Directory{
@@ -269,17 +256,18 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 	return respBody, nil
 }
 
-func (d *Directory) Dial(context upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (d *Directory) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
 	const op = "Dial"
-	cc, ok := context.(Context)
-	if !ok {
-		return nil, newError(op, "", errors.New("required ClientContext of type GCP Directory Context"))
+	if context == nil {
+		return nil, newError(op, "", errors.New("nil ClientContext"))
 	}
 	serverURL, err := url.Parse(string(e.NetAddr))
 	if err != nil {
 		return nil, newError(op, "", errors.New(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err)))
 	}
-	return new(serverURL.String(), cc.StoreService, cc.Client), nil
+	d.serverURL = serverURL.String()
+	d.storeService = context.Store
+	return d, nil
 }
 
 func (d *Directory) ServerUserName() string {
@@ -295,5 +283,6 @@ func newError(op string, path upspin.PathName, err error) *os.PathError {
 }
 
 func init() {
-	access.RegisterDirectory(upspin.GCP, &Directory{})
+	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
+	access.RegisterDirectory(upspin.GCP, new("", nil, &http.Client{}))
 }
