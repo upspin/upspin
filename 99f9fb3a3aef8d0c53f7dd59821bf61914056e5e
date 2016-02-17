@@ -120,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "dd7ab832_a5e8d29d",
+        "filename": "cloud/netutil/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-17T01:16:12Z",
+      "side": 1,
+      "message": "A named type is not strictly necessary. I was using an anonymous type before. It\u0027s only a named type now because I\u0027m declaring two variables for the same type.\n\nBut I think what you\u0027re asking is whether any kind of type (anonymous or named) is necessary, right? \n\nA type is necessary in this context to validate the kind of message the server sent. I could make it a string in this case of error messages, but then it would be hard to differentiate a malformed message from a valid error message.",
+      "parentUuid": "3d775410_af7a394a",
+      "range": {
+        "startLine": 74,
+        "startChar": 16,
+        "endLine": 74,
+        "endChar": 23
+      },
+      "revId": "99f9fb3a3aef8d0c53f7dd59821bf61914056e5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d775410_8f281d64",
         "filename": "cloud/netutil/parser/parser.go",
         "patchSetId": 3
