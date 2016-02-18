@@ -138,10 +138,12 @@ type Directory interface {
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
 
-	// Put stores the data at the given name and associates packdata with it.
-	// If something is already stored with that name, the new data and
+	// Put stores the data at the given path and associates packdata with it.
+	// All but the last element of the path name must already exist and be
+	// directories. The final element, if it exists, must not be a directory.
+	// If something is already stored under the path, the new data and
 	// packdata replace the old.
-	Put(name PathName, data []byte, packdata []byte) (Location, error)
+	Put(path PathName, data []byte, packdata []byte) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
