@@ -109,6 +109,12 @@ const (
 	// It is never used in production.
 	DebugPack Packing = iota
 
+	// UnsafePack is an obfuscating packing that is
+	// cryptographically unsound. It is similar to DebugPack, but
+	// updates the metadata with wrapped keys and signs
+	// messages. It should never be used in production.
+	UnsafePack
+
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
 	PlainPack
 
