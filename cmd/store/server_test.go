@@ -123,7 +123,7 @@ func TestPut(t *testing.T) {
 		t.Fatal(err)
 	}
 	req.Header.Set(netutil.ContentType, w.FormDataContentType())
-	resp := nettest.NewExpectingResponseWriter(`{"Key":"978f93921702f861cf941aaace56b83ae17c8f6845fd674263fff374a2696a4f"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Key":"978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"}`)
 
 	ss := NewStoreServer()
 
