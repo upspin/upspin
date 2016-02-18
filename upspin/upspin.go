@@ -115,6 +115,11 @@ const (
 	// EEp256Pack packing stores AES-encrypted data.
 	// The associated metadata has an ECDSA signature and ECDH-wrapped keys.
 	EEp256Pack
+
+	// UnsafePack is an obfuscating packing that is
+	// cryptographically unsound. It should not be used in
+	// production.
+	UnsafePack
 )
 
 // User service.
