@@ -148,6 +148,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 		return zeroLoc, newError(op, dirName, err)
 	}
 	if loc == nil {
+		log.Printf("loc is nil, respBody: %s", respBody)
 		return zeroLoc, newError(op, dirName, errors.New(fmt.Sprintf(serverError, "null Location")))
 	}
 
