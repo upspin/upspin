@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d546ce4_90327447",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-18T05:13:31Z",
+      "side": 1,
+      "message": "maybe for another CL: there are so many \u0027clients\u0027 running around that this field always confuses me. maybe  it should be httpClient.",
+      "revId": "8a51ec7643d0e60e7a2a8509639bf82a08383671",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d546ce4_b0377836",
+        "filename": "store/gcp/store.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-18T05:13:31Z",
+      "side": 1,
+      "message": "it\u0027s an error, so it will be printed in a context that makes that clear. you can therefore simplify the phrasing:\n\n\"invalid HTTP address for endpoint: %v\"",
+      "revId": "8a51ec7643d0e60e7a2a8509639bf82a08383671",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
