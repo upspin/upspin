@@ -96,6 +96,57 @@
       "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "02a22d63_bcc96170",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-18T23:55:55Z",
+      "side": 1,
+      "message": "no need to slice here. Uint16 will only take two bytes",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "02a22d63_5ce4ddfa",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-18T23:55:55Z",
+      "side": 1,
+      "message": "you should throw a fit if the return value (number of bytes copied) isn\u0027t right. you\u0027re assuming too much is just working.",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "02a22d63_7ce999cf",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-18T23:55:55Z",
+      "side": 1,
+      "message": "here you check, which is good, but the panic isn\u0027t the best message and panicking isn\u0027t the right thing to do, either: it\u0027s just bad user data.",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
