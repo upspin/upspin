@@ -4,6 +4,7 @@ package testuser
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
@@ -13,7 +14,9 @@ import (
 // Service maps user names to potential machines holdining root of the user's tree.
 // It implements the upspin.User interface.
 type Service struct {
-	root map[upspin.UserName][]upspin.Endpoint
+	m        sync.Mutex // Protects both fields below.
+	root     map[upspin.UserName][]upspin.Endpoint
+	keystore map[upspin.UserName][]upspin.PublicKey
 }
 
 var _ upspin.User = (*Service)(nil)
@@ -22,11 +25,36 @@ var _ upspin.User = (*Service)(nil)
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	locs, ok := s.root[name]
-	if !ok {
-		return nil, nil, fmt.Errorf("testuser: no root for user %q", name)
+	s.m.Lock()
+	defer s.m.Unlock()
+	locs := s.root[name]
+	keys := s.keystore[name]
+	return locs, keys, nil
+}
+
+// SetPublicKeys sets a slice of public keys to the keystore for a
+// given user name. Previously-known keys for that user are
+// forgotten. To add keys to the existing set, Lookup and append to
+// the slice. If keys is nil, the user is forgotten.
+func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
+	s.m.Lock()
+	defer s.m.Unlock()
+	if keys == nil {
+		delete(s.keystore, name)
+	} else {
+		s.keystore[name] = keys
 	}
-	return locs, nil, nil
+}
+
+// ListUsers returns a slice of all known users with at least one public key.
+func (s *Service) ListUsers() []upspin.UserName {
+	s.m.Lock()
+	defer s.m.Unlock()
+	users := make([]upspin.UserName, 0, len(s.keystore))
+	for u := range s.keystore {
+		users = append(users, u)
+	}
+	return users
 }
 
 // Install installs a user and its root in the provided Directory
@@ -34,6 +62,8 @@ func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 // adminstrative procedure. For this test version, we just provide a
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
+	s.m.Lock()
+	defer s.m.Unlock()
 	// Verify that it is a valid name. First make it look like a directory by adding a slash.
 	parsed, err := path.Parse(upspin.PathName(name + "/"))
 	if err != nil {
@@ -71,7 +101,8 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{},
 
 func init() {
 	s := &Service{
-		root: make(map[upspin.UserName][]upspin.Endpoint),
+		root:     make(map[upspin.UserName][]upspin.Endpoint),
+		keystore: make(map[upspin.UserName][]upspin.PublicKey),
 	}
 	access.RegisterUser(upspin.InProcess, s)
 }
