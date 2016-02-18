@@ -13,7 +13,8 @@ import (
 // Service maps user names to potential machines holdining root of the user's tree.
 // It implements the upspin.User interface.
 type Service struct {
-	root map[upspin.UserName][]upspin.Endpoint
+	root     map[upspin.UserName][]upspin.Endpoint
+	keystore map[upspin.UserName][]upspin.PublicKey
 }
 
 var _ upspin.User = (*Service)(nil)
@@ -22,11 +23,25 @@ var _ upspin.User = (*Service)(nil)
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	locs, ok := s.root[name]
-	if !ok {
-		return nil, nil, fmt.Errorf("testuser: no root for user %q", name)
+	locs, _ := s.root[name]
+	keys, _ := s.keystore[name]
+	return locs, keys, nil
+}
+
+// SetPublicKeys sets a slice of public keys to the keystore for a
+// given user name. Previously-known keys are forgotten. To add keys
+// to the existing set, Lookup and append to the slice.
+func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
+	s.keystore[name] = keys
+}
+
+// ListUsers returns a slice of all known users with at least one public key at a given time.
+func (s *Service) ListUsers() []upspin.UserName {
+	users := make([]upspin.UserName, 0, len(s.keystore))
+	for u := range s.keystore {
+		users = append(users, u)
 	}
-	return locs, nil, nil
+	return users
 }
 
 // Install installs a user and its root in the provided Directory
@@ -71,7 +86,8 @@ func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interf
 
 func init() {
 	s := &Service{
-		root: make(map[upspin.UserName][]upspin.Endpoint),
+		root:     make(map[upspin.UserName][]upspin.Endpoint),
+		keystore: make(map[upspin.UserName][]upspin.PublicKey),
 	}
 	access.RegisterUser(upspin.InProcess, s)
 }
