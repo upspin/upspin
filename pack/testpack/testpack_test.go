@@ -22,6 +22,10 @@ const (
 	text                 = "this is some text"
 )
 
+var (
+	context = &upspin.ClientContext{}
+)
+
 // The values returned by PackLen and UnpackLen should be exact,
 // but that is not a requirement for the Packer interface in general.
 // We test the precision here though.
@@ -30,12 +34,12 @@ func TestPackLen(t *testing.T) {
 
 	// First pack.
 	data := []byte(text)
-	n := packer.PackLen(data, nil, name)
+	n := packer.PackLen(context, data, nil, name)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
 	cipher := make([]byte, n)
-	m, err := packer.Pack(cipher, data, nil, name)
+	m, err := packer.Pack(context, cipher, data, nil, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -45,12 +49,12 @@ func TestPackLen(t *testing.T) {
 	cipher = cipher[:m] // Already true, but be thorough.
 
 	// Now unpack.
-	n = packer.UnpackLen(cipher, nil)
+	n = packer.UnpackLen(context, cipher, nil)
 	if n < 0 {
 		t.Fatal("UnpackLen failed")
 	}
 	clear := make([]byte, n)
-	m, err = packer.Unpack(clear, cipher, nil, name)
+	m, err = packer.Unpack(context, clear, cipher, nil, name)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
@@ -72,7 +76,7 @@ func TestPack(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	cipher := make([]byte, 1024)
-	m, err := packer.Pack(cipher, data, nil, name)
+	m, err := packer.Pack(context, cipher, data, nil, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -80,7 +84,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	m, err = packer.Unpack(clear, cipher, nil, name)
+	m, err = packer.Unpack(context, clear, cipher, nil, name)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}

@@ -19,13 +19,14 @@ type Service struct {
 var _ upspin.User = (*Service)(nil)
 
 // Lookup reports the set of locations the user's directory might be,
-// with the earlier entries being the best choice; later entries are fallbacks.
-func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, error) {
+// with the earlier entries being the best choice; later entries are
+// fallbacks and the user's public keys, if known.
+func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	locs, ok := s.root[name]
 	if !ok {
-		return nil, fmt.Errorf("testuser: no root for user %q", name)
+		return nil, nil, fmt.Errorf("testuser: no root for user %q", name)
 	}
-	return locs, nil
+	return locs, nil, nil
 }
 
 // Install installs a user and its root in the provided Directory

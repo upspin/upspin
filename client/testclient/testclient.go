@@ -35,7 +35,7 @@ func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
 	if err != nil {
 		return nil, err
 	}
-	endpoints, err := c.user.Lookup(upspin.UserName(parsed.User))
+	endpoints, _, err := c.user.Lookup(upspin.UserName(parsed.User))
 	if err != nil {
 		return nil, err
 	}
@@ -93,14 +93,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			if packer == nil {
 				return nil, fmt.Errorf("testclient: unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
 			}
-			clearLen := packer.UnpackLen(cipher, nil)
+			clearLen := packer.UnpackLen(c.ctxt, cipher, nil)
 			if clearLen < 0 {
 				return nil, fmt.Errorf("testclient: UnpackLen failed for %q", name)
 			}
 			cleartext := make([]byte, clearLen)
 			// Must use a canonicalized name. TODO: Put this in package path?
 			parsed, _ := path.Parse(name) // Known to be error-free.
-			n, err := packer.Unpack(cleartext, cipher, nil, parsed.Path())
+			n, err := packer.Unpack(c.ctxt, cleartext, cipher, nil, parsed.Path())
 			if err != nil {
 				return nil, err // Showstopper.
 			}

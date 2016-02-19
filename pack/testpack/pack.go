@@ -48,7 +48,7 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
 
-func (testPack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (testPack) Pack(context *upspin.ClientContext, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if len(name) > 64*1024 {
 		return 0, errors.New("name too long")
 	}
@@ -76,7 +76,7 @@ func (testPack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, name u
 	return len(out), nil
 }
 
-func (testPack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (testPack) Unpack(context *upspin.ClientContext, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
 	}
@@ -122,13 +122,13 @@ func (testPack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata, name
 	return i, nil
 }
 
-func (testPack) PackLen(cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (testPack) PackLen(context *upspin.ClientContext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
 	var buf [16]byte
 	n := binary.PutUvarint(buf[:], uint64(len(name)))
 	return n + len(name) + len(cleartext)
 }
 
-func (testPack) UnpackLen(ciphertext []byte, meta *upspin.Metadata) int {
+func (testPack) UnpackLen(context *upspin.ClientContext, ciphertext []byte, meta *upspin.Metadata) int {
 	br := bytes.NewReader(ciphertext)
 	cr := cryptByteReader{br}
 	nameLen, err := binary.ReadUvarint(cr)
