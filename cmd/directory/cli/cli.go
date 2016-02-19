@@ -110,7 +110,7 @@ func lookup(pathName upspin.PathName) {
 
 // newStore creates a new upspin.Store client for talking to a GCP
 // server, using an http.Client as transport.
-func newStore(context *upspin.ClientContext) upspin.Store {
+func newStore(context *upspin.Context) upspin.Store {
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*storeLocation),
@@ -125,7 +125,7 @@ func newStore(context *upspin.ClientContext) upspin.Store {
 // newDirectory creates a new upspin.Directory client for talking to a GCP
 // server, using an http.Client as transport.
 func newDirectory() upspin.Directory {
-	context := &upspin.ClientContext{}
+	context := &upspin.Context{}
 	context.Store = newStore(context)
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,

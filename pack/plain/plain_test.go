@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	context = &upspin.ClientContext{}
+	context = &upspin.Context{}
 )
 
 func TestRegister(t *testing.T) {

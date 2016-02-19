@@ -83,7 +83,7 @@ type Packer interface {
 	// The slice must be large enough; the PackLen method may be used to
 	// find a suitable allocation size.
 	// The returned count is the length of the ciphertext.
-	Pack(context *ClientContext, ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
+	Pack(context *Context, ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
 
 	// Unpack takes ciphertext data and packing metadata and stores the
 	// cleartext version in the supplied slice, which must be large enough.
@@ -91,17 +91,17 @@ type Packer interface {
 	// Unpack might update the metadata.
 	// It returns the path name and the number of bytes written to the slice.
 	// The returned name will be empty if the ciphertext does not contain one.
-	Unpack(context *ClientContext, cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
+	Unpack(context *Context, cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing. It might update the metadata.
 	// Returns -1 if there is an error.
-	PackLen(context *ClientContext, cleartext []byte, meta *Metadata, name PathName) int
+	PackLen(context *Context, cleartext []byte, meta *Metadata, name PathName) int
 
 	// UnpackLen returns an upper bound on the number of bytes required
 	// to store the unpacked cleartext. It might update the metadata.
 	// Returns -1 if there is an error.
-	UnpackLen(context *ClientContext, ciphertext []byte, meta *Metadata) int
+	UnpackLen(context *Context, ciphertext []byte, meta *Metadata) int
 }
 
 const (
@@ -272,9 +272,9 @@ type File interface {
 	Seek(offset int64, whence int) (ret int64, err error)
 }
 
-// ClientContext contains information such as the user's keys and
+// Context contains client information such as the user's keys and
 // preferred User, Directory, and Store servers.
-type ClientContext struct {
+type Context struct {
 	// The name of the user requesting access.
 	UserName UserName
 
@@ -305,7 +305,7 @@ type ClientContext struct {
 // the Upspin "access" package to connect to services.
 type Access interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(*ClientContext, Endpoint) (interface{}, error)
+	Dial(*Context, Endpoint) (interface{}, error)
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.

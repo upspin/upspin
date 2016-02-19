@@ -12,7 +12,7 @@ import (
 
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
-	ctxt *upspin.ClientContext
+	ctxt *upspin.Context
 	user upspin.User
 }
 
@@ -22,7 +22,7 @@ var loc0 = upspin.Location{}
 
 // New returns a new Client. The argument is the user service to use to look up root
 // directories for users.
-func New(ctxt *upspin.ClientContext) *Client {
+func New(ctxt *upspin.Context) *Client {
 	return &Client{
 		ctxt: ctxt,
 		user: ctxt.User,

@@ -64,7 +64,7 @@ func Usage() {
 }
 
 func newStore() upspin.Store {
-	context := &upspin.ClientContext{}
+	context := &upspin.Context{}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr("http://localhost:8080"),

@@ -256,10 +256,10 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 	return respBody, nil
 }
 
-func (d *Directory) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	const op = "Dial"
 	if context == nil {
-		return nil, newError(op, "", errors.New("nil ClientContext"))
+		return nil, newError(op, "", errors.New("nil Context"))
 	}
 	serverURL, err := url.Parse(string(e.NetAddr))
 	if err != nil {
