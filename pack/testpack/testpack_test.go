@@ -23,7 +23,7 @@ const (
 )
 
 var (
-	context = &upspin.ClientContext{}
+	context = &upspin.Context{}
 )
 
 // The values returned by PackLen and UnpackLen should be exact,

@@ -41,7 +41,7 @@ func New(serverURL string, httpClient netutil.HTTPClientInterface) *Store {
 	}
 }
 
-func (s *Store) Dial(context *upspin.ClientContext, endpoint upspin.Endpoint) (interface{}, error) {
+func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
 	if context == nil {
 		return nil, NewStoreError("nil context", "")
 	}

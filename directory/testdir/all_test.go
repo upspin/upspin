@@ -25,7 +25,7 @@ var (
 	useGCPStore = "" // leave empty for in-process. see init below
 )
 
-var context *upspin.ClientContext
+var context *upspin.Context
 
 func setupContext() {
 	if context != nil {
@@ -48,7 +48,7 @@ func setupContext() {
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	context = new(upspin.ClientContext)
+	context = new(upspin.Context)
 	context.Packing = upspin.PlainPack // TODO.
 	var err error
 	context.User, err = access.BindUser(context, endpoint)

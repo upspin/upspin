@@ -23,25 +23,25 @@ func (plainPack) Packing() upspin.Packing {
 	return upspin.PlainPack
 }
 
-func (plainPack) Pack(context *upspin.ClientContext, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
 	return copy(ciphertext, cleartext), nil
 }
 
-func (plainPack) Unpack(context *upspin.ClientContext, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if len(cleartext) < len(ciphertext) {
 		return 0, errTooShort
 	}
 	return copy(cleartext, ciphertext), nil
 }
 
-func (plainPack) PackLen(context *upspin.ClientContext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (plainPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
 	return len(cleartext)
 }
 
-func (plainPack) UnpackLen(context *upspin.ClientContext, ciphertext []byte, meta *upspin.Metadata) int {
+func (plainPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
 	return len(ciphertext)
 }
 

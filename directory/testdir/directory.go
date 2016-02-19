@@ -34,7 +34,7 @@ type Service struct {
 	endpoint      upspin.Endpoint
 	StoreEndpoint upspin.Endpoint
 	Store         upspin.Store
-	Context       *upspin.ClientContext
+	Context       *upspin.Context
 	Root          map[upspin.UserName]upspin.Reference // All inside Service.Store
 }
 
@@ -89,7 +89,7 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 
 var packer = pack.Lookup(upspin.DebugPack)
 
-func packBlob(context *upspin.ClientContext, cleartext []byte, name upspin.PathName) ([]byte, error) {
+func packBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
 	cipherLen := packer.PackLen(context, cleartext, nil, name)
 	if cipherLen < 0 {
@@ -103,7 +103,7 @@ func packBlob(context *upspin.ClientContext, cleartext []byte, name upspin.PathN
 	return ciphertext[:n], nil
 }
 
-func unpackBlob(context *upspin.ClientContext, ciphertext []byte, name upspin.PathName) ([]byte, error) {
+func unpackBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
 	clearLen := packer.UnpackLen(context, ciphertext, nil)
 	if clearLen < 0 {
@@ -538,7 +538,7 @@ func (s *Service) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interface{}, error) {
+func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testdir: unrecognized transport")
 	}
