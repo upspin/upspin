@@ -83,7 +83,7 @@ type Packer interface {
 	// The slice must be large enough; the PackLen method may be used to
 	// find a suitable allocation size.
 	// The returned count is the length of the ciphertext.
-	Pack(ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
+	Pack(context *ClientContext, ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
 
 	// Unpack takes ciphertext data and packing metadata and stores the
 	// cleartext version in the supplied slice, which must be large enough.
@@ -91,17 +91,17 @@ type Packer interface {
 	// Unpack might update the metadata.
 	// It returns the path name and the number of bytes written to the slice.
 	// The returned name will be empty if the ciphertext does not contain one.
-	Unpack(cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
+	Unpack(context *ClientContext, cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing. It might update the metadata.
 	// Returns -1 if there is an error.
-	PackLen(cleartext []byte, meta *Metadata, name PathName) int
+	PackLen(context *ClientContext, cleartext []byte, meta *Metadata, name PathName) int
 
 	// UnpackLen returns an upper bound on the number of bytes required
 	// to store the unpacked cleartext. It might update the metadata.
 	// Returns -1 if there is an error.
-	UnpackLen(ciphertext []byte, meta *Metadata) int
+	UnpackLen(context *ClientContext, ciphertext []byte, meta *Metadata) int
 }
 
 const (
@@ -123,11 +123,18 @@ const (
 type User interface {
 	Access
 
-	// Lookup returns a list (slice) of Endpoints of Directory services that may
-	// hold the root directory for the named user. Those earlier in the
-	// list are better places to look.
-	Lookup(userName UserName) ([]Endpoint, error)
+	// Lookup returns a list (slice) of Endpoints of Directory
+	// services that may hold the root directory for the named
+	// user and a list (slice) of public keys for that user. Those
+	// earlier in the lists are better places to look.
+	Lookup(userName UserName) ([]Endpoint, []PublicKey, error)
 }
+
+// A PublicKey is used when exchanging data with other users.
+type PublicKey []byte
+
+// A PrivateKey is used when exchanging data with other users.
+type PrivateKey []byte
 
 // Directory service.
 
@@ -271,7 +278,7 @@ type ClientContext struct {
 
 	// PrivateKey holds the user's private cryptographic keys.
 	// The public key is accessible through the data held here.
-	PrivateKey interface{}
+	PrivateKey PrivateKey
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related

@@ -34,6 +34,7 @@ type Service struct {
 	endpoint      upspin.Endpoint
 	StoreEndpoint upspin.Endpoint
 	Store         upspin.Store
+	Context       *upspin.ClientContext
 	Root          map[upspin.UserName]upspin.Reference // All inside Service.Store
 }
 
@@ -88,28 +89,28 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 
 var packer = pack.Lookup(upspin.DebugPack)
 
-func packBlob(cleartext []byte, name upspin.PathName) ([]byte, error) {
+func packBlob(context *upspin.ClientContext, cleartext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
-	cipherLen := packer.PackLen(cleartext, nil, name)
+	cipherLen := packer.PackLen(context, cleartext, nil, name)
 	if cipherLen < 0 {
 		return nil, errors.New("testpack.PackLen failed")
 	}
 	ciphertext := make([]byte, cipherLen)
-	n, err := packer.Pack(ciphertext, cleartext, nil, name)
+	n, err := packer.Pack(context, ciphertext, cleartext, nil, name)
 	if err != nil {
 		return nil, err
 	}
 	return ciphertext[:n], nil
 }
 
-func unpackBlob(ciphertext []byte, name upspin.PathName) ([]byte, error) {
+func unpackBlob(context *upspin.ClientContext, ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
-	clearLen := packer.UnpackLen(ciphertext, nil)
+	clearLen := packer.UnpackLen(context, ciphertext, nil)
 	if clearLen < 0 {
 		return nil, errors.New("testpack.UnpackLen failed")
 	}
 	cleartext := make([]byte, clearLen)
-	n, err := packer.Unpack(cleartext, ciphertext, nil, name)
+	n, err := packer.Unpack(context, cleartext, ciphertext, nil, name)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +222,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob, err := packBlob(nil, parsed.Path())
+		blob, err := packBlob(s.Context, nil, parsed.Path())
 		if err != nil {
 			return loc0, err
 		}
@@ -287,7 +288,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
 	// Create a blob storing the data for this file and store it in storage service.
-	ciphertext, err := packBlob(data, parsed.Path()) // parsed.Path() will be clean.
+	ciphertext, err := packBlob(s.Context, data, parsed.Path()) // parsed.Path() will be clean.
 	if err != nil {
 		return loc0, err
 	}
@@ -426,7 +427,7 @@ func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, 
 	if dirRef.Packing != upspin.DebugPack {
 		return nil, fmt.Errorf("testdir: unexpected packing %d in Fetch", dirRef.Packing)
 	}
-	payload, err := unpackBlob(ciphertext, name)
+	payload, err := unpackBlob(s.Context, ciphertext, name)
 	return payload, err
 }
 
@@ -512,7 +513,7 @@ Loop:
 		entry := newEntryBytes(ent.elem, ent.isDir, ent.ref)
 		dirData = append(dirData, entry...)
 	}
-	blob, err := packBlob(dirData, dirName)
+	blob, err := packBlob(s.Context, dirData, dirName)
 	if err != nil {
 		return r0, err
 	}
@@ -545,6 +546,7 @@ func (s *Service) Dial(context *upspin.ClientContext, e upspin.Endpoint) (interf
 	s.Store = context.Store
 	s.StoreEndpoint = context.Store.Endpoint()
 	s.endpoint = e
+	s.Context = context
 	return s, nil
 }
 

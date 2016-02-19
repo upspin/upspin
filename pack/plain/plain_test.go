@@ -7,6 +7,10 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+var (
+	context = &upspin.ClientContext{}
+)
+
 func TestRegister(t *testing.T) {
 	p := pack.Lookup(upspin.PlainPack)
 	if p == nil {
@@ -27,7 +31,7 @@ func TestPack(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	cipher := make([]byte, 1024)
-	m, err := packer.Pack(cipher, data, nil, name)
+	m, err := packer.Pack(context, cipher, data, nil, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -35,7 +39,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	m, err = packer.Unpack(clear, cipher, nil, name)
+	m, err = packer.Unpack(context, clear, cipher, nil, name)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
