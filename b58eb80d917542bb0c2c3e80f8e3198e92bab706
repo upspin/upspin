@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "62b849a7_676ef203",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-19T00:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02a22d63_7cc4395e",
+      "range": {
+        "startLine": 30,
+        "startChar": 53,
+        "endLine": 30,
+        "endChar": 58
+      },
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02a22d63_1cb975f1",
         "filename": "pack/ee/ee.go",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2016-02-18T23:49:01Z",
       "side": 1,
       "message": "s/file/the/",
+      "range": {
+        "startLine": 36,
+        "startChar": 46,
+        "endLine": 36,
+        "endChar": 50
+      },
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b849a7_c75c7e56",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-19T00:22:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02a22d63_1cb975f1",
       "range": {
         "startLine": 36,
         "startChar": 46,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "62b849a7_87568632",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-19T00:22:47Z",
+      "side": 1,
+      "message": "Thanks, I knew I was confused but forgot to ask you about the meaning of this function.",
+      "parentUuid": "02a22d63_3cbeb1da",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02a22d63_dcd22d21",
         "filename": "pack/ee/ee.go",
         "patchSetId": 10
@@ -76,6 +142,24 @@
       "writtenOn": "2016-02-18T23:49:01Z",
       "side": 1,
       "message": "i can\u0027t work out where the len of ciphertext grows. somewhere there needs to be a setting of the length, perhaps through append. maybe it happens under the covers here but at the moment it smells like a bug.",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b849a7_47488e59",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-19T00:22:47Z",
+      "side": 1,
+      "message": "I mistakenly thought XORKeyStream was doing that.  In fact the description says XORKeyStream should panic, but it\u0027s not.  I\u0027ll investigate.",
+      "parentUuid": "02a22d63_dcd22d21",
       "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
