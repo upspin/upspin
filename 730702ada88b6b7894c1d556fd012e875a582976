@@ -33,6 +33,46 @@
       "revId": "730702ada88b6b7894c1d556fd012e875a582976",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_5dc42b79",
+        "filename": "rc/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-20T23:07:38Z",
+      "side": 1,
+      "message": "Can we read public keys with this too? I think it would be an interesting way to override/bootstrap/test keys.",
+      "revId": "730702ada88b6b7894c1d556fd012e875a582976",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_7dc7ef7f",
+        "filename": "rc/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-20T23:07:38Z",
+      "side": 1,
+      "message": "Eric had a suggestion about making these constants strings instead or a big number like 0x0A0B0C0D so that the order we list them on the source file will not change how they\u0027re stored on disk. But that\u0027s for another CL, just echoing his suggestion, which I think is valid. (Or we could agree to never change the ordering too).",
+      "range": {
+        "startLine": 91,
+        "startChar": 9,
+        "endLine": 91,
+        "endChar": 15
+      },
+      "revId": "730702ada88b6b7894c1d556fd012e875a582976",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
