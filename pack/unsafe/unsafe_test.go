@@ -4,8 +4,19 @@ import (
 	"log"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/testuser"
+)
+
+var (
+	user    = upspin.UserName("me@me.com")
+	context = &upspin.ClientContext{
+		UserName: user,
+		Packing:  upspin.UnsafePack,
+	}
+	testUser *testuser.Service
 )
 
 func setup() *UnsafePack {
@@ -14,7 +25,25 @@ func setup() *UnsafePack {
 	if !ok {
 		panic("not unsafe pack")
 	}
+	endpoint := upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // ignored
+	}
+	var err error
+	context.User, err = access.BindUser(context, endpoint)
+	if err != nil {
+		panic(err)
+	}
+	testUser = context.User.(*testuser.Service)
+	// Add an initial public key for the current user
+	key := makeUserKey(user, []byte("NaCl"))
+	testUser.SetPublicKeys(user, []upspin.PublicKey{key})
+	context.PrivateKey = upspin.PrivateKey(key)
 	return u
+}
+
+func makeUserKey(userName upspin.UserName, salt []byte) upspin.PublicKey {
+	return upspin.PublicKey(xor([]byte(userName), salt))
 }
 
 func TestPackMeta(t *testing.T) {
@@ -49,16 +78,12 @@ func TestPackMeta(t *testing.T) {
 func TestPackUnpack(t *testing.T) {
 	u := setup()
 
-	user := upspin.UserName("me@me.com")
-	u.SetCurrentUser(user)
-	u.AddUserKeys(user, u.MakeUserKeys(user))
-
 	clear := []byte("this is data")
 	path := upspin.PathName("me@me.com/folder/dir/file.txt")
 	meta := upspin.Metadata{}
-	packLen := u.PackLen(clear, &meta, path)
+	packLen := u.PackLen(context, clear, &meta, path)
 	cipher := make([]byte, packLen+5)
-	n, err := u.Pack(cipher, clear, &meta, path)
+	n, err := u.Pack(context, cipher, clear, &meta, path)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -66,10 +91,13 @@ func TestPackUnpack(t *testing.T) {
 		t.Errorf("Expected %d bytes, got %d", packLen, n)
 	}
 	cipher = cipher[:n]
+	if len(meta.PackData) == 0 {
+		t.Error("PackData length is zero")
+	}
 
-	unpackLen := u.PackLen(cipher, &meta, path)
+	unpackLen := u.PackLen(context, cipher, &meta, path)
 	unpacked := make([]byte, unpackLen+10)
-	n, err = u.Unpack(unpacked, cipher, &meta, path)
+	n, err = u.Unpack(context, unpacked, cipher, &meta, path)
 	if err != nil {
 		t.Error(err)
 	}
@@ -85,16 +113,12 @@ func TestPackUnpack(t *testing.T) {
 func TestSharing(t *testing.T) {
 	u := setup()
 
-	user := upspin.UserName("me@me.com")
-	u.SetCurrentUser(user)
-	u.AddUserKeys(user, u.MakeUserKeys(user))
-
 	clear := []byte("this is data")
 	path := upspin.PathName("me@me.com/folder/dir/file.txt")
 	meta := upspin.Metadata{}
-	packLen := u.PackLen(clear, &meta, path)
+	packLen := u.PackLen(context, clear, &meta, path)
 	cipher := make([]byte, packLen)
-	n, err := u.Pack(cipher, clear, &meta, path)
+	n, err := u.Pack(context, cipher, clear, &meta, path)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -102,10 +126,11 @@ func TestSharing(t *testing.T) {
 	log.Printf("cipher1: %v", string(cipher))
 
 	newUser := upspin.UserName("someone@them.com")
-	u.AddUserKeys(newUser, u.MakeUserKeys(newUser))
+	newUserKey := makeUserKey(newUser, []byte("random stuff"))
+	testUser.SetPublicKeys(newUser, []upspin.PublicKey{newUserKey})
 
 	// Pack again.
-	n, err = u.Pack(cipher, clear, &meta, path)
+	n, err = u.Pack(context, cipher, clear, &meta, path)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -113,11 +138,11 @@ func TestSharing(t *testing.T) {
 
 	// Simulates the data being looked up by a new user, with whom
 	// access has been shared. Check that it works.
-	u.SetCurrentUser(newUser)
-	u.AddUserKeys(user, u.MakeUserKeys(user)) // Garble the owner's key to ensure we're not using them
-	unpackLen := u.UnpackLen(cipher, &meta)
+	context.UserName = newUser
+	context.PrivateKey = upspin.PrivateKey(newUserKey)
+	unpackLen := u.UnpackLen(context, cipher, &meta)
 	unpacked := make([]byte, unpackLen)
-	n, err = u.Unpack(unpacked, cipher, &meta, path)
+	n, err = u.Unpack(context, unpacked, cipher, &meta, path)
 	if err != nil {
 		t.Error(err)
 	}
@@ -125,5 +150,17 @@ func TestSharing(t *testing.T) {
 
 	if string(unpacked) != string(clear) {
 		t.Errorf("Expected unpacked %q, got %q", string(clear), string(unpacked))
+	}
+
+	// Now, to double-check, pretent the original writer's key got
+	// changed. The signature will no longer be valid.
+	testUser.SetPublicKeys(user, []upspin.PublicKey{makeUserKey(user, []byte("crazy bits"))})
+	n, err = u.Unpack(context, unpacked, cipher, &meta, path)
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	expectedError := "expected signature 26003, got 22526"
+	if err.Error() != expectedError {
+		t.Errorf("Expected error %v, got %v", expectedError, err)
 	}
 }

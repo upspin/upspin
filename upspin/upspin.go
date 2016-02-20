@@ -109,17 +109,18 @@ const (
 	// It is never used in production.
 	DebugPack Packing = iota
 
+	// UnsafePack is an obfuscating packing that is
+	// cryptographically unsound. It is similar to DebugPack, but
+	// updates the metadata with wrapped keys and signs
+	// messages. It should never be used in production.
+	UnsafePack
+
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
 	PlainPack
 
 	// EEp256Pack packing stores AES-encrypted data.
 	// The associated metadata has an ECDSA signature and ECDH-wrapped keys.
 	EEp256Pack
-
-	// UnsafePack is an obfuscating packing that is
-	// cryptographically unsound. It should not be used in
-	// production.
-	UnsafePack
 )
 
 // User service.

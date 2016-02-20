@@ -14,17 +14,11 @@ import (
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/testuser"
 )
 
-// UnsafePack is exported because we need to access methods that are
-// specific to end-to-end packing, such as setting public and private
-// keys.
+// UnsafePack uses XOR for encrypting and signing.
 type UnsafePack struct {
-	// keystore stores known keys for users.
-	keystore map[upspin.UserName]userKeys
-
-	// user is the current user
-	user upspin.UserName
 }
 
 var _ upspin.Packer = (*UnsafePack)(nil)
@@ -34,13 +28,6 @@ type aesKey []byte
 
 // signature is the signature of a cleartext using the owners private key.
 type signature uint64
-
-// userKeys stores the public and private key of each user.
-type userKeys struct {
-	user    upspin.UserName
-	public  []byte
-	private []byte
-}
 
 // wrappedKey is the encryption key used to encrypt the plain text
 // encrypted with the named user's public key.
@@ -61,9 +48,7 @@ var (
 )
 
 func init() {
-	pack.Register(&UnsafePack{
-		keystore: make(map[upspin.UserName]userKeys, 10),
-	})
+	pack.Register(&UnsafePack{})
 }
 
 // Packing implements the Packer interface
@@ -94,7 +79,7 @@ func (u *UnsafePack) packMeta(meta *clearMeta) []byte {
 }
 
 // Pack implements the Packer interface
-func (u *UnsafePack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (u *UnsafePack) Pack(context *upspin.ClientContext, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if meta == nil {
 		return 0, errors.New("nil metadata")
 	}
@@ -103,44 +88,46 @@ func (u *UnsafePack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, n
 		clear = &clearMeta{}
 	}
 
-	// Get a pair of keys for the current user
-	keyPair, found := u.keystore[u.user]
-	if !found {
-		return 0, errors.New("no keys for current user")
-	}
-	if len(keyPair.private) == 0 {
+	// Get private key for the current user.
+	if len(context.PrivateKey) == 0 {
 		return 0, errors.New("empty private key for current user")
 	}
 
 	// Get an AES key, either from the metadata if present or by
 	// creating a new one from scratch.
 	var aesKey aesKey
-	wrapped, err := u.extractWrappedKeyFromMeta(clear)
+	wrapped, err := u.extractWrappedKeyFromMeta(context, clear)
 	if err != nil {
 		log.Println("No wrapped key in meta. Creating new AES key")
-		aesKey, err = u.genUnsoundKey(u.user, name)
+		aesKey, err = u.genUnsoundKey(context.UserName, name)
 		if err != nil {
 			return 0, err
 		}
 	} else {
-		aesKey = u.xor(wrapped.Wrapped, keyPair.private)
+		aesKey = xor(wrapped.Wrapped, context.PrivateKey)
 	}
-	log.Printf("AES Key: %s", aesKey)
 
 	// Encrypt the cleartext with the AES key.
-	buf := u.xor(cleartext, aesKey)
+	buf := xor(cleartext, aesKey)
 	copy(ciphertext, buf)
 
 	// Sign it with the user's private key.
-	clear.Signature = sign(cleartext, keyPair.private)
+	clear.Signature = sign(cleartext, context.PrivateKey)
 
 	// Re-generate the metadata. All cached users get their own wrapped keys.
 	clear.WrappedKeys = nil
-	for user, keys := range u.keystore {
-		log.Printf("Wrapping keys for user: %v, pubkey: %v", user, keys.public)
+	for _, user := range context.User.(*testuser.Service).ListUsers() {
+		// Find keys for a user
+		_, keys, err := context.User.Lookup(user)
+		if err != nil || len(keys) == 0 {
+			log.Printf("Skipping sharing with user %v", user)
+			continue
+		}
+		// Prefer the first key returned
+		log.Printf("Wrapping keys for user: %v", user)
 		wk := wrappedKey{
 			User:    user,
-			Wrapped: u.xor(aesKey, keys.public),
+			Wrapped: xor(aesKey, keys[0]),
 		}
 		clear.WrappedKeys = append(clear.WrappedKeys, wk)
 	}
@@ -150,7 +137,7 @@ func (u *UnsafePack) Pack(ciphertext, cleartext []byte, meta *upspin.Metadata, n
 }
 
 // Unpack implements the Packer interface
-func (u *UnsafePack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (u *UnsafePack) Unpack(context *upspin.ClientContext, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if meta == nil {
 		return 0, errors.New("nil metadata")
 	}
@@ -160,27 +147,23 @@ func (u *UnsafePack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata,
 	}
 
 	// Find our key in the wrapped keys
-	wrapped, err := u.extractWrappedKeyFromMeta(clear)
+	wrapped, err := u.extractWrappedKeyFromMeta(context, clear)
 	if err != nil {
 		return 0, err
 	}
 
-	// Get private key of current user
-	keyPair, found := u.keystore[u.user]
-	if !found {
-		return 0, fmt.Errorf("no keys for user %v", u.user)
-	}
-	if len(keyPair.private) == 0 {
-		return 0, fmt.Errorf("no private key for user %v", u.user)
+	// Get private key of the current user
+	privateKey := context.PrivateKey
+	if len(privateKey) == 0 {
+		return 0, fmt.Errorf("no private key for user %v", context.UserName)
 	}
 
 	// Decrypt our wrapped key.
-	log.Printf("Keys found for user %v, private: %v", u.user, keyPair.private)
-	aesKey := u.xor(wrapped.Wrapped, keyPair.private)
-	log.Printf("AES Key after unwrapping: %s", aesKey)
+	log.Printf("Keys found for user %v", context.UserName)
+	aesKey := xor(wrapped.Wrapped, privateKey)
 
 	// Decrypt the ciphertext
-	buf := u.xor(ciphertext, aesKey)
+	buf := xor(ciphertext, aesKey)
 	copy(cleartext, buf)
 	cleartext = cleartext[:len(buf)]
 
@@ -192,12 +175,13 @@ func (u *UnsafePack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata,
 	}
 	fileOwner := p.User
 	log.Printf("File owner found: %s", fileOwner)
-	ownerKeyPair, found := u.keystore[fileOwner]
-	if !found {
-		return len(buf), errors.New("file owner's key pair not found")
+
+	_, keys, err := context.User.Lookup(fileOwner)
+	if err != nil || len(keys) == 0 {
+		return 0, fmt.Errorf("no keys for owner user of %v: %v", name, fileOwner)
 	}
 
-	sig := sign(cleartext, ownerKeyPair.public)
+	sig := sign(cleartext, keys[0])
 	if sig != clear.Signature {
 		err := fmt.Sprintf("expected signature %v, got %v", clear.Signature, sig)
 		log.Println(err)
@@ -208,23 +192,23 @@ func (u *UnsafePack) Unpack(cleartext, ciphertext []byte, meta *upspin.Metadata,
 }
 
 // PackLen implements the Packer interface
-func (u *UnsafePack) PackLen(cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (u *UnsafePack) PackLen(context *upspin.ClientContext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
 	return len(cleartext)
 }
 
 // UnpackLen implements the Packer interface
-func (u *UnsafePack) UnpackLen(ciphertext []byte, meta *upspin.Metadata) int {
+func (u *UnsafePack) UnpackLen(context *upspin.ClientContext, ciphertext []byte, meta *upspin.Metadata) int {
 	return len(ciphertext)
 }
 
 // extractWrappedKeyFromMeta returns the AES key stored in the user's own
 // wrappedKeys or an error if no such information is found in the
 // metadata.
-func (u *UnsafePack) extractWrappedKeyFromMeta(clearMeta *clearMeta) (wrappedKey, error) {
+func (u *UnsafePack) extractWrappedKeyFromMeta(context *upspin.ClientContext, clearMeta *clearMeta) (wrappedKey, error) {
 	var wrapped wrappedKey
 	for _, wk := range clearMeta.WrappedKeys {
-		if string(wk.User) == string(u.user) {
-			log.Printf("Wrapped Keys found for user: %v", u.user)
+		if string(wk.User) == string(context.UserName) {
+			log.Printf("Wrapped Keys found for user: %v", context.UserName)
 			wrapped = wk
 		}
 	}
@@ -246,24 +230,7 @@ func (u *UnsafePack) genUnsoundKey(userName upspin.UserName, pathName upspin.Pat
 	return buf, nil
 }
 
-func (u *UnsafePack) SetCurrentUser(user upspin.UserName) {
-	u.user = user
-}
-
-// MakeUserKeys returns a pair of public and private keys for a user.
-func (u *UnsafePack) MakeUserKeys(user upspin.UserName) userKeys {
-	return userKeys{
-		user:    user,
-		public:  u.xor([]byte(user), []byte("key")),
-		private: u.xor([]byte(user), []byte("key")),
-	}
-}
-
-func (u *UnsafePack) AddUserKeys(user upspin.UserName, userKeys userKeys) {
-	u.keystore[user] = userKeys
-}
-
-func (u *UnsafePack) xor(contents []byte, key []byte) []byte {
+func xor(contents []byte, key []byte) []byte {
 	buf := make([]byte, len(contents))
 
 	for i, b := range contents {
