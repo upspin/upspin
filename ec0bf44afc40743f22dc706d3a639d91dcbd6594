@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62be89e4_9df2c3bd",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-20T02:02:33Z",
+      "side": 1,
+      "message": "s/simKey/aeskey",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 26,
+        "endChar": 9
+      },
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_7d748fd8",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-20T02:02:33Z",
+      "side": 1,
+      "message": "maybe collapse to\n\nfunc (u *UnsafePack) packMeta(meta *clearMeta) []byte {        return json.Marshal(*meta)\n}",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_3d7e17b7",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-20T02:02:33Z",
+      "side": 1,
+      "message": "I\u0027m unclear what you\u0027re hoping to get here.  You want to reuse an old file encryption key if it exists?\n\nNo harm done, I\u0027m just curious.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_9a7f69ed",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-20T02:02:33Z",
+      "side": 1,
+      "message": "I see that you put this above PlainPack.\n\nI\u0027m slightly nervous that the integer values aren\u0027t static over time, since they\u0027re going to be out on disk.  Should be we using a string instead of an int?",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
