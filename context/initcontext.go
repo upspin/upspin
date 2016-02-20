@@ -1,6 +1,6 @@
-//Package rc creates a client context from various sources.
+//Package context creates a client context from various sources.
 
-package rc
+package context
 
 import (
 	"bufio"
@@ -13,18 +13,18 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// InitContext
+// InitContext returns a context generated from configuration files and environment variables.
 func InitContext() *upspin.ClientContext {
-	rcdir := "/etc"
+	dir := "/etc/upspin"
 	if u, err := user.Current(); err == nil {
 		if len(u.HomeDir) != 0 {
-			rcdir = u.HomeDir
+			dir = path.Join(u.HomeDir, "lib/upspin")
 		}
 	}
 
 	// First source of truth is the RC file.
 	vals := map[string]string{"name": "noone@nowhere.org", "user": "", "directory": "", "store": "", "packing": "plain"}
-	if file, err := os.Open(path.Join(rcdir, ".upspinrc")); err == nil {
+	if file, err := os.Open(path.Join(dir, "context")); err == nil {
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			line := scanner.Text()
