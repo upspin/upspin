@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a21241d6_a99f7d79",
+        "filename": "rc/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-20T09:02:45Z",
+      "side": 1,
+      "message": "Not a fan of the package name or the location of the file. I suggest for the latter, creating a .upspin directory in $HOME. Then at least when we find we need more crap we don\u0027t need to store more pieces in the user\u0027s home directory.\n\nWe could also try to set a precedent and put it somewhere VISIBLE (IMAGINE THAT!) like $HOME/lib but that might be too radical for users of a 45-year-old operating system.\n\nRegarding the package name, rather than put all our eggs in one basket this might end up being a handy place for followup elements as yet undiscovered.\n\nMaybe pref or prefs? I like user but that might be too confusing\n\nAnother way to think about it is that this is really about Context, so call it context. That has no bearing on the file name.",
+      "revId": "730702ada88b6b7894c1d556fd012e875a582976",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_89a4b9d0",
+        "filename": "rc/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-20T09:02:45Z",
+      "side": 1,
+      "message": "incomplete sentence.  moreover this should probably just be Init since it\u0027ll be prefixed by the package name: rc.Init or prefs.Init or context.Init.",
+      "revId": "730702ada88b6b7894c1d556fd012e875a582976",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
