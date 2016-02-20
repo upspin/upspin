@@ -73,6 +73,24 @@
       "revId": "730702ada88b6b7894c1d556fd012e875a582976",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_29b4adfd",
+        "filename": "rc/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-20T23:24:00Z",
+      "side": 1,
+      "message": "Whether strings or ints, they still need to be curated. It\u0027s a small economy, I admit, but I\u0027d prefer the (small! - where did you get 32-bits?) integers.",
+      "parentUuid": "62be89e4_7dc7ef7f",
+      "revId": "730702ada88b6b7894c1d556fd012e875a582976",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
