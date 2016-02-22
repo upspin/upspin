@@ -166,6 +166,24 @@
     },
     {
       "key": {
+        "uuid": "62b849a7_07f05645",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-22T05:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62b849a7_47488e59",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02a22d63_fccfe973",
         "filename": "pack/ee/ee.go",
         "patchSetId": 10
@@ -177,6 +195,24 @@
       "writtenOn": "2016-02-18T23:49:01Z",
       "side": 1,
       "message": "ditto for cleartext",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b849a7_27f55a36",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-22T05:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02a22d63_fccfe973",
       "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -200,6 +236,24 @@
     },
     {
       "key": {
+        "uuid": "62b849a7_8745263f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-22T05:21:41Z",
+      "side": 1,
+      "message": "I know.  I was doing this as a kind of comment, but happy to leave it out if more idiomatic.",
+      "parentUuid": "02a22d63_bcc96170",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02a22d63_5ce4ddfa",
         "filename": "pack/ee/ee.go",
         "patchSetId": 10
@@ -217,6 +271,24 @@
     },
     {
       "key": {
+        "uuid": "62b849a7_ed8ac1d4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-22T05:21:41Z",
+      "side": 1,
+      "message": "modified as disscussed",
+      "parentUuid": "02a22d63_5ce4ddfa",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02a22d63_7ce999cf",
         "filename": "pack/ee/ee.go",
         "patchSetId": 10
@@ -228,6 +300,24 @@
       "writtenOn": "2016-02-18T23:55:55Z",
       "side": 1,
       "message": "here you check, which is good, but the panic isn\u0027t the best message and panicking isn\u0027t the right thing to do, either: it\u0027s just bad user data.",
+      "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b849a7_8d9785ff",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-22T05:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02a22d63_7ce999cf",
       "revId": "b58eb80d917542bb0c2c3e80f8e3198e92bab706",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
