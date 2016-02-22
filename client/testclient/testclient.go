@@ -137,3 +137,19 @@ func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error)
 	}
 	return dir.MakeDirectory(dirName)
 }
+
+func (c *Client) Glob(pattern string) ([]upspin.PathName, error) {
+	dir, err := c.rootDir(upspin.PathName(pattern))
+	if err != nil {
+		return nil, err
+	}
+	dirEntries, err := dir.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+	paths := make([]upspin.PathName, len(dirEntries))
+	for i, de := range dirEntries {
+		paths[i] = de.Name
+	}
+	return paths, nil
+}

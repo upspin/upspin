@@ -2,6 +2,7 @@ package testclient
 
 import (
 	"bytes"
+	"fmt"
 	"math/rand"
 	"strings"
 	"testing"
@@ -370,4 +371,47 @@ func TestFileOverflow(t *testing.T) {
 	if err == nil {
 		t.Fatal("seek maxint+1 filex: expected error")
 	}
+}
+
+func TestGlob(t *testing.T) {
+	const user = "multiuser@a.co"
+	setup(user)
+	client := New(context)
+	var err error
+	var paths []upspin.PathName
+	writeFile := func(fileNumber int) {
+		fileName := fmt.Sprintf("%s/testfile%d.txt", user, fileNumber)
+		text := fmt.Sprintf("Contents of file %s", fileName)
+		_, err = client.Put(upspin.PathName(fileName), []byte(text))
+		if err != nil {
+			t.Fatal("put file:", err)
+		}
+	}
+	checkPaths := func(expPaths ...string) {
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if len(paths) != len(expPaths) {
+			t.Fatalf("Expected %d paths, got %d", len(expPaths), len(paths))
+		}
+		for i, p := range expPaths {
+			if string(paths[i]) != p {
+				t.Errorf("Expected path %d %q, got %q", i, p, paths[i])
+			}
+		}
+	}
+
+	writeFile(0)
+	writeFile(1)
+	writeFile(7)
+	writeFile(17)
+
+	paths, err = client.Glob("multiuser@a.co/testfile*.txt")
+	checkPaths("multiuser@a.co/testfile0.txt", "multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt")
+
+	paths, err = client.Glob("multiuser@a.co/*7.txt")
+	checkPaths("multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt")
+
+	paths, err = client.Glob("multiuser@a.co/*1*.txt")
+	checkPaths("multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt")
 }
