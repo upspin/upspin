@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_eb13393f",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_29570d31",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_495a4159",
         "filename": "client/gcp/client.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "should be gcpclient and the directory renamed. see testclient for an example",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_8b239d8f",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_495a4159",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_4b1d8544",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_a962dd13",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_695d054f",
         "filename": "client/gcp/client.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "comment to explain the arguments.\n\nanyway it should take a client context, not build one",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_cb3d15a7",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done. This is temporary. I put a TODO to fix it once we have a more permanent User service.",
+      "parentUuid": "a21241d6_695d054f",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_4b57c52f",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_a9e77dcc",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_89ecb9af",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
@@ -115,6 +205,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "fold into previous line for consistency with others",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_2b549128",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_89ecb9af",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -162,6 +270,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_8b5ddd51",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_e9dd75fc",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_49efe1a1",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
@@ -173,6 +299,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "owner\u0027s",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_0bde6df8",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_49efe1a1",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -196,6 +340,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_4bfc655d",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "json.Unmarshal can\u0027t populate the struct unless it\u0027s exported. Note that the type, at least, is not exported. I should not be using json as the encoding here anyway, and should pack things as binary. But this was a shortcut to avoid counting bytes. I put a TODO to fix this at some point, but given this is a testing packer, it\u0027s less important to fix it. Thanks.",
+      "parentUuid": "a21241d6_29fcad5c",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62be89e4_7d748fd8",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
@@ -207,6 +369,24 @@
       "writtenOn": "2016-02-20T02:02:33Z",
       "side": 1,
       "message": "maybe collapse to\n\nfunc (u *UnsafePack) packMeta(meta *clearMeta) []byte {        return json.Marshal(*meta)\n}",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_6b8ba9da",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Impedance mismatch. Marshal returns two items.",
+      "parentUuid": "62be89e4_7d748fd8",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -230,6 +410,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_4b46a54a",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Yeah. So, basically this is avoiding creating a new key just because we\u0027re sharing it with more people, just in the remote possibility that the key would be cached somewhere. I guess this is not strictly necessary (and might be cryptographically unsafe, but hey, this is the unsafe packer anyway :-))",
+      "parentUuid": "62be89e4_3d7e17b7",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_09f9e96c",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
@@ -241,6 +439,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "can you arrange that this doesn\u0027t allocate while preserving the (external) client\u0027s buffer? you\u0027ve got more allocs here than i think you need.\nthat is, i think it should be xor(dst, src []byte)",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_0b31cdec",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "I started changing it as per your suggestion but then I had to make almost the same number of copies outside of the loops. Basically, the aesKey in Pack() needs to be preserved and xor\u0027ed for each user\u0027s public key. If I xor it in place, it goes away, so I need to keep a copy of it.",
+      "parentUuid": "a21241d6_09f9e96c",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -282,6 +498,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_0b0f8d13",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "ack.",
+      "parentUuid": "62be89e4_9a7f69ed",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_e968d5f7",
         "filename": "user/testuser/user.go",
         "patchSetId": 4
@@ -293,6 +527,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "time for tests.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_4bcea5d1",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_e968d5f7",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -333,6 +585,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_eb6fb98b",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_898ef919",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_297eedb6",
         "filename": "user/testuser/user.go",
         "patchSetId": 4
@@ -344,6 +614,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "keys for that user",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_8b7f1d3c",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_297eedb6",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -367,6 +655,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_ab69c188",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_097b29c7",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_497121e7",
         "filename": "user/testuser/user.go",
         "patchSetId": 4
@@ -378,6 +684,24 @@
       "writtenOn": "2016-02-22T02:19:02Z",
       "side": 1,
       "message": "s/ at a given time//",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_6b7cc946",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T19:11:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_497121e7",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
