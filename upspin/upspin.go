@@ -245,6 +245,14 @@ type Client interface {
 	// TODO: Make multiple elems?
 	MakeDirectory(dirName PathName) (Location, error)
 
+	// Glob matches the pattern against the file names of the full rooted tree.
+	// That is, the pattern must look like a full path name, but elements of the
+	// path may contain metacharacters. Matching is done using Go's path.Match
+	// elementwise. The user name must be present in the pattern and is treated as
+	// a literal even if it contains metacharacters.
+	// The Metadata contains no key information.
+	Glob(pattern string) ([]*DirEntry, error)
+
 	// File-like methods similar to Go's os.File API.
 	// The name, however, is a fully-qualified upspin PathName.
 	// TODO: Should there be a concept of current directory and
