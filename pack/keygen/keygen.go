@@ -31,10 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = private.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer private.Close()
 
 	public, err := os.Create(filepath.Join(sshdir(), "public.upspinkey"))
 	if err != nil {
