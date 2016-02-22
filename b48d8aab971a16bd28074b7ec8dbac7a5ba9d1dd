@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a21241d6_a9641db1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T22:53:49Z",
+      "side": 1,
+      "message": "why not return the same as Directory.Glob? the DirEntry information is valuable and you\u0027re just throwing it away.",
+      "revId": "b48d8aab971a16bd28074b7ec8dbac7a5ba9d1dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
