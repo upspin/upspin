@@ -16,6 +16,24 @@
       "revId": "b48d8aab971a16bd28074b7ec8dbac7a5ba9d1dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_2cf9476d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-22T23:00:55Z",
+      "side": 1,
+      "message": "Because I believe the Client doesn\u0027t care about it. The implementation of the Client might, but it has access to Directory already. Exposing it would be exposing internal structures unnecessarily, no?\n\nWould, say, an implementation of fuse benefit from this, for example?\n\nDave, any thoughts?",
+      "parentUuid": "a21241d6_a9641db1",
+      "revId": "b48d8aab971a16bd28074b7ec8dbac7a5ba9d1dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
