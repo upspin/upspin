@@ -2,6 +2,125 @@
   "comments": [
     {
       "key": {
+        "uuid": "a21241d6_29570d31",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "odd sentence.\n\n// Package gcpclient implements a simple client service talking to services\n// running on GCP.\n\nalso, you shouldn\u0027t need to assume UnsafePack - it should soon be possible to read the client context for that",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_495a4159",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "should be gcpclient and the directory renamed. see testclient for an example",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_a962dd13",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "Put the _ imports into a separate block\nLooks nicer and signals they have a different purpose.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_695d054f",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "comment to explain the arguments.\n\nanyway it should take a client context, not build one",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_09544928",
+        "filename": "client/gcp/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "nice!",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_a9e77dcc",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "s/for testing a/to test/",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_89ecb9af",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "fold into previous line for consistency with others",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62be89e4_9df2c3bd",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
@@ -19,6 +138,58 @@
         "endLine": 26,
         "endChar": 9
       },
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_e9dd75fc",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "s/aeskey/aesKey/",
+      "parentUuid": "62be89e4_9df2c3bd",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_49efe1a1",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "owner\u0027s",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_29fcad5c",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "why are these upper case? same on 41,42",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -59,6 +230,23 @@
     },
     {
       "key": {
+        "uuid": "a21241d6_09f9e96c",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "can you arrange that this doesn\u0027t allocate while preserving the (external) client\u0027s buffer? you\u0027ve got more allocs here than i think you need.\nthat is, i think it should be xor(dst, src []byte)",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62be89e4_9a7f69ed",
         "filename": "upspin/upspin.go",
         "patchSetId": 4
@@ -70,6 +258,126 @@
       "writtenOn": "2016-02-20T02:02:33Z",
       "side": 1,
       "message": "I see that you put this above PlainPack.\n\nI\u0027m slightly nervous that the integer values aren\u0027t static over time, since they\u0027re going to be out on disk.  Should be we using a string instead of an int?",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_c96d1106",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "Just keep them in order. Once we have some permanent data, we can lock down the list and curate it.\n\nI think this is where it belongs, right after DebugPack.",
+      "parentUuid": "62be89e4_9a7f69ed",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_e968d5f7",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "time for tests.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_6974e5d8",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "probably time to put a mutex on this struct\u0027s methods.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_898ef919",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "you don\u0027t need the \", _\". if a map lookup fails you get the zero for the element type, which is what you want here.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_297eedb6",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "keys for that user",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_097b29c7",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "i would say\n\nif keys \u003d\u003d nil {\n delete(s.keystore, name)\n}\nand document that above.",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_497121e7",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-22T02:19:02Z",
+      "side": 1,
+      "message": "s/ at a given time//",
       "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
