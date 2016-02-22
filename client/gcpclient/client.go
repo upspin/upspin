@@ -175,6 +175,10 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	return cleartext[:n], nil
 }
 
+func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	return c.context.Directory.Glob(pattern)
+}
+
 func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 	return nil, errors.New("not implemented")
 }
