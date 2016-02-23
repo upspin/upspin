@@ -9,6 +9,8 @@ import (
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	_ "upspin.googlesource.com/upspin.git/pack/testpack"
 )
 
 // Service maps user names to potential machines holdining root of the user's tree.
@@ -76,7 +78,8 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	if ok {
 		return fmt.Errorf("testuser: user %q already installed", name)
 	}
-	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User))
+
+	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User + "/"))
 	if err != nil {
 		return err
 	}
