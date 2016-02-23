@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62be89e4_f66f998b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T17:12:58Z",
+      "side": 1,
+      "message": "should we change this too?",
+      "range": {
+        "startLine": 175,
+        "startChar": 33,
+        "endLine": 175,
+        "endChar": 48
+      },
+      "revId": "07b347c94586ade1f6c89731055ab93aaa303d0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_d66495b2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T17:12:58Z",
+      "side": 1,
+      "message": "and here?",
+      "revId": "07b347c94586ade1f6c89731055ab93aaa303d0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
