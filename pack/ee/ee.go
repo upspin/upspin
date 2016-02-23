@@ -435,7 +435,7 @@ func privateKey(user string) (priv *ecdsa.PrivateKey, err error) {
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.Open(filepath.Join(sshdir(), "secret.upspinkey"))
+	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", ciphersuite)))
 	if err != nil {
 		fmt.Printf("If you haven't already, run keygen.\n")
 		return nil, err
@@ -460,7 +460,7 @@ func privateKey(user string) (priv *ecdsa.PrivateKey, err error) {
 // publicKey returns the public key of user by reading file from ~/.ssh/.
 func publicKey(user string) (priv *ecdsa.PublicKey, err error) {
 	// TODO replace someday by keyserver
-	f, err := os.Open(filepath.Join(sshdir(), "public.upspinkey"))
+	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", ciphersuite)))
 	if err != nil {
 		return nil, err
 	}
