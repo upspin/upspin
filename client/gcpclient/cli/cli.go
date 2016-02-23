@@ -127,5 +127,5 @@ func newClient() upspin.Client {
 			Public: upspin.PublicKey("Commander Pike"),
 		},
 	}
-	return client.New(*storeLocation, *dirLocation, userKeys)
+	return client.NewForTesting(*storeLocation, *dirLocation, userKeys)
 }

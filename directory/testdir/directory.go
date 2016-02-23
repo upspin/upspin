@@ -8,6 +8,7 @@ package testdir
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	goPath "path"
 	"sort"
@@ -87,10 +88,10 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	return
 }
 
-var packer = pack.Lookup(upspin.DebugPack)
-
 func packBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
+	log.Printf("pack: Packing: %d", context.Packing)
+	packer := pack.Lookup(context.Packing)
 	cipherLen := packer.PackLen(context, cleartext, nil, name)
 	if cipherLen < 0 {
 		return nil, errors.New("testpack.PackLen failed")
@@ -105,6 +106,8 @@ func packBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) (
 
 func unpackBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
+	log.Printf("unpack: Packing: %d", context.Packing)
+	packer := pack.Lookup(context.Packing)
 	clearLen := packer.UnpackLen(context, ciphertext, nil)
 	if clearLen < 0 {
 		return nil, errors.New("testpack.UnpackLen failed")
@@ -180,7 +183,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 						Endpoint: s.StoreEndpoint,
 						Reference: upspin.Reference{
 							Key:     sha256key.BytesString(hashBytes),
-							Packing: upspin.DebugPack,
+							Packing: s.Context.Packing, // TODO: read it instead
 						},
 					},
 					Metadata: upspin.Metadata{
@@ -232,7 +235,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		}
 		ref := upspin.Reference{
 			Key:     key,
-			Packing: upspin.DebugPack,
+			Packing: s.Context.Packing, // TODO: use the parent's dir packing instead?
 		}
 		s.Root[parsed.User] = ref
 		loc := upspin.Location{
@@ -295,7 +298,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	key, err := s.Store.Put(ciphertext)
 	ref := upspin.Reference{
 		Key:     key,
-		Packing: upspin.DebugPack,
+		Packing: s.Context.Packing, // TODO: use the parent dir's packing instead?
 	}
 	loc := upspin.Location{
 		Endpoint:  s.Store.Endpoint(),
@@ -372,8 +375,9 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		Location: upspin.Location{
 			Endpoint: s.StoreEndpoint,
 			Reference: upspin.Reference{
-				Key:     r.Key,
-				Packing: upspin.DebugPack,
+				Key: r.Key,
+				// THIS IS A HACK (Packing should be stored and retrieved)
+				Packing: s.Context.Packing, // TODO: store Packing in entry.
 			},
 		},
 		Metadata: upspin.Metadata{
@@ -424,7 +428,7 @@ func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, 
 			return nil, err
 		}
 	}
-	if dirRef.Packing != upspin.DebugPack {
+	if dirRef.Packing != s.Context.Packing {
 		return nil, fmt.Errorf("testdir: unexpected packing %d in Fetch", dirRef.Packing)
 	}
 	payload, err := unpackBlob(s.Context, ciphertext, name)
@@ -464,8 +468,9 @@ Loop:
 			}
 		}
 		r := upspin.Reference{
-			Key:     sha256key.BytesString(hashBytes),
-			Packing: upspin.DebugPack,
+			Key: sha256key.BytesString(hashBytes),
+			// THIS IS A HACK
+			Packing: s.Context.Packing, // TODO: read the bytes instead
 		}
 		return r, isDir, nil
 	}
@@ -524,7 +529,7 @@ Loop:
 	}
 	ref := upspin.Reference{
 		Key:     key,
-		Packing: upspin.DebugPack,
+		Packing: s.Context.Packing, // TODO: pass the packing along.
 	}
 	return ref, err
 }

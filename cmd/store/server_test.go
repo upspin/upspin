@@ -57,7 +57,7 @@ func TestGetRemoteFile(t *testing.T) {
 	const RetLink = "http://here-you-go.com"
 	loc := upspin.Location{}
 	loc.Reference.Key = RetLink
-	loc.Endpoint.Transport = upspin.HTTP
+	loc.Endpoint.Transport = upspin.GCP
 	locJSON, err := json.Marshal(loc)
 	if err != nil {
 		t.Fatalf("Error marshalling: %v", err)

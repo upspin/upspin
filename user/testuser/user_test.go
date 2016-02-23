@@ -15,7 +15,9 @@ var (
 )
 
 func setup(t *testing.T) (upspin.User, *upspin.Context) {
-	c := &upspin.Context{}
+	c := &upspin.Context{
+		Packing: upspin.DebugPack,
+	}
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored

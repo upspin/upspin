@@ -124,6 +124,14 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	// Prepares a request to put dirName to the server
 	dirEntry := upspin.DirEntry{
 		Name: dirName,
+		Location: upspin.Location{
+			// Key is ignored.
+			// Endpoint is where we are.
+			Endpoint: upspin.Endpoint{
+				Transport: upspin.GCP,
+				NetAddr:   upspin.NetAddr(d.serverURL),
+			},
+		},
 		Metadata: upspin.Metadata{
 			IsDir:    true,
 			Sequence: 0, // don't care?
@@ -143,15 +151,12 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	if err != nil {
 		return zeroLoc, err
 	}
-	loc, err := parser.LocationResponse(respBody)
+	err = parser.ErrorResponse(respBody)
 	if err != nil {
 		return zeroLoc, newError(op, dirName, err)
 	}
-	if loc == nil {
-		return zeroLoc, newError(op, dirName, errors.New(fmt.Sprintf(serverError, "null Location")))
-	}
 
-	return *loc, nil
+	return dirEntry.Location, nil
 }
 
 // Glob traverses the directory structure looking for entries that

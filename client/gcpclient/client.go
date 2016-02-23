@@ -35,28 +35,35 @@ var (
 	zeroLoc upspin.Location
 )
 
-// New creates a new upspin.Client talking to the GCP backends located
-// at storeURL and dirURL and the User service pre-loaded with the
-// given user keys.
-// TODO: take a Context instead.
-func New(storeURL string, dirURL string, userKeys []UserKeys) upspin.Client {
-	client := Client{
-		context: &upspin.Context{
-			Packing:    upspin.UnsafePack,
-			UserName:   upspin.UserName("edpin@google.com"),
-			PrivateKey: upspin.PrivateKey("Zee Kee"),
-		},
+// New creates a Client for talking to GCP. The client finds the
+// servers according to the given Context.
+func New(context *upspin.Context) upspin.Client {
+	return &Client{
+		context: context,
 	}
-	client.context.User = newUser(client.context)
-	client.context.Store = newStore(client.context, storeURL)
-	client.context.Directory = newDirectory(client.context, dirURL)
+}
+
+// NewForTesting creates a new upspin.Client talking to the GCP
+// backends located at storeURL and dirURL and the User service
+// pre-loaded with the given user keys.
+func NewForTesting(storeURL string, dirURL string, userKeys []UserKeys) upspin.Client {
+	context := &upspin.Context{
+		Packing:    upspin.UnsafePack,
+		UserName:   upspin.UserName("edpin@google.com"),
+		PrivateKey: upspin.PrivateKey("Zee Kee"),
+	}
+
+	context.User = newUser(context)
+	context.Store = newStore(context, storeURL)
+	context.Directory = newDirectory(context, dirURL)
 
 	// TODO: this is a hack.
-	testuser := client.context.User.(*testuser.Service)
+	testuser := context.User.(*testuser.Service)
 	for _, uk := range userKeys {
 		testuser.SetPublicKeys(uk.User, []upspin.PublicKey{uk.Public})
 	}
-	return &client
+
+	return New(context)
 }
 
 // newUser creates a new in-process upspin.User client.

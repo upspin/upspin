@@ -2,17 +2,24 @@
 package test
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/client/gcpclient"
 	"upspin.googlesource.com/upspin.git/client/testclient"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
+	_ "upspin.googlesource.com/upspin.git/directory/gcp"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
+	_ "upspin.googlesource.com/upspin.git/pack/ee"
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/pack/testpack"
+	_ "upspin.googlesource.com/upspin.git/store/gcp"
 )
 
 // Config defines the configuration for each test setup.
@@ -23,19 +30,57 @@ type Config struct {
 	pack      upspin.Packing
 }
 
-func TestAll(t *testing.T) {
-	inProcess := upspin.Endpoint{
+var (
+	// For GCP, start the directory server and store server in
+	// ports 8080 and 8081 respectively and set
+	// --use_localhost_gcp to true in the command line (see init
+	// below)
+	useLocalhostGCP = false
+
+	inProcess = upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
+)
 
+func TestAll(t *testing.T) {
+	if useLocalhostGCP {
+		testAllGCP(t)
+	} else {
+		testAllInProcess(t)
+	}
+}
+
+func testAllGCP(t *testing.T) {
+	gcpLocalDirectoryEndpoint := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   "http://localhost:8081", // default port
+	}
+	gcpLocalStoreEndpoint := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   "http://localhost:8080", // default port
+	}
+
+	var configs = []Config{
+		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.DebugPack},
+		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.PlainPack},
+		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp256Pack},
+		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp521Pack},
+	}
+	for _, config := range configs {
+		newGCPSetup(config.user, config.directory, config.store, config.pack).runAllGCPTests(t)
+	}
+}
+
+func testAllInProcess(t *testing.T) {
 	// Tests create a lot of junk so avoid configs that write to permanent storage.
 	// The user endpoint should almost certainly point to an ephemeral service.
 	var configs = []Config{
 		{inProcess, inProcess, inProcess, upspin.DebugPack},
 		{inProcess, inProcess, inProcess, upspin.PlainPack},
-		{inProcess, inProcess, inProcess, upspin.EEp256Pack},
-		{inProcess, inProcess, inProcess, upspin.EEp521Pack},
+		// EE packing not working with testdir due to lack of support for metadata and packdata.
+		//{inProcess, inProcess, inProcess, upspin.EEp256Pack},
+		//{inProcess, inProcess, inProcess, upspin.EEp521Pack},
 	}
 
 	for _, config := range configs {
@@ -49,9 +94,31 @@ type Setup struct {
 	client  upspin.Client
 }
 
-// newSetup allocates and configures a setup for a test run.
+// newSetup allocates and configures a setup for a test run using a testclient as Client.
 // The user's name inside the context is set separately using the newUser method.
 func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
+	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
+	s := &Setup{
+		context: context,
+		client:  testclient.New(context),
+	}
+	return s
+}
+
+// newSetup allocates and configures a setup for a test run using a gcpclient as Client.
+// The user's name inside the context is set separately using the newUser method.
+func newGCPSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
+	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
+	s := &Setup{
+		context: context,
+		client:  gcpclient.New(context),
+	}
+	return s
+}
+
+// newSetup allocates and configures a context according to the given endpoints and packing.
+// The user's name inside the context is set separately using the newUser method.
+func newContext(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *upspin.Context {
 	context := new(upspin.Context)
 	var err error
 	context.Packing = packing
@@ -68,11 +135,7 @@ func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing 
 	if err != nil {
 		panic(err)
 	}
-	s := &Setup{
-		context: context,
-		client:  testclient.New(context),
-	}
-	return s
+	return context
 }
 
 var userNameCounter = 0
@@ -83,6 +146,7 @@ func (s *Setup) newUser() {
 	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 	userNameCounter++
 	s.context.UserName = userName
+	s.context.PrivateKey = []byte("my test private key")
 	err := s.context.User.(*testuser.Service).Install(userName, s.context.Directory) // TODO: this is a hack.
 	if err != nil && !strings.Contains(err.Error(), "already installed") {           // TODO: this is a hack.
 		panic(err)
@@ -106,6 +170,11 @@ func (s *Setup) setupFileIO(fileName upspin.PathName, max int, t *testing.T) (up
 func (s *Setup) runAllTests(t *testing.T) {
 	s.TestPutGetTopLevelFile(t)
 	s.TestFileSequentialAccess(t)
+}
+
+func (s *Setup) runAllGCPTests(t *testing.T) {
+	// GCP client does not yet implement the File interface
+	s.TestPutGetTopLevelFile(t)
 }
 
 func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
@@ -178,4 +247,9 @@ func (s *Setup) TestFileSequentialAccess(t *testing.T) {
 			}
 		}
 	}
+}
+
+func init() {
+	flag.BoolVar(&useLocalhostGCP, "use_localhost_gcp", false, "set to true to use GCP on the localhost using the default ports (8080 and 8081 for store and directory respectively)")
+
 }
