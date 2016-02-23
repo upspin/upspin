@@ -12,6 +12,7 @@ import (
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.

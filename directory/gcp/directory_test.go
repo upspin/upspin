@@ -63,7 +63,7 @@ func TestMkdirError(t *testing.T) {
 
 func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
-	mkdirEntry.Location = upspin.Location{}
+	mkdirEntry.Location.Reference = upspin.Reference{}
 	mkdirEntry.Metadata.IsDir = true
 	mkdirEntry.Metadata.PackData = nil
 	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
@@ -75,6 +75,8 @@ func TestMkdir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
+	// GCP servers don't have a Key for directory entries since they're stored locally.
+	location.Reference.Key = ""
 	if loc != location {
 		t.Fatalf("Expected location %v, got %v", location, loc)
 	}
@@ -83,7 +85,15 @@ func TestMkdir(t *testing.T) {
 }
 
 func newMockMkdirResponse(t *testing.T) []nettest.MockHTTPResponse {
-	return []nettest.MockHTTPResponse{newMockLocationResponse(t)}
+	return []nettest.MockHTTPResponse{newMockSuccessResponse(t)}
+}
+
+func newMockSuccessResponse(t *testing.T) nettest.MockHTTPResponse {
+	success, err := json.Marshal(&struct{ Error string }{Error: "success"})
+	if err != nil {
+		t.Fatalf("JSON marshal failed: %v", err)
+	}
+	return newResp(success)
 }
 
 func newMockLocationResponse(t *testing.T) nettest.MockHTTPResponse {
