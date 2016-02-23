@@ -57,6 +57,11 @@ func (u *UnsafePack) Packing() upspin.Packing {
 	return upspin.UnsafePack
 }
 
+// String implements the Packer interface
+func (u *UnsafePack) String() string {
+	return "unsafe"
+}
+
 // unpackMeta traverses the packdata portion of the metadata and
 // unpacks it, returning the wrapped keys as well as a signature.
 func (u *UnsafePack) unpackMeta(meta []byte) *clearMeta {
