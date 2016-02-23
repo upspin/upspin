@@ -1,4 +1,4 @@
-package store
+package gcpstore
 
 import (
 	"encoding/json"
