@@ -358,6 +358,24 @@
     },
     {
       "key": {
+        "uuid": "a21241d6_e9cfb5d0",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-23T00:56:37Z",
+      "side": 1,
+      "message": "there is a way for json to work on unexported data. you can use tags to rename the thing for json.\n\nbut a TODO is also fine.",
+      "parentUuid": "62be89e4_4bfc655d",
+      "revId": "ec0bf44afc40743f22dc706d3a639d91dcbd6594",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62be89e4_7d748fd8",
         "filename": "pack/unsafe/unsafe.go",
         "patchSetId": 4
