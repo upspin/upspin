@@ -11,8 +11,8 @@ import (
 	"log"
 
 	"upspin.googlesource.com/upspin.git/access"
-	_ "upspin.googlesource.com/upspin.git/directory/gcp"
-	_ "upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 

@@ -1,5 +1,5 @@
 // Package directory implements the interface upspin.Directory for talking to an HTTP server.
-package directory
+package gcpdir
 
 import (
 	"bytes"

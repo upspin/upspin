@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	_ "upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 
 	"upspin.googlesource.com/upspin.git/access"

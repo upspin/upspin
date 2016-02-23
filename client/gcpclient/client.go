@@ -13,9 +13,9 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/directory/gcp"
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
-	_ "upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 )
 
 type Client struct {
