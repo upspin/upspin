@@ -17,13 +17,7 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func TestPack(t *testing.T) {
-	const (
-		name upspin.PathName = "user@google.com/file/of/user"
-		text                 = "this is some text"
-	)
-	packer := pack.Lookup(upspin.EEp256Pack)
-
+func testPackAndUnpack(t *testing.T, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	data := []byte(text)
 	meta := upspin.Metadata{}
@@ -42,7 +36,25 @@ func TestPack(t *testing.T) {
 	}
 	clear = clear[:m]
 	str := string(clear[:m])
-	if str != text {
+	if str != string(text) {
 		t.Errorf("text: expected %q; got %q", text, str)
 	}
+}
+
+func TestPack256(t *testing.T) {
+	const (
+		name upspin.PathName = "user@google.com/file/of/user.256"
+		text                 = "this is some text 256"
+	)
+	packer := pack.Lookup(upspin.EEp256Pack)
+	testPackAndUnpack(t, packer, name, []byte(text))
+}
+
+func TestPack521(t *testing.T) {
+	const (
+		name upspin.PathName = "user@google.com/file/of/user.521"
+		text                 = "this is some text 521"
+	)
+	packer := pack.Lookup(upspin.EEp521Pack)
+	testPackAndUnpack(t, packer, name, []byte(text))
 }

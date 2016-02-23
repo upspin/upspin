@@ -9,21 +9,22 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-func main() {
-	log.SetFlags(0)
-	log.SetPrefix("keygen: ")
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+func createKeys(curve elliptic.Curve, packing upspin.Packing) {
+	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
 		log.Fatalf("key not generated: %s\n", err)
 	}
 
-	private, err := os.Create(filepath.Join(sshdir(), "secret.upspinkey"))
+	private, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	public, err := os.Create(filepath.Join(sshdir(), "public.upspinkey"))
+	public, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", packing)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,6 +53,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
+	log.SetFlags(0)
+	log.SetPrefix("keygen: ")
+
+	createKeys(elliptic.P256(), upspin.EEp256Pack)
+	createKeys(elliptic.P521(), upspin.EEp521Pack)
 }
 
 func sshdir() string {
