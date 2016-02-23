@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_e02a3374",
+        "filename": "client/testclient/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T00:51:24Z",
+      "side": 1,
+      "message": "Done.\n\nBut I\u0027m interested in learning the rationale for one vs the other.",
+      "parentUuid": "a21241d6_497c8146",
+      "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_29794d56",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-23T00:46:37Z",
       "side": 1,
       "message": "i would just copy the text from Directory.Glob.",
+      "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_c02f2f82",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T00:51:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_29794d56",
       "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
