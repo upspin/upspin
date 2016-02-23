@@ -105,25 +105,32 @@ type Packer interface {
 }
 
 const (
+	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
+	// It is the default packing but is, of course, insecure.
+	PlainPack = 0
+
+	// Packings from 1 through 16 are not for production use. This region
+	// is reserved for debugging and other temporary packing implementations.
+
 	// The DebugPack packing is available for use in tests for any purpose.
 	// It is never used in production.
-	DebugPack Packing = iota
+	DebugPack Packing = 1
 
 	// UnsafePack is an obfuscating packing that is
 	// cryptographically unsound. It is similar to DebugPack, but
 	// updates the metadata with wrapped keys and signs
 	// messages. It should never be used in production.
-	UnsafePack
+	UnsafePack = 2
 
-	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
-	PlainPack
+	// Packings from 16 and above (as well as PlainPack=0) are fixed in
+	// value and semantics and may be used in production.
 
 	// EEp256Pack and EEp521Pack store AES-encrypted data, with metadata
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// EEp256Pack packing uses AES-128, SHA-256, and curve P256.
-	EEp256Pack
+	EEp256Pack = 16
 	// EEp521Pack packing uses AES-256, SHA-512, and curve P521.
-	EEp521Pack
+	EEp521Pack = 17
 )
 
 // User service.
