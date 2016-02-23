@@ -22,3 +22,14 @@ func (Reference) Marshal([]byte) error {
 func (Reference) Unmarshal([]byte) error {
 	panic("unimplemented")
 }
+
+// Packing returns the Packing type to which this PackData applies, identified
+// by the initial byte of the PackData.
+func (p PackData) Packing() Packing {
+	return Packing(p[0])
+}
+
+// Data returns the data in the PackData, the bytes after the initial Packing metadata byte.
+func (p PackData) Data() []byte {
+	return p[1:]
+}

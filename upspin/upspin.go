@@ -62,6 +62,12 @@ type Reference struct {
 	Packing Packing
 }
 
+// PackData stores the encoded information used to pack the data in an
+// item, such decryption keys. The first byte identifies the Packing
+// used to store the information; the rest of the slice is the data
+// itself.
+type PackData []byte
+
 // A Packing identifies the technique for turning the data pointed to by
 // a Reference into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
