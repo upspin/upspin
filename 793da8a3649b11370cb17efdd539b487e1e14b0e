@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a21241d6_497c8146",
+        "filename": "client/testclient/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-23T00:46:37Z",
+      "side": 1,
+      "message": "why use a closure for this? just write a for loop.\n\ncheckPaths seems like a good use of a closure, on the other hand. it could also be done as a loop over test cases but it\u0027s fine as is.",
+      "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_29794d56",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-23T00:46:37Z",
+      "side": 1,
+      "message": "i would just copy the text from Directory.Glob.",
+      "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
