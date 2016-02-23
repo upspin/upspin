@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "a21241d6_c9bd1130",
+        "filename": "client/testclient/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-23T01:25:17Z",
+      "side": 1,
+      "message": "Isn\u0027t the loop simpler? It\u0027s also less code and more efficient.\nJust style, preference I guess. Closures are heavier weight than loops so I go for lighter weight unless it\u0027s necessary or much clearer.",
+      "parentUuid": "62be89e4_e02a3374",
+      "revId": "793da8a3649b11370cb17efdd539b487e1e14b0e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_29794d56",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
