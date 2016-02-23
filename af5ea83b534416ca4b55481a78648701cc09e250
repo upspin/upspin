@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_6032a3d5",
+        "filename": "client/gcpclient/cli/cli.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T01:07:20Z",
+      "side": 1,
+      "message": "Ok. Good to know. Since other CLIs are like this, I\u0027ll keep them consistent for now.",
+      "parentUuid": "a21241d6_89def983",
+      "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_a9d9bd9f",
         "filename": "pack/keygen/keygen.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-23T00:56:37Z",
       "side": 1,
       "message": "the previous code is correct. this is not. you need to check errors on close for keygen.\n\nin any case it\u0027s silly to defer a call on the last line of a function. and also if it were there (it should not be) it should be derferred right after the create is known to have succeeded.\n\nall this applied to private as well.\n\nbasically, revert these changes.",
+      "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_e056b3d6",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T01:07:20Z",
+      "side": 1,
+      "message": "Yeah, this was a bad 3-way merge. I had fixed this code one way, then Eric fixed it another and the merge was the worst possible one... Fixed.",
+      "parentUuid": "a21241d6_a9d9bd9f",
       "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_804ed737",
+        "filename": "pack/unsafe/unsafe_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T01:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_69c4e5b2",
+      "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_49c121a1",
         "filename": "pack/unsafe/unsafe_test.go",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-23T00:56:37Z",
       "side": 1,
       "message": "where do these numbers come from?\ncan you compute them instead?\nor write the test so the values aren\u0027t critical?",
+      "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_00876793",
+        "filename": "pack/unsafe/unsafe_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-23T01:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_49c121a1",
       "revId": "af5ea83b534416ca4b55481a78648701cc09e250",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
