@@ -36,3 +36,15 @@ func Lookup(p upspin.Packing) upspin.Packer {
 	mu.Unlock() // Not worth a defer.
 	return packer
 }
+
+// LookupByName returns the implementation of the specified Packing, or nil if none is registered.
+func LookupByName(name string) upspin.Packer {
+	mu.Lock()
+	defer mu.Unlock()
+	for _, packer := range packers {
+		if packer.String() == name {
+			return packer
+		}
+	}
+	return nil
+}
