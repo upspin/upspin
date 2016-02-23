@@ -127,5 +127,7 @@ func newClient() upspin.Client {
 			Public: upspin.PublicKey("Commander Pike"),
 		},
 	}
-	return client.New(*storeLocation, *dirLocation, userKeys)
+	// TODO: should be New(context) instead, but we're faking some
+	// user keys, so use the testing interface for now.
+	return client.NewForTesting(*storeLocation, *dirLocation, userKeys)
 }

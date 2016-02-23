@@ -15,7 +15,9 @@ var (
 )
 
 func setup(t *testing.T) (upspin.User, *upspin.Context) {
-	c := &upspin.Context{}
+	c := &upspin.Context{
+		Packing: upspin.DebugPack,
+	}
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -49,7 +51,7 @@ func TestInstallAndLookup(t *testing.T) {
 	}
 	eRecv, keys, err := u.Lookup(userName)
 	if err != nil {
-		t.Fatal("Expected no error, got %v", err)
+		t.Fatalf("Expected no error, got %v", err)
 	}
 	if len(keys) != 0 {
 		t.Errorf("Expected no keys for user %v, got %d", userName, len(keys))
@@ -58,7 +60,7 @@ func TestInstallAndLookup(t *testing.T) {
 		t.Fatalf("Expected 1 endpoint, got %d", len(eRecv))
 	}
 	if eRecv[0].Transport != upspin.InProcess {
-		t.Error("Expected endpoint to be %d, but instead it was %d", upspin.InProcess, eRecv[0].Transport)
+		t.Errorf("Expected endpoint to be %d, but instead it was %d", upspin.InProcess, eRecv[0].Transport)
 	}
 }
 
@@ -75,7 +77,7 @@ func TestPublicKeysAndUsers(t *testing.T) {
 
 	_, keys, err := u.Lookup(userName)
 	if err != nil {
-		t.Fatal("Expected no error, got %v", err)
+		t.Fatalf("Expected no error, got %v", err)
 	}
 	if len(keys) != 1 {
 		t.Fatalf("Expected 1 key for user %v, got %d", userName, len(keys))

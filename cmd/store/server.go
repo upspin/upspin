@@ -114,7 +114,7 @@ func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 
 	location := upspin.Location{}
 	location.Reference.Key = link
-	location.Endpoint.Transport = upspin.HTTP // Go fetch using the provided link.
+	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
 	log.Printf("Got link: %v\n", link)
 	netutil.SendJSONReply(w, location)
 }

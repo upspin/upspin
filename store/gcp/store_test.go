@@ -25,6 +25,10 @@ var (
 		Reference: upspin.Reference{
 			Key: "new key",
 		},
+		Endpoint: upspin.Endpoint{
+			Transport: upspin.GCP,
+			NetAddr:   upspin.NetAddr("http://localhost:8080"),
+		},
 	}
 
 	errInvalidKey = NewStoreError(invalidKeyError, "")

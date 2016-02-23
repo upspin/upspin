@@ -90,6 +90,11 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 		if err != nil {
 			return nil, nil, NewStoreError(err.Error(), key)
 		}
+		// If the server did not specify the endpoint, it's
+		// implicitly there; patch it.
+		if len(loc.Endpoint.NetAddr) == 0 {
+			loc.Endpoint.NetAddr = upspin.NetAddr(s.serverURL)
+		}
 		locs := []upspin.Location{*loc}
 		return nil, locs, nil
 	case "text/plain", "text/plain; charset=utf-8", "application/x-gzip":

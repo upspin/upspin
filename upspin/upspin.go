@@ -21,9 +21,6 @@ const (
 
 	// GCP indicates a Google Cloud Store instance.
 	GCP
-
-	// HTTP is a URL-encoded address.
-	HTTP
 )
 
 // A Location identifies where a piece of data is stored and how to retrieve it.
