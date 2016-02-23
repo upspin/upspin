@@ -23,6 +23,10 @@ func (plainPack) Packing() upspin.Packing {
 	return upspin.PlainPack
 }
 
+func (plainPack) String() string {
+	return "plain"
+}
+
 func (plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
@@ -43,8 +47,4 @@ func (plainPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin
 
 func (plainPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
 	return len(ciphertext)
-}
-
-func (plainPack) String() string {
-	return "plain"
 }

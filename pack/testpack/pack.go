@@ -27,6 +27,10 @@ func (testPack) Packing() upspin.Packing {
 	return upspin.DebugPack
 }
 
+func (testPack) String() string {
+	return "debug"
+}
+
 const cryptByte = 0x55
 
 // Lazy reversible encryption/decryption. Simple; fine for tests.

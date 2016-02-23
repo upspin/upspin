@@ -79,6 +79,9 @@ type Packer interface {
 	// Packing returns the integer identifier of this Packing algorithm.
 	Packing() Packing
 
+	// String returns the name of this packer.
+	String() string
+
 	// Pack takes cleartext data, metadata and path name and
 	// stores the ciphertext encoding in the supplied slice.
 	// The ciphertext and cleartext slices must not overlap.
