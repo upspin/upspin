@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a21241d6_cc6d1f06",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "s/io reader/non-nil io.Reader/",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_8c672724",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "is this right, or do we do getenv(\"HOME\")?",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_ac62eb13",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "defer f.Close()",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_6c5d134f",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "check scan.Err?",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_4c5a4f59",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "can\u0027t you return an error? panic isn\u0027t necessary",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_2c571b31",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "this can and maybe should go to the pack package",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_0c545728",
+        "filename": "context/initcontext_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-24T01:51:21Z",
+      "side": 1,
+      "message": "this is fine and leave it if you like, but i would be lazy and do a top-level\n\nvar errUnimplemented \u003d errors.New(\"unimplemented\")\n\nand use it everywhere",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
