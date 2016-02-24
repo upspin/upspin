@@ -180,7 +180,7 @@ func eePack(ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin
 			return 0, err
 		}
 	}
-	meta.PackData, err = pdMarshal(sig, wrap)
+	err = pdMarshal(&meta.PackData, sig, wrap)
 	return nCipher, err
 }
 
@@ -314,29 +314,42 @@ func aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err error) {
 	return
 }
 
-func pdMarshal(sig signature, wrap []wrappedKey) ([]byte, error) {
-	// TODO Guarantee dst is large enough; assume Varint could be 10.
-	dst := make([]byte, 200+len(wrap)*(sha256.Size+128+2*aesLen+116+10000)) // TODO len
-	n := 0
-	n += pdPutBytes(dst[n:], sig.r.Bytes())
-	n += pdPutBytes(dst[n:], sig.s.Bytes())
-	n += binary.PutVarint(dst[n:], int64(len(wrap)))
-	for _, w := range wrap {
-		n += pdPutBytes(dst[n:], w.keyHash)
-		n += pdPutBytes(dst[n:], w.encrypted)
-		n += pdPutBytes(dst[n:], w.nonce)
-		n += pdPutBytes(dst[n:], w.ephemeral.X.Bytes())
-		n += pdPutBytes(dst[n:], w.ephemeral.Y.Bytes())
+func pdMarshal(dst *[]byte, sig signature, wrap []wrappedKey) error {
+	// byteLen is copied from elliptic.go:Marshal()
+	byteLen := (curve.Params().BitSize + 7) >> 3
+	// n big enough for ciphersuite, sig.r, sig.s, len(wrap), {keyHash, encrypted, nonce, X, y}
+	n := 1 + 2*byteLen + (1+5*len(wrap))*binary.MaxVarintLen64 +
+		len(wrap)*(sha256.Size+(aesLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
+	// TODO great, but how is the ordinary user to know? maybe  PackdataLen(len(usernames))
+	if len(*dst) < n {
+		*dst = make([]byte, n)
 	}
-	dst = dst[:n]
-	return dst, nil // err impossible for now but the night is young
+	// dst is now guaranteed large enough
+	(*dst)[0] = byte(ciphersuite)
+	n = 1
+	n += pdPutBytes((*dst)[n:], sig.r.Bytes())
+	n += pdPutBytes((*dst)[n:], sig.s.Bytes())
+	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
+	for _, w := range wrap {
+		n += pdPutBytes((*dst)[n:], w.keyHash)
+		n += pdPutBytes((*dst)[n:], w.encrypted)
+		n += pdPutBytes((*dst)[n:], w.nonce)
+		n += pdPutBytes((*dst)[n:], w.ephemeral.X.Bytes())
+		n += pdPutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
+	}
+	*dst = (*dst)[:n]
+	return nil // err impossible for now but the night is young
 }
 
 func pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wrap []wrappedKey, err error) {
+	if pd[0] != byte(ciphersuite) {
+		return sig0, nil, fmt.Errorf("expected packing %d, got %d", ciphersuite, pd[0])
+	}
+	n := 1
 	sig.r = big.NewInt(0)
 	sig.s = big.NewInt(0)
-	buf := make([]byte, 2000) // TODO  This is a big overestimate.  Rewrite using CurveParams.
-	n := 0
+	byteLen := (curve.Params().BitSize + 7) >> 3
+	buf := make([]byte, byteLen)
 	n += pdGetBytes(&buf, pd[n:])
 	sig.r.SetBytes(buf)
 	n += pdGetBytes(&buf, pd[n:])
