@@ -1,4 +1,4 @@
-package directory
+package gcpdir
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	store "upspin.googlesource.com/upspin.git/store/gcp"
+	store "upspin.googlesource.com/upspin.git/store/gcpstore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
