@@ -1,5 +1,5 @@
 // Package store implements the interface upspin.Store for talking to Google Cloud Platform (GCP).
-package store
+package gcpstore
 
 import (
 	"bytes"

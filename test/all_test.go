@@ -14,13 +14,13 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/directory/gcp"
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/pack/testpack"
 	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
-	_ "upspin.googlesource.com/upspin.git/store/gcp"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 )
 
 // Config defines the configuration for each test setup.
