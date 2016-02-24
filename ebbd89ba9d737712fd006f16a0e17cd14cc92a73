@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_25e6f593",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-24T01:29:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_ac142b87",
+      "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_cc1f5fa2",
         "filename": "test/all_test.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-24T00:48:05Z",
       "side": 1,
       "message": "// TODO: Delete when it does.",
+      "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_651f4d4f",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-24T01:29:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_cc1f5fa2",
       "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_451c4958",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-24T01:29:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_ec1a23b4",
+      "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_0c4d77b2",
         "filename": "user/testuser/user.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-24T00:48:05Z",
       "side": 1,
       "message": "I don\u0027t mind this change but are you asserting that MakeDirectory can\u0027t handle a user name as a directory?",
+      "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_253155ed",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-24T01:29:26Z",
+      "side": 1,
+      "message": "Yes, the GCP client and server don\u0027t allow that. The testdir does, but it internally adds \"/\" to the path once it parses a user.",
+      "parentUuid": "a21241d6_0c4d77b2",
       "revId": "ebbd89ba9d737712fd006f16a0e17cd14cc92a73",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
