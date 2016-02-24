@@ -50,3 +50,22 @@ func (e *ExpectGetGCP) Get(ref string) (link string, error error) {
 	}
 	return "", errors.New("not found")
 }
+
+// CapturePutGCP captures the parameters to all calls to Put. It
+// should only be used as part of ExpectGetCapturePutGCP because it
+// does not implement DummyGCP.
+type CapturePutGCP struct {
+	PutRef      []string
+	PutContents [][]byte
+}
+
+func (c *CapturePutGCP) Put(ref string, contents []byte) (refLink string, error error) {
+	c.PutRef = append(c.PutRef, ref)
+	c.PutContents = append(c.PutContents, contents)
+	return "", nil
+}
+
+type ExpectGetCapturePutGCP struct {
+	ExpectGetGCP
+	CapturePutGCP
+}
