@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_c36bac5d",
+        "filename": "cloud/gcp/gcptest/gcptest.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done\n\nPS: A friend of mine once wrote a spell checker for C++ -- it looked into comments and strings. I\u0027m sure there must be one for Go somewhere. If you know of one, please share. Otherwise, I\u0027ll look into it. Thanks.",
+      "parentUuid": "a21241d6_2c6f1b3a",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_0c6c5741",
         "filename": "cmd/user/cli/cli.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-25T06:45:04Z",
       "side": 1,
       "message": "all these programs in directories called \"cli\" will be installed as \"cli\" if you do go install. maybe they should have distinct names, like usercli etc.\nc.f. my recent change to the gcp packages.",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_8365b48a",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "I\u0027ll get this fixed in the next CL. Thanks.",
+      "parentUuid": "a21241d6_0c6c5741",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_6362a082",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_8fa4b9d0",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_af9f7d79",
         "filename": "cmd/user/cli/cli.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-25T06:45:04Z",
       "side": 1,
       "message": "setRoot not implemented yet\n\notherwise it\u0027s mysterious when you get the error",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_030644b5",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_af9f7d79",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_e30a30b7",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_6faaa59c",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_4fa7e1d2",
         "filename": "cmd/user/server.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-02-25T06:45:04Z",
       "side": 1,
       "message": "you might be able to use path.Parse.\nif not, path.Parse needs work",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_a33f986a",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Ah, yeah. Good point. Done.",
+      "parentUuid": "a21241d6_4fa7e1d2",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_63498006",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "I meant \"on the response channel\", but your suggestion is better. Done. Thanks.",
+      "parentUuid": "a21241d6_2fb4adfd",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_0fb1e90d",
         "filename": "cmd/user/server.go",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2016-02-25T06:45:04Z",
       "side": 1,
       "message": "JSON",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_235ca8c5",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_0fb1e90d",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_a3ed581a",
+        "filename": "user/gcpuser/user.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "I\u0027ve fixed it on line 86, but here I don\u0027t have an err yet.",
+      "parentUuid": "a21241d6_4c724f26",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_6c75130c",
         "filename": "user/gcpuser/user_test.go",
         "patchSetId": 3
@@ -166,6 +328,24 @@
       "writtenOn": "2016-02-25T06:45:04Z",
       "side": 1,
       "message": "not important but this could be t.Fatal",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_63f740eb",
+        "filename": "user/gcpuser/user_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T17:51:45Z",
+      "side": 1,
+      "message": "Done. Improved the message a little bit too.",
+      "parentUuid": "a21241d6_6c75130c",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
