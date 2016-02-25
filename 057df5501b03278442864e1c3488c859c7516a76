@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_68e4b8fa",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-25T22:59:26Z",
+      "side": 1,
+      "message": "The classic failure mode for PGP in hands of a novice user is to send the private key instead of the public key.  It is important here to say more about which keyfile you mean, and then do some sanity check below.",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_8fa4b9d0",
         "filename": "cmd/user/cli/cli.go",
         "patchSetId": 3
@@ -171,6 +188,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "a21241d6_6faaa59c",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_e8d8c839",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-25T22:59:26Z",
+      "side": 1,
+      "message": "sanity check goes here (for data actually holding a public key)",
       "revId": "057df5501b03278442864e1c3488c859c7516a76",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
