@@ -275,7 +275,7 @@ func aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedK
 	v, err := ecdsa.GenerateKey(curve, rand.Reader)
 	sx, sy := curve.ScalarMult(R.X, R.Y, v.D.Bytes())
 	S := elliptic.Marshal(curve, sx, sy)
-	w.ephemeral = ecdsa.PublicKey{curve, v.X, v.Y}
+	w.ephemeral = ecdsa.PublicKey{Curve: curve, X: v.X, Y: v.Y}
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
 	w.nonce = make([]byte, gcmStandardNonceSize)
@@ -390,7 +390,7 @@ func pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wrap []wrapped
 		w.keyHash = make([]byte, sha256.Size)
 		w.encrypted = make([]byte, 100) // TODO len
 		w.nonce = make([]byte, gcmStandardNonceSize)
-		w.ephemeral = ecdsa.PublicKey{curve, big.NewInt(0), big.NewInt(0)}
+		w.ephemeral = ecdsa.PublicKey{Curve: curve, X: big.NewInt(0), Y: big.NewInt(0)}
 		n += pdGetBytes(&w.keyHash, pd[n:])
 		n += pdGetBytes(&w.encrypted, pd[n:])
 		n += pdGetBytes(&w.nonce, pd[n:])
@@ -491,7 +491,7 @@ func privateKey(user string) (priv *ecdsa.PrivateKey, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ecdsa.PrivateKey{*pubkey, &d}, nil
+	return &ecdsa.PrivateKey{PubicKey: *pubkey, D: &d}, nil
 }
 
 // publicKey returns the public key of user by reading file from ~/.ssh/.
@@ -507,7 +507,7 @@ func publicKey(user string) (priv *ecdsa.PublicKey, err error) {
 	if err != nil || n != 2 {
 		return nil, err
 	}
-	return &ecdsa.PublicKey{curve, &x, &y}, nil
+	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, nil
 }
 
 func sshdir() string {
