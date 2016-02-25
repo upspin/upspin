@@ -20,7 +20,7 @@ import (
 
 var (
 	userLocation = flag.String("user", "http://localhost:8082", "URL of the user service location")
-	keyFile      = flag.String("key", "", "full pathname of the PUBLIC key file used with addkey or empty for stdin")
+	keyFile      = flag.String("key", "", "full pathname of the public key file used with addkey or empty for stdin")
 )
 
 func main() {
@@ -85,7 +85,7 @@ func addKey(user upspin.UserName) {
 	} else {
 		file := strings.ToLower(*keyFile)
 		if strings.Contains(file, "secret") || strings.Contains(file, "private") {
-			log.Fatalf("Key file must contain the PUBLIC key. Filename %q is not accepted.", *keyFile)
+			log.Fatalf("Key file must contain the public key. Filename %q is not accepted.", *keyFile)
 		}
 		input, err = os.Open(*keyFile)
 		if err != nil {
