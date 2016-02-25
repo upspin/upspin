@@ -146,7 +146,3 @@ func (testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upsp
 	br.Seek(int64(nameLen), 1)
 	return int(br.Len())
 }
-
-func (testPack) String() string {
-	return "test"
-}
