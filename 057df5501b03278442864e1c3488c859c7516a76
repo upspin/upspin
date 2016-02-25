@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a21241d6_2c6f1b3a",
+        "filename": "cloud/gcp/gcptest/gcptest.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "captures",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_0c6c5741",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "all these programs in directories called \"cli\" will be installed as \"cli\" if you do go install. maybe they should have distinct names, like usercli etc.\nc.f. my recent change to the gcp packages.",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_8fa4b9d0",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "setRoot",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_af9f7d79",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "setRoot not implemented yet\n\notherwise it\u0027s mysterious when you get the error",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_6faaa59c",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "addKey",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_4fa7e1d2",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "you might be able to use path.Parse.\nif not, path.Parse needs work",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_2fb4adfd",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "\"as the response\"?",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_0fb1e90d",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "JSON",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_4c724f26",
+        "filename": "user/gcpuser/user.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "here and on 86, why not just return nil, err? it\u0027s fine to leave it like this though",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_6c75130c",
+        "filename": "user/gcpuser/user_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:45:04Z",
+      "side": 1,
+      "message": "not important but this could be t.Fatal",
+      "revId": "057df5501b03278442864e1c3488c859c7516a76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
