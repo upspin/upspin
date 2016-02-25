@@ -85,7 +85,9 @@ type Packer interface {
 	// Pack takes cleartext data, metadata and path name and
 	// stores the ciphertext encoding in the supplied slice.
 	// The ciphertext and cleartext slices must not overlap.
-	// Pack might update the metadata.
+	// Pack might update the metadata, which must not be
+	// nil but might have a nil PackData field. If meta.PackData has length>0,
+	// the first byte must be the correct value of Packing.
 	// The slice must be large enough; the PackLen method may be used to
 	// find a suitable allocation size.
 	// The returned count is the length of the ciphertext.
@@ -94,18 +96,24 @@ type Packer interface {
 	// Unpack takes ciphertext data and packing metadata and stores the
 	// cleartext version in the supplied slice, which must be large enough.
 	// The ciphertext and cleartext slices must not overlap.
-	// Unpack might update the metadata.
+	// Unpack might update the metadata, which must have the correct Packing
+	// value already present in meta.PackData[0].
 	// It returns the path name and the number of bytes written to the slice.
 	// The returned name will be empty if the ciphertext does not contain one.
 	Unpack(context *Context, cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
 
 	// PackLen returns an upper bound on the number of bytes required
-	// to store the cleartext after packing. It might update the metadata.
+	// to store the cleartext after packing.
+	// PackLen might update the metadata, which must not be
+	// nil but might have a nil PackData field. If meta.PackData has length>0,
+	// the first byte must be the correct value of Packing.
 	// Returns -1 if there is an error.
 	PackLen(context *Context, cleartext []byte, meta *Metadata, name PathName) int
 
 	// UnpackLen returns an upper bound on the number of bytes required
-	// to store the unpacked cleartext. It might update the metadata.
+	// to store the unpacked cleartext.
+	// UnpackLen might update the metadata, which must have the correct Packing
+	// value already present in meta.PackData[0].
 	// Returns -1 if there is an error.
 	UnpackLen(context *Context, ciphertext []byte, meta *Metadata) int
 }
@@ -120,7 +128,7 @@ const (
 
 	// The DebugPack packing is available for use in tests for any purpose.
 	// It is never used in production.
-	DebugPack Packing = 1
+	DebugPack = 1
 
 	// UnsafePack is an obfuscating packing that is
 	// cryptographically unsound. It is similar to DebugPack, but
@@ -172,7 +180,7 @@ type Directory interface {
 	// directories. The final element, if it exists, must not be a directory.
 	// If something is already stored under the path, the new data and
 	// packdata replace the old.
-	Put(path PathName, data []byte, packdata []byte) (Location, error)
+	Put(path PathName, data []byte, packdata PackData) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name

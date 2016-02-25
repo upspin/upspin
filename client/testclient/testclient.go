@@ -10,6 +10,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+// TODO: Total hack.
+var TODOMeta = &upspin.Metadata{
+	PackData: []byte{upspin.DebugPack},
+}
+
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
 	ctxt *upspin.Context
@@ -93,14 +98,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			if packer == nil {
 				return nil, fmt.Errorf("testclient: unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
 			}
-			clearLen := packer.UnpackLen(c.ctxt, cipher, nil)
+			clearLen := packer.UnpackLen(c.ctxt, cipher, TODOMeta)
 			if clearLen < 0 {
 				return nil, fmt.Errorf("testclient: UnpackLen failed for %q", name)
 			}
 			cleartext := make([]byte, clearLen)
 			// Must use a canonicalized name. TODO: Put this in package path?
 			parsed, _ := path.Parse(name) // Known to be error-free.
-			n, err := packer.Unpack(c.ctxt, cleartext, cipher, nil, parsed.Path())
+			n, err := packer.Unpack(c.ctxt, cleartext, cipher, TODOMeta, parsed.Path())
 			if err != nil {
 				return nil, err // Showstopper.
 			}
@@ -127,7 +132,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	if err != nil {
 		return loc0, err
 	}
-	return dir.Put(name, data, nil) // TODO packdata
+	return dir.Put(name, data, TODOMeta.PackData)
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {

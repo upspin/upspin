@@ -31,7 +31,7 @@ func setupContext() {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context = new(upspin.Context)
-	context.Packing = upspin.PlainPack // TODO.
+	context.Packing = upspin.DebugPack // TODO.
 	var err error
 	context.User, err = access.BindUser(context, endpoint)
 	if err != nil {

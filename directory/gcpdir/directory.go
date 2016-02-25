@@ -63,7 +63,7 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return dirEntry, nil
 }
 
-func (d *Directory) Put(name upspin.PathName, data, packdata []byte) (upspin.Location, error) {
+func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
 	var zeroLoc upspin.Location
 	const op = "Put"
 

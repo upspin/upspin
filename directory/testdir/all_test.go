@@ -28,6 +28,10 @@ var (
 
 var context *upspin.Context
 
+var meta = &upspin.Metadata{
+	PackData: []byte{upspin.DebugPack},
+}
+
 func setupContext() {
 	if context != nil {
 		return
@@ -50,7 +54,7 @@ func setupContext() {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context = new(upspin.Context)
-	context.Packing = upspin.PlainPack // TODO.
+	context.Packing = upspin.DebugPack // TODO.
 	var err error
 	context.User, err = access.BindUser(context, endpoint)
 	if err != nil {
@@ -85,7 +89,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	loc, err := context.Directory.Put(fileName, []byte(text), nil) // TODO.
+	loc, err := context.Directory.Put(fileName, []byte(text), meta.PackData)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -133,7 +137,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		loc, err := context.Directory.Put(fileName, []byte(text), nil) // TODO
+		loc, err := context.Directory.Put(fileName, []byte(text), meta.PackData)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -177,7 +181,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		h, err := context.Directory.Put(fileName, []byte(text), nil) // TODO
+		h, err := context.Directory.Put(fileName, []byte(text), meta.PackData)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -238,7 +242,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	_, err = context.Directory.Put(fileName, []byte(text), nil) // TODO
+	_, err = context.Directory.Put(fileName, []byte(text), meta.PackData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -267,7 +271,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	_, err = context.Directory.Put(fileName, []byte(text), nil) // TODO
+	_, err = context.Directory.Put(fileName, []byte(text), meta.PackData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -356,7 +360,7 @@ func TestGlob(t *testing.T) {
 	}
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
-		_, err := context.Directory.Put(name, []byte(name), nil) // TODO
+		_, err := context.Directory.Put(name, []byte(name), meta.PackData)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}

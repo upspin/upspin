@@ -20,9 +20,9 @@ var (
 	testUser *testuser.Service
 )
 
-func setup() *UnsafePack {
+func setup() UnsafePack {
 	packer := pack.Lookup(upspin.UnsafePack)
-	u, ok := packer.(*UnsafePack)
+	u, ok := packer.(UnsafePack)
 	if !ok {
 		panic("not unsafe pack")
 	}
@@ -64,8 +64,8 @@ func TestPackMeta(t *testing.T) {
 		Signature: signature(91873),
 	}
 	bytes := u.packMeta(&meta)
-	if len(bytes) != 163 {
-		t.Fatalf("Expected 163 bytes, got %d", len(bytes))
+	if len(bytes) != 164 {
+		t.Fatalf("Expected 164 bytes, got %d", len(bytes))
 	}
 	unpackedMeta := u.unpackMeta(bytes)
 	if len(unpackedMeta.WrappedKeys) != 2 {

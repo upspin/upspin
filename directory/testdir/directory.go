@@ -6,6 +6,7 @@
 package testdir
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"os"
@@ -15,14 +16,18 @@ import (
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
-	"upspin.googlesource.com/upspin.git/pack"
-
-	_ "upspin.googlesource.com/upspin.git/pack/testpack" // Binds upspin.DebugPack.
+	_ "upspin.googlesource.com/upspin.git/pack/debugpack"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
+
+// Total hack to fix build after adding Pack invariants. Must be fixed.
+var TODOMeta = &upspin.Metadata{
+	PackData: []byte{upspin.DebugPack},
+}
 
 var (
 	r0   upspin.Reference
@@ -68,12 +73,13 @@ func mkError(op string, name upspin.PathName, err error) *os.PathError {
 // step is an internal function that advances one directory entry given the cleartext
 // of the directory's contents.
 func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hashBytes []byte, isDir bool, err error) {
-	if len(payload) == 1 {
+	nameLen64, vLen := binary.Varint(payload)
+	nameLen := int(nameLen64)
+	if vLen <= 0 || int64(nameLen) != nameLen64 {
 		err = mkStrError(op, pathName, "internal error: invalid directory")
 		return
 	}
-	nameLen := int(payload[0])
-	payload = payload[1:]
+	payload = payload[vLen:]
 	if len(payload) < nameLen+1+sha256key.Size {
 		err = mkStrError(op, pathName, "internal error: truncated directory")
 		return
@@ -90,12 +96,12 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 func packBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
 	packer := pack.Lookup(context.Packing)
-	cipherLen := packer.PackLen(context, cleartext, nil, name)
+	cipherLen := packer.PackLen(context, cleartext, TODOMeta, name)
 	if cipherLen < 0 {
-		return nil, errors.New("testpack.PackLen failed")
+		return nil, errors.New("PackLen failed")
 	}
 	ciphertext := make([]byte, cipherLen)
-	n, err := packer.Pack(context, ciphertext, cleartext, nil, name)
+	n, err := packer.Pack(context, ciphertext, cleartext, TODOMeta, name)
 	if err != nil {
 		return nil, err
 	}
@@ -105,12 +111,12 @@ func packBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) (
 func unpackBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	// TODO: Metadata.
 	packer := pack.Lookup(context.Packing)
-	clearLen := packer.UnpackLen(context, ciphertext, nil)
+	clearLen := packer.UnpackLen(context, ciphertext, TODOMeta)
 	if clearLen < 0 {
-		return nil, errors.New("testpack.UnpackLen failed")
+		return nil, errors.New("UnpackLen failed")
 	}
 	cleartext := make([]byte, clearLen)
-	n, err := packer.Unpack(context, cleartext, ciphertext, nil, name)
+	n, err := packer.Unpack(context, cleartext, ciphertext, TODOMeta, name)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +159,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			if !ent.Metadata.IsDir {
 				continue
 			}
-			payload, err := s.Fetch(ent.Location.Reference, ent.Name)
+			payload, err := s.fetch(ent.Location.Reference, ent.Name)
 			if err != nil {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
@@ -250,7 +256,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDir. Roots are anyway. TODO.
-func (s *Service) Put(pathName upspin.PathName, data, packdata []byte) (upspin.Location, error) {
+func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
 	return s.put("Put", pathName, false, data)
 }
 
@@ -385,9 +391,20 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return entry, nil
 }
 
+// Internal representation of directory entries.
+// A directory entry is stored as:
+//	N=length of name, varint-encoded.
+//	N bytes of name.
+//	One byte. 0 for regular file, 1 for directory. TODO
+//	N=length metadata, varint-encoded. TODO
+//	N bytes of metadata. TODO
+//	sha256.Size bytes of Reference.
+
 func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
-	entry := make([]byte, 0, 1+len(elem)+1+sha256key.Size)
-	entry = append(entry, byte(len(elem)))
+	entry := make([]byte, 0, len(elem)+1+sha256key.Size+10) // +10 for varint encodings.
+	var varint [10]byte
+	n := binary.PutVarint(varint[:], int64(len(elem)))
+	entry = append(entry, varint[:n]...)
 	entry = append(entry, elem...)
 	dirByte := byte(0)
 	if isDir {
@@ -405,16 +422,15 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference) []byte {
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
 // It reads the whole directory, so avoid calling it repeatedly.
 func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (upspin.Reference, bool, error) {
-	payload, err := s.Fetch(dirRef, name)
+	payload, err := s.fetch(dirRef, name)
 	if err != nil {
 		return r0, false, err
 	}
 	return s.dirEntLookup(op, name, payload, elem)
 }
 
-// Fetch returns the decrypted data associated with the reference.
-// TODO: For test but is it genuinely valuable?
-func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
+// fetch returns the decrypted data associated with the reference.
+func (s *Service) fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
 	ciphertext, locs, err := s.Store.Get(dirRef.Key)
 	if err != nil {
 		return nil, err
@@ -432,21 +448,11 @@ func (s *Service) Fetch(dirRef upspin.Reference, name upspin.PathName) ([]byte, 
 	return payload, err
 }
 
-// Internal representation of directory entries.
-// A directory entry is stored as:
-//	N length of name, one unsigned byte (255 byte max element name seems fine).
-//	N bytes of name.
-//	One byte. 0 for regular file, 1 for directory. TODO
-//	sha256.Size bytes of Reference.
-
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
 func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (upspin.Reference, bool, error) {
 	if len(elem) == 0 {
 		return r0, false, mkStrError(op, pathName+"/", "empty name element")
-	}
-	if len(elem) > 255 {
-		return r0, false, mkStrError(op, upspin.PathName(elem), "name element too long")
 	}
 Loop:
 	for len(payload) > 0 {
@@ -477,7 +483,7 @@ Loop:
 // installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
 func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, ent entry, dirOverwriteOK bool) (upspin.Reference, error) {
-	dirData, err := s.Fetch(dirRef, dirName)
+	dirData, err := s.fetch(dirRef, dirName)
 	if err != nil {
 		return r0, err
 	}
@@ -534,7 +540,7 @@ Loop:
 // Methods to implement upspin.Access
 
 func (s *Service) ServerUserName() string {
-	return "testuser"
+	return "" // No one is authenticated.
 }
 
 // Dial always returns the same instance, so there is only one instance of the service
