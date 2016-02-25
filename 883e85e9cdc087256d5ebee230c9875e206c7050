@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62be89e4_63f86091",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-25T06:30:45Z",
+      "side": 1,
+      "message": "Sure, but why?",
+      "revId": "883e85e9cdc087256d5ebee230c9875e206c7050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
