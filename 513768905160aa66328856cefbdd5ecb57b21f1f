@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62be89e4_28f00046",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-25T23:35:55Z",
+      "side": 1,
+      "message": "unused if changes below are accepted",
+      "revId": "513768905160aa66328856cefbdd5ecb57b21f1f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_a81f704d",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-25T23:35:55Z",
+      "side": 1,
+      "message": "ok to remove meta \u003d\u003d nil check here",
+      "revId": "513768905160aa66328856cefbdd5ecb57b21f1f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_48eb345a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-02-25T23:35:55Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "513768905160aa66328856cefbdd5ecb57b21f1f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
