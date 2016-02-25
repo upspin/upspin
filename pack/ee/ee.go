@@ -86,19 +86,31 @@ func (e eep521) Packing() upspin.Packing {
 	return upspin.EEp521Pack
 }
 
-func (eep256) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (e eep256) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return -1
+	}
 	return len(cleartext)
 }
 
-func (eep521) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (e eep521) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return -1
+	}
 	return len(cleartext)
 }
 
-func (eep256) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (e eep256) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return -1
+	}
 	return len(ciphertext)
 }
 
-func (eep521) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (e eep521) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return -1
+	}
 	return len(ciphertext)
 }
 
@@ -111,6 +123,9 @@ func (eep521) String() string {
 }
 
 func (e eep256) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return 0, err
+	}
 	ciphersuite = upspin.EEp256Pack
 	curve = elliptic.P256()
 	aesLen = 16
@@ -118,6 +133,9 @@ func (e eep256) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *up
 }
 
 func (e eep521) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return 0, err
+	}
 	ciphersuite = upspin.EEp521Pack
 	curve = elliptic.P521()
 	aesLen = 32
@@ -125,6 +143,9 @@ func (e eep521) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *up
 }
 
 func (e eep256) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return 0, err
+	}
 	ciphersuite = upspin.EEp256Pack
 	curve = elliptic.P256()
 	aesLen = 16
@@ -132,6 +153,9 @@ func (e eep256) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *
 }
 
 func (e eep521) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return 0, err
+	}
 	ciphersuite = upspin.EEp521Pack
 	curve = elliptic.P521()
 	aesLen = 32

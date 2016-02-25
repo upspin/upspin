@@ -2,6 +2,7 @@
 package pack
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -45,6 +46,39 @@ func LookupByName(name string) upspin.Packer {
 		if packer.String() == name {
 			return packer
 		}
+	}
+	return nil
+}
+
+var (
+	ErrNilMetadata = errors.New("nil metadata")
+	ErrBadPacking  = errors.New("metadata has incorrect or missing Packing value")
+)
+
+// CheckPackMeta verifies that the metadata satisfies the invariant for Pack and Packlen.
+// It must not be nil, and if meta.PackData is not nil, its zeroth entry must be correct for
+// the Packer.
+func CheckPackMeta(p upspin.Packer, meta *upspin.Metadata) error {
+	if meta == nil {
+		return ErrNilMetadata
+	}
+	if meta.PackData != nil {
+		if len(meta.PackData) == 0 || meta.PackData[0] != byte(p.Packing()) {
+			return ErrBadPacking
+		}
+	}
+	return nil
+}
+
+// CheckUnpackMeta verifies that the metadata satisfies the invariant for Pack and Packlen.
+// It must not be nil, and the zeroth entry of meta.PackData must be correct for
+// the Packer.
+func CheckUnpackMeta(p upspin.Packer, meta *upspin.Metadata) error {
+	if meta == nil {
+		return ErrNilMetadata
+	}
+	if len(meta.PackData) == 0 || meta.PackData[0] != byte(p.Packing()) {
+		return ErrBadPacking
 	}
 	return nil
 }

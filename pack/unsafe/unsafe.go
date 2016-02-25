@@ -20,7 +20,7 @@ import (
 // UnsafePack uses XOR for encrypting and signing.
 type UnsafePack struct{}
 
-var _ upspin.Packer = (*UnsafePack)(nil)
+var _ upspin.Packer = UnsafePack{}
 
 // aesKey is the symmetric key used for obfuscating the plain text data.
 type aesKey []byte
@@ -49,25 +49,27 @@ var (
 )
 
 func init() {
-	pack.Register(&UnsafePack{})
+	pack.Register(UnsafePack{})
 }
 
 // Packing implements the Packer interface
-func (u *UnsafePack) Packing() upspin.Packing {
+func (u UnsafePack) Packing() upspin.Packing {
 	return upspin.UnsafePack
 }
 
 // String implements the Packer interface
-func (u *UnsafePack) String() string {
+func (u UnsafePack) String() string {
 	return "unsafe"
 }
 
 // unpackMeta traverses the packdata portion of the metadata and
 // unpacks it, returning the wrapped keys as well as a signature.
-func (u *UnsafePack) unpackMeta(meta []byte) *clearMeta {
-	if meta == nil || len(meta) == 0 {
+func (u UnsafePack) unpackMeta(meta []byte) *clearMeta {
+	if len(meta) == 0 {
 		return nil
 	}
+	// We know the first byte is upspin.UnsafePack. Drop it.
+	meta = meta[1:]
 	var clear clearMeta
 	err := json.Unmarshal(meta, &clear)
 	if err != nil {
@@ -76,18 +78,18 @@ func (u *UnsafePack) unpackMeta(meta []byte) *clearMeta {
 	return &clear
 }
 
-func (u *UnsafePack) packMeta(meta *clearMeta) []byte {
+func (u UnsafePack) packMeta(meta *clearMeta) []byte {
 	enc, err := json.Marshal(*meta)
 	if err != nil {
 		return nil
 	}
-	return enc
+	return append([]byte{upspin.UnsafePack}, enc...)
 }
 
 // Pack implements the Packer interface
-func (u *UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if meta == nil {
-		return 0, errors.New("nil metadata")
+func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(u, meta); err != nil {
+		return 0, err
 	}
 	clear := u.unpackMeta(meta.PackData)
 	if clear == nil {
@@ -143,9 +145,9 @@ func (u *UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte,
 }
 
 // Unpack implements the Packer interface
-func (u *UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if meta == nil {
-		return 0, errors.New("nil metadata")
+func (u UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(u, meta); err != nil {
+		return 0, err
 	}
 	clear := u.unpackMeta(meta.PackData)
 	if clear == nil {
@@ -198,19 +200,25 @@ func (u *UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byt
 }
 
 // PackLen implements the Packer interface
-func (u *UnsafePack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (u UnsafePack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(u, meta); err != nil {
+		return -1
+	}
 	return len(cleartext)
 }
 
 // UnpackLen implements the Packer interface
-func (u *UnsafePack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (u UnsafePack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(u, meta); err != nil {
+		return -1
+	}
 	return len(ciphertext)
 }
 
 // extractWrappedKeyFromMeta returns the AES key stored in the user's own
 // wrappedKeys or an error if no such information is found in the
 // metadata.
-func (u *UnsafePack) extractWrappedKeyFromMeta(context *upspin.Context, clearMeta *clearMeta) (wrappedKey, error) {
+func (u UnsafePack) extractWrappedKeyFromMeta(context *upspin.Context, clearMeta *clearMeta) (wrappedKey, error) {
 	var wrapped wrappedKey
 	for _, wk := range clearMeta.WrappedKeys {
 		if string(wk.User) == string(context.UserName) {
@@ -227,7 +235,7 @@ func (u *UnsafePack) extractWrappedKeyFromMeta(context *upspin.Context, clearMet
 
 // genUnsoundKey generates a random, unique key for a given user and
 // path name that is not cryptographically sound.
-func (u *UnsafePack) genUnsoundKey(userName upspin.UserName, pathName upspin.PathName) (aesKey, error) {
+func (u UnsafePack) genUnsoundKey(userName upspin.UserName, pathName upspin.PathName) (aesKey, error) {
 	buf := make([]byte, 8)
 	n, err := io.ReadFull(rand.Reader, buf)
 	if n < cap(buf) || err != nil {

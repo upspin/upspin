@@ -1,6 +1,6 @@
-// Package testpack contains a trivial implementation of the Packer interface useful in tests.
+// Package debugpack contains a trivial implementation of the Packer interface useful in tests.
 // It claims the upspin.DebugPack Packing code.
-package testpack
+package debugpack
 
 import (
 	"bytes"
@@ -52,7 +52,10 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
 
-func (testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(p, meta); err != nil {
+		return 0, err
+	}
 	if len(name) > 64*1024 {
 		return 0, errors.New("name too long")
 	}
@@ -80,7 +83,10 @@ func (testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta
 	return len(out), nil
 }
 
-func (testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(p, meta); err != nil {
+		return 0, err
+	}
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
 	}
@@ -126,13 +132,19 @@ func (testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, me
 	return i, nil
 }
 
-func (testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (p testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(p, meta); err != nil {
+		return -1
+	}
 	var buf [16]byte
 	n := binary.PutUvarint(buf[:], uint64(len(name)))
 	return n + len(name) + len(cleartext)
 }
 
-func (testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(p, meta); err != nil {
+		return -1
+	}
 	br := bytes.NewReader(ciphertext)
 	cr := cryptByteReader{br}
 	nameLen, err := binary.ReadUvarint(cr)

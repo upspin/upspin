@@ -9,6 +9,9 @@ import (
 
 var (
 	context = &upspin.Context{}
+	meta    = &upspin.Metadata{
+		PackData: []byte{upspin.PlainPack},
+	}
 )
 
 func TestRegister(t *testing.T) {
@@ -31,7 +34,7 @@ func TestPack(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	cipher := make([]byte, 1024)
-	m, err := packer.Pack(context, cipher, data, nil, name)
+	m, err := packer.Pack(context, cipher, data, meta, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -39,7 +42,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	m, err = packer.Unpack(context, clear, cipher, nil, name)
+	m, err = packer.Unpack(context, clear, cipher, meta, name)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
