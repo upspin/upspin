@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_13cd6c7b",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T23:21:37Z",
+      "side": 1,
+      "message": "no need for capitals here. the message is clear",
+      "revId": "a5bda575f26686e46d8b51c97a075c1f9a8c8117",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_33cae864",
+        "filename": "cmd/user/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T23:21:37Z",
+      "side": 1,
+      "message": "s/PUBLIC/public/",
+      "revId": "a5bda575f26686e46d8b51c97a075c1f9a8c8117",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
