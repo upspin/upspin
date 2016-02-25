@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_7d323dd5",
+        "filename": "endpoint/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:22:26Z",
+      "side": 1,
+      "message": "Ha, brain in neutral.",
+      "parentUuid": "a21241d6_8cde0784",
+      "revId": "a02ad194e3d7acba3ba2fe2930b5f4f3314d49a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_acd9cb9f",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-25T00:08:39Z",
       "side": 1,
       "message": "s/utf //",
+      "revId": "a02ad194e3d7acba3ba2fe2930b5f4f3314d49a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_7d4b5d29",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:22:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_acd9cb9f",
       "revId": "a02ad194e3d7acba3ba2fe2930b5f4f3314d49a2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
