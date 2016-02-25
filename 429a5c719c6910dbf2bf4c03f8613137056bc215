@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_f242fc17",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_cc6d1f06",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_8c672724",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-24T01:51:21Z",
       "side": 1,
       "message": "is this right, or do we do getenv(\"HOME\")?",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_d296d8c4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "It depends.  HOME is a convention that at most seem to live by though it is a site specific.   The os/user stuff reads it from the authoritative source, e.g., /etc/passwd on unix.   HOME is obviously overridable which could be a good thing I guess.   For now i\u0027m going with the authoritative answer.",
+      "parentUuid": "a21241d6_8c672724",
       "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_b29364d4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_ac62eb13",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_6c5d134f",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-24T01:51:21Z",
       "side": 1,
       "message": "check scan.Err?",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_126570ac",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_6c5d134f",
       "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_b2c124a4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Not sure where the program can go from there since it has no context but sure.  Better for it to report the error.",
+      "parentUuid": "a21241d6_4c5a4f59",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_2c571b31",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_92ce20cf",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_2c571b31",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a21241d6_0c545728",
         "filename": "context/initcontext_test.go",
         "patchSetId": 1
@@ -115,6 +223,24 @@
       "writtenOn": "2016-02-24T01:51:21Z",
       "side": 1,
       "message": "this is fine and leave it if you like, but i would be lazy and do a top-level\n\nvar errUnimplemented \u003d errors.New(\"unimplemented\")\n\nand use it everywhere",
+      "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_72a4ac13",
+        "filename": "context/initcontext_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-02-25T00:04:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a21241d6_0c545728",
       "revId": "429a5c719c6910dbf2bf4c03f8613137056bc215",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
