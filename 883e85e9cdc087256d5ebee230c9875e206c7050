@@ -16,6 +16,24 @@
       "revId": "883e85e9cdc087256d5ebee230c9875e206c7050",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a21241d6_cc851f33",
+        "filename": "pack/unsafe/unsafe.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-25T06:35:33Z",
+      "side": 1,
+      "message": "Mainly, it\u0027s simpler.\n\nAlso, the item has no storage, so it\u0027s zero bytes. If you make it a pointer, you\u0027re passing 8 bytes everywhere that point to nothing. Why bother?\n\nAlso the others are like this, so be consistent.\n\nSo lots of reasons.",
+      "parentUuid": "62be89e4_63f86091",
+      "revId": "883e85e9cdc087256d5ebee230c9875e206c7050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
