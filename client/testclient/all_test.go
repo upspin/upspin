@@ -12,7 +12,7 @@ import (
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/pack/debug"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
@@ -389,7 +389,7 @@ func TestGlob(t *testing.T) {
 		}
 		for i, p := range expPaths {
 			if string(paths[i].Name) != p {
-				t.Errorf("Expected path %d %q, got %q", i, p, paths[i])
+				t.Errorf("Expected path %d %q, got %q", i, p, paths[i].Name)
 			}
 		}
 	}
