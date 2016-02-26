@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -38,6 +39,7 @@ const (
 var (
 	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName      = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
+	readOnly        = flag.Bool("readonly", false, "Whether this server instance is read-only")
 	errKeyTooShort  = errors.New("key length too short")
 	errInvalidEmail = errors.New("invalid email format")
 )
@@ -70,6 +72,15 @@ func isNotFound(err error) bool {
 		return false
 	}
 	return strings.Contains(strings.ToLower(err.Error()), "not found")
+}
+
+func isKeyInSlice(key []byte, slice [][]byte) bool {
+	for _, k := range slice {
+		if bytes.Equal(key, k) {
+			return true
+		}
+	}
+	return false
 }
 
 // addKeyHandler handles the HTTP PUT/POST request for adding a new
@@ -105,11 +116,16 @@ func (u *userServer) addKeyHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	// Append the key and save
-	ue.Keys = append(ue.Keys, []byte(key))
-	err = u.putUserEntry(user, ue)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
+	// Check that the key is not already there.
+	if !isKeyInSlice(key, ue.Keys) {
+		// Place key at head of slice to indicate higher priority.
+		ue.Keys = append([][]byte{key}, ue.Keys...)
+		err = u.putUserEntry(user, ue)
+		if err != nil {
+			netutil.SendJSONError(w, context, err)
+			return
+		}
+		log.Printf("Added key %s for user %v\n", key, user)
 	}
 	netutil.SendJSONErrorString(w, "success")
 }
@@ -154,12 +170,13 @@ func (u *userServer) addRootHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	// Append the endpoint and save
-	ue.Endpoints = append(ue.Endpoints, endpoint)
+	// Place the endpoint at the head of the slice to indicate higher priority.
+	ue.Endpoints = append([]upspin.Endpoint{endpoint}, ue.Endpoints...)
 	err = u.putUserEntry(user, ue)
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 	}
+	log.Printf("Added root %v for user %v", endpoint, user)
 	netutil.SendJSONErrorString(w, "success")
 }
 
@@ -179,6 +196,7 @@ func (u *userServer) getHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Reply to user
+	log.Printf("Lookup request for user %v", user)
 	netutil.SendJSONReply(w, *ue)
 }
 
@@ -272,10 +290,13 @@ func new(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *use
 }
 
 func main() {
+	flag.Parse()
 	u := new(gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL), &http.Client{})
-	http.HandleFunc("/addkey", u.addKeyHandler)
-	http.HandleFunc("/addroot", u.addRootHandler)
-	http.HandleFunc("/delete", u.deleteHandler)
+	if !*readOnly {
+		http.HandleFunc("/addkey", u.addKeyHandler)
+		http.HandleFunc("/addroot", u.addRootHandler)
+		http.HandleFunc("/delete", u.deleteHandler)
+	}
 	http.HandleFunc("/get", u.getHandler)
 	log.Println("Starting user service...")
 	log.Fatal(http.ListenAndServe(":8082", nil))

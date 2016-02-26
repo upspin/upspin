@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,14 +14,17 @@ import (
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
 var (
-	userLocation = flag.String("user", "http://localhost:8082", "URL of the user service location")
+	userLocation = flag.String("user", "http://upspin.io:8082", "URL of the user service location")
 	keyFile      = flag.String("key", "", "full pathname of the public key file used with addkey or empty for stdin")
+	endpointLoc  = flag.String("endpoint", "", "and endpoint for adding a root. This consists of the value of the Transport type optionally followed by a comma and the NetAddr of the endpoint. (e.g. for a local GCP use -endpoint=gcp,http://localhost:8081)")
 )
 
 func main() {
@@ -35,8 +39,8 @@ func main() {
 	switch strings.ToLower(flag.Arg(0)) {
 	case "lookup":
 		lookup(name)
-	case "setroot":
-		setRoot(name)
+	case "addroot":
+		addRoot(name, *endpointLoc)
 	case "addkey":
 		addKey(name)
 	default:
@@ -47,7 +51,7 @@ func main() {
 
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <lookup|setroot|addkey> <user>\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <lookup|addroot|addkey> <user>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -60,20 +64,43 @@ func lookup(user upspin.UserName) {
 		log.Fatal(err)
 	}
 	fmt.Printf("roots: %+v\n", roots)
-	fmt.Printf("keys: %+v\n", keys)
+	fmt.Printf("keys: %v\n", keys)
 }
 
-func setRoot(user upspin.UserName) {
+func addRoot(user upspin.UserName, endpointStr string) {
+	if endpointStr == "" {
+		fmt.Fprintf(os.Stderr, "No endpoint specified for user.")
+		Usage()
+	}
+	e, err := endpoint.Parse(endpointStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	endpointJSON, err := json.Marshal(e)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// This requires that we talk to the user server directly,
 	// without using the User gcp client.
-
-	// First, we need to read all information about a user because
-	// we're going to delete the user and re-create it with a new
-	// root. This CLI does not currently support adding new roots,
-	// only setting one -- we want to avoid repeating the same
-	// root many times, which the server does not yet do for us.
-
-	fmt.Fprintf(os.Stderr, "setRoot not implemented yet\n")
+	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/addroot?user=%s&endpoint=%s", *userLocation, user, url.QueryEscape(string(endpointJSON))), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = parser.ErrorResponse(body)
+	if err != nil {
+		log.Fatalf("Server replied with error: %s", err)
+	}
+	fmt.Println("Root added successfully.")
 }
 
 func addKey(user upspin.UserName) {
