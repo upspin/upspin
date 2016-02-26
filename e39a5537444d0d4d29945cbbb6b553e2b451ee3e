@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62be89e4_66ace969",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T06:29:14Z",
+      "side": 1,
+      "message": "I don\u0027t understand the last sentence. \"file within have whatever they request\"? Do files request anything?",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 16
+      },
+      "revId": "e39a5537444d0d4d29945cbbb6b553e2b451ee3e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_46b1e5c2",
+        "filename": "test/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T06:29:14Z",
+      "side": 1,
+      "message": "Looks like you can delete this comment now, since it\u0027s working now.",
+      "revId": "e39a5537444d0d4d29945cbbb6b553e2b451ee3e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
