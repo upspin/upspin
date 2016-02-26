@@ -491,7 +491,7 @@ func privateKey(user string) (priv *ecdsa.PrivateKey, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ecdsa.PrivateKey{PubicKey: *pubkey, D: &d}, nil
+	return &ecdsa.PrivateKey{PublicKey: ecdsa.PublicKey{Curve: pubkey.Curve, X: pubkey.X, Y: pubkey.Y}, D: &d}, nil
 }
 
 // publicKey returns the public key of user by reading file from ~/.ssh/.
