@@ -69,9 +69,31 @@ func TestAddKeyToExistingUser(t *testing.T) {
 	if mockGCP.PutRef[0] != mockUser {
 		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":["DBEw","YWJjZGVmZ2hpamtsbW5vcHFycw=="],"Endpoints":null}`
+	expectedPutValue := `{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw==","DBEw"],"Endpoints":null}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
+	}
+}
+
+func TestAddExistingKey(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=bob@foo.com&key=abcdefghijklmnopqrs", []byte(""))
+
+	// Underlying HTTP client will look up the user data...
+	requestsExpected := []*http.Request{nettest.NewRequest(t, netutil.Get, mockGCPDownloadLink, nil)}
+	// ... and will receive it.
+	responsesToSend := []nettest.MockHTTPResponse{
+		nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw=="]}`)),
+	}
+
+	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u.addKeyHandler(resp, req)
+	resp.Verify(t)
+	mock.Verify(t)
+
+	// Verify that GCP did not try to Put the repeated key back.
+	if len(mockGCP.PutRef) != 0 || len(mockGCP.PutContents) != 0 {
+		t.Fatalf("Expected no call to GCP.Put, got %d", len(mockGCP.PutRef))
 	}
 }
 
@@ -125,7 +147,7 @@ func TestAddRootToExistingUser(t *testing.T) {
 	if mockGCP.PutRef[0] != mockUser {
 		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://here.com"},{"Transport":7,"NetAddr":"http://there.co.uk"}]}`
+	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":7,"NetAddr":"http://there.co.uk"},{"Transport":2,"NetAddr":"http://here.com"}]}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
 	}
