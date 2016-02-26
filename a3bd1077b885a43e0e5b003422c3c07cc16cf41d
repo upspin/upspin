@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_131d6c45",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-26T23:29:59Z",
+      "side": 1,
+      "message": "s/%s/%q/\ns/%v/%q/\nwould make this easier to read, not that it matters much",
+      "revId": "a3bd1077b885a43e0e5b003422c3c07cc16cf41d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
