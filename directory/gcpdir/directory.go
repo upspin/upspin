@@ -67,6 +67,10 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	var zeroLoc upspin.Location
 	const op = "Put"
 
+	if len(packdata) < 1 {
+		return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
+	}
+
 	// First, store the data itself, to find the key
 	key, err := d.storeService.Put(data)
 	if err != nil {
@@ -82,8 +86,8 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		Name: name,
 		Location: upspin.Location{
 			Reference: upspin.Reference{
-				Key: key,
-				// TODO: how do we know the packing at this level?
+				Key:     key,
+				Packing: upspin.Packing(packdata[0]),
 			},
 			Endpoint: d.storeService.Endpoint(),
 		},

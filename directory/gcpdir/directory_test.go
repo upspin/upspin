@@ -28,8 +28,10 @@ var (
 	errGlobBadPattern      = newError("Glob", badPathName, errBadPatternUserName)
 	key                    = "the key"
 	fileContents           = []byte("contents of file")
+	packData               = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
 	reference              = upspin.Reference{
-		Key: key,
+		Key:     key,
+		Packing: upspin.PlainPack,
 	}
 	location = upspin.Location{
 		Reference: reference,
@@ -44,7 +46,7 @@ var (
 		Metadata: upspin.Metadata{
 			IsDir:    false,
 			Sequence: 0,
-			PackData: []byte("Packed metadata"),
+			PackData: packData,
 		},
 	}
 )
@@ -226,6 +228,20 @@ func TestPutError(t *testing.T) {
 	}
 }
 
+func TestPutBadMeta(t *testing.T) {
+	mock := nettest.NewMockHTTPClient(nil, nil)
+	d := new("http://localhost:8081", nil, mock)
+
+	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte(""))
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	badPackingError := "Put bob@jones.com/myroot/mysubdir: missing packing type in packdata"
+	if err.Error() != badPackingError {
+		t.Errorf("Expected error %q, got %q", badPackingError, err)
+	}
+}
+
 func TestPut(t *testing.T) {
 	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))
 
@@ -235,7 +251,7 @@ func TestPut(t *testing.T) {
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), fileContents, []byte("Packed metadata"))
+	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
