@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_5763cdeb",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_73f7003d",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_13048cf7",
         "filename": "cmd/user/server.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-02-26T22:54:54Z",
       "side": 1,
       "message": "this is a huge number of allocations for no purpose\n\nisKeyInSlice(key []byte, slice[][]byte bool{\n  for _, k :\u003d range slice {\n     if bytes.Equal(key, k) {\n         return true\n     }\n  }\n return false\n}",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_f761c1e0",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_13048cf7",
       "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_776ed1cc",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_330188e8",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_d30e1416",
         "filename": "cmd/user/server.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-02-26T22:54:54Z",
       "side": 1,
       "message": "ditto",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_b73909d9",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_d30e1416",
       "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_97460548",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_f313103f",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_93089c09",
         "filename": "cmd/user/server.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-02-26T22:54:54Z",
       "side": 1,
       "message": "no newline, doubly so because it\u0027s printLN",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_77437139",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done. Should\u0027ve been Printf.",
+      "parentUuid": "e2251944_93089c09",
       "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_172b157a",
+        "filename": "cmd/user/usercli/usercli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "agreed.",
+      "parentUuid": "e2251944_b30d9818",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_5323e48f",
         "filename": "cmd/user/usercli/usercli.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-02-26T22:54:54Z",
       "side": 1,
       "message": "never a fan of Pleases in usage messages. how about\n\nNo endpoint specified for user.\nflag.Usage()",
+      "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_f72f8181",
+        "filename": "cmd/user/usercli/usercli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-02-26T23:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_5323e48f",
       "revId": "677b5e2e5ad18ff2bac2d2081c78f8d54633e770",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
