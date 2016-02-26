@@ -16,7 +16,7 @@ import (
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/pack/debugpack"
+	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
@@ -79,11 +79,11 @@ func testAllInProcess(t *testing.T) {
 	// The user endpoint should almost certainly point to an ephemeral service.
 	var configs = []Config{
 		{inProcess, inProcess, inProcess, upspin.DebugPack},
-		// {inProcess, inProcess, inProcess, upspin.PlainPack}, TODO: testdir etc. assume DebugPack
+		{inProcess, inProcess, inProcess, upspin.PlainPack},
 		// Unsafe and EE packing not working with testdir due to lack of support for metadata and packdata.
-		// {inProcess, inProcess, inProcess, upspin.UnsafePack},
-		// {inProcess, inProcess, inProcess, upspin.EEp256Pack},
-		// {inProcess, inProcess, inProcess, upspin.EEp521Pack},
+		{inProcess, inProcess, inProcess, upspin.UnsafePack},
+		{inProcess, inProcess, inProcess, upspin.EEp256Pack},
+		{inProcess, inProcess, inProcess, upspin.EEp521Pack},
 	}
 
 	for _, config := range configs {

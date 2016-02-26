@@ -9,8 +9,6 @@ import (
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	_ "upspin.googlesource.com/upspin.git/pack/debugpack"
 )
 
 // Service maps user names to potential machines holdining root of the user's tree.
