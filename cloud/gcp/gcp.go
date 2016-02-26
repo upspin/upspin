@@ -3,7 +3,6 @@
 package gcp
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -120,7 +119,7 @@ func (gcp *GCP) Get(ref string) (link string, error error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("The media download link for %v/%v is %v.\n\n", gcp.bucketName, res.Name, res.MediaLink)
+	log.Printf("The media download link for %v/%v is %v.\n\n", gcp.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
 }
 
