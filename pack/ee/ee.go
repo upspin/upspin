@@ -63,7 +63,6 @@ const (
 
 var (
 	errTooShort     = errors.New("destination slice too short")
-	errMetaNil      = errors.New("nil Metadata")
 	errVerify       = errors.New("does not verify")
 	errNoWrappedKey = errors.New("no wrapped key for me")
 	errKeyLength    = errors.New("wrong key length")
@@ -167,9 +166,6 @@ func eePack(ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	if meta == nil {
-		return 0, errMetaNil
-	}
 	dkey := make([]byte, aesLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
@@ -213,9 +209,6 @@ func eeUnpack(cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upsp
 		return 0, errTooShort
 	}
 	cleartext = cleartext[:len(ciphertext)]
-	if meta == nil {
-		return 0, errMetaNil
-	}
 	dkey := make([]byte, aesLen)
 	sig, wrap, err := pdUnmarshal(meta.PackData, pathname)
 	if err != nil {
