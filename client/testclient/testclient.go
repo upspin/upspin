@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -149,4 +150,17 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, err
 	}
 	return dir.Glob(pattern)
+}
+
+func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
+	// TODO: Make sure directory exists?
+	return file.Writable(c, name), nil
+}
+
+func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
+	data, err := c.Get(name)
+	if err != nil {
+		return nil, err
+	}
+	return file.Readable(c, name, data), nil
 }
