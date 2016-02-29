@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"math/rand"
-	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
@@ -303,74 +302,6 @@ func TestFileZeroFill(t *testing.T) {
 	}
 	if buf[N] != 'x' {
 		t.Errorf("byte %d should be 'x' is %#.2x", N, buf[N])
-	}
-}
-
-func TestFileOverflow(t *testing.T) {
-	maxInt = 100
-	defer func() { maxInt = int64(^uint(0) >> 1) }()
-	const (
-		user     = "overflow@google.com"
-		root     = user + "/"
-		fileName = user + "/" + "file"
-	)
-	client, f, _ := setupFileIO(user, fileName, 0, t)
-	// Write.
-	f, err := client.Create(fileName)
-	if err != nil {
-		t.Fatal("create file:", err)
-	}
-	defer f.Close()
-	buf := make([]byte, maxInt)
-	n, err := f.Write(buf)
-	if err != nil {
-		t.Fatal("write file:", err)
-	}
-	if n != int(maxInt) {
-		t.Fatalf("write file: expected %d got %d", maxInt, n)
-	}
-	n, err = f.Write(make([]byte, maxInt))
-	if err == nil {
-		t.Fatal("write file: expected overflow")
-	}
-	if !strings.Contains(err.Error(), "overflow") {
-		t.Fatal("write file: expected overflow error, got", err)
-	}
-	// Seek.
-	n64, err := f.Seek(0, 0)
-	if err != nil {
-		t.Fatal("seek file:", err)
-	}
-	if n64 != 0 {
-		t.Fatalf("seek begin file: expected 0 got %d", n64)
-	}
-	n64, err = f.Seek(maxInt, 0)
-	if err != nil {
-		t.Fatal("seek end file:", err)
-	}
-	if n64 != maxInt {
-		t.Fatalf("seek file: expected %d got %d", maxInt, n64)
-	}
-	n64, err = f.Seek(maxInt+1, 0)
-	if err == nil {
-		t.Fatal("seek past file: expected error")
-	}
-	// One more trick: Create empty file, then check seek.
-	f, err = client.Create(fileName + "x")
-	if err != nil {
-		t.Fatal("create filex:", err)
-	}
-	defer f.Close()
-	n64, err = f.Seek(maxInt, 0)
-	if err != nil {
-		t.Fatal("seek maxInt filex:", err)
-	}
-	if n64 != maxInt {
-		t.Fatalf("seek filex: expected %d got %d", maxInt, n64)
-	}
-	n64, err = f.Seek(maxInt+1, 0)
-	if err == nil {
-		t.Fatal("seek maxint+1 filex: expected error")
 	}
 }
 
