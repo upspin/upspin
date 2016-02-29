@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_534204e9",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-29T23:56:09Z",
+      "side": 1,
+      "message": "what\u0027s wrong with leaving it called File?",
+      "revId": "3754e61737b796a68c77f51a7fddb51fe487695f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_733f006c",
+        "filename": "client/common/file/file_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-29T23:56:09Z",
+      "side": 1,
+      "message": "s/24/len(dummyData)/ here and on next line",
+      "revId": "3754e61737b796a68c77f51a7fddb51fe487695f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_134c8c16",
+        "filename": "client/common/file/file_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-29T23:56:09Z",
+      "side": 1,
+      "message": "again, magic numbers. brittle",
+      "revId": "3754e61737b796a68c77f51a7fddb51fe487695f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_33498807",
+        "filename": "client/common/file/file_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-29T23:56:09Z",
+      "side": 1,
+      "message": "again",
+      "revId": "3754e61737b796a68c77f51a7fddb51fe487695f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_d35614a9",
+        "filename": "client/gcpclient/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-02-29T23:56:09Z",
+      "side": 1,
+      "message": "it\u0027s documented behavior, not a bug. but perhaps it should be fixed regardless.",
+      "revId": "3754e61737b796a68c77f51a7fddb51fe487695f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
