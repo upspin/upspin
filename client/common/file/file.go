@@ -1,4 +1,5 @@
-package testclient
+// Package file implements the File interface used in client.Open and client.Create.
+package file
 
 import (
 	"errors"
@@ -13,35 +14,11 @@ import (
 // In the tests, we cut it down to manageable size for overflow checking.
 var maxInt = int64(^uint(0) >> 1)
 
-func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
-	// TODO: Make sure directory exists?
-	f := &File{
-		client:   c,
-		writable: true,
-		name:     name,
-	}
-	return f, nil
-}
-
-func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
-	f := &File{
-		client:   c,
-		writable: false,
-		name:     name,
-	}
-	data, err := f.client.Get(f.name)
-	if err != nil {
-		return nil, err
-	}
-	f.data = data
-	return f, nil
-}
-
-// File is a test implementation of upspin.File.
+// File is a simple implementation of upspin.File.
 // It always keeps the whole file in memory under the assumption
 // that it is encrypted and must be read and written atomically.
 type File struct {
-	client   *Client         // Client the File belongs to.
+	client   upspin.Client   // Client the File belongs to.
 	closed   bool            // Whether the file has been closed, preventing further operations.
 	name     upspin.PathName // Full path name.
 	writable bool            // File is writable (made with Create, not Open).
@@ -50,6 +27,29 @@ type File struct {
 }
 
 var _ upspin.File = (*File)(nil)
+
+// Readable creates a new file with a given name and data contents,
+// belonging to a given client for read only. The data belongs to File
+// and must not be modified after this call.
+func Readable(client upspin.Client, name upspin.PathName, data []byte) *File {
+	return &File{
+		client:   client,
+		name:     name,
+		writable: false,
+		data:     data,
+	}
+}
+
+// Writable creates a new file with a given name, belonging to a given
+// client for write. Once closed, the file will overwrite any existing
+// file with the same name.
+func Writable(client upspin.Client, name upspin.PathName) *File {
+	return &File{
+		client:   client,
+		name:     name,
+		writable: true,
+	}
+}
 
 func (f *File) Name() upspin.PathName {
 	return f.name

@@ -70,7 +70,7 @@ func testAllGCP(t *testing.T) {
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp521Pack},
 	}
 	for _, config := range configs {
-		newGCPSetup(config.user, config.directory, config.store, config.pack).runAllGCPTests(t)
+		newGCPSetup(config.user, config.directory, config.store, config.pack).runAllTests(t)
 	}
 }
 
@@ -175,12 +175,6 @@ func (s *Setup) setupFileIO(fileName upspin.PathName, max int, t *testing.T) (up
 func (s *Setup) runAllTests(t *testing.T) {
 	s.TestPutGetTopLevelFile(t)
 	s.TestFileSequentialAccess(t)
-}
-
-func (s *Setup) runAllGCPTests(t *testing.T) {
-	// GCP client does not yet implement the File interface
-	// TODO: delete this when it does and use runAllTests for both GCP and InProcess tests.
-	s.TestPutGetTopLevelFile(t)
 }
 
 func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
