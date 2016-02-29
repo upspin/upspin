@@ -4,12 +4,13 @@
 package gcpclient
 
 import (
-	"errors"
 	"fmt"
 	"log"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -132,6 +133,11 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	if cipherLen < 0 {
 		return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
 	}
+	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
+	if len(meta.PackData) == 0 {
+		meta.PackData = make(upspin.PackData, 1)
+		meta.PackData[0] = byte(c.context.Packing)
+	}
 	cipher := make([]byte, cipherLen)
 	n, err := packer.Pack(c.context, cipher, data, meta, name)
 	if err != nil {
@@ -144,12 +150,42 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return c.context.Directory.MakeDirectory(dirName)
+	dir, err := c.getRootDir(dirName)
+	if err != nil {
+		return zeroLoc, err
+	}
+	return dir.MakeDirectory(dirName)
+}
+
+func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
+	// Add a final slash in case it's just a user name and we're referencing the root.
+	parsed, err := path.Parse(name + "/")
+	if err != nil {
+		return nil, err
+	}
+	endpoints, _, err := c.context.User.Lookup(parsed.User)
+	if err != nil {
+		return nil, err
+	}
+	var dir upspin.Directory
+	for _, e := range endpoints {
+		dir, err = access.BindDirectory(c.context, e)
+		if dir != nil {
+			return dir, nil
+		}
+	}
+	if err == nil {
+		err = fmt.Errorf("gcpclient: no such user %q", parsed.User)
+	}
+	return nil, err
 }
 
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	// TODO: ask c.context.User where the root for the user is. Right now, it's all in c.context.Directory.
-	entry, err := c.context.Directory.Lookup(name)
+	dir, err := c.getRootDir(name)
+	if err != nil {
+		return nil, err
+	}
+	entry, err := dir.Lookup(name)
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +199,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		cipher, _, err = c.context.Store.Get(locs[0].Reference.Key)
 	}
 	// Encrypted data was found. Unpack it.
-	// TODO: This should look into
-	// entry.Location.Reference.Packing instead. But dir.Put does
-	// not store the packing, since it doesn't know.
-	packer := pack.Lookup(c.context.Packing)
+	packer := pack.Lookup(entry.Location.Reference.Packing)
 	if packer == nil {
 		return nil, fmt.Errorf("unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
 	}
@@ -183,12 +216,22 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 }
 
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	return c.context.Directory.Glob(pattern)
+	dir, err := c.getRootDir(upspin.PathName(pattern))
+	if err != nil {
+		return nil, err
+	}
+	return dir.Glob(pattern)
 }
 
 func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
-	return nil, errors.New("not implemented")
+	return file.New(c, true, name), nil
 }
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
-	return nil, errors.New("not implemented")
+	f := file.New(c, false, name)
+	data, err := f.Client().Get(f.Name())
+	if err != nil {
+		return nil, err
+	}
+	f.SetData(data)
+	return f, nil
 }
