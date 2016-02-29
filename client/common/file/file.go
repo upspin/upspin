@@ -1,4 +1,5 @@
-package testclient
+// Package file implements the File interface used in client.Open and client.Create.
+package file
 
 import (
 	"errors"
@@ -13,35 +14,11 @@ import (
 // In the tests, we cut it down to manageable size for overflow checking.
 var maxInt = int64(^uint(0) >> 1)
 
-func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
-	// TODO: Make sure directory exists?
-	f := &File{
-		client:   c,
-		writable: true,
-		name:     name,
-	}
-	return f, nil
-}
-
-func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
-	f := &File{
-		client:   c,
-		writable: false,
-		name:     name,
-	}
-	data, err := f.client.Get(f.name)
-	if err != nil {
-		return nil, err
-	}
-	f.data = data
-	return f, nil
-}
-
-// File is a test implementation of upspin.File.
+// F is a simple implementation of upspin.File.
 // It always keeps the whole file in memory under the assumption
 // that it is encrypted and must be read and written atomically.
-type File struct {
-	client   *Client         // Client the File belongs to.
+type F struct {
+	client   upspin.Client   // Client the File belongs to.
 	closed   bool            // Whether the file has been closed, preventing further operations.
 	name     upspin.PathName // Full path name.
 	writable bool            // File is writable (made with Create, not Open).
@@ -49,13 +26,35 @@ type File struct {
 	data     []byte          // Contents of file.
 }
 
-var _ upspin.File = (*File)(nil)
+var _ upspin.File = (*F)(nil)
 
-func (f *File) Name() upspin.PathName {
+// New creates a new file with a given name, belonging to a given
+// client and writable or read-only.
+func New(client upspin.Client, writable bool, name upspin.PathName) *F {
+	return &F{
+		client:   client,
+		name:     name,
+		writable: writable,
+	}
+}
+
+func (f *F) Client() upspin.Client {
+	return f.client
+}
+
+func (f *F) Data() []byte {
+	return f.data
+}
+
+func (f *F) SetData(data []byte) {
+	f.data = data
+}
+
+func (f *F) Name() upspin.PathName {
 	return f.name
 }
 
-func (f *File) Read(b []byte) (n int, err error) {
+func (f *F) Read(b []byte) (n int, err error) {
 	n, err = f.readAt("Read", b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
@@ -63,11 +62,11 @@ func (f *File) Read(b []byte) (n int, err error) {
 	return n, err
 }
 
-func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
+func (f *F) ReadAt(b []byte, off int64) (n int, err error) {
 	return f.readAt("ReadAt", b, off)
 }
 
-func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
+func (f *F) readAt(op string, b []byte, off int64) (n int, err error) {
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
@@ -84,7 +83,7 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 	return n, nil
 }
 
-func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
+func (f *F) Seek(offset int64, whence int) (ret int64, err error) {
 	if f.closed {
 		return 0, f.errClosed("Seek")
 	}
@@ -105,7 +104,7 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	return ret, nil
 }
 
-func (f *File) Write(b []byte) (n int, err error) {
+func (f *F) Write(b []byte) (n int, err error) {
 	n, err = f.writeAt("Write", b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
@@ -113,11 +112,11 @@ func (f *File) Write(b []byte) (n int, err error) {
 	return n, err
 }
 
-func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
+func (f *F) WriteAt(b []byte, off int64) (n int, err error) {
 	return f.writeAt("WriteAt", b, off)
 }
 
-func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
+func (f *F) writeAt(op string, b []byte, off int64) (n int, err error) {
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
@@ -150,7 +149,7 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 	return len(b), nil
 }
 
-func (f *File) Close() error {
+func (f *F) Close() error {
 	if f.closed {
 		return f.errClosed("Close")
 	}
@@ -164,6 +163,6 @@ func (f *File) Close() error {
 	return err
 }
 
-func (f *File) errClosed(op string) error {
+func (f *F) errClosed(op string) error {
 	return fmt.Errorf("%s: %q is closed", op, f.name)
 }
