@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_d3b29431",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "this is just Read, really, or io.ReadAll. may be useful for tests but here it\u0027s exposed to the user and that seems wrong.\n\nthis package\u0027s File type should implement upspin.File exactly.",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_f3b7901e",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "no one should ever call this. the only time outsiders should set the data field is when initializing a file for read, and that should be done during that initialization. perhaps New needs data as an argument (that must be nil for writable) or there is a separate call. i would go with\n\nReadable(client, data)\nWritable(client)",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_93ac1cd1",
+        "filename": "client/common/file/file_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "gross but maybe ok.",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_53c7647f",
+        "filename": "client/gcpclient/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "this code isn\u0027t good. for instance, why create f when you don\u0027t use it (really) until the last line?\n\nif you use my other suggestion, could be just\ndata, err :\u003d ...\nif err ...\nreturn file.Readable(c, name, data), nil",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_73c4e079",
+        "filename": "client/gcpclient/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "s/ okay//",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_13c1ec68",
+        "filename": "client/gcpclient/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T05:27:07Z",
+      "side": 1,
+      "message": "all these \"expected no errror\" could be just\nt.Fatal(err)",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
