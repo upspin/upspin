@@ -21,6 +21,8 @@ const (
 // Definitions according to https://github.com/google/google-api-go-client/blob/master/storage/v1/storage-gen.go:
 //   "authenticatedRead" - Project team owners get OWNER access, and
 //       allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+//        project team owners get OWNER access.
 //   "private" - Project team owners get OWNER access.
 //   "projectPrivate" - Project team members get access according to
 //       their roles.
@@ -31,12 +33,13 @@ const (
 type WriteACL string
 
 const (
-	PublicRead        WriteACL = "publicRead"
-	AuthenticatedRead WriteACL = "authenticatedRead"
-	Private           WriteACL = "private"
-	ProjectPrivate    WriteACL = "projectPrivate"
-	PublicReadWrite   WriteACL = "publicReadWrite"
-	DefaultWriteACL   WriteACL = PublicRead
+	PublicRead          WriteACL = "publicRead"
+	AuthenticatedRead   WriteACL = "authenticatedRead"
+	Private             WriteACL = "private"
+	ProjectPrivate      WriteACL = "projectPrivate"
+	PublicReadWrite     WriteACL = "publicReadWrite"
+	BucketOwnerFullCtrl WriteACL = "bucketOwnerFullControl"
+	DefaultWriteACL     WriteACL = PublicRead
 )
 
 // Interface is how GCP clients talk to GCP.
@@ -46,8 +49,13 @@ type Interface interface {
 	// from GCP.
 	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
 
-	// Get returns a link for downloading ref from GCP.
+	// Get returns a link for downloading ref from GCP, if the ref
+	// is publicly readable.
 	Get(ref string) (link string, error error)
+
+	// Download retrieves the bytes from the media link (even if
+	// ref is not publicly readable).
+	Download(ref string) ([]byte, error)
 
 	// Put stores the contents given as ref on GCP.
 	Put(ref string, contents []byte) (refLink string, error error)
@@ -80,14 +88,10 @@ var _ Interface = (*GCP)(nil)
 
 // New creates a new GCP instance associated with the given project id and bucket name.
 func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
-	gcp := &GCP{}
-	gcp.projectId = projectId
-	gcp.bucketName = bucketName
-	switch defaultWriteACL {
-	case PublicRead, AuthenticatedRead, Private, ProjectPrivate, PublicReadWrite:
-		gcp.defaultWriteACL = defaultWriteACL
-	default:
-		gcp.defaultWriteACL = DefaultWriteACL
+	gcp := &GCP{
+		projectId:       projectId,
+		bucketName:      bucketName,
+		defaultWriteACL: defaultWriteACL,
 	}
 	gcp.Connect()
 	return gcp
@@ -121,6 +125,19 @@ func (gcp *GCP) Get(ref string) (link string, error error) {
 	}
 	log.Printf("The media download link for %v/%v is %v.", gcp.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
+}
+
+func (gcp *GCP) Download(ref string) ([]byte, error) {
+	resp, err := gcp.service.Objects.Get(gcp.bucketName, ref).Download()
+	if err != nil {
+		return nil, err
+	}
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	resp.Body.Close()
+	return buf, nil
 }
 
 func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {

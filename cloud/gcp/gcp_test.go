@@ -17,13 +17,14 @@ const (
 var (
 	client *GCP = New(projectId, bucketName, DefaultWriteACL)
 	// The time is important because we never delete this file, but instead overwrite it.
-	testData = []byte(fmt.Sprintf("This is test at %v", time.Now()))
+	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
+	testData    = []byte(testDataStr)
 )
 
 // This is more of a regression test as it uses the running cloud
 // storage in prod. However, since GCP is always available, we accept
 // to rely on it.
-func TestPutAndGet(t *testing.T) {
+func TestPutGetAndDownload(t *testing.T) {
 	link, err := client.Put("test-file", testData)
 	if err != nil {
 		t.Fatalf("Can't put: %v", err)
@@ -47,8 +48,16 @@ func TestPutAndGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Can't read http body: %v", err)
 	}
-	if string(data) != string(testData) {
-		t.Errorf("Data mismatch. Expected '%q' got '%q'", string(testData), string(data))
+	if string(data) != testDataStr {
+		t.Errorf("Expected %q got %q", testDataStr, string(data))
+	}
+	// Check that Download yields the same data
+	bytes, err := client.Download("test-file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(bytes) != testDataStr {
+		t.Errorf("Expected %q got %q", testDataStr, string(bytes))
 	}
 }
 
