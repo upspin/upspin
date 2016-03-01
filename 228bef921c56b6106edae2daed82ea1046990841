@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e211990a_d62fc281",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T23:24:42Z",
+      "side": 1,
+      "message": "Ah, yeah, you mentioned this before. Old habit, sorry.",
+      "parentUuid": "e2251944_96896a16",
+      "revId": "228bef921c56b6106edae2daed82ea1046990841",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_567432d8",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-01T23:16:22Z",
       "side": 1,
       "message": "Add",
+      "revId": "228bef921c56b6106edae2daed82ea1046990841",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e211990a_362556a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T23:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_567432d8",
       "revId": "228bef921c56b6106edae2daed82ea1046990841",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e211990a_1622da9a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T23:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_b68ee619",
+      "revId": "228bef921c56b6106edae2daed82ea1046990841",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_76712ee7",
         "filename": "cloud/gcp/gcp.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-01T23:16:22Z",
       "side": 1,
       "message": "this should be deferred earlier; the return on 137 will leak it",
+      "revId": "228bef921c56b6106edae2daed82ea1046990841",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e211990a_367716a7",
+        "filename": "cloud/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T23:24:42Z",
+      "side": 1,
+      "message": "Ah, good catch. Somehow I thought ReadAll was opening it. Fixed.",
+      "parentUuid": "e2251944_76712ee7",
       "revId": "228bef921c56b6106edae2daed82ea1046990841",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
