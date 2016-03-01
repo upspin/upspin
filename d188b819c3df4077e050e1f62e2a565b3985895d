@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_c82617fc",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_d3b29431",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_f3b7901e",
         "filename": "client/common/file/file.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-01T05:27:07Z",
       "side": 1,
       "message": "no one should ever call this. the only time outsiders should set the data field is when initializing a file for read, and that should be done during that initialization. perhaps New needs data as an argument (that must be nil for writable) or there is a separate call. i would go with\n\nReadable(client, data)\nWritable(client)",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_688a6b0a",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_f3b7901e",
       "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_285eb34c",
+        "filename": "client/common/file/file_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Just for testing. The reason is we need to look inside to see if the data was Put(). DummyClient here is a poor man\u0027s mock. :-)",
+      "parentUuid": "e2251944_93ac1cd1",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_53c7647f",
         "filename": "client/gcpclient/client.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-01T05:27:07Z",
       "side": 1,
       "message": "this code isn\u0027t good. for instance, why create f when you don\u0027t use it (really) until the last line?\n\nif you use my other suggestion, could be just\ndata, err :\u003d ...\nif err ...\nreturn file.Readable(c, name, data), nil",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_e87e7bb5",
+        "filename": "client/gcpclient/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e2251944_53c7647f",
       "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "62be89e4_085bef5c",
+        "filename": "client/gcpclient/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_73c4e079",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2251944_13c1ec68",
         "filename": "client/gcpclient/integration_test.go",
         "patchSetId": 3
@@ -98,6 +188,41 @@
       "writtenOn": "2016-03-01T05:27:07Z",
       "side": 1,
       "message": "all these \"expected no errror\" could be just\nt.Fatal(err)",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_e8579b2d",
+        "filename": "client/gcpclient/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2251944_13c1ec68",
+      "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62be89e4_08f08f82",
+        "filename": "client/gcpclient/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-01T18:05:56Z",
+      "side": 1,
+      "message": "Added more packers.",
       "revId": "d188b819c3df4077e050e1f62e2a565b3985895d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
