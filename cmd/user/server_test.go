@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
@@ -50,17 +49,9 @@ func TestAddKeyToExistingUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=bob@foo.com&key=abcdefghijklmnopqrs", []byte(""))
 
-	// Underlying HTTP client will look up the user data...
-	requestsExpected := []*http.Request{nettest.NewRequest(t, netutil.Get, mockGCPDownloadLink, nil)}
-	// ... and will receive it.
-	responsesToSend := []nettest.MockHTTPResponse{
-		nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"User":"bob@foo.com","Keys":[[12,17,48]]}`)),
-	}
-
-	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":[[12,17,48]]}`))
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 
 	// Verify that GCP tried to Put the added key back.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
@@ -79,17 +70,9 @@ func TestAddExistingKey(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=bob@foo.com&key=abcdefghijklmnopqrs", []byte(""))
 
-	// Underlying HTTP client will look up the user data...
-	requestsExpected := []*http.Request{nettest.NewRequest(t, netutil.Get, mockGCPDownloadLink, nil)}
-	// ... and will receive it.
-	responsesToSend := []nettest.MockHTTPResponse{
-		nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw=="]}`)),
-	}
-
-	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw=="]}`))
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 
 	// Verify that GCP did not try to Put the repeated key back.
 	if len(mockGCP.PutRef) != 0 || len(mockGCP.PutContents) != 0 {
@@ -101,14 +84,9 @@ func TestAddKeyToNewUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=new@user.com&key=abcdefghijklmnopqrs", []byte(""))
 
-	// Underlying HTTP client will not look up anything.
-	requestsExpected := []*http.Request{}
-	responsesToSend := []nettest.MockHTTPResponse{}
-
-	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, mockGCP := newUserServerWithMocking(nil)
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 
 	// Verify that GCP tried to Put the added key back.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
@@ -128,17 +106,9 @@ func TestAddRootToExistingUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, `http://localhost:8082/addroot?user=bob@foo.com&endpoint={"Transport":7,"NetAddr":"http://there.co.uk"}`, []byte(""))
 
-	// Underlying HTTP client will look up the user data...
-	requestsExpected := []*http.Request{nettest.NewRequest(t, netutil.Get, mockGCPDownloadLink, nil)}
-	// ... and will receive it.
-	responsesToSend := []nettest.MockHTTPResponse{
-		nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"User":"bob@foo.com","Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`)),
-	}
-
-	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`))
 	u.addRootHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 
 	// Verify that GCP tried to Put the added key back.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
@@ -157,14 +127,9 @@ func TestAddRootToNewUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, `http://localhost:8082/addroot?user=new@user.com&endpoint={"Transport":7,"NetAddr":"http://there.co.uk"}`, []byte(""))
 
-	// Underlying HTTP client will not look up anything.
-	requestsExpected := []*http.Request{}
-	responsesToSend := []nettest.MockHTTPResponse{}
-
-	u, mock, mockGCP := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, mockGCP := newUserServerWithMocking(nil)
 	u.addRootHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 
 	// Verify that GCP tried to Put the added key back.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
@@ -185,38 +150,26 @@ func TestGetExistingUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(expectedContents)
 	req := nettest.NewRequest(t, netutil.Get, `http://localhost:8082/get?user=bob@foo.com`, nil)
 
-	// Underlying HTTP client will look up the user data...
-	requestsExpected := []*http.Request{nettest.NewRequest(t, netutil.Get, mockGCPDownloadLink, nil)}
-	// ... and will receive it.
-	responsesToSend := []nettest.MockHTTPResponse{
-		nettest.NewMockHTTPResponse(200, "application/json", []byte(expectedContents)),
-	}
-
-	u, mock, _ := newUserServerWithMocking(responsesToSend, requestsExpected)
+	u, _ := newUserServerWithMocking([]byte(expectedContents))
 	u.getHandler(resp, req)
 	resp.Verify(t)
-	mock.Verify(t)
 }
 
 func newUserServer() *userServer {
-	return new(&gcptest.DummyGCP{}, &http.Client{})
+	return new(&gcptest.DummyGCP{})
 }
 
-// newUserServerWithMocking sets up an HTTP client mock that will
-// behave according to the parameters given. The underlying GCP client
-// is setup to expect a single lookup of user mockUser and it will
-// reply with download link mockGCPDownloadLink. It returns the user
-// server, its underlying mock HTTP client and the mock GCP client for
-// further verification.
-func newUserServerWithMocking(responsesToSend []nettest.MockHTTPResponse, requestsExpected []*http.Request) (*userServer, *nettest.MockHTTPClient, *gcptest.ExpectGetCapturePutGCP) {
-	mockGCP := &gcptest.ExpectGetCapturePutGCP{gcptest.ExpectGetGCP{
-		Ref:  mockUser,
-		Link: mockGCPDownloadLink,
-	}, gcptest.CapturePutGCP{
+// newUserServerWithMocking sets up a mock GCP client that expects a
+// single lookup of user mockUser and it will reply with the preset
+// data. It returns the user server, the mock GCP client for further
+// verification.
+func newUserServerWithMocking(data []byte) (*userServer, *gcptest.ExpectDownloadCapturePutGCP) {
+	mockGCP := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:         mockUser,
+		Data:        data,
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
-	}}
-	mock := nettest.NewMockHTTPClient(responsesToSend, requestsExpected)
-	u := new(mockGCP, mock)
-	return u, mock, mockGCP
+	}
+	u := new(mockGCP)
+	return u, mockGCP
 }

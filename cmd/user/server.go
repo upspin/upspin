@@ -7,7 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -21,7 +20,6 @@ import (
 // userServer is the implementation of the User Service on GCP.
 type userServer struct {
 	cloudClient gcp.Interface
-	httpClient  netutil.HTTPClientInterface
 }
 
 // userEntry stores all known information for a given user. The fields
@@ -239,23 +237,11 @@ func (u *userServer) preambleParseRequestAndGetUser(context string, expectedReqT
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
 func (u *userServer) fetchUserEntry(user string) (*userEntry, error) {
-	// Get the link to where the user entry is stored
-	link, err := u.cloudClient.Get(user)
+	// Get the user entry from GCP
+	buf, err := u.cloudClient.Download(user)
 	if err != nil {
+		log.Printf("Error downloading: %s", err)
 		return nil, err
-	}
-	// Now go fetch that link.
-	req, err := http.NewRequest(netutil.Get, link, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := u.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	buf, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading GCP link response %v", err)
 	}
 	// Now convert it to a userEntry
 	var ue userEntry
@@ -281,17 +267,16 @@ func (u *userServer) putUserEntry(user string, userEntry *userEntry) error {
 }
 
 // new creates a UserService from a pre-configured GCP instance and an HTTP client.
-func new(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *userServer {
+func new(cloudClient gcp.Interface) *userServer {
 	u := &userServer{
 		cloudClient: cloudClient,
-		httpClient:  httpClient,
 	}
 	return u
 }
 
 func main() {
 	flag.Parse()
-	u := new(gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL), &http.Client{})
+	u := new(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
 	if !*readOnly {
 		http.HandleFunc("/addkey", u.addKeyHandler)
 		http.HandleFunc("/addroot", u.addRootHandler)

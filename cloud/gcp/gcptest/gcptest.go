@@ -21,6 +21,10 @@ func (m *DummyGCP) Get(ref string) (link string, error error) {
 	return "", nil
 }
 
+func (m *DummyGCP) Download(ref string) ([]byte, error) {
+	return nil, nil
+}
+
 func (m *DummyGCP) Put(ref string, contents []byte) (refLink string, error error) {
 	return "", nil
 }
@@ -51,21 +55,28 @@ func (e *ExpectGetGCP) Get(ref string) (link string, error error) {
 	return "", errors.New("not found")
 }
 
-// CapturePutGCP captures the parameters to all calls to Put. It
-// should only be used as part of ExpectGetCapturePutGCP because it
-// does not implement DummyGCP.
-type CapturePutGCP struct {
+// ExpectDownloadCapturePutGCP inspects all calls to Download with the
+// given Ref and if it matches, it returns Data. It also captures all
+// Put requests.
+type ExpectDownloadCapturePutGCP struct {
+	DummyGCP
+	// Expectation for calls to Download
+	Ref  string
+	Data []byte
+	// Storage for calls to Put
 	PutRef      []string
 	PutContents [][]byte
 }
 
-func (c *CapturePutGCP) Put(ref string, contents []byte) (refLink string, error error) {
+func (e *ExpectDownloadCapturePutGCP) Download(ref string) ([]byte, error) {
+	if ref == e.Ref {
+		return e.Data, nil
+	}
+	return nil, errors.New("not found")
+}
+
+func (c *ExpectDownloadCapturePutGCP) Put(ref string, contents []byte) (refLink string, error error) {
 	c.PutRef = append(c.PutRef, ref)
 	c.PutContents = append(c.PutContents, contents)
 	return "", nil
-}
-
-type ExpectGetCapturePutGCP struct {
-	ExpectGetGCP
-	CapturePutGCP
 }
