@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_d66842f8",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T23:20:13Z",
+      "side": 1,
+      "message": "s/New/Readable/",
+      "revId": "2ffd30f2d5fceb442d0b8811d5c07e47f75e62a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2251944_f66d3e05",
+        "filename": "client/common/file/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-01T23:20:13Z",
+      "side": 1,
+      "message": "s/New/Writable/\ns/new file/new empty file/\n\n// Once closed, the file will overwrite any existing file with the same name.",
+      "revId": "2ffd30f2d5fceb442d0b8811d5c07e47f75e62a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
