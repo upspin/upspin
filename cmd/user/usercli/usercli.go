@@ -63,8 +63,14 @@ func lookup(user upspin.UserName) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("roots: %+v\n", roots)
-	fmt.Printf("keys: %v\n", keys)
+	fmt.Println("Roots:")
+	for i, r := range roots {
+		fmt.Printf("%d: %+v\n", i, r)
+	}
+	fmt.Println("Keys:")
+	for i, k := range keys {
+		fmt.Printf("%d: %s\n", i, k)
+	}
 }
 
 func addRoot(user upspin.UserName, endpointStr string) {
