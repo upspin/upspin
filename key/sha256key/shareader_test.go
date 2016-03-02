@@ -1,8 +1,7 @@
-package main
+package sha256key
 
 import (
 	"io"
-	"log"
 	"strings"
 	"testing"
 )
@@ -19,9 +18,8 @@ func TestEncodedSum(t *testing.T) {
 	for n, err := sr.Read(p); err != io.EOF; n, err = sr.Read(p) {
 		total += n
 	}
-	log.Printf("Read %d bytes\n", total)
 	ret := sr.EncodedSum()
 	if ret != encodedSha {
-		t.Errorf("Sha digests differ. Got %v expected %v", ret, encodedSha)
+		t.Errorf("Got %v expected %v", ret, encodedSha)
 	}
 }
