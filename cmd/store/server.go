@@ -10,6 +10,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
+	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -45,7 +46,7 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	sha := NewShaReader(file)
+	sha := sha256key.NewShaReader(file)
 	initialRef := s.fileCache.RandomRef()
 	err = s.fileCache.Put(initialRef, sha)
 	if err != nil {
