@@ -1,25 +1,25 @@
-package main
-
-// TODO: Perhaps move this functionality into sha256key.
+package sha256key
 
 import (
 	"bufio"
 	"crypto/sha256"
 	"hash"
 	"io"
-
-	"upspin.googlesource.com/upspin.git/key/sha256key"
 )
 
+// ShaReader continuously computes the SHA-256 as it reads bytes from
+// an io.Reader.
 type ShaReader struct {
 	rd  *bufio.Reader
 	sha hash.Hash
 }
 
+// NewShaReader creates a ShaReader for reading from f.
 func NewShaReader(f io.Reader) *ShaReader {
 	return &ShaReader{bufio.NewReader(f), sha256.New()}
 }
 
+// Read implements io.Reader.
 func (s *ShaReader) Read(p []byte) (n int, err error) {
 	n, err = s.rd.Read(p)
 	if n > 0 {
@@ -29,10 +29,7 @@ func (s *ShaReader) Read(p []byte) (n int, err error) {
 	return
 }
 
-func (s *ShaReader) Sum() []byte {
-	return s.sha.Sum(nil)
-}
-
+// EncodedSum returns a string-encoded representation of the hash.
 func (s *ShaReader) EncodedSum() string {
-	return sha256key.BytesString(s.sha.Sum(nil))
+	return BytesString(s.sha.Sum(nil))
 }
