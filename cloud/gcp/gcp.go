@@ -3,6 +3,7 @@
 package gcp
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -109,7 +110,7 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 	acl := string(gcp.defaultWriteACL)
 	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(acl).Do()
 	if err == nil {
-		log.Printf("Created object %v at location %v\n", res.Name, res.SelfLink)
+		log.Printf("Created object %v at location %v", res.Name, res.SelfLink)
 	} else {
 		log.Printf("Objects.Insert failed: %v", err)
 		return "", err
@@ -141,23 +142,17 @@ func (gcp *GCP) Download(ref string) ([]byte, error) {
 }
 
 func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
-	// TODO(edpin): this is not super safe, given the file has
-	// permissions 0666. But for now the contents are always
-	// public on cloud store, so it doesn't matter.
-	f, err := ioutil.TempFile("", "upload-gcp-blob-")
-	if err != nil {
+	buf := bytes.NewBuffer(contents)
+	acl := string(gcp.defaultWriteACL)
+	object := &storage.Object{Name: ref}
+	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
+	if err == nil {
+		log.Printf("Created object %v at location %v", res.Name, res.SelfLink)
+	} else {
+		log.Printf("Objects.Insert failed: %v", err)
 		return "", err
 	}
-	defer f.Close()
-	name := f.Name()
-	defer os.Remove(name)
-	n, err := f.Write(contents)
-	if err != nil || n != len(contents) {
-		return "", err
-	}
-	link, err := gcp.PutLocalFile(name, ref)
-
-	return link, err
+	return res.MediaLink, err
 }
 
 func (gcp *GCP) List(prefix string) (name []string, link []string, err error) {
