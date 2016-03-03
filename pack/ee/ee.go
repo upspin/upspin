@@ -44,15 +44,36 @@ type wrappedKey struct {
 }
 type wrappedKeys []wrappedKey
 
-type eep256 struct{}
-type eep521 struct{}
+// common implements common functions used by eep256 and eep521 that
+// are parameterized by cipher-specific values.
+type common struct {
+	ciphersuite upspin.Packing
+	aesLen      int
+	curve       elliptic.Curve
+}
+
+type eep256 struct {
+	common
+}
+
+type eep521 struct {
+	common
+}
 
 var _ upspin.Packer = eep256{}
 var _ upspin.Packer = eep521{}
 
 func init() {
-	pack.Register(eep256{})
-	pack.Register(eep521{})
+	pack.Register(eep256{common{
+		ciphersuite: upspin.EEp256Pack,
+		curve:       elliptic.P256(),
+		aesLen:      16,
+	}})
+	pack.Register(eep521{common{
+		ciphersuite: upspin.EEp521Pack,
+		curve:       elliptic.P521(),
+		aesLen:      32,
+	}})
 }
 
 const (
@@ -67,14 +88,6 @@ var (
 	errNoWrappedKey = errors.New("no wrapped key for me")
 	errKeyLength    = errors.New("wrong key length")
 	sig0            signature // for returning nil of correct type
-)
-
-var (
-	// These Packer-specific values are set by Pack and Unpack.
-	// TODO There is no locking, so this seems unsafe, but it will do for the moment.
-	ciphersuite upspin.Packing
-	aesLen      int
-	curve       elliptic.Curve
 )
 
 func (e eep256) Packing() upspin.Packing {
@@ -125,130 +138,144 @@ func (e eep256) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *up
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return 0, err
 	}
-	ciphersuite = upspin.EEp256Pack
-	curve = elliptic.P256()
-	aesLen = 16
-	return eePack(ciphertext, cleartext, meta, name)
+	return e.eePack(ctx, ciphertext, cleartext, meta, name)
 }
 
 func (e eep521) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return 0, err
 	}
-	ciphersuite = upspin.EEp521Pack
-	curve = elliptic.P521()
-	aesLen = 32
-	return eePack(ciphertext, cleartext, meta, name)
+	return e.eePack(ctx, ciphertext, cleartext, meta, name)
 }
 
 func (e eep256) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return 0, err
 	}
-	ciphersuite = upspin.EEp256Pack
-	curve = elliptic.P256()
-	aesLen = 16
-	return eeUnpack(cleartext, ciphertext, meta, name)
+	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
 }
 
 func (e eep521) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return 0, err
 	}
-	ciphersuite = upspin.EEp521Pack
-	curve = elliptic.P521()
-	aesLen = 32
-	return eeUnpack(cleartext, ciphertext, meta, name)
+	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
 }
 
-func eePack(ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
+func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	dkey := make([]byte, aesLen)
+	dkey := make([]byte, c.aesLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
 		return 0, err
 	}
-	nCipher, err := encrypt(ciphertext, cleartext, dkey)
+	nCipher, err := c.encrypt(ciphertext, cleartext, dkey)
 	if err != nil {
 		return 0, err
 	}
 
-	// TODO  switch to Context.UserName, .Packing, and .PrivateKey when test harness is in place
-	parsed, err := path.Parse(pathname)
+	usernames := []upspin.UserName{ctx.UserName}
+	// TODO: we should know which of our public keys goes with this private key. Perhaps put it in Context.
+	rawPublicKey, err := c.publicKey(ctx.UserName)
 	if err != nil {
 		return 0, err
 	}
-	owner := string(parsed.User)
-	usernames := []string{owner} // TODO should be readers of directory
-	privateKey, err := privateKey(owner)
+	publicKey, err := c.parsePublicKey(rawPublicKey)
+	if err != nil {
+		return 0, err
+	}
+	privateKey, err := c.parsePrivateKey(publicKey, ctx.PrivateKey)
 	if err != nil {
 		return 0, err
 	}
 
-	r, s, err := ecdsa.Sign(rand.Reader, privateKey, verHash(pathname, dkey, ciphertext))
+	r, s, err := ecdsa.Sign(rand.Reader, privateKey, c.verHash(pathname, dkey, ciphertext))
 	if err != nil {
 		return 0, err
 	}
 	sig := signature{r, s}
 	wrap := make([]wrappedKey, len(usernames))
 	for i, _ := range usernames {
-		wrap[i], err = aesWrap(&privateKey.PublicKey, privateKey, dkey)
+		wrap[i], err = c.aesWrap(&privateKey.PublicKey, privateKey, dkey)
 		if err != nil {
 			return 0, err
 		}
 	}
-	err = pdMarshal(&meta.PackData, sig, wrap)
+	err = c.pdMarshal(&meta.PackData, sig, wrap)
 	return nCipher, err
 }
 
-func eeUnpack(cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
+func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
 	if len(cleartext) < len(ciphertext) {
 		return 0, errTooShort
 	}
 	cleartext = cleartext[:len(ciphertext)]
-	dkey := make([]byte, aesLen)
-	sig, wrap, err := pdUnmarshal(meta.PackData, pathname)
+	dkey := make([]byte, c.aesLen)
+	sig, wrap, err := c.pdUnmarshal(meta.PackData, pathname)
 	if err != nil {
 		return 0, err
 	}
 
-	// TODO get from Context
+	// File owner is part of the pathname
 	parsed, err := path.Parse(pathname)
-	owner := string(parsed.User)
+	owner := parsed.User
 	if err != nil {
 		return 0, err
 	}
-	recipient := owner
-	privateKey, err := privateKey(recipient)
+	// The owner has a well-known public key
+	ownerRawPubKey, err := c.publicKey(owner)
 	if err != nil {
 		return 0, err
 	}
-	pubkey := privateKey.PublicKey // of recipient
-	rhash := keyHash(&pubkey)
+	ownerPubKey, err := c.parsePublicKey(ownerRawPubKey)
+	if err != nil {
+		return 0, err
+	}
+
+	// Now get my own keys
+	me := ctx.UserName // Recipient of the file is me (the user in the context)
+	rawPublicKey, err := c.publicKey(upspin.UserName(me))
+	if err != nil {
+		return 0, err
+	}
+	pubkey, err := c.parsePublicKey(rawPublicKey)
+	if err != nil {
+		return 0, err
+	}
+	privateKey, err := c.parsePrivateKey(pubkey, ctx.PrivateKey)
+	if err != nil {
+		return 0, err
+	}
+	// For quick lookup, hash my public key and locate my wrapped
+	// key in the metadata.
+	rhash := keyHash(pubkey)
 	for _, w := range wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
 			fmt.Printf("unequal %x\n        %x\n", rhash, w.keyHash)
 			continue
 		}
-		dkey, err = aesUnwrap(privateKey, w)
+		// Decode my wrapped key using my private key
+		dkey, err = c.aesUnwrap(privateKey, w)
 		if err != nil {
 			return 0, err
 		}
-		if !ecdsa.Verify(&pubkey, verHash(pathname, dkey, ciphertext), sig.r, sig.s) {
+		// Verify that the owner signed this with his/her public key.
+		if !ecdsa.Verify(ownerPubKey, c.verHash(pathname, dkey, ciphertext), sig.r, sig.s) {
 			return 0, errVerify
 		}
-		return decrypt(cleartext, ciphertext, dkey)
+		// dkey is safe, so we decrypt the whole blob.
+		return c.decrypt(cleartext, ciphertext, dkey)
 	}
 	return 0, errNoWrappedKey
 }
 
-func verHash(pathname upspin.PathName, dkey, ciphertext []byte) []byte {
+func (c common) verHash(pathname upspin.PathName, dkey, ciphertext []byte) []byte {
 	// TODO Consider alternative crypto that merges verification with wrapping.
 	// TODO If we stick with Sign, consider streaming ciphertext to sha256 here.
-	mess := []byte(fmt.Sprintf("%02x:%s:%x:%x", ciphersuite, pathname, dkey, ciphertext))
+	mess := []byte(fmt.Sprintf("%02x:%s:%x:%x", c.ciphersuite, pathname, dkey, ciphertext))
 	messhash := sha256.Sum256(mess)
 	return messhash[:]
 }
@@ -260,15 +287,14 @@ func keyHash(p *ecdsa.PublicKey) []byte {
 }
 
 // aesWrap implements NIST 800-56Ar2; see also RFC6637 §8.
-func aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedKey, err error) {
-
+func (c common) aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedKey, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// v, V=vG  ephemeral key pair
 	// S = vR   shared point
-	v, err := ecdsa.GenerateKey(curve, rand.Reader)
-	sx, sy := curve.ScalarMult(R.X, R.Y, v.D.Bytes())
-	S := elliptic.Marshal(curve, sx, sy)
-	w.ephemeral = ecdsa.PublicKey{Curve: curve, X: v.X, Y: v.Y}
+	v, err := ecdsa.GenerateKey(c.curve, rand.Reader)
+	sx, sy := c.curve.ScalarMult(R.X, R.Y, v.D.Bytes())
+	S := elliptic.Marshal(c.curve, sx, sy)
+	w.ephemeral = ecdsa.PublicKey{Curve: c.curve, X: v.X, Y: v.Y}
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
 	w.nonce = make([]byte, gcmStandardNonceSize)
@@ -277,10 +303,10 @@ func aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedK
 		return
 	}
 	w.keyHash = keyHash(R)
-	mess := []byte(fmt.Sprintf("%02x:%x:%x", ciphersuite, w.keyHash, w.nonce))
+	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO reconsider salt
-	strong := make([]byte, aesLen)
+	strong := make([]byte, c.aesLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
 		return
@@ -301,17 +327,17 @@ func aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedK
 	return
 }
 
-func aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err error) {
+func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	sx, sy := curve.ScalarMult(w.ephemeral.X, w.ephemeral.Y, R.D.Bytes())
-	S := elliptic.Marshal(curve, sx, sy)
+	sx, sy := c.curve.ScalarMult(w.ephemeral.X, w.ephemeral.Y, R.D.Bytes())
+	S := elliptic.Marshal(c.curve, sx, sy)
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
-	mess := []byte(fmt.Sprintf("%02x:%x:%x", ciphersuite, w.keyHash, w.nonce))
+	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess)
-	strong := make([]byte, aesLen)
+	strong := make([]byte, c.aesLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
 		return
@@ -326,23 +352,23 @@ func aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err error) {
 	if err != nil {
 		return
 	}
-	dkey = make([]byte, 0, aesLen)
+	dkey = make([]byte, 0, c.aesLen)
 	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
 	return
 }
 
-func pdMarshal(dst *[]byte, sig signature, wrap []wrappedKey) error {
+func (c common) pdMarshal(dst *[]byte, sig signature, wrap []wrappedKey) error {
 	// byteLen is copied from elliptic.go:Marshal()
-	byteLen := (curve.Params().BitSize + 7) >> 3
+	byteLen := (c.curve.Params().BitSize + 7) >> 3
 	// n big enough for ciphersuite, sig.r, sig.s, len(wrap), {keyHash, encrypted, nonce, X, y}
 	n := 1 + 2*byteLen + (1+5*len(wrap))*binary.MaxVarintLen64 +
-		len(wrap)*(sha256.Size+(aesLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
+		len(wrap)*(sha256.Size+(c.aesLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
 	// TODO great, but how is the ordinary user to know? maybe  PackdataLen(len(usernames))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
 	// dst is now guaranteed large enough
-	(*dst)[0] = byte(ciphersuite)
+	(*dst)[0] = byte(c.ciphersuite)
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.r.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.s.Bytes())
@@ -358,14 +384,14 @@ func pdMarshal(dst *[]byte, sig signature, wrap []wrappedKey) error {
 	return nil // err impossible for now but the night is young
 }
 
-func pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wrap []wrappedKey, err error) {
-	if pd[0] != byte(ciphersuite) {
-		return sig0, nil, fmt.Errorf("expected packing %d, got %d", ciphersuite, pd[0])
+func (c common) pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wrap []wrappedKey, err error) {
+	if pd[0] != byte(c.ciphersuite) {
+		return sig0, nil, fmt.Errorf("expected packing %d, got %d", c.ciphersuite, pd[0])
 	}
 	n := 1
 	sig.r = big.NewInt(0)
 	sig.s = big.NewInt(0)
-	byteLen := (curve.Params().BitSize + 7) >> 3
+	byteLen := (c.curve.Params().BitSize + 7) >> 3
 	buf := make([]byte, byteLen)
 	n += pdGetBytes(&buf, pd[n:])
 	sig.r.SetBytes(buf)
@@ -383,7 +409,7 @@ func pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wrap []wrapped
 		w.keyHash = make([]byte, sha256.Size)
 		w.encrypted = make([]byte, 100) // TODO len
 		w.nonce = make([]byte, gcmStandardNonceSize)
-		w.ephemeral = ecdsa.PublicKey{Curve: curve, X: big.NewInt(0), Y: big.NewInt(0)}
+		w.ephemeral = ecdsa.PublicKey{Curve: c.curve, X: big.NewInt(0), Y: big.NewInt(0)}
 		n += pdGetBytes(&w.keyHash, pd[n:])
 		n += pdGetBytes(&w.encrypted, pd[n:])
 		n += pdGetBytes(&w.nonce, pd[n:])
@@ -428,8 +454,8 @@ func pdGetBytes(dst *[]byte, src []byte) int {
 	return k + vlen
 }
 
-func encrypt(ciphertext, cleartext, dkey []byte) (int, error) {
-	if len(dkey) != aesLen {
+func (c common) encrypt(ciphertext, cleartext, dkey []byte) (int, error) {
+	if len(dkey) != c.aesLen {
 		return 0, errKeyLength
 	}
 	block, err := aes.NewCipher(dkey)
@@ -443,8 +469,8 @@ func encrypt(ciphertext, cleartext, dkey []byte) (int, error) {
 	return len(cleartext), nil
 }
 
-func decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
-	if len(dkey) != aesLen {
+func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
+	if len(dkey) != c.aesLen {
 		return 0, errKeyLength
 	}
 	block, err := aes.NewCipher(dkey)
@@ -457,50 +483,47 @@ func decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	return len(ciphertext), nil
 }
 
-// privateKey returns the private key of user by reading file from ~/.ssh/.
-func privateKey(user string) (priv *ecdsa.PrivateKey, err error) {
-	// TODO move to code that sets Context?
-	// TODO replace someday by a safe variant of ssh-agent
-	pubkey, err := publicKey(user)
-	if err != nil {
-		return nil, err
-	}
-	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", ciphersuite)))
-	if err != nil {
-		fmt.Printf("If you haven't already, run keygen.\n")
-		return nil, err
-	}
-	defer f.Close()
-	buf := make([]byte, 200) // big enough for P-521
-	n, err := f.Read(buf)
-	if err != nil {
-		return nil, fmt.Errorf("privateKey read: %v", err)
-	}
-	if buf[n-1] == '\n' {
-		n--
-	}
+// parsePrivateKey takes an ecdsa public key for a user and the user's
+// upspin representation of his/her private key and converts it into
+// an ecsda private key.
+func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
 	var d big.Int
-	err = d.UnmarshalText(buf[:n])
+	err = d.UnmarshalText(privateKey)
 	if err != nil {
 		return nil, err
 	}
-	return &ecdsa.PrivateKey{PublicKey: ecdsa.PublicKey{Curve: pubkey.Curve, X: pubkey.X, Y: pubkey.Y}, D: &d}, nil
+	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
 }
 
 // publicKey returns the public key of user by reading file from ~/.ssh/.
-func publicKey(user string) (priv *ecdsa.PublicKey, err error) {
+func (c common) publicKey(user upspin.UserName) (upspin.PublicKey, error) {
 	// TODO replace someday by keyserver
-	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", ciphersuite)))
+	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", c.ciphersuite)))
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	var x, y big.Int
-	n, err := fmt.Fscan(io.Reader(f), &x, &y)
-	if err != nil || n != 2 {
+	buf := make([]byte, 400) // enough for p-521
+	n, err := f.Read(buf)
+	if err != nil {
 		return nil, err
 	}
-	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, nil
+	buf = buf[:n]
+	return upspin.PublicKey(buf), nil
+}
+
+// parsePublicKey takes a user's upspin representation of his/her
+// public key and converts it into an ecsda public key.
+func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, error) {
+	var x, y big.Int
+	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &x, &y)
+	if err != nil {
+		return nil, err
+	}
+	if n != 2 {
+		return nil, fmt.Errorf("Expected two big ints, got %d", n)
+	}
+	return &ecdsa.PublicKey{Curve: c.curve, X: &x, Y: &y}, nil
 }
 
 func sshdir() string {
