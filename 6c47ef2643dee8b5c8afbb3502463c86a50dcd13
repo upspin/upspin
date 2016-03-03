@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e211990a_861cef59",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-03T23:37:16Z",
+      "side": 1,
+      "message": "Not necessary, but for consistency with ordering at line 69, may as well move line 51 down one.",
+      "revId": "6c47ef2643dee8b5c8afbb3502463c86a50dcd13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e211990a_66fa7326",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-03T23:37:16Z",
+      "side": 1,
+      "message": "Thank you, \"(c common)\" was the Go idiom I was looking for to avoid the globals.",
+      "revId": "6c47ef2643dee8b5c8afbb3502463c86a50dcd13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
