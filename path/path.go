@@ -145,3 +145,11 @@ func (p Parsed) Drop(n int) Parsed {
 	p.Elems = p.Elems[:len(p.Elems)-n]
 	return p
 }
+
+// Join a new path element to an upspin name.
+func Join(path upspin.PathName, elem string) upspin.PathName {
+	if len(path) == 0 {
+		return upspin.PathName(elem)
+	}
+	return upspin.PathName(string(path) + "/" + elem)
+}
