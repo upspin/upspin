@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	goPath "path"
 	"sort"
@@ -281,6 +282,7 @@ func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.Pac
 
 // put is the underlying implementation of Put and MakeDirectory.
 func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+	log.Printf("put %q", string(pathName))
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return loc0, nil
