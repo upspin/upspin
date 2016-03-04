@@ -81,7 +81,7 @@ func mkError(op string, name upspin.PathName, err error) *os.PathError {
 	}
 }
 
-func packDirBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, error) {
+func packDirBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
 	return packBlob(context, cleartext, dirPackData, name)
 }
 
@@ -91,16 +91,16 @@ func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
 	}
 	packer := pack.Lookup(upspin.Packing(packdata[0]))
 	if packer == nil {
-		return nil, fmt.Errorf("no packing %#x registerd", packdata[0])
+		return nil, fmt.Errorf("no packing %#x registered", packdata[0])
 	}
 	return packer, nil
 }
 
 // packBlob packs an arbitrary blob and its metadata.
-func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackData, name upspin.PathName) ([]byte, error) {
+func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackData, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
 	packer, err := getPacker(packdata)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	meta := upspin.Metadata{
 		// TODO: Do we need other fields?
@@ -108,14 +108,14 @@ func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackDat
 	}
 	cipherLen := packer.PackLen(context, cleartext, &meta, name)
 	if cipherLen < 0 {
-		return nil, errors.New("PackLen failed")
+		return nil, nil, errors.New("PackLen failed")
 	}
 	ciphertext := make([]byte, cipherLen)
 	n, err := packer.Pack(context, ciphertext, cleartext, &meta, name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return ciphertext[:n], nil
+	return ciphertext[:n], &meta, nil
 }
 
 // unpackBlob unpacks a blob.
@@ -247,7 +247,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob, err := packDirBlob(s.Context, nil, parsed.Path())
+		blob, _, err := packDirBlob(s.Context, nil, parsed.Path()) // TODO: Ignoring metadata.
 		if err != nil {
 			return loc0, err
 		}
@@ -326,7 +326,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
 	// Create a blob storing the data for this file and store it in storage service.
-	ciphertext, err := packBlob(s.Context, data, packdata, parsed.Path()) // parsed.Path() will be clean.
+	ciphertext, meta, err := packBlob(s.Context, data, packdata, parsed.Path()) // parsed.Path() will be clean.
 	if err != nil {
 		return loc0, err
 	}
@@ -346,7 +346,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		elem:     lastElem,
 		isDir:    dataIsDir,
 		ref:      ref,
-		packdata: packdata,
+		packdata: meta.PackData,
 	}
 	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, ent, false)
 	if err != nil {
@@ -588,7 +588,7 @@ Loop:
 		entry := newEntryBytes(ent.elem, ent.isDir, ent.ref, ent.packdata)
 		dirData = append(dirData, entry...)
 	}
-	blob, err := packDirBlob(s.Context, dirData, dirName)
+	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata.
 	if err != nil {
 		return r0, err
 	}
