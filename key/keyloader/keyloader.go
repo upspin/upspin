@@ -1,4 +1,4 @@
-// Package keyloader loads public and private keys from the users homedir.
+// Package keyloader loads public and private keys from the user's home directory.
 package keyloader
 
 import (
@@ -11,16 +11,19 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+const (
+	noKeysFound  = "no keys found for packing %d"
+	keyloaderErr = "keyloader: packing %d: %v"
+)
+
 var (
-	noKeysFound   = "no keys found for packing %d"
-	keyloaderErr  = "keyloader: packing %d: %v"
 	errNilContext = errors.New("nil context")
 	zeroPrivKey   upspin.PrivateKey
 	zeroPubKey    upspin.PublicKey
 )
 
 // Load reads a pair of keys from the user's .ssh directory and loads
-// it into the context. It will load the key according to the packing
+// them into the context. It will load the keys according to the packing
 // preference set in the context.
 func Load(context *upspin.Context) error {
 	if context == nil {
@@ -31,9 +34,8 @@ func Load(context *upspin.Context) error {
 	return err
 }
 
-// PublicKey returns the public key of the current user by reading file from ~/.ssh/.
-// TODO: this is exported temporarily while pack/ee.go depends on it. Soon to go away (next CL).
-func PublicKey(packing upspin.Packing) (upspin.PublicKey, error) {
+// publicKey returns the public key of the current user by reading the packing-specific key file from $HOME/.ssh/.
+func publicKey(packing upspin.Packing) (upspin.PublicKey, error) {
 	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", packing)))
 	if err != nil {
 		return zeroPubKey, fmt.Errorf(noKeysFound, packing)
@@ -48,7 +50,7 @@ func PublicKey(packing upspin.Packing) (upspin.PublicKey, error) {
 	return upspin.PublicKey(buf), nil
 }
 
-// privateKey returns the private key of the current user by reading file from ~/.ssh/.
+// privateKey returns the private key of the current user by reading the packing-specific key file from $HOME/.ssh/.
 func privateKey(packing upspin.Packing) (upspin.PrivateKey, error) {
 	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
 	if err != nil {
@@ -64,7 +66,7 @@ func privateKey(packing upspin.Packing) (upspin.PrivateKey, error) {
 		n--
 	}
 	buf = buf[:n]
-	pubkey, err := PublicKey(packing)
+	pubkey, err := publicKey(packing)
 	if err != nil {
 		return zeroPrivKey, err
 	}
