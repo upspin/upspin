@@ -21,7 +21,7 @@ import (
 func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
-		log.Fatalf("key not generated: %s\n", err)
+		log.Fatalf("key not generated: %s", err)
 	}
 
 	private, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
@@ -37,11 +37,11 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = private.WriteString(priv.D.String() + "\n")
+	_, err = private.WriteString(priv.D.String())
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = public.WriteString(priv.X.String() + "\n" + priv.Y.String() + "\n")
+	_, err = public.WriteString(priv.X.String() + "\n" + priv.Y.String())
 	if err != nil {
 		log.Fatal(err)
 	}

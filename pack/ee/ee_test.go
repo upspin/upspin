@@ -1,11 +1,9 @@
 package ee
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -72,25 +70,9 @@ func setup(t *testing.T, name upspin.UserName, packing upspin.Packing) (*upspin.
 		Packing:  packing,
 	}
 	packer := pack.Lookup(packing)
-	ctx.PrivateKey = privateKey(t, name, packing)
-	return ctx, packer
-}
-
-// privateKey returns the private key of the current user by reading file from ~/.ssh/.
-func privateKey(t *testing.T, user upspin.UserName, packing upspin.Packing) upspin.PrivateKey {
-	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
-	if err != nil {
-		t.Fatal("If you haven't already, run keygen.")
-	}
-	defer f.Close()
-	buf := make([]byte, 200) // big enough for P-521
-	n, err := f.Read(buf)
+	err := keyloader.Load(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if buf[n-1] == '\n' {
-		n--
-	}
-	buf = buf[:n]
-	return upspin.PrivateKey(buf)
+	return ctx, packer
 }
