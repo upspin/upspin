@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e211990a_4eb30964",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-04T23:04:28Z",
+      "side": 1,
+      "message": "just a suggestion; feel free to ignore...\n\nThe loop below might be less cryptic if you\ns/privateKey/wPrivateKey/\ns/pubK/rPublicKey/\nor in some other way indicate which is the writer and which the reader.",
+      "revId": "997176ecbae06f09db2740f3eeb914c73c76d9ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
