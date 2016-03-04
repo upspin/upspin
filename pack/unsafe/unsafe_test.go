@@ -39,7 +39,10 @@ func setup() UnsafePack {
 	// Add an initial public key for the current user
 	key := makeUserKey(user, []byte("NaCl"))
 	testUser.SetPublicKeys(user, []upspin.PublicKey{key})
-	context.PrivateKey = upspin.PrivateKey(key)
+	context.PrivateKey = upspin.PrivateKey{
+		Public:  key,
+		Private: []byte(key),
+	}
 	return u
 }
 
@@ -140,7 +143,10 @@ func TestSharing(t *testing.T) {
 	// Simulates the data being looked up by a new user, with whom
 	// access has been shared. Check that it works.
 	context.UserName = newUser
-	context.PrivateKey = upspin.PrivateKey(newUserKey)
+	context.PrivateKey = upspin.PrivateKey{
+		Public:  upspin.PublicKey(newUserKey),
+		Private: newUserKey,
+	}
 	unpackLen := u.UnpackLen(context, cipher, &meta)
 	unpacked := make([]byte, unpackLen)
 	n, err = u.Unpack(context, unpacked, cipher, &meta, path)
