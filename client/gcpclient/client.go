@@ -49,9 +49,12 @@ func New(context *upspin.Context) upspin.Client {
 // pre-loaded with the given user keys.
 func NewForTesting(storeURL string, dirURL string, userKeys []UserKeys) upspin.Client {
 	context := &upspin.Context{
-		Packing:    upspin.UnsafePack,
-		UserName:   upspin.UserName("edpin@google.com"),
-		PrivateKey: upspin.PrivateKey("Zee Kee"),
+		Packing:  upspin.UnsafePack,
+		UserName: upspin.UserName("edpin@google.com"),
+		PrivateKey: upspin.PrivateKey{
+			Public:  []byte("Zee Kee"),
+			Private: []byte("Zee Kee"),
+		},
 	}
 
 	context.User = newUser(context)
