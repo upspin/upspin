@@ -18,10 +18,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 
 	"golang.org/x/crypto/hkdf"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -179,35 +179,55 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 		return 0, err
 	}
 
-	usernames := []upspin.UserName{ctx.UserName}
-	// TODO: we should know which of our public keys goes with this private key. Perhaps put it in Context.
-	rawPublicKey, err := c.publicKey(ctx.UserName)
+	// Set up readers. The writer of a file is always a reader.
+	usernames := append([]upspin.UserName{ctx.UserName}, meta.Readers...)
+	myRawPublicKey, err := c.publicKey(ctx, ctx.UserName)
 	if err != nil {
 		return 0, err
 	}
-	publicKey, err := c.parsePublicKey(rawPublicKey)
+	myPublicKey, err := c.parsePublicKey(myRawPublicKey)
 	if err != nil {
 		return 0, err
 	}
-	privateKey, err := c.parsePrivateKey(publicKey, ctx.PrivateKey)
+	myPrivateKey, err := c.parsePrivateKey(myPublicKey, ctx.PrivateKey)
 	if err != nil {
 		return 0, err
 	}
 
-	r, s, err := ecdsa.Sign(rand.Reader, privateKey, c.verHash(pathname, dkey, ciphertext))
+	r, s, err := ecdsa.Sign(rand.Reader, myPrivateKey, c.verHash(pathname, dkey, ciphertext))
 	if err != nil {
 		return 0, err
 	}
 	sig := signature{r, s}
+	var firstErr error
 	wrap := make([]wrappedKey, len(usernames))
-	for i, _ := range usernames {
-		wrap[i], err = c.aesWrap(&privateKey.PublicKey, privateKey, dkey)
+	for i, u := range usernames {
+		readerRawPublicKey, err := c.publicKey(ctx, u)
+		if err != nil {
+			log.Printf("no public key found for user %s: %s", u, err)
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		readerPublicKey, err := c.parsePublicKey(readerRawPublicKey)
+		if err != nil {
+			log.Printf("parsing public key for user %s: %s", u, err)
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
 		}
 	}
 	err = c.pdMarshal(&meta.PackData, sig, wrap)
-	return nCipher, err
+	if err != nil {
+		return 0, err
+	}
+	return nCipher, firstErr
 }
 
 func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
@@ -228,7 +248,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 		return 0, err
 	}
 	// The owner has a well-known public key
-	ownerRawPubKey, err := c.publicKey(owner)
+	ownerRawPubKey, err := c.publicKey(ctx, owner)
 	if err != nil {
 		return 0, err
 	}
@@ -239,7 +259,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 
 	// Now get my own keys
 	me := ctx.UserName // Recipient of the file is me (the user in the context)
-	rawPublicKey, err := c.publicKey(upspin.UserName(me))
+	rawPublicKey, err := c.publicKey(ctx, me)
 	if err != nil {
 		return 0, err
 	}
@@ -256,16 +276,18 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	rhash := keyHash(pubkey)
 	for _, w := range wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
-			fmt.Printf("unequal %x\n        %x\n", rhash, w.keyHash)
+			log.Printf("unequal %x\n        %x\n", rhash, w.keyHash)
 			continue
 		}
 		// Decode my wrapped key using my private key
 		dkey, err = c.aesUnwrap(privateKey, w)
 		if err != nil {
+			log.Printf("unwrap failed: %v", err)
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
 		if !ecdsa.Verify(ownerPubKey, c.verHash(pathname, dkey, ciphertext), sig.r, sig.s) {
+			log.Println("verify failed")
 			return 0, errVerify
 		}
 		// dkey is safe, so we decrypt the whole blob.
@@ -420,9 +442,9 @@ func (c common) pdUnmarshal(pd []byte, name upspin.PathName) (sig signature, wra
 		n += pdGetBytes(&buf, pd[n:])
 		w.ephemeral.Y.SetBytes(buf)
 		wrap[i] = w
-		if n != len(pd) { // sanity check, not a thorough parser test
-			return sig0, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
-		}
+	}
+	if n != len(pd) { // sanity check, not a thorough parser test
+		return sig0, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
 	}
 	return sig, wrap, nil
 }
@@ -501,9 +523,19 @@ func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.Pr
 }
 
 // publicKey returns the public key of user by reading file from ~/.ssh/.
-func (c common) publicKey(user upspin.UserName) (upspin.PublicKey, error) {
-	// TODO replace someday by keyserver
-	return keyloader.PublicKey(c.ciphersuite)
+func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+	// Are we requesting our own public key?
+	if string(user) == string(ctx.UserName) {
+		return ctx.PrivateKey.Public, nil
+	}
+	_, keys, err := ctx.User.Lookup(user)
+	if err != nil {
+		return nil, err
+	}
+	if len(keys) < 1 {
+		return nil, fmt.Errorf("no known keys for user %s", user)
+	}
+	return keys[0], nil
 }
 
 // parsePublicKey takes a user's upspin representation of his/her

@@ -164,7 +164,7 @@ type User interface {
 type PublicKey []byte
 
 // A PrivateKey is used when exchanging data with other users. It
-// contains the PublicKey necessarily.
+// always contains the public key.
 type PrivateKey struct {
 	Public  PublicKey
 	Private []byte
