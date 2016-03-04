@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e211990a_8bd35325",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-04T19:40:29Z",
+      "side": 1,
+      "message": "No real problem with this, but I\u0027m curious: why the change?  It makes the file somewhat harder for manual inspection.   Inspection might add a newline anyway, so the reading code still needs to discard trailing newline.",
+      "revId": "b96dc0212eaa0047e1ebcf3c5f726d71143e995e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
