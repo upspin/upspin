@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2251944_597463d8",
+        "filename": "cloud/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-04T00:32:59Z",
+      "side": 1,
+      "message": "HTTP",
+      "revId": "fa075ecc3a15d23468e4a62883c34b6ee04920de",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
