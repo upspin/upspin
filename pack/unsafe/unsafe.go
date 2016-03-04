@@ -97,7 +97,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 	}
 
 	// Get private key for the current user.
-	if len(context.PrivateKey) == 0 {
+	if len(context.PrivateKey.Private) == 0 {
 		return 0, errors.New("empty private key for current user")
 	}
 
@@ -112,7 +112,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 			return 0, err
 		}
 	} else {
-		aesKey = xor(wrapped.Wrapped, context.PrivateKey)
+		aesKey = xor(wrapped.Wrapped, context.PrivateKey.Private)
 	}
 
 	// Encrypt the cleartext with the AES key.
@@ -120,7 +120,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 	copy(ciphertext, buf)
 
 	// Sign it with the user's private key.
-	clear.Signature = sign(cleartext, context.PrivateKey)
+	clear.Signature = sign(cleartext, context.PrivateKey.Private)
 
 	// Re-generate the metadata. All cached users get their own wrapped keys.
 	clear.WrappedKeys = nil
@@ -161,7 +161,7 @@ func (u UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byte
 	}
 
 	// Get private key of the current user
-	privateKey := context.PrivateKey
+	privateKey := context.PrivateKey.Private
 	if len(privateKey) == 0 {
 		return 0, fmt.Errorf("no private key for user %v", context.UserName)
 	}

@@ -11,6 +11,7 @@ import (
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/client/gcpclient"
 	"upspin.googlesource.com/upspin.git/client/testclient"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -41,6 +42,12 @@ var (
 	inProcess = upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
+	}
+
+	dummyKey  = "a dummy key"
+	dummyKeys = upspin.PrivateKey{
+		Public:  upspin.PublicKey(dummyKey),
+		Private: []byte(dummyKey),
 	}
 )
 
@@ -153,14 +160,24 @@ var userNameCounter = 0
 
 // newUser installs a new, previously unseen user. This makes it easy for each test to
 // have a private space.
-func (s *Setup) newUser() {
+func (s *Setup) newUser(t *testing.T) {
 	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 	userNameCounter++
 	s.context.UserName = userName
-	s.context.PrivateKey = []byte("my test private key")
+
+	// Set a key depending on the packer type:
+	switch s.context.Packing {
+	case upspin.EEp256Pack, upspin.EEp521Pack:
+		err := keyloader.Load(s.context)
+		if err != nil {
+			t.Fatal(err)
+		}
+	default:
+		s.context.PrivateKey = dummyKeys
+	}
 	testUser := s.context.User.(*testuser.Service)
 	// Set the public key for the current user.
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{upspin.PublicKey(s.context.PrivateKey)})
+	testUser.SetPublicKeys(userName, []upspin.PublicKey{s.context.PrivateKey.Public})
 	err := testUser.Install(userName, s.context.Directory)                 // TODO: this is a hack.
 	if err != nil && !strings.Contains(err.Error(), "already installed") { // TODO: this is a hack.
 		panic(err)
@@ -187,7 +204,7 @@ func (s *Setup) runAllTests(t *testing.T) {
 }
 
 func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
-	s.newUser()
+	s.newUser(t)
 
 	fileName := upspin.PathName(s.context.UserName + "/" + "file")
 	const text = "hello sailor"
@@ -205,7 +222,7 @@ func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
 }
 
 func (s *Setup) TestFileSequentialAccess(t *testing.T) {
-	s.newUser()
+	s.newUser(t)
 
 	const Max = 100 * 1000 // Must be > 100.
 	fileName := upspin.PathName(s.context.UserName + "/" + "file")
