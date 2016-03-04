@@ -207,9 +207,10 @@ type DirEntry struct {
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool   // The file is a directory.
-	Sequence int64  // The sequence (version) number of the item.
-	PackData []byte // Packing-specific metadata stored in directory.
+	IsDir    bool       // The file is a directory.
+	Sequence int64      // The sequence (version) number of the item.
+	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
+	PackData []byte     // Packing-specific metadata stored in directory.
 }
 
 // Store service.
@@ -316,8 +317,10 @@ type Context struct {
 	// The name of the user requesting access.
 	UserName UserName
 
+	// PublicKey holds the user's public cryptographic keys.
+	PublicKey PublicKey
+
 	// PrivateKey holds the user's private cryptographic keys.
-	// The public key is accessible through the data held here.
 	PrivateKey PrivateKey
 
 	// Packing is the default Packing to use when creating new data items.
