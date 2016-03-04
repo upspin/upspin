@@ -18,12 +18,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
-	"os"
-	"os/user"
-	"path/filepath"
 
 	"golang.org/x/crypto/hkdf"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -491,8 +490,12 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 // upspin representation of his/her private key and converts it into
 // an ecsda private key.
 func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
+	if n := len(privateKey.Private) - 1; privateKey.Private[n] == '\n' {
+		log.Println("Old-style private key found. Re-run keygen some time.")
+		privateKey.Private = privateKey.Private[:n]
+	}
 	var d big.Int
-	err = d.UnmarshalText(privateKey)
+	err = d.UnmarshalText(privateKey.Private)
 	if err != nil {
 		return nil, err
 	}
@@ -502,18 +505,7 @@ func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.Pr
 // publicKey returns the public key of user by reading file from ~/.ssh/.
 func (c common) publicKey(user upspin.UserName) (upspin.PublicKey, error) {
 	// TODO replace someday by keyserver
-	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", c.ciphersuite)))
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	buf := make([]byte, 400) // enough for p-521
-	n, err := f.Read(buf)
-	if err != nil {
-		return nil, err
-	}
-	buf = buf[:n]
-	return upspin.PublicKey(buf), nil
+	return keyloader.PublicKey(c.ciphersuite)
 }
 
 // parsePublicKey takes a user's upspin representation of his/her
@@ -528,12 +520,4 @@ func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, er
 		return nil, fmt.Errorf("Expected two big ints, got %d", n)
 	}
 	return &ecdsa.PublicKey{Curve: c.curve, X: &x, Y: &y}, nil
-}
-
-func sshdir() string {
-	user, err := user.Current()
-	if err != nil {
-		panic("no user")
-	}
-	return filepath.Join(user.HomeDir, ".ssh")
 }
