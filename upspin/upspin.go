@@ -163,8 +163,12 @@ type User interface {
 // A PublicKey is used when exchanging data with other users.
 type PublicKey []byte
 
-// A PrivateKey is used when exchanging data with other users.
-type PrivateKey []byte
+// A PrivateKey is used when exchanging data with other users. It
+// contains the PublicKey necessarily.
+type PrivateKey struct {
+	Public  PublicKey
+	Private []byte
+}
 
 // Directory service.
 
@@ -207,9 +211,10 @@ type DirEntry struct {
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool   // The file is a directory.
-	Sequence int64  // The sequence (version) number of the item.
-	PackData []byte // Packing-specific metadata stored in directory.
+	IsDir    bool       // The file is a directory.
+	Sequence int64      // The sequence (version) number of the item.
+	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
+	PackData []byte     // Packing-specific metadata stored in directory.
 }
 
 // Store service.
@@ -317,7 +322,6 @@ type Context struct {
 	UserName UserName
 
 	// PrivateKey holds the user's private cryptographic keys.
-	// The public key is accessible through the data held here.
 	PrivateKey PrivateKey
 
 	// Packing is the default Packing to use when creating new data items.
