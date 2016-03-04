@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e211990a_212b457a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-04T00:56:57Z",
+      "side": 1,
+      "message": "I\u0027d prefer to document the assumption, maybe using interface, that a PrivateKey struct always includes a PublicKey struct.   Any time there are two copies of something, there\u0027s a risk of getting things out of sync.",
+      "revId": "7d9eb84fef921ddd86dcc271bccf80414d5784d4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
