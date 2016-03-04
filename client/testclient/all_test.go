@@ -63,16 +63,19 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		root = user + "/"
 	)
 	setup(user)
-	client := New(context)
+	client, err := New(context)
+	if err != nil {
+		t.Fatal(err)
+	}
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	_, err := client.Put(fileName, []byte(text)) // TODO: Packing?
+	_, err = client.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
-	data, err := client.Get(fileName) // TODO: Metadata?
+	data, err := client.Get(fileName)
 	if err != nil {
 		t.Fatal("get file:", err)
 	}
@@ -87,7 +90,10 @@ const (
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (*Client, upspin.File, []byte) {
 	setup(user)
-	client := New(context)
+	client, err := New(context)
+	if err != nil {
+		t.Fatal(err)
+	}
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -308,8 +314,10 @@ func TestFileZeroFill(t *testing.T) {
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
 	setup(user)
-	client := New(context)
-	var err error
+	client, err := New(context)
+	if err != nil {
+		t.Fatal(err)
+	}
 	var paths []*upspin.DirEntry
 	checkPaths := func(expPaths ...string) {
 		if err != nil {

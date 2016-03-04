@@ -86,7 +86,12 @@ func testAllInProcess(t *testing.T) {
 	}
 
 	for _, config := range configs {
-		newSetup(config.user, config.directory, config.store, config.pack).runAllTests(t)
+		setup, err := newSetup(config.user, config.directory, config.store, config.pack)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		setup.runAllTests(t)
 	}
 }
 
@@ -98,13 +103,17 @@ type Setup struct {
 
 // newSetup allocates and configures a setup for a test run using a testclient as Client.
 // The user's name inside the context is set separately using the newUser method.
-func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
+func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) (*Setup, error) {
 	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
+	client, err := testclient.New(context)
+	if err != nil {
+		return nil, err
+	}
 	s := &Setup{
 		context: context,
-		client:  testclient.New(context),
+		client:  client,
 	}
-	return s
+	return s, nil
 }
 
 // newGCPSetup allocates and configures a setup for a test run using a gcpclient as Client.
@@ -182,11 +191,11 @@ func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
 
 	fileName := upspin.PathName(s.context.UserName + "/" + "file")
 	const text = "hello sailor"
-	_, err := s.client.Put(fileName, []byte(text)) // TODO: Packing?
+	_, err := s.client.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
-	data, err := s.client.Get(fileName) // TODO: Metadata?
+	data, err := s.client.Get(fileName)
 	if err != nil {
 		t.Fatal("get file:", err)
 	}

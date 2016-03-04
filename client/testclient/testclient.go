@@ -11,11 +11,6 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// TODO: Total hack.
-var TODOMeta = &upspin.Metadata{
-	PackData: []byte{upspin.DebugPack},
-}
-
 // Client is a simple non-persistent implementation of upspin.Client suitable for testing.
 type Client struct {
 	ctxt *upspin.Context
@@ -26,13 +21,26 @@ var _ upspin.Client = (*Client)(nil)
 
 var loc0 = upspin.Location{}
 
+// metadata returns a new instance of a metadata struct holding just the packing value in its PackData.
+func metadata(packing upspin.Packing) (*upspin.Metadata, error) {
+	packer := pack.Lookup(packing)
+	if packer == nil {
+		return nil, fmt.Errorf("no packing %#x registered", packing)
+	}
+	meta := &upspin.Metadata{
+		PackData: []byte{byte(packing)},
+	}
+	return meta, nil
+}
+
 // New returns a new Client. The argument is the user service to use to look up root
 // directories for users.
-func New(ctxt *upspin.Context) *Client {
-	return &Client{
+func New(ctxt *upspin.Context) (*Client, error) {
+	client := &Client{
 		ctxt: ctxt,
 		user: ctxt.User,
 	}
+	return client, nil
 }
 
 func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
@@ -99,14 +107,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			if packer == nil {
 				return nil, fmt.Errorf("testclient: unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
 			}
-			clearLen := packer.UnpackLen(c.ctxt, cipher, TODOMeta)
+			clearLen := packer.UnpackLen(c.ctxt, cipher, &entry.Metadata)
 			if clearLen < 0 {
 				return nil, fmt.Errorf("testclient: UnpackLen failed for %q", name)
 			}
 			cleartext := make([]byte, clearLen)
 			// Must use a canonicalized name. TODO: Put this in package path?
 			parsed, _ := path.Parse(name) // Known to be error-free.
-			n, err := packer.Unpack(c.ctxt, cleartext, cipher, TODOMeta, parsed.Path())
+			n, err := packer.Unpack(c.ctxt, cleartext, cipher, &entry.Metadata, parsed.Path())
 			if err != nil {
 				return nil, err // Showstopper.
 			}
@@ -133,7 +141,11 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	if err != nil {
 		return loc0, err
 	}
-	return dir.Put(name, data, TODOMeta.PackData)
+	meta, err := metadata(c.ctxt.Packing)
+	if err != nil {
+		return loc0, err
+	}
+	return dir.Put(name, data, meta.PackData)
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
