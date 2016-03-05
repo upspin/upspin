@@ -14,6 +14,7 @@ import (
 	goPath "path"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
@@ -22,7 +23,8 @@ import (
 )
 
 const (
-	serverError = "server error: %v"
+	serverError       = "server error: %v"
+	accessControlFile = "Access" // TODO: this should be global (in upspin.go?)
 )
 
 // Directory is an implementation of upspin.Directory that uses GCP to store its data.
@@ -67,35 +69,59 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	var zeroLoc upspin.Location
 	const op = "Put"
 
-	if len(packdata) < 1 {
-		return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
+	// Check whether this is an Access file, which is special.
+	isAccessFile, parsed := access.IsAccessFile(name)
+	if parsed == nil {
+		return zeroLoc, newError(op, name, errors.New("invalid path"))
 	}
+	// Directory entry to put to the server
+	var dirEntry *upspin.DirEntry
+	if isAccessFile {
+		accessPerms, err := access.Parse(data)
+		if err != nil {
+			return zeroLoc, newError(op, name, err)
+		}
+		// TODO: no support for groups yet.
+		readers := make([]upspin.UserName, 0, len(accessPerms.Readers))
+		for _, r := range accessPerms.Readers {
+			readers = append(readers, r.User)
+		}
+		dirEntry, err = d.Lookup(parsed.Drop(1).Path())
+		if err != nil {
+			return zeroLoc, err
+		}
+		dirEntry.Metadata.Readers = readers
+	} else {
+		if len(packdata) < 1 {
+			return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
+		}
 
-	// First, store the data itself, to find the key
-	key, err := d.storeService.Put(data)
-	if err != nil {
-		log.Printf("storeService returned error: %v", err)
-		return zeroLoc, err
-	}
-	// We now have a final Location in loc. We now create a
-	// directory entry for this Location.  From here on, if an
-	// error occurs, we'll have a dangling block. We could delete
-	// it, but we can always do fsck-style operations to find them
-	// later.
-	dirEntry := upspin.DirEntry{
-		Name: name,
-		Location: upspin.Location{
-			Reference: upspin.Reference{
-				Key:     key,
-				Packing: upspin.Packing(packdata[0]),
+		// First, store the data itself, to find the key
+		key, err := d.storeService.Put(data)
+		if err != nil {
+			log.Printf("storeService returned error: %v", err)
+			return zeroLoc, err
+		}
+		// We now have a final Location in loc. We now create a
+		// directory entry for this Location.  From here on, if an
+		// error occurs, we'll have a dangling block. We could delete
+		// it, but we can always do fsck-style operations to find them
+		// later.
+		dirEntry = &upspin.DirEntry{
+			Name: name,
+			Location: upspin.Location{
+				Reference: upspin.Reference{
+					Key:     key,
+					Packing: upspin.Packing(packdata[0]),
+				},
+				Endpoint: d.storeService.Endpoint(),
 			},
-			Endpoint: d.storeService.Endpoint(),
-		},
-		Metadata: upspin.Metadata{
-			IsDir:    false,
-			Sequence: 0, // TODO: server does not increment currently
-			PackData: packdata,
-		},
+			Metadata: upspin.Metadata{
+				IsDir:    false,
+				Sequence: 0, // TODO: server does not increment currently
+				PackData: packdata,
+			},
+		}
 	}
 
 	// Encode dirEntry as JSON
