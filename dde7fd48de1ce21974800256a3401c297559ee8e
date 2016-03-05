@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "570ea929_579a4c8b",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "s/users/user\u0027s/\ns/homedir/home directory/",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_379fd87b",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "these two could be consts, not vars",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_17a4d4cf",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "s/it/them/ \"a pair\" is plural\ns/key/keys/",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_f7a840a6",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "s/~/$HOME/\ni think that\u0027s clearer, especially if you\u0027re not on unix",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_d7a53ccc",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "ditto\ns/file/the file/\n\nalthough it\u0027s not clear from the comment which file it is.",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_77955059",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:34:39Z",
+      "side": 1,
+      "message": "// also always contains the public key.",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
