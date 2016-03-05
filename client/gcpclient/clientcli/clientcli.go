@@ -9,18 +9,28 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 
 	client "upspin.googlesource.com/upspin.git/client/gcpclient"
+	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	// Load useful packers
+	_ "upspin.googlesource.com/upspin.git/pack/ee"
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
+
+	// Load required gcp services
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
 var (
-	dirLocation   = flag.String("directory", "http://localhost:8081", "URL of the directory service location")
-	storeLocation = flag.String("store", "http://localhost:8080", "URL of the store service location")
-	inFile        = flag.String("in", "", "full pathname of file to be Put or empty for stdin")
-	outFile       = flag.String("out", "", "output file")
-	c             = newClient()
+	inFile  = flag.String("in", "", "full pathname of file to be Put or empty for stdin")
+	outFile = flag.String("out", "", "output file")
+	c       = newClient()
 )
 
 func main() {
@@ -108,26 +118,18 @@ func get(pathName upspin.PathName) {
 }
 
 func newClient() upspin.Client {
-	// Pre-load some keys into the system.
-	userKeys := []client.UserKeys{
-		client.UserKeys{
-			User:   upspin.UserName("edpin@google.com"),
-			Public: upspin.PublicKey("Zee Kee"),
-		},
-		client.UserKeys{
-			User:   upspin.UserName("p@google.com"),
-			Public: upspin.PublicKey("p's key"),
-		},
-		client.UserKeys{
-			User:   upspin.UserName("ehg@google.com"),
-			Public: upspin.PublicKey("Captain Crypto"),
-		},
-		client.UserKeys{
-			User:   upspin.UserName("r@google.com"),
-			Public: upspin.PublicKey("Commander Pike"),
-		},
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal("no user")
 	}
-	// TODO: should be New(context) instead, but we're faking some
-	// user keys, so use the testing interface for now.
-	return client.NewForTesting(*storeLocation, *dirLocation, userKeys)
+	rcFile, err := os.Open(filepath.Join(user.HomeDir, ".upspinrc"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rcFile.Close()
+	context, err := context.InitContext(rcFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client.New(context)
 }

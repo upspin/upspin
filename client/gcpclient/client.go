@@ -5,14 +5,12 @@ package gcpclient
 
 import (
 	"fmt"
-	"log"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
@@ -32,6 +30,10 @@ type UserKeys struct {
 	Public upspin.PublicKey
 }
 
+const (
+	accessControlFile = "Access" // TODO: this should be global (in upspin.go)
+)
+
 var (
 	zeroLoc upspin.Location
 )
@@ -44,93 +46,39 @@ func New(context *upspin.Context) upspin.Client {
 	}
 }
 
-// NewForTesting creates a new upspin.Client talking to the GCP
-// backends located at storeURL and dirURL and the User service
-// pre-loaded with the given user keys.
-func NewForTesting(storeURL string, dirURL string, userKeys []UserKeys) upspin.Client {
-	context := &upspin.Context{
-		Packing:  upspin.UnsafePack,
-		UserName: upspin.UserName("edpin@google.com"),
-		KeyPair: upspin.KeyPair{
-			Public:  []byte("Zee Kee"),
-			Private: []byte("Zee Kee"),
-		},
-	}
-
-	context.User = newUser(context)
-	context.Store = newStore(context, storeURL)
-	context.Directory = newDirectory(context, dirURL)
-
-	// TODO: this is a hack.
-	testuser := context.User.(*testuser.Service)
-	for _, uk := range userKeys {
-		testuser.SetPublicKeys(uk.User, []upspin.PublicKey{uk.Public})
-	}
-
-	return New(context)
-}
-
-// newUser creates a new in-process upspin.User client.
-func newUser(context *upspin.Context) upspin.User {
-	if context == nil {
-		return nil
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "",
-	}
-	u, err := bind.User(context, e)
+func (c *Client) updateMeta(meta *upspin.Metadata, parentDir upspin.PathName) error {
+	dirEntry, err := c.context.Directory.Lookup(parentDir)
 	if err != nil {
-		log.Fatalf("Can't bind to User: %v", err)
+		return err
 	}
-	return u
-}
-
-// newStore creates a new upspin.Store client for talking to a GCP
-// server located at storeURL
-func newStore(context *upspin.Context, storeURL string) upspin.Store {
-	if context == nil {
-		return nil
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr(storeURL),
-	}
-	s, err := bind.Store(context, e)
-	if err != nil {
-		log.Fatalf("Can't bind to Store: %v", err)
-	}
-	return s
-}
-
-// newDirectory creates a new upspin.Directory client for talking to a GCP
-// server located at dirURL
-func newDirectory(context *upspin.Context, dirURL string) upspin.Directory {
-	if context == nil {
-		return nil
-	}
-	if context.Store == nil {
-		log.Fatal("Need a Store to initialize a Directory.")
-	}
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr(dirURL),
-	}
-	d, err := bind.Directory(context, e)
-	if err != nil {
-		log.Fatalf("Can't bind to Directory: %v", err)
-	}
-	return d
+	meta.Readers = dirEntry.Metadata.Readers
+	return nil
 }
 
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+	// Treat pathname ending in "/Access" as special.
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return zeroLoc, err
+	}
+	if len(parsed.Elems) > 0 && parsed.Elems[len(parsed.Elems)-1] == accessControlFile {
+		return c.context.Directory.Put(name, data, []byte(""))
+	}
+
 	// Encrypt data according to the preferred packer
 	// TODO: Do a Lookup in the parent directory to find the overriding packer.
 	packer := pack.Lookup(c.context.Packing)
 	if packer == nil {
 		return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
 	}
+
 	meta := &upspin.Metadata{}
+	// Figure out if there are readers for this file.
+	err = c.updateMeta(meta, parsed.Drop(1).Path())
+	if err != nil {
+		return zeroLoc, err
+	}
+
 	// Get a buffer big enough for this data
 	cipherLen := packer.PackLen(c.context, data, meta, name)
 	if cipherLen < 0 {
@@ -178,7 +126,7 @@ func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
 		}
 	}
 	if err == nil {
-		err = fmt.Errorf("gcpclient: no such user %q", parsed.User)
+		err = fmt.Errorf("gcpclient: no endpoint for user %q", parsed.User)
 	}
 	return nil, err
 }
