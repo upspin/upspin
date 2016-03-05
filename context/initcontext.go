@@ -8,10 +8,12 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -90,6 +92,28 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		return nil, err
 	}
 	if context.Directory, err = bind.Directory(context, *ep); err != nil {
+		return nil, err
+	}
+	// Implicitly load the user's keys from $HOME/.ssh.
+	// TODO: add a section in vals containing overrides for "publickey" and "privatekey" files.
+	keyloader.Load(context)
+	return context, nil
+}
+
+// LoadContextFromRCFile opens $HOME/upspin/rc and parses the file and
+// builds a context from it.
+func LoadContextFromRCFile() (*upspin.Context, error) {
+	user, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+	rcFile, err := os.Open(filepath.Join(user.HomeDir, "upspin/rc"))
+	if err != nil {
+		return nil, err
+	}
+	defer rcFile.Close()
+	context, err := InitContext(rcFile)
+	if err != nil {
 		return nil, err
 	}
 	return context, nil
