@@ -266,6 +266,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			}
 			continue
 		}
+		log.Printf("Wrapping key for user %s", u)
 		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
@@ -426,6 +427,7 @@ func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err e
 	}
 	dkey = make([]byte, 0, c.aesLen)
 	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
+	log.Printf("Unwrapped dkey: %v, error: %s", dkey, err)
 	return
 }
 
