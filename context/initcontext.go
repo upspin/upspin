@@ -12,6 +12,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/endpoint"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -92,5 +93,8 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	if context.Directory, err = access.BindDirectory(context, *ep); err != nil {
 		return nil, err
 	}
+	// Implicitly load the user's keys from $HOME/.ssh.
+	// TODO: add a section in vals containing overrides for "publickey" and "privatekey" files.
+	keyloader.Load(context)
 	return context, nil
 }
