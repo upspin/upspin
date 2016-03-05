@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "570ea929_97afc4aa",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-05T00:37:51Z",
+      "side": 1,
+      "message": "s/pub/public/",
+      "revId": "5145ad600a6def9d9030879d4ad1cb73d330efc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
