@@ -72,11 +72,6 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	if len(parsed.Elems) != 0 {
 		return fmt.Errorf("testuser: %q not a user name", name)
 	}
-	_, ok := s.root[name]
-	if ok {
-		return fmt.Errorf("testuser: user %q already installed", name)
-	}
-
 	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User + "/"))
 	if err != nil {
 		return err
