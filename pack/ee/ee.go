@@ -266,6 +266,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			}
 			continue
 		}
+		log.Printf("Wrapping key for user %s", u)
 		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
@@ -412,16 +413,19 @@ func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err e
 	strong := make([]byte, c.aesLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
+		log.Printf("Error reading from hkdf: %v", err)
 		return
 	}
 
 	// Step 3. Decrypt dkey.
 	block, err := aes.NewCipher(strong)
 	if err != nil {
+		log.Printf("Error in creating new cipher block: %v", err)
 		return
 	}
 	aead, err := cipher.NewGCM(block)
 	if err != nil {
+		log.Printf("Error in creating new GCM block: %v", err)
 		return
 	}
 	dkey = make([]byte, 0, c.aesLen)
@@ -572,6 +576,7 @@ func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.Ke
 
 // publicKey returns the public key of user by reading file from ~/.ssh/.
 func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+	log.Printf("Getting pub key for user: %s", user)
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName) {
 		return ctx.KeyPair.Public, nil
@@ -583,6 +588,7 @@ func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.Pub
 	if len(keys) < 1 {
 		return nil, fmt.Errorf("no known keys for user %s", user)
 	}
+	// TODO: Loop over all keys looking for the one that has the correct packing type.
 	return keys[0], nil
 }
 

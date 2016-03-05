@@ -190,6 +190,10 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspi
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
 	}
+	// Add packing to packmeta if not already there
+	if meta != nil && len(meta.PackData) == 0 {
+		meta.PackData = []byte{byte(upspin.DebugPack)}
+	}
 	_, err := cryptByte(meta, true)
 	if err != nil {
 		return -1
