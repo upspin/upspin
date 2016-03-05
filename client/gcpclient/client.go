@@ -32,6 +32,10 @@ type UserKeys struct {
 	Public upspin.PublicKey
 }
 
+const (
+	accessControlFile = "Access" // TODO: this should be global (in upspin.go)
+)
+
 var (
 	zeroLoc upspin.Location
 )
@@ -124,6 +128,15 @@ func newDirectory(context *upspin.Context, dirURL string) upspin.Directory {
 }
 
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+	// Treat pathname ending in "/Access" as special.
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return zeroLoc, err
+	}
+	if len(parsed.Elems) > 0 && parsed.Elems[len(parsed.Elems)-1] == accessControlFile {
+		return c.context.Directory.Put(name, data, []byte(""))
+	}
+
 	// Encrypt data according to the preferred packer
 	// TODO: Do a Lookup in the parent directory to find the overriding packer.
 	packer := pack.Lookup(c.context.Packing)
