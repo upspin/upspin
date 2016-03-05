@@ -266,6 +266,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			}
 			continue
 		}
+		log.Printf("Wrapping key for user %s", u)
 		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
@@ -412,20 +413,24 @@ func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err e
 	strong := make([]byte, c.aesLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
+		log.Printf("Error reading from hkdf: %v", err)
 		return
 	}
 
 	// Step 3. Decrypt dkey.
 	block, err := aes.NewCipher(strong)
 	if err != nil {
+		log.Printf("Error in creating new cipher block: %v", err)
 		return
 	}
 	aead, err := cipher.NewGCM(block)
 	if err != nil {
+		log.Printf("Error in creating new GCM block: %v", err)
 		return
 	}
 	dkey = make([]byte, 0, c.aesLen)
 	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
+	log.Printf("Unwrapped dkey: %v, error: %s", dkey, err)
 	return
 }
 

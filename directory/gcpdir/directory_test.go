@@ -319,6 +319,53 @@ func TestGlob(t *testing.T) {
 	mock.Verify(t)
 }
 
+func TestAccessErrorInvalidPath(t *testing.T) {
+	const (
+		access        = pathName + "/Access"
+		accessControl = "invalidemail.com"
+	)
+
+	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t), []*http.Request{nettest.AnyRequest})
+	d := new("http://localhost:8080", nil, mock)
+
+	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	expectedError := "access: some user names are not valid"
+	if err.Error() != expectedError {
+		t.Errorf("Expected %s, got %s", expectedError, err)
+	}
+
+	mock.Verify(t)
+}
+
+func TestAccess(t *testing.T) {
+	const (
+		access        = pathName + "/Access"
+		accessControl = "\n\ndalai@lama.org\nbill@gatesfoundation.org/Group/malaria\n"
+	)
+	// We expect the following replies from the server:
+	responses := append(newMockLookupResponse(t), nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`)))
+
+	// We expect d.Put will send the dirEntry back to the server with the following updates:
+	// Note: we ignore groups for now. Only usernames are recorded for now, not full pathnames.
+	dirEntry.Metadata.Readers = []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
+	dirEntryJSON := toJSON(t, dirEntry)
+	updateDirEntryReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
+	requests := []*http.Request{nettest.AnyRequest, updateDirEntryReq}
+
+	mock := nettest.NewMockHTTPClient(responses, requests)
+	d := new("http://localhost:8080", nil, mock)
+
+	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mock.Verify(t)
+}
+
 // newDirEntry creates a new DirEntry with the given path name
 func newDirEntry(pathName upspin.PathName) *upspin.DirEntry {
 	return &upspin.DirEntry{
