@@ -29,6 +29,21 @@ const (
 	fileContents = "contents"
 )
 
+var (
+	privateKey16 = upspin.KeyPair{
+		Public:  upspin.PublicKey("104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
+		Private: []byte("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
+	}
+	privateKey17 = upspin.KeyPair{
+		Public:  upspin.PublicKey("5609358032714346557585322371361223448771823478702904261131808791466974229027162350131029155700491361187196856099198507670895901615568085019960144241246163732\n5195356724878950323636158219319724259803057075353106010024636779503927115021522079737832549096674594462118262649728934823279841544051937600335974684499860077"),
+		Private: []byte("1921083967088521992602096949959788705212477628248305933393351928788805710122036603979819682701613077258730599983893835863485419440554982916289222458067993673"),
+	}
+	unsafePrivateKey = upspin.KeyPair{
+		Public:  upspin.PublicKey("123456"),
+		Private: []byte("123456"),
+	}
+)
+
 func setupContext(packing upspin.Packing) *upspin.Context {
 	context := &upspin.Context{
 		Packing: packing,
@@ -62,20 +77,27 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	return context
 }
 
-func setupUser(context *upspin.Context, userName upspin.UserName, privateKey upspin.KeyPair) {
+func setupUser(context *upspin.Context, userName upspin.UserName) {
 	testUser := context.User.(*testuser.Service)
 	err := testUser.Install(userName, context.Directory)
 	if err != nil && !strings.Contains(err.Error(), "already installed") {
 		panic(err)
 	}
+	// For UnsafePack, use the same private and public keys
+	switch context.Packing {
+	case upspin.EEp256Pack:
+		context.KeyPair = privateKey16
+	case upspin.EEp521Pack:
+		context.KeyPair = privateKey17
+	default:
+		context.KeyPair = unsafePrivateKey
+	}
 	context.UserName = userName
-	context.PrivateKey = privateKey
-	// This only works for UnsafePack, but EE*Pack is safe for now because it reads keys from a file.
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{upspin.PublicKey(privateKey)})
+	testUser.SetPublicKeys(userName, []upspin.PublicKey{context.KeyPair.Public})
 }
 
 func testMkdir(context *upspin.Context, t *testing.T) {
-	setupUser(context, upspin.UserName("foo@bar.com"), upspin.PrivateKey("123456"))
+	setupUser(context, upspin.UserName("foo@bar.com"))
 	c := New(context)
 
 	dirPath := upspin.PathName("foo@bar.com/mydir")
@@ -101,7 +123,7 @@ func testMkdir(context *upspin.Context, t *testing.T) {
 }
 
 func testPutAndGet(context *upspin.Context, t *testing.T) {
-	setupUser(context, upspin.UserName("foo2@bar.com"), upspin.PrivateKey("123456"))
+	setupUser(context, upspin.UserName("foo2@bar.com"))
 	c := New(context)
 
 	filePath := upspin.PathName("foo2@bar.com/myfile.txt")
@@ -124,7 +146,7 @@ func testPutAndGet(context *upspin.Context, t *testing.T) {
 }
 
 func testCreateAndOpen(context *upspin.Context, t *testing.T) {
-	setupUser(context, upspin.UserName("foo3@bar.com"), upspin.PrivateKey("123456"))
+	setupUser(context, upspin.UserName("foo3@bar.com"))
 	c := New(context)
 
 	filePath := upspin.PathName("foo3@bar.com/myotherfile.txt")
@@ -163,7 +185,7 @@ func testCreateAndOpen(context *upspin.Context, t *testing.T) {
 }
 
 func testGlob(context *upspin.Context, t *testing.T) {
-	setupUser(context, upspin.UserName("foo4@bar.com"), upspin.PrivateKey("123456"))
+	setupUser(context, upspin.UserName("foo4@bar.com"))
 	c := New(context)
 
 	for i := 0; i <= 10; i++ {

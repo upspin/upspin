@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"testing"
 
+	"strings"
+
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	store "upspin.googlesource.com/upspin.git/store/gcpstore"
@@ -316,6 +318,54 @@ func TestGlob(t *testing.T) {
 	if string(dirEntries[1].Name) != path1 {
 		t.Errorf("Expected 1st entry %v, got %v", path1, dirEntries[1].Name)
 	}
+	mock.Verify(t)
+}
+
+func TestAccessErrorInvalidPath(t *testing.T) {
+	const (
+		access        = pathName + "/Access"
+		accessControl = "invalidemail.com"
+	)
+
+	// Does not perform a lookup since the Access file is invalid.
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
+	d := new("http://localhost:8080", nil, mock)
+
+	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	expectedError := "unrecognized text in Access file on line 0"
+	if !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected %s, got %s", expectedError, err)
+	}
+
+	mock.Verify(t)
+}
+
+func TestAccess(t *testing.T) {
+	const (
+		access        = pathName + "/Access"
+		accessControl = "\n r:dalai@lama.org, bill@gatesfoundation.org\n"
+	)
+	// We expect the following replies from the server:
+	responses := append(newMockLookupResponse(t), nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`)))
+
+	// We expect d.Put will send the dirEntry back to the server with the following updates:
+	// Note: we ignore groups for now. Only usernames are recorded for now, not full pathnames.
+	dirEntry.Metadata.Readers = []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
+	dirEntryJSON := toJSON(t, dirEntry)
+	updateDirEntryReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
+	requests := []*http.Request{nettest.AnyRequest, updateDirEntryReq}
+
+	mock := nettest.NewMockHTTPClient(responses, requests)
+	d := new("http://localhost:8080", nil, mock)
+
+	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	mock.Verify(t)
 }
 
