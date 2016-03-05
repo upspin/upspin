@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "37fcd52a_fe1f013e",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-05T00:53:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "570ea929_579a4c8b",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "570ea929_379fd87b",
         "filename": "key/keyloader/keyloader.go",
         "patchSetId": 9
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "37fcd52a_de1c454c",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-05T00:53:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "570ea929_379fd87b",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "570ea929_17a4d4cf",
         "filename": "key/keyloader/keyloader.go",
         "patchSetId": 9
@@ -47,6 +83,24 @@
       "writtenOn": "2016-03-05T00:34:39Z",
       "side": 1,
       "message": "s/it/them/ \"a pair\" is plural\ns/key/keys/",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37fcd52a_5e3cb5a9",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-05T00:53:31Z",
+      "side": 1,
+      "message": "Hmmm, I think not in this context: https://www.google.com/webhp?sourceid\u003dchrome-instant\u0026ion\u003d1\u0026espv\u003d2\u0026ie\u003dUTF-8#q\u003da%20pair%20of%20is%20plural%20or%20singular\n\nBut both done anyway. English is just too weird for me. :-)",
+      "parentUuid": "570ea929_17a4d4cf",
       "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "37fcd52a_1e462d2e",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-05T00:53:31Z",
+      "side": 1,
+      "message": "Done. Specified which file.",
+      "parentUuid": "570ea929_d7a53ccc",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "570ea929_77955059",
         "filename": "upspin/upspin.go",
         "patchSetId": 9
@@ -98,6 +170,24 @@
       "writtenOn": "2016-03-05T00:34:39Z",
       "side": 1,
       "message": "// also always contains the public key.",
+      "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37fcd52a_fe5141da",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-05T00:53:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "570ea929_77955059",
       "revId": "dde7fd48de1ce21974800256a3401c297559ee8e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
