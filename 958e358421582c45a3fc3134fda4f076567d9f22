@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "77b56dab_c8948fbc",
+        "filename": "client/gcpclient/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-07T21:33:53Z",
+      "side": 1,
+      "message": "s/Got/getRootDir/    to make it easier for me to understand the log",
+      "revId": "958e358421582c45a3fc3134fda4f076567d9f22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
