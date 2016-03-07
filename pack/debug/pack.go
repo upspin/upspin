@@ -1,5 +1,6 @@
 // Package debugpack contains a trivial implementation of the Packer interface useful in tests.
 // It encrypts the data with a randomly-chosen byte that is recorded in the PackData.
+// It does a trivial digital signature of the data and stores that in the PackData as well.
 // It claims the upspin.DebugPack Packing code.
 package debugpack
 
@@ -24,8 +25,10 @@ func init() {
 }
 
 var (
-	errTooShort    = errors.New("TestPack: destination slice too short")
-	errBadMetadata = errors.New("bad metadata")
+	errTooShort     = errors.New("TestPack: destination slice too short")
+	errBadMetadata  = errors.New("bad metadata")
+	errBadSignature = errors.New("signature validation failed")
+	errNoKey        = errors.New("no key for signature")
 )
 
 func (testPack) Packing() upspin.Packing {
@@ -58,15 +61,28 @@ func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
 		cb := byte(rand.Int31())
 		meta.PackData = append(meta.PackData, cb)
 		fallthrough
-	case 2:
+	case 2, 3:
 		return meta.PackData[1], nil
 	default:
 		return 0, errBadMetadata
 	}
 }
 
+func addSignature(meta *upspin.Metadata, signature byte) error {
+	switch len(meta.PackData) {
+	case 2:
+		meta.PackData = append(meta.PackData, signature)
+		return nil
+	case 3:
+		meta.PackData[2] = signature
+		return nil
+	default:
+		return errBadMetadata
+	}
+}
+
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
-// Metadata is {DebugPack, cryptByte}.
+// Metadata is {DebugPack, cryptByte, signatureByte}.
 
 func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(p, meta); err != nil {
@@ -80,6 +96,9 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 	}
 	if len(ciphertext) <= 4 {
 		return 0, errTooShort
+	}
+	if len(context.PrivateKey.Private) == 0 {
+		return 0, errNoKey
 	}
 	cb, err := cryptByte(meta, true)
 	if err != nil {
@@ -99,6 +118,7 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 		// Allocation occurred.
 		return 0, errTooShort
 	}
+	addSignature(meta, sign(cleartext, context.PrivateKey.Private))
 	for i, c := range out {
 		out[i] = c ^ cb
 	}
@@ -111,6 +131,9 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	}
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
+	}
+	if len(context.PrivateKey.Private) == 0 {
+		return 0, errNoKey
 	}
 	cb, err := cryptByte(meta, false)
 	if err != nil {
@@ -155,6 +178,10 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 		}
 		cleartext[i] = c
 	}
+	signature := sign(cleartext[:i], context.PrivateKey.Private)
+	if len(meta.PackData) < 3 || signature != meta.PackData[2] {
+		return 0, errBadSignature
+	}
 	return i, nil
 }
 
@@ -191,4 +218,12 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *up
 	}
 	br.Seek(int64(nameLen), 1)
 	return int(br.Len())
+}
+
+func sign(data, key []byte) byte {
+	signature := byte(0)
+	for i, c := range data {
+		signature ^= c ^ key[i%len(key)]
+	}
+	return signature
 }
