@@ -29,7 +29,11 @@ const (
 )
 
 var (
-	context = &upspin.Context{}
+	context = &upspin.Context{
+		PrivateKey: upspin.PrivateKey{
+			Private: []byte("privacy please"),
+		},
+	}
 )
 
 // The values returned by PackLen and UnpackLen should be exact,
