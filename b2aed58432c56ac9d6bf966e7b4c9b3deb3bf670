@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "570ea929_f77600de",
+        "filename": "client/gcpclient/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T03:15:21Z",
+      "side": 1,
+      "message": "yes",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_972224e8",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T03:15:21Z",
+      "side": 1,
+      "message": "yeah, probably. same for Group",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_1792943f",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T03:15:21Z",
+      "side": 1,
+      "message": "this isn\u0027t right. the Access file has a documented format in the overview document, and it\u0027s not one name per line.\n\nin any case, all the Access-parsing code should be in a separate package.",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_57880c13",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T03:15:21Z",
+      "side": 1,
+      "message": "Upspin ??",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_378d9823",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T03:15:21Z",
+      "side": 1,
+      "message": "s/upspin/Upspin/",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
