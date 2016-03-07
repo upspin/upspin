@@ -76,6 +76,66 @@ func TestPack521(t *testing.T) {
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
+func BenchmarkPack256(b *testing.B) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.256")
+		text                    = "this is some text 256"
+		packing                 = upspin.EEp256Pack
+	)
+	ctx, packer := setup2(user, packing)
+	for i := 0; i < b.N; i++ {
+		meta := &upspin.Metadata{}
+		data := []byte(text)
+		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
+		m, _ := packer.Pack(ctx, cipher, data, meta, name)
+		cipher = cipher[:m]
+		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
+		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
+		clear = clear[:m]
+	}
+}
+
+func BenchmarkPack384(b *testing.B) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.256")
+		text                    = "this is some text 384"
+		packing                 = upspin.EEp384Pack
+	)
+	ctx, packer := setup2(user, packing)
+	for i := 0; i < b.N; i++ {
+		meta := &upspin.Metadata{}
+		data := []byte(text)
+		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
+		m, _ := packer.Pack(ctx, cipher, data, meta, name)
+		cipher = cipher[:m]
+		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
+		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
+		clear = clear[:m]
+	}
+}
+
+func BenchmarkPack521(b *testing.B) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.256")
+		text                    = "this is some text 521"
+		packing                 = upspin.EEp521Pack
+	)
+	ctx, packer := setup2(user, packing)
+	for i := 0; i < b.N; i++ {
+		meta := &upspin.Metadata{}
+		data := []byte(text)
+		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
+		m, _ := packer.Pack(ctx, cipher, data, meta, name)
+		cipher = cipher[:m]
+		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
+		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
+		clear = clear[:m]
+	}
+}
+
 func TestLoadingRemoteKeys(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
@@ -140,6 +200,16 @@ func setup(t *testing.T, name upspin.UserName, packing upspin.Packing) (*upspin.
 	if err != nil {
 		t.Fatal(err)
 	}
+	return ctx, packer
+}
+
+func setup2(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
+	ctx := &upspin.Context{
+		UserName: name,
+		Packing:  packing,
+	}
+	packer := pack.Lookup(packing)
+	keyloader.Load(ctx)
 	return ctx, packer
 }
 

@@ -1,4 +1,4 @@
-// Keygen creates local files secret.P-256 and public.P-256
+// Keygen creates local files secret.* and public.* in ~/.ssh
 // which contain the private and public parts of a keypair.
 // Eventually this will be provided by ssh-agent or e2email
 // or something else, but we need a minimally usable and
@@ -60,6 +60,7 @@ func main() {
 	log.SetPrefix("keygen: ")
 
 	createKeys(elliptic.P256(), upspin.EEp256Pack)
+	createKeys(elliptic.P384(), upspin.EEp384Pack)
 	createKeys(elliptic.P521(), upspin.EEp521Pack)
 }
 
