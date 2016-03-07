@@ -557,10 +557,13 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 	found := false
 Loop:
 	for payload := dirData; len(payload) > 0 && !found; {
-		remaining, name, hashBytes, isDir, _, err := s.step(op, upspin.PathName(dirName), payload)
+		// Remember where this entry starts.
+		start := len(dirData) - len(payload)
+		remaining, name, _, isDir, _, err := s.step(op, upspin.PathName(dirName), payload)
 		if err != nil {
 			return r0, err
 		}
+		length := len(payload) - len(remaining)
 		payload = remaining
 		// Avoid allocation here: don't just convert to string for comparison.
 		if len(name) != len(ent.elem) { // Length check is easy and fast.
@@ -576,18 +579,15 @@ Loop:
 		if isDir && !dirOverwriteOK {
 			return r0, mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
-		// Overwrite in place.
-		h, err := sha256key.Parse(ent.ref.Key)
-		if err != nil {
-			return r0, err
-		}
-		copy(hashBytes, h[:])
-		found = true
+		// Drop this entry so we can append the updated one.
+		// It may have changed length because of the metadata being unpredictable,
+		// so we cannot overwrite it in place.
+		copy(dirData[start:], remaining)
+		dirData = dirData[:len(dirData)-length]
+		break
 	}
-	if !found {
-		entry := newEntryBytes(ent.elem, ent.isDir, ent.ref, ent.packdata)
-		dirData = append(dirData, entry...)
-	}
+	entry := newEntryBytes(ent.elem, ent.isDir, ent.ref, ent.packdata)
+	dirData = append(dirData, entry...)
 	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata.
 	if err != nil {
 		return r0, err

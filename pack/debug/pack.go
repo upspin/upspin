@@ -1,4 +1,5 @@
 // Package debugpack contains a trivial implementation of the Packer interface useful in tests.
+// It encrypts the data with a randomly-chosen byte that is recorded in the PackData.
 // It claims the upspin.DebugPack Packing code.
 package debugpack
 
@@ -8,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -21,7 +23,10 @@ func init() {
 	pack.Register(testPack{})
 }
 
-var errTooShort = errors.New("TestPack: destination slice too short")
+var (
+	errTooShort    = errors.New("TestPack: destination slice too short")
+	errBadMetadata = errors.New("bad metadata")
+)
 
 func (testPack) Packing() upspin.Packing {
 	return upspin.DebugPack
@@ -31,26 +36,37 @@ func (testPack) String() string {
 	return "debug"
 }
 
-const cryptByte = 0x55
-
-// Lazy reversible encryption/decryption. Simple; fine for tests.
-func crypt(data []byte) {
-	for i, c := range data {
-		data[i] = c ^ cryptByte
-	}
-}
-
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.
 type cryptByteReader struct {
-	br *bytes.Reader
+	crypt byte
+	br    *bytes.Reader
 }
 
 func (cr cryptByteReader) ReadByte() (byte, error) {
 	c, err := cr.br.ReadByte()
-	return c ^ cryptByte, err
+	return c ^ cr.crypt, err
+}
+
+func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
+	switch len(meta.PackData) {
+	case 1:
+		if !packing {
+			// cryptByte must be present to unpack.
+			return 0, errBadMetadata
+		}
+		// Add the crypt byte to the PackData.
+		cb := byte(rand.Int31())
+		meta.PackData = append(meta.PackData, cb)
+		fallthrough
+	case 2:
+		return meta.PackData[1], nil
+	default:
+		return 0, errBadMetadata
+	}
 }
 
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
+// Metadata is {DebugPack, cryptByte}.
 
 func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(p, meta); err != nil {
@@ -64,6 +80,10 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 	}
 	if len(ciphertext) <= 4 {
 		return 0, errTooShort
+	}
+	cb, err := cryptByte(meta, true)
+	if err != nil {
+		return 0, err
 	}
 	// Simple: Append to ciphertext and complain at the end if an allocation has happened.
 	// Constrain the allocation through a slice with cap==len(ciphertext).
@@ -79,7 +99,9 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 		// Allocation occurred.
 		return 0, errTooShort
 	}
-	crypt(out)
+	for i, c := range out {
+		out[i] = c ^ cb
+	}
 	return len(out), nil
 }
 
@@ -90,8 +112,12 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
 	}
+	cb, err := cryptByte(meta, false)
+	if err != nil {
+		return 0, err
+	}
 	br := bytes.NewReader(ciphertext)
-	cr := cryptByteReader{br}
+	cr := cryptByteReader{cb, br}
 	nameLen, err := binary.ReadUvarint(cr)
 	n, _ := br.Seek(0, 1) // Number of bytes consumed reading nameLen.
 	if err != nil || nameLen > 64*1024 || int(n)+int(nameLen) > len(ciphertext) {
@@ -136,6 +162,10 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspi
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
 	}
+	_, err := cryptByte(meta, true)
+	if err != nil {
+		return -1
+	}
 	var buf [16]byte
 	n := binary.PutUvarint(buf[:], uint64(len(name)))
 	return n + len(name) + len(cleartext)
@@ -145,8 +175,12 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *up
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1
 	}
+	cb, err := cryptByte(meta, false)
+	if err != nil {
+		return -1
+	}
 	br := bytes.NewReader(ciphertext)
-	cr := cryptByteReader{br}
+	cr := cryptByteReader{cb, br}
 	nameLen, err := binary.ReadUvarint(cr)
 	if err != nil {
 		return -1
