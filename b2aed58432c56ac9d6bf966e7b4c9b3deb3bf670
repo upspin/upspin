@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "37fcd52a_67112034",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-07T06:07:15Z",
+      "side": 1,
+      "message": "How about putting this into package acl? (See comment below for discussion on package name).",
+      "parentUuid": "570ea929_972224e8",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "570ea929_1792943f",
         "filename": "directory/gcpdir/directory.go",
         "patchSetId": 4
@@ -47,6 +65,24 @@
       "writtenOn": "2016-03-07T03:15:21Z",
       "side": 1,
       "message": "this isn\u0027t right. the Access file has a documented format in the overview document, and it\u0027s not one name per line.\n\nin any case, all the Access-parsing code should be in a separate package.",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37fcd52a_870c2c22",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-07T06:07:15Z",
+      "side": 1,
+      "message": "Ah, my apologies. I missed that update.\n\nDo you mind if I do that as another CL? Just to keep this one sane.\n\nAlso, we already have a package called Access, so do you have any preference for where to put the access control stuff? We could:\n\n1) Move the current access package (Dial and Register code) to say endpoint or maybe handshake or something else and use access for the access control code.\n\n2) Use package name acl instead, so it\u0027s clear. So this function would be acl.GetReaders.\n\nAny other choices?\n\nI prefer 2 but don\u0027t mind 1 or other choices.",
+      "parentUuid": "570ea929_1792943f",
       "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
