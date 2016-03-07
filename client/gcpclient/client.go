@@ -170,6 +170,7 @@ func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("Got %d endpoints: %+v", len(endpoints), endpoints)
 	var dir upspin.Directory
 	for _, e := range endpoints {
 		dir, err = access.BindDirectory(c.context, e)
