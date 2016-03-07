@@ -28,11 +28,9 @@ var (
 
 var context *upspin.Context
 
-var (
-	debugMeta = &upspin.Metadata{
-		PackData: []byte{upspin.DebugPack},
-	}
-)
+func packData() upspin.PackData {
+	return []byte{upspin.DebugPack}
+}
 
 func setupContext() {
 	if context != nil {
@@ -91,15 +89,15 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	loc, err := context.Directory.Put(fileName, []byte(text), debugMeta.PackData)
+	loc, err := context.Directory.Put(fileName, []byte(text), packData())
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
 
 	// Test that Lookup returns the same location.
-	entry, err := context.Directory.Lookup(fileName) // TODO.
+	entry, err := context.Directory.Lookup(fileName)
 	if err != nil {
-		t.Fatal("put file:", err)
+		t.Fatalf("lookup %s: %s", fileName, err)
 	}
 	if loc != entry.Location {
 		t.Errorf("Lookup's reference does not match Put's reference:\t%v\n\t%v", loc, entry.Location)
@@ -116,7 +114,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 			t.Fatal("get redirected blob:", err)
 		}
 	}
-	clear, err := unpackBlob(context, ciphertext, fileName, debugMeta)
+	clear, err := unpackBlob(context, ciphertext, fileName, &entry.Metadata)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -139,7 +137,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		loc, err := context.Directory.Put(fileName, []byte(text), debugMeta.PackData)
+		loc, err := context.Directory.Put(fileName, []byte(text), packData())
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -161,7 +159,11 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 				t.Fatalf("%q: get redirected blob: %v", fileName, err)
 			}
 		}
-		clear, err := unpackBlob(context, ciphertext, fileName, debugMeta)
+		entry, err := context.Directory.Lookup(fileName)
+		if err != nil {
+			t.Fatalf("lookup %s: %s", fileName, err)
+		}
+		clear, err := unpackBlob(context, ciphertext, fileName, &entry.Metadata)
 		if err != nil {
 			t.Fatal("unpack:", err)
 		}
@@ -183,7 +185,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		h, err := context.Directory.Put(fileName, []byte(text), debugMeta.PackData)
+		h, err := context.Directory.Put(fileName, []byte(text), packData())
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -209,7 +211,11 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 				t.Fatalf("%q: get redirected file: %v", fileName, err)
 			}
 		}
-		data, err := unpackBlob(context, cipher, fileName, debugMeta)
+		entry, err = context.Directory.Lookup(fileName)
+		if err != nil {
+			t.Fatalf("lookup %s: %s", fileName, err)
+		}
+		data, err := unpackBlob(context, cipher, fileName, &entry.Metadata)
 		if err != nil {
 			t.Fatalf("%q: unpack file: %v", fileName, err)
 		}
@@ -244,7 +250,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	_, err = context.Directory.Put(fileName, []byte(text), debugMeta.PackData)
+	_, err = context.Directory.Put(fileName, []byte(text), packData())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -263,7 +269,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
 	}
-	data, err := unpackBlob(context, cipher, fileName, debugMeta)
+	data, err := unpackBlob(context, cipher, fileName, &entry.Metadata)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -273,7 +279,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	_, err = context.Directory.Put(fileName, []byte(text), debugMeta.PackData)
+	_, err = context.Directory.Put(fileName, []byte(text), packData())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -292,7 +298,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: second get redirected file: %v", fileName, err)
 		}
 	}
-	data, err = unpackBlob(context, cipher, fileName, debugMeta)
+	data, err = unpackBlob(context, cipher, fileName, &entry.Metadata)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
 	}
@@ -362,7 +368,7 @@ func TestGlob(t *testing.T) {
 	}
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
-		_, err := context.Directory.Put(name, []byte(name), debugMeta.PackData)
+		_, err := context.Directory.Put(name, []byte(name), packData())
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
