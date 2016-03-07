@@ -143,6 +143,8 @@ const (
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// EEp256Pack packing uses AES-128, SHA-256, and curve P256.
 	EEp256Pack = 16
+	// EEp521Pack packing uses AES-256, SHA-512, and curve P384.
+	EEp384Pack = 18
 	// EEp521Pack packing uses AES-256, SHA-512, and curve P521.
 	EEp521Pack = 17
 )

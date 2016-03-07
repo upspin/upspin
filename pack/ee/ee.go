@@ -54,11 +54,16 @@ type eep256 struct {
 	common
 }
 
+type eep384 struct {
+	common
+}
+
 type eep521 struct {
 	common
 }
 
 var _ upspin.Packer = eep256{}
+var _ upspin.Packer = eep384{}
 var _ upspin.Packer = eep521{}
 
 func init() {
@@ -67,6 +72,13 @@ func init() {
 			ciphersuite: upspin.EEp256Pack,
 			curve:       elliptic.P256(),
 			aesLen:      16,
+		},
+	})
+	pack.Register(eep384{
+		common{
+			ciphersuite: upspin.EEp384Pack,
+			curve:       elliptic.P384(),
+			aesLen:      32,
 		},
 	})
 	pack.Register(eep521{
@@ -96,11 +108,22 @@ func (e eep256) Packing() upspin.Packing {
 	return upspin.EEp256Pack
 }
 
+func (e eep384) Packing() upspin.Packing {
+	return upspin.EEp384Pack
+}
+
 func (e eep521) Packing() upspin.Packing {
 	return upspin.EEp521Pack
 }
 
 func (e eep256) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return -1
+	}
+	return len(cleartext)
+}
+
+func (e eep384) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return -1
 	}
@@ -121,6 +144,13 @@ func (e eep256) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.M
 	return len(ciphertext)
 }
 
+func (e eep384) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return -1
+	}
+	return len(ciphertext)
+}
+
 func (e eep521) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return -1
@@ -132,11 +162,22 @@ func (eep256) String() string {
 	return "eep256"
 }
 
+func (eep384) String() string {
+	return "eep384"
+}
+
 func (eep521) String() string {
 	return "eep521"
 }
 
 func (e eep256) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(e, meta); err != nil {
+		return 0, err
+	}
+	return e.eePack(ctx, ciphertext, cleartext, meta, name)
+}
+
+func (e eep384) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return 0, err
 	}
@@ -151,6 +192,13 @@ func (e eep521) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *up
 }
 
 func (e eep256) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+		return 0, err
+	}
+	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
+}
+
+func (e eep384) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return 0, err
 	}
