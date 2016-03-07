@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "570ea929_37123899",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T02:49:36Z",
+      "side": 1,
+      "message": "the comment is already below, but i\u0027ll move it up",
+      "parentUuid": "37fcd52a_87d66cc5",
+      "revId": "9773b95846eed9377c42bf4f1838d1c442a8f1a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "37fcd52a_67db60ef",
         "filename": "pack/debug/pack.go",
         "patchSetId": 1
