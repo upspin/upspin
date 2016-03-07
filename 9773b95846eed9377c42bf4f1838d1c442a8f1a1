@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37fcd52a_87d66cc5",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-07T02:38:04Z",
+      "side": 1,
+      "message": "It would be best to add a comment here indicating the format of the packdata after the 0th byte, which is the packing.",
+      "revId": "9773b95846eed9377c42bf4f1838d1c442a8f1a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37fcd52a_67db60ef",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-07T02:38:04Z",
+      "side": 1,
+      "message": "same here.",
+      "revId": "9773b95846eed9377c42bf4f1838d1c442a8f1a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
