@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "570ea929_d71c1c4c",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T21:31:15Z",
+      "side": 1,
+      "message": "acl is clunky.\ni would prefer renaming the current access package and calling this one access.",
+      "parentUuid": "37fcd52a_67112034",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "570ea929_1792943f",
         "filename": "directory/gcpdir/directory.go",
         "patchSetId": 4
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "Ah, my apologies. I missed that update.\n\nDo you mind if I do that as another CL? Just to keep this one sane.\n\nAlso, we already have a package called Access, so do you have any preference for where to put the access control stuff? We could:\n\n1) Move the current access package (Dial and Register code) to say endpoint or maybe handshake or something else and use access for the access control code.\n\n2) Use package name acl instead, so it\u0027s clear. So this function would be acl.GetReaders.\n\nAny other choices?\n\nI prefer 2 but don\u0027t mind 1 or other choices.",
       "parentUuid": "570ea929_1792943f",
+      "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "570ea929_b719a85a",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-07T21:31:15Z",
+      "side": 1,
+      "message": "i strongly prefer 1.\n\ni also think we should set up the new package that handles the access and group files, unit test it, and then update the diretory code to use it. so i would prefer not checking this in.",
+      "parentUuid": "37fcd52a_870c2c22",
       "revId": "b2aed58432c56ac9d6bf966e7b4c9b3deb3bf670",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
