@@ -52,8 +52,8 @@ func NewForTesting(storeURL string, dirURL string, userKeys []UserKeys) upspin.C
 		Packing:  upspin.UnsafePack,
 		UserName: upspin.UserName("edpin@google.com"),
 		KeyPair: upspin.KeyPair{
-			Public:  []byte("Zee Kee"),
-			Private: []byte("Zee Kee"),
+			Public:  upspin.PublicKey("Zee Kee"),
+			Private: upspin.PrivateKey("Zee Kee"),
 		},
 	}
 

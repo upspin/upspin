@@ -221,7 +221,7 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *up
 	return int(br.Len())
 }
 
-func sign(data, key []byte) byte {
+func sign(data []byte, key upspin.PrivateKey) byte {
 	signature := byte(0)
 	for i, c := range data {
 		signature ^= c ^ key[i%len(key)]
