@@ -1,0 +1,95 @@
+// Package acl parses access control files.
+package acl
+
+import (
+	"fmt"
+	"log"
+	"strings"
+
+	"upspin.googlesource.com/upspin.git/path"
+	"upspin.googlesource.com/upspin.git/upspin"
+)
+
+// Parsed contains the parsed path names found in the ACL file, one for each section.
+type Parsed struct {
+	Readers   []path.Parsed
+	Writers   []path.Parsed
+	Appenders []path.Parsed
+}
+
+func Parse(data string) (*Parsed, error) {
+	lines := strings.Split(data, "\n")
+
+	// Map of access types ("r", "w", "a") to list of paths
+	aclEntries := make(map[string][]string, len(lines))
+
+	for i, line := range lines {
+		line = cleanUp(line)
+		if len(line) == 0 {
+			continue
+		}
+		entry := strings.Split(line, ":")
+		if len(entry) != 2 { // we expect format: "r: bob@foo.com,..."
+			return nil, fmt.Errorf("invalid format on line %d: %s", i, line)
+		}
+		accessType := trim(entry[0])
+		toAdd := strings.Split(entry[1], ",")
+		if _, found := aclEntries[accessType]; found {
+			aclEntries[accessType] = append(aclEntries[accessType], toAdd...)
+		} else {
+			aclEntries[accessType] = toAdd
+		}
+	}
+	// We now have a map of access types such as "r", "w", "a" to
+	// a list of possible user names. Interpret the elements now.
+	parsed := &Parsed{}
+
+	var readersLeft []string
+	parsed.Readers, readersLeft = parsePaths(aclEntries["r"])
+	delete(aclEntries, "r")
+	var writersLeft []string
+	parsed.Writers, writersLeft = parsePaths(aclEntries["w"])
+	delete(aclEntries, "w")
+	var appendersLeft []string
+	parsed.Appenders, appendersLeft = parsePaths(aclEntries["a"])
+	delete(aclEntries, "a")
+
+	if len(aclEntries) > 0 {
+		return nil, fmt.Errorf("unrecognized text in ACL file: %v", aclEntries)
+	}
+
+	// TODO: Resolve groups, if any, which are names in the various *Left lists above.
+	if len(readersLeft) > 0 || len(writersLeft) > 0 || len(appendersLeft) > 0 {
+		log.Printf("Unresolved groups exist")
+	}
+
+	return parsed, nil
+}
+
+// cleanUp removes comments and trims whitespace around any remaining characters.
+func cleanUp(line string) string {
+	return trim(strings.Split(strings.Split(line, "#")[0], "//")[0])
+}
+
+// trim is a shortcut to strings.Trim(line, "\t ")
+func trim(line string) string {
+	return strings.Trim(line, "\t ")
+}
+
+// parsePaths parses each path in paths and puts them into a
+// path.Parsed structure. Any unparseable path is returned separately.
+func parsePaths(paths []string) ([]path.Parsed, []string) {
+	parsed := make([]path.Parsed, 0, len(paths))
+	leftOvers := make([]string, 0, len(paths))
+
+	for _, pathName := range paths {
+		// Check that pathName is a valid Upspin pathName, even if just the userName part.
+		p, err := path.Parse(upspin.PathName(trim(pathName) + "/"))
+		if err != nil {
+			leftOvers = append(leftOvers, pathName)
+			continue
+		}
+		parsed = append(parsed, p)
+	}
+	return parsed, leftOvers
+}
