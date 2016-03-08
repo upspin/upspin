@@ -51,7 +51,7 @@ func NewForTesting(storeURL string, dirURL string, userKeys []UserKeys) upspin.C
 	context := &upspin.Context{
 		Packing:  upspin.UnsafePack,
 		UserName: upspin.UserName("edpin@google.com"),
-		PrivateKey: upspin.PrivateKey{
+		KeyPair: upspin.KeyPair{
 			Public:  []byte("Zee Kee"),
 			Private: []byte("Zee Kee"),
 		},

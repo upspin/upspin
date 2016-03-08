@@ -62,7 +62,7 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	return context
 }
 
-func setupUser(context *upspin.Context, userName upspin.UserName, privateKey upspin.PrivateKey) {
+func setupUser(context *upspin.Context, userName upspin.UserName, privateKey upspin.KeyPair) {
 	testUser := context.User.(*testuser.Service)
 	err := testUser.Install(userName, context.Directory)
 	if err != nil && !strings.Contains(err.Error(), "already installed") {

@@ -45,7 +45,7 @@ var (
 	}
 
 	dummyKey  = "a dummy key"
-	dummyKeys = upspin.PrivateKey{
+	dummyKeys = upspin.KeyPair{
 		Public:  upspin.PublicKey(dummyKey),
 		Private: []byte(dummyKey),
 	}
@@ -173,11 +173,11 @@ func (s *Setup) newUser(t *testing.T) {
 			t.Fatal(err)
 		}
 	default:
-		s.context.PrivateKey = dummyKeys
+		s.context.KeyPair = dummyKeys
 	}
 	testUser := s.context.User.(*testuser.Service)
 	// Set the public key for the current user.
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{s.context.PrivateKey.Public})
+	testUser.SetPublicKeys(userName, []upspin.PublicKey{s.context.KeyPair.Public})
 	err := testUser.Install(userName, s.context.Directory)                 // TODO: this is a hack.
 	if err != nil && !strings.Contains(err.Error(), "already installed") { // TODO: this is a hack.
 		panic(err)

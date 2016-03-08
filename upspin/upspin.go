@@ -165,9 +165,9 @@ type User interface {
 // A PublicKey is used when exchanging data with other users.
 type PublicKey []byte
 
-// A PrivateKey is used when exchanging data with other users. It
-// always contains the public key.
-type PrivateKey struct {
+// A KeyPair is used when exchanging data with other users. It
+// always contains both the public and private keys.
+type KeyPair struct {
 	Public  PublicKey
 	Private []byte
 }
@@ -323,9 +323,8 @@ type Context struct {
 	// The name of the user requesting access.
 	UserName UserName
 
-	// PrivateKey holds the user's private cryptographic keys.
-	// The public key is accessible through the data held here.
-	PrivateKey PrivateKey
+	// KeyPair holds the user's private cryptographic keys.
+	KeyPair KeyPair
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related

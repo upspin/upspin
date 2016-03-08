@@ -18,7 +18,7 @@ const (
 
 var (
 	errNilContext = errors.New("nil context")
-	zeroPrivKey   upspin.PrivateKey
+	zeroPrivKey   upspin.KeyPair
 	zeroPubKey    upspin.PublicKey
 )
 
@@ -30,7 +30,7 @@ func Load(context *upspin.Context) error {
 		return errNilContext
 	}
 	k, err := privateKey(context.Packing)
-	context.PrivateKey = k
+	context.KeyPair = k
 	return err
 }
 
@@ -51,7 +51,7 @@ func publicKey(packing upspin.Packing) (upspin.PublicKey, error) {
 }
 
 // privateKey returns the private key of the current user by reading the packing-specific key file from $HOME/.ssh/.
-func privateKey(packing upspin.Packing) (upspin.PrivateKey, error) {
+func privateKey(packing upspin.Packing) (upspin.KeyPair, error) {
 	f, err := os.Open(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
 	if err != nil {
 		return zeroPrivKey, fmt.Errorf(noKeysFound, packing)
@@ -70,7 +70,7 @@ func privateKey(packing upspin.Packing) (upspin.PrivateKey, error) {
 	if err != nil {
 		return zeroPrivKey, err
 	}
-	return upspin.PrivateKey{
+	return upspin.KeyPair{
 		Public:  pubkey,
 		Private: buf,
 	}, nil

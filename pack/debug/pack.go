@@ -98,7 +98,7 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 	if len(ciphertext) <= 4 {
 		return 0, errTooShort
 	}
-	if len(context.PrivateKey.Private) == 0 {
+	if len(context.KeyPair.Private) == 0 {
 		return 0, errNoKey
 	}
 	cb, err := cryptByte(meta, true)
@@ -119,7 +119,7 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 		// Allocation occurred.
 		return 0, errTooShort
 	}
-	addSignature(meta, sign(cleartext, context.PrivateKey.Private))
+	addSignature(meta, sign(cleartext, context.KeyPair.Private))
 	for i, c := range out {
 		out[i] = c ^ cb
 	}
@@ -133,7 +133,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
 	}
-	if len(context.PrivateKey.Private) == 0 {
+	if len(context.KeyPair.Private) == 0 {
 		return 0, errNoKey
 	}
 	cb, err := cryptByte(meta, false)
@@ -179,7 +179,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 		}
 		cleartext[i] = c
 	}
-	signature := sign(cleartext[:i], context.PrivateKey.Private)
+	signature := sign(cleartext[:i], context.KeyPair.Private)
 	if len(meta.PackData) < 3 || signature != meta.PackData[2] {
 		return 0, errBadSignature
 	}
