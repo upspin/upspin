@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
@@ -31,7 +31,7 @@ func setup() UnsafePack {
 		NetAddr:   "", // ignored
 	}
 	var err error
-	context.User, err = access.BindUser(context, endpoint)
+	context.User, err = bind.User(context, endpoint)
 	if err != nil {
 		panic(err)
 	}

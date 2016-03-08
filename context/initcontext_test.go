@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/pack"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
@@ -29,13 +29,21 @@ type expectations struct {
 	packing   upspin.Packing
 }
 
+// Endpoint is a helper to make it easier to build vet-error-free upspin.Endpoints.
+func Endpoint(t upspin.Transport, n upspin.NetAddr) upspin.Endpoint {
+	return upspin.Endpoint{
+		Transport: t,
+		NetAddr:   n,
+	}
+}
+
 func TestInitContext(t *testing.T) {
 	once.Do(func() { registerDummies(t) })
 	expect := expectations{
 		userName:  "p@google.com",
-		user:      upspin.Endpoint{upspin.InProcess, ""},
-		directory: upspin.Endpoint{upspin.GCP, "who.knows:1234"},
-		store:     upspin.Endpoint{upspin.GCP, "who.knows:1234"},
+		user:      Endpoint(upspin.InProcess, ""),
+		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		store:     Endpoint(upspin.GCP, "who.knows:1234"),
 		packing:   upspin.EEp256Pack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
@@ -45,9 +53,9 @@ func TestDefaults(t *testing.T) {
 	once.Do(func() { registerDummies(t) })
 	expect := expectations{
 		userName:  "noone@nowhere.org",
-		user:      upspin.Endpoint{upspin.InProcess, ""},
-		directory: upspin.Endpoint{upspin.InProcess, ""},
-		store:     upspin.Endpoint{upspin.InProcess, ""},
+		user:      Endpoint(upspin.InProcess, ""),
+		directory: Endpoint(upspin.InProcess, ""),
+		store:     Endpoint(upspin.InProcess, ""),
 		packing:   upspin.PlainPack,
 	}
 	testConfig(t, &expect, "")
@@ -57,19 +65,19 @@ func TestEnv(t *testing.T) {
 	once.Do(func() { registerDummies(t) })
 	expect := expectations{
 		userName:  "p@google.com",
-		user:      upspin.Endpoint{upspin.InProcess, ""},
-		directory: upspin.Endpoint{upspin.GCP, "who.knows:1234"},
-		store:     upspin.Endpoint{upspin.GCP, "who.knows:1234"},
+		user:      Endpoint(upspin.InProcess, ""),
+		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		store:     Endpoint(upspin.GCP, "who.knows:1234"),
 		packing:   upspin.EEp256Pack,
 	}
 	config := makeConfig(&expect)
 	expect.userName = "quux"
 	os.Setenv("upspinname", string(expect.userName))
-	expect.directory = upspin.Endpoint{upspin.InProcess, ""}
+	expect.directory = Endpoint(upspin.InProcess, "")
 	os.Setenv("upspindirectory", endpoint.String(&expect.directory))
-	expect.store = upspin.Endpoint{upspin.GCP, "who.knows:1234"}
+	expect.store = Endpoint(upspin.GCP, "who.knows:1234")
 	os.Setenv("upspinstore", endpoint.String(&expect.store))
-	expect.user = upspin.Endpoint{upspin.GCP, "who.knows:1234"}
+	expect.user = Endpoint(upspin.GCP, "who.knows:1234")
 	os.Setenv("upspinuser", endpoint.String(&expect.user))
 	expect.packing = upspin.PlainPack
 	os.Setenv("upspinpacking", pack.Lookup(expect.packing).String())
@@ -113,13 +121,13 @@ func testConfig(t *testing.T, expect *expectations, config string) {
 
 func registerDummies(t *testing.T) {
 	for _, transport := range []upspin.Transport{upspin.InProcess, upspin.GCP} {
-		if err := access.RegisterUser(transport, &dummyUser{}); err != nil {
+		if err := bind.RegisterUser(transport, &dummyUser{}); err != nil {
 			t.Errorf("registerUser failed")
 		}
-		if err := access.RegisterStore(transport, &dummyStore{}); err != nil {
+		if err := bind.RegisterStore(transport, &dummyStore{}); err != nil {
 			t.Errorf("registerStore failed")
 		}
-		if err := access.RegisterDirectory(transport, &dummyDirectory{}); err != nil {
+		if err := bind.RegisterDirectory(transport, &dummyDirectory{}); err != nil {
 			t.Errorf("registerDirectory failed")
 		}
 	}

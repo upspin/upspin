@@ -10,7 +10,7 @@ import (
 	"path"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -77,19 +77,19 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	if ep, err = endpoint.Parse(vals["user"]); err != nil {
 		return nil, err
 	}
-	if context.User, err = access.BindUser(context, *ep); err != nil {
+	if context.User, err = bind.User(context, *ep); err != nil {
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["store"]); err != nil {
 		return nil, err
 	}
-	if context.Store, err = access.BindStore(context, *ep); err != nil {
+	if context.Store, err = bind.Store(context, *ep); err != nil {
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["directory"]); err != nil {
 		return nil, err
 	}
-	if context.Directory, err = access.BindDirectory(context, *ep); err != nil {
+	if context.Directory, err = bind.Directory(context, *ep); err != nil {
 		return nil, err
 	}
 	return context, nil

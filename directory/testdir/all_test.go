@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -59,15 +59,15 @@ func setupContext() {
 	}
 	context.Packing = upspin.DebugPack // TODO.
 	var err error
-	context.User, err = access.BindUser(context, endpoint)
+	context.User, err = bind.User(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = access.BindStore(context, storeEndpoint)
+	context.Store, err = bind.Store(context, storeEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Directory, err = access.BindDirectory(context, endpoint)
+	context.Directory, err = bind.Directory(context, endpoint)
 	if err != nil {
 		panic(err)
 	}

@@ -3,7 +3,7 @@ package testuser
 import (
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
@@ -22,15 +22,15 @@ func setup(t *testing.T) (upspin.User, *upspin.Context) {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	u, err := access.BindUser(c, e)
+	u, err := bind.User(c, e)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.Store, err = access.BindStore(c, e)
+	c.Store, err = bind.Store(c, e)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.Directory, err = access.BindDirectory(c, e)
+	c.Directory, err = bind.Directory(c, e)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,7 +4,7 @@ package testclient
 import (
 	"fmt"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
@@ -55,7 +55,7 @@ func (c *Client) rootDir(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var dir upspin.Directory
 	for _, e := range endpoints {
-		dir, err = access.BindDirectory(c.ctxt, e)
+		dir, err = bind.Directory(c.ctxt, e)
 		if dir != nil {
 			return dir, nil
 		}
@@ -93,7 +93,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	where := []upspin.Location{entry.Location}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
-		store, err := access.BindStore(c.ctxt, loc.Endpoint)
+		store, err := bind.Store(c.ctxt, loc.Endpoint)
 		if isError(err) {
 			continue
 		}

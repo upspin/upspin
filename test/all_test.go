@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/gcpclient"
 	"upspin.googlesource.com/upspin.git/client/testclient"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
@@ -141,15 +141,15 @@ func newContext(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packin
 	var err error
 	context.Packing = packing
 	// TODO: order of creation may not be right for some services.
-	context.User, err = access.BindUser(context, userEndpoint)
+	context.User, err = bind.User(context, userEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = access.BindStore(context, storeEndpoint)
+	context.Store, err = bind.Store(context, storeEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Directory, err = access.BindDirectory(context, dirEndpoint)
+	context.Directory, err = bind.Directory(context, dirEndpoint)
 	if err != nil {
 		panic(err)
 	}
