@@ -47,7 +47,7 @@ var (
 	dummyKey  = "a dummy key"
 	dummyKeys = upspin.KeyPair{
 		Public:  upspin.PublicKey(dummyKey),
-		Private: []byte(dummyKey),
+		Private: upspin.PrivateKey(dummyKey),
 	}
 )
 

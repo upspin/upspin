@@ -41,13 +41,13 @@ func setup() UnsafePack {
 	testUser.SetPublicKeys(user, []upspin.PublicKey{key})
 	context.KeyPair = upspin.KeyPair{
 		Public:  key,
-		Private: []byte(key),
+		Private: upspin.PrivateKey(string(key)),
 	}
 	return u
 }
 
 func makeUserKey(userName upspin.UserName, salt []byte) upspin.PublicKey {
-	return upspin.PublicKey(xor([]byte(userName), salt))
+	return upspin.PublicKey(string(xor([]byte(userName), salt)))
 }
 
 func TestPackMeta(t *testing.T) {
@@ -145,7 +145,7 @@ func TestSharing(t *testing.T) {
 	context.UserName = newUser
 	context.KeyPair = upspin.KeyPair{
 		Public:  upspin.PublicKey(newUserKey),
-		Private: newUserKey,
+		Private: upspin.PrivateKey(newUserKey),
 	}
 	unpackLen := u.UnpackLen(context, cipher, &meta)
 	unpacked := make([]byte, unpackLen)
