@@ -1,10 +1,14 @@
 package ee
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/key/keyloader"
+	// let's generate keys internally rather than depend on tester's files   "upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -21,6 +25,7 @@ func TestRegister(t *testing.T) {
 
 // packBlob packs text according to the parameters and returns the cipher.
 func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, text []byte) []byte {
+	// TODO why data?
 	data := []byte(text)
 	cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
 	m, err := packer.Pack(ctx, cipher, data, meta, name)
@@ -48,6 +53,7 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	// Now unpack.
 	clear := unpackBlob(t, ctx, packer, name, meta, cipher)
 
+	// TODO why str?
 	str := string(clear)
 	if str != string(text) {
 		t.Errorf("text: expected %q; got %q", text, str)
@@ -61,7 +67,7 @@ func TestPack256(t *testing.T) {
 		text                    = "this is some text 256"
 		packing                 = upspin.EEp256Pack
 	)
-	ctx, packer := setup(t, user, packing)
+	ctx, packer := setup(user, packing)
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
@@ -72,7 +78,7 @@ func TestPack521(t *testing.T) {
 		text                    = "this is some text 521"
 		packing                 = upspin.EEp521Pack
 	)
-	ctx, packer := setup(t, user, packing)
+	ctx, packer := setup(user, packing)
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
@@ -83,7 +89,7 @@ func BenchmarkPack256(b *testing.B) {
 		text                    = "this is some text 256"
 		packing                 = upspin.EEp256Pack
 	)
-	ctx, packer := setup2(user, packing)
+	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
 		meta := &upspin.Metadata{}
 		data := []byte(text)
@@ -103,7 +109,7 @@ func BenchmarkPack384(b *testing.B) {
 		text                    = "this is some text 384"
 		packing                 = upspin.EEp384Pack
 	)
-	ctx, packer := setup2(user, packing)
+	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
 		meta := &upspin.Metadata{}
 		data := []byte(text)
@@ -123,7 +129,7 @@ func BenchmarkPack521(b *testing.B) {
 		text                    = "this is some text 521"
 		packing                 = upspin.EEp521Pack
 	)
-	ctx, packer := setup2(user, packing)
+	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
 		meta := &upspin.Metadata{}
 		data := []byte(text)
@@ -146,16 +152,16 @@ func TestLoadingRemoteKeys(t *testing.T) {
 		text                          = "bob, here's the secret file. Sincerely, The Dude."
 	)
 	dudesPrivKey := upspin.KeyPair{
-		Public:  upspin.PublicKey("104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
-		Private: []byte("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
+		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
+		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
 	}
 	bobsPrivKey := upspin.KeyPair{
-		Public:  upspin.PublicKey("22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528"),
-		Private: []byte("93177533964096447201034856864549483929260757048490326880916443359483929789924"),
+		Public:  upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528"),
+		Private: upspin.PrivateKey("93177533964096447201034856864549483929260757048490326880916443359483929789924"),
 	}
 
 	// Set up Dude as the creator/owner.
-	ctx, packer := setup(t, dudesUserName, packing)
+	ctx, packer := setup(dudesUserName, packing)
 	// Set up a mock user service that knows about Bob's and Dude's public keys.
 	mockUser := &dummyUser{
 		userToMatch: []upspin.UserName{bobsUserName, dudesUserName},
@@ -190,26 +196,24 @@ func TestLoadingRemoteKeys(t *testing.T) {
 	}
 }
 
-func setup(t *testing.T, name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
-	ctx := &upspin.Context{
-		UserName: name,
-		Packing:  packing,
-	}
-	packer := pack.Lookup(packing)
-	err := keyloader.Load(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return ctx, packer
-}
+func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
+	// because ee.common.curve is not exported
+	curve := []elliptic.Curve{16: elliptic.P256(), 18: elliptic.P384(), 17: elliptic.P521()}
 
-func setup2(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
 	ctx := &upspin.Context{
 		UserName: name,
 		Packing:  packing,
 	}
 	packer := pack.Lookup(packing)
-	keyloader.Load(ctx)
+	priv, err := ecdsa.GenerateKey(curve[packing], rand.Reader)
+	if err != nil {
+		// would be nice to t.Fatal but then can't call from Benchmark?
+		return ctx, packer
+	}
+	ctx.KeyPair = upspin.KeyPair{
+		upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
+		upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
+	}
 	return ctx, packer
 }
 

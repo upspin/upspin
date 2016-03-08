@@ -1,4 +1,4 @@
-// Keygen creates local files secret.* and public.* in ~/.ssh
+// Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
 // which contain the private and public parts of a keypair.
 // Eventually this will be provided by ssh-agent or e2email
 // or something else, but we need a minimally usable and
@@ -9,22 +9,24 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"fmt"
+	"flag"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
 
+	"upspin.googlesource.com/upspin.git/pack/ee"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-func createKeys(curve elliptic.Curve, packing upspin.Packing) {
+func createKeys(curve elliptic.Curve, packer upspin.Packer) {
+	// TODO get 128bit seed from rand.Random, print proquints, create random generator from that seed
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
 		log.Fatalf("key not generated: %s", err)
 	}
 
-	private, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
+	private, err := os.Create(filepath.Join(sshdir(), "secret.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +35,7 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 		log.Fatal(err)
 	}
 
-	public, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", packing)))
+	public, err := os.Create(filepath.Join(sshdir(), "public.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +43,7 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = public.WriteString(priv.X.String() + "\n" + priv.Y.String() + "\n")
+	_, err = public.WriteString(packer.String() + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,12 +58,20 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 }
 
 func main() {
+	// because ee.common.curve is not exported
+	curve := []elliptic.Curve{16: elliptic.P256(), 18: elliptic.P384(), 17: elliptic.P521()}
+
 	log.SetFlags(0)
 	log.SetPrefix("keygen: ")
+	packing := flag.String("packing", "p256", "packing name, such as p256")
+	flag.Parse()
 
-	createKeys(elliptic.P256(), upspin.EEp256Pack)
-	createKeys(elliptic.P384(), upspin.EEp384Pack)
-	createKeys(elliptic.P521(), upspin.EEp521Pack)
+	p, ok := ee.Packer[*packing]
+	if !ok {
+		log.Fatal("unrecognized packing")
+	}
+	i := p.Packing()
+	createKeys(curve[i], p)
 }
 
 func sshdir() string {
