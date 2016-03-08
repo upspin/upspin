@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "f7cebda2_b49ec07b",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-08T23:15:44Z",
+      "side": 1,
+      "message": "s/upspin/Upspin/\nmaybe put a blank line after line 1.",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7cebda2_94a3c4c9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-08T23:15:44Z",
+      "side": 1,
+      "message": "i don\u0027t think these should be exported unless i\u0027m missing some background",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7cebda2_74a948a8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-08T23:15:44Z",
+      "side": 1,
+      "message": "use fmt.Sprintf and there will be fewer allocations. also it will be easier to read the code.",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7cebda2_54a64cd8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-08T23:15:44Z",
+      "side": 1,
+      "message": "errors shouldn\u0027t start with upper case. they are often embedded in other errors and/or sentences.",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1789913a_30ece6e3",
         "filename": "pack/keygen/keygen.go",
         "patchSetId": 1
@@ -19,6 +87,23 @@
         "endLine": 63,
         "endChar": 35
       },
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7cebda2_d4993c97",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-08T23:15:44Z",
+      "side": 1,
+      "message": "is there a reason this can\u0027t be just Key? Why does a public key deserve a type while a private one is untyped?",
       "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
