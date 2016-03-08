@@ -1,5 +1,5 @@
-// Package ee implements elliptic-curve end-to-end-encrypted packers EEp256Pack and EEp521Pack.
-// crypto summary:
+// Package ee implements elliptic-curve end-to-end-encrypted packers.
+// upspin crypto summary:
 // Alice shares a file with Bob by picking a new random symmetric key, encrypting the file,
 // wrapping the symmetric encryption key with Bob's public key, signing the file using
 // her own elliptic curve private key, and sending the ciphertext and metadata to a
@@ -66,7 +66,13 @@ var _ upspin.Packer = eep256{}
 var _ upspin.Packer = eep384{}
 var _ upspin.Packer = eep521{}
 
+var (
+	PackName  [256]string
+	PackIndex map[string]upspin.Packing
+)
+
 func init() {
+	PackIndex = make(map[string]upspin.Packing, 256)
 	pack.Register(eep256{
 		common{
 			ciphersuite: upspin.EEp256Pack,
@@ -74,6 +80,9 @@ func init() {
 			aesLen:      16,
 		},
 	})
+	PackName[upspin.EEp256Pack] = "p256"
+	PackIndex["p256"] = upspin.EEp256Pack
+
 	pack.Register(eep384{
 		common{
 			ciphersuite: upspin.EEp384Pack,
@@ -81,6 +90,9 @@ func init() {
 			aesLen:      32,
 		},
 	})
+	PackName[upspin.EEp384Pack] = "p384"
+	PackIndex["p384"] = upspin.EEp384Pack
+
 	pack.Register(eep521{
 		common{
 			ciphersuite: upspin.EEp521Pack,
@@ -88,6 +100,9 @@ func init() {
 			aesLen:      32,
 		},
 	})
+	PackName[upspin.EEp521Pack] = "p521"
+	PackIndex["p521"] = upspin.EEp521Pack
+
 }
 
 const (
@@ -321,7 +336,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	}
 	// For quick lookup, hash my public key and locate my wrapped
 	// key in the metadata.
-	rhash := keyHash(pubkey)
+	rhash := c.keyHash(pubkey)
 	for _, w := range wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
 			log.Printf("unequal %x\n        %x\n", rhash, w.keyHash)
@@ -352,8 +367,9 @@ func (c common) verHash(pathname upspin.PathName, dkey, ciphertext []byte) []byt
 	return messhash[:]
 }
 
-func keyHash(p *ecdsa.PublicKey) []byte {
-	keybytes := []byte(p.X.String() + ":upspinkeyHash:" + p.Y.String())
+func (c common) keyHash(p *ecdsa.PublicKey) []byte {
+	keybytes := []byte(PackName[c.ciphersuite] + "\n" + p.X.String() + "\n" + p.Y.String() + "\n")
+	// this should be the same as the file contents ~/.ssh/public.upspinkey
 	keyHash := sha256.Sum256(keybytes)
 	return keyHash[:]
 }
@@ -374,7 +390,7 @@ func (c common) aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) 
 	if err != nil {
 		return
 	}
-	w.keyHash = keyHash(R)
+	w.keyHash = c.keyHash(R)
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO reconsider salt
@@ -556,21 +572,21 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 }
 
 // parsePrivateKey takes an ecdsa public key for a user and the user's
-// upspin representation of his/her private key and converts it into
+// string representation of their private key and converts it into
 // an ecsda private key.
 func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.KeyPair) (priv *ecdsa.PrivateKey, err error) {
 	if n := len(privateKey.Private) - 1; privateKey.Private[n] == '\n' {
 		privateKey.Private = privateKey.Private[:n]
 	}
 	var d big.Int
-	err = d.UnmarshalText(privateKey.Private)
+	err = d.UnmarshalText([]byte(privateKey.Private))
 	if err != nil {
 		return nil, err
 	}
 	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
 }
 
-// publicKey returns the public key of user by reading file from ~/.ssh/.
+// publicKey returns a user's string representation of their public key.
 func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName) {
@@ -578,24 +594,28 @@ func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.Pub
 	}
 	_, keys, err := ctx.User.Lookup(user)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if len(keys) < 1 {
-		return nil, fmt.Errorf("no known keys for user %s", user)
+		return "", fmt.Errorf("no known keys for user %s", user)
 	}
 	return keys[0], nil
 }
 
-// parsePublicKey takes a user's upspin representation of his/her
+// parsePublicKey takes a user's string representation of their
 // public key and converts it into an ecsda public key.
 func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, error) {
+	var packname string
 	var x, y big.Int
-	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &x, &y)
+	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &packname, &x, &y)
 	if err != nil {
 		return nil, err
 	}
-	if n != 2 {
-		return nil, fmt.Errorf("Expected two big ints, got %d", n)
+	if n != 3 {
+		return nil, fmt.Errorf("Expected packname and two big ints, got %d", n)
+	}
+	if packname != PackName[c.ciphersuite] {
+		return nil, fmt.Errorf("Expected packing %s, got %s", PackName[c.ciphersuite], packname)
 	}
 	return &ecdsa.PublicKey{Curve: c.curve, X: &x, Y: &y}, nil
 }

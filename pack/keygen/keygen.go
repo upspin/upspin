@@ -1,4 +1,4 @@
-// Keygen creates local files secret.* and public.* in ~/.ssh
+// Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
 // which contain the private and public parts of a keypair.
 // Eventually this will be provided by ssh-agent or e2email
 // or something else, but we need a minimally usable and
@@ -9,22 +9,23 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
 
+	"upspin.googlesource.com/upspin.git/pack/ee"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 func createKeys(curve elliptic.Curve, packing upspin.Packing) {
+	// TODO get 128bit seed from rand.Random, print proquints, create random generator from that seed
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
 		log.Fatalf("key not generated: %s", err)
 	}
 
-	private, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("secret.%d.upspinkey", packing)))
+	private, err := os.Create(filepath.Join(sshdir(), "secret.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +34,7 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 		log.Fatal(err)
 	}
 
-	public, err := os.Create(filepath.Join(sshdir(), fmt.Sprintf("public.%d.upspinkey", packing)))
+	public, err := os.Create(filepath.Join(sshdir(), "public.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +42,7 @@ func createKeys(curve elliptic.Curve, packing upspin.Packing) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = public.WriteString(priv.X.String() + "\n" + priv.Y.String() + "\n")
+	_, err = public.WriteString(ee.PackName[packing] + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,9 +60,8 @@ func main() {
 	log.SetFlags(0)
 	log.SetPrefix("keygen: ")
 
+	// TODO get packing from .upspinrc
 	createKeys(elliptic.P256(), upspin.EEp256Pack)
-	createKeys(elliptic.P384(), upspin.EEp384Pack)
-	createKeys(elliptic.P521(), upspin.EEp521Pack)
 }
 
 func sshdir() string {

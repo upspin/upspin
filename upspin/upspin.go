@@ -141,11 +141,12 @@ const (
 
 	// EEp256Pack and EEp521Pack store AES-encrypted data, with metadata
 	// including an ECDSA signature and ECDH-wrapped keys.
-	// EEp256Pack packing uses AES-128, SHA-256, and curve P256.
+	// See NIST SP 800-57 Pt.1 Rev.4 section 5.6.1
+	// EEp256Pack packing uses AES-128, SHA-256, and curve P256; strength 128.
 	EEp256Pack = 16
-	// EEp521Pack packing uses AES-256, SHA-512, and curve P384.
+	// EEp521Pack packing uses AES-256, SHA-512, and curve P384; strength 192.
 	EEp384Pack = 18
-	// EEp521Pack packing uses AES-256, SHA-512, and curve P521.
+	// EEp521Pack packing uses AES-256, SHA-512, and curve P521; strength 256.
 	EEp521Pack = 17
 )
 
@@ -163,13 +164,13 @@ type User interface {
 }
 
 // A PublicKey is used when exchanging data with other users.
-type PublicKey []byte
+type PublicKey string
 
 // A KeyPair is used when exchanging data with other users. It
 // always contains both the public and private keys.
 type KeyPair struct {
 	Public  PublicKey
-	Private []byte
+	Private string
 }
 
 // Directory service.
