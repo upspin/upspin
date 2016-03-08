@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -85,7 +85,7 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	return nil
 }
 
-// Methods to implement upspin.Access
+// Methods to implement upspin.Dialer
 
 func (s *Service) ServerUserName() string {
 	return "testuser"
@@ -105,5 +105,5 @@ func init() {
 		root:     make(map[upspin.UserName][]upspin.Endpoint),
 		keystore: make(map[upspin.UserName][]upspin.PublicKey),
 	}
-	access.RegisterUser(upspin.InProcess, s)
+	bind.RegisterUser(upspin.InProcess, s)
 }

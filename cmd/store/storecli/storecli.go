@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -69,7 +69,7 @@ func newStore() upspin.Store {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr("http://localhost:8080"),
 	}
-	s, err := access.BindStore(context, e)
+	s, err := bind.Store(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind: %v", err)
 	}

@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/endpoint"
@@ -151,7 +151,7 @@ func newUser() upspin.User {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*userLocation),
 	}
-	u, err := access.BindUser(context, e)
+	u, err := bind.User(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to Directory: %v", err)
 	}

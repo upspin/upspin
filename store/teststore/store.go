@@ -4,7 +4,7 @@ package teststore
 import (
 	"errors"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -50,7 +50,7 @@ func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, e
 	return copyOf(data), nil, nil
 }
 
-// Methods to implement upspin.Access
+// Methods to implement upspin.Dialer
 
 func (s *Service) ServerUserName() string {
 	return "testuser"
@@ -76,5 +76,5 @@ func init() {
 		},
 		blob: make(map[string][]byte),
 	}
-	access.RegisterStore(transport, s)
+	bind.RegisterStore(transport, s)
 }

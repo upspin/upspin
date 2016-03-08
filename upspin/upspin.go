@@ -44,7 +44,7 @@ type Endpoint struct {
 	NetAddr NetAddr
 }
 
-// A NetAddr is the network address of service. It is interpreted by Access's
+// A NetAddr is the network address of service. It is interpreted by Dialer's
 // Dial method to connect to the service.
 type NetAddr string
 
@@ -153,7 +153,7 @@ const (
 
 // The User interface provides access to public information about users.
 type User interface {
-	Access
+	Dialer
 
 	// Lookup returns a list (slice) of Endpoints of Directory
 	// services that may hold the root directory for the named
@@ -176,7 +176,7 @@ type PrivateKey struct {
 
 // The Directory service manages the name space for one or more users.
 type Directory interface {
-	Access
+	Dialer
 
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
@@ -223,7 +223,7 @@ type Metadata struct {
 
 // The Store service saves and retrieves data without interpretation.
 type Store interface {
-	Access
+	Dialer
 
 	// Get attempts to retrieve the data identified by the key.
 	// Three things might happen:
@@ -343,12 +343,12 @@ type Context struct {
 	Store Store
 }
 
-// Access defines how to connect and authenticate to a server. Each
+// Dialer defines how to connect and authenticate to a server. Each
 // service type (User, Directory, Store) implements the methods of
-// the Access interface. These methods are not used directly by
-// clients. Instead, clients should use the various Bind methods of
-// the Upspin "access" package to connect to services.
-type Access interface {
+// the Dialer interface. These methods are not used directly by
+// clients. Instead, clients should use the methods of
+// the Upspin "bind" package to connect to services.
+type Dialer interface {
 	// Dial connects to the service and performs any needed authentication.
 	Dial(*Context, Endpoint) (interface{}, error)
 

@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -111,7 +111,7 @@ func newUserError(error error, user upspin.UserName) *userError {
 }
 
 func init() {
-	access.RegisterUser(upspin.GCP, &user{
+	bind.RegisterUser(upspin.GCP, &user{
 		serverURL:  "",
 		httpClient: &http.Client{},
 	})

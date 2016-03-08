@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -68,7 +68,7 @@ func TestLookup(t *testing.T) {
 }
 
 func getUser(t *testing.T) upspin.User {
-	u, err := access.BindUser(
+	u, err := bind.User(
 		&upspin.Context{},
 		upspin.Endpoint{
 			Transport: upspin.GCP,

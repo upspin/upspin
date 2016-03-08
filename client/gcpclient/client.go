@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
@@ -79,7 +79,7 @@ func newUser(context *upspin.Context) upspin.User {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	u, err := access.BindUser(context, e)
+	u, err := bind.User(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to User: %v", err)
 	}
@@ -96,7 +96,7 @@ func newStore(context *upspin.Context, storeURL string) upspin.Store {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(storeURL),
 	}
-	s, err := access.BindStore(context, e)
+	s, err := bind.Store(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to Store: %v", err)
 	}
@@ -116,7 +116,7 @@ func newDirectory(context *upspin.Context, dirURL string) upspin.Directory {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(dirURL),
 	}
-	d, err := access.BindDirectory(context, e)
+	d, err := bind.Directory(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to Directory: %v", err)
 	}
@@ -172,7 +172,7 @@ func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var dir upspin.Directory
 	for _, e := range endpoints {
-		dir, err = access.BindDirectory(c.context, e)
+		dir, err = bind.Directory(c.context, e)
 		if dir != nil {
 			return dir, nil
 		}

@@ -10,7 +10,7 @@ import (
 
 	"log"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -115,7 +115,7 @@ func newStore(context *upspin.Context) upspin.Store {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*storeLocation),
 	}
-	s, err := access.BindStore(context, e)
+	s, err := bind.Store(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to Store: %v", err)
 	}
@@ -131,7 +131,7 @@ func newDirectory() upspin.Directory {
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(*dirLocation),
 	}
-	d, err := access.BindDirectory(context, e)
+	d, err := bind.Directory(context, e)
 	if err != nil {
 		log.Fatalf("Can't bind to Directory: %v", err)
 	}

@@ -1,5 +1,5 @@
-// Package access contains the global AccessSwitch and its methods.
-package access
+// Package bind contains the global binding switch and its methods.
+package bind
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Switch is the global accessor for services.
 var (
 	mu           sync.Mutex
 	userMap      = make(map[upspin.Transport]upspin.User)
@@ -52,8 +51,8 @@ func RegisterStore(transport upspin.Transport, store upspin.Store) error {
 	return nil
 }
 
-// BindUser returns a User interface bound to the endpoint.
-func BindUser(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
+// User returns a User interface bound to the endpoint.
+func User(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	mu.Lock()
 	u, ok := userMap[e.Transport]
 	mu.Unlock()
@@ -67,8 +66,8 @@ func BindUser(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	return x.(upspin.User), nil
 }
 
-// BindStore returns a Store interface bound to the endpoint.
-func BindStore(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
+// Store returns a Store interface bound to the endpoint.
+func Store(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
 	mu.Unlock()
@@ -82,8 +81,8 @@ func BindStore(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	return x.(upspin.Store), nil
 }
 
-// BindDirectory returns a Directory interface bound to the endpoint.
-func BindDirectory(cc *upspin.Context, e upspin.Endpoint) (upspin.Directory, error) {
+// Directory returns a Directory interface bound to the endpoint.
+func Directory(cc *upspin.Context, e upspin.Endpoint) (upspin.Directory, error) {
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
 	mu.Unlock()

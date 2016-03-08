@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -46,16 +46,16 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	var err error
-	context.User, err = access.BindUser(context, inProcessEndpoint)
+	context.User, err = bind.User(context, inProcessEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = access.BindStore(context, inProcessEndpoint)
+	context.Store, err = bind.Store(context, inProcessEndpoint)
 	if err != nil {
 		panic(err)
 	}
 
-	context.Directory, err = access.BindDirectory(context, endpoint)
+	context.Directory, err = bind.Directory(context, endpoint)
 	if err != nil {
 		panic(err)
 	}

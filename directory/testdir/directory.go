@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
@@ -604,7 +604,7 @@ Loop:
 	return ref, err
 }
 
-// Methods to implement upspin.Access
+// Methods to implement upspin.Dialer
 
 func (s *Service) ServerUserName() string {
 	return "" // No one is authenticated.
@@ -633,5 +633,5 @@ func init() {
 		Store:    nil,               // uninitialized until Dial time.
 		Root:     make(map[upspin.UserName]upspin.Reference),
 	}
-	access.RegisterDirectory(transport, s)
+	bind.RegisterDirectory(transport, s)
 }

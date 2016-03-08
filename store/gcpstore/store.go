@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -228,5 +228,5 @@ func NewStoreError(error string, key string) *StoreError {
 
 func init() {
 	// By default, set up only the HTTP client. The server URL gets bound at Dial time.
-	access.RegisterStore(upspin.GCP, New("", &http.Client{}))
+	bind.RegisterStore(upspin.GCP, New("", &http.Client{}))
 }

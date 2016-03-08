@@ -14,7 +14,7 @@ import (
 	goPath "path"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/path"
@@ -293,5 +293,5 @@ func newError(op string, path upspin.PathName, err error) *os.PathError {
 
 func init() {
 	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
-	access.RegisterDirectory(upspin.GCP, new("", nil, &http.Client{}))
+	bind.RegisterDirectory(upspin.GCP, new("", nil, &http.Client{}))
 }
