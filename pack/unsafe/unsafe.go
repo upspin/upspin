@@ -112,7 +112,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 			return 0, err
 		}
 	} else {
-		aesKey = xor(wrapped.Wrapped, context.KeyPair.Private)
+		aesKey = xor(wrapped.Wrapped, []byte(context.KeyPair.Private))
 	}
 
 	// Encrypt the cleartext with the AES key.
@@ -120,7 +120,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 	copy(ciphertext, buf)
 
 	// Sign it with the user's private key.
-	clear.Signature = sign(cleartext, context.KeyPair.Private)
+	clear.Signature = sign(cleartext, string(context.KeyPair.Private))
 
 	// Re-generate the metadata. All cached users get their own wrapped keys.
 	clear.WrappedKeys = nil
@@ -135,7 +135,7 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 		log.Printf("Wrapping keys for user: %v", user)
 		wk := wrappedKey{
 			User:    user,
-			Wrapped: xor(aesKey, keys[0]),
+			Wrapped: xor(aesKey, []byte(keys[0])),
 		}
 		clear.WrappedKeys = append(clear.WrappedKeys, wk)
 	}
@@ -168,7 +168,7 @@ func (u UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byte
 
 	// Decrypt our wrapped key.
 	log.Printf("Keys found for user %v", context.UserName)
-	aesKey := xor(wrapped.Wrapped, privateKey)
+	aesKey := xor(wrapped.Wrapped, []byte(privateKey))
 
 	// Decrypt the ciphertext
 	buf := xor(ciphertext, aesKey)
@@ -189,7 +189,7 @@ func (u UnsafePack) Unpack(context *upspin.Context, cleartext, ciphertext []byte
 		return 0, fmt.Errorf("no keys for owner user of %v: %v", name, fileOwner)
 	}
 
-	sig := sign(cleartext, keys[0])
+	sig := sign(cleartext, string(keys[0]))
 	if sig != clear.Signature {
 		err := fmt.Sprintf("expected signature %v, got %v", clear.Signature, sig)
 		log.Println(err)
@@ -253,7 +253,7 @@ func xor(contents []byte, key []byte) []byte {
 	return buf
 }
 
-func sign(contents []byte, key []byte) signature {
+func sign(contents []byte, key string) signature {
 	if len(key) == 0 {
 		return 0
 	}
