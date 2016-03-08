@@ -30,7 +30,7 @@ func setupContext() {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context = new(upspin.Context)
-	context.PrivateKey = upspin.PrivateKey{
+	context.KeyPair = upspin.KeyPair{
 		Private: []byte("privacy is next to lunacy"),
 	}
 	context.Packing = upspin.DebugPack // TODO.

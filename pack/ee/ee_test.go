@@ -145,11 +145,11 @@ func TestLoadingRemoteKeys(t *testing.T) {
 		bobsUserName  upspin.UserName = "bob@foo.com"
 		text                          = "bob, here's the secret file. Sincerely, The Dude."
 	)
-	dudesPrivKey := upspin.PrivateKey{
+	dudesPrivKey := upspin.KeyPair{
 		Public:  upspin.PublicKey("104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
 		Private: []byte("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
 	}
-	bobsPrivKey := upspin.PrivateKey{
+	bobsPrivKey := upspin.KeyPair{
 		Public:  upspin.PublicKey("22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528"),
 		Private: []byte("93177533964096447201034856864549483929260757048490326880916443359483929789924"),
 	}
@@ -161,7 +161,7 @@ func TestLoadingRemoteKeys(t *testing.T) {
 		userToMatch: []upspin.UserName{bobsUserName, dudesUserName},
 		keyToReturn: []upspin.PublicKey{bobsPrivKey.Public, dudesPrivKey.Public},
 	}
-	ctx.PrivateKey = dudesPrivKey // Override setup to prevent reading keys from .ssh/
+	ctx.KeyPair = dudesPrivKey // Override setup to prevent reading keys from .ssh/
 	ctx.User = mockUser
 
 	// Setup the metadata such that Bob is a reader.
@@ -177,7 +177,7 @@ func TestLoadingRemoteKeys(t *testing.T) {
 
 	// Now load Bob as the current user.
 	ctx.UserName = bobsUserName
-	ctx.PrivateKey = bobsPrivKey
+	ctx.KeyPair = bobsPrivKey
 
 	clear := unpackBlob(t, ctx, packer, pathName, meta, cipher)
 	if string(clear) != text {

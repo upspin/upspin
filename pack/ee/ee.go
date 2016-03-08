@@ -237,7 +237,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	if err != nil {
 		return 0, err
 	}
-	myPrivateKey, err := c.parsePrivateKey(myPublicKey, ctx.PrivateKey)
+	myPrivateKey, err := c.parsePrivateKey(myPublicKey, ctx.KeyPair)
 	if err != nil {
 		return 0, err
 	}
@@ -315,7 +315,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	if err != nil {
 		return 0, err
 	}
-	privateKey, err := c.parsePrivateKey(pubkey, ctx.PrivateKey)
+	privateKey, err := c.parsePrivateKey(pubkey, ctx.KeyPair)
 	if err != nil {
 		return 0, err
 	}
@@ -558,7 +558,7 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 // parsePrivateKey takes an ecdsa public key for a user and the user's
 // upspin representation of his/her private key and converts it into
 // an ecsda private key.
-func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
+func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.KeyPair) (priv *ecdsa.PrivateKey, err error) {
 	if n := len(privateKey.Private) - 1; privateKey.Private[n] == '\n' {
 		privateKey.Private = privateKey.Private[:n]
 	}
@@ -574,7 +574,7 @@ func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.Pr
 func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName) {
-		return ctx.PrivateKey.Public, nil
+		return ctx.KeyPair.Public, nil
 	}
 	_, keys, err := ctx.User.Lookup(user)
 	if err != nil {

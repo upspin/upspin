@@ -30,7 +30,7 @@ const (
 
 var (
 	context = &upspin.Context{
-		PrivateKey: upspin.PrivateKey{
+		KeyPair: upspin.KeyPair{
 			Private: []byte("privacy please"),
 		},
 	}
