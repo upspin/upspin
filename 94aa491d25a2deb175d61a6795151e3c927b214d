@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9712e1d6_18493132",
+        "filename": "access/access.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T20:00:24Z",
+      "side": 1,
+      "message": "maybe add \u0027\\r\u0027, \u0027\\f\u0027, and \u0027\\v\u0027",
+      "revId": "94aa491d25a2deb175d61a6795151e3c927b214d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_18737175",
+        "filename": "access/access.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T20:00:24Z",
+      "side": 1,
+      "message": "elems is a list of users or groups, correct?  another name like \"id\" might make this clearer.",
+      "revId": "94aa491d25a2deb175d61a6795151e3c927b214d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_f853fdb4",
+        "filename": "access/access.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T20:00:24Z",
+      "side": 1,
+      "message": "I read \"Upspin: Access control\" doc as allowing either abbreviated section names or not.  So it would be legal to have a line \"Read: family, *@microsoft.com\".   Is that also what you intend here?",
+      "revId": "94aa491d25a2deb175d61a6795151e3c927b214d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
