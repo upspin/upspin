@@ -16,6 +16,24 @@
       "revId": "589d8cc211b75232510d5c2eeae88487cfa60ca9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_1eceb9d2",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T23:36:56Z",
+      "side": 1,
+      "message": "oh yeah, bad merge. Done. Thanks.",
+      "parentUuid": "9712e1d6_7e2b7562",
+      "revId": "589d8cc211b75232510d5c2eeae88487cfa60ca9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
