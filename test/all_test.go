@@ -4,6 +4,7 @@ package test
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 	"testing"
@@ -11,7 +12,6 @@ import (
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/gcpclient"
 	"upspin.googlesource.com/upspin.git/client/testclient"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -48,6 +48,14 @@ var (
 	dummyKeys = upspin.KeyPair{
 		Public:  upspin.PublicKey(dummyKey),
 		Private: upspin.PrivateKey(dummyKey),
+	}
+	p521Keys = upspin.KeyPair{
+		Public:  upspin.PublicKey("p521\n6450881751971713196569094102081239393076079963958900743928198284492339970336929522903654432965250717230023303429579440002827022968286561560707424665790636516\n6112296178924797905471636976280701727548001722247534805995457563858330724205693643226473079857232632790111053373068566276215130870301334200655705076516179704"),
+		Private: upspin.PrivateKey("4521947149785170611891779226481561520929161578837051798262777353868642403465932692054573259457058158914995500557356995179754042449859359445129927600658124810"),
+	}
+	p256Keys = upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n41791600332717317269223890558424257039864678367319112297252443408877177583918\n31135882230954424983906858071404861049739328230080936198766036208628071024704"),
+		Private: upspin.PrivateKey("9148895919924802165789297199844745269316784374066786715028616676753697458529"),
 	}
 )
 
@@ -111,6 +119,7 @@ type Setup struct {
 // newSetup allocates and configures a setup for a test run using a testclient as Client.
 // The user's name inside the context is set separately using the newUser method.
 func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) (*Setup, error) {
+	log.Printf("===== Using packing: %d", packing)
 	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
 	client, err := testclient.New(context)
 	if err != nil {
@@ -167,11 +176,10 @@ func (s *Setup) newUser(t *testing.T) {
 
 	// Set a key depending on the packer type:
 	switch s.context.Packing {
-	case upspin.EEp256Pack, upspin.EEp521Pack:
-		err := keyloader.Load(s.context)
-		if err != nil {
-			t.Fatal(err)
-		}
+	case upspin.EEp256Pack:
+		s.context.KeyPair = p256Keys
+	case upspin.EEp521Pack:
+		s.context.KeyPair = p521Keys
 	default:
 		s.context.KeyPair = dummyKeys
 	}
