@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_29582d5c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7cebda2_b49ec07b",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_94a3c4c9",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-08T23:15:44Z",
       "side": 1,
       "message": "i don\u0027t think these should be exported unless i\u0027m missing some background",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_69f18585",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "They\u0027re needed for keygen.go.\n\nI almost added to upspin.go but decided to discuss at 4pm first.",
+      "parentUuid": "f7cebda2_94a3c4c9",
       "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_c908714e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Yes, grew over time and should have changed to Sprintf.  Done.",
+      "parentUuid": "f7cebda2_74a948a8",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_54a64cd8",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-08T23:15:44Z",
       "side": 1,
       "message": "errors shouldn\u0027t start with upper case. they are often embedded in other errors and/or sentences.",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_89027928",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7cebda2_54a64cd8",
       "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +165,24 @@
     },
     {
       "key": {
+        "uuid": "1789913a_538dfc21",
+        "filename": "pack/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1789913a_30ece6e3",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_d4993c97",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -104,6 +194,24 @@
       "writtenOn": "2016-03-08T23:15:44Z",
       "side": 1,
       "message": "is there a reason this can\u0027t be just Key? Why does a public key deserve a type while a private one is untyped?",
+      "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_29202d91",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Reasonable question.  I see a lot of occurrences of upspin.PublicKey through the code, which seems to be a useful documentation and type checking of arguments.\n\nLet\u0027s discuss at 4pm.",
+      "parentUuid": "f7cebda2_d4993c97",
       "revId": "917e846e52b87653405621b3cc2396c9b49cc036",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
