@@ -15,7 +15,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"upspin.googlesource.com/upspin.git/pack/ee"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -66,10 +66,7 @@ func main() {
 	packing := flag.String("packing", "p256", "packing name, such as p256")
 	flag.Parse()
 
-	p, ok := ee.Packer[*packing]
-	if !ok {
-		log.Fatal("unrecognized packing")
-	}
+	p := pack.LookupByName(*packing)
 	i := p.Packing()
 	createKeys(curve[i], p)
 }
