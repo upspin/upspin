@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_89f3994f",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Emails out of sync;  I was responding to Eduardo\u0027s review and hadn\u0027t seen yours yet.\n\nThis is now fixed by also defining PrivateKey type.",
+      "parentUuid": "f7cebda2_74db8834",
+      "revId": "844e38e19ee2008474a79a315d89961fb4cb4ea9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9712e1d6_787cad46",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-09T19:39:56Z",
       "side": 1,
       "message": "To address Rob\u0027s question (and paraphrase what Eric said in person): We can create a new type PrivateKey. A private key is used standalone only inside the ee packer for now and in tests, but it\u0027s worth having it for type checking.",
+      "revId": "844e38e19ee2008474a79a315d89961fb4cb4ea9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_98e1a14b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-09T19:43:26Z",
+      "side": 1,
+      "message": "Already did it in a pending CL.",
+      "parentUuid": "9712e1d6_787cad46",
       "revId": "844e38e19ee2008474a79a315d89961fb4cb4ea9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
