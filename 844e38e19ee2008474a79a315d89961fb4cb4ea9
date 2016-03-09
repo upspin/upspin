@@ -69,6 +69,24 @@
       "revId": "844e38e19ee2008474a79a315d89961fb4cb4ea9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_f82c1d4e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T19:49:06Z",
+      "side": 1,
+      "message": "If it\u0027s in this one, you need to re-export it for us to see it. (I don\u0027t see any other pending CLs though).",
+      "parentUuid": "9712e1d6_98e1a14b",
+      "revId": "844e38e19ee2008474a79a315d89961fb4cb4ea9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
