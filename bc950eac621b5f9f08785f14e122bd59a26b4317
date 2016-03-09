@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_09c1e9f8",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T01:46:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7cebda2_54cd2c7e",
+      "revId": "bc950eac621b5f9f08785f14e122bd59a26b4317",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_34cab068",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_89d4b9bb",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T01:46:06Z",
+      "side": 1,
+      "message": "It is, but where I am calling it (well, will be calling, in the next CL) path.Parse needs to be called anyway. That\u0027s why I\u0027m returning it here. I think it\u0027s useful, but maybe I should have two versions of it?",
+      "parentUuid": "f7cebda2_f4e67803",
+      "revId": "bc950eac621b5f9f08785f14e122bd59a26b4317",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_d4eb7ccb",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -87,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_69caa51b",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T01:46:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7cebda2_d4eb7ccb",
+      "revId": "bc950eac621b5f9f08785f14e122bd59a26b4317",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7cebda2_b4f000b5",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -98,6 +152,24 @@
       "writtenOn": "2016-03-08T23:27:51Z",
       "side": 1,
       "message": "you might be looking for strings.Fields, but even that is too much allocation.",
+      "revId": "bc950eac621b5f9f08785f14e122bd59a26b4317",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_29c4ad08",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-09T01:46:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7cebda2_b4f000b5",
       "revId": "bc950eac621b5f9f08785f14e122bd59a26b4317",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
