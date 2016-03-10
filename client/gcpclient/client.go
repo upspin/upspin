@@ -6,7 +6,6 @@ package gcpclient
 import (
 	"fmt"
 
-	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
@@ -43,37 +42,7 @@ func New(context *upspin.Context) upspin.Client {
 	}
 }
 
-// updateReadersInMeta traverses the given parsed path backwards looking for the closest directory that contains an
-// Access file (present as the DirEntry's Metadata.Reader). When it finds one, it overwrites the metadata (which must
-// not be nil) with it. If not found, meta.Readers will be untouched.
-// TODO: this can be extremely slow, especially when Readers is null. To fix it without caching, make Mkdir inherit
-// Readers automatically.
-func (c *Client) updateReadersInMeta(meta *upspin.Metadata, parsedPath path.Parsed) error {
-	for len(parsedPath.Elems) > 0 {
-		parsedPath = parsedPath.Drop(1)
-		dirEntry, err := c.context.Directory.Lookup(parsedPath.Path())
-		if err != nil {
-			return err
-		}
-		if dirEntry.Metadata.Readers != nil {
-			meta.Readers = dirEntry.Metadata.Readers
-			return nil
-		}
-	}
-	return nil
-}
-
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
-	// Treat pathname ending in "/Access" as special.
-
-	isAccessFile, parsed := access.IsAccessFile(name)
-	if parsed == nil {
-		return zeroLoc, fmt.Errorf("error parsing path %s", name)
-	}
-	if isAccessFile {
-		return c.context.Directory.Put(name, data, []byte(""))
-	}
-
 	// Encrypt data according to the preferred packer
 	// TODO: Do a Lookup in the parent directory to find the overriding packer.
 	packer := pack.Lookup(c.context.Packing)
@@ -82,11 +51,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	meta := &upspin.Metadata{}
-	// Figure out if there are readers for this file.
-	err := c.updateReadersInMeta(meta, *parsed)
-	if err != nil {
-		return zeroLoc, err
-	}
 
 	// Get a buffer big enough for this data
 	cipherLen := packer.PackLen(c.context, data, meta, name)

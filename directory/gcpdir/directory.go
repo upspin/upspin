@@ -36,6 +36,10 @@ type Directory struct {
 // Guarantee we implement the interface
 var _ upspin.Directory = (*Directory)(nil)
 
+var (
+	zeroLoc upspin.Location
+)
+
 // new returns a concrete implementation of Directory, pointing to a server at a given URL and port.
 func new(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) *Directory {
 	return &Directory{
@@ -65,17 +69,29 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
-	var zeroLoc upspin.Location
 	const op = "Put"
+
+	if len(packdata) < 1 {
+		return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
+	}
 
 	// Check whether this is an Access file, which is special.
 	isAccessFile, parsed := access.IsAccessFile(name)
 	if parsed == nil {
 		return zeroLoc, newError(op, name, errors.New("invalid path"))
 	}
+	// Lookup parent directory
+	parentDirEntry, err := d.Lookup(parsed.Drop(1).Path())
+	if err != nil {
+		return zeroLoc, err
+	}
 	// Now, let's make a directory entry to Put to the server
 	var dirEntry *upspin.DirEntry
 	if isAccessFile {
+		if packdata[0] != upspin.PlainPack {
+			// The directory service must be able to read the bytes passed in.
+			return zeroLoc, newError(op, name, errors.New("packing must be plain for Access file"))
+		}
 		accessPerms, err := access.Parse(data)
 		if err != nil {
 			return zeroLoc, newError(op, name, err)
@@ -85,107 +101,115 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		for _, r := range accessPerms.Readers {
 			readers = append(readers, r.User)
 		}
-		dirEntry, err = d.Lookup(parsed.Drop(1).Path())
+		// Overwrite parent's dir entry with new set of readers
+		parentDirEntry.Metadata.Readers = readers
+		err = d.storeDirEntry(op, parentDirEntry)
 		if err != nil {
 			return zeroLoc, err
-		}
-		dirEntry.Metadata.Readers = readers
-	} else {
-		if len(packdata) < 1 {
-			return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
-		}
-
-		// First, store the data itself, to find the key
-		// TODO: bind to the Store server pointed at by the dirEntry instead of using the default one.
-		key, err := d.storeService.Put(data)
-		if err != nil {
-			log.Printf("storeService returned error: %v", err)
-			return zeroLoc, err
-		}
-		// We now have a final Location in loc. We now create a
-		// directory entry for this Location.  From here on, if an
-		// error occurs, we'll have a dangling block. We could delete
-		// it, but we can always do fsck-style operations to find them
-		// later.
-		dirEntry = &upspin.DirEntry{
-			Name: name,
-			Location: upspin.Location{
-				Reference: upspin.Reference{
-					Key:     key,
-					Packing: upspin.Packing(packdata[0]),
-				},
-				Endpoint: d.storeService.Endpoint(),
-			},
-			Metadata: upspin.Metadata{
-				IsDir:    false,
-				Sequence: 0, // TODO: server does not increment currently
-				PackData: packdata,
-			},
 		}
 	}
 
+	// First, store the data itself, to find the key
+	// TODO: bind to the Store server pointed at by the dirEntry instead of using the default one.
+	key, err := d.storeService.Put(data)
+	if err != nil {
+		log.Printf("storeService returned error: %v", err)
+		return zeroLoc, err
+	}
+	// We now have a final Location in loc. We now create a
+	// directory entry for this Location.  From here on, if an
+	// error occurs, we'll have a dangling block. We could delete
+	// it, but we can always do fsck-style operations to find them
+	// later.
+	dirEntry = &upspin.DirEntry{
+		Name: name,
+		Location: upspin.Location{
+			Reference: upspin.Reference{
+				Key:     key,
+				Packing: upspin.Packing(packdata[0]),
+			},
+			Endpoint: d.storeService.Endpoint(),
+		},
+		Metadata: upspin.Metadata{
+			IsDir:    false,
+			Sequence: 0, // TODO: server does not increment currently
+			PackData: packdata,
+			Readers:  parentDirEntry.Metadata.Readers, // Inherited from the parent.
+		},
+	}
+	err = d.storeDirEntry(op, dirEntry)
+	if err != nil {
+		return zeroLoc, err
+	}
+	return dirEntry.Location, nil
+}
+
+func (d *Directory) storeDirEntry(op string, dirEntry *upspin.DirEntry) error {
+	name := dirEntry.Name
 	// Encode dirEntry as JSON
 	dirEntryJSON, err := json.Marshal(dirEntry)
 	if err != nil {
-		return zeroLoc, newError(op, name, err)
+		return newError(op, name, err)
 	}
 
 	// Prepare a put request to the server
 	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
 	if err != nil {
-		return zeroLoc, newError(op, name, err)
+		return newError(op, name, err)
 	}
 	respBody, err := d.requestAndReadResponseBody(op, name, req)
 	if err != nil {
-		return zeroLoc, err
+		return err
 	}
 	err = parser.ErrorResponse(respBody)
 	if err != nil {
-		return zeroLoc, newError(op, name, err)
+		return newError(op, name, err)
 	}
 
-	return dirEntry.Location, nil
+	return nil
 }
 
 func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	var zeroLoc upspin.Location // The zero location
 	const op = "MakeDirectory"
+
+	parsed, err := path.Parse(dirName)
+	if err != nil {
+		return zeroLoc, err
+	}
+	// Unless this is the root dir, we do a lookup to find the parent, so we can inherit Readers and Endpoint.
+	var parentReaders []upspin.UserName
+	parentEndpoint := upspin.Endpoint{ // Default endpoint, if parent does not have one.
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(d.serverURL),
+	}
+	if len(parsed.Elems) > 0 {
+		parentDirEntry, err := d.Lookup(parsed.Drop(1).Path())
+		if err != nil {
+			return zeroLoc, err
+		}
+		parentEndpoint = parentDirEntry.Location.Endpoint
+		parentReaders = parentDirEntry.Metadata.Readers
+	}
 
 	// Prepares a request to put dirName to the server
 	dirEntry := upspin.DirEntry{
-		Name: dirName,
+		Name: parsed.Path(),
 		Location: upspin.Location{
 			// Key is ignored.
-			// Endpoint is where the server is.
-			Endpoint: upspin.Endpoint{
-				Transport: upspin.GCP,
-				NetAddr:   upspin.NetAddr(d.serverURL),
-			},
+			// Endpoint is where the Store server is.
+			Endpoint: parentEndpoint,
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    true,
 			Sequence: 0, // don't care?
 			PackData: nil,
+			Readers:  parentReaders,
 		},
 	}
-	body, err := json.Marshal(dirEntry)
-	if err != nil {
-		return zeroLoc, newError(op, dirName, err)
-	}
-	data := bytes.NewBuffer(body)
-	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", d.serverURL), data)
-	if err != nil {
-		return zeroLoc, newError(op, dirName, err)
-	}
-	respBody, err := d.requestAndReadResponseBody(op, dirName, req)
+	err = d.storeDirEntry(op, &dirEntry)
 	if err != nil {
 		return zeroLoc, err
 	}
-	err = parser.ErrorResponse(respBody)
-	if err != nil {
-		return zeroLoc, newError(op, dirName, err)
-	}
-
 	return dirEntry.Location, nil
 }
 
