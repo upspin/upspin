@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_cbb3bc5f",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "We\u0027ve got to do it somewhere.   I might just make up a library routine somwhere that imports all the packers and transports.  Right now I\u0027m just getting lucky because the testdir stuff imports what I need.",
+      "parentUuid": "9712e1d6_2b17f824",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9712e1d6_cb05fcf2",
         "filename": "cmd/dfuse/fs.go",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-10T18:23:25Z",
       "side": 1,
       "message": "Why does userDirs need a raw struct{}?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_4ba8ecea",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "It\u0027s the easiest way to create a map that just has the mappings and mo contents.  Think of it as a set.  userDirs[\"quux\"] \u003d struct{}{} adds \"quux\" to the set.",
+      "parentUuid": "9712e1d6_cb05fcf2",
       "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_0bff94c8",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "That would have worked as well.   I\u0027ll change to it.",
+      "parentUuid": "9712e1d6_4b034cf3",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9712e1d6_6b285064",
         "filename": "cmd/dfuse/main.go",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-10T18:23:25Z",
       "side": 1,
       "message": "Don\u0027t you need to _ import all packers here?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_cb1f3cf0",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "Yup. have to do it somewhere.   See my answer in the equivalent fs.go comment.",
+      "parentUuid": "9712e1d6_6b285064",
       "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_ab240849",
+        "filename": "cmd/dfuse/users.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "Done.\n\nI\u0027m sure Rob will want something else...",
+      "parentUuid": "9712e1d6_0be55487",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9712e1d6_abf3e84e",
         "filename": "cmd/dfuse/users.go",
         "patchSetId": 10
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "9712e1d6_a6d0bf16",
+        "filename": "cmd/dfuse/users.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9712e1d6_abf3e84e",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9712e1d6_6b23b0a0",
         "filename": "path/path.go",
         "patchSetId": 10
@@ -115,6 +223,24 @@
       "writtenOn": "2016-03-10T18:23:25Z",
       "side": 1,
       "message": "I\u0027m going to channel Rob here and suggest fmt.Sprintf to avoid an extra allocation (if you had only one \u0027+\u0027 it would be equivalent, I think, but with two, Sprintf is probably more economical. Though, I think this is true for Java, not 100% sure about Go)",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_c60cd38f",
+        "filename": "path/path.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-03-10T18:53:38Z",
+      "side": 1,
+      "message": "Done.  I didn\u0027t want to import fmt just for that one line but its  sure to have been imported elsewhere.",
+      "parentUuid": "9712e1d6_6b23b0a0",
       "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
