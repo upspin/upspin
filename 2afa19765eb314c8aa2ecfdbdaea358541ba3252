@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9712e1d6_2b17f824",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "Do you need to _ import all the possible packers here (or in main.go)?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_cb05fcf2",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "Why does userDirs need a raw struct{}?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_4b034cf3",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "I hadn\u0027t seen this style before. Usually I see \nconst ( \n   rootNode nodeType \u003d iota\n   userNode\n   otherNode\n)\n\nBut I defer to Go experts.",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_6b285064",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "Don\u0027t you need to _ import all packers here?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_0be55487",
+        "filename": "cmd/dfuse/users.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "This comment does not seem accurate anymore.",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_abf3e84e",
+        "filename": "cmd/dfuse/users.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "And log a warning?",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9712e1d6_6b23b0a0",
+        "filename": "path/path.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-10T18:23:25Z",
+      "side": 1,
+      "message": "I\u0027m going to channel Rob here and suggest fmt.Sprintf to avoid an extra allocation (if you had only one \u0027+\u0027 it would be equivalent, I think, but with two, Sprintf is probably more economical. Though, I think this is true for Java, not 100% sure about Go)",
+      "revId": "2afa19765eb314c8aa2ecfdbdaea358541ba3252",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
