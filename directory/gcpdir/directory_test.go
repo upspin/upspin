@@ -17,21 +17,23 @@ import (
 )
 
 const (
-	pathName    = "bob@jones.com/myroot/mysubdir"
-	badPathName = "invalid/path/name"
+	parentPathName = "bob@jones.com/mydir"
+	pathName       = parentPathName + "/mysubdir"
+	badPathName    = "invalid/path/name"
 )
 
 var (
-	errBadConnection       = errors.New("bad internet connection")
-	errBadPatternUserName  = errors.New("bad user name in path")
-	errMkdirBadConnection  = newError("MakeDirectory", pathName, errBadConnection)
-	errLookupBadConnection = newError("Lookup", pathName, errBadConnection)
-	errPutBadConnection    = newError("Put", pathName, errBadConnection)
-	errGlobBadPattern      = newError("Glob", badPathName, errBadPatternUserName)
-	key                    = "the key"
-	fileContents           = []byte("contents of file")
-	packData               = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
-	reference              = upspin.Reference{
+	errBadConnection             = errors.New("bad internet connection")
+	errBadPatternUserName        = errors.New("bad user name in path")
+	errLookupParentBadConnection = newError("Lookup", parentPathName, errBadConnection)
+	errLookupBadConnection       = newError("Lookup", pathName, errBadConnection)
+	errPutBadConnection          = newError("Put", pathName, errBadConnection)
+	errGlobBadPattern            = newError("Glob", badPathName, errBadPatternUserName)
+	key                          = "the key"
+	fileContents                 = []byte("contents of file")
+	packData                     = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
+	readers                      = []upspin.UserName{upspin.UserName("wife@jones.com")}
+	reference                    = upspin.Reference{
 		Key:     key,
 		Packing: upspin.PlainPack,
 	}
@@ -51,6 +53,8 @@ var (
 			PackData: packData,
 		},
 	}
+	// A mock HTTP client that does not do anything
+	doNothingHTTPClient = nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 )
 
 func TestMkdirError(t *testing.T) {
@@ -60,8 +64,9 @@ func TestMkdirError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	if err.Error() != errMkdirBadConnection.Error() {
-		t.Fatalf("Expected error %v, got %v", errMkdirBadConnection, err)
+	// MakeDirectory calls Lookup in all cases except the root.
+	if err.Error() != errLookupParentBadConnection.Error() {
+		t.Fatalf("Expected error %v, got %v", errLookupParentBadConnection, err)
 	}
 }
 
@@ -70,10 +75,13 @@ func TestMkdir(t *testing.T) {
 	mkdirEntry.Location.Reference = upspin.Reference{}
 	mkdirEntry.Metadata.IsDir = true
 	mkdirEntry.Metadata.PackData = nil
-	request := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
-	mock := nettest.NewMockHTTPClient(newMockMkdirResponse(t), []*http.Request{request})
+	mkdirEntry.Metadata.Readers = readers
+	// Mkdir will first Lookup the parent, then perform the Mkdir itself
+	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
+	requestMkdir := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
+	mock := nettest.NewMockHTTPClient(append(newMockLookupParentResponse(t), newMockMkdirResponse(t)...), []*http.Request{requestLookup, requestMkdir})
 
-	d := new("http://localhost:8080", nil, mock)
+	d := new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
 
 	loc, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err != nil {
@@ -100,14 +108,6 @@ func newMockSuccessResponse(t *testing.T) nettest.MockHTTPResponse {
 	return newResp(success)
 }
 
-func newMockLocationResponse(t *testing.T) nettest.MockHTTPResponse {
-	loc, err := json.Marshal(location)
-	if err != nil {
-		t.Fatalf("JSON marshal failed: %v", err)
-	}
-	return newResp(loc)
-}
-
 func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
 	keyJSON, err := json.Marshal(&struct{ Key string }{Key: key})
 	if err != nil {
@@ -118,6 +118,19 @@ func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
 
 func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
 	dir, err := json.Marshal(dirEntry)
+	if err != nil {
+		t.Fatalf("JSON marshal failed: %v", err)
+	}
+	resp := newResp(dir)
+	return []nettest.MockHTTPResponse{resp}
+}
+
+func newMockLookupParentResponse(t *testing.T) []nettest.MockHTTPResponse {
+	// Set up the parent to contain default Readers.
+	newDir := dirEntry
+	newDir.Name = parentPathName
+	newDir.Metadata.Readers = readers
+	dir, err := json.Marshal(newDir)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
@@ -184,7 +197,7 @@ func newErroringDirectoryClient() upspin.Directory {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 
-	return new("http://localhost:8080", nil, mock)
+	return new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
 }
 
 func newStore(client netutil.HTTPClientInterface) upspin.Store {
@@ -199,14 +212,15 @@ func newStore(client netutil.HTTPClientInterface) upspin.Store {
 // inspections.
 func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse, dirClientRequest *http.Request) (upspin.Directory, *nettest.MockHTTPClient) {
 	// The HTTP client will return a sequence of responses, the
-	// first one will be to the Store.Put request, then the second
-	// to the Directory.Put request. We set up the requests and
-	// responses accordingly.  The first request is for Store. We
-	// don't check the body matches.
-	storeRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+	// first one will be to the Directory server, to Lookup the parent path.
+	// Then, the actual Store.Put request, followed by he Directory.Put request.
+	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%s", parentPathName), nil)
+	parentLookupResp := newMockLookupParentResponse(t)[0]
+
 	mock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{newMockKeyResponse(t), dirClientResponse},
-		[]*http.Request{storeRequest, dirClientRequest})
+		[]nettest.MockHTTPResponse{parentLookupResp, newMockKeyResponse(t), dirClientResponse},
+		[]*http.Request{parentLookupReq, storeReq, dirClientRequest})
 
 	// Get a Store client
 	s := newStore(mock)
@@ -238,16 +252,18 @@ func TestPutBadMeta(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	badPackingError := "Put bob@jones.com/myroot/mysubdir: missing packing type in packdata"
+	badPackingError := "Put bob@jones.com/mydir/mysubdir: missing packing type in packdata"
 	if err.Error() != badPackingError {
 		t.Errorf("Expected error %q, got %q", badPackingError, err)
 	}
 }
 
 func TestPut(t *testing.T) {
-	respSuccess := nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))
+	respSuccess := newResp([]byte(`{"error":"success"}`))
 
-	dirEntryJSON := toJSON(t, dirEntry)
+	de := dirEntry
+	de.Metadata.Readers = readers
+	dirEntryJSON := toJSON(t, de)
 	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
 
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
@@ -321,17 +337,17 @@ func TestGlob(t *testing.T) {
 	mock.Verify(t)
 }
 
-func TestAccessErrorInvalidPath(t *testing.T) {
+func TestAccessErrorInvalidContents(t *testing.T) {
 	const (
-		access        = pathName + "/Access"
+		access        = parentPathName + "/Access"
 		accessControl = "invalidemail.com"
 	)
 
 	// Does not perform a lookup since the Access file is invalid.
-	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
-	d := new("http://localhost:8080", nil, mock)
+	mock := nettest.NewMockHTTPClient(newMockLookupParentResponse(t), []*http.Request{nettest.AnyRequest})
+	d := new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
 
-	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)})
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -345,28 +361,51 @@ func TestAccessErrorInvalidPath(t *testing.T) {
 
 func TestAccess(t *testing.T) {
 	const (
-		access        = pathName + "/Access"
+		accessPath    = parentPathName + "/Access"
 		accessControl = "\n r:dalai@lama.org, bill@gatesfoundation.org\n"
+		success       = `{"error":"success"}`
 	)
-	// We expect the following replies from the server:
-	responses := append(newMockLookupResponse(t), nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`)))
 
-	// We expect d.Put will send the dirEntry back to the server with the following updates:
+	// We expect d.Put will cause the following updates:
+	// 1 - Re-write the parent with new Readers to the Directory server
+	// 2 - Write the DirEntry for the actual Access file to the Directory server
+	// 3 - Write the contents of the Access file, in plain packing to the Store server
 	// Note: we ignore groups for now. Only usernames are recorded for now, not full pathnames.
-	dirEntry.Metadata.Readers = []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
-	dirEntryJSON := toJSON(t, dirEntry)
-	updateDirEntryReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
-	requests := []*http.Request{nettest.AnyRequest, updateDirEntryReq}
 
-	mock := nettest.NewMockHTTPClient(responses, requests)
-	d := new("http://localhost:8080", nil, mock)
+	// Set up Store
+	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
+	storeMock := nettest.NewMockHTTPClient(
+		[]nettest.MockHTTPResponse{newMockKeyResponse(t)},
+		[]*http.Request{storeReq})
+	store := newStore(storeMock)
 
-	_, err := d.Put(access, []byte(accessControl), []byte(""))
+	// Set up Directory
+	deParent := dirEntry
+	deParent.Name = parentPathName
+	deParent.Metadata.Readers = []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
+	deParentJSON := toJSON(t, deParent)
+	updateParentReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deParentJSON)
+
+	deAccess := deParent
+	deAccess.Name = accessPath
+	deAccess.Metadata.PackData = []byte{byte(upspin.PlainPack)} // Access file does not have packdata
+	deAccessJSON := toJSON(t, deAccess)
+	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8081/get?pathname=%s", parentPathName), nil)
+	putAccessReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deAccessJSON)
+
+	requests := []*http.Request{parentLookupReq, updateParentReq, putAccessReq}
+	responses := []nettest.MockHTTPResponse{newMockLookupParentResponse(t)[0], newResp([]byte(success)), newResp([]byte(success))}
+
+	dirMock := nettest.NewMockHTTPClient(responses, requests)
+	d := new("http://localhost:8081", store, dirMock)
+
+	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mock.Verify(t)
+	dirMock.Verify(t)
+	storeMock.Verify(t)
 }
 
 // newDirEntry creates a new DirEntry with the given path name
