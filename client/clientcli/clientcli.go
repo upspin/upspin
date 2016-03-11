@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	client "upspin.googlesource.com/upspin.git/client/gcpclient"
+	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/upspin"
 
