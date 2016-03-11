@@ -22,6 +22,8 @@ import (
 	"log"
 	"math/big"
 
+	"strings"
+
 	"golang.org/x/crypto/hkdf"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
@@ -46,9 +48,10 @@ type wrappedKeys []wrappedKey
 // common implements common functions used by eep256 and eep521 that
 // are parameterized by cipher-specific values.
 type common struct {
-	ciphersuite upspin.Packing
-	curve       elliptic.Curve
-	aesLen      int
+	ciphersuite  upspin.Packing
+	curve        elliptic.Curve
+	aesLen       int
+	packerString string
 }
 
 type eep256 struct {
@@ -67,31 +70,41 @@ var _ upspin.Packer = eep256{}
 var _ upspin.Packer = eep384{}
 var _ upspin.Packer = eep521{}
 
+const (
+	p256               = "p256"
+	p384               = "p384"
+	p521               = "p521"
+	noKnownKeysForUser = "no known keys for user %s"
+)
+
 var (
 	Packer map[string]upspin.Packer
 )
 
 func init() {
-	Packer = make(map[string]upspin.Packer, 256)
-	Packer["p256"] = eep256{
+	Packer = make(map[string]upspin.Packer)
+	Packer[p256] = eep256{
 		common{
-			ciphersuite: upspin.EEp256Pack,
-			curve:       elliptic.P256(),
-			aesLen:      16,
+			ciphersuite:  upspin.EEp256Pack,
+			curve:        elliptic.P256(),
+			aesLen:       16,
+			packerString: p256,
 		},
 	}
-	Packer["p384"] = eep384{
+	Packer[p384] = eep384{
 		common{
-			ciphersuite: upspin.EEp384Pack,
-			curve:       elliptic.P384(),
-			aesLen:      32,
+			ciphersuite:  upspin.EEp384Pack,
+			curve:        elliptic.P384(),
+			aesLen:       32,
+			packerString: p384,
 		},
 	}
-	Packer["p521"] = eep521{
+	Packer[p521] = eep521{
 		common{
-			ciphersuite: upspin.EEp521Pack,
-			curve:       elliptic.P521(),
-			aesLen:      32,
+			ciphersuite:  upspin.EEp521Pack,
+			curve:        elliptic.P521(),
+			aesLen:       32,
+			packerString: p521,
 		},
 	}
 
@@ -598,10 +611,14 @@ func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.Pub
 		return "", err
 	}
 	if len(keys) < 1 {
-		return "", fmt.Errorf("no known keys for user %s", user)
+		return "", fmt.Errorf(noKnownKeysForUser, user)
 	}
-	// TODO: Loop over all keys looking for the one that has the correct packing type.
-	return keys[0], nil
+	for _, k := range keys {
+		if c.isValidKeyForPacker(k) {
+			return k, nil
+		}
+	}
+	return "", fmt.Errorf(noKnownKeysForUser, user)
 }
 
 // parsePublicKey takes a user's string representation of their
@@ -610,9 +627,6 @@ func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, er
 	var packname string
 	var x, y big.Int
 
-	// TODO  gotta be a better way...
-	pname := []string{16: "p256", 18: "p384", 17: "p521"}
-
 	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &packname, &x, &y)
 	if err != nil {
 		return nil, err
@@ -620,8 +634,12 @@ func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, er
 	if n != 3 {
 		return nil, fmt.Errorf("expected packname and two big ints, got %d", n)
 	}
-	if packname != pname[c.ciphersuite] {
-		return nil, fmt.Errorf("expected packing %s, got %s", pname[c.ciphersuite], packname)
+	if packname != c.packerString {
+		return nil, fmt.Errorf("expected packing %s, got %s", c.packerString, packname)
 	}
 	return &ecdsa.PublicKey{Curve: c.curve, X: &x, Y: &y}, nil
+}
+
+func (c common) isValidKeyForPacker(publicKey upspin.PublicKey) bool {
+	return strings.HasPrefix(string(publicKey), c.packerString)
 }
