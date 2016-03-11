@@ -325,12 +325,8 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	}
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
-	// Create a blob storing the data for this file and store it in storage service.
-	ciphertext, meta, err := packBlob(s.Context, data, packdata, parsed.Path()) // parsed.Path() will be clean.
-	if err != nil {
-		return loc0, err
-	}
-	key, err := s.Store.Put(ciphertext)
+	// Store the data in the storage service.
+	key, err := s.Store.Put(data)
 	ref := upspin.Reference{
 		Key:     key,
 		Packing: upspin.Packing(packdata[0]), // packdata is known to be non-empty.
@@ -346,7 +342,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		elem:     lastElem,
 		isDir:    dataIsDir,
 		ref:      ref,
-		packdata: meta.PackData,
+		packdata: packdata,
 	}
 	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, ent, false)
 	if err != nil {

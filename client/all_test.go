@@ -1,4 +1,4 @@
-package testclient
+package client
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
@@ -66,15 +67,12 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		root = user + "/"
 	)
 	setup(user)
-	client, err := New(context)
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := New(context)
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	_, err = client.Put(fileName, []byte(text))
+	_, err := client.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -91,12 +89,9 @@ const (
 	Max = 100 * 1000 // Must be > 100.
 )
 
-func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (*Client, upspin.File, []byte) {
+func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
 	setup(user)
-	client, err := New(context)
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := New(context)
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -317,10 +312,8 @@ func TestFileZeroFill(t *testing.T) {
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
 	setup(user)
-	client, err := New(context)
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := New(context)
+	var err error
 	var paths []*upspin.DirEntry
 	checkPaths := func(expPaths ...string) {
 		if err != nil {
