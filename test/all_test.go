@@ -10,8 +10,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/client/gcpclient"
-	"upspin.googlesource.com/upspin.git/client/testclient"
+	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -85,7 +84,7 @@ func testAllGCP(t *testing.T) {
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp521Pack},
 	}
 	for _, config := range configs {
-		newGCPSetup(config.user, config.directory, config.store, config.pack).runAllTests(t)
+		newSetup(config.user, config.directory, config.store, config.pack).runAllTests(t)
 	}
 }
 
@@ -101,11 +100,7 @@ func testAllInProcess(t *testing.T) {
 	}
 
 	for _, config := range configs {
-		setup, err := newSetup(config.user, config.directory, config.store, config.pack)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+		setup := newSetup(config.user, config.directory, config.store, config.pack)
 		setup.runAllTests(t)
 	}
 }
@@ -116,29 +111,14 @@ type Setup struct {
 	client  upspin.Client
 }
 
-// newSetup allocates and configures a setup for a test run using a testclient as Client.
+// newGCPSetup allocates and configures a setup for a test run using a Client.
 // The user's name inside the context is set separately using the newUser method.
-func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) (*Setup, error) {
+func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
 	log.Printf("===== Using packing: %d", packing)
 	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
-	client, err := testclient.New(context)
-	if err != nil {
-		return nil, err
-	}
 	s := &Setup{
 		context: context,
-		client:  client,
-	}
-	return s, nil
-}
-
-// newGCPSetup allocates and configures a setup for a test run using a gcpclient as Client.
-// The user's name inside the context is set separately using the newUser method.
-func newGCPSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
-	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
-	s := &Setup{
-		context: context,
-		client:  gcpclient.New(context),
+		client:  client.New(context),
 	}
 	return s
 }

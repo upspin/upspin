@@ -5,7 +5,7 @@
 
 // +build integration
 
-package gcpclient
+package client_test
 
 import (
 	"fmt"
@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -109,7 +110,7 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 
 func testMkdir(context *upspin.Context, t *testing.T) {
 	setupUser(context, upspin.UserName(userName))
-	c := New(context)
+	c := client.New(context)
 
 	dirPath := path.Join(upspin.PathName(userName), "mydir")
 	loc, err := c.MakeDirectory(dirPath)
@@ -135,7 +136,7 @@ func testMkdir(context *upspin.Context, t *testing.T) {
 
 func testPutAndGet(context *upspin.Context, t *testing.T) {
 	setupUser(context, upspin.UserName(userName))
-	c := New(context)
+	c := client.New(context)
 
 	filePath := path.Join(upspin.PathName(userName), "myfile.txt")
 	loc, err := c.Put(filePath, []byte(fileContents))
@@ -158,7 +159,7 @@ func testPutAndGet(context *upspin.Context, t *testing.T) {
 
 func testCreateAndOpen(context *upspin.Context, t *testing.T) {
 	setupUser(context, upspin.UserName(userName))
-	c := New(context)
+	c := client.New(context)
 
 	filePath := path.Join(upspin.PathName(userName), "myotherfile.txt")
 
@@ -197,7 +198,7 @@ func testCreateAndOpen(context *upspin.Context, t *testing.T) {
 
 func testGlob(context *upspin.Context, t *testing.T) {
 	setupUser(context, upspin.UserName(userName))
-	c := New(context)
+	c := client.New(context)
 
 	for i := 0; i <= 10; i++ {
 		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", userName, i))
@@ -233,7 +234,7 @@ func testSharing(context *upspin.Context, t *testing.T) {
 		sharedFilePath = path.Join(upspin.PathName(userName), "mydir/sharedfile")
 	)
 	setupUser(context, upspin.UserName(userName))
-	c := New(context)
+	c := client.New(context)
 
 	// Put a new file under a previously created dir
 	_, err := c.Put(sharedFilePath, []byte(sharedContent))
