@@ -324,8 +324,11 @@ type File interface {
 // Context contains client information such as the user's keys and
 // preferred User, Directory, and Store servers.
 type Context struct {
-	// The name of the user requesting access.
+	// UserName is the name of the user requesting access.
 	UserName UserName
+
+	// HomeDir is the home directory of user UserName.
+	HomeDir string
 
 	// KeyPair holds the user's private cryptographic keys.
 	KeyPair KeyPair

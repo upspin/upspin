@@ -80,5 +80,9 @@ func sshdir() string {
 	if err != nil {
 		panic("no user")
 	}
-	return filepath.Join(user.HomeDir, ".ssh")
+	homeDir := user.HomeDir
+	if v := os.Getenv("HOME"); len(v) != 0 {
+		homeDir = v
+	}
+	return filepath.Join(homeDir, ".ssh")
 }

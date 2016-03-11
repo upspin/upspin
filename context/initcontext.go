@@ -27,13 +27,18 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		"store":     "inprocess",
 		"packing":   "plain"}
 
-	if r == nil {
-		dir := "/etc/upspin"
-		if u, err := user.Current(); err == nil {
-			if len(u.HomeDir) != 0 {
-				dir = path.Join(u.HomeDir, ".upspin")
-			}
+	homeDir := "/tmp"
+	dir := "/etc/upspin"
+	if u, err := user.Current(); err == nil {
+		if len(u.HomeDir) != 0 {
+			homeDir = u.HomeDir
 		}
+	}
+	if v := os.Getenv("HOME"); len(v) != 0 {
+		homeDir = v
+	}
+	dir = path.Join(homeDir, ".upspin")
+	if r == nil {
 		if f, err := os.Open(path.Join(dir, "config")); err == nil {
 			r = f
 			defer f.Close()
@@ -69,6 +74,7 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 
 	context := new(upspin.Context)
 	context.UserName = upspin.UserName(vals["name"])
+	context.HomeDir = homeDir
 	packer := pack.LookupByName(vals["packing"])
 	if packer == nil {
 		return nil, fmt.Errorf("unknown packing %s", vals["packing"])

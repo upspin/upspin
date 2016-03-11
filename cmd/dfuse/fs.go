@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/user"
 	filepath "path"
 	"sync"
 	"time"
@@ -70,14 +69,8 @@ func newUpspinFS(context *upspin.Context, users *userCache) *upspinFs {
 		gid:      os.Getgid(),
 		userDirs: make(map[string]struct{}),
 	}
-	homeDir := "/tmp"
-	if u, err := user.Current(); err == nil {
-		if len(u.HomeDir) != 0 {
-			homeDir = u.HomeDir
-		}
-	}
-	f.writeDir = homeDir + "/.upspin/wb"
-	f.cacheDir = homeDir + "/.upspin/cache"
+	f.writeDir = context.HomeDir + "/.upspin/wb"
+	f.cacheDir = context.HomeDir + "/.upspin/cache"
 	os.Mkdir(f.writeDir, 0700)
 	os.Mkdir(f.cacheDir, 0700)
 	f.root = f.allocNode(nil, 0500|os.ModeDir, "")
