@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "179d11d4_967d3290",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-11T01:47:20Z",
+      "side": 1,
+      "message": "Rob suggested ~/upspin/ without the .\n\nI\u0027m already using ~/upspin/rc as the rc file (see recent change in initcontext).",
+      "range": {
+        "startLine": 72,
+        "startChar": 32,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "6dec7bb30c811d35238de65e9f746ccb4be75f83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_b6314eec",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-11T01:47:20Z",
+      "side": 1,
+      "message": "see prior comment. can we drop the dot?",
+      "revId": "6dec7bb30c811d35238de65e9f746ccb4be75f83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_966412f4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-11T01:47:20Z",
+      "side": 1,
+      "message": "Oh, we seem to be using two different standards. I missed the .upspin above. I guess this function is redundant and can be deleted. Except it\u0027s being used in client/gcpclient/clientcli.\n\nMy bad, I should have read the \"if r \u003d\u003d nil\" above more carefully before implementing this one.",
+      "range": {
+        "startLine": 116,
+        "startChar": 13,
+        "endLine": 116,
+        "endChar": 15
+      },
+      "revId": "6dec7bb30c811d35238de65e9f746ccb4be75f83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_f65476f5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-11T01:47:20Z",
+      "side": 1,
+      "message": "This is confusing because a user can have multiple root directories. It seems home dir is the home directory on the user\u0027s native file system, right? Maybe it should just say that.",
+      "revId": "6dec7bb30c811d35238de65e9f746ccb4be75f83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
