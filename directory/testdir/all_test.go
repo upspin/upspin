@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
@@ -27,10 +28,6 @@ var (
 )
 
 var context *upspin.Context
-
-func packData() upspin.PackData {
-	return []byte{upspin.DebugPack}
-}
 
 func setupContext() {
 	if context != nil {
@@ -82,6 +79,31 @@ func setup(userName upspin.UserName) {
 	}
 }
 
+func packData(t *testing.T, data []byte, name upspin.PathName) ([]byte, upspin.PackData) {
+	packer := pack.Lookup(context.Packing)
+	if packer == nil {
+		t.Fatalf("Packer is nil for packing %d", context.Packing)
+	}
+
+	meta := &upspin.Metadata{}
+
+	// Get a buffer big enough for this data
+	cipherLen := packer.PackLen(context, data, meta, name)
+	if cipherLen < 0 {
+		t.Fatalf("PackLen failed for %v", name)
+	}
+	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
+	if len(meta.PackData) == 0 {
+		meta.PackData = []byte{byte(context.Packing)}
+	}
+	cipher := make([]byte, cipherLen)
+	n, err := packer.Pack(context, cipher, data, meta, name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return cipher[:n], meta.PackData
+}
+
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	const (
 		user = "user1@google.com"
@@ -92,7 +114,9 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		fileName = root + "file"
 		text     = "hello sailor"
 	)
-	loc, err := context.Directory.Put(fileName, []byte(text), packData())
+
+	data, packdata := packData(t, []byte(text), fileName)
+	loc, err := context.Directory.Put(fileName, data, packdata)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -140,7 +164,8 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		loc, err := context.Directory.Put(fileName, []byte(text), packData())
+		data, packdata := packData(t, []byte(text), fileName)
+		loc, err := context.Directory.Put(fileName, data, packdata)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -188,7 +213,8 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		h, err := context.Directory.Put(fileName, []byte(text), packData())
+		data, packdata := packData(t, []byte(text), fileName)
+		h, err := context.Directory.Put(fileName, data, packdata)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -253,7 +279,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	_, err = context.Directory.Put(fileName, []byte(text), packData())
+	data, packdata := packData(t, []byte(text), fileName)
+	_, err = context.Directory.Put(fileName, data, packdata)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -272,7 +299,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
 	}
-	data, err := unpackBlob(context, cipher, fileName, &entry.Metadata)
+	data, err = unpackBlob(context, cipher, fileName, &entry.Metadata)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -282,7 +309,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	_, err = context.Directory.Put(fileName, []byte(text), packData())
+	data, packdata = packData(t, []byte(text), fileName)
+	_, err = context.Directory.Put(fileName, data, packdata)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -371,7 +399,8 @@ func TestGlob(t *testing.T) {
 	}
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
-		_, err := context.Directory.Put(name, []byte(name), packData())
+		data, packdata := packData(t, []byte(name), name)
+		_, err := context.Directory.Put(name, data, packdata)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
