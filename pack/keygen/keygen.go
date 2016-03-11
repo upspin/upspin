@@ -19,6 +19,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+var (
+	packing = flag.String("packing", "p256", "packing name, such as p256")
+	where   = flag.String("where", "", "directory where to write keys. If empty, put in $HOME/.ssh/")
+)
+
 func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 	// TODO get 128bit seed from rand.Random, print proquints, create random generator from that seed
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
@@ -26,7 +31,7 @@ func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 		log.Fatalf("key not generated: %s", err)
 	}
 
-	private, err := os.Create(filepath.Join(sshdir(), "secret.upspinkey"))
+	private, err := os.Create(filepath.Join(keydir(), "secret.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +40,7 @@ func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 		log.Fatal(err)
 	}
 
-	public, err := os.Create(filepath.Join(sshdir(), "public.upspinkey"))
+	public, err := os.Create(filepath.Join(keydir(), "public.upspinkey"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +68,6 @@ func main() {
 
 	log.SetFlags(0)
 	log.SetPrefix("keygen: ")
-	packing := flag.String("packing", "p256", "packing name, such as p256")
 	flag.Parse()
 
 	p, ok := ee.Packer[*packing]
@@ -74,7 +78,10 @@ func main() {
 	createKeys(curve[i], p)
 }
 
-func sshdir() string {
+func keydir() string {
+	if where != nil && len(*where) > 0 {
+		return *where
+	}
 	user, err := user.Current()
 	if err != nil {
 		log.Fatal("no user")
