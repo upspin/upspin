@@ -7,6 +7,8 @@ import (
 	"bufio"
 	"bytes"
 
+	"unicode"
+
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -76,10 +78,52 @@ func isAllSpace(buf []byte) bool {
 	return true
 }
 
+// matchesUpper returns true if a case-insensitive comparison between a token and an upper-cased string matches.
+func matchesUpper(token string, toMatchInUpper string) bool {
+	if len(token) != len(toMatchInUpper) {
+		return false
+	}
+	for i, r := range token {
+		if unicode.ToUpper(rune(r)) != rune(toMatchInUpper[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func stateFromFile(line []byte, first, last int) state {
+	if first < 0 || last < 0 || first > last {
+		return invalid
+	}
+	// Try to avoid allocations here: do not call strings.ToUpper here as it performs allocations.
+	token := string(line[first : last+1])
+	const (
+		read   = "READ"
+		append = "APPEND"
+		write  = "WRITE"
+	)
+	switch unicode.ToUpper(rune(line[first])) {
+	case 'R':
+		if len(token) == 1 || matchesUpper(token, read) {
+			return readers
+		}
+	case 'W':
+		if len(token) == 1 || matchesUpper(token, write) {
+			return writers
+		}
+	case 'A':
+		if len(token) == 1 || matchesUpper(token, append) {
+			return appenders
+		}
+	}
+	return invalid
+}
+
 // parseLine returns the section the line belongs to (readers, appenders, etc) and a list of non-comment, non-marker strings as found.
 func parseLine(line []byte) (state, []path.Parsed) {
 	state := newSection
 	lastNonEmpty := 0
+	firstNonEmpty := -1
 	var ids []path.Parsed
 	lastChar := len(line) - 1
 	for i, c := range line {
@@ -89,24 +133,17 @@ func parseLine(line []byte) (state, []path.Parsed) {
 		if state == newSection {
 			if c != ':' {
 				if !isSpace(c) {
-					// Have we already seen a non-comment, non-whitespace character?
-					if lastNonEmpty != 0 {
-						return invalid, nil
+					if firstNonEmpty < 0 {
+						firstNonEmpty = i
 					}
 					lastNonEmpty = i
 				}
 				continue
 			}
 			// Found a colon. Check what the previous non-whitespace character was.
-			switch line[lastNonEmpty] {
-			case 'r':
-				state = readers
-			case 'w':
-				state = writers
-			case 'a':
-				state = appenders
-			default:
-				return invalid, nil
+			state = stateFromFile(line, firstNonEmpty, lastNonEmpty)
+			if state == invalid {
+				return state, nil
 			}
 			lastNonEmpty = i + 1
 			continue
