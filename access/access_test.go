@@ -16,7 +16,10 @@ var (
 
 w:writerjoe@a.bc # comment r: ignored@incomment.com
 a: m@n.mn  # other comment a: ignored@too.com
-r:extra@reader.org`)
+Read : extra@reader.org
+# Some comment r: a: w: read: write ::::
+WRITE: writerbob@a.bc
+  aPPeNd  :appenderjohn@c.com`)
 )
 
 func BenchmarkParse(b *testing.B) {
@@ -35,8 +38,8 @@ func TestParse(t *testing.T) {
 	}
 
 	containsAll(t, p.Readers, []string{"foo@bob.com", "a@b.co", "x@y.uk", "extra@reader.org"})
-	containsAll(t, p.Writers, []string{"writerjoe@a.bc"})
-	containsAll(t, p.Appenders, []string{"m@n.mn"})
+	containsAll(t, p.Writers, []string{"writerjoe@a.bc", "writerbob@a.bc"})
+	containsAll(t, p.Appenders, []string{"m@n.mn", "appenderjohn@c.com"})
 }
 
 func TestParseEmptyFile(t *testing.T) {
@@ -83,6 +86,20 @@ func TestParseWrongFormat2(t *testing.T) {
 		expectedErr = "unrecognized text in Access file on line 1"
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
+	_, err := access.Parse(accessText)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.HasPrefix(err.Error(), expectedErr) {
+		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	}
+}
+
+func TestParseWrongFormat3(t *testing.T) {
+	const (
+		expectedErr = "unrecognized text in Access file on line 0"
+	)
+	accessText := []byte(": bob@abc.com") // missing access format text.
 	_, err := access.Parse(accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
