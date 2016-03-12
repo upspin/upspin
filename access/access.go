@@ -37,6 +37,27 @@ const (
 	invalidFormat = "unrecognized text in Access file on line %d"
 )
 
+var (
+	// A state map to avoid too many allocations to string.
+	stateMap = map[string]state{
+		"r":      readers,
+		"R":      readers,
+		"read":   readers,
+		"Read":   readers,
+		"READ":   readers,
+		"w":      writers,
+		"W":      writers,
+		"write":  writers,
+		"Write":  writers,
+		"WRITE":  writers,
+		"a":      appenders,
+		"A":      appenders,
+		"append": appenders,
+		"Append": appenders,
+		"APPEND": appenders,
+	}
+)
+
 func Parse(data []byte) (*Parsed, error) {
 	p := &Parsed{}
 	s := bufio.NewScanner(bytes.NewBuffer(data))
@@ -76,10 +97,24 @@ func isAllSpace(buf []byte) bool {
 	return true
 }
 
+func stateFromFile(line []byte, first, last int) state {
+	if first < 0 || last < 0 || first > last {
+		return invalid
+	}
+	// Try to avoid allocations here: do not call strings.ToUpper here as it performs allocations.
+	token := string(line[first : last+1])
+	newState, ok := stateMap[token]
+	if ok {
+		return newState
+	}
+	return invalid
+}
+
 // parseLine returns the section the line belongs to (readers, appenders, etc) and a list of non-comment, non-marker strings as found.
 func parseLine(line []byte) (state, []path.Parsed) {
 	state := newSection
 	lastNonEmpty := 0
+	firstNonEmpty := -1
 	var ids []path.Parsed
 	lastChar := len(line) - 1
 	for i, c := range line {
@@ -89,24 +124,17 @@ func parseLine(line []byte) (state, []path.Parsed) {
 		if state == newSection {
 			if c != ':' {
 				if !isSpace(c) {
-					// Have we already seen a non-comment, non-whitespace character?
-					if lastNonEmpty != 0 {
-						return invalid, nil
+					if firstNonEmpty < 0 {
+						firstNonEmpty = i
 					}
 					lastNonEmpty = i
 				}
 				continue
 			}
 			// Found a colon. Check what the previous non-whitespace character was.
-			switch line[lastNonEmpty] {
-			case 'r':
-				state = readers
-			case 'w':
-				state = writers
-			case 'a':
-				state = appenders
-			default:
-				return invalid, nil
+			state = stateFromFile(line, firstNonEmpty, lastNonEmpty)
+			if state == invalid {
+				return state, nil
 			}
 			lastNonEmpty = i + 1
 			continue
