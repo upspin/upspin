@@ -74,12 +74,11 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	if len(packdata) < 1 {
 		return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
 	}
-
-	// Check whether this is an Access file, which is special.
-	isAccessFile, parsed := access.IsAccessFile(name)
-	if parsed == nil {
+	parsed, err := path.Parse(name)
+	if err != nil {
 		return zeroLoc, newError(op, name, errors.New("invalid path"))
 	}
+
 	// Lookup parent directory
 	parentDirEntry, err := d.Lookup(parsed.Drop(1).Path())
 	if err != nil {
@@ -87,14 +86,15 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	}
 	// Now, let's make a directory entry to Put to the server
 	var dirEntry *upspin.DirEntry
-	if isAccessFile {
+	// Check whether this is an Access file, which is special.
+	if access.IsAccessFile(name) {
 		if packdata[0] != upspin.PlainPack {
 			// The directory service must be able to read the bytes passed in.
 			return zeroLoc, newError(op, name, errors.New("packing must be plain for Access file"))
 		}
-		accessPerms, err := access.Parse(data)
+		accessPerms, err := access.Parse(name, data)
 		if err != nil {
-			return zeroLoc, newError(op, name, err)
+			return zeroLoc, newError(op, "", err) // err already contains name
 		}
 		// TODO: no support for groups yet.
 		readers := make([]upspin.UserName, 0, len(accessPerms.Readers))
