@@ -1,13 +1,21 @@
 // Package access parses access control files.
+//
+// Access files have the following format:
+// <access type>: <email>[, <email>, ...]
+//
+// Anything after a '#' character is ignored
+//
+// Example:
+//
+// Read: email@domain,com, email2@domain.com
+// Write: writer@domain.com, writer2@domain.com, writer3@exmaple,com
+// Append: appender@example.com # This is a comment
 package access
 
 import (
-	"fmt"
-
 	"bufio"
 	"bytes"
-
-	"unicode"
+	"fmt"
 
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -36,15 +44,15 @@ const (
 )
 
 const (
-	invalidFormat = "unrecognized text in Access file on line %d"
+	invalidFormat = "line %d: unrecognized text: %q"
 )
 
 func Parse(data []byte) (*Parsed, error) {
-	p := &Parsed{}
-	s := bufio.NewScanner(bytes.NewBuffer(data))
+	var p Parsed
+	s := bufio.NewScanner(bytes.NewReader(data))
 	for lineNum := 0; s.Scan(); lineNum++ {
 		line := s.Bytes()
-		state, elems := parseLine(line)
+		state, elems, offending := parseLine(line)
 		switch state {
 		case readers:
 			p.Readers = append(p.Readers, elems...)
@@ -53,10 +61,10 @@ func Parse(data []byte) (*Parsed, error) {
 		case appenders:
 			p.Appenders = append(p.Appenders, elems...)
 		case invalid:
-			return nil, fmt.Errorf(invalidFormat, lineNum)
+			return nil, fmt.Errorf(invalidFormat, lineNum, line[offending:])
 		}
 	}
-	return p, nil
+	return &p, nil
 }
 
 func isSpace(b byte) bool {
@@ -69,22 +77,26 @@ func isSpace(b byte) bool {
 	}
 }
 
-func isAllSpace(buf []byte) bool {
+func toLower(r rune) rune {
+	return r | ' '
+}
+
+func isAllBlank(buf []byte) bool {
 	for _, b := range buf {
-		if !isSpace(b) {
+		if b != ' ' && b != '\t' {
 			return false
 		}
 	}
 	return true
 }
 
-// matchesUpper returns true if a case-insensitive comparison between a token and an upper-cased string matches.
-func matchesUpper(token string, toMatchInUpper string) bool {
-	if len(token) != len(toMatchInUpper) {
+// matchesUpper returns true if a case-insensitive comparison between a token and an lower-cased string matches.
+func matchesLower(token string, toMatchInLower string) bool {
+	if len(token) != len(toMatchInLower) {
 		return false
 	}
 	for i, r := range token {
-		if unicode.ToUpper(rune(r)) != rune(toMatchInUpper[i]) {
+		if toLower(r) != rune(toMatchInLower[i]) {
 			return false
 		}
 	}
@@ -98,29 +110,31 @@ func stateFromFile(line []byte, first, last int) state {
 	// Try to avoid allocations here: do not call strings.ToUpper here as it performs allocations.
 	token := string(line[first : last+1])
 	const (
-		read   = "READ"
-		append = "APPEND"
-		write  = "WRITE"
+		read   = "read"
+		append = "append"
+		write  = "write"
 	)
-	switch unicode.ToUpper(rune(line[first])) {
-	case 'R':
-		if len(token) == 1 || matchesUpper(token, read) {
+	switch toLower(rune(line[first])) {
+	case 'r':
+		if len(token) == 1 || matchesLower(token, read) {
 			return readers
 		}
-	case 'W':
-		if len(token) == 1 || matchesUpper(token, write) {
+	case 'w':
+		if len(token) == 1 || matchesLower(token, write) {
 			return writers
 		}
-	case 'A':
-		if len(token) == 1 || matchesUpper(token, append) {
+	case 'a':
+		if len(token) == 1 || matchesLower(token, append) {
 			return appenders
 		}
 	}
 	return invalid
 }
 
-// parseLine returns the section the line belongs to (readers, appenders, etc) and a list of non-comment, non-marker strings as found.
-func parseLine(line []byte) (state, []path.Parsed) {
+// parseLine returns the section the line belongs to (readers, appenders, etc) and a list of non-comment,
+// non-marker strings as found. In case of error, state will be invalid and the position of the offending character is
+// returned as an int.
+func parseLine(line []byte) (state, []path.Parsed, int) {
 	state := newSection
 	lastNonEmpty := 0
 	firstNonEmpty := -1
@@ -128,7 +142,7 @@ func parseLine(line []byte) (state, []path.Parsed) {
 	lastChar := len(line) - 1
 	for i, c := range line {
 		if c == '#' {
-			return state, ids
+			return state, ids, -1
 		}
 		if state == newSection {
 			if c != ':' {
@@ -143,7 +157,7 @@ func parseLine(line []byte) (state, []path.Parsed) {
 			// Found a colon. Check what the previous non-whitespace character was.
 			state = stateFromFile(line, firstNonEmpty, lastNonEmpty)
 			if state == invalid {
-				return state, nil
+				return state, nil, i
 			}
 			lastNonEmpty = i + 1
 			continue
@@ -155,7 +169,7 @@ func parseLine(line []byte) (state, []path.Parsed) {
 			}
 			// Our token is from sectionIndex to i, if non-empty
 			token := line[lastNonEmpty:i]
-			if isAllSpace(token) {
+			if isAllBlank(token) {
 				lastNonEmpty = i + 1
 				continue
 			}
@@ -171,13 +185,13 @@ func parseLine(line []byte) (state, []path.Parsed) {
 		}
 		// Can't have another section on the same line
 		if c == ':' {
-			return invalid, nil
+			return invalid, nil, i
 		}
 	}
-	return state, ids
+	return state, ids, -1
 }
 
-// IsAccessFile returns true if the pathName is a valid upspin path
+// IsAccessFile reports whether the pathName is a valid Upspin path
 // name and is for a file named Access, which is special. For
 // convenience, it also returns the parsed path in case there were no
 // errors parsing it.
