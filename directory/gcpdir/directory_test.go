@@ -351,7 +351,7 @@ func TestAccessErrorInvalidContents(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	expectedError := "unrecognized text in Access file on line 0"
+	expectedError := "Put bob@jones.com/mydir/Access: 0: unrecognized text: "
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected %s, got %s", expectedError, err)
 	}
