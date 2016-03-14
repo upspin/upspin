@@ -14,7 +14,6 @@ import (
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 // UnsafePack uses XOR for encrypting and signing.
@@ -122,9 +121,10 @@ func (u UnsafePack) Pack(context *upspin.Context, ciphertext, cleartext []byte, 
 	// Sign it with the user's private key.
 	clear.Signature = sign(cleartext, string(context.KeyPair.Private))
 
-	// Re-generate the metadata. All cached users get their own wrapped keys.
+	// Re-generate the metadata. All readers get their own wrapped keys.
 	clear.WrappedKeys = nil
-	for _, user := range context.User.(*testuser.Service).ListUsers() {
+	readers := append([]upspin.UserName{context.UserName}, meta.Readers...)
+	for _, user := range readers {
 		// Find keys for a user
 		_, keys, err := context.User.Lookup(user)
 		if err != nil || len(keys) == 0 {

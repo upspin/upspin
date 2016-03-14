@@ -117,9 +117,15 @@ func TestPackUnpack(t *testing.T) {
 func TestSharing(t *testing.T) {
 	u := setup()
 
+	newUser := upspin.UserName("someone@them.com")
+	newUserKey := makeUserKey(newUser, []byte("random stuff"))
+	testUser.SetPublicKeys(newUser, []upspin.PublicKey{newUserKey})
+
 	clear := []byte("this is data")
 	path := upspin.PathName("me@me.com/folder/dir/file.txt")
-	meta := upspin.Metadata{}
+	meta := upspin.Metadata{
+		Readers: []upspin.UserName{newUser},
+	}
 	packLen := u.PackLen(context, clear, &meta, path)
 	cipher := make([]byte, packLen)
 	n, err := u.Pack(context, cipher, clear, &meta, path)
@@ -128,10 +134,6 @@ func TestSharing(t *testing.T) {
 	}
 
 	log.Printf("cipher1: %v", string(cipher))
-
-	newUser := upspin.UserName("someone@them.com")
-	newUserKey := makeUserKey(newUser, []byte("random stuff"))
-	testUser.SetPublicKeys(newUser, []upspin.PublicKey{newUserKey})
 
 	// Pack again.
 	n, err = u.Pack(context, cipher, clear, &meta, path)
