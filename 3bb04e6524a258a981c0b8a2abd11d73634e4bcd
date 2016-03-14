@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "179d11d4_8a9cdae0",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T03:55:23Z",
+      "side": 1,
+      "message": "Or just use tolower(line[first]) and ignore up to : so that we would even accept \"Readers:\" but also the silly \"ReallyReallyReaders:\".   I don\u0027t feel strongly.\n\nHere I don\u0027t mean a tolower that does any allocation, just the \"if \u0027A\u0027 \u003c\u003d r \u0026\u0026 r \u003c\u003d \u0027Z\u0027 { r +\u003d \u0027a\u0027 - \u0027A\u0027}\" trick.",
+      "revId": "3bb04e6524a258a981c0b8a2abd11d73634e4bcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
