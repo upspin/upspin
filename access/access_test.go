@@ -69,7 +69,7 @@ func TestParseContainsGroupName(t *testing.T) {
 
 func TestParseWrongFormat1(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "0: unrecognized text: "
 	)
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
 	_, err := access.Parse(accessText)
@@ -83,7 +83,7 @@ func TestParseWrongFormat1(t *testing.T) {
 
 func TestParseWrongFormat2(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 1"
+		expectedErr = "1: unrecognized text: "
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
 	_, err := access.Parse(accessText)
@@ -97,7 +97,7 @@ func TestParseWrongFormat2(t *testing.T) {
 
 func TestParseWrongFormat3(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "0: unrecognized text: "
 	)
 	accessText := []byte(": bob@abc.com") // missing access format text.
 	_, err := access.Parse(accessText)
@@ -109,9 +109,37 @@ func TestParseWrongFormat3(t *testing.T) {
 	}
 }
 
+func TestParseWrongFormat4(t *testing.T) {
+	const (
+		expectedErr = "0: unrecognized text: "
+	)
+	accessText := []byte("rea:bob@abc.com") // invalid access format text.
+	_, err := access.Parse(accessText)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.HasPrefix(err.Error(), expectedErr) {
+		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	}
+}
+
+func TestParseMissingAccessField(t *testing.T) {
+	const (
+		expectedErr = "0: unrecognized text: "
+	)
+	accessText := []byte("bob@abc.com")
+	_, err := access.Parse(accessText)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.HasPrefix(err.Error(), expectedErr) {
+		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	}
+}
+
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "0: unrecognized text: "
 	)
 	accessText := []byte("r: a@b.co r: c@b.co")
 	_, err := access.Parse(accessText)
@@ -125,7 +153,7 @@ func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 
 func TestParseBadPath(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "0: unrecognized text: "
 	)
 	// TODO: Group names are being ignored. When implemented, this group name should cause an error.
 	accessText := []byte("r: notanemail/Group/family")
