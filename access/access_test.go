@@ -10,6 +10,10 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+const (
+	accessFile = "me@here.com/Access"
+)
+
 var (
 	accessText = []byte(`
   r : foo@bob.com ,a@b.co, x@y.uk # a comment
@@ -24,7 +28,7 @@ WRITE: writerbob@a.bc
 
 func BenchmarkParse(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_, err := access.Parse(accessText)
+		_, err := access.Parse(accessFile, accessText)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -32,7 +36,7 @@ func BenchmarkParse(b *testing.B) {
 }
 
 func TestParse(t *testing.T) {
-	p, err := access.Parse(accessText)
+	p, err := access.Parse(accessFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +48,7 @@ func TestParse(t *testing.T) {
 
 func TestParseEmptyFile(t *testing.T) {
 	accessText := []byte("\n # Just a comment.\n\r\t # Nothing to see here \n \n \n\t\n")
-	p, err := access.Parse(accessText)
+	p, err := access.Parse(accessFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +60,7 @@ func TestParseEmptyFile(t *testing.T) {
 
 func TestParseContainsGroupName(t *testing.T) {
 	accessText := []byte("r: family,*@google.com,edpin@google.com/Groups/friends")
-	p, err := access.Parse(accessText)
+	p, err := access.Parse(accessFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,67 +73,95 @@ func TestParseContainsGroupName(t *testing.T) {
 
 func TestParseWrongFormat1(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "1: unrecognized text: "
 	)
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
-	_, err := access.Parse(accessText)
+	_, err := access.Parse(accessFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.HasPrefix(err.Error(), expectedErr) {
+	if !strings.Contains(err.Error(), expectedErr) {
 		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
 	}
 }
 
 func TestParseWrongFormat2(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 1"
+		expectedErr = "2: unrecognized text: "
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
-	_, err := access.Parse(accessText)
+	_, err := access.Parse(accessFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.HasPrefix(err.Error(), expectedErr) {
+	if !strings.Contains(err.Error(), expectedErr) {
 		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
 	}
 }
 
 func TestParseWrongFormat3(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "1: unrecognized text: "
 	)
 	accessText := []byte(": bob@abc.com") // missing access format text.
-	_, err := access.Parse(accessText)
+	_, err := access.Parse(accessFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.HasPrefix(err.Error(), expectedErr) {
+	if !strings.Contains(err.Error(), expectedErr) {
+		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	}
+}
+
+func TestParseWrongFormat4(t *testing.T) {
+	const (
+		expectedErr = "1: unrecognized text: "
+	)
+	accessText := []byte("rea:bob@abc.com") // invalid access format text.
+	_, err := access.Parse(accessFile, accessText)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.Contains(err.Error(), expectedErr) {
+		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	}
+}
+
+func TestParseMissingAccessField(t *testing.T) {
+	const (
+		expectedErr = "1: unrecognized text: "
+	)
+	accessText := []byte("bob@abc.com")
+	_, err := access.Parse(accessFile, accessText)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.Contains(err.Error(), expectedErr) {
 		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
 	}
 }
 
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "3: unrecognized text: "
 	)
-	accessText := []byte("r: a@b.co r: c@b.co")
-	_, err := access.Parse(accessText)
+	accessText := []byte("\n\nr: a@b.co r: c@b.co")
+	_, err := access.Parse(accessFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.HasPrefix(err.Error(), expectedErr) {
+	if !strings.Contains(err.Error(), expectedErr) {
 		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
 	}
 }
 
 func TestParseBadPath(t *testing.T) {
 	const (
-		expectedErr = "unrecognized text in Access file on line 0"
+		expectedErr = "0: unrecognized text: "
 	)
 	// TODO: Group names are being ignored. When implemented, this group name should cause an error.
 	accessText := []byte("r: notanemail/Group/family")
-	p, err := access.Parse(accessText)
+	p, err := access.Parse(accessFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,17 +171,12 @@ func TestParseBadPath(t *testing.T) {
 }
 
 func TestIsAccessFile(t *testing.T) {
-	const (
-		nonNil = true
-		isNil  = false
-	)
-
-	expectState(t, true, nonNil, upspin.PathName("a@b.com/Access"))
-	expectState(t, true, nonNil, upspin.PathName("a@b.com/dir/subdir/Access"))
-	expectState(t, false, nonNil, upspin.PathName("a@b.com/dir/subdir/access"))
-	expectState(t, true, nonNil, upspin.PathName("a@b.com/dir/subdir/Access/")) // weird, but maybe ok?
-	expectState(t, false, isNil, upspin.PathName("booboo/dir/subdir/Access"))
-	expectState(t, false, isNil, upspin.PathName("not a path"))
+	expectState(t, true, upspin.PathName("a@b.com/Access"))
+	expectState(t, true, upspin.PathName("a@b.com/dir/subdir/Access"))
+	expectState(t, false, upspin.PathName("a@b.com/dir/subdir/access"))
+	expectState(t, false, upspin.PathName("a@b.com/dir/subdir/Access/")) // weird, but maybe ok?
+	expectState(t, true, upspin.PathName("booboo/dir/subdir/Access"))    // more parsing is necessary
+	expectState(t, false, upspin.PathName("not a path"))
 }
 
 func containsAll(t *testing.T, p []path.Parsed, expect []string) {
@@ -179,18 +206,10 @@ func found(haystack []string, needle string) bool {
 	return false
 }
 
-// expectState tests the results of IsAccessFile. It checks the state
-// of the bool and whether the pointer is null or not (without
-// checking the contents).
-func expectState(t *testing.T, expectIsFile bool, expectNonNilPath bool, pathName upspin.PathName) {
-	isFile, gotPath := access.IsAccessFile(pathName)
+// expectState checks whether the results of IsAccessFile match with expectations and if not it fails the test.
+func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
+	isFile := access.IsAccessFile(pathName)
 	if expectIsFile != isFile {
 		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
-	}
-	if expectNonNilPath && gotPath == nil {
-		t.Fatal("Expected non-nil, got nil")
-	}
-	if !expectNonNilPath && gotPath != nil {
-		t.Fatal("Expected nil, got non-nil")
 	}
 }
