@@ -46,6 +46,142 @@
       "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ebbaede3",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "i would prefer a canonically formatted error message in the form of a compiler error:\n\n\"%s:%d: unrecognized text: %q\" where %s is the file name, %d the line number, %q the offending text",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_0bd02115",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "var p Parsed",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_4bca1969",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "bytes.NewReader(data)",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2bcde57f",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "return \u0026p, nil",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_6bc7dd5d",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "be careful. i don\u0027t think \\r and \\n are valid in all the places this is called",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_8be6d102",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "this is incomplete but i see there are later CLs about this",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_abeb95cb",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "s/upspin/Upspin/\ns/returns true/reports whether/\n\nthe \u0027returns true\u0027 style doesn\u0027t say when it returns false. we agonized over this in the go project and settled on \u0027reports whether\u0027 as more helpful usage",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cbf0c9b6",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T22:50:46Z",
+      "side": 1,
+      "message": "really, i think all this should do is be a boolean, the result of\nstrings.HasSuffix(\"/Access\")\nit doesn\u0027t need to check validity of the full path. that\u0027s just overhead because it\u0027s unlikely the caller won\u0027t be doing other analysis anyway.",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
