@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_e0bbffe9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "fixed typo",
+      "parentUuid": "772d6d76_28da4b5f",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_88afb7c8",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-14T09:13:29Z",
       "side": 1,
       "message": "parsePrivateKey returns an ECDSA private key given a user\u0027s ECDSA public\nkey and the string representation of the private key.\n\n(avoid their)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_20f187b8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_88afb7c8",
       "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_00f60baf",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_48e77f2a",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_68e44325",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-14T09:13:29Z",
       "side": 1,
       "message": "publicKey returns the string representation of a user\u0027s private key.\n\n(avoid their)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_a0fc5785",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_68e44325",
       "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_e0301f40",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_a8b47b19",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_c8a9afc4",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -98,6 +188,42 @@
       "writtenOn": "2016-03-14T09:13:29Z",
       "side": 1,
       "message": "indeed. should be in package pack. (isn\u0027t it there already? we talked about it)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_60454f8f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_c8a9afc4",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_0040cb7f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_c8a9afc4",
       "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +247,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_20122799",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_2865eb8a",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_48621f84",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 6
@@ -138,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_807e7bb2",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_48621f84",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_08dd8756",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 6
@@ -149,6 +311,24 @@
       "writtenOn": "2016-03-14T09:13:29Z",
       "side": 1,
       "message": "if !bytes.Equal(text, clear) { ...\n\n(the %q will still work as you desire)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_00ec4bb0",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-14T17:52:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_08dd8756",
       "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
