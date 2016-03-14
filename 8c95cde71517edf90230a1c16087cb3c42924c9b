@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_9e941bf8",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-14T23:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_ab12b5a7",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_cb07e968",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_de64e3f4",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-14T23:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_cb07e968",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_eb0cad8f",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-03-14T23:01:37Z",
       "side": 1,
       "message": "see above. this can be much simpler.",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_7e74cf9d",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-14T23:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_eb0cad8f",
       "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
