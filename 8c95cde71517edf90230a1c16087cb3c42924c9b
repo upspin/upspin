@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_ab12b5a7",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T23:01:37Z",
+      "side": 1,
+      "message": "unicode is a massive dependency and you don\u0027t need it. the case folding can be done entirely in ASCII as the words you\u0027re looking for are ASCII",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cb07e968",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T23:01:37Z",
+      "side": 1,
+      "message": "far too expensive for the purpose. (mostly in dependency you\u0027re adding.)\ninstead of unicode.ToUpper, use lower case instead of upper and then you can just do \nr | \u0027 \u0027\nto lower-case the ASCII letter. and put a comment in explaining.",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_eb0cad8f",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T23:01:37Z",
+      "side": 1,
+      "message": "see above. this can be much simpler.",
+      "revId": "8c95cde71517edf90230a1c16087cb3c42924c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
