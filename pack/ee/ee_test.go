@@ -1,6 +1,7 @@
 package ee
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -8,7 +9,6 @@ import (
 	"fmt"
 	"testing"
 
-	// let's generate keys internally rather than depend on tester's files   "upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -25,10 +25,8 @@ func TestRegister(t *testing.T) {
 
 // packBlob packs text according to the parameters and returns the cipher.
 func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, text []byte) []byte {
-	// TODO why data?
-	data := []byte(text)
-	cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-	m, err := packer.Pack(ctx, cipher, data, meta, name)
+	cipher := make([]byte, packer.PackLen(ctx, text, meta, name))
+	m, err := packer.Pack(ctx, cipher, text, meta, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -53,10 +51,8 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	// Now unpack.
 	clear := unpackBlob(t, ctx, packer, name, meta, cipher)
 
-	// TODO why str?
-	str := string(clear)
-	if str != string(text) {
-		t.Errorf("text: expected %q; got %q", text, str)
+	if !bytes.Equal(text, clear) {
+		t.Errorf("text: expected %q; got %q", text, clear)
 	}
 }
 
