@@ -1,9 +1,12 @@
 package main
 
 import (
+	"crypto/sha256"
+	"ecdsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"net/http"
 	"net/url"
 
@@ -198,6 +201,51 @@ func (d *DirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return buf, nil
 }
 
+// TODO   should this be in upspin.go?
+// lookupUser returns user's newest public key
+func lookupUser(user upspin.UserName) PublicKey {
+	context := &upspin.Context{}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr("http://upspin.io:8082"),
+	}
+	u, err := bind.User(context, e)
+	if err != nil {
+		log.Fatalf("Can't bind to User server: %v", err)
+	}
+	_, keys, err := u.Lookup(user)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return keys[0]
+}
+
+// validateRequest takes an http.Request after ParseForm() and my servername
+// and returns the authenticated user making the request.
+func validateRequest(r *http.Request, servername string) (upspin.Username, error) {
+	server := r.FormValue("server")
+	if server != servername {
+		return nil, fmt.Errorf("you asked for %s, my name is %s", server, servername)
+	}
+	scope := r.FormValue("scope")
+	if scope != "full-power" {
+		return nil, fmt.Errorf("unimplemented scope %s", scope)
+	}
+	actor := r.FormValue("actor")
+	atime := r.FormValue("atime")
+	// TODO check if atime is sane
+	sigr = big.NewInt(0)
+	sigs = big.NewInt(0)
+	sigr.UnmarshalText([]byte(r.FormValue("sigr")))
+	sigs.UnmarshalText([]byte(r.FormValue("sigs")))
+	hash := sha256.Sum256([]byte(fmt.Sprintf("upspin server:%s\nscope:%s\nactor:%s\natime:%s\n", servername, scope, actor, atime)))
+	actorPubKey := lookupUser(actor)
+	if !ecdsa.Verify(actorPubKey, hash, sigr, sigs) {
+		return nil, fmt.Errorf("signature failed")
+	}
+	return actor, nil
+}
+
 func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL == nil {
 		// This is so bad it's probably a panic at this point. URL should never be nil.
@@ -209,6 +257,10 @@ func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
+	}
+	actor, err := validateRequest(r, "upspin.io")
+	if err != nil {
+		netutil.SendJSONErrorString(w, "don't know you, go away!")
 	}
 	pathName := r.FormValue("pathname")
 	if pathName == "" {
@@ -222,7 +274,7 @@ func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// We have a dirEntry. Marshal it and send it back.
 	// TODO: verify ACLs before replying.
-	log.Printf("Got dir entry for %v: %v", pathName, dirEntry)
+	log.Printf("for %s Got dir entry for %v: %v", actor, pathName, dirEntry)
 	netutil.SendJSONReply(w, dirEntry)
 }
 

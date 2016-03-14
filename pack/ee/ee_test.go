@@ -1,6 +1,7 @@
 package ee
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -8,7 +9,6 @@ import (
 	"fmt"
 	"testing"
 
-	// let's generate keys internally rather than depend on tester's files   "upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -25,10 +25,8 @@ func TestRegister(t *testing.T) {
 
 // packBlob packs text according to the parameters and returns the cipher.
 func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, text []byte) []byte {
-	// TODO why data?
-	data := []byte(text)
-	cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-	m, err := packer.Pack(ctx, cipher, data, meta, name)
+	cipher := make([]byte, packer.PackLen(ctx, text, meta, name))
+	m, err := packer.Pack(ctx, cipher, text, meta, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -53,10 +51,8 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	// Now unpack.
 	clear := unpackBlob(t, ctx, packer, name, meta, cipher)
 
-	// TODO why str?
-	str := string(clear)
-	if str != string(text) {
-		t.Errorf("text: expected %q; got %q", text, str)
+	if !bytes.Equal(text, clear) {
+		t.Errorf("text: expected %q; got %q", text, clear)
 	}
 }
 
@@ -82,13 +78,12 @@ func TestPack521(t *testing.T) {
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
-func BenchmarkPack256(b *testing.B) {
+func benchmarkPack(b *testing.B, packing upspin.Packing) {
 	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.256")
-		text                    = "this is some text 256"
-		packing                 = upspin.EEp256Pack
+		user upspin.UserName = "user@google.com"
+		text                 = "this is some text"
 	)
+	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
 	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
 		meta := &upspin.Metadata{}
@@ -102,45 +97,9 @@ func BenchmarkPack256(b *testing.B) {
 	}
 }
 
-func BenchmarkPack384(b *testing.B) {
-	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.256")
-		text                    = "this is some text 384"
-		packing                 = upspin.EEp384Pack
-	)
-	ctx, packer := setup(user, packing)
-	for i := 0; i < b.N; i++ {
-		meta := &upspin.Metadata{}
-		data := []byte(text)
-		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-		m, _ := packer.Pack(ctx, cipher, data, meta, name)
-		cipher = cipher[:m]
-		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
-		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
-		clear = clear[:m]
-	}
-}
-
-func BenchmarkPack521(b *testing.B) {
-	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.256")
-		text                    = "this is some text 521"
-		packing                 = upspin.EEp521Pack
-	)
-	ctx, packer := setup(user, packing)
-	for i := 0; i < b.N; i++ {
-		meta := &upspin.Metadata{}
-		data := []byte(text)
-		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-		m, _ := packer.Pack(ctx, cipher, data, meta, name)
-		cipher = cipher[:m]
-		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
-		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
-		clear = clear[:m]
-	}
-}
+func BenchmarkPack256(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack) }
+func BenchmarkPack384(b *testing.B) { benchmarkPack(b, upspin.EEp384Pack) }
+func BenchmarkPack521(b *testing.B) { benchmarkPack(b, upspin.EEp521Pack) }
 
 func TestLoadingRemoteKeys(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.
