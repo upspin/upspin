@@ -1,6 +1,6 @@
 // Package ee implements elliptic-curve end-to-end-encrypted packers.
 
-// Uupspin crypto summary:
+// Upspin crypto summary:
 // Alice shares a file with Bob by picking a new random symmetric key, encrypting the file,
 // wrapping the symmetric encryption key with Bob's public key, signing the file using
 // her own elliptic curve private key, and sending the ciphertext and metadata to a
@@ -45,14 +45,15 @@ type wrappedKey struct {
 }
 type wrappedKeys []wrappedKey
 
-// common implements common functions used by eep256 and eep521 that
-// are parameterized by cipher-specific values.
+// common implements common functions parameterized by cipher-specific values.
 type common struct {
 	ciphersuite  upspin.Packing
 	curve        elliptic.Curve
 	aesLen       int
 	packerString string
 }
+
+var _ upspin.Packer = common{}
 
 type eep256 struct {
 	common
@@ -66,10 +67,6 @@ type eep521 struct {
 	common
 }
 
-var _ upspin.Packer = eep256{}
-var _ upspin.Packer = eep384{}
-var _ upspin.Packer = eep521{}
-
 const (
 	p256               = "p256"
 	p384               = "p384"
@@ -77,6 +74,7 @@ const (
 	noKnownKeysForUser = "no known keys for user %s"
 )
 
+// TODO(ehg)  I cleaned this once (to call pack.go's LookupByName) but some git catastrophe seems to have wiped out the fix.  I'll redo when things are quiescent.
 var (
 	Packer map[string]upspin.Packer
 )
@@ -127,108 +125,36 @@ var (
 	sig0            signature // for returning nil of correct type
 )
 
-func (e eep256) Packing() upspin.Packing {
-	return upspin.EEp256Pack
+func (e common) Packing() upspin.Packing {
+	return e.ciphersuite
 }
 
-func (e eep384) Packing() upspin.Packing {
-	return upspin.EEp384Pack
-}
-
-func (e eep521) Packing() upspin.Packing {
-	return upspin.EEp521Pack
-}
-
-func (e eep256) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (e common) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (e eep384) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
-		return -1
-	}
-	return len(cleartext)
-}
-
-func (e eep521) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
-		return -1
-	}
-	return len(cleartext)
-}
-
-func (e eep256) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (e common) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return -1
 	}
 	return len(ciphertext)
 }
 
-func (e eep384) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
-		return -1
-	}
-	return len(ciphertext)
+func (e common) String() string {
+	return e.packerString
 }
 
-func (e eep521) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
-		return -1
-	}
-	return len(ciphertext)
-}
-
-func (eep256) String() string {
-	return "p256"
-}
-
-func (eep384) String() string {
-	return "p384"
-}
-
-func (eep521) String() string {
-	return "p521"
-}
-
-func (e eep256) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (e common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(e, meta); err != nil {
 		return 0, err
 	}
 	return e.eePack(ctx, ciphertext, cleartext, meta, name)
 }
 
-func (e eep384) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
-		return 0, err
-	}
-	return e.eePack(ctx, ciphertext, cleartext, meta, name)
-}
-
-func (e eep521) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
-		return 0, err
-	}
-	return e.eePack(ctx, ciphertext, cleartext, meta, name)
-}
-
-func (e eep256) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
-		return 0, err
-	}
-	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
-}
-
-func (e eep384) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
-		return 0, err
-	}
-	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
-}
-
-func (e eep521) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (e common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
 	if err := pack.CheckUnpackMeta(e, meta); err != nil {
 		return 0, err
 	}
@@ -584,9 +510,8 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	return len(ciphertext), nil
 }
 
-// parsePrivateKey takes an ecdsa public key for a user and the user's
-// string representation of their private key and converts it into
-// an ecsda private key.
+// parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
+// string representation of the private key.
 func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.KeyPair) (priv *ecdsa.PrivateKey, err error) {
 	if n := len(privateKey.Private) - 1; privateKey.Private[n] == '\n' {
 		privateKey.Private = privateKey.Private[:n]
@@ -599,7 +524,7 @@ func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.Ke
 	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
 }
 
-// publicKey returns a user's string representation of their public key.
+// publicKey returns the string representation of a user's public key.
 func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
 	log.Printf("Getting pub key for user: %s", user)
 	// Are we requesting our own public key?
@@ -621,8 +546,8 @@ func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.Pub
 	return "", fmt.Errorf(noKnownKeysForUser, user)
 }
 
-// parsePublicKey takes a user's string representation of their
-// public key and converts it into an ecsda public key.
+// parsePublicKey takes a string representation of a
+// public key and converts it into an ECDSA public key.
 func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, error) {
 	var packname string
 	var x, y big.Int
