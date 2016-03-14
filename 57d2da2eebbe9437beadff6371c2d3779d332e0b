@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_28da4b5f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "Upspin",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_88afb7c8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "parsePrivateKey returns an ECDSA private key given a user\u0027s ECDSA public\nkey and the string representation of the private key.\n\n(avoid their)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_48e77f2a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "ECSDA",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_68e44325",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "publicKey returns the string representation of a user\u0027s private key.\n\n(avoid their)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_a8b47b19",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "parsePublicKey takes the string representation of a user\u0027s public\nkey and converts it to an ECSDA public key.",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_c8a9afc4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "indeed. should be in package pack. (isn\u0027t it there already? we talked about it)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2865eb8a",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_48621f84",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "needless. just use text. this is just an alias for text. moreover the conversion is nugatory",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_08dd8756",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-14T09:13:29Z",
+      "side": 1,
+      "message": "if !bytes.Equal(text, clear) { ...\n\n(the %q will still work as you desire)",
+      "revId": "57d2da2eebbe9437beadff6371c2d3779d332e0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
