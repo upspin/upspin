@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_eb666db8",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:43:03Z",
+      "side": 1,
+      "message": "the solution to the error formatting problem might involve passing the name of the Access file to Parse.",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_0b7ca145",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:43:03Z",
+      "side": 1,
+      "message": "we could be less cryptic and go with\n\n// An old trick: In ASCII the characters line up bitwise so this changes any letter to lower case.\nreturn b | (\u0027a\u0027-\u0027A\u0027)",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cb61a9a3",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:43:03Z",
+      "side": 1,
+      "message": "see comment in other test",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ab6c759c",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:43:03Z",
+      "side": 1,
+      "message": "i would expect the message to be\n\nPut: unrecognized text at bob@jones.com/mydir/Access:1: whateveritis\n\nthat is, the message should contain\n\nfilename:linenumber: message\n\nand linenumber should never be 0",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
