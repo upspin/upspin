@@ -3,12 +3,14 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
@@ -35,11 +37,14 @@ const (
 )
 
 var (
-	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName      = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
-	readOnly        = flag.Bool("readonly", false, "Whether this server instance is read-only")
-	errKeyTooShort  = errors.New("key length too short")
-	errInvalidEmail = errors.New("invalid email format")
+	projectId             = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName            = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
+	readOnly              = flag.Bool("readonly", false, "Whether this server instance is read-only.")
+	port                  = flag.Int("port", 8082, "TCP port to serve.")
+	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
+	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	errKeyTooShort        = errors.New("key length too short")
+	errInvalidEmail       = errors.New("invalid email format")
 )
 
 // validateUserEmail checks whether the given email is valid. For
@@ -182,6 +187,9 @@ func (u *userServer) addRootHandler(w http.ResponseWriter, r *http.Request) {
 // information. The user=<email> parameter is required.
 func (u *userServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	context := "get: "
+	if r.TLS != nil {
+		log.Printf("Encrypted connection. Cipher: %d", r.TLS.CipherSuite)
+	}
 	user := u.preambleParseRequestAndGetUser(context, netutil.Get, w, r)
 	if user == "" {
 		// An error has already been sent out on w.
@@ -274,6 +282,28 @@ func new(cloudClient gcp.Interface) *userServer {
 	return u
 }
 
+// isReadableFile reports whether the file exists and is readable.
+func isReadableFile(path string) bool {
+	// Is it stattable and is it a plain file?
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false // Item does not exist.
+		}
+		return false // Item is problematic.
+	}
+	if info.IsDir() {
+		return false
+	}
+	// Is it readable?
+	fd, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	fd.Close()
+	return true // Item exists and is readable.
+}
+
 func main() {
 	flag.Parse()
 	u := new(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
@@ -283,6 +313,31 @@ func main() {
 		http.HandleFunc("/delete", u.deleteHandler)
 	}
 	http.HandleFunc("/get", u.getHandler)
-	log.Println("Starting user service...")
-	log.Fatal(http.ListenAndServe(":8082", nil))
+
+	portNum := fmt.Sprintf(":%d", *port)
+	if isReadableFile(*sslCertificateFile) && isReadableFile(*sslCertificateFile) {
+		log.Println("Starting HTTPS server with SSL")
+
+		tlsConfig := &tls.Config{
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			},
+			PreferServerCipherSuites: true, // Use our choice, not the client's choice
+			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		}
+		tlsConfig.BuildNameToCertificate()
+
+		server := &http.Server{
+			Addr:      portNum,
+			TLSConfig: tlsConfig,
+		}
+
+		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
+	} else {
+		log.Println("No SSL certificate found. Starting regular HTTP server")
+		log.Fatal(http.ListenAndServe(portNum, nil))
+	}
 }
