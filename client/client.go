@@ -22,7 +22,7 @@ var (
 	zeroLoc upspin.Location
 )
 
-// New creates a Client. The client finds the  servers according to the given Context.
+// New creates a Client. The client finds the servers according to the given Context.
 func New(context *upspin.Context) upspin.Client {
 	return &Client{
 		context: context,
