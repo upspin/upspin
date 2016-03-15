@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_6b499d31",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:18:24Z",
+      "side": 1,
+      "message": "s/ for talking to GCP//",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_4b4cd942",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:18:24Z",
+      "side": 1,
+      "message": "s/gcp//",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2b4fa539",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:18:24Z",
+      "side": 1,
+      "message": "comment disagrees with name, which is particularly odd because there is an edit to make it differ. maybe just an editing glitch.",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
