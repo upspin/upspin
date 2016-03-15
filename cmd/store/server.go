@@ -23,7 +23,8 @@ const (
 var (
 	projectId  = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
-	tempDir    = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default")
+	tempDir    = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default.")
+	port       = flag.Int("port", 8080, "TCP port to serve.")
 )
 
 type StoreServer struct {
@@ -148,7 +149,7 @@ func main() {
 	http.HandleFunc("/put", ss.putHandler)
 	http.HandleFunc("/get", ss.getHandler)
 	http.HandleFunc("/delete", ss.deleteHandler)
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
