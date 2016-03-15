@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 
+	"os"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/path"
@@ -35,11 +36,14 @@ const (
 )
 
 var (
-	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName      = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
-	readOnly        = flag.Bool("readonly", false, "Whether this server instance is read-only")
-	errKeyTooShort  = errors.New("key length too short")
-	errInvalidEmail = errors.New("invalid email format")
+	projectId             = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName            = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
+	readOnly              = flag.Bool("readonly", false, "Whether this server instance is read-only.")
+	port                  = flag.Int("port", 8082, "TCP port to bind to.")
+	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
+	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	errKeyTooShort        = errors.New("key length too short")
+	errInvalidEmail       = errors.New("invalid email format")
 )
 
 // validateUserEmail checks whether the given email is valid. For
@@ -182,6 +186,9 @@ func (u *userServer) addRootHandler(w http.ResponseWriter, r *http.Request) {
 // information. The user=<email> parameter is required.
 func (u *userServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	context := "get: "
+	if r.TLS != nil {
+		log.Printf("Encrypted connection. Cipher: %d", r.TLS.CipherSuite)
+	}
 	user := u.preambleParseRequestAndGetUser(context, netutil.Get, w, r)
 	if user == "" {
 		// An error has already been sent out on w.
@@ -274,6 +281,11 @@ func new(cloudClient gcp.Interface) *userServer {
 	return u
 }
 
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
 func main() {
 	flag.Parse()
 	u := new(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
@@ -283,6 +295,14 @@ func main() {
 		http.HandleFunc("/delete", u.deleteHandler)
 	}
 	http.HandleFunc("/get", u.getHandler)
-	log.Println("Starting user service...")
-	log.Fatal(http.ListenAndServe(":8082", nil))
+
+	portNum := fmt.Sprintf(":%d", *port)
+	if fileExists(*sslCertificateFile) &&
+		fileExists(*sslCertificateKeyFile) {
+		log.Println("Starting HTTPS server with SSL")
+		log.Fatal(http.ListenAndServeTLS(portNum, *sslCertificateFile, *sslCertificateKeyFile, nil))
+	} else {
+		log.Println("No SSL certificate found. Starting regular HTTP server")
+		log.Fatal(http.ListenAndServe(portNum, nil))
+	}
 }
