@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_4b2699ff",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T02:16:12Z",
+      "side": 1,
+      "message": "you can drop the \"line \" and use just a :, as i said in my prior review.\nlooks like a compiler error message then (and works with all my tools as well as yours)\n\nbut if you\u0027re adamant the word should be there, this is the last time i will ask.",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_6b235dee",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T02:16:12Z",
+      "side": 1,
+      "message": "for rigor, need to check scan.Err(), although it\u0027s certainly going to be nil",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ab871502",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T02:16:12Z",
+      "side": 1,
+      "message": "use bytes. see below\nneeds a comment - this is an old trick that might be unfamiliar to people",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_eb910d3c",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T02:16:12Z",
+      "side": 1,
+      "message": "s/matchesUpper/matchesLower/\ns/an lower/a lower/\n\nbut i would call this \"equalsLower\" and say\n// equalsLower reports whether word, once lower-cased, is equal to want.\nfunc equalsLower(word, want string) bool {",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_8b8251f3",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T02:16:12Z",
+      "side": 1,
+      "message": "avoid the rune casting. you\u0027re matching bytes anyway\nfor i :\u003d 0; i \u003c len(word); i++ {\n  if word[i]|\u0027 \u0027 !\u003d want[i] {\n   return false\n  }\n}\n\nyou can use toLower(word[i]) if you want, for clarity. it will be in-lined anyway",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
