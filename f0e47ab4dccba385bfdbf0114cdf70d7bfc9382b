@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_9e6b7bbe",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9712e1d6_08b0ba24",
+      "range": {
+        "startLine": 2,
+        "startChar": 8,
+        "endLine": 2,
+        "endChar": 14
+      },
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_ebbaede3",
         "filename": "access/access.go",
         "patchSetId": 9
@@ -60,6 +84,24 @@
       "writtenOn": "2016-03-14T22:50:46Z",
       "side": 1,
       "message": "i would prefer a canonically formatted error message in the form of a compiler error:\n\n\"%s:%d: unrecognized text: %q\" where %s is the file name, %d the line number, %q the offending text",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_9e009be6",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done. But I don\u0027t have a filename with this interface, only its contents. I could change the signature if you really want the name there.",
+      "parentUuid": "772d6d76_ebbaede3",
       "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -83,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_1ef4ab35",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done\n\n(For my edification: is this more idiomatic of Go or for efficiency reason to avoid a pointer dereference? Or maybe it\u0027s both)",
+      "parentUuid": "772d6d76_0bd02115",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_4bca1969",
         "filename": "access/access.go",
         "patchSetId": 9
@@ -94,6 +154,24 @@
       "writtenOn": "2016-03-14T22:50:46Z",
       "side": 1,
       "message": "bytes.NewReader(data)",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_de106333",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_4bca1969",
       "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -117,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_1e0b0b08",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_2bcde57f",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_6bc7dd5d",
         "filename": "access/access.go",
         "patchSetId": 9
@@ -128,6 +224,24 @@
       "writtenOn": "2016-03-14T22:50:46Z",
       "side": 1,
       "message": "be careful. i don\u0027t think \\r and \\n are valid in all the places this is called",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_de3b43b1",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_6bc7dd5d",
       "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -151,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_1e466b2d",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Yup. This was just the first iteration.",
+      "parentUuid": "772d6d76_8be6d102",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_abeb95cb",
         "filename": "access/access.go",
         "patchSetId": 9
@@ -168,6 +300,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_7e2b2f62",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "Makes sense. Done.",
+      "parentUuid": "772d6d76_abeb95cb",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_cbf0c9b6",
         "filename": "access/access.go",
         "patchSetId": 9
@@ -179,6 +329,24 @@
       "writtenOn": "2016-03-14T22:50:46Z",
       "side": 1,
       "message": "really, i think all this should do is be a boolean, the result of\nstrings.HasSuffix(\"/Access\")\nit doesn\u0027t need to check validity of the full path. that\u0027s just overhead because it\u0027s unlikely the caller won\u0027t be doing other analysis anyway.",
+      "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_5e28f363",
+        "filename": "access/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:00:43Z",
+      "side": 1,
+      "message": "I will fix this in another CL because there are open CLs that depend on this and I\u0027d hate to create a git merge nightmare. It should be a trivial fix after that.",
+      "parentUuid": "772d6d76_cbf0c9b6",
       "revId": "f0e47ab4dccba385bfdbf0114cdf70d7bfc9382b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
