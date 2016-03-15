@@ -23,6 +23,7 @@ const (
 var (
 	projectId  = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
+	port       = flag.Int("port", 8081, "TCP port to bind to.")
 
 	errEntryNotFound = DirEntryError{"pathname not found"}
 )
@@ -266,5 +267,5 @@ func main() {
 	http.HandleFunc("/get", d.getHandler)
 	http.HandleFunc("/list", d.listHandler)
 	log.Println("Starting server...")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }

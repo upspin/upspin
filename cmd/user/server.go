@@ -37,7 +37,8 @@ const (
 var (
 	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName      = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
-	readOnly        = flag.Bool("readonly", false, "Whether this server instance is read-only")
+	readOnly        = flag.Bool("readonly", false, "Whether this server instance is read-only.")
+	port            = flag.Int("port", 8082, "TCP port to bind to.")
 	errKeyTooShort  = errors.New("key length too short")
 	errInvalidEmail = errors.New("invalid email format")
 )
@@ -284,5 +285,5 @@ func main() {
 	}
 	http.HandleFunc("/get", u.getHandler)
 	log.Println("Starting user service...")
-	log.Fatal(http.ListenAndServe(":8082", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
