@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	userLocation = flag.String("user", "http://upspin.io:8082", "URL of the user service location")
+	userLocation = flag.String("user", "https://upspin.io:8082", "URL of the user service location")
 	keyFile      = flag.String("key", "", "full pathname of the public key file used with addkey or empty for stdin")
 	endpointLoc  = flag.String("endpoint", "", "and endpoint for adding a root. This consists of the value of the Transport type optionally followed by a comma and the NetAddr of the endpoint. (e.g. for a local GCP use -endpoint=gcp,http://localhost:8081)")
 )
