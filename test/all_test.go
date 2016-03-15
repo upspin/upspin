@@ -20,7 +20,6 @@ import (
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
-	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 )
 
@@ -80,7 +79,6 @@ func testAllGCP(t *testing.T) {
 	var configs = []Config{
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.DebugPack},
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.PlainPack},
-		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.UnsafePack},
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp256Pack},
 		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp521Pack},
 	}
@@ -95,7 +93,6 @@ func testAllInProcess(t *testing.T) {
 	var configs = []Config{
 		{inProcess, inProcess, inProcess, upspin.DebugPack},
 		{inProcess, inProcess, inProcess, upspin.PlainPack},
-		{inProcess, inProcess, inProcess, upspin.UnsafePack},
 		{inProcess, inProcess, inProcess, upspin.EEp256Pack},
 		{inProcess, inProcess, inProcess, upspin.EEp521Pack},
 	}

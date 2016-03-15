@@ -13,7 +13,6 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
-	_ "upspin.googlesource.com/upspin.git/pack/unsafe"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 )
 
