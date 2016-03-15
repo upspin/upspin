@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_cb8a899b",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:36:37Z",
+      "side": 1,
+      "message": "\"to bind to\" is hard to parse. how about\nTCP port to serve",
+      "revId": "3eb00af9932e605521ab16cb2479169f7e9a5c12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_eb8f4da8",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:36:37Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3eb00af9932e605521ab16cb2479169f7e9a5c12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2b9245ce",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:36:37Z",
+      "side": 1,
+      "message": "rearrange so the non-upspin imports are in the upper block.",
+      "revId": "3eb00af9932e605521ab16cb2479169f7e9a5c12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_0b9581b5",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:36:37Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3eb00af9932e605521ab16cb2479169f7e9a5c12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_4b9f79d5",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-15T23:36:37Z",
+      "side": 1,
+      "message": "i don\u0027t think this is right. you don\u0027t want to know if you get a specific error, you want to know if it\u0027s a valid and readable file. it might be a directory or a file you can\u0027t read, for instance.\n\ni think you need something like\n\n// isReadableFile reports whether the file exists and is readable.\n// If the error is non-nil, it means there might be a file or directory\n// with that name but we cannot read it.\nfunc isReadableFile(path string) (bool, error) {\n// Is it stattable and is it a plain file?\ninfo, err :\u003d os.Stat(path)\nif err !\u003d nil {\n  if os.IsNotExist(err) {\n   return false, nil // Item does not exist.\n  }\n  return false, err // Item is problematic.\n}\nif info.IsDir() {\n   return false, errors.New(\"is directory\")\n}\n\n// Is it readable?\nfd, err :\u003d os.Open(path)\nif err !\u003d nil {\n   return false, errors.New(\"permission denied\")\n}\nfd.Close()\nreturn true, nil // Item exists and is readable.\n}\n\nthen when you call it, if err is nil you can\u0027t proceed because of a setup problem: report the error and exit.\n\nyou could also do it by trying open first and then statting the fd to see if it\u0027s a directory.",
+      "revId": "3eb00af9932e605521ab16cb2479169f7e9a5c12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
