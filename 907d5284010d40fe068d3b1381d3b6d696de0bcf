@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "179d11d4_fe539fb4",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T00:27:12Z",
+      "side": 1,
+      "message": "I\u0027d prefer if we put this in a separate package so we can re-use it across all servers and also make it testable. \n\nI\u0027m thinking of something like \n\ntype Authenticate struct {\n    Sign(ctx *upspin.Context, request *http.Request)\n    Verify(ctx *upspin.Context, request *http.Request, userName upspin.UserName)\n}\n\nNote also that this code does not authenticate the specific details about a request. Meaning I could be doing a Get or a Put and the signature would verify. So, if someone where to intercept this request within the time limit (10 seconds or so) and play it back changing the parameters from ?get\u003d\u003cfilename\u003e to ?put\u003d\u003cother file\u003e it would successfully overwrite a file.\n\nWe\u0027ll need to authenticate each request\u0027s parameters individually, as much as we can possibly do.\n\nAnd even that wouldn\u0027t be enough because if an operation is not idempotent, an attacker could replay the same request again. So I probably need to add an incarnation number in the request somewhere so that a request can\u0027t be replayed by an attacker. (In fact, even if an operation IS idempotent, such as delete, if an attacker can replay the delete after the user has re-created the file, the attacker would get away with erasing a new file. This scenario would be common in text-editing via fuse, for example).\n\nThere are many libraries for signing HTTP requests that handle these things and look over headers and cookie data and auth data, etc. Let me dig into them and I\u0027ll come pick your brain and discuss them.\n\nThanks.",
+      "revId": "907d5284010d40fe068d3b1381d3b6d696de0bcf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
