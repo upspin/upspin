@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_e42aee17",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T17:04:17Z",
+      "side": 1,
+      "message": "Dropped. I don\u0027t care about it the least really. I only kept it there because I don\u0027t have a file name with this API and when I saw the message \"0: unrecognized text...\" I thought it looked odd. Zero what?\n\nBut since this is for tools to parse, it\u0027s fine by me.",
+      "parentUuid": "772d6d76_4b2699ff",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_6b235dee",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-15T02:16:12Z",
       "side": 1,
       "message": "for rigor, need to check scan.Err(), although it\u0027s certainly going to be nil",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_24251645",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T17:04:17Z",
+      "side": 1,
+      "message": "Done. I wasn\u0027t aware of scan.Err(), thanks for pointing it out.",
+      "parentUuid": "772d6d76_6b235dee",
       "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_841a0afe",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T17:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_ab871502",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_eb910d3c",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "179d11d4_84ddea58",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T17:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_eb910d3c",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_8b8251f3",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-03-15T02:16:12Z",
       "side": 1,
       "message": "avoid the rune casting. you\u0027re matching bytes anyway\nfor i :\u003d 0; i \u003c len(word); i++ {\n  if word[i]|\u0027 \u0027 !\u003d want[i] {\n   return false\n  }\n}\n\nyou can use toLower(word[i]) if you want, for clarity. it will be in-lined anyway",
+      "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "179d11d4_04b0da24",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T17:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_8b8251f3",
       "revId": "3dc02f6ec75d2a556c856a46b02e3c476747002c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
