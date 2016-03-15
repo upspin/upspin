@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "97dae1a7_f811fd94",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T23:22:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_6b499d31",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_4b4cd942",
         "filename": "client/client.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "97dae1a7_d816b98a",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T23:22:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_4b4cd942",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_2b4fa539",
         "filename": "test/all_test.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-03-15T23:18:24Z",
       "side": 1,
       "message": "comment disagrees with name, which is particularly odd because there is an edit to make it differ. maybe just an editing glitch.",
+      "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97dae1a7_182971d0",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-15T23:22:59Z",
+      "side": 1,
+      "message": "Done. I swear I fixed this twice. I guess my git merge+rebase foo is not that good.\n\nFixed.",
+      "parentUuid": "772d6d76_2b4fa539",
       "revId": "058fd0a1267ef6886eb7c94aba750a7ffc88e2f7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
