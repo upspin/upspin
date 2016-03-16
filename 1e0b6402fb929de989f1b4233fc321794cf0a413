@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "97dae1a7_d80d19d3",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T00:25:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_eb666db8",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_0b7ca145",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-15T23:43:03Z",
       "side": 1,
       "message": "we could be less cryptic and go with\n\n// An old trick: In ASCII the characters line up bitwise so this changes any letter to lower case.\nreturn b | (\u0027a\u0027-\u0027A\u0027)",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97dae1a7_38f39500",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T00:25:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_0b7ca145",
       "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "97dae1a7_78fd0dc8",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T00:25:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "772d6d76_cb61a9a3",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_ab6c759c",
         "filename": "directory/gcpdir/directory_test.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-15T23:43:03Z",
       "side": 1,
       "message": "i would expect the message to be\n\nPut: unrecognized text at bob@jones.com/mydir/Access:1: whateveritis\n\nthat is, the message should contain\n\nfilename:linenumber: message\n\nand linenumber should never be 0",
+      "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97dae1a7_58fac9d1",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T00:25:09Z",
+      "side": 1,
+      "message": "Done.\n\nBut the code in dir was also outputting the name and access.Parse is not also doing the same. So I made the error message not stutter. It unusual, but correct.\n\nThanks.",
+      "parentUuid": "772d6d76_ab6c759c",
       "revId": "1e0b6402fb929de989f1b4233fc321794cf0a413",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
