@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_4b769965",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T00:04:56Z",
+      "side": 1,
+      "message": "I think if the file is a directory or is not openable you shouldn\u0027t continue. There\u0027s something wrong and you shouldn\u0027t blindly start up a server.\n\nFor instance, what if I have a valid SSL config but I don\u0027t have permission to read it. Better to report the error than serve insecurely.\n\nThat\u0027s why I suggested a bool and an error.",
+      "revId": "39d55010c863c3c925c57b70ecc4bf75acaf0a5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
