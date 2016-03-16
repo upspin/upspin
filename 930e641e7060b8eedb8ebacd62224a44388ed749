@@ -2,6 +2,329 @@
   "comments": [
     {
       "key": {
+        "uuid": "772d6d76_6b48bd06",
+        "filename": "cmd/dfuse/errors.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "s/strings/string/\ns/posix/POSIX/",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_8b5331b6",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "FS is an initialism so by the rules of Go style this should be upspinFS.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ab58f5d2",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "comments needed on most of these fields.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_0b1ae1ff",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "if this is a boolean check, it\u0027s prettier to use a boolean value so you can just ask userDirs[sss] for a boolean result instead of checking for map presence.\n\nsome people disagree and prefer this style, but i think it\u0027s clunkier",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_0b682164",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "comments",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2b65e58a",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "// An open file holding the in-the-clear contents.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_6b5fddb4",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "here it\u0027s FS.  you already half agree.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ab0395a6",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "might be nice to mention which methods are here for the FUSE interface",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cb08c9c5",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "this is fine but in other places you\u0027ve just used unlock. defer isn\u0027t as cheap as we\u0027d like.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_eb0d8dd2",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "s/written to upspin/Put in an Upspin directory/",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2bf085f0",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "here and below you don\u0027t need the string cast. fmt handles any string type the same",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_8b25f149",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "don\u0027t need parens",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_ab2ab516",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "again don\u0027t need these string conversions",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cb1fe9ef",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_eb24ad4a",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "return fmt.Sprintf(\"%x\", sha1.Sum([]byte(loc.Reference.Key)))\n\nanyway i think you should be using sha256 and the key/sha256key package.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2b17a5d6",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "more needless string casts",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_cb4d2914",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "A FUSE driver for Upspin.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2b3ec56e",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "s/MOUNTPOINT/\u003cmountpoint\u003e/",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_4b4bf903",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T04:05:26Z",
+      "side": 1,
+      "message": "maybe put os.Exit(2) here and avoid it below.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "772d6d76_6bcefdd3",
         "filename": "path/path.go",
         "patchSetId": 12
