@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c6d9a11_d6c7445d",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "obvious but doc comment please",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_36e67806",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "Scanf is very expensive. use strings.Fields",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_16eb7ccc",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "check the return values!!!!",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_f6b1a00d",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "please don\u0027t mix comment styles like this. It\u0027s fine to use /* */ for the whole thing.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_96a4acd1",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "Just call this Handler. The \"Interface\" part is redundant. I most ly avoid putting types into names, or you get things like UserArray and FileMap instead of just User[s] and File[s].\n\nAlso, it\u0027s standard Go nomenclature to name an interface after its main method, like io.Reader for Read. It\u0027s io.Reader not io.ReadInterface.\n\nThis Handles, so call it Handler.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_d6ae24ad",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "it doesn\u0027t \u0027return whether\u0027. it always returns. that\u0027s why we say \"reports whether\" which is less ambiguous.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_36bdd8de",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_16c25c54",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "s/that should be /\n\nthere is no \u0027above\u0027. godoc might not show the other comment. say \u0027See example in package document\u0027.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_76b750fe",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "// Lookup looks up user keys.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_56bcd4de",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "AllowUnauthenticatedConnections allows unauthenticated connections, making it the caller\u0027s responsibility to check IsAuthenticated.\n\n(and what is that?",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_b6d0c817",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "s/  by/ by/",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_96cdcc81",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "i wonder if this is the right message. maybe \"missing username\"?",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_f6ca4065",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T23:51:02Z",
+      "side": 1,
+      "message": "this is not a good message for users. it\u0027s about program internals.\nmaybe \"cannot authenticate: internal error: missing Lookup function\".\n\n(there shoudl always be one, right?)",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
