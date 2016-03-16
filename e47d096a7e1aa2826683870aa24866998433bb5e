@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_8bd25179",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T00:25:34Z",
+      "side": 1,
+      "message": "I sound like a broken record: There shouldn\u0027t be a space after \"Put\" or before \"1\".\n\nLook at a compiler error message.",
+      "revId": "e47d096a7e1aa2826683870aa24866998433bb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
