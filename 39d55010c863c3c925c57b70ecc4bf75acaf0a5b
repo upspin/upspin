@@ -16,6 +16,24 @@
       "revId": "39d55010c863c3c925c57b70ecc4bf75acaf0a5b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97dae1a7_b8c8259e",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T00:32:07Z",
+      "side": 1,
+      "message": "Got it. Done.\n\nBut this still leaves one crack: if I set the flags to anything not \"\" and I can\u0027t find that file, should I abort? I think it\u0027s okay for now, but maybe later we want to revisit that.\n\nThanks.",
+      "parentUuid": "772d6d76_4b769965",
+      "revId": "39d55010c863c3c925c57b70ecc4bf75acaf0a5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
