@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772d6d76_6bcefdd3",
+        "filename": "path/path.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T03:31:48Z",
+      "side": 1,
+      "message": "I have ideas about doing this better. will put together a CL.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_4bd1396f",
+        "filename": "path/path.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T03:31:48Z",
+      "side": 1,
+      "message": "I think this would do fewer allocations (just one) if it were just\n\nreturn path + \"/\" + upspin.PathName(elem)\n\nbut if path ends in /, both these are problematic. we need a cleaner.",
+      "revId": "930e641e7060b8eedb8ebacd62224a44388ed749",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
