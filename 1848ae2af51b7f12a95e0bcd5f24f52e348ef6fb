@@ -16,6 +16,24 @@
       "revId": "1848ae2af51b7f12a95e0bcd5f24f52e348ef6fb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "772d6d76_2bda455f",
+        "filename": "path/join_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-16T05:11:51Z",
+      "side": 1,
+      "message": "it\u0027s usually not the rule to use package foo_test unless there\u0027s a dependency loop.\n\ni moved this all back into path_test.go",
+      "parentUuid": "97dae1a7_23736627",
+      "revId": "1848ae2af51b7f12a95e0bcd5f24f52e348ef6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
