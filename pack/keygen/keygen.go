@@ -12,7 +12,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	"upspin.googlesource.com/upspin.git/pack/ee"
@@ -82,9 +81,9 @@ func keydir() string {
 	if where != nil && len(*where) > 0 {
 		return *where
 	}
-	user, err := user.Current()
-	if err != nil {
-		log.Fatal("no user")
+	home := os.Getenv("HOME")
+	if len(home) == 0 {
+		log.Fatal("no home directory")
 	}
-	return filepath.Join(user.HomeDir, ".ssh")
+	return filepath.Join(home, ".ssh")
 }

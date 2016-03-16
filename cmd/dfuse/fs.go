@@ -30,7 +30,6 @@ type upspinFs struct {
 	gid      int
 	lastId   fuse.NodeID
 	cacheDir string // Directory for in the clear cached files.
-	writeDir string // Directory for files being written.
 	userDirs map[string]struct{}
 }
 
@@ -70,15 +69,11 @@ func newUpspinFS(context *upspin.Context, users *userCache) *upspinFs {
 		gid:      os.Getgid(),
 		userDirs: make(map[string]struct{}),
 	}
-	homeDir := "/tmp"
-	if u, err := user.Current(); err == nil {
-		if len(u.HomeDir) != 0 {
-			homeDir = u.HomeDir
-		}
+	homeDir := os.Getenv("HOME")
+	if len(homeDir) == 0 {
+		homeDir = "/etc"
 	}
-	f.writeDir = homeDir + "/.upspin/wb"
-	f.cacheDir = homeDir + "/.upspin/cache"
-	os.Mkdir(f.writeDir, 0700)
+	f.cacheDir = homeDir + "/upspin/cache"
 	os.Mkdir(f.cacheDir, 0700)
 	f.root = f.allocNode(nil, 0500|os.ModeDir, "")
 	f.allocNode(f.root, 0700|os.ModeDir, string(f.context.UserName))

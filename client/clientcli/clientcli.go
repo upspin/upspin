@@ -116,7 +116,7 @@ func get(pathName upspin.PathName) {
 }
 
 func newClient() upspin.Client {
-	ctx, err := context.LoadContextFromRCFile()
+	ctx, err := context.InitContext()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -76,9 +75,9 @@ func privateKey() (upspin.KeyPair, error) {
 }
 
 func sshdir() string {
-	user, err := user.Current()
-	if err != nil {
-		panic("no user")
+	home := os.Getenv("HOME")
+	if len(home) == 0 {
+		panic("no home directory")
 	}
-	return filepath.Join(user.HomeDir, ".ssh")
+	return filepath.Join(home, ".ssh")
 }
