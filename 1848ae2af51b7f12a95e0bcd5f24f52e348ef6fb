@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "97dae1a7_23736627",
+        "filename": "path/join_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-16T04:53:55Z",
+      "side": 1,
+      "message": "I\u0027d put this path_test since it\u0027s not only testing join, but also clean and it\u0027s part of package path. Just a suggestion. I can see how this is cleaner too. Maybe then other_test.go?",
+      "revId": "1848ae2af51b7f12a95e0bcd5f24f52e348ef6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
