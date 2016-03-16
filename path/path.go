@@ -3,8 +3,9 @@ package path
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
+
+	gopath "path"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -147,13 +148,35 @@ func (p Parsed) Drop(n int) Parsed {
 	return p
 }
 
-// Join a new path element to an upspin name.
-func Join(path upspin.PathName, elem string) upspin.PathName {
-	if len(path) == 0 {
-		return upspin.PathName(elem)
+// Join appends any number of path elements onto a (possibly empty)
+// Upspin path, adding a separating slash if necessary. All empty
+// strings are ignored. The result, if non-empty, is passed through
+// Clean. There is no guarantee that the resulting path is a valid
+// Upspin path. This differs from path.Join in that it requires a
+// first argument of type upspin.PathName.
+func Join(path upspin.PathName, elems ...string) upspin.PathName {
+	// Do what we can to avoid unnecessary allocation.
+	joined := upspin.PathName("")
+	for i, e := range elems {
+		if e != "" {
+			joined = upspin.PathName(strings.Join(elems[i:], "/"))
+			break
+		}
 	}
-	if len(elem) == 0 {
-		return path
+	switch {
+	case path == "" && joined == "":
+		return ""
+	case path == "" && joined != "":
+		// Nothing to do.
+	case path != "" && joined == "":
+		joined = path
+	case path != "" && joined != "":
+		joined = path + "/" + joined
 	}
-	return upspin.PathName(fmt.Sprintf("%s/%s", string(path), elem))
+	return Clean(joined)
+}
+
+// Clean applies Go's path.Clean to an Upspin path.
+func Clean(path upspin.PathName) upspin.PathName {
+	return upspin.PathName(gopath.Clean(string(path)))
 }
