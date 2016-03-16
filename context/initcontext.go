@@ -5,10 +5,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
-	"os/user"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/bind"
@@ -28,13 +27,11 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		"packing":   "plain"}
 
 	if r == nil {
-		dir := "/etc/upspin"
-		if u, err := user.Current(); err == nil {
-			if len(u.HomeDir) != 0 {
-				dir = path.Join(u.HomeDir, ".upspin")
-			}
+		home := os.Getenv("HOME")
+		if len(home) == 0 {
+			log.Fatal("no home directory")
 		}
-		if f, err := os.Open(path.Join(dir, "config")); err == nil {
+		if f, err := os.Open(path.Join(home, "upspin/rc")); err == nil {
 			r = f
 			defer f.Close()
 		}
@@ -97,24 +94,5 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	// Implicitly load the user's keys from $HOME/.ssh.
 	// TODO: add a section in vals containing overrides for "publickey" and "privatekey" files.
 	keyloader.Load(context)
-	return context, nil
-}
-
-// LoadContextFromRCFile opens $HOME/upspin/rc and parses the file and
-// builds a context from it.
-func LoadContextFromRCFile() (*upspin.Context, error) {
-	user, err := user.Current()
-	if err != nil {
-		return nil, err
-	}
-	rcFile, err := os.Open(filepath.Join(user.HomeDir, "upspin/rc"))
-	if err != nil {
-		return nil, err
-	}
-	defer rcFile.Close()
-	context, err := InitContext(rcFile)
-	if err != nil {
-		return nil, err
-	}
 	return context, nil
 }
