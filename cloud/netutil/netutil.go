@@ -18,6 +18,7 @@ const (
 	Post = "POST"
 )
 
+// TODO(edpin): Rename this to get rid of 'Interface'.
 // HTTPClientInterface is a minimal HTTP client interface. An instance of
 // http.Client implements this interface.
 type HTTPClientInterface interface {
