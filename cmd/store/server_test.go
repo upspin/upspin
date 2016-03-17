@@ -133,7 +133,7 @@ func TestPut(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	m.Run()
-	cache.DeleteFileCache(fileCache)
+	fileCache.Delete()
 }
 
 func NewStoreServer() *StoreServer {
