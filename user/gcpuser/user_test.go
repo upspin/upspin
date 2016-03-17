@@ -29,7 +29,7 @@ func TestRegistration(t *testing.T) {
 func TestLookup(t *testing.T) {
 	ue := userEntry{
 		User: userName,
-		Keys: [][]byte{[]byte(key)},
+		Keys: []upspin.PublicKey{upspin.PublicKey(key)},
 		Endpoints: []upspin.Endpoint{upspin.Endpoint{
 			Transport: upspin.GCP,
 			NetAddr:   upspin.NetAddr(rootNetAddr),

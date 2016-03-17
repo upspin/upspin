@@ -24,9 +24,9 @@ var _ upspin.User = (*user)(nil)
 // userEntry stores all known information for a given user. The fields
 // are exported because JSON parsing needs access to them.
 type userEntry struct {
-	User      string            // User's email address (e.g. bob@bar.com).
-	Keys      [][]byte          // Known keys for the user.
-	Endpoints []upspin.Endpoint // Known endpoints for the user's directory entry.
+	User      string             // User's email address (e.g. bob@bar.com).
+	Keys      []upspin.PublicKey // Known keys for the user.
+	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
 }
 
 const (
@@ -69,12 +69,7 @@ func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicK
 	if ue.User != string(name) {
 		return nil, nil, newUserError(fmt.Errorf("invalid user returned %s", ue.User), name)
 	}
-	// Convert keys returned by server to appropriate type
-	keys := make([]upspin.PublicKey, 0, len(ue.Keys))
-	for _, k := range ue.Keys {
-		keys = append(keys, upspin.PublicKey(k))
-	}
-	return ue.Endpoints, keys, nil
+	return ue.Endpoints, ue.Keys, nil
 }
 
 func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
