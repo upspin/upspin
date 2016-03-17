@@ -31,6 +31,7 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		if len(home) == 0 {
 			log.Fatal("no home directory")
 		}
+		log.Printf("Reading from %s", path.Join(home, "upspin/rc"))
 		if f, err := os.Open(path.Join(home, "upspin/rc")); err == nil {
 			r = f
 			defer f.Close()

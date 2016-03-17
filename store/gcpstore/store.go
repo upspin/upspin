@@ -1,4 +1,4 @@
-// Package store implements the interface upspin.Store for talking to Google Cloud Platform (GCP).
+// Package gcpstore implements the interface upspin.Store for talking to Google Cloud Platform (GCP).
 package gcpstore
 
 import (
@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
@@ -41,25 +42,33 @@ func New(serverURL string, httpClient netutil.HTTPClientInterface) *Store {
 	}
 }
 
+// Dial implements Dialer.
 func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
 	if context == nil {
-		return nil, NewStoreError("nil context", "")
+		return nil, newStoreError("nil context", "")
 	}
 	serverURL, err := url.Parse(string(endpoint.NetAddr))
 	if err != nil {
-		return nil, NewStoreError(fmt.Sprintf("invalid HTTP address for endpoint: %v", err), "")
+		return nil, newStoreError(fmt.Sprintf("invalid HTTP address for endpoint: %v", err), "")
 	}
 	s.serverURL = serverURL.String()
+	authClient, isSecure := s.httpClient.(*auth.HTTPClient)
+	if isSecure {
+		authClient.SetUserName(context.UserName)
+		authClient.SetUserKeys(context.KeyPair)
+	}
 	return s, nil
 }
 
+// ServerUserName implements Dialer.
 func (s *Store) ServerUserName() string {
 	return "GPC Store"
 }
 
+// Get implements Store.
 func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	if key == "" {
-		return nil, nil, NewStoreError(invalidKeyError, "")
+		return nil, nil, newStoreError(invalidKeyError, "")
 	}
 	var request string
 	if strings.HasPrefix(key, "http://") || strings.HasPrefix(key, "https://") {
@@ -73,7 +82,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
-		return nil, nil, NewStoreError(fmt.Sprintf(serverError, "Get", err), key)
+		return nil, nil, newStoreError(fmt.Sprintf(serverError, "Get", err), key)
 	}
 	defer resp.Body.Close()
 	// TODO(edpin): maybe add a limit here to the size of bytes we
@@ -88,7 +97,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 		// This is either a re-location reply or an error.
 		loc, err := parser.LocationResponse(body)
 		if err != nil {
-			return nil, nil, NewStoreError(err.Error(), key)
+			return nil, nil, newStoreError(err.Error(), key)
 		}
 		// If the server did not specify the endpoint, it's
 		// implicitly there; patch it.
@@ -109,6 +118,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	// NOT REACHED
 }
 
+// Put implements Store.
 func (s *Store) Put(data []byte) (string, error) {
 	const op = "Put"
 	var zeroKey string
@@ -117,7 +127,7 @@ func (s *Store) Put(data []byte) (string, error) {
 	w := multipart.NewWriter(&body)
 	fw, err := w.CreateFormFile("file", "dummy")
 	if err != nil {
-		return zeroKey, NewStoreError(fmt.Sprintf("%v: multi-part form error: %v", op, err), "")
+		return zeroKey, newStoreError(fmt.Sprintf("%v: multi-part form error: %v", op, err), "")
 	}
 	_, err = io.Copy(fw, bufFrom)
 	if err != nil {
@@ -142,17 +152,18 @@ func (s *Store) Put(data []byte) (string, error) {
 	// Parse the response
 	key, err := parser.KeyResponse(respBody)
 	if err != nil {
-		return zeroKey, NewStoreError(fmt.Sprintf(serverError, op, err), "")
+		return zeroKey, newStoreError(fmt.Sprintf(serverError, op, err), "")
 	}
 	if key == "" {
-		return zeroKey, NewStoreError(invalidKeyError, "")
+		return zeroKey, newStoreError(invalidKeyError, "")
 	}
 	return key, nil
 }
 
+// Delete implements Store.
 func (s *Store) Delete(key string) error {
 	if key == "" {
-		return NewStoreError(invalidKeyError, "")
+		return newStoreError(invalidKeyError, "")
 	}
 	// TODO: check if we own the file or otherwise are allowed to delete it.
 	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, key), nil)
@@ -180,12 +191,12 @@ func (s *Store) Delete(key string) error {
 func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Request) ([]byte, error) {
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return nil, NewStoreError(fmt.Sprintf("%v: %v", op, err), key)
+		return nil, newStoreError(fmt.Sprintf("%v: %v", op, err), key)
 	}
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
-		return nil, NewStoreError(fmt.Sprintf(serverError, op, resp.StatusCode), key)
+		return nil, newStoreError(fmt.Sprintf(serverError, op, resp.StatusCode), key)
 	}
 
 	// Read the body of the response
@@ -193,11 +204,12 @@ func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Requ
 	// TODO(edpin): maybe add a limit here to the size of bytes we return?
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, NewStoreError(fmt.Sprintf("%v: %v", op, err), key)
+		return nil, newStoreError(fmt.Sprintf("%v: %v", op, err), key)
 	}
 	return respBody, nil
 }
 
+// Endpoint implements Store.
 func (s *Store) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -205,22 +217,22 @@ func (s *Store) Endpoint() upspin.Endpoint {
 	}
 }
 
-// Implements Error
-type StoreError struct {
+// storeError Implements Error
+type storeError struct {
 	error string
 	key   string
 }
 
-func (s StoreError) Error() string {
+func (s storeError) Error() string {
 	return s.error
 }
 
-func (s StoreError) Key() string {
+func (s storeError) Key() string {
 	return s.key
 }
 
-func NewStoreError(error string, key string) *StoreError {
-	return &StoreError{
+func newStoreError(error string, key string) *storeError {
+	return &storeError{
 		error: error,
 		key:   key,
 	}
@@ -228,5 +240,5 @@ func NewStoreError(error string, key string) *StoreError {
 
 func init() {
 	// By default, set up only the HTTP client. The server URL gets bound at Dial time.
-	bind.RegisterStore(upspin.GCP, New("", &http.Client{}))
+	bind.RegisterStore(upspin.GCP, New("", auth.NewPartialClient(&http.Client{})))
 }

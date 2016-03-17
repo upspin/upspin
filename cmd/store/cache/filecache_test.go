@@ -5,10 +5,13 @@ import (
 	"testing"
 )
 
+const (
+	ref        = "1234"
+	testString = "This is a test."
+)
+
 var (
-	fc         *FileCache = NewFileCache("")
-	ref        string     = "1234"
-	testString string     = "This is a test."
+	fc = NewFileCache("")
 )
 
 func TestPutAndGet(t *testing.T) {

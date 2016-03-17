@@ -7,13 +7,18 @@ import (
 	"net/http"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-func Put(t *testing.T, ds *DirServer, dirEntry upspin.DirEntry, errorExpected string) {
+var (
+	nilAh auth.Handler
+)
+
+func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
 	resp := nettest.NewExpectingResponseWriter(errorExpected)
 	jsonStr, err := json.Marshal(dirEntry)
 	if err != nil {
@@ -23,20 +28,20 @@ func Put(t *testing.T, ds *DirServer, dirEntry upspin.DirEntry, errorExpected st
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
 	}
-	ds.putHandler(resp, req)
+	ds.putHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newDirServer(), upspin.DirEntry{}, `{"error":"dir entry verification failed: no slash in path"}`)
+	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"dir entry verification failed: no slash in path"}`)
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newDirServer(), dir, `{"error":"dir entry verification failed: no user name in path"}`)
+	Put(t, newDummyDirServer(), dir, `{"error":"dir entry verification failed: no user name in path"}`)
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -53,15 +58,15 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newDirServer(), dir, `{"error":"dir entry verification failed: invalid sequence number"}`)
+	Put(t, newDummyDirServer(), dir, `{"error":"dir entry verification failed: invalid sequence number"}`)
 }
 
 func TestLookupPathError(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"missing pathname in request"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get", nil)
 
-	ds := newDirServer()
-	ds.getHandler(resp, req)
+	ds := newDummyDirServer()
+	ds.getHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -69,8 +74,8 @@ func TestListMissingPrefix(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"missing prefix in request"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list", nil)
 
-	ds := newDirServer()
-	ds.listHandler(resp, req)
+	ds := newDummyDirServer()
+	ds.listHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -78,8 +83,8 @@ func TestListBadPath(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"list: bad user name in path"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file", nil)
 
-	ds := newDirServer()
-	ds.listHandler(resp, req)
+	ds := newDummyDirServer()
+	ds.listHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -92,7 +97,7 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Ref: "something that does not match",
 	}
 
-	ds := new(egcp, &http.Client{})
+	ds := newDirServer(egcp, &http.Client{})
 	Put(t, ds, dir, `{"error":"path is not writable"}`)
 }
 
@@ -103,8 +108,8 @@ func TestLookupPathNotFound(t *testing.T) {
 		Ref: "something that does not match",
 	}
 
-	ds := new(egcp, &http.Client{})
-	ds.getHandler(resp, req)
+	ds := newDirServer(egcp, &http.Client{})
+	ds.getHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -119,8 +124,8 @@ func TestList(t *testing.T) {
 		fileNames: []string{"testuser@google.com/subdir/", "testuser@google.com/subdir/test.txt"},
 		fileLinks: []string{"http://a.com", "http://b.com"},
 	}
-	ds := new(lgcp, &http.Client{})
-	ds.listHandler(resp, req)
+	ds := newDirServer(lgcp, &http.Client{})
+	ds.listHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -159,8 +164,8 @@ func TestPutNotDir(t *testing.T) {
 		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", dirParentJSON)},
 		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
 
-	ds := new(egcp, mockHTTPClient)
-	ds.putHandler(resp, req)
+	ds := newDirServer(egcp, mockHTTPClient)
+	ds.putHandler(nilAh, resp, req)
 	resp.Verify(t)
 	mockHTTPClient.Verify(t)
 }
@@ -200,14 +205,14 @@ func TestPut(t *testing.T) {
 		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", dirParentJSON)},
 		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
 
-	ds := new(egcp, mockHTTPClient)
-	ds.putHandler(resp, req)
+	ds := newDirServer(egcp, mockHTTPClient)
+	ds.putHandler(nilAh, resp, req)
 	resp.Verify(t)
 	mockHTTPClient.Verify(t)
 }
 
-func newDirServer() *DirServer {
-	return new(&gcptest.DummyGCP{}, &http.Client{})
+func newDummyDirServer() *dirServer {
+	return newDirServer(&gcptest.DummyGCP{}, &http.Client{})
 }
 
 // listGCP is a DummyGCP that returns a slice of fileNames and

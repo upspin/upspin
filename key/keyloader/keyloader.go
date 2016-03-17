@@ -4,6 +4,7 @@ package keyloader
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -29,6 +30,7 @@ func Load(context *upspin.Context) error {
 	}
 	k, err := privateKey()
 	context.KeyPair = k
+	log.Printf("context.KeyPair=%v", k)
 	return err
 }
 
