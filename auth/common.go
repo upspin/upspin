@@ -44,8 +44,9 @@ func hashUserRequest(userName upspin.UserName, r *http.Request) []byte {
 	return sha.Sum(nil)
 }
 
-// SignRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
-func SignRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
+// TODO: move to client.go as the server doesn't need it.
+// signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
+func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
 	req.Header.Set(userNameHeader, string(userName)) // Set the username
 	ecdsaPubKey, keyType, err := parsePublicKey(keys.Public)
 	if err != nil {
@@ -66,6 +67,7 @@ func SignRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Reques
 	return nil
 }
 
+// TODO: move to server.go as the client doesn't need it.
 // verifyRequest verifies whether named user has signed the HTTP request using one of the possible keys.
 func verifyRequest(userName upspin.UserName, keys []upspin.PublicKey, req *http.Request) error {
 	sig := req.Header.Get(signatureHeader)

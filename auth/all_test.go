@@ -5,6 +5,9 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
+
+	"io/ioutil"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -24,7 +27,7 @@ var (
 )
 
 func signReq(t *testing.T, key upspin.KeyPair, req *http.Request) {
-	err := SignRequest(user, key, req)
+	err := signRequest(user, key, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +141,7 @@ func TestServerHandlerNotTLS(t *testing.T) {
 }
 
 func TestServerHandlerWritesResponseDirectly(t *testing.T) {
-	w := nettest.NewExpectingResponseWriter(`{"error":"AuthHandler:cannot authenticate: internal error: missing Lookup function"}`)
+	w := nettest.NewExpectingResponseWriterWithCode(http.StatusUnauthorized, `{"error":"AuthHandler:cannot authenticate: internal error: missing Lookup function"}`)
 
 	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
 	if err != nil {
@@ -159,7 +162,7 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 }
 
 func TestServerHandlerSignaturesMismatch(t *testing.T) {
-	w := nettest.NewExpectingResponseWriter(`{"error":"AuthHandler:no keys found for user joe@blow.com"}`)
+	w := nettest.NewExpectingResponseWriterWithCode(http.StatusUnauthorized, `{"error":"AuthHandler:no keys found for user joe@blow.com"}`)
 
 	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
 	if err != nil {
@@ -221,6 +224,136 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	if called != 2 {
 		t.Errorf("Expected 2 handler calls, got %d", called)
 	}
+}
+
+func TestClientDoesProperAuthDance(t *testing.T) {
+	const (
+		url             = "https://secure.server.com"
+		get             = "GET"
+		json            = "application/json"
+		errUnauthorized = `{"error":"you can't access this, dude"}`
+		accepted        = "you're in"
+	)
+
+	// External client issues 3 requests. They become 4 due to this sequence of events:
+	// 1 - First request is authenticated, since it's new. Server returns accepted.
+	// 2 - For the second request, the server forgot about the client somehow and returns a 401.
+	// 3 - Client recovers by re-issuing the request with auth.
+	// 4 - Then, client issues one more request and this time it does NOT do auth again.
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte(accepted)),
+		nettest.NewMockHTTPResponse(http.StatusUnauthorized, json, []byte(errUnauthorized)),
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte(accepted)),
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte(accepted)),
+	}, []*http.Request{
+		nettest.NewRequest(t, get, url, nil),
+		nettest.NewRequest(t, get, url, nil),
+		nettest.NewRequest(t, get, url, nil),
+		nettest.NewRequest(t, get, url, nil),
+	})
+
+	client := NewClient(user, p521Key, mock)
+
+	sendRequestAndCheckReply := func() {
+		resp, err := client.Do(nettest.NewRequest(t, get, url, nil))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("Expected auth client to return status %d, got %d", http.StatusOK, resp.StatusCode)
+		}
+		// Did we get our expected reply back?
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(data) != accepted {
+			t.Fatalf("Expected response %q, got %q", accepted, data)
+		}
+	}
+	var zeroTime time.Time
+
+	// Save the auth time.
+	lastAuth := client.timeLastAuth
+	if lastAuth != zeroTime {
+		t.Fatalf("Expected no auth happened yet, but it did at time %v", lastAuth)
+	}
+
+	sendRequestAndCheckReply()
+
+	// Ensure client did auth after first request.
+	if client.timeLastAuth == zeroTime {
+		t.Fatal("Expected auth to have happened, but it didn't")
+	}
+
+	// Save the auth time.
+	lastAuth = client.timeLastAuth
+
+	// Issue another request
+	sendRequestAndCheckReply()
+
+	// This time the server forgot about us and we had to re-auth. Ensure we did by checking the last auth time.
+	if lastAuth == client.timeLastAuth {
+		t.Errorf("Expected lastAuth to change, but it didn't")
+	}
+
+	// Save the auth time.
+	lastAuth = client.timeLastAuth
+
+	// Issue another request
+	sendRequestAndCheckReply()
+
+	// Compare lastAuth time to ensure it hasn't changed.
+	if lastAuth != client.timeLastAuth {
+		t.Errorf("Expected lastAuth to be %v, got %v", lastAuth, client.timeLastAuth)
+	}
+
+	mock.Verify(t)
+}
+
+func TestClientReAuthsWithNewServer(t *testing.T) {
+	const (
+		url1     = "https://secure.server.com"
+		url2     = "https://more-secure.server.com"
+		get      = "GET"
+		json     = "application/json"
+		accepted = "ok"
+	)
+
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte(accepted)),
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte(accepted)),
+	}, []*http.Request{
+		nettest.NewRequest(t, get, url1, nil),
+		nettest.NewRequest(t, get, url2, nil),
+	})
+
+	client := NewClient(user, p521Key, mock)
+
+	resp, err := client.Do(nettest.NewRequest(t, get, url1, nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected auth client to return status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	lastAuth := client.timeLastAuth
+
+	resp, err = client.Do(nettest.NewRequest(t, get, url2, nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected auth client to return status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	if lastAuth == client.timeLastAuth {
+		// Bad caching
+		t.Fatal("Client did not re-auth with new server.")
+	}
+
+	mock.Verify(t)
 }
 
 func BenchmarkSignp256(b *testing.B) {
