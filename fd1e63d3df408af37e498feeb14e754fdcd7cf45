@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "3c6d9a11_96d66c09",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-17T00:28:35Z",
+      "side": 1,
+      "message": "be consistent: s/%v/%q/",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_f6e360ed",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-17T00:28:35Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6d9a11_d6e0e4e3",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-17T00:28:35Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_d6c7445d",
         "filename": "auth/common.go",
         "patchSetId": 1
