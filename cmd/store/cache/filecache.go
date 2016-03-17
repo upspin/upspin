@@ -8,10 +8,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 // FileCache implements a cache.Interface for storing local files.
 type FileCache struct {
+	m         sync.Mutex // protects the root
 	cacheRoot string
 }
 
@@ -49,6 +51,8 @@ func (fc FileCache) Rename(newRef, oldRef string) error {
 }
 
 func (fc FileCache) RandomRef() string {
+	fc.m.Lock()
+	defer fc.m.Unlock()
 	f, err := ioutil.TempFile(fc.cacheRoot, "upload-")
 	if err != nil {
 		panic("Can't create a tempfile")
@@ -69,6 +73,8 @@ func (fc FileCache) IsCached(ref string) bool {
 }
 
 func (fc FileCache) GetFileLocation(ref string) string {
+	fc.m.Lock()
+	defer fc.m.Unlock()
 	return fmt.Sprintf("%s/%s", fc.cacheRoot, ref)
 }
 
@@ -78,7 +84,7 @@ func (fc FileCache) OpenRefForRead(ref string) (*os.File, error) {
 }
 
 func (fc FileCache) createFile(name string) (*os.File, error) {
-	location := fmt.Sprintf("%s/%s", fc.cacheRoot, name)
+	location := fc.GetFileLocation(name)
 	log.Printf("Creating file %v\n", location)
 	f, err := os.Create(location)
 	if err != nil {
@@ -96,14 +102,16 @@ func NewFileCache(cacheRootDir string) *FileCache {
 	if err != nil {
 		log.Fatalf("Can't create tempdir: %v", err)
 	}
-	fc := &FileCache{cacheRoot}
+	fc := &FileCache{cacheRoot: cacheRoot}
 	return fc
 }
 
-// DeleteFileCache removes all files from the cache and invalidates
+// Delete removes all files from the cache and invalidates
 // it. Further calls to any FileCache methods may fail unpredictably
 // or silently.
-func DeleteFileCache(fc *FileCache) {
+func (fc FileCache) Delete() {
+	fc.m.Lock()
+	defer fc.m.Unlock()
 	err := os.RemoveAll(fc.cacheRoot)
 	if err != nil {
 		log.Fatalf("Can't delete cache dir: %v", err)

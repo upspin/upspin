@@ -61,7 +61,7 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 	s.fileCache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
-	go func(ref string) {
+	go func() {
 		if _, err := s.cloudClient.PutLocalFile(s.fileCache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
@@ -70,7 +70,7 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 			// because FileCache is thread safe.
 			s.fileCache.Purge(ref)
 		}
-	}(ref)
+	}()
 
 	// Answer something sensible to the client.
 	keyStruct := &struct {
