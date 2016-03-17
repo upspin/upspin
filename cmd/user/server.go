@@ -2,19 +2,17 @@
 package main
 
 import (
-	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cmd/auth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -27,9 +25,9 @@ type userServer struct {
 // userEntry stores all known information for a given user. The fields
 // are exported because JSON parsing needs access to them.
 type userEntry struct {
-	User      string            // User's email address (e.g. bob@bar.com).
-	Keys      [][]byte          // Known keys for the user.
-	Endpoints []upspin.Endpoint // Known endpoints for the user's directory entry.
+	User      string             // User's email address (e.g. bob@bar.com).
+	Keys      []upspin.PublicKey // Known keys for the user.
+	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
 }
 
 const (
@@ -37,7 +35,7 @@ const (
 )
 
 var (
-	projectId             = flag.String("project", "upspin", "Our cloud project ID.")
+	projectID             = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName            = flag.String("bucket", "g-upspin-user", "The name of an existing bucket within the project.")
 	readOnly              = flag.Bool("readonly", false, "Whether this server instance is read-only.")
 	port                  = flag.Int("port", 8082, "TCP port to serve.")
@@ -63,7 +61,8 @@ func validateUserEmail(userEmail string) error {
 // known key formats. It does not reject unknown formats, but it does
 // reject keys that are too short to be valid in any current of future
 // format. A nil error indicates validity.
-func validateKey(key []byte) error {
+func validateKey(key upspin.PublicKey) error {
+	// TODO: use keyload.parsePublicKey to check it conforms.
 	if len(key) < minKeyLen {
 		return errKeyTooShort
 	}
@@ -77,9 +76,9 @@ func isNotFound(err error) bool {
 	return strings.Contains(strings.ToLower(err.Error()), "not found")
 }
 
-func isKeyInSlice(key []byte, slice [][]byte) bool {
+func isKeyInSlice(key upspin.PublicKey, slice []upspin.PublicKey) bool {
 	for _, k := range slice {
-		if bytes.Equal(key, k) {
+		if key == k {
 			return true
 		}
 	}
@@ -98,7 +97,7 @@ func (u *userServer) addKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := []byte(r.FormValue("key"))
+	key := upspin.PublicKey(r.FormValue("key"))
 	err := validateKey(key)
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
@@ -112,7 +111,7 @@ func (u *userServer) addKeyHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("User %q not found on GCP, adding new one", user)
 			ue = &userEntry{
 				User: user,
-				Keys: make([][]byte, 0, 1),
+				Keys: make([]upspin.PublicKey, 0, 1),
 			}
 		} else {
 			netutil.SendJSONError(w, context, err)
@@ -122,7 +121,7 @@ func (u *userServer) addKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Check that the key is not already there.
 	if !isKeyInSlice(key, ue.Keys) {
 		// Place key at head of slice to indicate higher priority.
-		ue.Keys = append([][]byte{key}, ue.Keys...)
+		ue.Keys = append([]upspin.PublicKey{key}, ue.Keys...)
 		err = u.putUserEntry(user, ue)
 		if err != nil {
 			netutil.SendJSONError(w, context, err)
@@ -274,82 +273,34 @@ func (u *userServer) putUserEntry(user string, userEntry *userEntry) error {
 	return err
 }
 
-// new creates a UserService from a pre-configured GCP instance and an HTTP client.
-func new(cloudClient gcp.Interface) *userServer {
+// newUserServer creates a UserService from a pre-configured GCP instance and an HTTP client.
+func newUserServer(cloudClient gcp.Interface) *userServer {
 	u := &userServer{
 		cloudClient: cloudClient,
 	}
 	return u
 }
 
-// isReadableFile reports whether the file exists and is readable.
-// If the error is non-nil, it means there might be a file or directory
-// with that name but we cannot read it.
-func isReadableFile(path string) (bool, error) {
-	// Is it stattable and is it a plain file?
-	info, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil // Item does not exist.
-		}
-		return false, err // Item is problematic.
-	}
-	if info.IsDir() {
-		return false, errors.New("is directory")
-	}
-	// Is it readable?
-	fd, err := os.Open(path)
-	if err != nil {
-		return false, errors.New("permission denied")
-	}
-	fd.Close()
-	return true, nil // Item exists and is readable.
-}
-
 func main() {
 	flag.Parse()
-	u := new(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
+	u := newUserServer(gcp.New(*projectID, *bucketName, gcp.BucketOwnerFullCtrl))
 	if !*readOnly {
+		// TODO: these should be authenticated too.
 		http.HandleFunc("/addkey", u.addKeyHandler)
 		http.HandleFunc("/addroot", u.addRootHandler)
 		http.HandleFunc("/delete", u.deleteHandler)
 	}
 	http.HandleFunc("/get", u.getHandler)
 
-	portNum := fmt.Sprintf(":%d", *port)
-	certReadable, err := isReadableFile(*sslCertificateFile)
-	if err != nil {
-		log.Fatalf("Problem with SSL certificate in %s: %v", *sslCertificateFile, err)
-	}
-	keyReadable, err := isReadableFile(*sslCertificateKeyFile)
-	if err != nil {
-		log.Fatalf("Problem with SSL key %s: %v", *sslCertificateKeyFile, err)
-	}
-
-	if certReadable && keyReadable {
-		log.Println("Starting HTTPS server with SSL")
-
-		tlsConfig := &tls.Config{
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			},
-			MinVersion:               tls.VersionTLS12,
-			PreferServerCipherSuites: true, // Use our choice, not the client's choice
-			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
+		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		if err != nil {
+			log.Fatal(err)
 		}
-		tlsConfig.BuildNameToCertificate()
-
-		server := &http.Server{
-			Addr:      portNum,
-			TLSConfig: tlsConfig,
-		}
-
+		log.Println("Starting HTTPS server with SSL.")
 		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
 	} else {
-		log.Println("No SSL certificate found. Starting regular HTTP server")
-		log.Fatal(http.ListenAndServe(portNum, nil))
+		log.Println("Not using SSL certificate. Starting regular HTTP server.")
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 	}
 }

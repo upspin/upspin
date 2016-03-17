@@ -2,6 +2,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -41,6 +42,11 @@ const (
 	AuthIntervalSec = 5 * 60 // 5 minutes
 )
 
+var (
+	errNoUser = &clientError{"no user set"}
+	errNoKeys = &clientError{"no keys set"}
+)
+
 // NewClient returns a new HTTPClient that handles auth for the named user with the provided key pair and underlying HTTP client.
 func NewClient(user upspin.UserName, keys upspin.KeyPair, httClient netutil.HTTPClientInterface) *HTTPClient {
 	return &HTTPClient{
@@ -48,6 +54,24 @@ func NewClient(user upspin.UserName, keys upspin.KeyPair, httClient netutil.HTTP
 		keys:   keys,
 		client: httClient,
 	}
+}
+
+// NewAnonymousClient returns a new HTTPClient that does not yet know about the user name or user keys.
+// To complete setup, use SetUserName and SetUserKeys.
+func NewAnonymousClient(httClient netutil.HTTPClientInterface) *HTTPClient {
+	return &HTTPClient{
+		client: httClient,
+	}
+}
+
+// SetUserName sets the user name for this HTTPClient instance.
+func (c *HTTPClient) SetUserName(user upspin.UserName) {
+	c.user = user
+}
+
+// SetUserKeys sets the user keys for this HTTPClient instance.
+func (c *HTTPClient) SetUserKeys(keys upspin.KeyPair) {
+	c.keys = keys
 }
 
 // Do implements netutil.HTTPClientInterface.
@@ -76,7 +100,7 @@ func (c *HTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
 func (c *HTTPClient) doWithoutAuth(req *http.Request) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return resp, err
+		return resp, newError(err)
 	}
 	if resp.StatusCode == 401 && req.URL.Scheme == "https" {
 		return c.doAuth(req)
@@ -86,11 +110,31 @@ func (c *HTTPClient) doWithoutAuth(req *http.Request) (*http.Response, error) {
 
 // doAuth performs authentication and caches the server and time of this last auth.
 func (c *HTTPClient) doAuth(req *http.Request) (*http.Response, error) {
+	if c.user == "" {
+		return nil, errNoUser
+	}
+	var zeroKeys upspin.KeyPair
+	if c.keys == zeroKeys {
+		return nil, errNoKeys
+	}
 	err := signRequest(c.user, c.keys, req)
 	if err != nil {
-		return nil, err
+		return nil, newError(err)
 	}
 	c.url = req.URL
 	c.timeLastAuth = time.Now()
 	return c.client.Do(req)
+}
+
+type clientError struct {
+	errorMsg string
+}
+
+// Error implements error
+func (c *clientError) Error() string {
+	return fmt.Sprintf("HTTPClient: %s", c.errorMsg)
+}
+
+func newError(err error) error {
+	return &clientError{err.Error()}
 }

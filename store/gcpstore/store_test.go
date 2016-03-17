@@ -31,7 +31,7 @@ var (
 		},
 	}
 
-	errInvalidKey = NewStoreError(invalidKeyError, "")
+	errInvalidKey = newStoreError(invalidKeyError, "")
 )
 
 func TestStorePutError(t *testing.T) {

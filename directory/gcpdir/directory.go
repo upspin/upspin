@@ -1,4 +1,4 @@
-// Package directory implements the interface upspin.Directory for talking to an HTTP server.
+// Package gcpdir implements the interface upspin.Directory for talking to an HTTP server.
 package gcpdir
 
 import (
@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
@@ -49,6 +50,7 @@ func new(serverURL string, storeService upspin.Store, client netutil.HTTPClientI
 	}
 }
 
+// Lookup implements Directory.
 func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Lookup"
 	// Prepare a get request to the server
@@ -68,6 +70,7 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return dirEntry, nil
 }
 
+// Put implements Directory.
 func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
 	const op = "Put"
 
@@ -169,6 +172,7 @@ func (d *Directory) storeDirEntry(op string, dirEntry *upspin.DirEntry) error {
 	return nil
 }
 
+// MakeDirectory implements Directory.
 func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
 	const op = "MakeDirectory"
 
@@ -296,12 +300,12 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 		return nil, newError(op, path, err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, newError(op, path, errors.New(fmt.Sprintf(serverError, resp.StatusCode)))
+		return nil, newError(op, path, fmt.Errorf(serverError, resp.StatusCode))
 	}
 	// Check the content type
 	answerType := resp.Header.Get(netutil.ContentType)
 	if !strings.HasPrefix(answerType, "application/json") {
-		return nil, newError(op, path, errors.New(fmt.Sprintf("invalid response format: %v", answerType)))
+		return nil, newError(op, path, fmt.Errorf("invalid response format: %v", answerType))
 	}
 
 	// Read the body of the response
@@ -315,6 +319,7 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 	return respBody, nil
 }
 
+// Dial implements Dialer.
 func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	const op = "Dial"
 	if context == nil {
@@ -322,13 +327,19 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	}
 	serverURL, err := url.Parse(string(e.NetAddr))
 	if err != nil {
-		return nil, newError(op, "", errors.New(fmt.Sprintf("required endpoint with a valid HTTP address: %v", err)))
+		return nil, newError(op, "", fmt.Errorf("required endpoint with a valid HTTP address: %v", err))
 	}
 	d.serverURL = serverURL.String()
 	d.storeService = context.Store
+	authClient, isSecure := d.client.(*auth.HTTPClient)
+	if isSecure {
+		authClient.SetUserName(context.UserName)
+		authClient.SetUserKeys(context.KeyPair)
+	}
 	return d, nil
 }
 
+// ServerUserName implements Dialer.
 func (d *Directory) ServerUserName() string {
 	return "GCP Directory"
 }
@@ -343,5 +354,5 @@ func newError(op string, path upspin.PathName, err error) *os.PathError {
 
 func init() {
 	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
-	bind.RegisterDirectory(upspin.GCP, new("", nil, &http.Client{}))
+	bind.RegisterDirectory(upspin.GCP, new("", nil, auth.NewAnonymousClient(&http.Client{})))
 }

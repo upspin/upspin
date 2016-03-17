@@ -11,13 +11,14 @@ import (
 	"sync"
 )
 
-// FileCache implements a cache.Interface for storing local files.
+// FileCache implements a StoreCache for storing local files.
 type FileCache struct {
 	m         sync.Mutex // protects the root
 	cacheRoot string
 }
 
-func (fc FileCache) Put(ref string, blob io.Reader) error {
+// Put implements StoreCache.
+func (fc *FileCache) Put(ref string, blob io.Reader) error {
 	f, err := fc.createFile(ref)
 	if err != nil {
 		return err
@@ -26,7 +27,8 @@ func (fc FileCache) Put(ref string, blob io.Reader) error {
 	return err
 }
 
-func (fc FileCache) Get(ref string) *bufio.Reader {
+// Get implements StoreCache.
+func (fc *FileCache) Get(ref string) *bufio.Reader {
 	f, err := fc.OpenRefForRead(ref)
 	if err != nil {
 		return nil
@@ -34,7 +36,8 @@ func (fc FileCache) Get(ref string) *bufio.Reader {
 	return bufio.NewReader(f)
 }
 
-func (fc FileCache) Rename(newRef, oldRef string) error {
+// Rename implements StoreCache.
+func (fc *FileCache) Rename(newRef, oldRef string) error {
 	f, err := fc.OpenRefForRead(oldRef)
 	if err != nil {
 		return err
@@ -50,7 +53,8 @@ func (fc FileCache) Rename(newRef, oldRef string) error {
 	return os.Rename(oldName, newName)
 }
 
-func (fc FileCache) RandomRef() string {
+// RandomRef implements StoreCache.
+func (fc *FileCache) RandomRef() string {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	f, err := ioutil.TempFile(fc.cacheRoot, "upload-")
@@ -62,28 +66,32 @@ func (fc FileCache) RandomRef() string {
 	return fname
 }
 
-func (fc FileCache) Purge(ref string) error {
+// Purge implements StoreCache.
+func (fc *FileCache) Purge(ref string) error {
 	return os.Remove(fc.GetFileLocation(ref))
 }
 
-func (fc FileCache) IsCached(ref string) bool {
+// IsCached implements StoreCache.
+func (fc *FileCache) IsCached(ref string) bool {
 	fname := fc.GetFileLocation(ref)
 	fi, err := os.Stat(fname)
 	return err == nil && fi.Mode().IsRegular()
 }
 
-func (fc FileCache) GetFileLocation(ref string) string {
+// GetFileLocation returns the full pathname of the location of the file.
+func (fc *FileCache) GetFileLocation(ref string) string {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	return fmt.Sprintf("%s/%s", fc.cacheRoot, ref)
 }
 
-func (fc FileCache) OpenRefForRead(ref string) (*os.File, error) {
+// OpenRefForRead opens a given ref stored in the cache for read-only.
+func (fc *FileCache) OpenRefForRead(ref string) (*os.File, error) {
 	location := fc.GetFileLocation(ref)
 	return os.Open(location)
 }
 
-func (fc FileCache) createFile(name string) (*os.File, error) {
+func (fc *FileCache) createFile(name string) (*os.File, error) {
 	location := fc.GetFileLocation(name)
 	log.Printf("Creating file %v\n", location)
 	f, err := os.Create(location)
@@ -109,7 +117,7 @@ func NewFileCache(cacheRootDir string) *FileCache {
 // Delete removes all files from the cache and invalidates
 // it. Further calls to any FileCache methods may fail unpredictably
 // or silently.
-func (fc FileCache) Delete() {
+func (fc *FileCache) Delete() {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	err := os.RemoveAll(fc.cacheRoot)
