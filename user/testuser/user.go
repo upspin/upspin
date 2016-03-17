@@ -11,10 +11,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Service maps user names to potential machines holdining root of the user's tree.
+// Service maps user names to potential machines holding root of the user's tree.
 // It implements the upspin.User interface.
 type Service struct {
-	m        sync.Mutex // Protects both fields below.
+	// mu protects the fields below.
+	mu       sync.RWMutex
 	root     map[upspin.UserName][]upspin.Endpoint
 	keystore map[upspin.UserName][]upspin.PublicKey
 }
@@ -25,8 +26,8 @@ var _ upspin.User = (*Service)(nil)
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	s.m.Lock()
-	defer s.m.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	// Return copies so the caller can't modify our data structures.
 	locs := make([]upspin.Endpoint, len(s.root[name]))
 	copy(locs, s.root[name])
@@ -40,8 +41,8 @@ func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 // forgotten. To add keys to the existing set, Lookup and append to
 // the slice. If keys is nil, the user is forgotten.
 func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
-	s.m.Lock()
-	defer s.m.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if keys == nil {
 		delete(s.keystore, name)
 	} else {
@@ -51,8 +52,8 @@ func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
 
 // ListUsers returns a slice of all known users with at least one public key.
 func (s *Service) ListUsers() []upspin.UserName {
-	s.m.Lock()
-	defer s.m.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	users := make([]upspin.UserName, 0, len(s.keystore))
 	for u := range s.keystore {
 		users = append(users, u)
@@ -65,8 +66,6 @@ func (s *Service) ListUsers() []upspin.UserName {
 // adminstrative procedure. For this test version, we just provide a
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
-	s.m.Lock()
-	defer s.m.Unlock()
 	// Verify that it is a valid name. First make it look like a directory by adding a slash.
 	parsed, err := path.Parse(upspin.PathName(name + "/"))
 	if err != nil {
@@ -79,7 +78,9 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	if err != nil {
 		return err
 	}
+	s.mu.Lock()
 	s.root[name] = []upspin.Endpoint{loc.Endpoint}
+	s.mu.Unlock()
 	return nil
 }
 
