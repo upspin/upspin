@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_2ab77bff",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_96d66c09",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_f6e360ed",
         "filename": "auth/all_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-17T00:28:35Z",
       "side": 1,
       "message": "ditto",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_0abcbfdd",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_f6e360ed",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_ead04318",
+        "filename": "auth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_d6e0e4e3",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_d6c7445d",
         "filename": "auth/common.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "obvious but doc comment please",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_c7eea017",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_d6c7445d",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_a7be04f3",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_36e67806",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_16eb7ccc",
         "filename": "auth/common.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "check the return values!!!!",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_679a4c9c",
+        "filename": "auth/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_16eb7ccc",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_07a958b8",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_f6b1a00d",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_96a4acd1",
         "filename": "auth/server.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "Just call this Handler. The \"Interface\" part is redundant. I most ly avoid putting types into names, or you get things like UserArray and FileMap instead of just User[s] and File[s].\n\nAlso, it\u0027s standard Go nomenclature to name an interface after its main method, like io.Reader for Read. It\u0027s io.Reader not io.ReadInterface.\n\nThis Handles, so call it Handler.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_c7734025",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_96a4acd1",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_a7704419",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_d6ae24ad",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_36bdd8de",
         "filename": "auth/server.go",
         "patchSetId": 1
@@ -166,6 +328,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "ditto",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_6a94535f",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_36bdd8de",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_4a999793",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_16c25c54",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_76b750fe",
         "filename": "auth/server.go",
         "patchSetId": 1
@@ -200,6 +398,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "// Lookup looks up user keys.",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_eaa723d4",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_76b750fe",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_0aa39fcb",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_56bcd4de",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_b6d0c817",
         "filename": "auth/server.go",
         "patchSetId": 1
@@ -234,6 +468,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "s/  by/ by/",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_caa467d2",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_b6d0c817",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "fc4ce28c_aab12b0e",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c6d9a11_96cdcc81",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c6d9a11_f6ca4065",
         "filename": "auth/server.go",
         "patchSetId": 1
@@ -268,6 +538,24 @@
       "writtenOn": "2016-03-16T23:51:02Z",
       "side": 1,
       "message": "this is not a good message for users. it\u0027s about program internals.\nmaybe \"cannot authenticate: internal error: missing Lookup function\".\n\n(there shoudl always be one, right?)",
+      "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4ce28c_6abd73dd",
+        "filename": "auth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T01:34:24Z",
+      "side": 1,
+      "message": "I should probably check this in NewAuthHandler and return an error instead. Changed error message for now.",
+      "parentUuid": "3c6d9a11_f6ca4065",
       "revId": "fd1e63d3df408af37e498feeb14e754fdcd7cf45",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
