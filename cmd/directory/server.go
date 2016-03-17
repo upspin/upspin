@@ -2,18 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 
-	"flag"
-	"log"
-
+	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
 const (
@@ -21,9 +24,11 @@ const (
 )
 
 var (
-	projectId  = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
-	port       = flag.Int("port", 8081, "TCP port to serve.")
+	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName      = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
+	port            = flag.Int("port", 8081, "TCP port to serve.")
+	userServiceAddr = flag.String("user", "https://upspin.io:8082", "Net address of the user service.")
+	noAuth          = flag.Bool("noauth", false, "Disable authentication.")
 
 	errEntryNotFound = DirEntryError{"pathname not found"}
 )
@@ -72,7 +77,7 @@ func verifyUrl(urlStr string) error {
 
 // putHandler handles file put requests, for storing or updating
 // metadata information.
-func (d *DirServer) putHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) putHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	log.Println("In handler for /put")
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
@@ -199,7 +204,7 @@ func (d *DirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return buf, nil
 }
 
-func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	if r.URL == nil {
 		// This is so bad it's probably a panic at this point. URL should never be nil.
 		netutil.SendJSONErrorString(w, "server error: invalid URL")
@@ -227,7 +232,7 @@ func (d *DirServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, dirEntry)
 }
 
-func (d *DirServer) listHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DirServer) listHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	context := "list: "
 	err := r.ParseForm()
 	if err != nil {
@@ -252,7 +257,7 @@ func (d *DirServer) listHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
-func new(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *DirServer {
+func newDirServer(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *DirServer {
 	d := &DirServer{
 		cloudClient: cloudClient,
 		httpClient:  httpClient,
@@ -260,12 +265,31 @@ func new(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *Dir
 	return d
 }
 
+func bindToGCPUserService() upspin.User {
+	context := &upspin.Context{}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(*userServiceAddr),
+	}
+	u, err := bind.User(context, e)
+	if err != nil {
+		log.Fatalf("Can't bind to Directory: %v", err)
+	}
+	return u
+}
+
 func main() {
 	flag.Parse()
-	d := new(gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL), &http.Client{})
-	http.HandleFunc("/put", d.putHandler)
-	http.HandleFunc("/get", d.getHandler)
-	http.HandleFunc("/list", d.listHandler)
+
+	ah := auth.NewHandler(&auth.Config{
+		Lookup: bindToGCPUserService().Lookup,
+		AllowUnauthenticatedConnections: *noAuth,
+	})
+
+	d := newDirServer(gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL), &http.Client{})
+	http.HandleFunc("/put", ah.Handle(d.putHandler))
+	http.HandleFunc("/get", ah.Handle(d.getHandler))
+	http.HandleFunc("/list", ah.Handle(d.listHandler))
 	log.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }

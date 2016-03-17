@@ -7,11 +7,15 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
 const (
@@ -21,10 +25,12 @@ const (
 )
 
 var (
-	projectId  = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
-	tempDir    = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default.")
-	port       = flag.Int("port", 8080, "TCP port to serve.")
+	projectId       = flag.String("project", "upspin", "Our cloud project ID.")
+	bucketName      = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
+	tempDir         = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default.")
+	port            = flag.Int("port", 8080, "TCP port to serve.")
+	userServiceAddr = flag.String("user", "https://upspin.io:8082", "Net address of the user service.")
+	noAuth          = flag.Bool("noauth", false, "Disable authentication.")
 )
 
 type StoreServer struct {
@@ -34,7 +40,7 @@ type StoreServer struct {
 
 // Handler for receiving file put requests (i.e. storing new blobs).
 // Requests must contain a 'file' form entry.
-func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
+func (s *StoreServer) putHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	const op = "putHandler: "
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "post or put request expected")
@@ -82,7 +88,7 @@ func (s *StoreServer) putHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, keyStruct)
 }
 
-func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
+func (s *StoreServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
 		netutil.SendJSONErrorString(w, invalidRefError)
@@ -121,7 +127,7 @@ func (s *StoreServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONReply(w, location)
 }
 
-func (s *StoreServer) deleteHandler(w http.ResponseWriter, r *http.Request) {
+func (s *StoreServer) deleteHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
 		netutil.SendJSONErrorString(w, invalidRefError)
@@ -140,15 +146,34 @@ func (s *StoreServer) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	netutil.SendJSONErrorString(w, "success")
 }
 
+func bindToGCPUserService() upspin.User {
+	context := &upspin.Context{}
+	e := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(*userServiceAddr),
+	}
+	u, err := bind.User(context, e)
+	if err != nil {
+		log.Fatalf("Can't bind to Directory: %v", err)
+	}
+	return u
+}
+
 func main() {
 	flag.Parse()
 	ss := &StoreServer{
 		cloudClient: gcp.New(*projectId, *bucketName, gcp.DefaultWriteACL),
 		fileCache:   cache.NewFileCache(*tempDir),
 	}
-	http.HandleFunc("/put", ss.putHandler)
-	http.HandleFunc("/get", ss.getHandler)
-	http.HandleFunc("/delete", ss.deleteHandler)
+
+	ah := auth.NewHandler(&auth.Config{
+		Lookup: bindToGCPUserService().Lookup,
+		AllowUnauthenticatedConnections: *noAuth,
+	})
+
+	http.HandleFunc("/put", ah.Handle(ss.putHandler))
+	http.HandleFunc("/get", ah.Handle(ss.getHandler))
+	http.HandleFunc("/delete", ah.Handle(ss.deleteHandler))
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 	if err != nil {
 		log.Fatal(err)
