@@ -69,6 +69,24 @@
       "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_4e3f270c",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-17T21:37:54Z",
+      "side": 1,
+      "message": "The string being signed in my first version of this auth code was\n  \"upspin server:%s\\nscope:%s\\nactor:%s\\natime:%s\nThe idea was that we ensure any signature can only be used with this Upspin server, not any other protocol or service, and with what scope.   The explicit name of the actor may matter if one key is used for several actors and atime is insurance against replay.\n\nIf you add Date, then you\u0027re close enough for now.",
+      "parentUuid": "1c161690_0b9fe18a",
+      "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
