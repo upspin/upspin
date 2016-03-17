@@ -7,7 +7,8 @@ import (
 	"io"
 )
 
-type Interface interface {
+// StoreCache specifies how reference caches should be accessed.
+type StoreCache interface {
 	// Put stores a blob under the given ref for later retrieval. If another ref exists, it is
 	// overwritten. Returns an error if blob can't be read or storage is full.
 	Put(ref string, blob io.Reader) error

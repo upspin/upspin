@@ -56,8 +56,8 @@ type Config struct {
 	// TODO: set preferred cipher method.
 }
 
-// AuthHandler implements a Handler that ensures cryptography-grade authentication.
-type AuthHandler struct {
+// authHandler implements a Handler that ensures cryptography-grade authentication.
+type authHandler struct {
 	// TODO: make this thread safe?
 	config         *Config
 	user           upspin.UserName
@@ -67,37 +67,40 @@ type AuthHandler struct {
 	err            error
 }
 
-var _ Handler = (*AuthHandler)(nil)
+var _ Handler = (*authHandler)(nil)
 
 // NewHandler creates a new instance of a Handler according to the given config, which must not be changed subsequently by the caller.
 func NewHandler(config *Config) Handler {
 	// TODO: look at preferred cipher in config
-	return &AuthHandler{
+	return &authHandler{
 		config:         config,
 		tlsUniqueCache: make(map[string]upspin.UserName),
 	}
 }
 
-func (ah *AuthHandler) User() upspin.UserName {
+// User implements Handler.
+func (ah *authHandler) User() upspin.UserName {
 	return ah.user
 }
 
-func (ah *AuthHandler) IsAuthenticated() bool {
+// IsAuthenticated implements Handler.
+func (ah *authHandler) IsAuthenticated() bool {
 	return ah.isAuth
 }
 
-func (ah *AuthHandler) Err() error {
+// Err implements Handler.
+func (ah *authHandler) Err() error {
 	return ah.err
 }
 
-func (ah *AuthHandler) setTLSUnique(userName upspin.UserName, tlsUnique []byte) {
+func (ah *authHandler) setTLSUnique(userName upspin.UserName, tlsUnique []byte) {
 	if tlsUnique == nil {
 		delete(ah.tlsUniqueCache, string(tlsUnique))
 	}
 	ah.tlsUniqueCache[string(tlsUnique)] = userName
 }
 
-func (ah *AuthHandler) getUserbyTLSUnique(tlsUnique []byte) upspin.UserName {
+func (ah *authHandler) getUserbyTLSUnique(tlsUnique []byte) upspin.UserName {
 	user, ok := ah.tlsUniqueCache[string(tlsUnique)]
 	if !ok {
 		return ""
@@ -105,7 +108,7 @@ func (ah *AuthHandler) getUserbyTLSUnique(tlsUnique []byte) upspin.UserName {
 	return user
 }
 
-func (ah *AuthHandler) doAuth(w http.ResponseWriter, r *http.Request) error {
+func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) error {
 	ah.isAuth = false
 	// The username must be in all communications, even after a TLS handshake.
 	ah.user = upspin.UserName(r.Header.Get(userNameHeader))
@@ -145,7 +148,7 @@ func (ah *AuthHandler) doAuth(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (ah *AuthHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request) {
+func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request) {
 	httpHandler := func(w http.ResponseWriter, r *http.Request) {
 		// Perform authentication here, return the handler func used by the HTTP handler.
 		err := ah.doAuth(w, r)

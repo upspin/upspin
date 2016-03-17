@@ -16,7 +16,7 @@ const (
 func TestInvalidUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"get: invalid email format"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8082/get?user=a", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.getHandler(resp, req)
 	resp.Verify(t)
 }
@@ -24,7 +24,7 @@ func TestInvalidUser(t *testing.T) {
 func TestMethodGet(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"get: only handles GET http requests"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/get?user=a@bbc.com", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.getHandler(resp, req)
 	resp.Verify(t)
 }
@@ -32,7 +32,7 @@ func TestMethodGet(t *testing.T) {
 func TestMethodPut(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"addkey: only handles POST http requests"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8082/addkey?user=a@bbc.com", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 }
@@ -40,7 +40,7 @@ func TestMethodPut(t *testing.T) {
 func TestAddKeyShortKey(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"addkey: key length too short"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=a@bbc.com&key=1234", []byte(""))
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 }
@@ -155,8 +155,8 @@ func TestGetExistingUser(t *testing.T) {
 	resp.Verify(t)
 }
 
-func newUserServer() *userServer {
-	return new(&gcptest.DummyGCP{})
+func newDummyUserServer() *userServer {
+	return newUserServer(&gcptest.DummyGCP{})
 }
 
 // newUserServerWithMocking sets up a mock GCP client that expects a
@@ -170,6 +170,6 @@ func newUserServerWithMocking(data []byte) (*userServer, *gcptest.ExpectDownload
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
-	u := new(mockGCP)
+	u := newUserServer(mockGCP)
 	return u, mockGCP
 }
