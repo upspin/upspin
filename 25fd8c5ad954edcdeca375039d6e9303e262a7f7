@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_6bdc958c",
+        "filename": "auth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T21:19:50Z",
+      "side": 1,
+      "message": "Ah, good point. We shouldn\u0027t. The server will continue to return 401 if it\u0027s not https. Fixed and added a test to catch this.",
+      "parentUuid": "1c161690_48327fed",
+      "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c161690_c8f82fd9",
         "filename": "auth/common.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-17T19:21:09Z",
       "side": 1,
       "message": "still studying what is in req, but it seems likely that this hash needs to include more",
+      "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_0b9fe18a",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-17T21:19:50Z",
+      "side": 1,
+      "message": "Sure. Maybe Date? \n\nHere\u0027s what\u0027s there now, from the e2e test:\n\nReq: \u0026{Method:GET URL:https://127.0.0.1:37252/authhello Proto:HTTP/1.1 ProtoMajor:1 ProtoMinor:1 Header:map[X-Upspin-Username:[joe@blow.com] X-Upspin-Signature-Type:[p256] X-Upspin-Signature:[22749268291390473513397327834084516631809079701912379804595036708735195264440 11799953611746980908719841625016168992320440516466370256220898397938913847664]] Body:\u003cnil\u003e ContentLength:0 TransferEncoding:[] Close:false Host:127.0.0.1:37252 Form:map[] PostForm:map[] MultipartForm:\u003cnil\u003e Trailer:map[] RemoteAddr: RequestURI: TLS:\u003cnil\u003e Cancel:\u003cnil\u003e}",
+      "parentUuid": "1c161690_c8f82fd9",
       "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
