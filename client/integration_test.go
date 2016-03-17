@@ -1,5 +1,9 @@
-// This is an integration test for gcpclient. It requires a local GCP
-// Directory instance running on port 8081. The use 'go test -tags integration'.
+// This is an integration test for Client. It requires a local GCP
+// Directory instance running on port 8081. To launch a local GCP Directory use:
+//
+// ./directory -noauth -cert -key
+//
+// The launch this test: 'go test -tags integration'.
 //
 // The line below is important or 'go test' will fail:
 
@@ -81,7 +85,7 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	}
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.GCP,
-		NetAddr:   "http://upspin.io:8082",
+		NetAddr:   "https://upspin.io:8082",
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
