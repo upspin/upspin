@@ -108,5 +108,5 @@ func TestIsCached(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	m.Run()
-	DeleteFileCache(fc)
+	fc.Delete()
 }
