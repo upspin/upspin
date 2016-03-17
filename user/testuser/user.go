@@ -27,8 +27,11 @@ var _ upspin.User = (*Service)(nil)
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	s.m.Lock()
 	defer s.m.Unlock()
-	locs := s.root[name]
-	keys := s.keystore[name]
+	// Return copies so the caller can't modify our data structures.
+	locs := make([]upspin.Endpoint, len(s.root[name]))
+	copy(locs, s.root[name])
+	keys := make([]upspin.PublicKey, len(s.keystore[name]))
+	copy(keys, s.keystore[name])
 	return locs, keys, nil
 }
 

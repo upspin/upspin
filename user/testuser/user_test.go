@@ -102,3 +102,45 @@ func TestPublicKeysAndUsers(t *testing.T) {
 		t.Fatalf("Expected 0 users, got %d", len(users))
 	}
 }
+
+func TestSafety(t *testing.T) {
+	// Make sure the answers from Lookup are not aliases for the Service maps.
+	u, _ := setup(t)
+	testUser, ok := u.(*Service)
+	if !ok {
+		t.Fatal("Not a testuser Service")
+	}
+	const testKey = "pub key2"
+	testUser.SetPublicKeys(userName, []upspin.PublicKey{
+		upspin.PublicKey(testKey),
+	})
+
+	locs, keys, err := u.Lookup(userName)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	if len(locs) != 1 || len(keys) != 1 {
+		t.Fatal("Extra locs or keys")
+	}
+
+	// Save and then modify the two.
+	loc0 := locs[0]
+	locs[0].Transport++
+	key0 := keys[0]
+	keys[0] += "gotcha"
+
+	// Fetch again, expect the original results.
+	locs1, keys1, err := u.Lookup(userName)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	if len(locs1) != 1 || len(keys1) != 1 {
+		t.Fatal("Extra locs or keys (1)")
+	}
+	if locs1[0] != loc0 {
+		t.Error("loc was modified")
+	}
+	if keys1[0] != key0 {
+		t.Error("key was modified")
+	}
+}
