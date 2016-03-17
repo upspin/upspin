@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
@@ -24,14 +25,15 @@ const (
 
 var (
 	fileCache = cache.NewFileCache("")
+	nilAh     auth.Handler
 )
 
 func TestDelete(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/delete?ref=foo", nil)
 
-	ss := NewStoreServer()
-	ss.deleteHandler(resp, req)
+	ss := newStoreServer()
+	ss.deleteHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -39,8 +41,8 @@ func TestDeleteInvalidKey(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"invalid ref"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/delete", nil)
 
-	ss := NewStoreServer()
-	ss.deleteHandler(resp, req)
+	ss := newStoreServer()
+	ss.deleteHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -48,8 +50,8 @@ func TestDeleteInvalidRequestType(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"Delete only accepts POST HTTP requests"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/delete?ref=foo", nil)
 
-	ss := NewStoreServer()
-	ss.deleteHandler(resp, req)
+	ss := newStoreServer()
+	ss.deleteHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -65,10 +67,10 @@ func TestGetRemoteFile(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(string(locJSON))
 	req := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%v", Key), nil)
 
-	ss := NewStoreServer()
+	ss := newStoreServer()
 	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: Key, Link: RetLink}
 
-	ss.getHandler(resp, req)
+	ss.getHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -83,9 +85,9 @@ func TestGetLocalFile(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(Contents)
 	req := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%v", Key), nil)
 
-	ss := NewStoreServer()
+	ss := newStoreServer()
 
-	ss.getHandler(resp, req)
+	ss.getHandler(nilAh, resp, req)
 	resp.Verify(t)
 
 }
@@ -94,9 +96,9 @@ func TestPutError(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"putHandler: request Content-Type isn't multipart/form-data"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", nil)
 
-	ss := NewStoreServer()
+	ss := newStoreServer()
 
-	ss.putHandler(resp, req)
+	ss.putHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -125,9 +127,9 @@ func TestPut(t *testing.T) {
 	req.Header.Set(netutil.ContentType, w.FormDataContentType())
 	resp := nettest.NewExpectingResponseWriter(`{"Key":"978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"}`)
 
-	ss := NewStoreServer()
+	ss := newStoreServer()
 
-	ss.putHandler(resp, req)
+	ss.putHandler(nilAh, resp, req)
 	resp.Verify(t)
 }
 
@@ -136,8 +138,8 @@ func TestMain(m *testing.M) {
 	fileCache.Delete()
 }
 
-func NewStoreServer() *StoreServer {
-	return &StoreServer{
+func newStoreServer() *storeServer {
+	return &storeServer{
 		cloudClient: &gcptest.DummyGCP{},
 		fileCache:   fileCache,
 	}
