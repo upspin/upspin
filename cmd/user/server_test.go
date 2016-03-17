@@ -9,14 +9,13 @@ import (
 )
 
 const (
-	mockUser            = "bob@foo.com"
-	mockGCPDownloadLink = "http://googleapi.com/dl?ref=bob@foo.com"
+	mockUser = "bob@foo.com"
 )
 
 func TestInvalidUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"get: invalid email format"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8082/get?user=a", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.getHandler(resp, req)
 	resp.Verify(t)
 }
@@ -24,7 +23,7 @@ func TestInvalidUser(t *testing.T) {
 func TestMethodGet(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"get: only handles GET http requests"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/get?user=a@bbc.com", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.getHandler(resp, req)
 	resp.Verify(t)
 }
@@ -32,7 +31,7 @@ func TestMethodGet(t *testing.T) {
 func TestMethodPut(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"addkey: only handles POST http requests"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8082/addkey?user=a@bbc.com", nil)
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 }
@@ -40,7 +39,7 @@ func TestMethodPut(t *testing.T) {
 func TestAddKeyShortKey(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"addkey: key length too short"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=a@bbc.com&key=1234", []byte(""))
-	u := newUserServer()
+	u := newDummyUserServer()
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 }
@@ -49,7 +48,7 @@ func TestAddKeyToExistingUser(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=bob@foo.com&key=abcdefghijklmnopqrs", []byte(""))
 
-	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":[[12,17,48]]}`))
+	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["xyz"]}`))
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 
@@ -60,7 +59,7 @@ func TestAddKeyToExistingUser(t *testing.T) {
 	if mockGCP.PutRef[0] != mockUser {
 		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw==","DBEw"],"Endpoints":null}`
+	expectedPutValue := `{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs","xyz"],"Endpoints":null}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
 	}
@@ -70,7 +69,7 @@ func TestAddExistingKey(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8082/addkey?user=bob@foo.com&key=abcdefghijklmnopqrs", []byte(""))
 
-	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw=="]}`))
+	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs"]}`))
 	u.addKeyHandler(resp, req)
 	resp.Verify(t)
 
@@ -96,7 +95,7 @@ func TestAddKeyToNewUser(t *testing.T) {
 	if mockGCP.PutRef[0] != newUser {
 		t.Errorf("Expected update to user %s, got user %s", newUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"new@user.com","Keys":["YWJjZGVmZ2hpamtsbW5vcHFycw=="],"Endpoints":null}`
+	expectedPutValue := `{"User":"new@user.com","Keys":["abcdefghijklmnopqrs"],"Endpoints":null}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
 	}
@@ -155,8 +154,8 @@ func TestGetExistingUser(t *testing.T) {
 	resp.Verify(t)
 }
 
-func newUserServer() *userServer {
-	return new(&gcptest.DummyGCP{})
+func newDummyUserServer() *userServer {
+	return newUserServer(&gcptest.DummyGCP{})
 }
 
 // newUserServerWithMocking sets up a mock GCP client that expects a
@@ -170,6 +169,6 @@ func newUserServerWithMocking(data []byte) (*userServer, *gcptest.ExpectDownload
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
-	u := new(mockGCP)
+	u := newUserServer(mockGCP)
 	return u, mockGCP
 }
