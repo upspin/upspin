@@ -79,11 +79,8 @@ func TestEndToEnd(t *testing.T) {
 	client := &http.Client{
 		Transport: tr,
 	}
-	err = auth.SignRequest(user, p256Key, req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	resp, err := client.Do(req)
+	authClient := auth.NewClient(user, p256Key, client)
+	resp, err := authClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
