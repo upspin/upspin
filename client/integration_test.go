@@ -81,7 +81,7 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	}
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.GCP,
-		NetAddr:   "http://upspin.io:8082",
+		NetAddr:   "https://upspin.io:8082",
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
