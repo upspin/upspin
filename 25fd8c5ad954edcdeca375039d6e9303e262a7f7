@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_48327fed",
+        "filename": "auth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-17T19:21:09Z",
+      "side": 1,
+      "message": "even if Scheme !\u003d \"https\" ?",
+      "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_c8f82fd9",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-17T19:21:09Z",
+      "side": 1,
+      "message": "still studying what is in req, but it seems likely that this hash needs to include more",
+      "revId": "25fd8c5ad954edcdeca375039d6e9303e262a7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
