@@ -17,7 +17,7 @@ type FileCache struct {
 	cacheRoot string
 }
 
-func (fc FileCache) Put(ref string, blob io.Reader) error {
+func (fc *FileCache) Put(ref string, blob io.Reader) error {
 	f, err := fc.createFile(ref)
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func (fc FileCache) Put(ref string, blob io.Reader) error {
 	return err
 }
 
-func (fc FileCache) Get(ref string) *bufio.Reader {
+func (fc *FileCache) Get(ref string) *bufio.Reader {
 	f, err := fc.OpenRefForRead(ref)
 	if err != nil {
 		return nil
@@ -34,7 +34,7 @@ func (fc FileCache) Get(ref string) *bufio.Reader {
 	return bufio.NewReader(f)
 }
 
-func (fc FileCache) Rename(newRef, oldRef string) error {
+func (fc *FileCache) Rename(newRef, oldRef string) error {
 	f, err := fc.OpenRefForRead(oldRef)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (fc FileCache) Rename(newRef, oldRef string) error {
 	return os.Rename(oldName, newName)
 }
 
-func (fc FileCache) RandomRef() string {
+func (fc *FileCache) RandomRef() string {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	f, err := ioutil.TempFile(fc.cacheRoot, "upload-")
@@ -62,28 +62,28 @@ func (fc FileCache) RandomRef() string {
 	return fname
 }
 
-func (fc FileCache) Purge(ref string) error {
+func (fc *FileCache) Purge(ref string) error {
 	return os.Remove(fc.GetFileLocation(ref))
 }
 
-func (fc FileCache) IsCached(ref string) bool {
+func (fc *FileCache) IsCached(ref string) bool {
 	fname := fc.GetFileLocation(ref)
 	fi, err := os.Stat(fname)
 	return err == nil && fi.Mode().IsRegular()
 }
 
-func (fc FileCache) GetFileLocation(ref string) string {
+func (fc *FileCache) GetFileLocation(ref string) string {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	return fmt.Sprintf("%s/%s", fc.cacheRoot, ref)
 }
 
-func (fc FileCache) OpenRefForRead(ref string) (*os.File, error) {
+func (fc *FileCache) OpenRefForRead(ref string) (*os.File, error) {
 	location := fc.GetFileLocation(ref)
 	return os.Open(location)
 }
 
-func (fc FileCache) createFile(name string) (*os.File, error) {
+func (fc *FileCache) createFile(name string) (*os.File, error) {
 	location := fc.GetFileLocation(name)
 	log.Printf("Creating file %v\n", location)
 	f, err := os.Create(location)
@@ -109,7 +109,7 @@ func NewFileCache(cacheRootDir string) *FileCache {
 // Delete removes all files from the cache and invalidates
 // it. Further calls to any FileCache methods may fail unpredictably
 // or silently.
-func (fc FileCache) Delete() {
+func (fc *FileCache) Delete() {
 	fc.m.Lock()
 	defer fc.m.Unlock()
 	err := os.RemoveAll(fc.cacheRoot)

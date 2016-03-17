@@ -3,18 +3,17 @@ package main
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cmd/auth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -274,82 +273,34 @@ func (u *userServer) putUserEntry(user string, userEntry *userEntry) error {
 	return err
 }
 
-// new creates a UserService from a pre-configured GCP instance and an HTTP client.
-func new(cloudClient gcp.Interface) *userServer {
+// newUserServer creates a UserService from a pre-configured GCP instance and an HTTP client.
+func newUserServer(cloudClient gcp.Interface) *userServer {
 	u := &userServer{
 		cloudClient: cloudClient,
 	}
 	return u
 }
 
-// isReadableFile reports whether the file exists and is readable.
-// If the error is non-nil, it means there might be a file or directory
-// with that name but we cannot read it.
-func isReadableFile(path string) (bool, error) {
-	// Is it stattable and is it a plain file?
-	info, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil // Item does not exist.
-		}
-		return false, err // Item is problematic.
-	}
-	if info.IsDir() {
-		return false, errors.New("is directory")
-	}
-	// Is it readable?
-	fd, err := os.Open(path)
-	if err != nil {
-		return false, errors.New("permission denied")
-	}
-	fd.Close()
-	return true, nil // Item exists and is readable.
-}
-
 func main() {
 	flag.Parse()
-	u := new(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
+	u := newUserServer(gcp.New(*projectId, *bucketName, gcp.BucketOwnerFullCtrl))
 	if !*readOnly {
+		// TODO: these should be authenticated too.
 		http.HandleFunc("/addkey", u.addKeyHandler)
 		http.HandleFunc("/addroot", u.addRootHandler)
 		http.HandleFunc("/delete", u.deleteHandler)
 	}
 	http.HandleFunc("/get", u.getHandler)
 
-	portNum := fmt.Sprintf(":%d", *port)
-	certReadable, err := isReadableFile(*sslCertificateFile)
-	if err != nil {
-		log.Fatalf("Problem with SSL certificate in %s: %v", *sslCertificateFile, err)
-	}
-	keyReadable, err := isReadableFile(*sslCertificateKeyFile)
-	if err != nil {
-		log.Fatalf("Problem with SSL key %s: %v", *sslCertificateKeyFile, err)
-	}
-
-	if certReadable && keyReadable {
-		log.Println("Starting HTTPS server with SSL")
-
-		tlsConfig := &tls.Config{
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			},
-			MinVersion:               tls.VersionTLS12,
-			PreferServerCipherSuites: true, // Use our choice, not the client's choice
-			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
+		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		if err != nil {
+			log.Fatal(err)
 		}
-		tlsConfig.BuildNameToCertificate()
-
-		server := &http.Server{
-			Addr:      portNum,
-			TLSConfig: tlsConfig,
-		}
-
+		log.Println("Starting HTTPS server with SSL.")
 		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
 	} else {
-		log.Println("No SSL certificate found. Starting regular HTTP server")
-		log.Fatal(http.ListenAndServe(portNum, nil))
+		log.Println("Not using SSL certificate. Starting regular HTTP server.")
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 	}
 }
