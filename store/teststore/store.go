@@ -3,6 +3,7 @@ package teststore
 
 import (
 	"errors"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
@@ -11,6 +12,8 @@ import (
 
 // Service returns data and metadata referenced by the request.
 type Service struct {
+	// mu protects the fields below.
+	mu       sync.Mutex
 	endpoint upspin.Endpoint
 	blob     map[string][]byte // string is key made from SHA256 hash of data.
 }
@@ -30,7 +33,9 @@ func (s *Service) Endpoint() upspin.Endpoint {
 
 func (s *Service) Put(ciphertext []byte) (string, error) {
 	key := sha256key.Of(ciphertext).String()
+	s.mu.Lock()
 	s.blob[key] = ciphertext
+	s.mu.Unlock()
 	return key, nil
 }
 
@@ -38,9 +43,11 @@ func (s *Service) Delete(key string) error {
 	return errors.New("Not implemented yet")
 }
 
-// TODO: Function should provide alternate location if missing.
+// TODO: Get should provide alternate location if missing.
 func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, err error) {
+	s.mu.Lock()
 	data, ok := s.blob[key]
+	s.mu.Unlock()
 	if !ok {
 		return nil, nil, errors.New("no such blob")
 	}

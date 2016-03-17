@@ -54,7 +54,7 @@ func setupContext() {
 	context.KeyPair = upspin.KeyPair{
 		Private: upspin.PrivateKey("privacy in the privy"),
 	}
-	context.Packing = upspin.DebugPack // TODO.
+	context.Packing = upspin.DebugPack
 	var err error
 	context.User, err = bind.User(context, endpoint)
 	if err != nil {

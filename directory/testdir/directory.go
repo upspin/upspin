@@ -12,6 +12,7 @@ import (
 	goPath "path"
 	"sort"
 	"strings"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
@@ -50,7 +51,13 @@ type Service struct {
 	StoreEndpoint upspin.Endpoint
 	Store         upspin.Store
 	Context       *upspin.Context
-	Root          map[upspin.UserName]upspin.Reference // All inside Service.Store
+
+	// mu is used to serialize access to the Root map.
+	// It's also used to serialize all access to the store through the
+	// exported API, for simple but slow safety. At least it's an RWMutex
+	// so it's not _too_ bad.
+	mu   sync.RWMutex
+	Root map[upspin.UserName]upspin.Reference // All inside Service.Store
 }
 
 var _ upspin.Directory = (*Service)(nil)
@@ -154,6 +161,8 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	dirRef, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Glob", upspin.PathName(parsed.User), "no such user")
@@ -242,6 +251,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	if err != nil {
 		return loc0, err
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if len(parsed.Elems) == 0 {
 		// Creating a root: easy!
 		if _, present := s.Root[parsed.User]; present {
@@ -276,6 +287,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
 func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return s.put("Put", pathName, false, data, packdata)
 }
 
@@ -336,7 +349,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		Reference: ref,
 	}
 
-	// Update directory holding the file. TODO: must be atomic.
+	// Update directory holding the file.
 	// Need the name of the directory we're updating.
 	ent = entry{
 		elem:     lastElem,
@@ -381,6 +394,8 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if len(parsed.Elems) == 0 {
 		return nil, mkStrError("Lookup", pathName, "cannot use Get on directory; use Glob")
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	dirRef, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Lookup", upspin.PathName(parsed.User), "no such user")
