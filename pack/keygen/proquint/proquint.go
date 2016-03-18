@@ -1,15 +1,15 @@
 // Package proquint converts uint16 to/from pronounceable five letters.
-
-// See http://arxiv.org/html/0901.4016.
 package proquint
 
 import "bytes"
 
+// See http://arxiv.org/html/0901.4016.
 var (
-	cons  []byte = []byte("bdfghjklmnprstvz")
-	vowel []byte = []byte("aiou")
+	cons  = []byte("bdfghjklmnprstvz")
+	vowel = []byte("aiou")
 )
 
+// Encode returns a five-letter word representing a uint16.
 func Encode(x uint16) (s []byte) {
 	cons3 := x & 0x0f
 	x >>= 4
@@ -29,6 +29,7 @@ func Encode(x uint16) (s []byte) {
 	return
 }
 
+// Decode parses a five-letter word, returning a uint16.
 func Decode(s []byte) (x uint16) {
 	cons1 := uint16(bytes.IndexByte(cons, s[0]))
 	vow1 := uint16(bytes.IndexByte(vowel, s[1]))

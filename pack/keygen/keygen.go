@@ -25,7 +25,7 @@ import (
 
 var (
 	packing = flag.String("packing", "p256", "packing name, such as p256")
-	seed    = flag.String("seed", "", "128 bit seed in proquint format")
+	secret  = flag.String("secret", "", "128 bit secret in proquint format")
 	where   = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
 )
 
@@ -39,17 +39,18 @@ type drng struct {
 func (d *drng) Read(p []byte) (n int, err error) {
 	lenp := len(p)
 	n = lenp
+	var drand [16]byte
 	for n > 0 {
 		if len(d.random) == 0 {
-			d.random = make([]byte, 16) // TODO try again to move this outside
-			binary.BigEndian.PutUint32(d.random[0:4], d.counter)
+			binary.BigEndian.PutUint32(drand[0:4], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[4:8], d.counter)
+			binary.BigEndian.PutUint32(drand[4:8], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[8:12], d.counter)
+			binary.BigEndian.PutUint32(drand[8:12], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[12:16], d.counter)
+			binary.BigEndian.PutUint32(drand[12:16], d.counter)
 			d.counter++
+			d.random = drand[:]
 			d.aes.Encrypt(d.random, d.random)
 		}
 		m := copy(p, d.random)
@@ -62,28 +63,27 @@ func (d *drng) Read(p []byte) (n int, err error) {
 
 func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 
-	// Pick seed with 128 bits of entropy.
+	// Pick secret 128 bits.
+	// TODO  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
-	if len(*seed) > 0 {
-		if len((*seed)) != 47 || (*seed)[5] != '-' || (*seed)[23] != ' ' {
-			log.Fatalf("expected seed like\n lusab-babad-gutih-tugad gutuk-bisog-mudof-sakat\n"+
-				"not\n %s\nkey not generated", *seed)
+	if len(*secret) > 0 {
+		if len((*secret)) != 47 || (*secret)[5] != '-' || (*secret)[23] != ' ' {
+			log.Fatalf("expected secret like\n lusab-babad-gutih-tugad gutuk-bisog-mudof-sakat\n"+
+				"not\n %s\nkey not generated", *secret)
 		}
 		for i := 0; i < 8; i++ {
-			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((*seed)[6*i:6*i+5])))
+			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((*secret)[6*i:6*i+5])))
 		}
 	} else {
 		_, err := rand.Read(b)
 		if err != nil {
 			log.Fatalf("key not generated: %s", err)
 		}
-		proquints := make([]string, 8)
+		proquints := make([]interface{}, 8)
 		for i := 0; i < 8; i++ {
-			proquints[i] = string(proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2])))
+			proquints[i] = interface{}(proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2])))
 		}
-		// fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints...)
-		fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints[0], proquints[1], proquints[2],
-			proquints[3], proquints[4], proquints[5], proquints[6], proquints[7])
+		fmt.Printf("-secret \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints...)
 	}
 
 	// Create crypto deterministic random generator from b.
