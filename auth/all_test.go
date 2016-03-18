@@ -93,16 +93,16 @@ func TestServerHandler(t *testing.T) {
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
-	handler := func(authHandler Handler, w http.ResponseWriter, r *http.Request) {
+	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
 		called = true
-		if authHandler.User() != user {
-			t.Errorf("Expected user %q, got %q", user, authHandler.User())
+		if session.User() != user {
+			t.Errorf("Expected user %q, got %q", user, session.User())
 		}
-		if !authHandler.IsAuthenticated() {
+		if !session.IsAuthenticated() {
 			t.Error("Expected IsAuthenticated")
 		}
-		if authHandler.Err() != nil {
-			t.Errorf("Expected no error, got %q", authHandler.Err())
+		if session.Err() != nil {
+			t.Errorf("Expected no error, got %q", session.Err())
 		}
 	}
 	config := &Config{Lookup: lookup}
@@ -122,9 +122,9 @@ func TestServerHandlerNotTLS(t *testing.T) {
 	}
 	signReq(t, p256Key, req)
 
-	handler := func(authHandler Handler, w http.ResponseWriter, r *http.Request) {
+	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
 		called = true
-		if authHandler.IsAuthenticated() {
+		if session.IsAuthenticated() {
 			t.Errorf("Expected not IsAuthenticated")
 		}
 	}
@@ -151,7 +151,7 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	signReq(t, p256Key, req)
 	makeTLSRequest(req, []byte("1234"))
 
-	handler := func(authHandler Handler, w http.ResponseWriter, r *http.Request) {
+	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Do not define a Lookup function
@@ -173,7 +173,7 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	signReq(t, p256Key, req)
 	makeTLSRequest(req, []byte("1234"))
 
-	handler := func(authHandler Handler, w http.ResponseWriter, r *http.Request) {
+	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Define a custom Lookup
@@ -198,16 +198,16 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
-	handler := func(authHandler Handler, w http.ResponseWriter, r *http.Request) {
+	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
 		called++
-		if authHandler.User() != user {
-			t.Errorf("Expected user %q, got %q", user, authHandler.User())
+		if session.User() != user {
+			t.Errorf("Expected user %q, got %q", user, session.User())
 		}
-		if !authHandler.IsAuthenticated() {
+		if !session.IsAuthenticated() {
 			t.Error("Expected IsAuthenticated")
 		}
-		if authHandler.Err() != nil {
-			t.Errorf("Expected no error, got %q", authHandler.Err())
+		if session.Err() != nil {
+			t.Errorf("Expected no error, got %q", session.Err())
 		}
 	}
 	config := &Config{Lookup: lookup}

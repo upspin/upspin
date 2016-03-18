@@ -70,7 +70,7 @@ func verifyMetadata(meta upspin.Metadata) error {
 
 // putHandler handles file put requests, for storing or updating
 // metadata information.
-func (d *dirServer) putHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) putHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	log.Println("In handler for /put")
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
@@ -197,7 +197,7 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return buf, nil
 }
 
-func (d *dirServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	if r.URL == nil {
 		// This is so bad it's probably a panic at this point. URL should never be nil.
 		netutil.SendJSONErrorString(w, "server error: invalid URL")
@@ -225,7 +225,7 @@ func (d *dirServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http.R
 	netutil.SendJSONReply(w, dirEntry)
 }
 
-func (d *dirServer) listHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	context := "list: "
 	err := r.ParseForm()
 	if err != nil {

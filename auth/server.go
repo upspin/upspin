@@ -5,8 +5,8 @@ Sample usage:
 
    authHandler := auth.NewHandler(&auth.Config{Lookup: context.User.Lookup})
 
-   rawHandler := func(authHandler *auth.AuthHandler, w http.ResponseWriter, r *http.Request) {
-   	user := authHandler.User()
+   rawHandler := func(session *auth.AuthSession, w http.ResponseWriter, r *http.Request) {
+   	user := session.User()
    	w.Write([]byte(fmt.Sprintf("Hello Authenticated user %v", user)))
    }
    http.HandleFunc("/hellowithauth", authHandler.Handle(rawHandler))
@@ -25,20 +25,10 @@ import (
 )
 
 // HandlerFunc is a type used by HTTP handler functions that want to use a Handler for authentication.
-type HandlerFunc func(authHandler Handler, w http.ResponseWriter, r *http.Request)
+type HandlerFunc func(session *Session, w http.ResponseWriter, r *http.Request)
 
 // Handler is used by HTTP servers to authenticate Upspin users.
 type Handler interface {
-	// User returns the user name given in the request. It does not guarantee the user returned, if any, is
-	// authenticated when Config.AllowUnauthenticatedConnections is true.
-	User() upspin.UserName
-
-	// IsAuthenticated reports whether the connection is authenticated to a particular user. Calls to User will return a valid user name.
-	IsAuthenticated() bool
-
-	// Err reports whether there was any error in authentication.
-	Err() error
-
 	// Handle is the chained handler function to register an authenticated handler. See example in package document.
 	Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request)
 
@@ -56,102 +46,119 @@ type Config struct {
 	// TODO: set preferred cipher method.
 }
 
+// Session contains information about the connection and the authenticated user, if any.
+type Session struct {
+	user      upspin.UserName
+	isAuth    bool
+	tlsUnique string // This must represent a tls.ConnectionState.TLSUnique
+	err       error
+}
+
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
 	// TODO: make this thread safe?
-	config         *Config
-	user           upspin.UserName
-	isAuth         bool
-	tlsUniqueCache map[string]upspin.UserName // TODO: One day this will be a proper LRUCache.
-	tlsUnique      []byte                     // This must match tls.ConnectionState.TLSUnique
-	err            error
+	config       *Config
+	sessionCache *Cache // maps tlsUnique to AuthSession. Thread-safe.
 }
 
 var _ Handler = (*authHandler)(nil)
+
+const (
+	// maxSessions defines the maximum number of connections to remember before we re-auth them.
+	// This also limits the number of parallel requests we can service, so do not set it to small numbers.
+	maxSessions = 1000
+)
 
 // NewHandler creates a new instance of a Handler according to the given config, which must not be changed subsequently by the caller.
 func NewHandler(config *Config) Handler {
 	// TODO: look at preferred cipher in config
 	return &authHandler{
-		config:         config,
-		tlsUniqueCache: make(map[string]upspin.UserName),
+		config:       config,
+		sessionCache: NewLRUCache(maxSessions),
 	}
 }
 
 // User implements Handler.
-func (ah *authHandler) User() upspin.UserName {
-	return ah.user
+func (as *Session) User() upspin.UserName {
+	return as.user
 }
 
 // IsAuthenticated implements Handler.
-func (ah *authHandler) IsAuthenticated() bool {
-	return ah.isAuth
+func (as *Session) IsAuthenticated() bool {
+	return as.isAuth
 }
 
 // Err implements Handler.
-func (ah *authHandler) Err() error {
-	return ah.err
+func (as *Session) Err() error {
+	return as.err
 }
 
-func (ah *authHandler) setTLSUnique(userName upspin.UserName, tlsUnique []byte) {
-	if tlsUnique == nil {
-		delete(ah.tlsUniqueCache, string(tlsUnique))
+func (ah *authHandler) setTLSUnique(session *Session, tlsUnique string) {
+	if tlsUnique == "" {
+		log.Printf("Invalid tlsUnique for user %q", session.user)
+		return
 	}
-	ah.tlsUniqueCache[string(tlsUnique)] = userName
+	ah.sessionCache.Add(tlsUnique, session)
 }
 
-func (ah *authHandler) getUserbyTLSUnique(tlsUnique []byte) upspin.UserName {
-	user, ok := ah.tlsUniqueCache[string(tlsUnique)]
+func (ah *authHandler) getSessionByTLSUnique(tlsUnique string) *Session {
+	session, ok := ah.sessionCache.Get(tlsUnique)
 	if !ok {
-		return ""
+		return nil
 	}
-	return user
+	return session.(*Session)
 }
 
-func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) error {
-	ah.isAuth = false
+func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*Session, error) {
 	// The username must be in all communications, even after a TLS handshake.
-	ah.user = upspin.UserName(r.Header.Get(userNameHeader))
-	if ah.user == "" {
-		return errors.New("missing username in HTTP header")
+	user := upspin.UserName(r.Header.Get(userNameHeader))
+	if user == "" {
+		return nil, errors.New("missing username in HTTP header")
 	}
 	// Is this a TLS connection?
 	if r.TLS == nil {
 		// Not a TLS connection, so nothing else to do here.
-		return errors.New("not a TLS secure connection")
+		return nil, errors.New("not a TLS secure connection")
 	}
 	// If we have a tlsUnique, let's use it.
-	if r.TLS.TLSUnique != nil && len(r.TLS.TLSUnique) > 0 { // 1 is the min size allowed by TLS.
-		user := ah.getUserbyTLSUnique(r.TLS.TLSUnique)
-		if user != "" {
+	if len(r.TLS.TLSUnique) > 0 { // 1 is the min size allowed by TLS.
+		session := ah.getSessionByTLSUnique(string(r.TLS.TLSUnique))
+		if session != nil && session.user == user {
 			// We have a user and it's now authenticated. Done.
-			ah.isAuth = true
-			return nil
+			session.isAuth = true
+			return session, nil
 		}
 	}
 	// Let's authenticate from scratch, if we have enough info.
 	if ah.config.Lookup == nil {
-		return errors.New("cannot authenticate: internal error: missing Lookup function")
+		return nil, errors.New("cannot authenticate: internal error: missing Lookup function")
 	}
-	_, keys, err := ah.config.Lookup(ah.user)
+	_, keys, err := ah.config.Lookup(user)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	err = verifyRequest(ah.user, keys, r)
+	err = verifyRequest(user, keys, r)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	// Success!
-	ah.isAuth = true
+	// Success! Create a new session and cache it if we have a TLSUnique.
+	session := &Session{
+		isAuth: true,
+		user:   user,
+	}
 	// Cache TLS unique to speed up the process in further requests.
-	ah.setTLSUnique(ah.user, r.TLS.TLSUnique)
-	return nil
+	if r.TLS.TLSUnique != nil && len(r.TLS.TLSUnique) > 0 {
+		// 1 is the min size allowed by TLS.
+		ah.setTLSUnique(session, string(r.TLS.TLSUnique))
+	}
+	return session, nil
 }
 
 func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request) {
 	httpHandler := func(w http.ResponseWriter, r *http.Request) {
 		// Perform authentication here, return the handler func used by the HTTP handler.
-		err := ah.doAuth(w, r)
+		var session *Session
+		session, err := ah.doAuth(w, r)
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
 				// Return an error to the client and do not call the underlying handler function.
@@ -161,10 +168,12 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 				netutil.SendJSONError(w, "AuthHandler:", err)
 				return
 			}
-			ah.err = err
-			// ah.isAuth is guaranteed to be false here. TODO: assert this?
+			session = &Session{
+				err: err,
+			}
 		}
-		authHandlerFunc(ah, w, r)
+		// session is guaranteed non-nil here.
+		authHandlerFunc(session, w, r)
 	}
 	return httpHandler
 }
