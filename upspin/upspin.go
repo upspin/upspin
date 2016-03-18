@@ -1,5 +1,7 @@
 package upspin
 
+// Yo!
+
 // A UserName is just a string representing a user.
 // It is given a unique type so the API is clear.
 // Example: gopher@google.com
