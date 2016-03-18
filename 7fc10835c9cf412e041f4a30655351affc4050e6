@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_bb9d8781",
+        "filename": "auth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-18T00:13:39Z",
+      "side": 1,
+      "message": "i could handle a newline after the comma here and below",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_9ba2cbc5",
+        "filename": "auth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-18T00:13:39Z",
+      "side": 1,
+      "message": "TestClientAuthFlow seems a better name\n\nnice test though",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_5ba563ca",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-18T00:13:39Z",
+      "side": 1,
+      "message": "these are not the usual Go comment style, but the names are unexported so it\u0027s less important",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_3bb29712",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-18T00:13:39Z",
+      "side": 1,
+      "message": "this is exported and it matters a lot\nAuthIntervalSec is the maximum...",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_1bafdbaa",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-18T00:13:39Z",
+      "side": 1,
+      "message": "what interface? think of this from the point of view of the user reading the documentation",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
