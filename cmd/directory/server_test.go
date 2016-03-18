@@ -7,15 +7,10 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
-)
-
-var (
-	nilAh auth.Handler
 )
 
 func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
@@ -28,7 +23,7 @@ func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected st
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
 	}
-	ds.putHandler(nilAh, resp, req)
+	ds.putHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -66,7 +61,7 @@ func TestLookupPathError(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get", nil)
 
 	ds := newDummyDirServer()
-	ds.getHandler(nilAh, resp, req)
+	ds.getHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -75,7 +70,7 @@ func TestListMissingPrefix(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(nilAh, resp, req)
+	ds.listHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -84,7 +79,7 @@ func TestListBadPath(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(nilAh, resp, req)
+	ds.listHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -109,7 +104,7 @@ func TestLookupPathNotFound(t *testing.T) {
 	}
 
 	ds := newDirServer(egcp, &http.Client{})
-	ds.getHandler(nilAh, resp, req)
+	ds.getHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -125,7 +120,7 @@ func TestList(t *testing.T) {
 		fileLinks: []string{"http://a.com", "http://b.com"},
 	}
 	ds := newDirServer(lgcp, &http.Client{})
-	ds.listHandler(nilAh, resp, req)
+	ds.listHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -165,7 +160,7 @@ func TestPutNotDir(t *testing.T) {
 		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
 
 	ds := newDirServer(egcp, mockHTTPClient)
-	ds.putHandler(nilAh, resp, req)
+	ds.putHandler(nil, resp, req)
 	resp.Verify(t)
 	mockHTTPClient.Verify(t)
 }
@@ -206,7 +201,7 @@ func TestPut(t *testing.T) {
 		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
 
 	ds := newDirServer(egcp, mockHTTPClient)
-	ds.putHandler(nilAh, resp, req)
+	ds.putHandler(nil, resp, req)
 	resp.Verify(t)
 	mockHTTPClient.Verify(t)
 }
