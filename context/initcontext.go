@@ -71,6 +71,13 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		return nil, fmt.Errorf("unknown packing %s", vals["packing"])
 	}
 	context.Packing = packer.Packing()
+
+	// Implicitly load the user's keys from $HOME/.ssh.
+	// This must be done before bind because the bind operation now sets user keys.
+	// TODO(edpin): fix this by re-checking keys when they're needed.
+	// TODO: add a section in vals containing overrides for "publickey" and "privatekey" files.
+	keyloader.Load(context)
+
 	var err error
 	var ep *upspin.Endpoint
 	if ep, err = endpoint.Parse(vals["user"]); err != nil {
@@ -91,8 +98,5 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	if context.Directory, err = bind.Directory(context, *ep); err != nil {
 		return nil, err
 	}
-	// Implicitly load the user's keys from $HOME/.ssh.
-	// TODO: add a section in vals containing overrides for "publickey" and "privatekey" files.
-	keyloader.Load(context)
 	return context, nil
 }
