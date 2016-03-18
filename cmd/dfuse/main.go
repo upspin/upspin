@@ -1,4 +1,4 @@
-// A fuse interface to upspin.
+// A FUSE driver for Upspin.
 package main
 
 import (
@@ -18,8 +18,9 @@ import (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s MOUNTPOINT\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
 	flag.PrintDefaults()
+	os.Exit(2)
 }
 
 func main() {
@@ -28,7 +29,6 @@ func main() {
 
 	if flag.NArg() != 1 {
 		usage()
-		os.Exit(2)
 	}
 	mountpoint := flag.Arg(0)
 

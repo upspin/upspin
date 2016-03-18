@@ -19,35 +19,39 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// upspinFs represents an instance of the mounted file system.
-type upspinFs struct {
-	sync.Mutex
-	context  *upspin.Context
-	users    *userCache
-	root     *node
-	uid      int
-	gid      int
-	lastId   fuse.NodeID
-	cacheDir string // Directory for in the clear cached files.
-	userDirs map[string]struct{}
+// upspinFS represents an instance of the mounted file system.
+type upspinFS struct {
+	sync.Mutex                 // Protects concurrent access to the rest of this struct.
+	context    *upspin.Context // Upspin context used for all requests.
+	users      *userCache      // A cache of lookups in the upspin.User service.
+	root       *node           // The root of the upspin file system.
+	uid        int             // OS user id of this process' owner.
+	gid        int             // OS group id of this process' owner.
+	lastId     fuse.NodeID     // The last node ID assigned to a file.  A new ID is created
+	// for each file as it is seen and roughly corresponds to a POSIX inode number.
+	cacheDir string              // Directory for in-the-clear cached files.
+	userDirs map[string]struct{} // A set of user directories we know to exist in the root.
+	// This is used for reads/lookups of the root directory.
 }
 
 type nodeType uint8
 
 const (
-	rootNode nodeType = iota
-	userNode
+	rootNode nodeType = iota // There is only one root.
+	userNode                 // All nodes directly below the root represent user directories.
 	otherNode
 )
 
+// node represents a node (directory of file) in the namespace tree.  All nodes
+// under the root are user directories.
 type node struct {
-	sync.Mutex
-	t     nodeType
-	id    fuse.NodeID
-	f     *upspinFs
-	uname upspin.PathName
-	user  upspin.UserName
-	attr  fuse.Attr
+	sync.Mutex // Protects concurrent access to the rest of this struct.
+	t          nodeType
+	id         fuse.NodeID     // See the explanation on upspinFS.
+	f          *upspinFS       // File system this node belongs to.
+	uname      upspin.PathName // The complete upspin path name of the node.
+	user       upspin.UserName // The upspin user whose directory tree contains this node.
+	attr       fuse.Attr       // Attributes of this node, e.g. POSIX mode bits.
 }
 
 // handle represents an open file.
@@ -60,8 +64,8 @@ type handle struct {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context *upspin.Context, users *userCache) *upspinFs {
-	f := &upspinFs{
+func newUpspinFS(context *upspin.Context, users *userCache) *upspinFS {
+	f := &upspinFS{
 		context:  context,
 		users:    users,
 		uid:      os.Getuid(),
@@ -79,18 +83,23 @@ func newUpspinFS(context *upspin.Context, users *userCache) *upspinFs {
 	return f
 }
 
-func (f *upspinFs) Root() (fs.Node, error) {
+// All capitailized *upspinFS, *node, and *handle methods represent the interface
+// to fuse/fs.
+
+// Mkdir implements fs.Root.  It returns the root node of the file system.
+func (f *upspinFS) Root() (fs.Node, error) {
 	return f.root, nil
 }
 
-func (f *upspinFs) allocNodeId() fuse.NodeID {
+func (f *upspinFS) allocNodeId() fuse.NodeID {
 	f.Lock()
-	defer f.Unlock()
 	f.lastId++
-	return f.lastId
+	x := f.lastId
+	f.Unlock()
+	return x
 }
 
-func (f *upspinFs) allocNode(parent *node, mode os.FileMode, name string) *node {
+func (f *upspinFS) allocNode(parent *node, mode os.FileMode, name string) *node {
 	n := &node{id: f.allocNodeId(), f: f}
 	now := time.Now()
 	n.attr = fuse.Attr{
@@ -132,7 +141,7 @@ func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 
 // Create implements fs.NodeCreator.Create. Creates and opens a file.
 // Every created file is initially backed by a clear text local file which is
-// written to upspin on close.  It is assumed that 'n' is a directory.
+// Pu in an upspin Directory on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
 	log.Printf("Create %q in %q", req.Name, n.uname)
 	f := n.f
@@ -156,7 +165,7 @@ func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *f
 		// TODO(p): clear user cache and retry?
 		h.file.Close()
 		os.Remove(h.fname)
-		return nil, nil, eio("%s Directory.Put %q", err, string(nn.uname))
+		return nil, nil, eio("%s Directory.Put %q", err, nn.uname)
 	}
 	resp.Node = h.n.id
 	resp.Attr = nn.attr
@@ -206,7 +215,7 @@ func (n *node) Open(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.
 func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	log.Printf("openDir %q %d", n.uname, n.t)
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
-		return nil, enotdir(string(n.uname))
+		return nil, enotdir("%q", n.uname)
 	}
 	if n.t == rootNode {
 		// The root is a special case since it is a local fiction.
@@ -220,29 +229,29 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	}
 	ue, err := n.f.users.lookup(n.user)
 	if err != nil {
-		return nil, enoent("%s looking up user %q", err, string(n.user))
+		return nil, enoent("%s looking up user %q", err, n.user)
 	}
 	pattern := path.Join(n.uname, "*")
 	de, err := ue.dir.Glob(string(pattern))
 	if err != nil {
-		return nil, eio("%s globing %q", err, string(pattern))
+		return nil, eio("%s globing %q", err, pattern)
 	}
 	return &handle{n: n, de: de}, nil
 }
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
 func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	log.Printf("openFile %q", string(n.uname))
-	if (n.attr.Mode & os.ModeDir) != 0 {
-		return nil, eisdir(string(n.uname))
+	log.Printf("openFile %q", n.uname)
+	if n.attr.Mode&os.ModeDir != 0 {
+		return nil, eisdir("%q", n.uname)
 	}
 	ue, err := n.f.users.lookup(n.user)
 	if err != nil {
-		return nil, enoent(string(n.user))
+		return nil, enoent("%q", n.user)
 	}
 	de, err := ue.dir.Lookup(n.uname)
 	if err != nil {
-		return nil, enoent(string(n.uname))
+		return nil, enoent("%q", n.uname)
 	}
 
 	var finalErr error
@@ -269,7 +278,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 		var data []byte
 		var locs []upspin.Location
 		if data, locs, err = store.Get(loc.Reference.Key); err != nil {
-			finalErr = eio("%s Get %q key %q file %q", err, string(h.n.uname), loc.Reference.Key, h.fname)
+			finalErr = eio("%s Get %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
 			continue
 		}
 		if len(locs) > 0 {
@@ -278,27 +287,27 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 		}
 		packer := pack.Lookup(loc.Reference.Packing)
 		if packer == nil {
-			finalErr = eio("couldn't lookup %q key %q file %q", string(h.n.uname), loc.Reference.Key, h.fname)
+			finalErr = eio("couldn't lookup %q key %q file %q", h.n.uname, loc.Reference.Key, h.fname)
 			continue
 		}
 		clearLen := packer.UnpackLen(n.f.context, data, &de.Metadata)
 		if clearLen < 0 {
-			finalErr = eio("couldn't unpack %q key %q file %q", string(h.n.uname), loc.Reference.Key, h.fname)
+			finalErr = eio("couldn't unpack %q key %q file %q", h.n.uname, loc.Reference.Key, h.fname)
 			continue
 		}
 		cleartext := make([]byte, clearLen)
 		len, err := packer.Unpack(n.f.context, cleartext, data, &de.Metadata, h.n.uname)
 		if err != nil {
-			finalErr = eio("%s unpacking %q key %q file %q", err, string(h.n.uname), loc.Reference.Key, h.fname)
+			finalErr = eio("%s unpacking %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
 			continue
 		}
 		cleartext = cleartext[:len]
 		// Save a copy o the cleartext in the local file system.
 		if h.file, err = os.Create(h.fname); err != nil {
-			return nil, eio("%s creating %q key %q file %q", err, string(h.n.uname), loc.Reference.Key, h.fname)
+			return nil, eio("%s creating %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
 		}
 		if wlen, err := h.file.Write(cleartext); err != nil || len != wlen {
-			return nil, eio("%s writing %q key %q file %q", err, string(h.n.uname), loc.Reference.Key, h.fname)
+			return nil, eio("%s writing %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
 		}
 		n.Lock()
 		n.attr.Size = uint64(len)
@@ -308,27 +317,14 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	return nil, finalErr
 }
 
-func hex(x byte) byte {
-	if x < 10 {
-		return x + byte('0')
-	}
-	return x + byte('a')
-}
-
 func fingerprint(loc upspin.Location) string {
-	hash := sha1.Sum([]byte(loc.Reference.Key))
-	s := make([]byte, 2*len(hash))
-	for i, b := range hash {
-		s[2*i] = hex(b >> 4)
-		s[2*i+1] = hex(b & 0xf)
-	}
-	return string(s)
+	return fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference.Key)))
 }
 
 // Remove implements fs.Noderemover.
 // TODO(p): implement Directory.Remove
 func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
-	log.Printf("Remove %q", string(n.uname))
+	log.Printf("Remove %q", n.uname)
 	return nil
 }
 
@@ -337,15 +333,15 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	log.Printf("Lookup %q in %q", name, n.uname)
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
-		return nil, enotdir(string(n.uname))
+		return nil, enotdir("%q", n.uname)
 	}
 	ue, err := n.f.users.lookup(n.user)
 	if err != nil {
-		return nil, enoent("%s looking for user %q", err, string(n.user))
+		return nil, enoent("%s looking for user %q", err, n.user)
 	}
 	de, err := ue.dir.Lookup(path.Join(n.uname, name))
 	if err != nil {
-		return nil, enoent("%s looking for file %q", err, string(n.uname))
+		return nil, enoent("%s looking for file %q", err, n.uname)
 	}
 	mode := os.FileMode(0700)
 	if de.Metadata.IsDir {
@@ -360,7 +356,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	return nn, nil
 }
 
-func (f *upspinFs) addUserDir(name string) {
+func (f *upspinFS) addUserDir(name string) {
 	f.Lock()
 	if _, ok := f.userDirs[name]; !ok {
 		f.userDirs[name] = struct{}{}
@@ -459,17 +455,17 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 func (n *node) put(cleartext []byte) error {
 	ue, err := n.f.users.lookup(n.user)
 	if err != nil {
-		return eio("%s looking up %s", err, string(n.user))
+		return eio("%s looking up %s", err, n.user)
 	}
 	packer := pack.Lookup(n.f.context.Packing)
 	if packer == nil {
-		return eio("unrecognized Packing %d for %q", n.f.context.Packing, string(n.uname))
+		return eio("unrecognized Packing %d for %q", n.f.context.Packing, n.uname)
 	}
 	meta := &upspin.Metadata{}
 	// Get a buffer big enough for this data.
 	cipherLen := packer.PackLen(n.f.context, cleartext, meta, n.uname)
 	if cipherLen < 0 {
-		return eio("PackLen failed for %q", string(n.uname))
+		return eio("PackLen failed for %q", n.uname)
 	}
 	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
 	if len(meta.PackData) == 0 {
@@ -479,13 +475,13 @@ func (n *node) put(cleartext []byte) error {
 	cipher := make([]byte, cipherLen)
 	len, err := packer.Pack(n.f.context, cipher, cleartext, meta, n.uname)
 	if err != nil {
-		return eio("%s Pack(%s)", err, string(n.uname))
+		return eio("%s Pack(%s)", err, n.uname)
 	}
 	cipher = cipher[:len]
 	// Create the directory entry.
 	_, err = ue.dir.Put(n.uname, cipher, meta.PackData)
 	if err != nil {
-		return eio("%s Directory.Put(%s)", err, string(n.uname))
+		return eio("%s Directory.Put(%s)", err, n.uname)
 	}
 	return nil
 }
