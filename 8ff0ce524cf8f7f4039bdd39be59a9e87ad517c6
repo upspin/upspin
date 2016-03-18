@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_919e5f7b",
+        "filename": "auth/client.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T21:12:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_5b89e3e1",
+      "revId": "8ff0ce524cf8f7f4039bdd39be59a9e87ad517c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c161690_ce203287",
         "filename": "auth/client.go",
         "patchSetId": 8
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_b1a43bd1",
+        "filename": "auth/client.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T21:12:16Z",
+      "side": 1,
+      "message": "Good catch! We should not be doing that every time. \n\nMy next CL will cache some context per connection, since it\u0027s necessary for concurrency (this is not thread-safe) and will thus let us cache this.",
+      "parentUuid": "1c161690_ce203287",
+      "revId": "8ff0ce524cf8f7f4039bdd39be59a9e87ad517c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c161690_8e8aba98",
         "filename": "cmd/auth/serverauth.go",
         "patchSetId": 8
@@ -47,6 +83,24 @@
       "writtenOn": "2016-03-18T20:34:16Z",
       "side": 1,
       "message": "I\u0027m not entirely sure that the best long term design is to have multiple servers on different ports, as opposed to structuring the code in a way to multiplexes handlers onto a single https server.   But this is fine for now.",
+      "revId": "8ff0ce524cf8f7f4039bdd39be59a9e87ad517c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_11b26f11",
+        "filename": "cmd/auth/serverauth.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T21:12:16Z",
+      "side": 1,
+      "message": "ack.",
+      "parentUuid": "1c161690_8e8aba98",
       "revId": "8ff0ce524cf8f7f4039bdd39be59a9e87ad517c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
