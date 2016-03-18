@@ -8,7 +8,7 @@ import (
 	"bazil.org/fuse"
 )
 
-// upspinError is an error strings with a posix syscall error number.
+// upspinError is an error string with a POSIX syscall error number.
 type upspinError struct {
 	errno syscall.Errno
 	err   string
