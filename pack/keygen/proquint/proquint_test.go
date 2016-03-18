@@ -30,4 +30,8 @@ func TestEncode(t *testing.T) {
 			t.Errorf("Decode(%q) == %x, want %x", c.s[6:], x, uint16(c.x&0xffff))
 		}
 	}
+	x := Decode([]byte("xxxxx"))
+	if x == 0 {
+		t.Errorf("Decode(\"xxxxx\") = %x", x)
+	}
 }
