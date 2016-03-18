@@ -39,17 +39,18 @@ type drng struct {
 func (d *drng) Read(p []byte) (n int, err error) {
 	lenp := len(p)
 	n = lenp
+	var drand [16]byte
 	for n > 0 {
 		if len(d.random) == 0 {
-			d.random = make([]byte, 16) // TODO try again to move this outside
-			binary.BigEndian.PutUint32(d.random[0:4], d.counter)
+			binary.BigEndian.PutUint32(drand[0:4], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[4:8], d.counter)
+			binary.BigEndian.PutUint32(drand[4:8], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[8:12], d.counter)
+			binary.BigEndian.PutUint32(drand[8:12], d.counter)
 			d.counter++
-			binary.BigEndian.PutUint32(d.random[12:16], d.counter)
+			binary.BigEndian.PutUint32(drand[12:16], d.counter)
 			d.counter++
+			d.random = drand[:]
 			d.aes.Encrypt(d.random, d.random)
 		}
 		m := copy(p, d.random)
@@ -63,6 +64,7 @@ func (d *drng) Read(p []byte) (n int, err error) {
 func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 
 	// Pick seed with 128 bits of entropy.
+	// TODO  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
 	if len(*seed) > 0 {
 		if len((*seed)) != 47 || (*seed)[5] != '-' || (*seed)[23] != ' ' {
@@ -77,13 +79,13 @@ func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 		if err != nil {
 			log.Fatalf("key not generated: %s", err)
 		}
-		proquints := make([]string, 8)
+		proquints := make([]interface{}, 8)
 		for i := 0; i < 8; i++ {
-			proquints[i] = string(proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2])))
+			proquints[i] = interface{}(proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2])))
 		}
-		// fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints...)
-		fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints[0], proquints[1], proquints[2],
-			proquints[3], proquints[4], proquints[5], proquints[6], proquints[7])
+		fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints...)
+		// fmt.Printf("-seed \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints[0], proquints[1], proquints[2],
+		//	proquints[3], proquints[4], proquints[5], proquints[6], proquints[7])
 	}
 
 	// Create crypto deterministic random generator from b.
