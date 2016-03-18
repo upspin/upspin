@@ -42,7 +42,7 @@ type storeServer struct {
 
 // Handler for receiving file put requests (i.e. storing new blobs).
 // Requests must contain a 'file' form entry.
-func (s *storeServer) putHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (s *storeServer) putHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "putHandler: "
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "post or put request expected")
@@ -90,7 +90,7 @@ func (s *storeServer) putHandler(ah auth.Handler, w http.ResponseWriter, r *http
 	netutil.SendJSONReply(w, keyStruct)
 }
 
-func (s *storeServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (s *storeServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
 		netutil.SendJSONErrorString(w, invalidRefError)
@@ -129,7 +129,7 @@ func (s *storeServer) getHandler(ah auth.Handler, w http.ResponseWriter, r *http
 	netutil.SendJSONReply(w, location)
 }
 
-func (s *storeServer) deleteHandler(ah auth.Handler, w http.ResponseWriter, r *http.Request) {
+func (s *storeServer) deleteHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
 	ref := r.FormValue("ref")
 	if ref == "" {
 		netutil.SendJSONErrorString(w, invalidRefError)

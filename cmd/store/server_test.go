@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
@@ -25,7 +24,6 @@ const (
 
 var (
 	fileCache = cache.NewFileCache("")
-	nilAh     auth.Handler
 )
 
 func TestDelete(t *testing.T) {
@@ -33,7 +31,7 @@ func TestDelete(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/delete?ref=foo", nil)
 
 	ss := newStoreServer()
-	ss.deleteHandler(nilAh, resp, req)
+	ss.deleteHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -42,7 +40,7 @@ func TestDeleteInvalidKey(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/delete", nil)
 
 	ss := newStoreServer()
-	ss.deleteHandler(nilAh, resp, req)
+	ss.deleteHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -51,7 +49,7 @@ func TestDeleteInvalidRequestType(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/delete?ref=foo", nil)
 
 	ss := newStoreServer()
-	ss.deleteHandler(nilAh, resp, req)
+	ss.deleteHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -70,7 +68,7 @@ func TestGetRemoteFile(t *testing.T) {
 	ss := newStoreServer()
 	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: Key, Link: RetLink}
 
-	ss.getHandler(nilAh, resp, req)
+	ss.getHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -87,7 +85,7 @@ func TestGetLocalFile(t *testing.T) {
 
 	ss := newStoreServer()
 
-	ss.getHandler(nilAh, resp, req)
+	ss.getHandler(nil, resp, req)
 	resp.Verify(t)
 
 }
@@ -98,7 +96,7 @@ func TestPutError(t *testing.T) {
 
 	ss := newStoreServer()
 
-	ss.putHandler(nilAh, resp, req)
+	ss.putHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
@@ -129,7 +127,7 @@ func TestPut(t *testing.T) {
 
 	ss := newStoreServer()
 
-	ss.putHandler(nilAh, resp, req)
+	ss.putHandler(nil, resp, req)
 	resp.Verify(t)
 }
 
