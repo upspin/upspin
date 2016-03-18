@@ -1,4 +1,4 @@
-// A fuse interface to upspin.
+// A FUSE driver for Upspin.
 package main
 
 import (
@@ -11,15 +11,20 @@ import (
 	"bazil.org/fuse/fs"
 
 	"upspin.googlesource.com/upspin.git/context"
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
+	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 	_ "upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s MOUNTPOINT\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
 	flag.PrintDefaults()
+	os.Exit(2)
 }
 
 func main() {
@@ -28,7 +33,6 @@ func main() {
 
 	if flag.NArg() != 1 {
 		usage()
-		os.Exit(2)
 	}
 	mountpoint := flag.Arg(0)
 
