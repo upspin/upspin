@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_d9f803d9",
+        "filename": "auth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T00:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_bb9d8781",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_9ba2cbc5",
         "filename": "auth/all_test.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-18T00:13:39Z",
       "side": 1,
       "message": "TestClientAuthFlow seems a better name\n\nnice test though",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_79210f3a",
+        "filename": "auth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T00:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_9ba2cbc5",
       "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_39c8379b",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T00:23:33Z",
+      "side": 1,
+      "message": "ok.",
+      "parentUuid": "dcb0fe0b_5ba563ca",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_3bb29712",
         "filename": "auth/client.go",
         "patchSetId": 5
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_99d84b66",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T00:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_3bb29712",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_1bafdbaa",
         "filename": "auth/client.go",
         "patchSetId": 5
@@ -81,6 +153,24 @@
       "writtenOn": "2016-03-18T00:13:39Z",
       "side": 1,
       "message": "what interface? think of this from the point of view of the user reading the documentation",
+      "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_f9e5ff23",
+        "filename": "auth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-18T00:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_1bafdbaa",
       "revId": "7fc10835c9cf412e041f4a30655351affc4050e6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
