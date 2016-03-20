@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_9b588b28",
+        "filename": "auth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-20T23:32:32Z",
+      "side": 1,
+      "message": "you can just do len(r.TLS.TLSUnique) \u003e 0. len(nil slice) is safe and zero.",
+      "revId": "3d0b94968f4046f162c3b6beca7cb44596039d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
