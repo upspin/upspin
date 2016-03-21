@@ -66,6 +66,7 @@ var _ upspin.Directory = (*Service)(nil)
 type entry struct {
 	elem     string           // Path element, such as "foo" representing the file a@b.c/a/b/c/foo.
 	isDir    bool             // The referenced item is itself a directory.
+	seq      int64            // Sequence number.
 	ref      upspin.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
 	packdata upspin.PackData
 }
@@ -192,7 +193,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
 			for len(payload) > 0 {
-				remaining, name, hashBytes, isDir, packdata, err := s.step("Get", ent.Name, payload)
+				remaining, name, hashBytes, isDir, _, packdata, err := s.step("Get", ent.Name, payload)
 				if err != nil {
 					return nil, err
 				}
@@ -310,10 +311,12 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
 	// Invariant: dirRef refers to a directory.
 	isDir := true
+	seq := int64(0)
 	entries := make([]entry, 0, 10) // 0th entry is the root.
 	ent := entry{
 		elem:     "",
 		isDir:    true,
+		seq:      0, // Always zero for directories. TODO?
 		ref:      dirRef,
 		packdata: packdata,
 	}
@@ -321,7 +324,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	for i := 0; i < len(parsed.Elems)-1; i++ {
 		elem := parsed.Elems[i]
 		var pdata upspin.PackData
-		dirRef, isDir, pdata, err = s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		dirRef, isDir, seq, pdata, err = s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return loc0, err
 		}
@@ -331,6 +334,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		ent := entry{
 			elem:     elem,
 			isDir:    true,
+			seq:      seq,
 			ref:      dirRef,
 			packdata: pdata,
 		}
@@ -354,6 +358,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	ent = entry{
 		elem:     lastElem,
 		isDir:    dataIsDir,
+		seq:      0, // Will be updated by installEntry.
 		ref:      ref,
 		packdata: packdata,
 	}
@@ -404,7 +409,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// Invariant: dirRef refers to a directory.
 	isDir := true
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		dirRef, isDir, _, err = s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		dirRef, isDir, _, _, err = s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return nil, err
 		}
@@ -416,7 +421,8 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// Destination must exist. If so we need to update the parent directory record.
 	var r upspin.Reference
 	var packdata upspin.PackData
-	if r, isDir, packdata, err = s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem); err != nil {
+	var seq int64
+	if r, isDir, seq, packdata, err = s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem); err != nil {
 		return nil, err
 	}
 	entry := &upspin.DirEntry{
@@ -427,6 +433,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    isDir,
+			Sequence: seq,
 			PackData: packdata,
 		},
 	}
@@ -438,12 +445,13 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 //	N=length of name, varint-encoded.
 //	N bytes of name.
 //	One byte. 0 for regular file, 1 for directory. TODO
+//	N=sequence number, varint-encoded.
 //	N=length of packdata, varint-encoded.
 //	N bytes of packdata.
 //	sha256.Size bytes of Reference.
 
-func newEntryBytes(elem string, isDir bool, ref upspin.Reference, packdata upspin.PackData) []byte {
-	entry := make([]byte, 0, len(elem)+1+sha256key.Size+len(packdata)+10) // +10 for varint encodings.
+func newEntryBytes(elem string, isDir bool, seq int64, ref upspin.Reference, packdata upspin.PackData) []byte {
+	entry := make([]byte, 0, len(elem)+1+sha256key.Size+len(packdata)+20) // +20 for varint encodings.
 	var varint [10]byte
 	n := binary.PutVarint(varint[:], int64(len(elem)))
 	entry = append(entry, varint[:n]...)
@@ -453,6 +461,8 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference, packdata upspi
 		dirByte = 1
 	}
 	entry = append(entry, dirByte)
+	n = binary.PutVarint(varint[:], seq)
+	entry = append(entry, varint[:n]...)
 	n = binary.PutVarint(varint[:], int64(len(packdata)))
 	entry = append(entry, varint[:n]...)
 	entry = append(entry, packdata...)
@@ -466,7 +476,8 @@ func newEntryBytes(elem string, isDir bool, ref upspin.Reference, packdata upspi
 
 // step is an internal function that advances one directory entry given the cleartext
 // of the directory's contents.
-func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hashBytes []byte, isDir bool, packdata upspin.PackData, err error) {
+// TODO: This has a crazy signature. Fix all the code to pass entries around rather than this huge list.
+func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hashBytes []byte, isDir bool, seq int64, packdata upspin.PackData, err error) {
 	nameLen64, vLen := binary.Varint(payload)
 	nameLen := int(nameLen64)
 	if vLen <= 0 || int64(nameLen) != nameLen64 {
@@ -482,6 +493,8 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 	payload = payload[nameLen:]
 	isDir = payload[0] != 0
 	payload = payload[1:]
+	seq, vLen = binary.Varint(payload)
+	payload = payload[vLen:]
 	packDataLen64, vLen := binary.Varint(payload)
 	packDataLen := int(packDataLen64)
 	if vLen <= 0 || int64(packDataLen) != packDataLen64 || packDataLen <= 0 { // Cannot have zero-length packdata.
@@ -503,10 +516,10 @@ func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (rem
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
 // We always know that the packing is defined by dirPack and dirMeta.
 // It reads the whole directory, so avoid calling it repeatedly.
-func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (upspin.Reference, bool, upspin.PackData, error) {
+func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (upspin.Reference, bool, int64, upspin.PackData, error) {
 	payload, err := s.fetchDir(dirRef, name)
 	if err != nil {
-		return r0, false, nil, err
+		return r0, false, 0, nil, err
 	}
 	return s.dirEntLookup(op, name, payload, elem)
 }
@@ -529,15 +542,15 @@ func (s *Service) fetchDir(dirRef upspin.Reference, name upspin.PathName) ([]byt
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
-func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (upspin.Reference, bool, upspin.PackData, error) {
+func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (upspin.Reference, bool, int64, upspin.PackData, error) {
 	if len(elem) == 0 {
-		return r0, false, nil, mkStrError(op, pathName+"/", "empty name element")
+		return r0, false, 0, nil, mkStrError(op, pathName+"/", "empty name element")
 	}
 Loop:
 	for len(payload) > 0 {
-		remaining, name, hashBytes, isDir, packdata, err := s.step(op, pathName, payload)
+		remaining, name, hashBytes, isDir, seq, packdata, err := s.step(op, pathName, payload)
 		if err != nil {
-			return r0, false, nil, err
+			return r0, false, 0, nil, err
 		}
 		payload = remaining
 		// Avoid allocation here: don't just convert to string for comparison.
@@ -553,9 +566,9 @@ Loop:
 			Key:     sha256key.BytesString(hashBytes),
 			Packing: upspin.Packing(packdata[0]), // packdata is known to have data.
 		}
-		return r, isDir, packdata, nil
+		return r, isDir, seq, packdata, nil
 	}
-	return r0, false, nil, mkStrError(op, pathName, "no such directory entry: "+elem)
+	return r0, false, 0, nil, mkStrError(op, pathName, "no such directory entry: "+elem)
 }
 
 // installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
@@ -566,14 +579,16 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		return r0, err
 	}
 	found := false
+	var sequence int64
 Loop:
 	for payload := dirData; len(payload) > 0 && !found; {
 		// Remember where this entry starts.
 		start := len(dirData) - len(payload)
-		remaining, name, _, isDir, _, err := s.step(op, upspin.PathName(dirName), payload)
+		remaining, name, _, isDir, seq, _, err := s.step(op, upspin.PathName(dirName), payload)
 		if err != nil {
 			return r0, err
 		}
+		sequence = seq
 		length := len(payload) - len(remaining)
 		payload = remaining
 		// Avoid allocation here: don't just convert to string for comparison.
@@ -597,7 +612,10 @@ Loop:
 		dirData = dirData[:len(dirData)-length]
 		break
 	}
-	entry := newEntryBytes(ent.elem, ent.isDir, ent.ref, ent.packdata)
+	if !ent.isDir {
+		sequence++
+	}
+	entry := newEntryBytes(ent.elem, ent.isDir, sequence, ent.ref, ent.packdata)
 	dirData = append(dirData, entry...)
 	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata.
 	if err != nil {
