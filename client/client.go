@@ -5,6 +5,7 @@ package client
 import (
 	"fmt"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
@@ -12,6 +13,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
+// Client implements upspin.Client.
 type Client struct {
 	context *upspin.Context
 }
@@ -29,41 +31,67 @@ func New(context *upspin.Context) upspin.Client {
 	}
 }
 
+// Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
 	dir, err := c.getRootDir(name)
 	if err != nil {
 		return zeroLoc, err
 	}
 
-	// Encrypt data according to the preferred packer
-	// TODO: Do a Lookup in the parent directory to find the overriding packer.
-	packer := pack.Lookup(c.context.Packing)
-	if packer == nil {
-		return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
-	}
-
-	meta := &upspin.Metadata{}
-
-	// Get a buffer big enough for this data
-	cipherLen := packer.PackLen(c.context, data, meta, name)
-	if cipherLen < 0 {
-		return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
-	}
-	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
-	if len(meta.PackData) == 0 {
-		meta.PackData = []byte{byte(c.context.Packing)}
-	}
-	cipher := make([]byte, cipherLen)
-	n, err := packer.Pack(c.context, cipher, data, meta, name)
+	parsed, err := path.Parse(name)
 	if err != nil {
 		return zeroLoc, err
 	}
-	cipher = cipher[:n]
+
+	var readers []upspin.UserName
+
+	// Lookup parent directory, if any.
+	if len(parsed.Elems) > 1 {
+		parentDirEntry, err := dir.Lookup(parsed.Drop(1).Path())
+		if err != nil {
+			return zeroLoc, err
+		}
+		readers = parentDirEntry.Metadata.Readers
+	}
+
+	var cipher []byte
+	meta := &upspin.Metadata{
+		Readers: readers,
+	}
+
+	if !access.IsAccessFile(name) {
+		// Encrypt data according to the preferred packer
+		// TODO: Do a Lookup in the parent directory to find the overriding packer.
+		packer := pack.Lookup(c.context.Packing)
+		if packer == nil {
+			return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
+		}
+
+		// Get a buffer big enough for this data
+		cipherLen := packer.PackLen(c.context, data, meta, name)
+		if cipherLen < 0 {
+			return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
+		}
+		// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
+		if len(meta.PackData) == 0 {
+			meta.PackData = []byte{byte(c.context.Packing)}
+		}
+		cipher = make([]byte, cipherLen)
+		n, err := packer.Pack(c.context, cipher, data, meta, name)
+		if err != nil {
+			return zeroLoc, err
+		}
+		cipher = cipher[:n]
+	} else {
+		cipher = data
+		meta.PackData = []byte{byte(upspin.PlainPack)}
+	}
 
 	// Store it.
 	return dir.Put(name, cipher, meta.PackData)
 }
 
+// MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
 	dir, err := c.getRootDir(dirName)
 	if err != nil {
@@ -95,6 +123,7 @@ func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
 	return nil, err
 }
 
+// Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	dir, err := c.getRootDir(name)
 	if err != nil {
@@ -165,6 +194,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	return nil, fmt.Errorf("client: %q not found on any store server", name)
 }
 
+// Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	dir, err := c.getRootDir(upspin.PathName(pattern))
 	if err != nil {
@@ -173,11 +203,13 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return dir.Glob(pattern)
 }
 
+// Create implements upspin.Client.
 func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 	// TODO: Make sure directory exists?
 	return file.Writable(c, name), nil
 }
 
+// Open implements upspin.Client.
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	data, err := c.Get(name)
 	if err != nil {
