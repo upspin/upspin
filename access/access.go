@@ -24,8 +24,8 @@ import (
 )
 
 const (
-	// Name of Access file. Exported in case it's useful on its own. Prefer using IsAccessFile below.
-	AccessFile = "Access"
+	// accessFile is the name of the Access file.
+	accessFile = "Access"
 )
 
 // Parsed contains the parsed path names found in the ACL file, one for each section.
@@ -46,9 +46,10 @@ const (
 )
 
 const (
-	invalidFormat = "%s: %d: unrecognized text: %q"
+	invalidFormat = "%s:%d: unrecognized text: %q"
 )
 
+// Parse parses the contents of a path name, in data, and returns the parsed contents if they abide by the rules of Access files.
 func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
 	var p Parsed
 	s := bufio.NewScanner(bytes.NewReader(data))
@@ -207,5 +208,5 @@ func parseLine(line []byte) (state, []path.Parsed, int) {
 
 // IsAccessFile reports whether the pathName contains a file named Access, which is special.
 func IsAccessFile(pathName upspin.PathName) bool {
-	return strings.HasSuffix(string(pathName), AccessFile)
+	return strings.HasSuffix(string(pathName), accessFile)
 }
