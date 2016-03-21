@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	goPath "path"
 	"strings"
 
@@ -344,11 +343,24 @@ func (d *Directory) ServerUserName() string {
 	return "GCP Directory"
 }
 
-func newError(op string, path upspin.PathName, err error) *os.PathError {
-	return &os.PathError{
-		Op:   op,
-		Path: string(path),
-		Err:  err,
+type dirError struct {
+	op   string
+	path upspin.PathName
+	err  error
+}
+
+func (e *dirError) Error() string {
+	if e.path == "" {
+		return fmt.Sprintf("Directory: %s: %s", e.op, e.err)
+	}
+	return fmt.Sprintf("Directory: %s: %s: %s", e.op, e.path, e.err)
+}
+
+func newError(op string, path upspin.PathName, err error) *dirError {
+	return &dirError{
+		op:   op,
+		path: path,
+		err:  err,
 	}
 }
 
