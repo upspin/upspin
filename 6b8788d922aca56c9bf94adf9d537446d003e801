@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_bbdb4794",
+        "filename": "auth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-21T19:56:19Z",
+      "side": 1,
+      "message": "request is already in the argument, so i\u0027d call this just isReplayable(request)",
+      "revId": "6b8788d922aca56c9bf94adf9d537446d003e801",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_dbd6136e",
+        "filename": "client/integration_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-21T19:56:19Z",
+      "side": 1,
+      "message": "i prefer the old name. the return value is a context, so calling this packing is confusing.\nbetter would be\n\nnewContext(packing upspin.Packing) *upspin.Context\n\nsince that\u0027s really what it does",
+      "revId": "6b8788d922aca56c9bf94adf9d537446d003e801",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
