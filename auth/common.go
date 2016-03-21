@@ -13,15 +13,15 @@ import (
 	"math/big"
 	"net/http"
 	"strings"
-	"time"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 const (
-	userNameHeader  = "X-Upspin-UserName"
-	signatureHeader = "X-Upspin-Signature"
-	signatureType   = "X-Upspin-Signature-Type"
+	// Header tagas must be in canonical format (first letter capitalized)
+	userNameHeader      = "X-Upspin-Username"
+	signatureHeader     = "X-Upspin-Signature"
+	signatureTypeHeader = "X-Upspin-Signature-Type"
 )
 
 var (
@@ -48,17 +48,15 @@ func hashUserRequest(userName upspin.UserName, r *http.Request) []byte {
 // TODO: move to client.go as the server doesn't need it.
 // signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
 func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
-	req.Header.Set(userNameHeader, string(userName)) // Set the username
 	ecdsaPubKey, keyType, err := parsePublicKey(keys.Public)
 	if err != nil {
 		return err
 	}
-	req.Header.Set(signatureType, keyType)
+	req.Header.Set(signatureTypeHeader, keyType)
 	ecdsaPrivKey, err := parsePrivateKey(ecdsaPubKey, keys.Private)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Date", time.Now().Format(time.RFC850))
 	// The hash includes the user name and the key type.
 	hash := hashUserRequest(userName, req)
 	r, s, err := ecdsa.Sign(rand.Reader, ecdsaPrivKey, hash)
@@ -76,7 +74,7 @@ func verifyRequest(userName upspin.UserName, keys []upspin.PublicKey, req *http.
 	if sig == "" {
 		return errors.New("no signature in header")
 	}
-	neededKeyType := req.Header.Get(signatureType)
+	neededKeyType := req.Header.Get(signatureTypeHeader)
 	if neededKeyType == "" {
 		return errors.New("no signature type in header")
 	}

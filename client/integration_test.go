@@ -49,10 +49,6 @@ var (
 				Public:  upspin.PublicKey("p521\n5609358032714346557585322371361223448771823478702904261131808791466974229027162350131029155700491361187196856099198507670895901615568085019960144241246163732\n5195356724878950323636158219319724259803057075353106010024636779503927115021522079737832549096674594462118262649728934823279841544051937600335974684499860077"),
 				Private: upspin.PrivateKey("1921083967088521992602096949959788705212477628248305933393351928788805710122036603979819682701613077258730599983893835863485419440554982916289222458067993673"),
 			},
-			upspin.DebugPack: upspin.KeyPair{
-				Public:  upspin.PublicKey("123456"),
-				Private: upspin.PrivateKey("123456"),
-			},
 		},
 		// These keys belong to a fictitious user called upspin-friend-test@google.com. If they're changed here, please upload
 		// the public ones to the keyserver on upspin.io:8082
@@ -69,10 +65,24 @@ var (
 	}
 )
 
-func setupContext(packing upspin.Packing) *upspin.Context {
+func newContext(packing upspin.Packing) *upspin.Context {
 	context := &upspin.Context{
 		Packing: packing,
 	}
+	return context
+}
+
+func setupUser(context *upspin.Context, userName upspin.UserName) {
+	// Packing and keys are different things. We need a key for signing HTTPS requests, even if packing is Plain or Debug.
+	switch context.Packing {
+	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack:
+		context.KeyPair = keyMap[userName][context.Packing]
+	default:
+		context.KeyPair = keyMap[userName][upspin.EEp256Pack]
+	}
+
+	context.UserName = userName
+
 	// For testing, use an InProcess Store...
 	inProcessEndpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -81,7 +91,7 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	// ... and a real GCP directory and upspin.io User.
 	endpointDir := upspin.Endpoint{
 		Transport: upspin.GCP,
-		NetAddr:   "http://localhost:8081",
+		NetAddr:   "https://upspin.io:8081",
 	}
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -98,17 +108,10 @@ func setupContext(packing upspin.Packing) *upspin.Context {
 	if err != nil {
 		panic(err)
 	}
-
 	context.Directory, err = bind.Directory(context, endpointDir)
 	if err != nil {
 		panic(err)
 	}
-	return context
-}
-
-func setupUser(context *upspin.Context, userName upspin.UserName) {
-	context.KeyPair = keyMap[userName][context.Packing]
-	context.UserName = userName
 }
 
 func testMkdir(context *upspin.Context, t *testing.T) {
@@ -298,7 +301,7 @@ func TestRunAllTests(t *testing.T) {
 		upspin.EEp521Pack,
 	} {
 		log.Printf("==== Using packing type %d ...", packing)
-		context := setupContext(packing)
+		context := newContext(packing)
 		runAllTests(context, t)
 	}
 }

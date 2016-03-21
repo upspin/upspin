@@ -26,7 +26,14 @@ var (
 	user = upspin.UserName("joe@blow.com")
 )
 
+var (
+	json = "application/json"
+	get  = "GET"
+	post = "POST"
+)
+
 func signReq(t *testing.T, key upspin.KeyPair, req *http.Request) {
+	req.Header.Set(userNameHeader, string(user)) // Set the username
 	err := signRequest(user, key, req)
 	if err != nil {
 		t.Fatal(err)
@@ -41,7 +48,7 @@ func verifyReq(t *testing.T, key upspin.PublicKey, req *http.Request) {
 }
 
 func testSignAndVerify(t *testing.T, key upspin.KeyPair) {
-	req, err := http.NewRequest("GET", "http://someserver.somewhere", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +62,7 @@ func TestSignAndVerify(t *testing.T) {
 }
 
 func TestWrongKey(t *testing.T) {
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +92,7 @@ func makeTLSRequest(req *http.Request, tlsUnique []byte) {
 
 func TestServerHandler(t *testing.T) {
 	called := false
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +123,7 @@ func TestServerHandler(t *testing.T) {
 
 func TestServerHandlerNotTLS(t *testing.T) {
 	called := false
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
+	req, err := http.NewRequest("GET", "http://unsecure-server.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +151,7 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	w := nettest.NewExpectingResponseWriterWithCode(http.StatusUnauthorized,
 		`{"error":"AuthHandler:cannot authenticate: internal error: missing Lookup function"}`)
 
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -166,7 +173,7 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	w := nettest.NewExpectingResponseWriterWithCode(http.StatusUnauthorized,
 		`{"error":"AuthHandler:no keys found for user joe@blow.com"}`)
 
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:80", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -190,7 +197,7 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 
 func TestServerContinuesTLSSession(t *testing.T) {
 	called := 0
-	req, err := http.NewRequest("GET", "http://someserver.somewhere:443", nil)
+	req, err := http.NewRequest("GET", "https://someserver.somewhere:443", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,7 +221,7 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	ah := NewHandler(config)
 	ah.Handle(handler)(nil, req) // Invoke the handler.
 
-	newReq, err := http.NewRequest("POST", "http://someserver.somewhere:443/bla", nil)
+	newReq, err := http.NewRequest("POST", "https://someserver.somewhere:443/bla", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -231,8 +238,6 @@ func TestServerContinuesTLSSession(t *testing.T) {
 func TestClientAuthFlow(t *testing.T) {
 	const (
 		url             = "https://secure.server.com"
-		get             = "GET"
-		json            = "application/json"
 		errUnauthorized = `{"error":"you can't access this, dude"}`
 		accepted        = "you're in"
 	)
@@ -332,8 +337,6 @@ func TestClientReAuthsWithNewServer(t *testing.T) {
 	const (
 		url1     = "https://secure.server.com"
 		url2     = "https://more-secure.server.com"
-		get      = "GET"
-		json     = "application/json"
 		accepted = "ok"
 	)
 
@@ -376,8 +379,6 @@ func TestClientReAuthsWithNewServer(t *testing.T) {
 func TestClientDoesNotTryAuthWithoutHTTPS(t *testing.T) {
 	const (
 		url   = "http://unsecure.server.com"
-		get   = "GET"
-		json  = "application/json"
 		error = "error"
 	)
 
@@ -418,6 +419,49 @@ func TestClientDoesNotTryAuthWithoutHTTPS(t *testing.T) {
 	lastAuth = client.timeLastAuth
 	if lastAuth != zeroTime {
 		t.Fatal("Expected auth client not to do auth, but it did")
+	}
+}
+
+func TestClientSignsUnreplayableRequests(t *testing.T) {
+	const (
+		url = "https://secure.server.com"
+	)
+
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte("ok")),
+		nettest.NewMockHTTPResponse(http.StatusOK, json, []byte("ok")),
+	}, []*http.Request{
+		nettest.NewRequest(t, get, url, nil),
+		nettest.NewRequest(t, post, url, []byte("DATA")),
+	})
+
+	var zeroTime time.Time
+	client := NewClient(user, p256Key, mock)
+	resp, err := client.Do(nettest.NewRequest(t, get, url, nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected auth client to return status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	lastAuth := client.timeLastAuth
+
+	if lastAuth == zeroTime {
+		t.Fatal("Expected auth client to do auth, but it didn't")
+	}
+
+	// Now do a POST request with a request body.
+	resp, err = client.Do(nettest.NewRequest(t, post, url, []byte("DATA")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected auth client to return status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	if lastAuth == client.timeLastAuth {
+		t.Fatal("Expected auth client to do auth again, but it didn't")
 	}
 }
 
