@@ -51,10 +51,12 @@ func Writable(client upspin.Client, name upspin.PathName) *File {
 	}
 }
 
+// Name implements upspin.File.
 func (f *File) Name() upspin.PathName {
 	return f.name
 }
 
+// Read implements upspin.File.
 func (f *File) Read(b []byte) (n int, err error) {
 	n, err = f.readAt("Read", b, f.offset)
 	if err == nil {
@@ -63,6 +65,7 @@ func (f *File) Read(b []byte) (n int, err error) {
 	return n, err
 }
 
+// ReadAt implements upspin.File.
 func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
 	return f.readAt("ReadAt", b, off)
 }
@@ -84,6 +87,7 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 	return n, nil
 }
 
+// Seek implements upspin.File.
 func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	if f.closed {
 		return 0, f.errClosed("Seek")
@@ -105,6 +109,7 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	return ret, nil
 }
 
+// Write implements upspin.File.
 func (f *File) Write(b []byte) (n int, err error) {
 	n, err = f.writeAt("Write", b, f.offset)
 	if err == nil {
@@ -113,6 +118,7 @@ func (f *File) Write(b []byte) (n int, err error) {
 	return n, err
 }
 
+// WriteAt implements upspin.File.
 func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
 	return f.writeAt("WriteAt", b, off)
 }
@@ -150,6 +156,7 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 	return len(b), nil
 }
 
+// Close implements upspin.File.
 func (f *File) Close() error {
 	if f.closed {
 		return f.errClosed("Close")
