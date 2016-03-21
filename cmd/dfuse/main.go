@@ -11,9 +11,13 @@ import (
 	"bazil.org/fuse/fs"
 
 	"upspin.googlesource.com/upspin.git/context"
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
+	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 	_ "upspin.googlesource.com/upspin.git/user/testuser"
 )
 
