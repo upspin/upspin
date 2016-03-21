@@ -206,3 +206,24 @@ func TestClean(t *testing.T) {
 		}
 	}
 }
+
+func TestUserAndDomain(t *testing.T) {
+	u, d, err := UserAndDomain(upspin.UserName("ldap@domain.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	ldap := "ldap"
+	domain := "domain.com"
+	if u != "ldap" {
+		t.Errorf("Expected %q, got %q", ldap, u)
+	}
+	if d != domain {
+		t.Errorf("Expected %q, got %q", domain, d)
+	}
+
+	// Now an error
+	u, d, err = UserAndDomain(upspin.UserName("foo-bar"))
+	if err == nil {
+		t.Errorf("Expected an error, got none")
+	}
+}

@@ -7,6 +7,8 @@ import (
 
 	gopath "path"
 
+	"errors"
+
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -179,4 +181,13 @@ func Join(path upspin.PathName, elems ...string) upspin.PathName {
 // Clean applies Go's path.Clean to an Upspin path.
 func Clean(path upspin.PathName) upspin.PathName {
 	return upspin.PathName(gopath.Clean(string(path)))
+}
+
+// UserAndDomain splits an upspin.UserName into user and domain and returns the pair.
+func UserAndDomain(userName upspin.UserName) (user string, domain string, err error) {
+	fields := strings.Split(string(userName), "@")
+	if len(fields) != 2 {
+		return "", "", errors.New("user name not a properly formatted")
+	}
+	return fields[0], fields[1], nil
 }
