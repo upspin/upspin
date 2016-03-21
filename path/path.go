@@ -3,6 +3,7 @@ package path
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 
 	gopath "path"
@@ -52,7 +53,8 @@ func (p Parsed) Path() upspin.PathName {
 }
 
 var (
-	pn0 = Parsed{}
+	pn0         = Parsed{}
+	errUserName = errors.New("user name not a properly formatted")
 )
 
 // NameError gives information about an erroneous path name, including the name and error description.
@@ -179,4 +181,25 @@ func Join(path upspin.PathName, elems ...string) upspin.PathName {
 // Clean applies Go's path.Clean to an Upspin path.
 func Clean(path upspin.PathName) upspin.PathName {
 	return upspin.PathName(gopath.Clean(string(path)))
+}
+
+// UserAndDomain splits an upspin.UserName into user and domain and returns the pair.
+func UserAndDomain(userName upspin.UserName) (user string, domain string, err error) {
+	u := string(userName)
+	if strings.Count(u, "@") != 1 {
+		return "", "", errUserName
+	}
+	i := strings.Index(u, "@")
+	user = u[:i]
+	if len(user) < 1 {
+		return "", "", errUserName
+	}
+	domain = u[i+1:]
+	if len(domain) < 4 {
+		return "", "", errUserName
+	}
+	if strings.Count(domain, ".") < 1 {
+		return "", "", errUserName
+	}
+	return
 }

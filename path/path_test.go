@@ -206,3 +206,39 @@ func TestClean(t *testing.T) {
 		}
 	}
 }
+
+func TestUserAndDomain(t *testing.T) {
+	type cases struct {
+		userName upspin.UserName
+		user     string
+		domain   string
+		err      error
+	}
+	var (
+		tests = []cases{
+			{upspin.UserName("me@here.com"), "me", "here.com", nil},
+			{upspin.UserName("@"), "", "", errUserName},
+			{upspin.UserName("a@bcom"), "", "", errUserName},
+			{upspin.UserName("a@b@.com"), "", "", errUserName},
+			{upspin.UserName("@bbc.com"), "", "", errUserName},
+			{upspin.UserName("abc.com@"), "", "", errUserName},
+			{upspin.UserName("a@b.co"), "a", "b.co", nil},
+		}
+	)
+	for _, test := range tests {
+		u, d, err := UserAndDomain(test.userName)
+		if err != test.err {
+			t.Fatalf("Expected %q, got %q", test.err, err)
+		}
+		if err != nil {
+			// Already validated the error
+			continue
+		}
+		if u != test.user {
+			t.Errorf("Expected user %q, got %q", test.user, u)
+		}
+		if d != test.domain {
+			t.Errorf("Expected domain %q, got %q", test.domain, u)
+		}
+	}
+}
