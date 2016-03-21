@@ -74,41 +74,31 @@ const (
 	noKnownKeysForUser = "no known keys for user %s"
 )
 
-// TODO(ehg)  I cleaned this once (to call pack.go's LookupByName) but some git catastrophe seems to have wiped out the fix.  I'll redo when things are quiescent.
-var (
-	Packer map[string]upspin.Packer
-)
-
 func init() {
-	Packer = make(map[string]upspin.Packer)
-	Packer[p256] = eep256{
+	pack.Register(eep256{
 		common{
 			ciphersuite:  upspin.EEp256Pack,
 			curve:        elliptic.P256(),
 			aesLen:       16,
 			packerString: p256,
 		},
-	}
-	Packer[p384] = eep384{
+	})
+	pack.Register(eep384{
 		common{
 			ciphersuite:  upspin.EEp384Pack,
 			curve:        elliptic.P384(),
 			aesLen:       32,
 			packerString: p384,
 		},
-	}
-	Packer[p521] = eep521{
+	})
+	pack.Register(eep521{
 		common{
 			ciphersuite:  upspin.EEp521Pack,
 			curve:        elliptic.P521(),
 			aesLen:       32,
 			packerString: p521,
 		},
-	}
-
-	for _, p := range Packer {
-		pack.Register(p)
-	}
+	})
 }
 
 const (
