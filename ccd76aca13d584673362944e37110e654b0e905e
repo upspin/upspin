@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_7debb299",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-21T04:48:22Z",
+      "side": 1,
+      "message": "Isn\u0027t there a more generic way of doing this than creating an append function per type? Maybe using interface{} and then a switch at the N :\u003d ... line? Just a thought.",
+      "range": {
+        "startLine": 99,
+        "startChar": 5,
+        "endLine": 99,
+        "endChar": 16
+      },
+      "revId": "ccd76aca13d584673362944e37110e654b0e905e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
