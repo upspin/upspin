@@ -25,7 +25,7 @@ import (
 
 var (
 	packing = flag.String("packing", "p256", "packing name, such as p256")
-	secret  = flag.String("secret", "", "128 bit secret in proquint format")
+	secret  = flag.String("secretseed", "", "128 bit secret seed in proquint format")
 	where   = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
 )
 
@@ -67,8 +67,8 @@ func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 	// TODO  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
 	if len(*secret) > 0 {
-		if len((*secret)) != 47 || (*secret)[5] != '-' || (*secret)[23] != ' ' {
-			log.Fatalf("expected secret like\n lusab-babad-gutih-tugad gutuk-bisog-mudof-sakat\n"+
+		if len((*secret)) != 47 || (*secret)[5] != '-' {
+			log.Fatalf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
 				"not\n %s\nkey not generated", *secret)
 		}
 		for i := 0; i < 8; i++ {
@@ -83,7 +83,8 @@ func createKeys(curve elliptic.Curve, packer upspin.Packer) {
 		for i := 0; i < 8; i++ {
 			proquints[i] = proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2]))
 		}
-		fmt.Printf("-secret \"%s-%s-%s-%s %s-%s-%s-%s\"\n", proquints...)
+		fmt.Printf("-secretseed %s-%s-%s-%s.%s-%s-%s-%s\n", proquints...)
+		// Ignore punctuation on input;  this format is just to help the user keep their place.
 	}
 
 	// Create crypto deterministic random generator from b.
