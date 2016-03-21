@@ -16,6 +16,24 @@
       "revId": "3d0b94968f4046f162c3b6beca7cb44596039d66",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_1de43ef6",
+        "filename": "auth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-21T00:19:20Z",
+      "side": 1,
+      "message": "Changed here and above on line 124.",
+      "parentUuid": "dcb0fe0b_9b588b28",
+      "revId": "3d0b94968f4046f162c3b6beca7cb44596039d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
