@@ -162,7 +162,7 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
 				// Return an error to the client and do not call the underlying handler function.
-				log.Printf("Sending error: %v", err)
+				log.Printf("HTTPClient: auth error: %v", err)
 				// To be precise, the user is only unauthenticated. But an unauthenticated user is also not authorized.
 				w.WriteHeader(http.StatusUnauthorized)
 				netutil.SendJSONError(w, "AuthHandler:", err)

@@ -64,7 +64,7 @@ func PublicUserLookupService() func(userName upspin.UserName) ([]upspin.Endpoint
 	}
 	u, err := bind.User(context, e)
 	if err != nil {
-		log.Fatalf("Can't bind to Directory: %v", err)
+		log.Fatalf("Can't bind to User service: %v", err)
 	}
 	return u.Lookup
 }

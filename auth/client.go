@@ -76,40 +76,65 @@ func (c *HTTPClient) SetUserKeys(keys upspin.KeyPair) {
 
 // Do implements netutil.HTTPClientInterface.
 func (c *HTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
+	c.prepareRequest(req)
 	if req.URL == nil {
 		// Let the native client handle this weirdness.
-		return c.doWithoutAuth(req)
+		return c.doWithoutSign(req)
 	}
 	if req.URL.Scheme != "https" {
 		// No point in doing authentication.
-		return c.doWithoutAuth(req)
+		return c.doWithoutSign(req)
 	}
 	if c.url == nil || c.url.Host != req.URL.Host {
-		// Must do auth again.
-		return c.doAuth(req)
+		// Must sign gain.
+		return c.doWithSign(req)
+	}
+	// It's better to avoid a round trip and sign requests that can't be played back.
+	if !isRequestReplayable(req) {
+		return c.doWithSign(req)
 	}
 	now := time.Now()
 	if c.timeLastAuth.Add(time.Duration(AuthIntervalSec) * time.Second).Before(now) {
-		return c.doAuth(req)
+		return c.doWithSign(req)
 	}
-	return c.doWithoutAuth(req)
+	return c.doWithoutSign(req)
 }
 
-// doWithoutAuth does not initially perform auth, but if the request fails with error code 401, we try exactly one more
-// time with auth.
-func (c *HTTPClient) doWithoutAuth(req *http.Request) (*http.Response, error) {
+// prepareRequest sets the necessary fields for auth on the request, common to both signed and unsigned requests.
+func (c *HTTPClient) prepareRequest(req *http.Request) {
+	req.Header.Set(userNameHeader, string(c.user)) // Set the username
+	req.Header.Set("Date", time.Now().Format(time.RFC850))
+}
+
+// isRequestReplayable reports whether the request can be played back to the server safely.
+func isRequestReplayable(req *http.Request) bool {
+	if req.Body == nil && req.Method != "POST" {
+		// A request without payload is always replayable
+		return true
+	}
+	// Note: In general, if the body can seek to the beginning again, it should be replayable. However, Go's HTTP
+	// client peeks inside the buffer, making it hard for us to wrap another buffer with an implentation of
+	// io.ReadSeeker (it can be resolved, but not without reverse-engineering the native HTTP client, which is a bad idea).
+	return false
+}
+
+// doWithoutSign does not initially signs the request, but if the request fails with error code 401, we try exactly one more
+// time with signing.
+func (c *HTTPClient) doWithoutSign(req *http.Request) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return resp, newError(err)
 	}
-	if resp.StatusCode == 401 && req.URL.Scheme == "https" {
-		return c.doAuth(req)
+	if resp.StatusCode == http.StatusUnauthorized && req.URL.Scheme == "https" {
+		if isRequestReplayable(req) {
+			return c.doWithSign(req)
+		}
 	}
 	return resp, err
 }
 
-// doAuth performs authentication and caches the server and time of this last auth.
-func (c *HTTPClient) doAuth(req *http.Request) (*http.Response, error) {
+// doAuth performs signature authentication and caches the server and time of this last signed request.
+func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 	if c.user == "" {
 		return nil, errNoUser
 	}

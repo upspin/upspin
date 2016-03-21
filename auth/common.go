@@ -13,13 +13,12 @@ import (
 	"math/big"
 	"net/http"
 	"strings"
-	"time"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 const (
-	userNameHeader  = "X-Upspin-UserName"
+	userNameHeader  = "X-Upspin-Username"
 	signatureHeader = "X-Upspin-Signature"
 	signatureType   = "X-Upspin-Signature-Type"
 )
@@ -48,7 +47,6 @@ func hashUserRequest(userName upspin.UserName, r *http.Request) []byte {
 // TODO: move to client.go as the server doesn't need it.
 // signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
 func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
-	req.Header.Set(userNameHeader, string(userName)) // Set the username
 	ecdsaPubKey, keyType, err := parsePublicKey(keys.Public)
 	if err != nil {
 		return err
@@ -58,7 +56,6 @@ func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Reques
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Date", time.Now().Format(time.RFC850))
 	// The hash includes the user name and the key type.
 	hash := hashUserRequest(userName, req)
 	r, s, err := ecdsa.Sign(rand.Reader, ecdsaPrivKey, hash)
