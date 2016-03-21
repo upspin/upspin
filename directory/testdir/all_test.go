@@ -436,6 +436,36 @@ func TestGlob(t *testing.T) {
 	}
 }
 
+func TestSequenceIncreaseOnWrite(t *testing.T) {
+	const (
+		user     = "user6@google.com"
+		fileName = user + "/file"
+	)
+	setup(user)
+	// Validate sequence increases after write.
+	seq := int64(-1)
+	for i := 0; i < 10; i++ {
+		// Create a file.
+		text := fmt.Sprintln("version", i)
+		data, packdata := packData(t, []byte(text), fileName)
+		_, err := context.Directory.Put(fileName, data, packdata)
+		if err != nil {
+			t.Fatalf("put file %d: %v", i, err)
+		}
+		entry, err := context.Directory.Lookup(fileName)
+		if err != nil {
+			t.Fatalf("lookup file %d: %v", i, err)
+		}
+		if entry == nil {
+			t.Fatalf("lookup file %d: entry is nil", i)
+		}
+		if entry.Metadata.Sequence <= seq {
+			t.Fatalf("sequence file %d did not increase: old seq %d; new seq %d", i, seq, entry.Metadata.Sequence)
+		}
+		seq = entry.Metadata.Sequence
+	}
+}
+
 func init() {
 	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
 }
