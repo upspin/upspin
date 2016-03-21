@@ -1,21 +1,17 @@
 // Package testdir implements a simple, non-persistent, in-memory directory service.
 // It stores its directory entries, including user roots, in the in-memory teststore,
 // but allows Put operations to place data in arbitrary locations.
-// TODO: Make concurrency-safe.
 package testdir
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"os"
 	goPath "path"
 	"sort"
-	"strings"
 	"sync"
 
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -62,15 +58,6 @@ type Service struct {
 
 var _ upspin.Directory = (*Service)(nil)
 
-// entry represents the metadata for a file in a directory.
-type entry struct {
-	elem     string           // Path element, such as "foo" representing the file a@b.c/a/b/c/foo.
-	isDir    bool             // The referenced item is itself a directory.
-	seq      int64            // Sequence number.
-	ref      upspin.Reference // Not hinted, so replicas hold the same data. Directories are near blob servers.
-	packdata upspin.PackData
-}
-
 // mkStrError creates an os.PathError from the arguments including a string for the error description.
 func mkStrError(op string, name upspin.PathName, err string) *os.PathError {
 	return &os.PathError{
@@ -80,7 +67,7 @@ func mkStrError(op string, name upspin.PathName, err string) *os.PathError {
 	}
 }
 
-// mkPathError creates an os.PathError from the arguments.
+// mkError creates an os.PathError from the arguments.
 func mkError(op string, name upspin.PathName, err error) *os.PathError {
 	return &os.PathError{
 		Op:   op,
@@ -193,36 +180,24 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
 			}
 			for len(payload) > 0 {
-				remaining, name, hashBytes, isDir, _, packdata, err := s.step("Get", ent.Name, payload)
+				var nextEntry upspin.DirEntry
+				remaining, err := nextEntry.Unmarshal(payload)
 				if err != nil {
 					return nil, err
 				}
 				payload = remaining
-				matched, err := goPath.Match(elem, string(name))
+				parsed, err := path.Parse(nextEntry.Name)
+				if err != nil {
+					return nil, err
+				}
+				matched, err := goPath.Match(elem, parsed.Elems[len(parsed.Elems)-1])
 				if err != nil {
 					return nil, mkError("Glob", ent.Name, err)
 				}
 				if !matched {
 					continue
 				}
-				dirPath := string(ent.Name)
-				if !strings.HasSuffix(dirPath, "/") {
-					dirPath += "/"
-				}
-				e := &upspin.DirEntry{
-					Name: upspin.PathName(dirPath + string(name)),
-					Location: upspin.Location{
-						Endpoint: s.StoreEndpoint,
-						Reference: upspin.Reference{
-							Key:     sha256key.BytesString(hashBytes),
-							Packing: upspin.Packing(packdata[0]), // packdata known to have bytes.
-						},
-					},
-					Metadata: upspin.Metadata{
-						IsDir: isDir,
-					},
-				}
-				next = append(next, e)
+				next = append(next, &nextEntry)
 			}
 		}
 	}
@@ -259,7 +234,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob, _, err := packDirBlob(s.Context, nil, parsed.Path()) // TODO: Ignoring metadata.
+		blob, _, err := packDirBlob(s.Context, nil, parsed.Path()) // TODO: Ignoring metadata (but using PlainPack).
 		if err != nil {
 			return loc0, err
 		}
@@ -278,7 +253,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		}
 		return loc, nil
 	}
-	return s.put("MakeDirectory", directoryName, true, nil, dirPackData)
+	// Use parsed.Path() rather than directoryName so it's canonicalized.
+	return s.put("MakeDirectory", parsed.Path(), true, nil, dirPackData)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -288,9 +264,14 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
 func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+	parsed, err := path.Parse(pathName + "/")
+	if err != nil {
+		return loc0, err
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.put("Put", pathName, false, data, packdata)
+	// Use parsed.Path() rather than directoryName so it's canonicalized.
+	return s.put("Put", parsed.Path(), false, data, packdata)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
@@ -310,37 +291,31 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
 	// Invariant: dirRef refers to a directory.
-	isDir := true
-	seq := int64(0)
-	entries := make([]entry, 0, 10) // 0th entry is the root.
-	ent := entry{
-		elem:     "",
-		isDir:    true,
-		seq:      0, // Always zero for directories. TODO?
-		ref:      dirRef,
-		packdata: packdata,
+	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
+	dirEntry := &upspin.DirEntry{
+		Name: "",
+		Location: upspin.Location{
+			Endpoint:  s.StoreEndpoint,
+			Reference: dirRef,
+		},
+		Metadata: upspin.Metadata{
+			IsDir:    true,
+			Sequence: 0,
+			PackData: packdata,
+		},
 	}
-	entries = append(entries, ent)
+	entries = append(entries, dirEntry)
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		elem := parsed.Elems[i]
-		var pdata upspin.PackData
-		dirRef, isDir, seq, pdata, err = s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return loc0, err
 		}
-		if !isDir {
+		if !entry.Metadata.IsDir {
 			return loc0, mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
-		ent := entry{
-			elem:     elem,
-			isDir:    true,
-			seq:      seq,
-			ref:      dirRef,
-			packdata: pdata,
-		}
-		entries = append(entries, ent) // TODO: IsDir should be checked
+		entries = append(entries, entry)
+		dirRef = entry.Location.Reference
 	}
-	lastElem := parsed.Elems[len(parsed.Elems)-1]
 
 	// Store the data in the storage service.
 	key, err := s.Store.Put(data)
@@ -355,14 +330,20 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 
 	// Update directory holding the file.
 	// Need the name of the directory we're updating.
-	ent = entry{
-		elem:     lastElem,
-		isDir:    dataIsDir,
-		seq:      0, // Will be updated by installEntry.
-		ref:      ref,
-		packdata: packdata,
+	newEntry := &upspin.DirEntry{
+		Name: pathName,
+		Location: upspin.Location{
+			Endpoint:  s.StoreEndpoint,
+			Reference: ref,
+		},
+		Metadata: upspin.Metadata{
+			IsDir:    dataIsDir,
+			Sequence: 0,   // Will be updated by installEntry.
+			Readers:  nil, // TODO
+			PackData: packdata,
+		},
 	}
-	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, ent, false)
+	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return loc0, err
@@ -372,13 +353,20 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	// i indicates the directory that needs to be updated to store the new dirRef.
 	for i := len(entries) - 2; i >= 0; i-- {
 		// Install into the ith directory the (i+1)th entry.
-		ent := entry{
-			elem:     entries[i+1].elem,
-			isDir:    true,
-			ref:      dirRef,
-			packdata: dirPackData,
+		dirEntry := &upspin.DirEntry{
+			Name: entries[i+1].Name,
+			Location: upspin.Location{
+				Endpoint:  s.StoreEndpoint,
+				Reference: dirRef,
+			},
+			Metadata: upspin.Metadata{
+				IsDir:    true,
+				Sequence: 0,   // TODO? We never care about Sequence for directories.
+				Readers:  nil, // TODO
+				PackData: dirPackData,
+			},
 		}
-		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].ref, ent, true)
+		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
 			return loc0, err
@@ -407,119 +395,32 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
-	isDir := true
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		dirRef, isDir, _, _, err = s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		entry, err := s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return nil, err
 		}
-		if !isDir {
+		if !entry.Metadata.IsDir {
 			return nil, mkStrError("Lookup", pathName, "not a directory")
 		}
+		dirRef = entry.Location.Reference
 	}
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 	// Destination must exist. If so we need to update the parent directory record.
-	var r upspin.Reference
-	var packdata upspin.PackData
-	var seq int64
-	if r, isDir, seq, packdata, err = s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem); err != nil {
+	entry, err := s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem)
+	if err != nil {
 		return nil, err
 	}
-	entry := &upspin.DirEntry{
-		Name: parsed.Path(),
-		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: r,
-		},
-		Metadata: upspin.Metadata{
-			IsDir:    isDir,
-			Sequence: seq,
-			PackData: packdata,
-		},
-	}
 	return entry, nil
-}
-
-// Internal representation of directory entries.
-// A directory entry is stored as:
-//	N=length of name, varint-encoded.
-//	N bytes of name.
-//	One byte. 0 for regular file, 1 for directory. TODO
-//	N=sequence number, varint-encoded.
-//	N=length of packdata, varint-encoded.
-//	N bytes of packdata.
-//	sha256.Size bytes of Reference.
-
-func newEntryBytes(elem string, isDir bool, seq int64, ref upspin.Reference, packdata upspin.PackData) []byte {
-	entry := make([]byte, 0, len(elem)+1+sha256key.Size+len(packdata)+20) // +20 for varint encodings.
-	var varint [10]byte
-	n := binary.PutVarint(varint[:], int64(len(elem)))
-	entry = append(entry, varint[:n]...)
-	entry = append(entry, elem...)
-	dirByte := byte(0)
-	if isDir {
-		dirByte = 1
-	}
-	entry = append(entry, dirByte)
-	n = binary.PutVarint(varint[:], seq)
-	entry = append(entry, varint[:n]...)
-	n = binary.PutVarint(varint[:], int64(len(packdata)))
-	entry = append(entry, varint[:n]...)
-	entry = append(entry, packdata...)
-	key, err := sha256key.Parse(ref.Key)
-	if err != nil {
-		panic(err)
-	}
-	entry = append(entry, key[:]...)
-	return entry
-}
-
-// step is an internal function that advances one directory entry given the cleartext
-// of the directory's contents.
-// TODO: This has a crazy signature. Fix all the code to pass entries around rather than this huge list.
-func (s *Service) step(op string, pathName upspin.PathName, payload []byte) (remaining []byte, name []byte, hashBytes []byte, isDir bool, seq int64, packdata upspin.PackData, err error) {
-	nameLen64, vLen := binary.Varint(payload)
-	nameLen := int(nameLen64)
-	if vLen <= 0 || int64(nameLen) != nameLen64 {
-		err = mkStrError(op, pathName, "internal error: invalid directory 1")
-		return
-	}
-	payload = payload[vLen:]
-	if len(payload) < nameLen+1 {
-		err = mkStrError(op, pathName, "internal error: truncated directory 2")
-		return
-	}
-	name = payload[:nameLen]
-	payload = payload[nameLen:]
-	isDir = payload[0] != 0
-	payload = payload[1:]
-	seq, vLen = binary.Varint(payload)
-	payload = payload[vLen:]
-	packDataLen64, vLen := binary.Varint(payload)
-	packDataLen := int(packDataLen64)
-	if vLen <= 0 || int64(packDataLen) != packDataLen64 || packDataLen <= 0 { // Cannot have zero-length packdata.
-		err = mkStrError(op, pathName, "internal error: invalid directory 3")
-		return
-	}
-	payload = payload[vLen:]
-	if len(payload) < packDataLen+sha256key.Size {
-		err = mkStrError(op, pathName, "internal error: truncated directory 4")
-		return
-	}
-	packdata = upspin.PackData(payload[:packDataLen])
-	payload = payload[packDataLen:]
-	hashBytes = payload[:sha256key.Size]
-	remaining = payload[sha256key.Size:]
-	return
 }
 
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
 // We always know that the packing is defined by dirPack and dirMeta.
 // It reads the whole directory, so avoid calling it repeatedly.
-func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (upspin.Reference, bool, int64, upspin.PackData, error) {
+func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (*upspin.DirEntry, error) {
 	payload, err := s.fetchDir(dirRef, name)
 	if err != nil {
-		return r0, false, 0, nil, err
+		return nil, err
 	}
 	return s.dirEntLookup(op, name, payload, elem)
 }
@@ -542,67 +443,51 @@ func (s *Service) fetchDir(dirRef upspin.Reference, name upspin.PathName) ([]byt
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
-func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (upspin.Reference, bool, int64, upspin.PackData, error) {
+func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (*upspin.DirEntry, error) {
 	if len(elem) == 0 {
-		return r0, false, 0, nil, mkStrError(op, pathName+"/", "empty name element")
+		return nil, mkStrError(op, pathName+"/", "empty name element")
 	}
+	fileName := path.Join(pathName, elem)
+	var entry upspin.DirEntry
 Loop:
 	for len(payload) > 0 {
-		remaining, name, hashBytes, isDir, seq, packdata, err := s.step(op, pathName, payload)
+		remaining, err := entry.Unmarshal(payload)
 		if err != nil {
-			return r0, false, 0, nil, err
+			return nil, err
 		}
 		payload = remaining
-		// Avoid allocation here: don't just convert to string for comparison.
-		if len(name) != len(elem) { // Length check is easy and fast.
+		if fileName != entry.Name {
 			continue Loop
 		}
-		for i, c := range name {
-			if c != elem[i] {
-				continue Loop
-			}
-		}
-		r := upspin.Reference{
-			Key:     sha256key.BytesString(hashBytes),
-			Packing: upspin.Packing(packdata[0]), // packdata is known to have data.
-		}
-		return r, isDir, seq, packdata, nil
+		return &entry, nil
 	}
-	return r0, false, 0, nil, mkStrError(op, pathName, "no such directory entry: "+elem)
+	return nil, mkStrError(op, pathName, "no such directory entry: "+elem)
 }
 
-// installEntry installs the entry in the directory referenced by dirRef, appending or overwriting the
+// installEntry installs the new entry in the directory referenced by dirRef, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
-func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, ent entry, dirOverwriteOK bool) (upspin.Reference, error) {
+func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, dirOverwriteOK bool) (upspin.Reference, error) {
 	dirData, err := s.fetchDir(dirRef, dirName)
 	if err != nil {
 		return r0, err
 	}
 	found := false
-	var sequence int64
-Loop:
+	var nextEntry upspin.DirEntry
 	for payload := dirData; len(payload) > 0 && !found; {
 		// Remember where this entry starts.
 		start := len(dirData) - len(payload)
-		remaining, name, _, isDir, seq, _, err := s.step(op, upspin.PathName(dirName), payload)
+		remaining, err := nextEntry.Unmarshal(payload)
 		if err != nil {
 			return r0, err
 		}
-		sequence = seq
 		length := len(payload) - len(remaining)
 		payload = remaining
-		// Avoid allocation here: don't just convert to string for comparison.
-		if len(name) != len(ent.elem) { // Length check is easy and fast.
-			continue Loop
-		}
-		for i, c := range name {
-			if c != ent.elem[i] {
-				continue Loop
-			}
+		if nextEntry.Name != newEntry.Name {
+			continue
 		}
 		// We found the reference.
 		// If it's already there and is not expected to be a directory, this is an error.
-		if isDir && !dirOverwriteOK {
+		if nextEntry.Metadata.IsDir && !dirOverwriteOK {
 			return r0, mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
 		// Drop this entry so we can append the updated one.
@@ -610,17 +495,16 @@ Loop:
 		// so we cannot overwrite it in place.
 		copy(dirData[start:], remaining)
 		dirData = dirData[:len(dirData)-length]
+		// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
+		newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
 		break
 	}
-	if !ent.isDir {
-		sequence++
-	}
-	entry := newEntryBytes(ent.elem, ent.isDir, sequence, ent.ref, ent.packdata)
-	dirData = append(dirData, entry...)
-	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata.
+	data, err := newEntry.Marshal()
 	if err != nil {
 		return r0, err
 	}
+	dirData = append(dirData, data...)
+	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
 	key, err := s.Store.Put(blob)
 	if err != nil {
 		// TODO: System is now inconsistent.
@@ -628,9 +512,9 @@ Loop:
 	}
 	ref := upspin.Reference{
 		Key:     key,
-		Packing: upspin.Packing(ent.packdata[0]),
+		Packing: upspin.Packing(newEntry.Metadata.PackData[0]),
 	}
-	return ref, err
+	return ref, nil
 }
 
 // Methods to implement upspin.Dialer
