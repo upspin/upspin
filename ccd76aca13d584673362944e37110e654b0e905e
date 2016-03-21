@@ -22,6 +22,30 @@
       "revId": "ccd76aca13d584673362944e37110e654b0e905e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_bb3fc79b",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-21T08:45:03Z",
+      "side": 1,
+      "message": "i don\u0027t usually do this, but OK. it\u0027s ugly enough code to write only once.",
+      "parentUuid": "1c161690_7debb299",
+      "range": {
+        "startLine": 99,
+        "startChar": 5,
+        "endLine": 99,
+        "endChar": 16
+      },
+      "revId": "ccd76aca13d584673362944e37110e654b0e905e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
