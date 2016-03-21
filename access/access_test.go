@@ -73,7 +73,7 @@ func TestParseContainsGroupName(t *testing.T) {
 
 func TestParseWrongFormat1(t *testing.T) {
 	const (
-		expectedErr = "1: unrecognized text: "
+		expectedErr = accessFile + ":1: unrecognized text: "
 	)
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
 	_, err := access.Parse(accessFile, accessText)
@@ -87,7 +87,7 @@ func TestParseWrongFormat1(t *testing.T) {
 
 func TestParseWrongFormat2(t *testing.T) {
 	const (
-		expectedErr = "2: unrecognized text: "
+		expectedErr = accessFile + ":2: unrecognized text: "
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
 	_, err := access.Parse(accessFile, accessText)
@@ -101,7 +101,7 @@ func TestParseWrongFormat2(t *testing.T) {
 
 func TestParseWrongFormat3(t *testing.T) {
 	const (
-		expectedErr = "1: unrecognized text: "
+		expectedErr = accessFile + ":1: unrecognized text: "
 	)
 	accessText := []byte(": bob@abc.com") // missing access format text.
 	_, err := access.Parse(accessFile, accessText)
@@ -115,7 +115,7 @@ func TestParseWrongFormat3(t *testing.T) {
 
 func TestParseWrongFormat4(t *testing.T) {
 	const (
-		expectedErr = "1: unrecognized text: "
+		expectedErr = accessFile + ":1: unrecognized text: "
 	)
 	accessText := []byte("rea:bob@abc.com") // invalid access format text.
 	_, err := access.Parse(accessFile, accessText)
@@ -129,7 +129,7 @@ func TestParseWrongFormat4(t *testing.T) {
 
 func TestParseMissingAccessField(t *testing.T) {
 	const (
-		expectedErr = "1: unrecognized text: "
+		expectedErr = accessFile + ":1: unrecognized text: "
 	)
 	accessText := []byte("bob@abc.com")
 	_, err := access.Parse(accessFile, accessText)
@@ -143,7 +143,7 @@ func TestParseMissingAccessField(t *testing.T) {
 
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	const (
-		expectedErr = "3: unrecognized text: "
+		expectedErr = accessFile + ":3: unrecognized text: "
 	)
 	accessText := []byte("\n\nr: a@b.co r: c@b.co")
 	_, err := access.Parse(accessFile, accessText)
@@ -156,9 +156,6 @@ func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 }
 
 func TestParseBadPath(t *testing.T) {
-	const (
-		expectedErr = "0: unrecognized text: "
-	)
 	// TODO: Group names are being ignored. When implemented, this group name should cause an error.
 	accessText := []byte("r: notanemail/Group/family")
 	p, err := access.Parse(accessFile, accessText)

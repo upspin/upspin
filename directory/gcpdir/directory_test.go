@@ -252,7 +252,7 @@ func TestPutBadMeta(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	badPackingError := "Put bob@jones.com/mydir/mysubdir: missing packing type in packdata"
+	badPackingError := "Directory: Put: bob@jones.com/mydir/mysubdir: missing packing type in packdata"
 	if err.Error() != badPackingError {
 		t.Errorf("Expected error %q, got %q", badPackingError, err)
 	}
@@ -351,7 +351,7 @@ func TestAccessErrorInvalidContents(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	expectedError := "Put : bob@jones.com/mydir/Access: 1: unrecognized text: "
+	expectedError := "Put: bob@jones.com/mydir/Access:1: unrecognized text: "
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected %s, got %s", expectedError, err)
 	}

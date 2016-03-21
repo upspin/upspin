@@ -30,8 +30,6 @@ var (
 			NetAddr:   upspin.NetAddr("http://localhost:8080"),
 		},
 	}
-
-	errInvalidKey = newStoreError(invalidKeyError, "")
 )
 
 func TestStorePutError(t *testing.T) {
@@ -45,7 +43,7 @@ func TestStorePutError(t *testing.T) {
 
 	_, err := s.Put([]byte("contents"))
 
-	expected := fmt.Sprintf("Put: %v", errSomethingBad)
+	expected := fmt.Sprintf("Store: Put: %v", errSomethingBad)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -91,7 +89,7 @@ func TestStoreGetError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := fmt.Sprintf(serverError, "Get", errBrokenPipe)
+	expected := fmt.Sprintf("Store: Get: server error: %s", errBrokenPipe)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -108,7 +106,7 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := invalidKeyError
+	expected := fmt.Sprintf("Store: Get: %s", invalidKeyError)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -152,7 +150,8 @@ func TestStoreDeleteInvalidKey(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if err.Error() != errInvalidKey.Error() {
+	errInvalidKey := "Store: Delete: invalid key"
+	if err.Error() != errInvalidKey {
 		t.Fatalf("Expected error %v, got %v", errInvalidKey, err)
 	}
 	mock.Verify(t)
