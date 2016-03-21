@@ -2,7 +2,6 @@
 package test
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -14,12 +13,10 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 )
 
 // Config defines the configuration for each test setup.
@@ -31,12 +28,6 @@ type Config struct {
 }
 
 var (
-	// For GCP, start the directory server and store server in
-	// ports 8080 and 8081 respectively and set
-	// --use_localhost_gcp to true in the command line (see init
-	// below)
-	useLocalhostGCP = flag.Bool("use_localhost_gcp", false, "set to true to use GCP on the localhost using the default ports (8080 and 8081 for store and directory respectively)")
-
 	inProcess = upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -58,32 +49,7 @@ var (
 )
 
 func TestAll(t *testing.T) {
-	if *useLocalhostGCP {
-		testAllGCP(t)
-	} else {
-		testAllInProcess(t)
-	}
-}
-
-func testAllGCP(t *testing.T) {
-	gcpLocalDirectoryEndpoint := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   "http://localhost:8081", // default port
-	}
-	gcpLocalStoreEndpoint := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   "http://localhost:8080", // default port
-	}
-
-	var configs = []Config{
-		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.DebugPack},
-		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.PlainPack},
-		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp256Pack},
-		{inProcess, gcpLocalDirectoryEndpoint, gcpLocalStoreEndpoint, upspin.EEp521Pack},
-	}
-	for _, config := range configs {
-		newSetup(config.user, config.directory, config.store, config.pack).runAllTests(t)
-	}
+	testAllInProcess(t)
 }
 
 func testAllInProcess(t *testing.T) {
