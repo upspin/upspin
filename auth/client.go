@@ -2,12 +2,15 @@
 package auth
 
 import (
+	"crypto/ecdsa"
+	"crypto/rand"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -149,6 +152,27 @@ func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 	c.url = req.URL
 	c.timeLastAuth = time.Now()
 	return c.client.Do(req)
+}
+
+// signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
+func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
+	ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(keys.Public)
+	if err != nil {
+		return err
+	}
+	req.Header.Set(signatureTypeHeader, keyType)
+	ecdsaPrivKey, err := keyloader.ParsePrivateKey(ecdsaPubKey, keys.Private)
+	if err != nil {
+		return err
+	}
+	// The hash includes the user name and the key type.
+	hash := hashUserRequest(userName, req)
+	r, s, err := ecdsa.Sign(rand.Reader, ecdsaPrivKey, hash)
+	if err != nil {
+		return err
+	}
+	req.Header.Set(signatureHeader, fmt.Sprintf("%s %s", r, s))
+	return nil
 }
 
 type clientError struct {

@@ -89,7 +89,7 @@ func TestStoreGetError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := fmt.Sprintf("Store: Get: server error: %s", errBrokenPipe)
+	expected := fmt.Sprintf("Store: Get: 1234: server error: %s", errBrokenPipe)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}

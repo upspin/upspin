@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/hkdf"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -539,20 +540,14 @@ func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.Pub
 // parsePublicKey takes a string representation of a
 // public key and converts it into an ECDSA public key.
 func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, error) {
-	var packname string
-	var x, y big.Int
-
-	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &packname, &x, &y)
+	ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
-	if n != 3 {
-		return nil, fmt.Errorf("expected packname and two big ints, got %d", n)
+	if keyType != c.packerString {
+		return nil, fmt.Errorf("expected packing %s, got %s", c.packerString, keyType)
 	}
-	if packname != c.packerString {
-		return nil, fmt.Errorf("expected packing %s, got %s", c.packerString, packname)
-	}
-	return &ecdsa.PublicKey{Curve: c.curve, X: &x, Y: &y}, nil
+	return ecdsaPubKey, nil
 }
 
 func (c common) isValidKeyForPacker(publicKey upspin.PublicKey) bool {
