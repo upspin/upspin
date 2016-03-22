@@ -49,3 +49,6 @@ func enotdir(format string, vars ...interface{}) *upspinError {
 func eisdir(format string, vars ...interface{}) *upspinError {
 	return mkError(syscall.EISDIR, "Is a directory: "+format, vars...)
 }
+func efuckingdotunderscore() *upspinError {
+	return &upspinError{syscall.ENOENT, ""}
+}

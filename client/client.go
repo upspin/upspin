@@ -168,7 +168,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		}
 		if locs == nil && err == nil {
 			// Encrypted data was found. Need to unpack it.
-			packer := pack.Lookup(entry.Location.Reference.Packing)
+			packer := pack.Lookup(loc.Reference.Packing)
 			if packer == nil {
 				return nil, fmt.Errorf("client: unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
 			}
