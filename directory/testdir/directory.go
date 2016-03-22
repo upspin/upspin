@@ -144,8 +144,7 @@ func unpackDirBlob(context *upspin.Context, ciphertext []byte, name upspin.PathN
 // as a literal even if it contains metacharacters. The metadata in each entry
 // has no key information.
 func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	// We can use Parse for this because it's only looking for slashes.
-	parsed, err := path.Parse(upspin.PathName(pattern + "/"))
+	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +222,7 @@ func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
-	parsed, err := path.Parse(directoryName + "/")
+	parsed, err := path.Parse(directoryName)
 	if err != nil {
 		return loc0, err
 	}
@@ -264,7 +263,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
 func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
-	parsed, err := path.Parse(pathName + "/")
+	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return loc0, err
 	}

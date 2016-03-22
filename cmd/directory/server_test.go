@@ -29,7 +29,7 @@ func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected st
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"dir entry verification failed: no slash in path"}`)
+	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"dir entry verification failed: no user name in path"}`)
 }
 
 func TestPutErrorParseUser(t *testing.T) {
