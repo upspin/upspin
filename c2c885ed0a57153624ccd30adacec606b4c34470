@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_dcabbeb8",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-22T21:38:03Z",
+      "side": 1,
+      "message": "The new G-on-G security document\n  https://g3doc.corp.google.com/ops/security/g_on_g/g3doc/gce_best_practices.md?cl\u003dhead\nsuggests we run in GCI instead of Ubuntu LTS.   I\u0027m not sure yet if that affects this script.\n\nI\u0027m looking into host security monitoring.  I think we\u0027re ok with regard to the other points mentioned in that doc.",
+      "revId": "c2c885ed0a57153624ccd30adacec606b4c34470",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
