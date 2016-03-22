@@ -1,0 +1,9 @@
+#!/bin/sh
+
+go build
+./keygen -where=. -secretseed pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok
+
+(cmp -s public.upspinkey public.test && cmp -s secret.upspinkey secret.test ) || (echo FAILED; exit)
+
+rm keygen public.upspinkey secret.upspinkey
+echo PASSED
