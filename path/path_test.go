@@ -20,6 +20,7 @@ type parseTest struct {
 }
 
 var goodParseTests = []parseTest{
+	{"u@google.com", newP([]string{}), "/"},
 	{"u@google.com/", newP([]string{}), "/"},
 	{"u@google.com/a", newP([]string{"a"}), "/a"},
 	{"u@google.com/a/", newP([]string{"a"}), "/a"},
@@ -86,9 +87,8 @@ func (p Parsed) Equal(q Parsed) bool {
 }
 
 var badParseTests = []upspin.PathName{
-	"u@google.com", // No slash.
-	"u@x/a/b",      // User name too short.
-	"user/a/b",     // Invalid user name.
+	"u@x/a/b",  // User name too short.
+	"user/a/b", // Invalid user name.
 }
 
 func TestBadParse(t *testing.T) {

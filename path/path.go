@@ -12,7 +12,8 @@ import (
 
 // Parsing of file names. File names always start with a user name in mail-address form,
 // followed by a slash and a possibly empty pathname that follows. Thus the root of
-// user@google.com's name space is "user@google.com/".
+// user@google.com's name space is "user@google.com/". But Parse also allows
+// "user@google.com" to refer to the user's root directory.
 
 // Parsed represents a successfully parsed path name.
 type Parsed struct {
@@ -72,20 +73,22 @@ func (n NameError) Error() string {
 }
 
 // Parse parses a full file name, including the user, validates it,
-// and returns its parsed form.
+// and returns its parsed form. If the name is a user root directory,
+// the trailing slash is optional.
 func Parse(pathName upspin.PathName) (Parsed, error) {
 	name := string(pathName)
 	// Pull off the user name.
+	var user string
 	slash := strings.IndexByte(name, '/')
 	if slash < 0 {
-		// No slash.
-		return pn0, NameError{string(pathName), "no slash in path"}
+		user, name = name, ""
+	} else {
+		user, name = name[:slash], name[slash:]
 	}
-	if slash < 6 {
+	if len(user) < 6 {
 		// No user name. Must be at least "u@x.co". Silly test - do more.
 		return pn0, NameError{string(pathName), "no user name in path"}
 	}
-	user, name := name[:slash], name[slash:]
 	if strings.Count(user, "@") != 1 {
 		// User name must contain exactly one "@".
 		return pn0, NameError{string(pathName), "bad user name in path"}

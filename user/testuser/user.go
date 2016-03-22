@@ -66,8 +66,8 @@ func (s *Service) ListUsers() []upspin.UserName {
 // adminstrative procedure. For this test version, we just provide a
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
-	// Verify that it is a valid name. First make it look like a directory by adding a slash.
-	parsed, err := path.Parse(upspin.PathName(name + "/"))
+	// Verify that it is a valid name.
+	parsed, err := path.Parse(upspin.PathName(name))
 	if err != nil {
 		return err
 	}
