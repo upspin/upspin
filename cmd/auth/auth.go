@@ -1,5 +1,5 @@
 // Package serverauth provides authentication and SSL functionality common to all Upspin servers.
-package serverauth
+package auth
 
 import (
 	"crypto/tls"
