@@ -16,11 +16,16 @@ Sample usage:
 package auth
 
 import (
+	"crypto/ecdsa"
 	"errors"
+	"fmt"
 	"log"
+	"math/big"
 	"net/http"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -176,4 +181,44 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 		authHandlerFunc(session, w, r)
 	}
 	return httpHandler
+}
+
+// verifyRequest verifies whether named user has signed the HTTP request using one of the possible keys.
+func verifyRequest(userName upspin.UserName, keys []upspin.PublicKey, req *http.Request) error {
+	sig := req.Header.Get(signatureHeader)
+	if sig == "" {
+		return errors.New("no signature in header")
+	}
+	neededKeyType := req.Header.Get(signatureTypeHeader)
+	if neededKeyType == "" {
+		return errors.New("no signature type in header")
+	}
+	sigPieces := strings.Fields(sig)
+	if len(sigPieces) != 2 {
+		return fmt.Errorf("expected two integers in signature, got %d", len(sigPieces))
+	}
+	var rs, ss big.Int
+	_, ok := rs.SetString(sigPieces[0], 10)
+	if !ok {
+		return errMissingSignature
+	}
+	_, ok = ss.SetString(sigPieces[1], 10)
+	if !ok {
+		return errMissingSignature
+	}
+	for _, k := range keys {
+		ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(k)
+		if err != nil {
+			return err
+		}
+		if keyType != neededKeyType {
+			continue
+		}
+		hash := hashUserRequest(userName, req)
+		if !ecdsa.Verify(ecdsaPubKey, hash, &rs, &ss) {
+			return fmt.Errorf("signature verification failed for user %s", userName)
+		}
+		return nil
+	}
+	return fmt.Errorf("no keys found for user %s", userName)
 }

@@ -229,7 +229,7 @@ type storeError struct {
 // Error implements error
 func (s storeError) Error() string {
 	if s.key != "" {
-		fmt.Sprintf("Store: %s: %s: %s", s.op, s.key, s.error)
+		return fmt.Sprintf("Store: %s: %s: %s", s.op, s.key, s.error)
 	}
 	return fmt.Sprintf("Store: %s: %s", s.op, s.error)
 }
