@@ -18,9 +18,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"upspin.googlesource.com/upspin.git/cmd/keygen/proquint"
 	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/pack/keygen/proquint"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	_ "upspin.googlesource.com/upspin.git/pack/ee" // needed for init() registration
 )
 
 var (
@@ -140,9 +142,14 @@ func main() {
 	log.SetPrefix("keygen: ")
 	flag.Parse()
 
+	p := pack.Lookup(16)
+	if p == nil {
+		log.Fatal("packers apparently not registered")
+	}
+
 	packer := pack.LookupByName(*packing)
 	if packer == nil {
-		log.Fatal("unrecognized packing")
+		log.Fatalf("unrecognized packing %s", *packing)
 	}
 	createKeys(curve[packer.Packing()], packer)
 }
