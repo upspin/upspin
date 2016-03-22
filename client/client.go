@@ -168,6 +168,8 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		}
 		if locs == nil && err == nil {
 			// Encrypted data was found. Need to unpack it.
+			// TODO(p,edpin): change to loc.Reference.Packing when GCP makes the indirected reference
+			// have the correct packing info.
 			packer := pack.Lookup(entry.Location.Reference.Packing)
 			if packer == nil {
 				return nil, fmt.Errorf("client: unrecognized Packing %d for %q", entry.Location.Reference.Packing, name)
