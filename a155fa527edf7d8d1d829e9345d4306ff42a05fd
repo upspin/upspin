@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_6730383f",
+        "filename": "client/clientcli/clientcli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T00:23:20Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s a little ugly.",
+      "parentUuid": "dcb0fe0b_db3053a0",
+      "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_bb35878e",
         "filename": "client/clientcli/clientcli.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-22T00:07:06Z",
       "side": 1,
       "message": "printShortDirEntries\nprintLongDirEntries",
+      "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_47353c2d",
+        "filename": "client/clientcli/clientcli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T00:23:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_bb35878e",
       "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_a73a301a",
+        "filename": "client/clientcli/clientcli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T00:23:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_9b3acb7a",
+      "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_7b401fe1",
         "filename": "client/clientcli/clientcli.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-22T00:07:06Z",
       "side": 1,
       "message": "i don\u0027t like the return type, very unidiomatic.\ni\u0027d either return []byte or if you prefer pass in a bytes.Buffer as an argument and write to that.",
+      "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_873f340b",
+        "filename": "client/clientcli/clientcli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T00:23:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_7b401fe1",
       "revId": "a155fa527edf7d8d1d829e9345d4306ff42a05fd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
