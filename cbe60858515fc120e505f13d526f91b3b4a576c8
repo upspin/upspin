@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_a2a4dee3",
+        "filename": "path/path.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T16:29:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_db5973d6",
+      "revId": "cbe60858515fc120e505f13d526f91b3b4a576c8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_bb4ea70c",
         "filename": "path/path.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-22T00:28:32Z",
       "side": 1,
       "message": "again, this is an allocation (for the slice) when none is required.\nstrings.Count should have exactly one @\nstrings.IndexByte will give you its location\nreturn two subslices",
+      "revId": "cbe60858515fc120e505f13d526f91b3b4a576c8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_82a9e2ba",
+        "filename": "path/path.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-22T16:29:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_bb4ea70c",
       "revId": "cbe60858515fc120e505f13d526f91b3b4a576c8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
