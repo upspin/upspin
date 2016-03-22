@@ -18,7 +18,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"upspin.googlesource.com/upspin.git/pack/ee"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/pack/keygen/proquint"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -140,12 +140,11 @@ func main() {
 	log.SetPrefix("keygen: ")
 	flag.Parse()
 
-	p, ok := ee.Packer[*packing]
-	if !ok {
+	packer := pack.LookupByName(*packing)
+	if packer == nil {
 		log.Fatal("unrecognized packing")
 	}
-	i := p.Packing()
-	createKeys(curve[i], p)
+	createKeys(curve[packer.Packing()], packer)
 }
 
 func keydir() string {
