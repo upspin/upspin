@@ -11,7 +11,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cmd/auth"
+	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -33,8 +33,8 @@ var (
 )
 
 type dirServer struct {
-	cloudClient gcp.Interface
-	httpClient  netutil.HTTPClientInterface
+	cloudClient gcp.Interface               // handle for GCP bucket upspin-directory
+	httpClient  netutil.HTTPClientInterface // our HTTP client for calling User service
 }
 
 type dirEntryError struct {
@@ -167,6 +167,8 @@ func (d *dirServer) getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
 // putMeta forcibly writes the given dirEntry to the path on the
 // backend without checking anything.
 func (d *dirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) error {
+	// TODO  think about best place to canonicalize dirEntry.Name
+	// TODO(ehg)  if using crypto packing here, as we should, how will secrets get to code at service tartup?
 	jsonBuf, err := json.Marshal(dirEntry)
 	if err != nil {
 		return dirEntryError{fmt.Sprintf("conversion to json failed: %v", err)}
