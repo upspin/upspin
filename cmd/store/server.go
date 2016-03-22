@@ -10,7 +10,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cmd/auth"
+	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
