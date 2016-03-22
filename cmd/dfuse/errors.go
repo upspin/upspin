@@ -49,3 +49,8 @@ func enotdir(format string, vars ...interface{}) *upspinError {
 func eisdir(format string, vars ...interface{}) *upspinError {
 	return mkError(syscall.EISDIR, "Is a directory: "+format, vars...)
 }
+
+// TODO(p): make this mac specific or remove it when we're done debugging.
+func edotunderscore() *upspinError {
+	return &upspinError{syscall.ENOENT, ""}
+}
