@@ -74,7 +74,7 @@ func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error)
 
 func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
 	// Add a final slash in case it's just a user name and we're referencing the root.
-	parsed, err := path.Parse(name + "/")
+	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, err
 	}
