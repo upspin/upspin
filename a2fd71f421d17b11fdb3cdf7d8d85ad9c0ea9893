@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_7e5fed46",
+        "filename": "cmd/keygen/public.test",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T00:48:02Z",
+      "side": 1,
+      "message": "golden files like this are to be placed in a subdirectory testdata.",
+      "revId": "a2fd71f421d17b11fdb3cdf7d8d85ad9c0ea9893",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_9e6999fb",
+        "filename": "cmd/keygen/test",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T00:48:02Z",
+      "side": 1,
+      "message": "something like this:\n\nfunction fail() {\n  rm -f keygen public.upspinkey secret.upspinkey\n  echo FAILED\n  exit 1\n}\n\ngo build || fail\n./keygen-where\u003d/tmp -secretseed pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok || fail\n(cmp -s /tmp/public.upsinkey testdata/public.test \u0026\u0026 cmp -s /tmp/secret.upspkinkey testdata/secret.test) || fail\nrm -f keygen public.upspinkey secret.upspinkey\n\necho PASSED\nexit 0",
+      "revId": "a2fd71f421d17b11fdb3cdf7d8d85ad9c0ea9893",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
