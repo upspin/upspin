@@ -226,7 +226,7 @@ func (t Time) String() string {
 	return t.Go().Format("2006-01-02T15:04:05 UTC")
 }
 
-// Go returns the a Go Time value representation of an Upspin time.
+// Go returns the Go Time value representation of an Upspin time.
 // The time zone always UTC.
 func (t Time) Go() time.Time {
 	return time.Unix(int64(t), 0).In(time.UTC)
@@ -235,4 +235,9 @@ func (t Time) Go() time.Time {
 // TimeFromGo returns the Upspin Time value representation of a Go time.
 func TimeFromGo(t time.Time) Time {
 	return Time(t.Unix())
+}
+
+// Now returns the current Upspin Time.
+func Now() Time {
+	return TimeFromGo(time.Now())
 }
