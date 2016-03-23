@@ -436,7 +436,7 @@ func TestGlob(t *testing.T) {
 	}
 }
 
-func TestSequenceIncreaseOnWrite(t *testing.T) {
+func TestSequencing(t *testing.T) {
 	const (
 		user     = "user6@google.com"
 		fileName = user + "/file"
@@ -463,6 +463,66 @@ func TestSequenceIncreaseOnWrite(t *testing.T) {
 			t.Fatalf("sequence file %d did not increase: old seq %d; new seq %d", i, seq, entry.Metadata.Sequence)
 		}
 		seq = entry.Metadata.Sequence
+	}
+	// Now check it updates if we set the sequence correctly.
+	data, packdata := packData(t, []byte("first seq version"), fileName)
+	opts := upspin.PutOptions{
+		Sequence: seq,
+	}
+	_, err := context.Directory.Put(fileName, data, packdata, &opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err := context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatalf("lookup file: %v", err)
+	}
+	if entry == nil {
+		t.Fatalf("lookup file: entry is nil")
+	}
+	if entry.Metadata.Sequence != seq+1 {
+		t.Fatalf("wrong sequence: expected %d got %d", seq+1, entry.Metadata.Sequence)
+	}
+	// Now check it fails if we don't. We can just use the previous options.
+	data, packdata = packData(t, []byte("second seq version"), fileName)
+	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+	errStr := err.Error()
+	if !strings.Contains(errStr, "sequence mismatch") {
+		t.Fatalf("expected sequence error, got %v", err)
+	}
+}
+
+func TestTimeAndSize(t *testing.T) {
+	const (
+		user     = "user7@google.com"
+		fileName = user + "/file"
+	)
+	setup(user)
+	// Validate sequence increases after write.
+	data, packdata := packData(t, []byte("hello"), fileName)
+	opts := upspin.PutOptions{
+		Size: 1234,
+		Time: 12345,
+	}
+	_, err := context.Directory.Put(fileName, data, packdata, &opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err := context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry == nil {
+		t.Fatalf("lookup: entry is nil")
+	}
+	if entry.Metadata.Size != opts.Size {
+		t.Fatalf("did not set size; got %d", entry.Metadata.Size)
+	}
+	if entry.Metadata.Time != opts.Time {
+		t.Fatalf("did not set time; got %d", entry.Metadata.Time)
 	}
 }
 
