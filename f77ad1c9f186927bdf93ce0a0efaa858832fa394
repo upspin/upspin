@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_e93231eb",
+        "filename": "client/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_de2ba11a",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_3efcc5ca",
         "filename": "directory/testdir/all_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-03-23T22:52:50Z",
       "side": 1,
       "message": "why?",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_492705ae",
+        "filename": "directory/testdir/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_3efcc5ca",
       "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_8921fd98",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Pending const fix.",
+      "parentUuid": "dcb0fe0b_5eef9113",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_9e0cf9d5",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-03-23T22:52:50Z",
       "side": 1,
       "message": "s/DebugPack packing/DebugPack/",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_a9e95964",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_9e0cf9d5",
       "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1c161690_e9f3514e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_7ef24dfd",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_1ef909db",
         "filename": "user/testuser/user_test.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-03-23T22:52:50Z",
       "side": 1,
       "message": "you don\u0027t need the plain import",
+      "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_29f56932",
+        "filename": "user/testuser/user_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T23:54:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dcb0fe0b_1ef909db",
       "revId": "f77ad1c9f186927bdf93ce0a0efaa858832fa394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
