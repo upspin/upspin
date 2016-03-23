@@ -18,33 +18,25 @@ const (
 	scope = storage.DevstorageFullControlScope
 )
 
-// ACLs for writing data to Cloud Store.
+// WriteACL defines ACLs for writing data to Cloud Store.
 // Definitions according to https://github.com/google/google-api-go-client/blob/master/storage/v1/storage-gen.go:
-//   "authenticatedRead" - Project team owners get OWNER access, and
-//       allAuthenticatedUsers get READER access.
-//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
-//        project team owners get OWNER access.
-//   "private" - Project team owners get OWNER access.
-//   "projectPrivate" - Project team members get access according to
-//       their roles.
-//   "publicRead" - Project team owners get OWNER access, and allUsers
-//       get READER access.
 //   "publicReadWrite" - Project team owners get OWNER access, and
 //       allUsers get WRITER access.
 type WriteACL string
 
 const (
-	PublicRead          WriteACL = "publicRead"
-	AuthenticatedRead   WriteACL = "authenticatedRead"
-	Private             WriteACL = "private"
-	ProjectPrivate      WriteACL = "projectPrivate"
-	PublicReadWrite     WriteACL = "publicReadWrite"
+	// PublicRead means project team owners get owner access and all users get reader access.
+	PublicRead WriteACL = "publicRead"
+	// Private means project team owners get owner access.
+	Private WriteACL = "private"
+	// ProjectPrivate means project team members get access according to their roles.
+	ProjectPrivate WriteACL = "projectPrivate"
+	// BucketOwnerFullCtrl means the object owner gets owner access and project team owners get owner access.
 	BucketOwnerFullCtrl WriteACL = "bucketOwnerFullControl"
-	DefaultWriteACL     WriteACL = PublicRead
 )
 
-// Interface is how GCP clients talk to GCP.
-type Interface interface {
+// GCP is how clients talk to GCP.
+type GCP interface {
 	// PutLocalFile copies a local file to GCP using ref as its
 	// name. It returns a direct link for downloading the file
 	// from GCP.
@@ -75,22 +67,22 @@ type Interface interface {
 	Connect()
 }
 
-// GCP is an implementation of Interface that connects to a live GCP instance.
-type GCP struct {
+// gcpImpl is an implementation of GCP that connects to a live GCP instance.
+type gcpImpl struct {
 	client          *http.Client
 	service         *storage.Service
-	projectId       string
+	projectID       string
 	bucketName      string
 	defaultWriteACL WriteACL
 }
 
-// Guarantee we implement the interface.
-var _ Interface = (*GCP)(nil)
+// Guarantee we implement the GCP interface.
+var _ GCP = (*gcpImpl)(nil)
 
 // New creates a new GCP instance associated with the given project id and bucket name.
-func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
-	gcp := &GCP{
-		projectId:       projectId,
+func New(projectID, bucketName string, defaultWriteACL WriteACL) GCP {
+	gcp := &gcpImpl{
+		projectID:       projectID,
 		bucketName:      bucketName,
 		defaultWriteACL: defaultWriteACL,
 	}
@@ -98,7 +90,8 @@ func New(projectId, bucketName string, defaultWriteACL WriteACL) *GCP {
 	return gcp
 }
 
-func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
+// PutLocalFile implements GCP.
+func (gcp *gcpImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// Insert an object into a bucket.
 	object := &storage.Object{Name: ref}
 	file, err := os.Open(srcLocalFilename)
@@ -118,7 +111,8 @@ func (gcp *GCP) PutLocalFile(srcLocalFilename string, ref string) (refLink strin
 	return res.MediaLink, err
 }
 
-func (gcp *GCP) Get(ref string) (link string, error error) {
+// Get implements GCP.
+func (gcp *gcpImpl) Get(ref string) (link string, error error) {
 	// Get the link of the blob
 	res, err := gcp.service.Objects.Get(gcp.bucketName, ref).Do()
 	if err != nil {
@@ -128,7 +122,8 @@ func (gcp *GCP) Get(ref string) (link string, error error) {
 	return res.MediaLink, nil
 }
 
-func (gcp *GCP) Download(ref string) ([]byte, error) {
+// Download implements GCP.
+func (gcp *gcpImpl) Download(ref string) ([]byte, error) {
 	resp, err := gcp.service.Objects.Get(gcp.bucketName, ref).Download()
 	if err != nil {
 		return nil, err
@@ -141,7 +136,8 @@ func (gcp *GCP) Download(ref string) ([]byte, error) {
 	return buf, nil
 }
 
-func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
+// Put implements GCP.
+func (gcp *gcpImpl) Put(ref string, contents []byte) (refLink string, error error) {
 	buf := bytes.NewBuffer(contents)
 	acl := string(gcp.defaultWriteACL)
 	object := &storage.Object{Name: ref}
@@ -155,7 +151,8 @@ func (gcp *GCP) Put(ref string, contents []byte) (refLink string, error error) {
 	return res.MediaLink, err
 }
 
-func (gcp *GCP) List(prefix string) (name []string, link []string, err error) {
+// List implements GCP.
+func (gcp *gcpImpl) List(prefix string) (name []string, link []string, err error) {
 	nextPageToken := ""
 	for {
 		moreNames, moreLinks, nextPageToken, err := gcp.innerList(prefix, nextPageToken)
@@ -174,7 +171,7 @@ func (gcp *GCP) List(prefix string) (name []string, link []string, err error) {
 // innerList is an internal function that does what List does, except
 // it accepts a continuation token and possibly returns one if there
 // are more objects to retrieve.
-func (gcp *GCP) innerList(prefix, pageToken string) (name []string, link []string, nextPageToken string, error error) {
+func (gcp *gcpImpl) innerList(prefix, pageToken string) (name []string, link []string, nextPageToken string, error error) {
 	objs, err := gcp.service.Objects.List(gcp.bucketName).Prefix(prefix).Fields("items(name,mediaLink),nextPageToken").PageToken(pageToken).Do()
 	if err != nil {
 		return nil, nil, "", err
@@ -193,7 +190,8 @@ func (gcp *GCP) innerList(prefix, pageToken string) (name []string, link []strin
 	return name, link, objs.NextPageToken, nil
 }
 
-func (gcp *GCP) Delete(ref string) error {
+// Delete implements GCP.
+func (gcp *gcpImpl) Delete(ref string) error {
 	err := gcp.service.Objects.Delete(gcp.bucketName, ref).Do()
 	if err != nil {
 		return err
@@ -201,8 +199,9 @@ func (gcp *GCP) Delete(ref string) error {
 	return nil
 }
 
-func (gcp *GCP) Connect() {
-	if gcp.projectId == "" {
+// Connect implements GCP.
+func (gcp *gcpImpl) Connect() {
+	if gcp.projectID == "" {
 		log.Fatalf("Project argument is required.")
 	}
 	if gcp.bucketName == "" {

@@ -19,7 +19,7 @@ import (
 
 // userServer is the implementation of the User Service on GCP.
 type userServer struct {
-	cloudClient gcp.Interface
+	cloudClient gcp.GCP
 }
 
 // userEntry stores all known information for a given user. The fields
@@ -274,7 +274,7 @@ func (u *userServer) putUserEntry(user string, userEntry *userEntry) error {
 }
 
 // newUserServer creates a UserService from a pre-configured GCP instance and an HTTP client.
-func newUserServer(cloudClient gcp.Interface) *userServer {
+func newUserServer(cloudClient gcp.GCP) *userServer {
 	u := &userServer{
 		cloudClient: cloudClient,
 	}

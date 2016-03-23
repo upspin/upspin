@@ -9,16 +9,25 @@ import (
 )
 
 const (
-	// Constants that may appear in HTTP headers
-	ContentType   = "Content-Type"
+	// Constants that may appear in HTTP headers:
+
+	// ContentType is the content type.
+	ContentType = "Content-Type"
+
+	// ContentLength is the content length.
 	ContentLength = "Content-Length"
 
-	// HTTP Methods
-	Get  = "GET"
+	// HTTP Methods:
+
+	// Get is the GET method.
+	Get = "GET"
+
+	// Post is the POST method.
 	Post = "POST"
 )
 
 // TODO(edpin): Rename this to get rid of 'Interface'.
+
 // HTTPClientInterface is a minimal HTTP client interface. An instance of
 // http.Client implements this interface.
 type HTTPClientInterface interface {

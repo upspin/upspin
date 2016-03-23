@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	projectId  = "upspin"
+	projectID  = "upspin"
 	bucketName = "upspin-test"
 )
 
 var (
-	client *GCP = New(projectId, bucketName, DefaultWriteACL)
+	client = New(projectID, bucketName, PublicRead)
 	// The time is important because we never delete this file, but instead overwrite it.
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
