@@ -19,6 +19,7 @@ import (
 	"upspin.googlesource.com/upspin.git/user/testuser"
 
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )

@@ -86,6 +86,7 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 
 // Methods to implement upspin.Dialer
 
+// ServerUserName implements upspin.Dialer.
 func (s *Service) ServerUserName() string {
 	return "testuser"
 }

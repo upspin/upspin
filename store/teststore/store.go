@@ -27,10 +27,12 @@ func copyOf(in []byte) (out []byte) {
 	return out
 }
 
+// Endpoint implements upspin.Store
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.endpoint
 }
 
+// Put implements upspin.Store
 func (s *Service) Put(ciphertext []byte) (string, error) {
 	key := sha256key.Of(ciphertext).String()
 	s.mu.Lock()
@@ -39,10 +41,12 @@ func (s *Service) Put(ciphertext []byte) (string, error) {
 	return key, nil
 }
 
+// Delete implements upspin.Store
 func (s *Service) Delete(key string) error {
 	return errors.New("Not implemented yet")
 }
 
+// Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
 func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, err error) {
 	s.mu.Lock()
@@ -59,6 +63,7 @@ func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, e
 
 // Methods to implement upspin.Dialer
 
+// ServerUserName implements upspin.Dialer
 func (s *Service) ServerUserName() string {
 	return "testuser"
 }

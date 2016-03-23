@@ -12,6 +12,7 @@ import (
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
