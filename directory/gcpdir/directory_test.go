@@ -119,12 +119,12 @@ func newMockSuccessResponse(t *testing.T) nettest.MockHTTPResponse {
 	return newResp(success)
 }
 
-func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
-	keyJSON, err := json.Marshal(&struct{ Key upspin.Reference }{Key: ref})
+func newMockRefResponse(t *testing.T) nettest.MockHTTPResponse {
+	refJSON, err := json.Marshal(&struct{ Ref upspin.Reference }{Ref: ref})
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	return newResp(keyJSON)
+	return newResp(refJSON)
 }
 
 func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
@@ -230,7 +230,7 @@ func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.M
 	parentLookupResp := newMockLookupParentResponse(t)[0]
 
 	mock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{parentLookupResp, newMockKeyResponse(t), dirClientResponse},
+		[]nettest.MockHTTPResponse{parentLookupResp, newMockRefResponse(t), dirClientResponse},
 		[]*http.Request{parentLookupReq, storeReq, dirClientRequest})
 
 	// Get a Store client
@@ -285,10 +285,10 @@ func TestPut(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	if loc.Reference != ref {
-		t.Fatalf("Expected key %v, got %v", ref, loc.Reference)
+		t.Fatalf("Expected ref %v, got %v", ref, loc.Reference)
 	}
 
-	// Verify we sent to the Directory service the key we got back from the Store server
+	// Verify we sent to the Directory service the ref we got back from the Store server
 	mock.Verify(t)
 }
 
@@ -386,7 +386,7 @@ func TestAccess(t *testing.T) {
 	// Set up Store
 	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
 	storeMock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{newMockKeyResponse(t)},
+		[]nettest.MockHTTPResponse{newMockRefResponse(t)},
 		[]*http.Request{storeReq})
 	store := newStore(storeMock)
 

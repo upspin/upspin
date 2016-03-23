@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -19,6 +20,7 @@ import (
 
 const (
 	maxBuffSizePerReq = 1 << 20 // 1MB max buff size per request
+	context           = "DirService: "
 )
 
 var (
@@ -28,48 +30,68 @@ var (
 	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
-	errEntryNotFound      = dirEntryError{"pathname not found"}
+	errEntryNotFound      = newDirError("download", "", "pathname not found")
 )
 
 type dirServer struct {
 	cloudClient gcp.GCP // handle for GCP bucket g-upspin-directory
 }
 
-type dirEntryError struct {
+type dirError struct {
+	op    string
+	path  upspin.PathName
 	error string
 }
 
-func (d dirEntryError) Error() string {
-	return d.error
+func (d dirError) Error() string {
+	var buf bytes.Buffer
+	if d.op != "" {
+		buf.WriteString(d.op)
+		buf.WriteString(": ")
+	}
+	if len(d.path) > 0 {
+		buf.WriteString(string(d.path))
+		buf.WriteString(": ")
+	}
+	buf.WriteString(d.error)
+	return buf.String()
+}
+
+func newDirError(op string, path upspin.PathName, err string) *dirError {
+	return &dirError{
+		op:    op,
+		path:  path,
+		error: err,
+	}
 }
 
 // verifyDirEntry checks that the dirEntry given by the user is
 // minimally valid (we can't enforce a crypto verification here, that
 // can only be done in the client). It returns a parsed path or an
 // error if one occurred.
-func verifyDirEntry(dirEntry *upspin.DirEntry) (parsedPath path.Parsed, err error) {
+func verifyDirEntry(dirEntry *upspin.DirEntry) (path.Parsed, error) {
 	// Can we parse this path?
-	parsedPath, err = path.Parse(dirEntry.Name)
+	parsedPath, err := path.Parse(dirEntry.Name)
 	if err != nil {
-		return
+		return parsedPath, newDirError("verifyDirEntry", dirEntry.Name, err.Error())
 	}
 	// Checks the metadata
-	return parsedPath, verifyMetadata(dirEntry.Metadata)
+	return parsedPath, verifyMetadata(parsedPath.Path(), dirEntry.Metadata)
 }
 
 // verifyMetadata checks that the metadata portion of the DirEntry is
 // minimally valid.
-func verifyMetadata(meta upspin.Metadata) error {
+func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 	if meta.Sequence < 0 {
-		return dirEntryError{"invalid sequence number"}
+		return newDirError("verifyMeta", path, "invalid sequence number")
 	}
 	return nil
 }
 
 // putHandler handles file put requests, for storing or updating
 // metadata information.
-func (d *dirServer) putHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
-	log.Println("In handler for /put")
+func (d *dirServer) putHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+	const op = "Put"
 	if r.Method != "POST" && r.Method != "PUT" {
 		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
 		return
@@ -86,27 +108,25 @@ func (d *dirServer) putHandler(sess *auth.Session, w http.ResponseWriter, r *htt
 		return
 	}
 	// TODO: verify ACLs before applying put.
-	err = d.createDirEntry(dirEntry)
+	err = d.createDirEntry(op, dirEntry)
 	if err != nil {
-		netutil.SendJSONError(w, "", err)
+		netutil.SendJSONError(w, context, err)
 		return
 	}
+	fmt.Printf("%s: %q %q\n", op, sess.User(), dirEntry.Name)
 	netutil.SendJSONErrorString(w, "success")
 }
 
 // createDirEntry will attempt to write a new dirEntry to the back
 // end, provided several checks have passed first.
-func (d *dirServer) createDirEntry(dirEntry *upspin.DirEntry) error {
+func (d *dirServer) createDirEntry(op string, dirEntry *upspin.DirEntry) error {
 	parsedPath, err := verifyDirEntry(dirEntry)
 	if err != nil {
-		return dirEntryError{fmt.Sprintf("dir entry verification failed: %v", err)}
+		return err
 	}
-	// All checks passed so far. Now go put the object into GCE.
-	fmt.Printf("Got valid dir entry for path: %v\n", parsedPath)
-
 	err = d.verifyParentWritable(parsedPath)
 	if err != nil {
-		return dirEntryError{"path is not writable"}
+		return err
 	}
 
 	// Before we can create this entry, we verify that we're not
@@ -115,14 +135,22 @@ func (d *dirServer) createDirEntry(dirEntry *upspin.DirEntry) error {
 	// anyway.
 	path := parsedPath.Path()
 	otherDir, err := d.getMeta(path)
-	if err != errEntryNotFound {
+	if err != nil && err != errEntryNotFound {
+		return newDirError(op, path, err.Error())
+	}
+	if err == nil {
 		if otherDir.Metadata.IsDir && !dirEntry.Metadata.IsDir {
-			return dirEntryError{"Overwriting dir with file"}
+			return newDirError(op, path, "Overwriting dir with file")
 		}
 		if !otherDir.Metadata.IsDir && dirEntry.Metadata.IsDir {
-			return dirEntryError{"Overwriting file with dir"}
+			return newDirError(op, path, "Overwriting file with dir")
 		}
 	}
+	// Either err is nil (dir entry existed and is not ovewriting the wrong kind of entry) or it's not found.
+	// In both cases, we proceed to creating or overwriting the entry.
+
+	// Canonicalize the pathname
+	dirEntry.Name = parsedPath.Path()
 
 	// Writes the entry
 	return d.putMeta(path, dirEntry)
@@ -139,17 +167,20 @@ func (d *dirServer) verifyParentWritable(path path.Parsed) error {
 	// create is already a directory.
 	dirEntry, err := d.getMeta(path.Drop(1).Path())
 	if err != nil {
-		return err
+		if err == errEntryNotFound {
+			return newDirError("verify", path.Path(), "parent path not found")
+		}
+		return newDirError("verify", path.Path(), err.Error())
 	}
 	if !dirEntry.Metadata.IsDir {
-		return dirEntryError{"parent directory given is not a directory"}
+		return newDirError("verify", path.Path(), "parent of path is not a directory")
 	}
 	return nil
 }
 
 // getMeta returns the metadata for the given path.
 func (d *dirServer) getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
-	log.Printf("Looking up dir entry %q on storage backend\n", path)
+	fmt.Printf("Looking up dir entry %q on storage backend\n", path)
 	var dirEntry upspin.DirEntry
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
@@ -157,20 +188,20 @@ func (d *dirServer) getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	err = json.Unmarshal(buf, &dirEntry)
 	if err != nil {
-		return &dirEntry, dirEntryError{fmt.Sprintf("json unmarshal failed retrieving metadata: %v", err)}
+		return &dirEntry, newDirError("getmeta", path, fmt.Sprintf("json unmarshal failed retrieving metadata: %v", err))
 	}
 	return &dirEntry, nil
 }
 
-// putMeta forcibly writes the given dirEntry to the path on the
+// putMeta forcibly writes the given dirEntry to the canonical path on the
 // backend without checking anything.
 func (d *dirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) error {
-	// TODO  think about best place to canonicalize dirEntry.Name
-	// TODO(ehg)  if using crypto packing here, as we should, how will secrets get to code at service tartup?
+	// TODO(ehg)  if using crypto packing here, as we should, how will secrets get to code at service startup?
 	jsonBuf, err := json.Marshal(dirEntry)
 	if err != nil {
-		return dirEntryError{fmt.Sprintf("conversion to json failed: %v", err)}
+		return newDirError("putmeta", path, fmt.Sprintf("conversion to json failed: %v", err))
 	}
+	fmt.Printf("Storing dir entry at %q\n", path)
 	_, err = d.cloudClient.Put(string(path), jsonBuf)
 	return err
 }
@@ -184,13 +215,12 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 	return data, err
 }
 
-func (d *dirServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	if r.URL == nil {
 		// This is so bad it's probably a panic at this point. URL should never be nil.
-		netutil.SendJSONErrorString(w, "server error: invalid URL")
+		netutil.SendJSONErrorString(w, context+"server error: invalid URL")
 		return
 	}
-	context := "get: "
 	err := r.ParseForm()
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
@@ -198,22 +228,25 @@ func (d *dirServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *htt
 	}
 	pathName := r.FormValue("pathname")
 	if pathName == "" {
-		netutil.SendJSONErrorString(w, "missing pathname in request")
+		netutil.SendJSONErrorString(w, context+"missing pathname in request")
 		return
 	}
-	dirEntry, err := d.getMeta(upspin.PathName(pathName))
+	path := upspin.PathName(pathName)
+	dirEntry, err := d.getMeta(path)
 	if err != nil {
+		if err == errEntryNotFound {
+			err = newDirError("get", path, "path not found")
+		}
 		netutil.SendJSONError(w, context, err)
 		return
 	}
 	// We have a dirEntry. Marshal it and send it back.
 	// TODO: verify ACLs before replying.
-	log.Printf("Got dir entry for %v: %v", pathName, dirEntry)
+	fmt.Printf("Got dir entry for user %s: path %s: %s\n", sess.User(), pathName, dirEntry)
 	netutil.SendJSONReply(w, dirEntry)
 }
 
-func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
-	context := "list: "
+func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
@@ -221,7 +254,7 @@ func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *ht
 	}
 	prefix := r.FormValue("prefix")
 	if prefix == "" {
-		netutil.SendJSONErrorString(w, "missing prefix in request")
+		netutil.SendJSONErrorString(w, context+"missing prefix in request")
 		return
 	}
 	_, err = path.Parse(upspin.PathName(prefix))
@@ -234,6 +267,7 @@ func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *ht
 		netutil.SendJSONError(w, context, err)
 		return
 	}
+	fmt.Printf("List request for prefix %q\n", prefix)
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 

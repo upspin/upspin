@@ -5,7 +5,7 @@ Sample usage:
 
    authHandler := auth.NewHandler(&auth.Config{Lookup: context.User.Lookup})
 
-   rawHandler := func(session *auth.AuthSession, w http.ResponseWriter, r *http.Request) {
+   rawHandler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
    	user := session.User()
    	w.Write([]byte(fmt.Sprintf("Hello Authenticated user %v", user)))
    }
@@ -30,7 +30,7 @@ import (
 )
 
 // HandlerFunc is a type used by HTTP handler functions that want to use a Handler for authentication.
-type HandlerFunc func(session *Session, w http.ResponseWriter, r *http.Request)
+type HandlerFunc func(session Session, w http.ResponseWriter, r *http.Request)
 
 // Handler is used by HTTP servers to authenticate Upspin users.
 type Handler interface {
@@ -52,12 +52,25 @@ type Config struct {
 }
 
 // Session contains information about the connection and the authenticated user, if any.
-type Session struct {
+type Session interface {
+	// User returns the user name present in the session. It may be empty. Note: user might not be authenticated.
+	User() upspin.UserName
+
+	// IsAuthenticated reports whether the user in the session is authenticated.
+	IsAuthenticated() bool
+
+	// Err reports the status of the session.
+	Err() error
+}
+
+type sessionImpl struct {
 	user      upspin.UserName
 	isAuth    bool
 	tlsUnique string // This must represent a tls.ConnectionState.TLSUnique
 	err       error
 }
+
+var _ Session = (*sessionImpl)(nil)
 
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
@@ -83,22 +96,22 @@ func NewHandler(config *Config) Handler {
 	}
 }
 
-// User implements Handler.
-func (as *Session) User() upspin.UserName {
-	return as.user
+// User implements Session.
+func (s *sessionImpl) User() upspin.UserName {
+	return s.user
 }
 
-// IsAuthenticated implements Handler.
-func (as *Session) IsAuthenticated() bool {
-	return as.isAuth
+// IsAuthenticated implements Session.
+func (s *sessionImpl) IsAuthenticated() bool {
+	return s.isAuth
 }
 
-// Err implements Handler.
-func (as *Session) Err() error {
-	return as.err
+// Err implements Session.
+func (s *sessionImpl) Err() error {
+	return s.err
 }
 
-func (ah *authHandler) setTLSUnique(session *Session, tlsUnique string) {
+func (ah *authHandler) setTLSUnique(session *sessionImpl, tlsUnique string) {
 	if tlsUnique == "" {
 		log.Printf("Invalid tlsUnique for user %q", session.user)
 		return
@@ -106,15 +119,15 @@ func (ah *authHandler) setTLSUnique(session *Session, tlsUnique string) {
 	ah.sessionCache.Add(tlsUnique, session)
 }
 
-func (ah *authHandler) getSessionByTLSUnique(tlsUnique string) *Session {
+func (ah *authHandler) getSessionByTLSUnique(tlsUnique string) *sessionImpl {
 	session, ok := ah.sessionCache.Get(tlsUnique)
 	if !ok {
 		return nil
 	}
-	return session.(*Session)
+	return session.(*sessionImpl)
 }
 
-func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*Session, error) {
+func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*sessionImpl, error) {
 	// The username must be in all communications, even after a TLS handshake.
 	user := upspin.UserName(r.Header.Get(userNameHeader))
 	if user == "" {
@@ -147,7 +160,7 @@ func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*Session,
 		return nil, err
 	}
 	// Success! Create a new session and cache it if we have a TLSUnique.
-	session := &Session{
+	session := &sessionImpl{
 		isAuth: true,
 		user:   user,
 	}
@@ -162,7 +175,7 @@ func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*Session,
 func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request) {
 	httpHandler := func(w http.ResponseWriter, r *http.Request) {
 		// Perform authentication here, return the handler func used by the HTTP handler.
-		var session *Session
+		var session *sessionImpl
 		session, err := ah.doAuth(w, r)
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
@@ -173,7 +186,7 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 				netutil.SendJSONError(w, "AuthHandler:", err)
 				return
 			}
-			session = &Session{
+			session = &sessionImpl{
 				err: err,
 			}
 		}

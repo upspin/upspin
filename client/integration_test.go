@@ -112,6 +112,12 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Ensure user has root.
+	_, err = context.Directory.MakeDirectory(path.Join(upspin.PathName(userName), "/"))
+	if err != nil {
+		log.Fatal("Can't create root: %s", err)
+	}
 }
 
 func testMkdir(context *upspin.Context, t *testing.T) {
