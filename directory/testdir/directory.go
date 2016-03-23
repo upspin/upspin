@@ -16,25 +16,24 @@ import (
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
+	// Imported because it's used to pack dir entries.
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
+
+	// Imported because this directory service needs to register a teststore implicitly.
+	// Expecting end users (tests, client, etc) to import it relies on ordering of inits, which is not safe.
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 // Used to store directory entries.
-// All directories are encoded with this packing/metadata; the user-creaed
+// All directories are encoded with this packing/metadata; the user-created
 // blobs are packed according to the arguments to Put.
 var (
-	dirPacking  upspin.Packing = upspin.PlainPack
-	dirPackData                = upspin.PackData{byte(dirPacking)}
-	dirMeta                    = &upspin.Metadata{
+	dirPacking  = upspin.PlainPack
+	dirPackData = upspin.PackData{byte(dirPacking)}
+	dirMeta     = &upspin.Metadata{
 		PackData: dirPackData,
 	}
-	dirPacker upspin.Packer
 )
-
-func init() {
-	dirPacker = pack.Lookup(dirPacking)
-}
 
 var (
 	r0   upspin.Reference
@@ -243,7 +242,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		}
 		ref := upspin.Reference{
 			Key:     key,
-			Packing: dirPacking,
+			Packing: upspin.Packing(dirPacking),
 		}
 		s.Root[parsed.User] = ref
 		loc := upspin.Location{
@@ -385,6 +384,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	return loc, nil
 }
 
+// Lookup returns the directory entry for the named file.
 func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -532,6 +532,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 
 // Methods to implement upspin.Dialer
 
+// ServerUserName implements upspin.Dialer.
 func (s *Service) ServerUserName() string {
 	return "" // No one is authenticated.
 }
