@@ -189,7 +189,8 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	sig := signature{r, s}
 	var firstErr error
 	wrap := make([]wrappedKey, len(usernames))
-	for i, u := range usernames {
+	nwrap := 0
+	for _, u := range usernames {
 		readerRawPublicKey, err := c.publicKey(ctx, u)
 		if err != nil {
 			log.Printf("no public key found for user %s: %s", u, err)
@@ -207,11 +208,13 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			continue
 		}
 		log.Printf("Wrapping key for user %s", u)
-		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
+		wrap[nwrap], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
 		}
+		nwrap++
 	}
+	wrap = wrap[:nwrap]
 	err = c.pdMarshal(&meta.PackData, sig, wrap)
 	if err != nil {
 		return 0, err
