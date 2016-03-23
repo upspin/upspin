@@ -479,7 +479,7 @@ func (n *node) put(cleartext []byte) error {
 	}
 	cipher = cipher[:len]
 	// Create the directory entry.
-	_, err = ue.dir.Put(n.uname, cipher, meta.PackData)
+	_, err = ue.dir.Put(n.uname, cipher, meta.PackData, nil) // TODO: Options
 	if err != nil {
 		return eio("%s Directory.Put(%s)", err, n.uname)
 	}

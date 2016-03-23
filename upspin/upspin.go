@@ -186,11 +186,15 @@ type Directory interface {
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put stores the data at the given path and associates packdata with it.
+	// The data should already have been packed by the caller; that is, the
+	// data is not cleartext unless PlainPack is being used.
 	// All but the last element of the path name must already exist and be
 	// directories. The final element, if it exists, must not be a directory.
 	// If something is already stored under the path, the new data and
-	// packdata replace the old.
-	Put(path PathName, data []byte, packdata PackData) (Location, error)
+	// packdata replace the old. If PutOptions is nil, the behavior of the options
+	// is equivalent  to the default behavior for each option value.
+	// See the documentation for PutOptions for more information.
+	Put(path PathName, data []byte, packdata PackData, opts *PutOptions) (Location, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
@@ -207,6 +211,34 @@ type Directory interface {
 	Glob(pattern string) ([]*DirEntry, error)
 }
 
+// PutOptions contains several optional data items relevant to the operation
+// of Directory.Put.
+// For each field, the zero value represents the default behavior.
+type PutOptions struct {
+	// Size represents the size of the original, unpacked data as seen by
+	// the client. It is stored in the Size field of the metadata for the new item.
+	// It is advisory only and is unchecked. If the size is zero,
+	// the Directory service instead records the size of the packed ciphertext.
+	// (For a truly zero-sized, file, these should be equivalent.)
+	Size uint64
+
+	// Time represents a timestamp for the item. It is stored in the Time
+	// field of the metadata for the new item. It is advisory only and is
+	// unchecked. If the value is zero, the Directory service instead
+	// records the time of the operation.
+	Time Time
+
+	// Sequence represents a sequence number for the operation. If it
+	// is non-zero, the Directory service will reject the Put operation
+	// unless Sequence is the same as that currently stored in the metadata
+	// for the item.
+	Sequence int64
+}
+
+// Time represents a timestamp in units of seconds since
+// the Unix epoch, Jan 1 1970 0:00 UTC.
+type Time int64
+
 // DirEntry represents the directory information for a file.
 type DirEntry struct {
 	Name     PathName // The full path name of the file.
@@ -217,8 +249,9 @@ type DirEntry struct {
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool       // The file is a directory.
-	Sequence int64      // The sequence (version) number of the item.
+	IsDir    bool  // The file is a directory.
+	Sequence int64 // The sequence (version) number of the item.
+	// TODO: Add Time and Size here.
 	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
 	PackData []byte     // Packing-specific metadata stored in directory.
 }

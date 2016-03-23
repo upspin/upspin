@@ -116,7 +116,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	)
 
 	data, packdata := packData(t, []byte(text), fileName)
-	loc, err := context.Directory.Put(fileName, data, packdata)
+	loc, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -165,7 +165,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		data, packdata := packData(t, []byte(text), fileName)
-		loc, err := context.Directory.Put(fileName, data, packdata)
+		loc, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -214,7 +214,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		data, packdata := packData(t, []byte(text), fileName)
-		h, err := context.Directory.Put(fileName, data, packdata)
+		h, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -280,7 +280,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
 	data, packdata := packData(t, []byte(text), fileName)
-	_, err = context.Directory.Put(fileName, data, packdata)
+	_, err = context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -310,7 +310,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	// Now overwrite it.
 	text = "goodnight mother"
 	data, packdata = packData(t, []byte(text), fileName)
-	_, err = context.Directory.Put(fileName, data, packdata)
+	_, err = context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -400,7 +400,7 @@ func TestGlob(t *testing.T) {
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
 		data, packdata := packData(t, []byte(name), name)
-		_, err := context.Directory.Put(name, data, packdata)
+		_, err := context.Directory.Put(name, data, packdata, nil) // TODO: Options
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
@@ -448,7 +448,7 @@ func TestSequenceIncreaseOnWrite(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		data, packdata := packData(t, []byte(text), fileName)
-		_, err := context.Directory.Put(fileName, data, packdata)
+		_, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}

@@ -70,7 +70,8 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+// TODO: Implement options.
+func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
 	const op = "Put"
 
 	if len(packdata) < 1 {

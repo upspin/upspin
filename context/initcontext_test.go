@@ -178,7 +178,7 @@ func (d *dummyStore) Delete(key string) error {
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.Lookup not implemented")
 }
-func (d *dummyDirectory) Put(name upspin.PathName, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+func (d *dummyDirectory) Put(name upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
 	return upspin.Location{}, errors.New("dummyDirectory.Lookup not implemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
