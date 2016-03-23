@@ -71,6 +71,8 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)
 	//	Sequence: varint encoded.
+	//	Size: varint encoded.
+	//	Time: varint encoded.
 	//	PackData: count N, followed by N bytes
 	//	Readers: count N followed by N*(count N, followed by N bytes)
 	if d.Metadata.IsDir {
@@ -79,6 +81,10 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 		b = append(b, byte(0))
 	}
 	N := binary.PutVarint(tmp[:], d.Metadata.Sequence)
+	b = append(b, tmp[:N]...)
+	N = binary.PutVarint(tmp[:], d.Metadata.Size)
+	b = append(b, tmp[:N]...)
+	N = binary.PutVarint(tmp[:], int64(d.Metadata.Time))
 	b = append(b, tmp[:N]...)
 	b = appendBytes(b, d.Metadata.PackData)
 	N = binary.PutUvarint(tmp[:], uint64(len(d.Metadata.Readers)))
@@ -151,6 +157,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)
 	//	Sequence: varint encoded.
+	//	Size: varint encoded.
+	//	Time: varint encoded.
 	//	PackData: count N, followed by N bytes
 	//	Readers: count N followed by N*(count N, followed by N bytes)
 	if len(b) < 1 {
@@ -163,6 +171,18 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		return nil, ErrTooShort
 	}
 	d.Metadata.Sequence = seq
+	b = b[N:]
+	size, N := binary.Varint(b)
+	if N == 0 {
+		return nil, ErrTooShort
+	}
+	d.Metadata.Size = size
+	b = b[N:]
+	time, N := binary.Varint(b)
+	if N == 0 {
+		return nil, ErrTooShort
+	}
+	d.Metadata.Time = Time(time)
 	b = b[N:]
 	bytes, b = getBytes(b)
 	if b == nil {
