@@ -33,8 +33,8 @@ var (
 )
 
 type dirServer struct {
-	cloudClient gcp.Interface               // handle for GCP bucket upspin-directory
-	httpClient  netutil.HTTPClientInterface // our HTTP client for calling User service
+	cloudClient gcp.GCP
+	httpClient  netutil.HTTPClientInterface
 }
 
 type dirEntryError struct {
@@ -252,7 +252,7 @@ func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *ht
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
-func newDirServer(cloudClient gcp.Interface, httpClient netutil.HTTPClientInterface) *dirServer {
+func newDirServer(cloudClient gcp.GCP, httpClient netutil.HTTPClientInterface) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
 		httpClient:  httpClient,
@@ -268,7 +268,7 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
-	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.DefaultWriteACL), &http.Client{})
+	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), &http.Client{})
 	http.HandleFunc("/put", ah.Handle(d.putHandler))
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
 	http.HandleFunc("/list", ah.Handle(d.listHandler))
