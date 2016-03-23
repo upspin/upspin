@@ -235,7 +235,7 @@ func TestPutError(t *testing.T) {
 		Response: nil,
 	}, nettest.AnyRequest)
 
-	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte("Packed metadata"))
+	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte("Packed metadata"), nil) // TODO: Options
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -248,7 +248,7 @@ func TestPutBadMeta(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(nil, nil)
 	d := new("http://localhost:8081", nil, mock)
 
-	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte(""))
+	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte(""), nil) // TODO: Options
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -269,7 +269,7 @@ func TestPut(t *testing.T) {
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData)
+	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, nil) // TODO: Options
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -347,7 +347,7 @@ func TestAccessErrorInvalidContents(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockLookupParentResponse(t), []*http.Request{nettest.AnyRequest})
 	d := new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
 
-	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)})
+	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -399,7 +399,7 @@ func TestAccess(t *testing.T) {
 	dirMock := nettest.NewMockHTTPClient(responses, requests)
 	d := new("http://localhost:8081", store, dirMock)
 
-	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)})
+	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
 	if err != nil {
 		t.Fatal(err)
 	}
