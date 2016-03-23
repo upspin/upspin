@@ -61,7 +61,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	cipher = cipher[:n]
 
 	// Store it.
-	return dir.Put(name, cipher, meta.PackData)
+	return dir.Put(name, cipher, meta.PackData, nil) // TODO: Options
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {

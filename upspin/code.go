@@ -3,6 +3,7 @@ package upspin
 import (
 	"encoding/binary"
 	"errors"
+	"time"
 )
 
 // This file contains implementations of things like marshaling of the
@@ -196,4 +197,21 @@ func getBytes(b []byte) (data, remaining []byte) {
 		return nil, nil
 	}
 	return b[N : N+int(u)], b[N+int(u):]
+}
+
+// String returns a default string representation of the time,
+// in the format similar to RFC 3339: "2006-01-02T15:04:05 UTC"
+// The time zone always UTC.
+func (t Time) String() string {
+	return t.Go().Format("2006-01-02T15:04:05 UTC")
+}
+
+// Go returns the a Go Time value representation of an Upspin time. It is always in UTC.
+func (t Time) Go() time.Time {
+	return time.Unix(int64(t), 0).In(time.UTC)
+}
+
+// TimeFromGo returns the Upspin Time value representation of a Go time.
+func TimeFromGo(t time.Time) Time {
+	return Time(t.Unix())
 }
