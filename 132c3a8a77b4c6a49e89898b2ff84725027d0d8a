@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_75ebbdcb",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T03:45:19Z",
+      "side": 1,
+      "message": "\"is always in UTC\"? (consistent with the comment  below)",
+      "range": {
+        "startLine": 204,
+        "startChar": 12,
+        "endLine": 204,
+        "endChar": 16
+      },
+      "revId": "132c3a8a77b4c6a49e89898b2ff84725027d0d8a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
