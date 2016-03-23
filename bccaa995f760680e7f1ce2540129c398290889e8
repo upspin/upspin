@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_5e18b104",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T23:56:16Z",
+      "side": 1,
+      "message": "reverse these two so they stay alphabetical. also put a blank line in between the two so it\u0027s easier to read.",
+      "revId": "bccaa995f760680e7f1ce2540129c398290889e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
