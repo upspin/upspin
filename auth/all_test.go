@@ -100,7 +100,7 @@ func TestServerHandler(t *testing.T) {
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
-	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		called = true
 		if session.User() != user {
 			t.Errorf("Expected user %q, got %q", user, session.User())
@@ -129,7 +129,7 @@ func TestServerHandlerNotTLS(t *testing.T) {
 	}
 	signReq(t, p256Key, req)
 
-	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		called = true
 		if session.IsAuthenticated() {
 			t.Errorf("Expected not IsAuthenticated")
@@ -158,7 +158,7 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	signReq(t, p256Key, req)
 	makeTLSRequest(req, []byte("1234"))
 
-	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Do not define a Lookup function
@@ -180,7 +180,7 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	signReq(t, p256Key, req)
 	makeTLSRequest(req, []byte("1234"))
 
-	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Define a custom Lookup
@@ -205,7 +205,7 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
-	handler := func(session *Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		called++
 		if session.User() != user {
 			t.Errorf("Expected user %q, got %q", user, session.User())

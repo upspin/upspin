@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	keyStruct = struct{ Key string }{Key: contentRef}
+	refStruct = struct{ Ref string }{Ref: contentRef}
 
 	newLocation = upspin.Location{
 		Reference: "new reference",
@@ -94,7 +94,7 @@ func TestStoreGetError(t *testing.T) {
 	mock.Verify(t)
 }
 
-func TestStoreGetErrorEmptyKey(t *testing.T) {
+func TestStoreGetErrorEmptyRef(t *testing.T) {
 	// Our request is invalid.
 	mock := nettest.NewMockHTTPClient(nil, nil)
 	s := New("http://localhost:8080", mock)
@@ -104,7 +104,7 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
-	expected := fmt.Sprintf("Store: Get: %s", invalidKeyError)
+	expected := fmt.Sprintf("Store: Get: %s", invalidRefError)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -137,7 +137,7 @@ func TestStoreGetRedirect(t *testing.T) {
 	mock.Verify(t)
 }
 
-func TestStoreDeleteInvalidKey(t *testing.T) {
+func TestStoreDeleteInvalidRef(t *testing.T) {
 	// No requests are sent
 	mock := nettest.NewMockHTTPClient(
 		[]nettest.MockHTTPResponse{},
@@ -148,9 +148,9 @@ func TestStoreDeleteInvalidKey(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	errInvalidKey := "Store: Delete: invalid key"
-	if err.Error() != errInvalidKey {
-		t.Fatalf("Expected error %v, got %v", errInvalidKey, err)
+	errInvalidRef := "Store: Delete: invalid reference"
+	if err.Error() != errInvalidRef {
+		t.Fatalf("Expected error %v, got %v", errInvalidRef, err)
 	}
 	mock.Verify(t)
 }
@@ -179,10 +179,10 @@ func createMockGetResponse(t *testing.T) []nettest.MockHTTPResponse {
 }
 
 func createMockPutResponse(t *testing.T) []nettest.MockHTTPResponse {
-	keyStructJSON, err := json.Marshal(keyStruct)
+	refStructJSON, err := json.Marshal(refStruct)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
-	resp := nettest.NewMockHTTPResponse(200, "application/json", keyStructJSON)
+	resp := nettest.NewMockHTTPResponse(200, "application/json", refStructJSON)
 	return []nettest.MockHTTPResponse{resp}
 }

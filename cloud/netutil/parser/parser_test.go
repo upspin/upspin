@@ -84,23 +84,23 @@ func TestLocationResponseWithProperError(t *testing.T) {
 	}
 }
 
-func TestKeyResponse(t *testing.T) {
-	key, err := KeyResponse([]byte(`{"key": "1234"}`))
+func TestRefResponse(t *testing.T) {
+	ref, err := ReferenceResponse([]byte(`{"ref": "1234"}`))
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	if key != "1234" {
-		t.Errorf("Expected key 1234, got %v", key)
+	if ref != "1234" {
+		t.Errorf("Expected key 1234, got %v", ref)
 	}
 }
 
-func TestKeyResponseBadError(t *testing.T) {
-	key, err := KeyResponse([]byte("bla bla bla"))
+func TestRefResponseBadError(t *testing.T) {
+	ref, err := ReferenceResponse([]byte("bla bla bla"))
 	if err == nil {
 		t.Fatal("Expected error, got nil")
 	}
-	if key != "" {
-		t.Fatalf("Expected a nil key, got %v", key)
+	if ref != "" {
+		t.Fatalf("Expected a nil key, got %v", ref)
 	}
 	if !strings.HasPrefix(err.Error(), serverParsingErrorPrefix) {
 		t.Fatalf("Expected error prefix %q, got %q", serverParsingErrorPrefix, err)
