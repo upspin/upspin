@@ -36,7 +36,7 @@ var (
 )
 
 type storeServer struct {
-	cloudClient gcp.Interface
+	cloudClient gcp.GCP
 	fileCache   *cache.FileCache
 }
 
@@ -151,7 +151,7 @@ func (s *storeServer) deleteHandler(sess *auth.Session, w http.ResponseWriter, r
 func main() {
 	flag.Parse()
 	ss := &storeServer{
-		cloudClient: gcp.New(*projectID, *bucketName, gcp.DefaultWriteACL),
+		cloudClient: gcp.New(*projectID, *bucketName, gcp.ProjectPrivate),
 		fileCache:   cache.NewFileCache(*tempDir),
 	}
 
