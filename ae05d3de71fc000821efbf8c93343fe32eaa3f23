@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_fe265d54",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T22:52:50Z",
+      "side": 0,
+      "message": "don\u0027t delete this import. we need it.\nyou\u0027ve moved the import to the test, which is wrong.",
+      "revId": "ae05d3de71fc000821efbf8c93343fe32eaa3f23",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
