@@ -253,7 +253,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		return loc, nil
 	}
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("MakeDirectory", parsed.Path(), true, nil, dirPackData)
+	return s.put("MakeDirectory", parsed.Path(), true, nil, dirPackData, nil)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -262,7 +262,6 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-// TODO: Implement options.
 func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -271,11 +270,11 @@ func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.Pac
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("Put", parsed.Path(), false, data, packdata)
+	return s.put("Put", parsed.Path(), false, data, packdata, opts)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
-func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data []byte, packdata upspin.PackData) (upspin.Location, error) {
+func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return loc0, nil
@@ -338,10 +337,17 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    dataIsDir,
-			Sequence: 0,   // Will be updated by installEntry.
+			Sequence: 0,
+			Size:     uint64(len(data)),
+			Time:     upspin.Now(),
 			Readers:  nil, // TODO
 			PackData: packdata,
 		},
+	}
+	if opts != nil {
+		newEntry.Metadata.Sequence = opts.Sequence
+		newEntry.Metadata.Size = opts.Size
+		newEntry.Metadata.Time = opts.Time
 	}
 	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
 	if err != nil {
@@ -464,6 +470,8 @@ Loop:
 	return nil, mkStrError(op, pathName, "no such directory entry: "+elem)
 }
 
+var errSeq = errors.New("sequence mismatch")
+
 // installEntry installs the new entry in the directory referenced by dirRef, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
 func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, dirOverwriteOK bool) (upspin.Reference, error) {
@@ -496,6 +504,11 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		copy(dirData[start:], remaining)
 		dirData = dirData[:len(dirData)-length]
 		// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
+		if newEntry.Metadata.Sequence != 0 {
+			if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
+				return r0, mkError(op, newEntry.Name, errSeq)
+			}
+		}
 		newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
 		break
 	}
