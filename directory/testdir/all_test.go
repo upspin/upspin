@@ -436,7 +436,7 @@ func TestGlob(t *testing.T) {
 	}
 }
 
-func TestSequenceIncreaseOnWrite(t *testing.T) {
+func TestSequencing(t *testing.T) {
 	const (
 		user     = "user6@google.com"
 		fileName = user + "/file"
@@ -456,13 +456,80 @@ func TestSequenceIncreaseOnWrite(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lookup file %d: %v", i, err)
 		}
-		if entry == nil {
-			t.Fatalf("lookup file %d: entry is nil", i)
-		}
 		if entry.Metadata.Sequence <= seq {
 			t.Fatalf("sequence file %d did not increase: old seq %d; new seq %d", i, seq, entry.Metadata.Sequence)
 		}
 		seq = entry.Metadata.Sequence
+	}
+	// Now check it updates if we set the sequence correctly.
+	data, packdata := packData(t, []byte("first seq version"), fileName)
+	opts := upspin.PutOptions{
+		Sequence: seq,
+	}
+	_, err := context.Directory.Put(fileName, data, packdata, &opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err := context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatalf("lookup file: %v", err)
+	}
+	if entry.Metadata.Sequence != seq+1 {
+		t.Fatalf("wrong sequence: expected %d got %d", seq+1, entry.Metadata.Sequence)
+	}
+	// Now check it fails if we don't. We can just use the previous options.
+	data, packdata = packData(t, []byte("second seq version"), fileName)
+	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+	errStr := err.Error()
+	if !strings.Contains(errStr, "sequence mismatch") {
+		t.Fatalf("expected sequence error, got %v", err)
+	}
+}
+
+func TestTimeAndSize(t *testing.T) {
+	const (
+		user     = "user7@google.com"
+		fileName = user + "/file"
+	)
+	setup(user)
+	// Default opts provide default values. (We don't check the values carefully; it's tricky.)
+	data, packdata := packData(t, []byte("hello"), fileName)
+	_, err := context.Directory.Put(fileName, data, packdata, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err := context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.Metadata.Size < uint64(len("hello")) { // Packed size will be larger.
+		t.Fatalf("default did not set size %d; got %d", len("hello"), entry.Metadata.Size)
+	}
+	if entry.Metadata.Time == 0 {
+		t.Fatalf("default did not set time")
+	}
+	// Options override.
+	data, packdata = packData(t, []byte("good bye"), fileName)
+	opts := upspin.PutOptions{
+		Size: 1234,
+		Time: 12345,
+	}
+	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err = context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.Metadata.Size != opts.Size {
+		t.Fatalf("did not set size; got %d", entry.Metadata.Size)
+	}
+	if entry.Metadata.Time != opts.Time {
+		t.Fatalf("did not set time; got %d", entry.Metadata.Time)
 	}
 }
 
