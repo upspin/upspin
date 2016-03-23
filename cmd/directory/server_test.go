@@ -7,10 +7,34 @@ import (
 	"net/http"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/auth/testauth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
+)
+
+const (
+	pathName       = "test@foo.com/mydir/myfile.txt"
+	parentPathName = "test@foo.com/mydir"
+)
+
+var (
+	dummySess = testauth.NewSessionForTesting("test@google.com", false, nil)
+	dir       = upspin.DirEntry{
+		Name: upspin.PathName(pathName),
+		Metadata: upspin.Metadata{
+			IsDir: false,
+			Size:  32,
+			Time:  upspin.Now(),
+		},
+	}
+	dirParent = upspin.DirEntry{
+		Name: upspin.PathName(parentPathName),
+		Metadata: upspin.Metadata{
+			IsDir: true,
+		},
+	}
 )
 
 func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
@@ -23,20 +47,20 @@ func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected st
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
 	}
-	ds.putHandler(nil, resp, req)
+	ds.putHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"dir entry verification failed: no user name in path"}`)
+	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"DirService: verifyDirEntry: no user name in path"}`)
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newDummyDirServer(), dir, `{"error":"dir entry verification failed: no user name in path"}`)
+	Put(t, newDummyDirServer(), dir, `{"error":"DirService: verifyDirEntry: a@x/myroot/myfile: no user name in path"}`)
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -53,33 +77,33 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newDummyDirServer(), dir, `{"error":"dir entry verification failed: invalid sequence number"}`)
+	Put(t, newDummyDirServer(), dir, `{"error":"DirService: verifyMeta: fred@bob.com/myroot/myfile: invalid sequence number"}`)
 }
 
 func TestLookupPathError(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"missing pathname in request"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: missing pathname in request"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get", nil)
 
 	ds := newDummyDirServer()
-	ds.getHandler(nil, resp, req)
+	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
 func TestListMissingPrefix(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"missing prefix in request"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: missing prefix in request"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(nil, resp, req)
+	ds.listHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
 func TestListBadPath(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"list: bad user name in path"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: bad user name in path"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(nil, resp, req)
+	ds.listHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
@@ -88,23 +112,23 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: makeValidMeta(),
 	}
-	egcp := &gcptest.ExpectGetGCP{
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: "something that does not match",
 	}
 
 	ds := newDirServer(egcp)
-	Put(t, ds, dir, `{"error":"path is not writable"}`)
+	Put(t, ds, dir, `{"error":"DirService: verify: fred@bob.com/myroot/myfile: parent path not found"}`)
 }
 
 func TestLookupPathNotFound(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"get: pathname not found"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: get: o@foo.bar/invalid/invalid/invalid: path not found"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname=o@foo.bar/invalid/invalid/invalid", nil)
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: "something that does not match",
 	}
 
 	ds := newDirServer(egcp)
-	ds.getHandler(nil, resp, req)
+	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
@@ -120,60 +144,44 @@ func TestList(t *testing.T) {
 		fileLinks: []string{"http://a.com", "http://b.com"},
 	}
 	ds := newDirServer(lgcp)
-	ds.listHandler(nil, resp, req)
+	ds.listHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
 func TestPutNotDir(t *testing.T) {
-	// The DirEntry we're trying to Put
-	dir := upspin.DirEntry{
-		Name: upspin.PathName("test@foo.com/mydir/myfile.txt"),
-	}
+	// The DirEntry we're trying to Put, converted to JSON.
 	dirEntryJSON, err := json.Marshal(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The DirEntry of the parent
-	dirParent := upspin.DirEntry{
-		Name: upspin.PathName("test@foo.com/mydir"),
-		Metadata: upspin.Metadata{
-			IsDir: false, // Not a directory
-		},
-	}
-	dirParentJSON, err := json.Marshal(dirParent)
+	// The DirEntry of the parent, converted to JSON.
+	notDirParent := dirParent
+	notDirParent.Metadata.IsDir = false
+	dirParentJSON, err := json.Marshal(notDirParent)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"path is not writable"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: verify: test@foo.com/mydir/myfile.txt: parent of path is not a directory"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  "test@foo.com/mydir",
+		Ref:  parentPathName,
 		Data: dirParentJSON,
 	}
 
 	ds := newDirServer(egcp)
-	ds.putHandler(nil, resp, req)
+	ds.putHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
 func TestPut(t *testing.T) {
-	// The DirEntry we're trying to Put
-	dir := upspin.DirEntry{
-		Name: upspin.PathName("test@foo.com/mydir/myfile.txt"),
-	}
+	// The DirEntry we're trying to Put, converted to JSON.
 	dirEntryJSON, err := json.Marshal(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The DirEntry of the parent
-	dirParent := upspin.DirEntry{
-		Name: upspin.PathName("test@foo.com/mydir"),
-		Metadata: upspin.Metadata{
-			IsDir: true,
-		},
-	}
+	// The DirEntry of the parent, converted to JSON.
 	dirParentJSON, err := json.Marshal(dirParent)
 	if err != nil {
 		t.Fatal(err)
@@ -188,7 +196,26 @@ func TestPut(t *testing.T) {
 	}
 
 	ds := newDirServer(egcp)
-	ds.putHandler(nil, resp, req)
+	ds.putHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
+func TestGet(t *testing.T) {
+	dirEntryJSON, err := json.Marshal(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  "test@foo.com/mydir/myfile.txt",
+		Data: dirEntryJSON,
+	}
+
+	resp := nettest.NewExpectingResponseWriter(string(dirEntryJSON))
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/get?pathname="+pathName, dirEntryJSON)
+
+	ds := newDirServer(egcp)
+	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 

@@ -20,7 +20,7 @@ import (
 
 const (
 	serverError     = "server error: %v"
-	invalidKeyError = "invalid key"
+	invalidRefError = "invalid reference"
 )
 
 // Store is an implementation of upspin.Store that uses GCP to manage its storage.
@@ -70,7 +70,7 @@ func (s *Store) ServerUserName() string {
 func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	const op = "Get"
 	if ref == "" {
-		return nil, nil, newStoreError(op, invalidKeyError, "")
+		return nil, nil, newStoreError(op, invalidRefError, "")
 	}
 	var request string
 	if strings.HasPrefix(string(ref), "http://") || strings.HasPrefix(string(ref), "https://") {
@@ -152,12 +152,12 @@ func (s *Store) Put(data []byte) (upspin.Reference, error) {
 	}
 
 	// Parse the response
-	ref, err := parser.KeyResponse(respBody)
+	ref, err := parser.ReferenceResponse(respBody)
 	if err != nil {
 		return zeroRef, newStoreError(op, fmt.Sprintf(serverError, err), "")
 	}
 	if ref == "" {
-		return zeroRef, newStoreError(op, invalidKeyError, "")
+		return zeroRef, newStoreError(op, invalidRefError, "")
 	}
 	return ref, nil
 }
@@ -166,7 +166,7 @@ func (s *Store) Put(data []byte) (upspin.Reference, error) {
 func (s *Store) Delete(ref upspin.Reference) error {
 	const op = "Delete"
 	if ref == "" {
-		return newStoreError(op, invalidKeyError, "")
+		return newStoreError(op, invalidRefError, "")
 	}
 	// TODO: check if we own the file or otherwise are allowed to delete it.
 	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, ref), nil)

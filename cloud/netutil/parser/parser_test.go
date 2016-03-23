@@ -85,7 +85,7 @@ func TestLocationResponseWithProperError(t *testing.T) {
 }
 
 func TestKeyResponse(t *testing.T) {
-	key, err := KeyResponse([]byte(`{"key": "1234"}`))
+	key, err := ReferenceResponse([]byte(`{"ref": "1234"}`))
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -95,7 +95,7 @@ func TestKeyResponse(t *testing.T) {
 }
 
 func TestKeyResponseBadError(t *testing.T) {
-	key, err := KeyResponse([]byte("bla bla bla"))
+	key, err := ReferenceResponse([]byte("bla bla bla"))
 	if err == nil {
 		t.Fatal("Expected error, got nil")
 	}
