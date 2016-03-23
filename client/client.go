@@ -60,8 +60,15 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 	cipher = cipher[:n]
 
+	// Set options.
+	opts := upspin.PutOptions{
+		Sequence: 0, // TODO.
+		Size:     uint64(len(data)),
+		Time:     upspin.Now(),
+	}
+
 	// Store it.
-	return dir.Put(name, cipher, meta.PackData, nil) // TODO: Options
+	return dir.Put(name, cipher, meta.PackData, &opts)
 }
 
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
