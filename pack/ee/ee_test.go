@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/pack"
@@ -28,7 +29,7 @@ func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upsp
 	cipher := make([]byte, packer.PackLen(ctx, text, meta, name))
 	m, err := packer.Pack(ctx, cipher, text, meta, name)
 	if err != nil {
-		t.Fatal("Pack: ", err)
+		t.Error("Pack: ", err)
 	}
 	return cipher[:m]
 }
@@ -152,6 +153,54 @@ func TestLoadingRemoteKeys(t *testing.T) {
 	// Finally, check that unpack looked up Dude's public key, to verify the signature.
 	if mockUser.returnedKeys != 2 {
 		t.Fatal("Packer failed to request dude's public key")
+	}
+}
+
+func TestLoadingRemoteKeyless(t *testing.T) {
+	// dudette@google.com is the owner of a file that is attempting to be shared with mia@foo.com, but mia has no key.
+	const (
+		dudettesUserName upspin.UserName = "dudette@google.com"
+		packing                          = upspin.EEp256Pack
+		pathName                         = upspin.PathName(dudettesUserName + "/secret_file_shared_with_mia")
+		miasUserName     upspin.UserName = "mia@foo.com"
+		text                             = "mia, here's the secret file. sincerely, dudette."
+	)
+	dudettesPrivKey := upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
+		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
+	}
+	var miasPublic upspin.PublicKey
+
+	ctx, packer := setup(dudettesUserName, packing)
+	mockUser := &dummyUser{
+		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
+		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPrivKey.Public},
+	}
+	ctx.KeyPair = dudettesPrivKey // Override setup to prevent reading keys from .ssh/
+	ctx.User = mockUser
+
+	meta := &upspin.Metadata{
+		Readers: []upspin.UserName{miasUserName},
+	}
+	cipher := make([]byte, packer.PackLen(ctx, []byte(text), meta, pathName))
+	m, err := packer.Pack(ctx, cipher, []byte(text), meta, pathName)
+	if err == nil || !strings.HasPrefix(err.Error(), "no known keys for user") {
+		t.Error("Pack: ", err)
+	}
+	cipher = cipher[:m]
+
+	// Check that we didn't kid ourselves into wrapping for mia without a key.
+	p, ok := packer.(eep256)
+	if ok {
+		_, wrap, err := p.pdUnmarshal(meta.PackData, pathName)
+		if err != nil || len(wrap) != 1 {
+			t.Fatalf("Expected 1 wrapped key, got %d", len(wrap))
+		}
+	}
+
+	clear := unpackBlob(t, ctx, packer, pathName, meta, cipher)
+	if string(clear) != text {
+		t.Errorf("Expected %s, got %s", text, clear)
 	}
 }
 

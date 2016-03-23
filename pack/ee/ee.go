@@ -1,11 +1,11 @@
 // Package ee implements elliptic-curve end-to-end-encrypted packers.
+package ee
 
 // Upspin crypto summary:
 // Alice shares a file with Bob by picking a new random symmetric key, encrypting the file,
 // wrapping the symmetric encryption key with Bob's public key, signing the file using
 // her own elliptic curve private key, and sending the ciphertext and metadata to a
 // directory server.
-package ee
 
 import (
 	"bytes"
@@ -116,40 +116,40 @@ var (
 	sig0            signature // for returning nil of correct type
 )
 
-func (e common) Packing() upspin.Packing {
-	return e.ciphersuite
+func (c common) Packing() upspin.Packing {
+	return c.ciphersuite
 }
 
-func (e common) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
+func (c common) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+	if err := pack.CheckPackMeta(c, meta); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (e common) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+func (c common) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+	if err := pack.CheckUnpackMeta(c, meta); err != nil {
 		return -1
 	}
 	return len(ciphertext)
 }
 
-func (e common) String() string {
-	return e.packerString
+func (c common) String() string {
+	return c.packerString
 }
 
-func (e common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckPackMeta(e, meta); err != nil {
+func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckPackMeta(c, meta); err != nil {
 		return 0, err
 	}
-	return e.eePack(ctx, ciphertext, cleartext, meta, name)
+	return c.eePack(ctx, ciphertext, cleartext, meta, name)
 }
 
-func (e common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckUnpackMeta(e, meta); err != nil {
+func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+	if err := pack.CheckUnpackMeta(c, meta); err != nil {
 		return 0, err
 	}
-	return e.eeUnpack(ctx, cleartext, ciphertext, meta, name)
+	return c.eeUnpack(ctx, cleartext, ciphertext, meta, name)
 }
 
 func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
@@ -189,7 +189,8 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	sig := signature{r, s}
 	var firstErr error
 	wrap := make([]wrappedKey, len(usernames))
-	for i, u := range usernames {
+	nwrap := 0
+	for _, u := range usernames {
 		readerRawPublicKey, err := c.publicKey(ctx, u)
 		if err != nil {
 			log.Printf("no public key found for user %s: %s", u, err)
@@ -207,11 +208,13 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			continue
 		}
 		log.Printf("Wrapping key for user %s", u)
-		wrap[i], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
+		wrap[nwrap], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
 		if err != nil {
 			return 0, err
 		}
+		nwrap++
 	}
+	wrap = wrap[:nwrap]
 	err = c.pdMarshal(&meta.PackData, sig, wrap)
 	if err != nil {
 		return 0, err
