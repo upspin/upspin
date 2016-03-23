@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_3e596560",
+        "filename": "path/path.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T00:56:43Z",
+      "side": 1,
+      "message": "s/ a / /",
+      "revId": "baccd31e8c61363c93efa9730225ea4312e32b33",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_1e56a930",
+        "filename": "path/path.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T00:56:43Z",
+      "side": 1,
+      "message": "maybe also for safety strings.Count(u, \"/\") !\u003d 0",
+      "revId": "baccd31e8c61363c93efa9730225ea4312e32b33",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_fedbfd04",
+        "filename": "path/path.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-23T00:56:43Z",
+      "side": 1,
+      "message": "you could do IndexByte",
+      "revId": "baccd31e8c61363c93efa9730225ea4312e32b33",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
