@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// AnyRequest is a request that matches any kind of request.
 	AnyRequest = NewRequest(nil, "*", "*", []byte("*"))
 )
 
@@ -71,7 +72,7 @@ func NewMockHTTPResponse(statusCode int, bodyType string, data []byte) MockHTTPR
 	return MockHTTPResponse{Error: nil, Response: resp}
 }
 
-// Request returns the request sent to the http client.
+// Requests returns the request sent to the HTTP client.
 func (m *MockHTTPClient) Requests() []*http.Request {
 	return m.requestsReceived
 }

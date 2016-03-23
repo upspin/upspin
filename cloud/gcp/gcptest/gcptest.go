@@ -7,36 +7,43 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 )
 
-// DummyGCP is a dummy version of gcp.Interface that does nothing.
+// DummyGCP is a dummy version of gcp.GCP that does nothing.
 type DummyGCP struct {
 }
 
-var _ gcp.Interface = (*DummyGCP)(nil)
+var _ gcp.GCP = (*DummyGCP)(nil)
 
+// PutLocalFile implements GCP.
 func (m *DummyGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	return "", nil
 }
 
+// Get implements GCP.
 func (m *DummyGCP) Get(ref string) (link string, error error) {
 	return "", nil
 }
 
+// Download implements GCP.
 func (m *DummyGCP) Download(ref string) ([]byte, error) {
 	return nil, nil
 }
 
+// Put implements GCP.
 func (m *DummyGCP) Put(ref string, contents []byte) (refLink string, error error) {
 	return "", nil
 }
 
+// List implements GCP.
 func (m *DummyGCP) List(prefix string) (name []string, link []string, err error) {
 	return []string{}, []string{}, nil
 }
 
+// Delete implements GCP.
 func (m *DummyGCP) Delete(ref string) error {
 	return nil
 }
 
+// Connect implements GCP.
 func (m *DummyGCP) Connect() {
 }
 
@@ -48,6 +55,7 @@ type ExpectGetGCP struct {
 	Link string
 }
 
+// Get implements GCP.
 func (e *ExpectGetGCP) Get(ref string) (link string, error error) {
 	if ref == e.Ref {
 		return e.Link, nil
@@ -68,6 +76,7 @@ type ExpectDownloadCapturePutGCP struct {
 	PutContents [][]byte
 }
 
+// Download implements GCP.
 func (e *ExpectDownloadCapturePutGCP) Download(ref string) ([]byte, error) {
 	if ref == e.Ref {
 		return e.Data, nil
@@ -75,8 +84,9 @@ func (e *ExpectDownloadCapturePutGCP) Download(ref string) ([]byte, error) {
 	return nil, errors.New("not found")
 }
 
-func (c *ExpectDownloadCapturePutGCP) Put(ref string, contents []byte) (refLink string, error error) {
-	c.PutRef = append(c.PutRef, ref)
-	c.PutContents = append(c.PutContents, contents)
+// Put implements GCP.
+func (e *ExpectDownloadCapturePutGCP) Put(ref string, contents []byte) (refLink string, error error) {
+	e.PutRef = append(e.PutRef, ref)
+	e.PutContents = append(e.PutContents, contents)
 	return "", nil
 }
