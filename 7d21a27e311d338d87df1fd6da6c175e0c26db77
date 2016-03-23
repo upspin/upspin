@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_a1bcd3df",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-03-23T21:24:17Z",
+      "side": 1,
+      "message": "Maybe say \"Alleged time file was last written.\", so people don\u0027t assume complete reliability?\n\nNote that this timestamp is not even included in the string Alice signs, so a Directory server can also lie.  That\u0027s a feature, not a bug.",
+      "revId": "7d21a27e311d338d87df1fd6da6c175e0c26db77",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
