@@ -31,6 +31,7 @@ type Directory struct {
 	serverURL    string
 	storeService upspin.Store
 	client       netutil.HTTPClientInterface
+	timeNow      func() upspin.Time
 }
 
 // Guarantee we implement the interface
@@ -40,12 +41,16 @@ var (
 	zeroLoc upspin.Location
 )
 
-// new returns a concrete implementation of Directory, pointing to a server at a given URL and port.
-func new(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface) *Directory {
+// newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
+func newDirectory(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface, timeFunc func() upspin.Time) *Directory {
+	if timeFunc == nil {
+		timeFunc = upspin.Now
+	}
 	return &Directory{
 		serverURL:    serverURL,
 		storeService: storeService,
 		client:       client,
+		timeNow:      timeFunc,
 	}
 }
 
@@ -70,7 +75,6 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-// TODO: Implement options.
 func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
 	const op = "Put"
 
@@ -112,6 +116,24 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		}
 	}
 
+	// Prepare default optionals.
+	commitOpts := &upspin.PutOptions{
+		Sequence: 0, // Explicit for clarity. 0 = don't care.
+		Size:     uint64(len(data)),
+		Time:     d.timeNow(),
+	}
+	if opts != nil {
+		if opts.Size != 0 {
+			commitOpts.Size = opts.Size
+		}
+		if opts.Time != 0 {
+			commitOpts.Time = opts.Time
+		}
+		if opts.Sequence != 0 {
+			commitOpts.Sequence = opts.Sequence
+		}
+	}
+
 	// First, store the data itself, to find the key
 	// TODO: bind to the Store server pointed at by the dirEntry instead of using the default one.
 	key, err := d.storeService.Put(data)
@@ -135,7 +157,9 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    false,
-			Sequence: 0, // TODO: server does not increment currently
+			Sequence: commitOpts.Sequence,
+			Size:     commitOpts.Size,
+			Time:     commitOpts.Time,
 			PackData: packdata,
 			Readers:  parentDirEntry.Metadata.Readers, // Inherited from the parent.
 		},
@@ -206,6 +230,8 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 		Metadata: upspin.Metadata{
 			IsDir:    true,
 			Sequence: 0, // don't care?
+			Size:     0, // Being explicit that dir entries have zero size.
+			Time:     d.timeNow(),
 			PackData: nil,
 			Readers:  parentReaders,
 		},
@@ -367,5 +393,5 @@ func newError(op string, path upspin.PathName, err error) *dirError {
 
 func init() {
 	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
-	bind.RegisterDirectory(upspin.GCP, new("", nil, auth.NewAnonymousClient(&http.Client{})))
+	bind.RegisterDirectory(upspin.GCP, newDirectory("", nil, auth.NewAnonymousClient(&http.Client{}), nil))
 }
