@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	testString string = "This is a not-so-long blob."
-	encodedSha string = "BB6C37813EE84E08B1D1638F6121A77D1B117891C8C4AF955D4F5E8643E576C1"
+	testString = "This is a not-so-long blob."
+	encodedSha = "BB6C37813EE84E08B1D1638F6121A77D1B117891C8C4AF955D4F5E8643E576C1"
 )
 
 func TestEncodedSum(t *testing.T) {

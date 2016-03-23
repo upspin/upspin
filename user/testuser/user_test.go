@@ -7,6 +7,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
+	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 

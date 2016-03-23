@@ -24,7 +24,7 @@ func Parse(v string) (*upspin.Endpoint, error) {
 	return nil, fmt.Errorf("unknown transport type in endpoint %q", v)
 }
 
-// EndpointString converts an endpoint to a string.
+// String converts an endpoint to a string.
 func String(ep *upspin.Endpoint) string {
 	switch ep.Transport {
 	case upspin.GCP:

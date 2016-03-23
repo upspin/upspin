@@ -126,15 +126,9 @@ const (
 	// Packings from 1 through 16 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
 
-	// The DebugPack packing is available for use in tests for any purpose.
+	// DebugPack is available for use in tests for any purpose.
 	// It is never used in production.
 	DebugPack = 1
-
-	// UnsafePack is an obfuscating packing that is
-	// cryptographically unsound. It is similar to DebugPack, but
-	// updates the metadata with wrapped keys and signs
-	// messages. It should never be used in production.
-	UnsafePack = 2
 
 	// Packings from 16 and above (as well as PlainPack=0) are fixed in
 	// value and semantics and may be used in production.
@@ -142,11 +136,11 @@ const (
 	// EEp256Pack and EEp521Pack store AES-encrypted data, with metadata
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// See NIST SP 800-57 Pt.1 Rev.4 section 5.6.1
-	// EEp256Pack packing uses AES-128, SHA-256, and curve P256; strength 128.
+	// EEp256Pack uses AES-128, SHA-256, and curve P256; strength 128.
 	EEp256Pack = 16
-	// EEp521Pack packing uses AES-256, SHA-512, and curve P384; strength 192.
+	// EEp384Pack uses AES-256, SHA-512, and curve P384; strength 192.
 	EEp384Pack = 18
-	// EEp521Pack packing uses AES-256, SHA-512, and curve P521; strength 256.
+	// EEp521Pack uses AES-256, SHA-512, and curve P521; strength 256.
 	EEp521Pack = 17
 )
 
