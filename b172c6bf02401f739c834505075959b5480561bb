@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_abe1524b",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T18:40:38Z",
+      "side": 1,
+      "message": "You should remove bobsUserName here because dummyUser assumes the lists are in sync. Or, you should add a nil for Bob\u0027s key. Either way you\u0027ll exercise that bug. But see below...",
+      "revId": "b172c6bf02401f739c834505075959b5480561bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_eb3cea76",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T18:40:38Z",
+      "side": 1,
+      "message": "The fact it didn\u0027t crash is good. But it would be best if we could verify that the packdata contains only 1 wrapped key. Could you peek inside meta and check it here? I *think* it would amount to calling packer.pdUnmarshal(meta.PackData, ...). \n\nHowever, Packer does not have a pdUnmarshal, but you know this is an eep256 packer, so you can abuse of the type system a bit and do:\n\n p, ok :\u003d packer.(eep256)\n if ok {\n    sig, wrap, err :\u003d p.pdUnmarshal(meta.PackData, ...)\n    // Assert that len(wrap) \u003d\u003d 1\n  }\n\nmake sense?\n\nThanks.",
+      "revId": "b172c6bf02401f739c834505075959b5480561bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
