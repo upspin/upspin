@@ -33,6 +33,7 @@ var (
 	fileContents                 = []byte("contents of file")
 	packData                     = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
 	readers                      = []upspin.UserName{upspin.UserName("wife@jones.com")}
+	now                          = upspin.Now()
 	reference                    = upspin.Reference{
 		Key:     key,
 		Packing: upspin.PlainPack,
@@ -49,10 +50,18 @@ var (
 		Location: location,
 		Metadata: upspin.Metadata{
 			IsDir:    false,
-			Sequence: 0,
+			Sequence: 17,
+			Size:     uint64(len(fileContents)),
+			Time:     now,
 			PackData: packData,
 		},
 	}
+	opts = upspin.PutOptions{
+		Sequence: 17,
+		Time:     now,
+		Size:     uint64(len(fileContents)),
+	}
+
 	// A mock HTTP client that does not do anything
 	doNothingHTTPClient = nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 )
@@ -74,14 +83,20 @@ func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
 	mkdirEntry.Location.Reference = upspin.Reference{}
 	mkdirEntry.Metadata.IsDir = true
+	mkdirEntry.Metadata.Time = 42
+	mkdirEntry.Metadata.Size = 0
+	mkdirEntry.Metadata.Sequence = 0
 	mkdirEntry.Metadata.PackData = nil
 	mkdirEntry.Metadata.Readers = readers
 	// Mkdir will first Lookup the parent, then perform the Mkdir itself
 	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
 	requestMkdir := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
-	mock := nettest.NewMockHTTPClient(append(newMockLookupParentResponse(t), newMockMkdirResponse(t)...), []*http.Request{requestLookup, requestMkdir})
+	mock := nettest.NewMockHTTPClient(append(newMockLookupParentResponse(t), newMockMkdirResponse(t)...),
+		[]*http.Request{requestLookup, requestMkdir})
 
-	d := new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
+	d := newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, func() upspin.Time {
+		return upspin.Time(42)
+	})
 
 	loc, err := d.MakeDirectory(upspin.PathName(pathName))
 	if err != nil {
@@ -153,7 +168,7 @@ func TestLookupError(t *testing.T) {
 func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t), []*http.Request{nettest.AnyRequest})
 
-	d := new("http://localhost:8080", nil, mock)
+	d := newDirectory("http://localhost:8080", nil, mock, nil)
 
 	dir, err := d.Lookup(pathName)
 	if err != nil {
@@ -197,7 +212,7 @@ func newErroringDirectoryClient() upspin.Directory {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 
-	return new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
+	return newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, nil)
 }
 
 func newStore(client netutil.HTTPClientInterface) upspin.Store {
@@ -226,7 +241,7 @@ func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.M
 	s := newStore(mock)
 
 	// Get a Directory client
-	return new("http://localhost:9090", s, mock), mock
+	return newDirectory("http://localhost:9090", s, mock, nil), mock
 }
 
 func TestPutError(t *testing.T) {
@@ -246,7 +261,7 @@ func TestPutError(t *testing.T) {
 
 func TestPutBadMeta(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	d := new("http://localhost:8081", nil, mock)
+	d := newDirectory("http://localhost:8081", nil, mock, nil)
 
 	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte(""), nil) // TODO: Options
 	if err == nil {
@@ -269,7 +284,7 @@ func TestPut(t *testing.T) {
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, nil) // TODO: Options
+	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, &opts) // TODO: Options
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -285,7 +300,7 @@ func TestGlobBadPattern(t *testing.T) {
 	// No requests are issued
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 
-	d := new("http://localhost:8080", nil, mock)
+	d := newDirectory("http://localhost:8080", nil, mock, nil)
 
 	_, err := d.Glob(badPathName)
 	if err == nil {
@@ -319,7 +334,7 @@ func TestGlob(t *testing.T) {
 	}
 
 	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
-	d := new("http://localhost:9090", nil, mock)
+	d := newDirectory("http://localhost:9090", nil, mock, nil)
 
 	dirEntries, err := d.Glob("a@b.co/dir1/*.txt")
 	if err != nil {
@@ -345,7 +360,7 @@ func TestAccessErrorInvalidContents(t *testing.T) {
 
 	// Does not perform a lookup since the Access file is invalid.
 	mock := nettest.NewMockHTTPClient(newMockLookupParentResponse(t), []*http.Request{nettest.AnyRequest})
-	d := new("http://localhost:8080", newStore(doNothingHTTPClient), mock)
+	d := newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, nil)
 
 	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
 	if err == nil {
@@ -389,6 +404,9 @@ func TestAccess(t *testing.T) {
 	deAccess := deParent
 	deAccess.Name = accessPath
 	deAccess.Metadata.PackData = []byte{byte(upspin.PlainPack)} // Access file does not have packdata
+	deAccess.Metadata.Sequence = 17
+	deAccess.Metadata.Time = now
+	deAccess.Metadata.Size = uint64(len(accessControl))
 	deAccessJSON := toJSON(t, deAccess)
 	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8081/get?pathname=%s", parentPathName), nil)
 	putAccessReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deAccessJSON)
@@ -397,9 +415,13 @@ func TestAccess(t *testing.T) {
 	responses := []nettest.MockHTTPResponse{newMockLookupParentResponse(t)[0], newResp([]byte(success)), newResp([]byte(success))}
 
 	dirMock := nettest.NewMockHTTPClient(responses, requests)
-	d := new("http://localhost:8081", store, dirMock)
+	d := newDirectory("http://localhost:8081", store, dirMock, nil)
 
-	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
+	opts := upspin.PutOptions{
+		Sequence: 17,
+		Time:     now,
+	}
+	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)}, &opts)
 	if err != nil {
 		t.Fatal(err)
 	}
