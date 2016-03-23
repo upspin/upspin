@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrHashFormat = errors.New("bad hash format")
+	errHashFormat = errors.New("bad hash format")
 )
 
 // Size is the number of bytes in a hash.
@@ -40,7 +40,7 @@ func (hash Hash) EqualString(b string) bool {
 
 // Parse returns the hash whose standard format (possibly absent the brackets) is the value of str.
 func Parse(str string) (hash Hash, err error) {
-	err = ErrHashFormat
+	err = errHashFormat
 	if len(str) != 2*Size {
 		return
 	}

@@ -28,11 +28,11 @@ var (
 )
 
 func main() {
-	flag.Usage = Usage
+	flag.Usage = usage
 	flag.Parse()
 
 	if len(flag.Args()) != 2 {
-		Usage()
+		usage()
 	}
 
 	name := upspin.UserName(flag.Arg(1))
@@ -45,11 +45,11 @@ func main() {
 		addKey(name)
 	default:
 		fmt.Fprintf(os.Stderr, "Can't understand command: %v\n", flag.Arg(0))
-		Usage()
+		usage()
 	}
 }
 
-func Usage() {
+func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\tcli [flags] <lookup|addroot|addkey> <user>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
@@ -76,7 +76,7 @@ func lookup(user upspin.UserName) {
 func addRoot(user upspin.UserName, endpointStr string) {
 	if endpointStr == "" {
 		fmt.Fprintf(os.Stderr, "No endpoint specified for user.")
-		Usage()
+		usage()
 	}
 	e, err := endpoint.Parse(endpointStr)
 	if err != nil {
