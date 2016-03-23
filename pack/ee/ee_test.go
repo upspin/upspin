@@ -155,6 +155,42 @@ func TestLoadingRemoteKeys(t *testing.T) {
 	}
 }
 
+func TestLoadingRemoteKeyless(t *testing.T) {
+	// dude@google.com is the owner of a file that is attempting to be shared with bob@foo.com, but bob has no key.
+	const (
+		dudesUserName upspin.UserName = "dude@google.com"
+		packing                       = upspin.EEp256Pack
+		pathName                      = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
+		bobsUserName  upspin.UserName = "bob@foo.com"
+		text                          = "bob, here's the secret file. Sincerely, The Dude."
+	)
+	dudesPrivKey := upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
+		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
+	}
+
+	// Set up Dude as the creator/owner.
+	ctx, packer := setup(dudesUserName, packing)
+	// Set up a mock user service that knows about Bob's and Dude's public keys.
+	mockUser := &dummyUser{
+		userToMatch: []upspin.UserName{bobsUserName, dudesUserName},
+		keyToReturn: []upspin.PublicKey{dudesPrivKey.Public},
+	}
+	ctx.KeyPair = dudesPrivKey // Override setup to prevent reading keys from .ssh/
+	ctx.User = mockUser
+
+	// Setup the metadata such that Bob is a reader.
+	meta := &upspin.Metadata{
+		Readers: []upspin.UserName{bobsUserName},
+	}
+	cipher := packBlob(t, ctx, packer, pathName, meta, []byte(text))
+
+	clear := unpackBlob(t, ctx, packer, pathName, meta, cipher)
+	if string(clear) != text {
+		t.Errorf("Expected %s, got %s", text, clear)
+	}
+}
+
 func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
 	// because ee.common.curve is not exported
 	curve := []elliptic.Curve{16: elliptic.P256(), 18: elliptic.P384(), 17: elliptic.P521()}
