@@ -37,7 +37,7 @@ func lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, er
 	return nil, nil, errors.New("No user here")
 }
 
-func authHelloHandle(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
+func authHelloHandle(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	if !sess.IsAuthenticated() {
 		log.Fatal("Expected authenticated connection here")
 	}

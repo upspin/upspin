@@ -12,12 +12,12 @@ import (
 var (
 	errEmptyServerResponse = errors.New("empty server response")
 	zeroLoc                upspin.Location
-	zeroKey                keyMessage
+	zeroRef                refMessage
 	zeroErr                errorMessage
 )
 
-type keyMessage struct {
-	Key upspin.Reference // TODO: Rename field to Ref or Reference.
+type refMessage struct {
+	Ref upspin.Reference
 }
 
 type errorMessage struct {
@@ -39,19 +39,19 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 	return &loc, nil
 }
 
-// KeyResponse interprets the body of an HTTP response as a reference in a
-// proper JSON structure (example "{key:'foo'}"). If it's not in the
+// ReferenceResponse interprets the body of an HTTP response as a reference in a
+// proper JSON structure (i.e. "{ref:'foo'}"). If it's not in the
 // format of a reference, it tries to read an error message instead.
-func KeyResponse(body []byte) (upspin.Reference, error) {
+func ReferenceResponse(body []byte) (upspin.Reference, error) {
 	if len(body) == 0 {
 		return "", errEmptyServerResponse
 	}
-	var key keyMessage
-	err := json.Unmarshal(body, &key)
-	if err != nil || key == zeroKey {
+	var ref refMessage
+	err := json.Unmarshal(body, &ref)
+	if err != nil || ref == zeroRef {
 		return "", ErrorResponse(body)
 	}
-	return key.Key, nil
+	return ref.Ref, nil
 }
 
 // DirEntryResponse interprets the body of an HTTP response as
