@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c161690_0694ddb9",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T20:41:41Z",
+      "side": 1,
+      "message": "Good catch! I fixed this same bug in the statement above (line 165) but missed it here. Thanks.",
+      "revId": "de399262ddacd3b55938854da4300028ce4e3c6c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c161690_264ab925",
+        "filename": "cmd/dfuse/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-23T20:41:41Z",
+      "side": 1,
+      "message": "That should require no explanation. :-)\n\nBut are you sure you want to keep it? It likely not SFW.",
+      "revId": "de399262ddacd3b55938854da4300028ce4e3c6c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
