@@ -92,18 +92,18 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Ref: "something that does not match",
 	}
 
-	ds := newDirServer(egcp, &http.Client{})
+	ds := newDirServer(egcp)
 	Put(t, ds, dir, `{"error":"path is not writable"}`)
 }
 
 func TestLookupPathNotFound(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"get: pathname not found"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname=o@foo.bar/invalid/invalid/invalid", nil)
-	egcp := &gcptest.ExpectGetGCP{
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: "something that does not match",
 	}
 
-	ds := newDirServer(egcp, &http.Client{})
+	ds := newDirServer(egcp)
 	ds.getHandler(nil, resp, req)
 	resp.Verify(t)
 }
@@ -119,7 +119,7 @@ func TestList(t *testing.T) {
 		fileNames: []string{"testuser@google.com/subdir/", "testuser@google.com/subdir/test.txt"},
 		fileLinks: []string{"http://a.com", "http://b.com"},
 	}
-	ds := newDirServer(lgcp, &http.Client{})
+	ds := newDirServer(lgcp)
 	ds.listHandler(nil, resp, req)
 	resp.Verify(t)
 }
@@ -148,21 +148,14 @@ func TestPutNotDir(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"path is not writable"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
-	const downloadLink = "http://download-it-here.com/mydir"
-	egcp := &gcptest.ExpectGetGCP{
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  "test@foo.com/mydir",
-		Link: downloadLink,
+		Data: dirParentJSON,
 	}
 
-	// Setup a mock HTTP client that will return our DirEntry dir.
-	mockHTTPClient := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", dirParentJSON)},
-		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
-
-	ds := newDirServer(egcp, mockHTTPClient)
+	ds := newDirServer(egcp)
 	ds.putHandler(nil, resp, req)
 	resp.Verify(t)
-	mockHTTPClient.Verify(t)
 }
 
 func TestPut(t *testing.T) {
@@ -189,25 +182,18 @@ func TestPut(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
-	const downloadLink = "http://download-it-here.com/mydir"
-	egcp := &gcptest.ExpectGetGCP{
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  "test@foo.com/mydir",
-		Link: downloadLink,
+		Data: dirParentJSON,
 	}
 
-	// Setup a mock HTTP client that will return our DirEntry dir.
-	mockHTTPClient := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", dirParentJSON)},
-		[]*http.Request{nettest.NewRequest(t, netutil.Get, downloadLink, nil)})
-
-	ds := newDirServer(egcp, mockHTTPClient)
+	ds := newDirServer(egcp)
 	ds.putHandler(nil, resp, req)
 	resp.Verify(t)
-	mockHTTPClient.Verify(t)
 }
 
 func newDummyDirServer() *dirServer {
-	return newDirServer(&gcptest.DummyGCP{}, &http.Client{})
+	return newDirServer(&gcptest.DummyGCP{})
 }
 
 // listGCP is a DummyGCP that returns a slice of fileNames and
