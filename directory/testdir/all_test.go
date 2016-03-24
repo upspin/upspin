@@ -127,16 +127,16 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		t.Fatalf("lookup %s: %s", fileName, err)
 	}
 	if loc != entry.Location {
-		t.Errorf("Lookup's reference does not match Put's reference:\t%v\n\t%v", loc, entry.Location)
+		t.Errorf("Lookup's location does not match Put's location:\t%v\n\t%v", loc, entry.Location)
 	}
 
 	// Fetch the data back and inspect it.
-	ciphertext, locs, err := context.Store.Get(loc.Reference.Key)
+	ciphertext, locs, err := context.Store.Get(loc.Key)
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
 	if locs != nil {
-		ciphertext, _, err = context.Store.Get(locs[0].Reference.Key)
+		ciphertext, _, err = context.Store.Get(locs[0].Key)
 		if err != nil {
 			t.Fatal("get redirected blob:", err)
 		}
@@ -177,12 +177,12 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		ciphertext, newLocs, err := context.Store.Get(locs[j].Reference.Key)
+		ciphertext, newLocs, err := context.Store.Get(locs[j].Key)
 		if err != nil {
-			t.Fatalf("%q: get blob: %v, key: %v", fileName, err, locs[j].Reference.Key)
+			t.Fatalf("%q: get blob: %v, key: %v", fileName, err, locs[j].Key)
 		}
 		if newLocs != nil {
-			ciphertext, _, err = context.Store.Get(newLocs[0].Reference.Key)
+			ciphertext, _, err = context.Store.Get(newLocs[0].Key)
 			if err != nil {
 				t.Fatalf("%q: get redirected blob: %v", fileName, err)
 			}
@@ -230,12 +230,12 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: %q: lookup file: %v", i, fileName, err)
 		}
-		cipher, locs, err := context.Store.Get(entry.Location.Reference.Key)
+		cipher, locs, err := context.Store.Get(entry.Location.Key)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
 		if locs != nil {
-			cipher, _, err = context.Store.Get(locs[0].Reference.Key)
+			cipher, _, err = context.Store.Get(locs[0].Key)
 			if err != nil {
 				t.Fatalf("%q: get redirected file: %v", fileName, err)
 			}
@@ -289,12 +289,12 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: lookup file: %v", fileName, err)
 	}
-	cipher, locs, err := context.Store.Get(entry.Location.Reference.Key)
+	cipher, locs, err := context.Store.Get(entry.Location.Key)
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
 	}
 	if locs != nil {
-		cipher, _, err = context.Store.Get(locs[0].Reference.Key)
+		cipher, _, err = context.Store.Get(locs[0].Key)
 		if err != nil {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
@@ -319,12 +319,12 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%q: second lookup file: %v", fileName, err)
 	}
-	cipher, locs, err = context.Store.Get(entry.Location.Reference.Key)
+	cipher, locs, err = context.Store.Get(entry.Location.Key)
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
 	}
 	if locs != nil {
-		cipher, _, err = context.Store.Get(locs[0].Reference.Key)
+		cipher, _, err = context.Store.Get(locs[0].Key)
 		if err != nil {
 			t.Fatalf("%q: second get redirected file: %v", fileName, err)
 		}

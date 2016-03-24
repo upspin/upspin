@@ -270,7 +270,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 			}
 		}
 		h.fname = filepath.Join(n.f.cacheDir, fingerprint(loc, de.Metadata.Sequence))
-		if loc.Reference.Packing != upspin.PlainPack {
+		if de.Metadata.Packing() != upspin.PlainPack {
 			h.file, err = os.OpenFile(h.fname, int(req.Flags), 0700)
 			if err == nil {
 				if info, err := h.file.Stat(); err == nil {
@@ -283,8 +283,8 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 		}
 		var data []byte
 		var locs []upspin.Location
-		if data, locs, err = store.Get(loc.Reference.Key); err != nil {
-			finalErr = eio("%s Get %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
+		if data, locs, err = store.Get(loc.Key); err != nil {
+			finalErr = eio("%s Get %q key %q file %q", err, h.n.uname, loc.Key, h.fname)
 			continue
 		}
 		if len(locs) > 0 {
@@ -292,29 +292,29 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 			locations = append(locations, locs...)
 			continue
 		}
-		packer := pack.Lookup(de.Location.Reference.Packing)
+		packer := pack.Lookup(de.Metadata.Packing())
 		if packer == nil {
-			finalErr = eio("couldn't lookup %q key %q file %q", h.n.uname, loc.Reference.Key, h.fname)
+			finalErr = eio("couldn't lookup %q key %q file %q", h.n.uname, loc.Key, h.fname)
 			continue
 		}
 		clearLen := packer.UnpackLen(n.f.context, data, &de.Metadata)
 		if clearLen < 0 {
-			finalErr = eio("couldn't unpack %q key %q file %q", h.n.uname, loc.Reference.Key, h.fname)
+			finalErr = eio("couldn't unpack %q key %q file %q", h.n.uname, loc.Key, h.fname)
 			continue
 		}
 		cleartext := make([]byte, clearLen)
 		rlen, err := packer.Unpack(n.f.context, cleartext, data, &de.Metadata, h.n.uname)
 		if err != nil {
-			finalErr = eio("%s unpacking %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
+			finalErr = eio("%s unpacking %q key %q file %q", err, h.n.uname, loc.Key, h.fname)
 			continue
 		}
 		cleartext = cleartext[:rlen]
 		// Save a copy of the cleartext in the local file system.
 		if h.file, err = os.Create(h.fname); err != nil {
-			return nil, eio("%s creating %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
+			return nil, eio("%s creating %q key %q file %q", err, h.n.uname, loc.Key, h.fname)
 		}
 		if wlen, err := h.file.Write(cleartext); err != nil || rlen != wlen {
-			return nil, eio("%s writing %q key %q file %q", err, h.n.uname, loc.Reference.Key, h.fname)
+			return nil, eio("%s writing %q key %q file %q", err, h.n.uname, loc.Key, h.fname)
 		}
 		n.Lock()
 		n.attr.Size = uint64(rlen)
@@ -325,7 +325,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 }
 
 func fingerprint(loc upspin.Location, seq int64) string {
-	return fmt.Sprintf("%x.%d", sha1.Sum([]byte(loc.Reference.Key)), seq)
+	return fmt.Sprintf("%x.%d", sha1.Sum([]byte(loc.Key)), seq)
 }
 
 // Remove implements fs.Noderemover.

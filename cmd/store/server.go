@@ -123,7 +123,7 @@ func (s *storeServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *h
 	}
 
 	location := upspin.Location{}
-	location.Reference.Key = link
+	location.Key = link
 	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
 	log.Printf("Got link: %v\n", link)
 	netutil.SendJSONReply(w, location)

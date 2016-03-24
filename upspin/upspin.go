@@ -28,8 +28,8 @@ type Location struct {
 	// Endpoint identifies the machine or service where the data resides.
 	Endpoint Endpoint
 
-	// Reference is the key that will retrieve the data from the endpoint.
-	Reference Reference
+	// Key is the key that will retrieve the data from the endpoint.
+	Key string
 }
 
 // An Endpoint identifies an instance of a service, encompassing an address
@@ -48,17 +48,6 @@ type Endpoint struct {
 // Dial method to connect to the service.
 type NetAddr string
 
-// A Reference is the key to find a piece of data in a given Store. It is decoupled
-// from the address of the Store itself, but contains a unique identifier key
-// such as a hash of the contents and a Packing defining how to unpack it.
-type Reference struct {
-	// Key identifies the data within the Store.
-	Key string
-
-	// Packing identifies how to unpack the original data using this Reference.
-	Packing Packing
-}
-
 // PackData stores the encoded information used to pack the data in an
 // item, such decryption keys. The first byte identifies the Packing
 // used to store the information; the rest of the slice is the data
@@ -66,7 +55,7 @@ type Reference struct {
 type PackData []byte
 
 // A Packing identifies the technique for turning the data pointed to by
-// a Reference into the user's data. This may involve checksum verification,
+// a key into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
 // Secondary data such as encryption keys may be required to implement
 // the packing. That data appears in the API as arguments and struct fields
