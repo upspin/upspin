@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcb0fe0b_4180d6e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "Migrate",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_217dcab6",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "move this up to line 4.\nare you not running goimports?",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_016beef5",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_e16fe2fd",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_c164e624",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcb0fe0b_a169dafa",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-24T22:40:02Z",
+      "side": 1,
+      "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
