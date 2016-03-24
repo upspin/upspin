@@ -246,7 +246,7 @@ type Metadata struct {
 	IsDir    bool       // The file is a directory.
 	Sequence int64      // The sequence (version) number of the item.
 	Size     uint64     // Length of file in bytes.
-	Time     Time       // Time file was last written.
+	Time     Time       // Time associated with file; might be when it was last written.
 	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
 	PackData []byte     // Packing-specific metadata stored in directory.
 }
