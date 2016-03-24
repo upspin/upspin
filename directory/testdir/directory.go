@@ -344,9 +344,15 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		},
 	}
 	if opts != nil {
-		newEntry.Metadata.Sequence = opts.Sequence
-		newEntry.Metadata.Size = opts.Size
-		newEntry.Metadata.Time = opts.Time
+		if opts.Sequence != 0 {
+			newEntry.Metadata.Sequence = opts.Sequence
+		}
+		if opts.Size != 0 {
+			newEntry.Metadata.Size = opts.Size
+		}
+		if opts.Time != 0 {
+			newEntry.Metadata.Time = opts.Time
+		}
 	}
 	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
 	if err != nil {

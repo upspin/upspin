@@ -511,9 +511,26 @@ func TestTimeAndSize(t *testing.T) {
 	if entry.Metadata.Time == 0 {
 		t.Fatalf("default did not set time")
 	}
-	// Options override.
+	// Unset options do not override.
+	data, packdata = packData(t, []byte("sailor"), fileName)
+	opts := upspin.PutOptions{}
+	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err = context.Directory.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.Metadata.Size < uint64(len("sailor")) { // Packed size will be larger.
+		t.Fatalf("default did not set size %d; got %d", len("hello"), entry.Metadata.Size)
+	}
+	if entry.Metadata.Time == 0 {
+		t.Fatalf("default did not set time")
+	}
+	// Set options override.
 	data, packdata = packData(t, []byte("good bye"), fileName)
-	opts := upspin.PutOptions{
+	opts = upspin.PutOptions{
 		Size: 1234,
 		Time: 12345,
 	}
