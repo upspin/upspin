@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "1c9d36d4_b6266e53",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-24T22:50:41Z",
+      "side": 1,
+      "message": "I am. On every save. On emacs it got this right and I never had to worry about it. Sadly, Intellij is a little dumbj.\n\nFixed.",
+      "parentUuid": "dcb0fe0b_217dcab6",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_016beef5",
         "filename": "cmd/directory/server.go",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2016-03-24T22:40:02Z",
       "side": 1,
       "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c9d36d4_761526cc",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-24T22:50:41Z",
+      "side": 1,
+      "message": "This was on purpose to get non-error issues reported to stdout. This is because on our GCE instance the err log and out log are different files and I wanted the err log to show only errors and warnings.\n\nIs that not advisable?",
+      "parentUuid": "dcb0fe0b_016beef5",
       "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "1c9d36d4_5612aae5",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-24T22:50:41Z",
+      "side": 1,
+      "message": "same as above.",
+      "parentUuid": "dcb0fe0b_e16fe2fd",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_c164e624",
         "filename": "cmd/directory/server.go",
         "patchSetId": 2
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "1c9d36d4_b6c78e8c",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-24T22:50:41Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "dcb0fe0b_c164e624",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dcb0fe0b_a169dafa",
         "filename": "cmd/directory/server.go",
         "patchSetId": 2
@@ -98,6 +170,24 @@
       "writtenOn": "2016-03-24T22:40:02Z",
       "side": 1,
       "message": "log",
+      "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c9d36d4_96cc12b0",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-03-24T22:50:41Z",
+      "side": 1,
+      "message": "ditto.",
+      "parentUuid": "dcb0fe0b_a169dafa",
       "revId": "c20d399041ced7c68f5dc99446d5a485a8f90729",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
