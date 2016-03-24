@@ -151,7 +151,7 @@ func (s *storeServer) deleteHandler(sess *auth.Session, w http.ResponseWriter, r
 func main() {
 	flag.Parse()
 	ss := &storeServer{
-		cloudClient: gcp.New(*projectID, *bucketName, gcp.ProjectPrivate),
+		cloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
 		fileCache:   cache.NewFileCache(*tempDir),
 	}
 

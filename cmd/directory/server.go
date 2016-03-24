@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -33,8 +32,7 @@ var (
 )
 
 type dirServer struct {
-	cloudClient gcp.GCP                     // handle for GCP bucket g-upspin-directory
-	httpClient  netutil.HTTPClientInterface // our HTTP client for calling User service
+	cloudClient gcp.GCP // handle for GCP bucket g-upspin-directory
 }
 
 type dirEntryError struct {
@@ -179,24 +177,11 @@ func (d *dirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) err
 
 // getCloudBytes fetches the path from the storage backend.
 func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
-	link, err := d.cloudClient.Get(string(path))
+	data, err := d.cloudClient.Download(string(path))
 	if err != nil {
 		return nil, errEntryNotFound
 	}
-	// Now use the link to retrieve the metadata.
-	req, err := http.NewRequest(netutil.Get, link, nil)
-	if err != nil {
-		return nil, dirEntryError{err.Error()}
-	}
-	resp, err := d.httpClient.Do(req)
-	if err != nil {
-		return nil, dirEntryError{err.Error()}
-	}
-	buf, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, dirEntryError{fmt.Sprintf("error reading cloud: %v", err)}
-	}
-	return buf, nil
+	return data, err
 }
 
 func (d *dirServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
@@ -252,10 +237,9 @@ func (d *dirServer) listHandler(sess *auth.Session, w http.ResponseWriter, r *ht
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
-func newDirServer(cloudClient gcp.GCP, httpClient netutil.HTTPClientInterface) *dirServer {
+func newDirServer(cloudClient gcp.GCP) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
-		httpClient:  httpClient,
 	}
 	return d
 }
@@ -268,7 +252,7 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
-	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), &http.Client{})
+	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate))
 	http.HandleFunc("/put", ah.Handle(d.putHandler))
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
 	http.HandleFunc("/list", ah.Handle(d.listHandler))
