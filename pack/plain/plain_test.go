@@ -10,7 +10,7 @@ import (
 var (
 	context = &upspin.Context{}
 	meta    = &upspin.Metadata{
-		PackData: []byte{upspin.PlainPack},
+		PackData: []byte{byte(upspin.PlainPack)},
 	}
 )
 

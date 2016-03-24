@@ -110,14 +110,14 @@ type Packer interface {
 const (
 	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
 	// It is the default packing but is, of course, insecure.
-	PlainPack = 0
+	PlainPack Packing = 0
 
 	// Packings from 1 through 16 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
 
 	// DebugPack is available for use in tests for any purpose.
 	// It is never used in production.
-	DebugPack = 1
+	DebugPack Packing = 1
 
 	// Packings from 16 and above (as well as PlainPack=0) are fixed in
 	// value and semantics and may be used in production.
@@ -126,11 +126,11 @@ const (
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// See NIST SP 800-57 Pt.1 Rev.4 section 5.6.1
 	// EEp256Pack uses AES-128, SHA-256, and curve P256; strength 128.
-	EEp256Pack = 16
+	EEp256Pack Packing = 16
 	// EEp384Pack uses AES-256, SHA-512, and curve P384; strength 192.
-	EEp384Pack = 18
+	EEp384Pack Packing = 18
 	// EEp521Pack uses AES-256, SHA-512, and curve P521; strength 256.
-	EEp521Pack = 17
+	EEp521Pack Packing = 17
 )
 
 // User service.
