@@ -36,7 +36,6 @@ var (
 )
 
 var (
-	r0   upspin.Reference
 	loc0 upspin.Location
 )
 
@@ -52,7 +51,7 @@ type Service struct {
 	// exported API, for simple but slow safety. At least it's an RWMutex
 	// so it's not _too_ bad.
 	mu   sync.RWMutex
-	Root map[upspin.UserName]upspin.Reference // All inside Service.Store
+	Root map[upspin.UserName]string // Roots are just keys, all inside Service.Store
 }
 
 var _ upspin.Directory = (*Service)(nil)
@@ -149,7 +148,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirRef, ok := s.Root[parsed.User]
+	dirKey, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Glob", upspin.PathName(parsed.User), "no such user")
 	}
@@ -159,8 +158,8 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	next[0] = &upspin.DirEntry{
 		Name: parsed.First(0).Path(), // The root.
 		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: dirRef,
+			Key:      dirKey,
+			Endpoint: s.StoreEndpoint,
 		},
 		Metadata: upspin.Metadata{
 			IsDir: true,
@@ -173,9 +172,9 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			if !ent.Metadata.IsDir {
 				continue
 			}
-			payload, err := s.fetchDir(ent.Location.Reference, ent.Name)
+			payload, err := s.fetchDir(ent.Location.Key, ent.Name)
 			if err != nil {
-				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference")
+				return nil, mkStrError("Glob", ent.Name, "internal error: invalid key: "+err.Error())
 			}
 			for len(payload) > 0 {
 				var nextEntry upspin.DirEntry
@@ -240,14 +239,10 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if err != nil {
 			return loc0, err
 		}
-		ref := upspin.Reference{
-			Key:     key,
-			Packing: upspin.Packing(dirPacking),
-		}
-		s.Root[parsed.User] = ref
+		s.Root[parsed.User] = key
 		loc := upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: ref,
+			Endpoint: s.StoreEndpoint,
+			Key:      key,
 		}
 		return loc, nil
 	}
@@ -281,20 +276,20 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	if len(parsed.Elems) == 0 {
 		return loc0, mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
-	dirRef, ok := s.Root[parsed.User]
+	dirKey, ok := s.Root[parsed.User]
 	if !ok {
 		// Cannot create user root with Put.
 		return loc0, mkStrError(op, upspin.PathName(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
-	// Invariant: dirRef refers to a directory.
+	// Invariant: dirKey refers to a directory.
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
 	dirEntry := &upspin.DirEntry{
 		Name: "",
 		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: dirRef,
+			Endpoint: s.StoreEndpoint,
+			Key:      dirKey,
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    true,
@@ -304,7 +299,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	}
 	entries = append(entries, dirEntry)
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirKey, parsed.Elems[i])
 		if err != nil {
 			return loc0, err
 		}
@@ -312,18 +307,17 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 			return loc0, mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
 		entries = append(entries, entry)
-		dirRef = entry.Location.Reference
+		dirKey = entry.Location.Key
 	}
 
 	// Store the data in the storage service.
 	key, err := s.Store.Put(data)
-	ref := upspin.Reference{
-		Key:     key,
-		Packing: upspin.Packing(packdata[0]), // packdata is known to be non-empty.
+	if err != nil {
+		return loc0, err
 	}
 	loc := upspin.Location{
-		Endpoint:  s.Store.Endpoint(),
-		Reference: ref,
+		Endpoint: s.Store.Endpoint(),
+		Key:      key,
 	}
 
 	// Update directory holding the file.
@@ -331,8 +325,8 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	newEntry := &upspin.DirEntry{
 		Name: pathName,
 		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: ref,
+			Endpoint: s.StoreEndpoint,
+			Key:      key,
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    dataIsDir,
@@ -354,21 +348,21 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 			newEntry.Metadata.Time = opts.Time
 		}
 	}
-	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
+	dirKey, err = s.installEntry(op, parsed.Drop(1).Path(), dirKey, newEntry, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return loc0, err
 	}
 	// Rewrite the tree up to the root.
-	// Invariant: dirRef identifies the directory that has just been updated.
-	// i indicates the directory that needs to be updated to store the new dirRef.
+	// Invariant: dirKey identifies the directory that has just been updated.
+	// i indicates the directory that needs to be updated to store the new dirKey.
 	for i := len(entries) - 2; i >= 0; i-- {
 		// Install into the ith directory the (i+1)th entry.
 		dirEntry := &upspin.DirEntry{
 			Name: entries[i+1].Name,
 			Location: upspin.Location{
-				Endpoint:  s.StoreEndpoint,
-				Reference: dirRef,
+				Endpoint: s.StoreEndpoint,
+				Key:      dirKey,
 			},
 			Metadata: upspin.Metadata{
 				IsDir:    true,
@@ -377,16 +371,16 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 				PackData: dirPackData,
 			},
 		}
-		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)
+		dirKey, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Key, dirEntry, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
 			return loc0, err
 		}
 	}
 	// Update the root.
-	s.Root[parsed.User] = dirRef
+	s.Root[parsed.User] = dirKey
 
-	// Return the reference to the file.
+	// Return the location of the file.
 	return loc, nil
 }
 
@@ -401,50 +395,50 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirRef, ok := s.Root[parsed.User]
+	dirKey, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Lookup", upspin.PathName(parsed.User), "no such user")
 	}
 	// Iterate along the path up to but not past the last element.
-	// Invariant: dirRef refers to a directory.
+	// Invariant: dirKey refers to a directory.
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		entry, err := s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		entry, err := s.fetchEntry("Lookup", parsed.First(i).Path(), dirKey, parsed.Elems[i])
 		if err != nil {
 			return nil, err
 		}
 		if !entry.Metadata.IsDir {
 			return nil, mkStrError("Lookup", pathName, "not a directory")
 		}
-		dirRef = entry.Location.Reference
+		dirKey = entry.Location.Key
 	}
 	lastElem := parsed.Elems[len(parsed.Elems)-1]
 	// Destination must exist. If so we need to update the parent directory record.
-	entry, err := s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem)
+	entry, err := s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirKey, lastElem)
 	if err != nil {
 		return nil, err
 	}
 	return entry, nil
 }
 
-// fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
+// fetchEntry returns the reference for the named elem within the named directory referenced by dirKey.
 // We always know that the packing is defined by dirPack and dirMeta.
 // It reads the whole directory, so avoid calling it repeatedly.
-func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (*upspin.DirEntry, error) {
-	payload, err := s.fetchDir(dirRef, name)
+func (s *Service) fetchEntry(op string, name upspin.PathName, dirKey string, elem string) (*upspin.DirEntry, error) {
+	payload, err := s.fetchDir(dirKey, name)
 	if err != nil {
 		return nil, err
 	}
 	return s.dirEntLookup(op, name, payload, elem)
 }
 
-// fetchDir returns the decrypted directory data associated with the reference.
-func (s *Service) fetchDir(dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	ciphertext, locs, err := s.Store.Get(dirRef.Key)
+// fetchDir returns the decrypted directory data associated with the key.
+func (s *Service) fetchDir(dirKey string, name upspin.PathName) ([]byte, error) {
+	ciphertext, locs, err := s.Store.Get(dirKey)
 	if err != nil {
 		return nil, err
 	}
 	if locs != nil {
-		ciphertext, _, err = s.Store.Get(locs[0].Reference.Key)
+		ciphertext, _, err = s.Store.Get(locs[0].Key)
 		if err != nil {
 			return nil, err
 		}
@@ -478,12 +472,12 @@ Loop:
 
 var errSeq = errors.New("sequence mismatch")
 
-// installEntry installs the new entry in the directory referenced by dirRef, appending or overwriting the
+// installEntry installs the new entry in the directory referenced by dirLeu, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
-func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, dirOverwriteOK bool) (upspin.Reference, error) {
-	dirData, err := s.fetchDir(dirRef, dirName)
+func (s *Service) installEntry(op string, dirName upspin.PathName, dirKey string, newEntry *upspin.DirEntry, dirOverwriteOK bool) (string, error) {
+	dirData, err := s.fetchDir(dirKey, dirName)
 	if err != nil {
-		return r0, err
+		return "", err
 	}
 	found := false
 	var nextEntry upspin.DirEntry
@@ -492,17 +486,17 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		start := len(dirData) - len(payload)
 		remaining, err := nextEntry.Unmarshal(payload)
 		if err != nil {
-			return r0, err
+			return "", err
 		}
 		length := len(payload) - len(remaining)
 		payload = remaining
 		if nextEntry.Name != newEntry.Name {
 			continue
 		}
-		// We found the reference.
+		// We found the item.
 		// If it's already there and is not expected to be a directory, this is an error.
 		if nextEntry.Metadata.IsDir && !dirOverwriteOK {
-			return r0, mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
+			return "", mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
 		// Drop this entry so we can append the updated one.
 		// It may have changed length because of the metadata being unpredictable,
@@ -512,7 +506,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
 		if newEntry.Metadata.Sequence != 0 {
 			if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
-				return r0, mkError(op, newEntry.Name, errSeq)
+				return "", mkError(op, newEntry.Name, errSeq)
 			}
 		}
 		newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
@@ -520,20 +514,16 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 	}
 	data, err := newEntry.Marshal()
 	if err != nil {
-		return r0, err
+		return "", err
 	}
 	dirData = append(dirData, data...)
 	blob, _, err := packDirBlob(s.Context, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
 	key, err := s.Store.Put(blob)
 	if err != nil {
 		// TODO: System is now inconsistent.
-		return r0, err
+		return "", err
 	}
-	ref := upspin.Reference{
-		Key:     key,
-		Packing: upspin.Packing(newEntry.Metadata.PackData[0]),
-	}
-	return ref, nil
+	return key, nil
 }
 
 // Methods to implement upspin.Dialer
@@ -564,7 +554,7 @@ func init() {
 	s := &Service{
 		endpoint: upspin.Endpoint{}, // uninitialized until Dial time.
 		Store:    nil,               // uninitialized until Dial time.
-		Root:     make(map[upspin.UserName]upspin.Reference),
+		Root:     make(map[upspin.UserName]string),
 	}
 	bind.RegisterDirectory(transport, s)
 }

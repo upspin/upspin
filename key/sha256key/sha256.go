@@ -1,4 +1,4 @@
-// Package sha256key provides access to the hash function used to make content-addressable references.
+// Package sha256key provides access to the hash function used to make content-addressable keys.
 package sha256key
 
 import (

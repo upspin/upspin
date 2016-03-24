@@ -12,10 +12,7 @@ var dirEnt = DirEntry{
 			Transport: GCP,
 			NetAddr:   "foo.com:1234",
 		},
-		Reference: Reference{
-			Key:     "Chubb",
-			Packing: DebugPack,
-		},
+		Key: "Chubb",
 	},
 	Metadata: Metadata{
 		IsDir:    true,
