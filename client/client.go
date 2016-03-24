@@ -162,7 +162,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		if isError(err) {
 			continue
 		}
-		cipher, locs, err := store.Get(loc.Key)
+		cipher, locs, err := store.Get(loc.Reference)
 		if isError(err) {
 			continue // locs guaranteed to be nil.
 		}

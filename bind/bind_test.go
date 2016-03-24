@@ -65,10 +65,10 @@ func (d *dummyUser) ServerUserName() string {
 	return "userUser"
 }
 
-func (d *dummyStore) Get(key string) ([]byte, []upspin.Location, error) {
+func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	return nil, nil, errors.New("dummyStore.Get not implemented")
 }
-func (d *dummyStore) Put(data []byte) (string, error) {
+func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.New("dummyStore.Put not implemented")
 }
 func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
@@ -81,7 +81,7 @@ func (d *dummyStore) Endpoint() upspin.Endpoint {
 func (d *dummyStore) ServerUserName() string {
 	return "userStore"
 }
-func (d *dummyStore) Delete(key string) error {
+func (d *dummyStore) Delete(ref upspin.Reference) error {
 	return errors.New("dummyStore.Delete not implemented")
 }
 

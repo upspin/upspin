@@ -222,8 +222,8 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 		return ctx, packer
 	}
 	ctx.KeyPair = upspin.KeyPair{
-		upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
-		upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
+		Public:  upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
+		Private: upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
 	}
 	return ctx, packer
 }
