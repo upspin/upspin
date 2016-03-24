@@ -22,9 +22,7 @@ var (
 	keyStruct = struct{ Key string }{Key: contentKey}
 
 	newLocation = upspin.Location{
-		Reference: upspin.Reference{
-			Key: "new key",
-		},
+		Key: "new key",
 		Endpoint: upspin.Endpoint{
 			Transport: upspin.GCP,
 			NetAddr:   upspin.NetAddr("http://localhost:8080"),

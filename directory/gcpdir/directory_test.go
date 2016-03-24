@@ -34,12 +34,8 @@ var (
 	packData                     = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
 	readers                      = []upspin.UserName{upspin.UserName("wife@jones.com")}
 	now                          = upspin.Now()
-	reference                    = upspin.Reference{
-		Key:     key,
-		Packing: upspin.PlainPack,
-	}
-	location = upspin.Location{
-		Reference: reference,
+	location                     = upspin.Location{
+		Key: key,
 		Endpoint: upspin.Endpoint{
 			Transport: upspin.GCP,
 			NetAddr:   upspin.NetAddr("http://localhost:8080"),
@@ -81,7 +77,7 @@ func TestMkdirError(t *testing.T) {
 
 func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
-	mkdirEntry.Location.Reference = upspin.Reference{}
+	mkdirEntry.Location.Key = ""
 	mkdirEntry.Metadata.IsDir = true
 	mkdirEntry.Metadata.Time = 42
 	mkdirEntry.Metadata.Size = 0
@@ -103,7 +99,7 @@ func TestMkdir(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	// GCP servers don't have a Key for directory entries since they're stored locally.
-	location.Reference.Key = ""
+	location.Key = ""
 	if loc != location {
 		t.Fatalf("Expected location %v, got %v", location, loc)
 	}
@@ -288,11 +284,11 @@ func TestPut(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	if loc.Reference.Key != key {
-		t.Fatalf("Expected key %v, got %v", key, loc.Reference.Key)
+	if loc.Key != key {
+		t.Fatalf("Expected key %v, got %v", key, loc.Key)
 	}
 
-	// Verify we sent to the Directory service the Reference.Key we got back from the Store server
+	// Verify we sent to the Directory service the key we got back from the Store server
 	mock.Verify(t)
 }
 

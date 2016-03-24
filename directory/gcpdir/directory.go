@@ -149,10 +149,7 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	dirEntry = &upspin.DirEntry{
 		Name: name,
 		Location: upspin.Location{
-			Reference: upspin.Reference{
-				Key:     key,
-				Packing: upspin.Packing(packdata[0]),
-			},
+			Key:      key,
 			Endpoint: d.storeService.Endpoint(),
 		},
 		Metadata: upspin.Metadata{

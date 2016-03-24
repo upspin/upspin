@@ -19,16 +19,6 @@ func (Location) Unmarshal([]byte) error {
 	panic("unimplemented")
 }
 
-// Marshal packs the Reference into a byte slice for transport.
-func (Reference) Marshal([]byte) error {
-	panic("unimplemented")
-}
-
-// Unmarshal unpacks the byte slice to recover the encoded Reference.
-func (Reference) Unmarshal([]byte) error {
-	panic("unimplemented")
-}
-
 // Packing returns the Packing type to which this PackData applies, identified
 // by the initial byte of the PackData.
 func (p PackData) Packing() Packing {
@@ -38,6 +28,12 @@ func (p PackData) Packing() Packing {
 // Data returns the data in the PackData, the bytes after the initial Packing metadata byte.
 func (p PackData) Data() []byte {
 	return p[1:]
+}
+
+// Packing returns the Packing type to which this Metadata applies, identified
+// by the initial byte of uts PackData.
+func (m Metadata) Packing() Packing {
+	return PackData(m.PackData).Packing() // TODO: Maybe Metadata.PackData should be typed.
 }
 
 // Marshal packs the DirEntry into a new byte slice for transport.
@@ -62,11 +58,9 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	//	NetAddr: count N followed by N bytes.
 	b = append(b, byte(d.Location.Endpoint.Transport))
 	b = appendString(b, string(d.Location.Endpoint.NetAddr))
-	// Location.Reference:
-	//	Packing: 1 byte.
+	// Location.Key:
 	//	Key: count N followed by N bytes.
-	b = append(b, byte(d.Location.Reference.Packing))
-	b = appendString(b, d.Location.Reference.Key)
+	b = appendString(b, d.Location.Key)
 
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)
@@ -140,19 +134,14 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	d.Location.Endpoint.NetAddr = NetAddr(bytes)
 
-	// Location.Reference:
+	// d.Location.Key
 	//	Packing: 1 byte.
 	//	Key: count N followed by N bytes.
-	if len(b) < 1 {
-		return nil, ErrTooShort
-	}
-	d.Location.Reference.Packing = Packing(b[0])
-	b = b[1:]
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort
 	}
-	d.Location.Reference.Key = string(bytes)
+	d.Location.Key = string(bytes)
 
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)
