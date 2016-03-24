@@ -95,7 +95,7 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	var dirEntry *upspin.DirEntry
 	// Check whether this is an Access file, which is special.
 	if access.IsAccessFile(name) {
-		if packdata[0] != upspin.PlainPack {
+		if upspin.Packing(packdata[0]) != upspin.PlainPack {
 			// The directory service must be able to read the bytes passed in.
 			return zeroLoc, newError(op, name, errors.New("packing must be plain for Access file"))
 		}

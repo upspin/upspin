@@ -9,7 +9,7 @@ import (
 
 var (
 	meta = &upspin.Metadata{
-		PackData: []byte{upspin.DebugPack},
+		PackData: []byte{byte(upspin.DebugPack)},
 	}
 )
 
