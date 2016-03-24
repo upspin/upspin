@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -179,24 +178,11 @@ func (d *dirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) err
 
 // getCloudBytes fetches the path from the storage backend.
 func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
-	link, err := d.cloudClient.Get(string(path))
+	data, err := d.cloudClient.Download(string(path))
 	if err != nil {
 		return nil, errEntryNotFound
 	}
-	// Now use the link to retrieve the metadata.
-	req, err := http.NewRequest(netutil.Get, link, nil)
-	if err != nil {
-		return nil, dirEntryError{err.Error()}
-	}
-	resp, err := d.httpClient.Do(req)
-	if err != nil {
-		return nil, dirEntryError{err.Error()}
-	}
-	buf, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, dirEntryError{fmt.Sprintf("error reading cloud: %v", err)}
-	}
-	return buf, nil
+	return data, err
 }
 
 func (d *dirServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *http.Request) {
