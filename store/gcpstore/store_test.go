@@ -15,14 +15,14 @@ import (
 const (
 	errSomethingBad = "Something bad happened on the internet"
 	errBrokenPipe   = "The internet has a broken pipe"
-	contentKey      = "my key"
+	contentRef      = "my ref"
 )
 
 var (
-	keyStruct = struct{ Key string }{Key: contentKey}
+	keyStruct = struct{ Key string }{Key: contentRef}
 
 	newLocation = upspin.Location{
-		Key: "new key",
+		Reference: "new reference",
 		Endpoint: upspin.Endpoint{
 			Transport: upspin.GCP,
 			NetAddr:   upspin.NetAddr("http://localhost:8080"),
@@ -56,12 +56,12 @@ func TestStorePut(t *testing.T) {
 	s := New("http://localhost:8080", mock)
 
 	contents := []byte("contents")
-	key, err := s.Put(contents)
+	ref, err := s.Put(contents)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
-	if key != contentKey {
-		t.Fatalf("Server gave us wrong location. Expected %v, got %v", contentKey, key)
+	if ref != contentRef {
+		t.Fatalf("Server gave us wrong location. Expected %v, got %v", contentRef, ref)
 	}
 	// Verify the server received the proper request
 	mock.Verify(t)
@@ -112,14 +112,14 @@ func TestStoreGetErrorEmptyKey(t *testing.T) {
 
 func TestStoreGetRedirect(t *testing.T) {
 	// The server will redirect the client to a new location
-	const LookupKey = "XX some hash XX"
+	const LookupRef = "XX some hash XX"
 	mock := nettest.NewMockHTTPClient(createMockGetResponse(t), []*http.Request{
-		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%s", LookupKey), nil),
+		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%s", LookupRef), nil),
 	})
 
 	s := New("http://localhost:8080", mock)
 
-	data, locs, err := s.Get(LookupKey)
+	data, locs, err := s.Get(LookupRef)
 
 	if data != nil {
 		t.Fatal("Got data when we expected to get redirected")
@@ -156,13 +156,13 @@ func TestStoreDeleteInvalidKey(t *testing.T) {
 }
 
 func TestStoreDelete(t *testing.T) {
-	const Key = "xyz"
+	const Ref = "xyz"
 	mock := nettest.NewMockHTTPClient(
 		[]nettest.MockHTTPResponse{nettest.NewMockHTTPResponse(200, "application/json", []byte(`{"error":"success"}`))},
-		[]*http.Request{nettest.NewRequest(t, netutil.Post, fmt.Sprintf("http://localhost:8080/delete?ref=%s", Key), nil)})
+		[]*http.Request{nettest.NewRequest(t, netutil.Post, fmt.Sprintf("http://localhost:8080/delete?ref=%s", Ref), nil)})
 
 	s := New("http://localhost:8080", mock)
-	err := s.Delete(Key)
+	err := s.Delete(Ref)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

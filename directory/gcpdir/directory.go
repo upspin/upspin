@@ -134,9 +134,9 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		}
 	}
 
-	// First, store the data itself, to find the key
+	// First, store the data itself, to find the reference.
 	// TODO: bind to the Store server pointed at by the dirEntry instead of using the default one.
-	key, err := d.storeService.Put(data)
+	ref, err := d.storeService.Put(data)
 	if err != nil {
 		log.Printf("storeService returned error: %v", err)
 		return zeroLoc, err
@@ -149,8 +149,8 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	dirEntry = &upspin.DirEntry{
 		Name: name,
 		Location: upspin.Location{
-			Key:      key,
-			Endpoint: d.storeService.Endpoint(),
+			Reference: ref,
+			Endpoint:  d.storeService.Endpoint(),
 		},
 		Metadata: upspin.Metadata{
 			IsDir:    false,
@@ -220,7 +220,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	dirEntry := upspin.DirEntry{
 		Name: parsed.Path(),
 		Location: upspin.Location{
-			// Key is ignored.
+			// Reference is ignored.
 			// Endpoint is where the Store server is.
 			Endpoint: parentEndpoint,
 		},

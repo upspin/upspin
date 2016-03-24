@@ -29,13 +29,13 @@ var (
 	errLookupBadConnection       = newError("Lookup", pathName, errBadConnection)
 	errPutBadConnection          = newError("Put", pathName, errBadConnection)
 	errGlobBadPattern            = newError("Glob", badPathName, errBadPatternUserName)
-	key                          = "the key"
+	ref                          = upspin.Reference("the reference")
 	fileContents                 = []byte("contents of file")
 	packData                     = append([]byte{byte(upspin.PlainPack)}, []byte("Packed metadata")...)
 	readers                      = []upspin.UserName{upspin.UserName("wife@jones.com")}
 	now                          = upspin.Now()
 	location                     = upspin.Location{
-		Key: key,
+		Reference: ref,
 		Endpoint: upspin.Endpoint{
 			Transport: upspin.GCP,
 			NetAddr:   upspin.NetAddr("http://localhost:8080"),
@@ -77,7 +77,7 @@ func TestMkdirError(t *testing.T) {
 
 func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
-	mkdirEntry.Location.Key = ""
+	mkdirEntry.Location.Reference = ""
 	mkdirEntry.Metadata.IsDir = true
 	mkdirEntry.Metadata.Time = 42
 	mkdirEntry.Metadata.Size = 0
@@ -98,8 +98,8 @@ func TestMkdir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	// GCP servers don't have a Key for directory entries since they're stored locally.
-	location.Key = ""
+	// GCP servers don't have a Reference for directory entries since they're stored locally.
+	location.Reference = ""
 	if loc != location {
 		t.Fatalf("Expected location %v, got %v", location, loc)
 	}
@@ -120,7 +120,7 @@ func newMockSuccessResponse(t *testing.T) nettest.MockHTTPResponse {
 }
 
 func newMockKeyResponse(t *testing.T) nettest.MockHTTPResponse {
-	keyJSON, err := json.Marshal(&struct{ Key string }{Key: key})
+	keyJSON, err := json.Marshal(&struct{ Key upspin.Reference }{Key: ref})
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)
 	}
@@ -284,8 +284,8 @@ func TestPut(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	if loc.Key != key {
-		t.Fatalf("Expected key %v, got %v", key, loc.Key)
+	if loc.Reference != ref {
+		t.Fatalf("Expected key %v, got %v", ref, loc.Reference)
 	}
 
 	// Verify we sent to the Directory service the key we got back from the Store server

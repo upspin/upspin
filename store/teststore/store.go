@@ -15,7 +15,7 @@ type Service struct {
 	// mu protects the fields below.
 	mu       sync.Mutex
 	endpoint upspin.Endpoint
-	blob     map[string][]byte // string is key made from SHA256 hash of data.
+	blob     map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
 }
 
 // This package (well, the Servie type) implements the upspin.Store interface.
@@ -33,29 +33,29 @@ func (s *Service) Endpoint() upspin.Endpoint {
 }
 
 // Put implements upspin.Store
-func (s *Service) Put(ciphertext []byte) (string, error) {
-	key := sha256key.Of(ciphertext).String()
+func (s *Service) Put(ciphertext []byte) (upspin.Reference, error) {
+	ref := upspin.Reference(sha256key.Of(ciphertext).String())
 	s.mu.Lock()
-	s.blob[key] = ciphertext
+	s.blob[ref] = ciphertext
 	s.mu.Unlock()
-	return key, nil
+	return ref, nil
 }
 
 // Delete implements upspin.Store
-func (s *Service) Delete(key string) error {
+func (s *Service) Delete(upspin.Reference) error {
 	return errors.New("Not implemented yet")
 }
 
 // Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
-func (s *Service) Get(key string) (ciphertext []byte, other []upspin.Location, err error) {
+func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
 	s.mu.Lock()
-	data, ok := s.blob[key]
+	data, ok := s.blob[ref]
 	s.mu.Unlock()
 	if !ok {
 		return nil, nil, errors.New("no such blob")
 	}
-	if sha256key.Of(data).String() != key {
+	if upspin.Reference(sha256key.Of(data).String()) != ref {
 		return nil, nil, errors.New("internal hash mismatch in Store.Get")
 	}
 	return copyOf(data), nil, nil
@@ -86,7 +86,7 @@ func init() {
 			Transport: upspin.InProcess,
 			NetAddr:   "", // Ignored.
 		},
-		blob: make(map[string][]byte),
+		blob: make(map[upspin.Reference][]byte),
 	}
 	bind.RegisterStore(transport, s)
 }

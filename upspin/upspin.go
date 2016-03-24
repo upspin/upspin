@@ -28,8 +28,8 @@ type Location struct {
 	// Endpoint identifies the machine or service where the data resides.
 	Endpoint Endpoint
 
-	// Key is the key that will retrieve the data from the endpoint.
-	Key string
+	// Reference is the key that will retrieve the data from the endpoint.
+	Reference Reference
 }
 
 // An Endpoint identifies an instance of a service, encompassing an address
@@ -47,6 +47,9 @@ type Endpoint struct {
 // A NetAddr is the network address of service. It is interpreted by Dialer's
 // Dial method to connect to the service.
 type NetAddr string
+
+// A Reference is the string identifying an item in a Store.
+type Reference string
 
 // PackData stores the encoded information used to pack the data in an
 // item, such decryption keys. The first byte identifies the Packing
@@ -246,7 +249,7 @@ type Metadata struct {
 type Store interface {
 	Dialer
 
-	// Get attempts to retrieve the data identified by the key.
+	// Get attempts to retrieve the data identified by the reference.
 	// Three things might happen:
 	// 1. The data is in this Store. It is returned. The Location slice
 	// and error are nil.
@@ -255,17 +258,17 @@ type Store interface {
 	// is returned. The data slice and error are nil.
 	// 3. An error occurs. The data and Location slices are nil
 	// and the error describes the problem.
-	Get(key string) ([]byte, []Location, error)
+	Get(ref Reference) ([]byte, []Location, error)
 
-	// Put puts the data into the store and returns the key
+	// Put puts the data into the store and returns the reference
 	// to be used to retrieve it.
-	Put(data []byte) (string, error)
+	Put(data []byte) (Reference, error)
 
 	// Delete permanently removes all storage space associated
-	// with key. After a successful Delete, calls to Get with the
+	// with the reference. After a successful Delete, calls to Get with the
 	// same key will fail. If a key is not found, an error is
 	// returned.
-	Delete(key string) error
+	Delete(ref Reference) error
 
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint

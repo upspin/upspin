@@ -81,6 +81,7 @@ func (s *storeServer) putHandler(sess *auth.Session, w http.ResponseWriter, r *h
 	}()
 
 	// Answer something sensible to the client.
+	// TODO: Change field to Ref or Reference.
 	keyStruct := &struct {
 		Key string
 	}{
@@ -123,7 +124,7 @@ func (s *storeServer) getHandler(sess *auth.Session, w http.ResponseWriter, r *h
 	}
 
 	location := upspin.Location{}
-	location.Key = link
+	location.Reference = upspin.Reference(link)
 	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
 	log.Printf("Got link: %v\n", link)
 	netutil.SendJSONReply(w, location)
