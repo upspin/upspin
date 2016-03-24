@@ -18,7 +18,7 @@ var (
 			Transport: upspin.GCP,
 			NetAddr:   "some server",
 		},
-		Key: "abcd",
+		Reference: "abcd",
 	}
 	dirEntry = upspin.DirEntry{
 		Name:     "foo",
@@ -38,8 +38,8 @@ func TestLocationResponse(t *testing.T) {
 	if loc == nil {
 		t.Fatal("Expected a valid location, got nil")
 	}
-	if loc.Key != location.Key {
-		t.Errorf("Expected key %v, got %v", location.Key, loc.Key)
+	if loc.Reference != location.Reference {
+		t.Errorf("Expected key %v, got %v", location.Reference, loc.Reference)
 	}
 }
 
@@ -119,8 +119,8 @@ func TestDirEntryResponse(t *testing.T) {
 	if dir == nil {
 		t.Fatal("Expected a valid dirEntry, got nil")
 	}
-	if dir.Location.Key != dirEntry.Location.Key {
-		t.Errorf("Expected key %v, got %v", dirEntry.Location.Key, dir.Location.Key)
+	if dir.Location.Reference != dirEntry.Location.Reference {
+		t.Errorf("Expected key %v, got %v", dirEntry.Location.Reference, dir.Location.Reference)
 	}
 }
 

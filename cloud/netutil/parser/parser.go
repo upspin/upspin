@@ -17,7 +17,7 @@ var (
 )
 
 type keyMessage struct {
-	Key string
+	Key upspin.Reference // TODO: Rename field to Ref or Reference.
 }
 
 type errorMessage struct {
@@ -39,10 +39,10 @@ func LocationResponse(body []byte) (*upspin.Location, error) {
 	return &loc, nil
 }
 
-// KeyResponse interprets the body of an HTTP response as a key in a
+// KeyResponse interprets the body of an HTTP response as a reference in a
 // proper JSON structure (example "{key:'foo'}"). If it's not in the
-// format of a key, it tries to read an error message instead.
-func KeyResponse(body []byte) (string, error) {
+// format of a refer, it tries to read an error message instead.
+func KeyResponse(body []byte) (upspin.Reference, error) {
 	if len(body) == 0 {
 		return "", errEmptyServerResponse
 	}

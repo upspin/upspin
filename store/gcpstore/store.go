@@ -67,16 +67,16 @@ func (s *Store) ServerUserName() string {
 }
 
 // Get implements Store.
-func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
+func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	const op = "Get"
-	if key == "" {
+	if ref == "" {
 		return nil, nil, newStoreError(op, invalidKeyError, "")
 	}
 	var request string
-	if strings.HasPrefix(key, "http://") || strings.HasPrefix(key, "https://") {
-		request = key
+	if strings.HasPrefix(string(ref), "http://") || strings.HasPrefix(string(ref), "https://") {
+		request = string(ref)
 	} else {
-		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, key)
+		request = fmt.Sprintf("%s/get?ref=%s", s.serverURL, ref)
 	}
 	httpReq, err := http.NewRequest(netutil.Get, request, nil)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
-		return nil, nil, newStoreError(op, fmt.Sprintf(serverError, err), key)
+		return nil, nil, newStoreError(op, fmt.Sprintf(serverError, err), ref)
 	}
 	defer resp.Body.Close()
 	// TODO(edpin): maybe add a limit here to the size of bytes we
@@ -99,7 +99,7 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 		// This is either a re-location reply or an error.
 		loc, err := parser.LocationResponse(body)
 		if err != nil {
-			return nil, nil, newStoreError(op, err.Error(), key)
+			return nil, nil, newStoreError(op, err.Error(), ref)
 		}
 		// If the server did not specify the endpoint, it's
 		// implicitly there; patch it.
@@ -121,60 +121,60 @@ func (s *Store) Get(key string) ([]byte, []upspin.Location, error) {
 }
 
 // Put implements Store.
-func (s *Store) Put(data []byte) (string, error) {
+func (s *Store) Put(data []byte) (upspin.Reference, error) {
 	const op = "Put"
-	var zeroKey string
+	var zeroRef upspin.Reference
 	bufFrom := bytes.NewBuffer(data)
 	var body bytes.Buffer
 	w := multipart.NewWriter(&body)
 	fw, err := w.CreateFormFile("file", "dummy")
 	if err != nil {
-		return zeroKey, newStoreError(op, err.Error(), "")
+		return zeroRef, newStoreError(op, err.Error(), "")
 	}
 	_, err = io.Copy(fw, bufFrom)
 	if err != nil {
-		return zeroKey, err
+		return zeroRef, err
 	}
 	err = w.Close()
 	if err != nil {
-		return zeroKey, err
+		return zeroRef, err
 	}
 	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", s.serverURL), &body)
 	if err != nil {
-		return zeroKey, err
+		return zeroRef, err
 	}
 	req.Header.Set(netutil.ContentType, w.FormDataContentType())
 
 	// Submit the request
 	respBody, err := s.requestAndReadResponseBody(op, "", req)
 	if err != nil {
-		return zeroKey, err
+		return zeroRef, err
 	}
 
 	// Parse the response
-	key, err := parser.KeyResponse(respBody)
+	ref, err := parser.KeyResponse(respBody)
 	if err != nil {
-		return zeroKey, newStoreError(op, fmt.Sprintf(serverError, err), "")
+		return zeroRef, newStoreError(op, fmt.Sprintf(serverError, err), "")
 	}
-	if key == "" {
-		return zeroKey, newStoreError(op, invalidKeyError, "")
+	if ref == "" {
+		return zeroRef, newStoreError(op, invalidKeyError, "")
 	}
-	return key, nil
+	return ref, nil
 }
 
 // Delete implements Store.
-func (s *Store) Delete(key string) error {
+func (s *Store) Delete(ref upspin.Reference) error {
 	const op = "Delete"
-	if key == "" {
+	if ref == "" {
 		return newStoreError(op, invalidKeyError, "")
 	}
 	// TODO: check if we own the file or otherwise are allowed to delete it.
-	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, key), nil)
+	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/delete?ref=%s", s.serverURL, ref), nil)
 	if err != nil {
 		return err
 	}
 
-	respBody, err := s.requestAndReadResponseBody(op, key, req)
+	respBody, err := s.requestAndReadResponseBody(op, ref, req)
 	if err != nil {
 		return err
 	}
@@ -191,15 +191,15 @@ func (s *Store) Delete(key string) error {
 // sends a given request over the HTTP client and parses the body of
 // the reply, using op and key to build an error if one is
 // encountered along the way.
-func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Request) ([]byte, error) {
+func (s *Store) requestAndReadResponseBody(op string, ref upspin.Reference, req *http.Request) ([]byte, error) {
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return nil, newStoreError(op, err.Error(), key)
+		return nil, newStoreError(op, err.Error(), ref)
 	}
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
-		return nil, newStoreError(op, fmt.Sprintf(serverError, resp.StatusCode), key)
+		return nil, newStoreError(op, fmt.Sprintf(serverError, resp.StatusCode), ref)
 	}
 
 	// Read the body of the response
@@ -207,7 +207,7 @@ func (s *Store) requestAndReadResponseBody(op string, key string, req *http.Requ
 	// TODO(edpin): maybe add a limit here to the size of bytes we return?
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, newStoreError(op, err.Error(), key)
+		return nil, newStoreError(op, err.Error(), ref)
 	}
 	return respBody, nil
 }
@@ -223,22 +223,22 @@ func (s *Store) Endpoint() upspin.Endpoint {
 type storeError struct {
 	op    string
 	error string
-	key   string
+	ref   upspin.Reference
 }
 
 // Error implements error
 func (s storeError) Error() string {
-	if s.key != "" {
-		return fmt.Sprintf("Store: %s: %s: %s", s.op, s.key, s.error)
+	if s.ref != "" {
+		return fmt.Sprintf("Store: %s: %s: %s", s.op, s.ref, s.error)
 	}
 	return fmt.Sprintf("Store: %s: %s", s.op, s.error)
 }
 
-func newStoreError(op string, error string, key string) *storeError {
+func newStoreError(op string, error string, ref upspin.Reference) *storeError {
 	return &storeError{
 		op:    op,
 		error: error,
-		key:   key,
+		ref:   ref,
 	}
 }
 

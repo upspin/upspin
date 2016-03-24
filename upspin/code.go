@@ -59,8 +59,8 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, byte(d.Location.Endpoint.Transport))
 	b = appendString(b, string(d.Location.Endpoint.NetAddr))
 	// Location.Key:
-	//	Key: count N followed by N bytes.
-	b = appendString(b, d.Location.Key)
+	//	Reference: count N followed by N bytes.
+	b = appendString(b, string(d.Location.Reference))
 
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)
@@ -134,14 +134,14 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	d.Location.Endpoint.NetAddr = NetAddr(bytes)
 
-	// d.Location.Key
+	// d.Location.Reference
 	//	Packing: 1 byte.
 	//	Key: count N followed by N bytes.
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort
 	}
-	d.Location.Key = string(bytes)
+	d.Location.Reference = Reference(bytes)
 
 	// Metadata.
 	//	IsDir: 1 byte (0 false, 1 true)

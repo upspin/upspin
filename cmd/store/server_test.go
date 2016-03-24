@@ -56,7 +56,7 @@ func TestDeleteInvalidRequestType(t *testing.T) {
 func TestGetRemoteFile(t *testing.T) {
 	const RetLink = "http://here-you-go.com"
 	loc := upspin.Location{}
-	loc.Key = RetLink
+	loc.Reference = RetLink
 	loc.Endpoint.Transport = upspin.GCP
 	locJSON, err := json.Marshal(loc)
 	if err != nil {
