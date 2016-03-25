@@ -164,8 +164,8 @@ func newDummyUserServer() *userServer {
 // verification.
 func newUserServerWithMocking(data []byte) (*userServer, *gcptest.ExpectDownloadCapturePutGCP) {
 	mockGCP := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:         mockUser,
-		Data:        data,
+		Ref:         []string{mockUser},
+		Data:        [][]byte{data},
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
