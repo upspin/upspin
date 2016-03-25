@@ -39,10 +39,7 @@ var (
 
 func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
 	resp := nettest.NewExpectingResponseWriter(errorExpected)
-	jsonStr, err := json.Marshal(dirEntry)
-	if err != nil {
-		t.Fatalf("Can't marshal dirEntry: %v", err)
-	}
+	jsonStr := toJSON(t, dirEntry)
 	req, err := http.NewRequest("POST", "http://localhost:8080/put", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
@@ -113,7 +110,7 @@ func TestPutErrorFileNoDir(t *testing.T) {
 		Metadata: makeValidMeta(),
 	}
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref: "something that does not match",
+		Ref: []string{"something that does not match"},
 	}
 
 	ds := newDirServer(egcp)
@@ -124,7 +121,7 @@ func TestLookupPathNotFound(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: get: o@foo.bar/invalid/invalid/invalid: path not found"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname=o@foo.bar/invalid/invalid/invalid", nil)
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref: "something that does not match",
+		Ref: []string{"something that does not match"},
 	}
 
 	ds := newDirServer(egcp)
@@ -150,24 +147,68 @@ func TestList(t *testing.T) {
 
 func TestPutNotDir(t *testing.T) {
 	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON, err := json.Marshal(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dirEntryJSON := toJSON(t, dir)
 	// The DirEntry of the parent, converted to JSON.
 	notDirParent := dirParent
 	notDirParent.Metadata.IsDir = false
-	dirParentJSON, err := json.Marshal(notDirParent)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dirParentJSON := toJSON(t, notDirParent)
 
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: verify: test@foo.com/mydir/myfile.txt: parent of path is not a directory"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  parentPathName,
-		Data: dirParentJSON,
+		Ref:  []string{parentPathName},
+		Data: [][]byte{dirParentJSON},
+	}
+
+	ds := newDirServer(egcp)
+	ds.putHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
+func TestPutFileOverwritesDir(t *testing.T) {
+	// The DirEntry we're trying to Put, converted to JSON.
+	dirEntryJSON := toJSON(t, dir)
+	// The DirEntry of the parent, converted to JSON.
+	dirParentJSON := toJSON(t, dirParent)
+
+	// The dir entry we're trying to add already exists as a directory.
+	existingDirEntry := dir
+	existingDirEntry.Metadata.IsDir = true
+	existingDirEntryJSON := toJSON(t, existingDirEntry)
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: Overwriting dir with file"}`)
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{parentPathName, pathName},
+		Data: [][]byte{dirParentJSON, existingDirEntryJSON},
+	}
+
+	ds := newDirServer(egcp)
+	ds.putHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
+func TestPutDirOverwritesFile(t *testing.T) {
+	// The DirEntry we're trying to Put, converted to JSON.
+	newDir := dir
+	newDir.Metadata.IsDir = true
+	dirEntryJSON := toJSON(t, newDir)
+
+	// The DirEntry of the parent, converted to JSON.
+	dirParentJSON := toJSON(t, dirParent)
+
+	// The dir entry we're trying to add already exists as a file.
+	existingDirEntry := dir
+	existingDirEntryJSON := toJSON(t, existingDirEntry)
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: Overwriting file with dir"}`)
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{parentPathName, pathName},
+		Data: [][]byte{dirParentJSON, existingDirEntryJSON},
 	}
 
 	ds := newDirServer(egcp)
@@ -177,22 +218,17 @@ func TestPutNotDir(t *testing.T) {
 
 func TestPut(t *testing.T) {
 	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON, err := json.Marshal(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dirEntryJSON := toJSON(t, dir)
+
 	// The DirEntry of the parent, converted to JSON.
-	dirParentJSON, err := json.Marshal(dirParent)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dirParentJSON := toJSON(t, dirParent)
 
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  "test@foo.com/mydir",
-		Data: dirParentJSON,
+		Ref:  []string{"test@foo.com/mydir"},
+		Data: [][]byte{dirParentJSON},
 	}
 
 	ds := newDirServer(egcp)
@@ -201,14 +237,11 @@ func TestPut(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	dirEntryJSON, err := json.Marshal(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dirEntryJSON := toJSON(t, dir)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  "test@foo.com/mydir/myfile.txt",
-		Data: dirEntryJSON,
+		Ref:  []string{"test@foo.com/mydir/myfile.txt"},
+		Data: [][]byte{dirEntryJSON},
 	}
 
 	resp := nettest.NewExpectingResponseWriter(string(dirEntryJSON))
@@ -217,6 +250,14 @@ func TestGet(t *testing.T) {
 	ds := newDirServer(egcp)
 	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
+}
+
+func toJSON(t *testing.T, data interface{}) []byte {
+	ret, err := json.Marshal(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ret
 }
 
 func newDummyDirServer() *dirServer {
