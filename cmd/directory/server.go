@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
@@ -31,6 +32,9 @@ var (
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	errEntryNotFound      = newDirError("download", "", "pathname not found")
+
+	logErr = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC)
+	logMsg = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LUTC)
 )
 
 type dirServer struct {
@@ -104,16 +108,19 @@ func (d *dirServer) putHandler(sess auth.Session, w http.ResponseWriter, r *http
 	dirEntry := &upspin.DirEntry{}
 	err := json.Unmarshal(buf, dirEntry)
 	if err != nil {
-		netutil.SendJSONError(w, "error unmarshaling:", err)
+		retErr := newDirError(op, dirEntry.Name, fmt.Sprintf("unmarshal: %s", err))
+		netutil.SendJSONError(w, context, retErr)
+		logErr.Println(retErr)
 		return
 	}
 	// TODO: verify ACLs before applying put.
 	err = d.createDirEntry(op, dirEntry)
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
+		logErr.Println(err)
 		return
 	}
-	fmt.Printf("%s: %q %q\n", op, sess.User(), dirEntry.Name)
+	logMsg.Printf("%s: %q %q\n", op, sess.User(), dirEntry.Name)
 	netutil.SendJSONErrorString(w, "success")
 }
 
@@ -139,11 +146,11 @@ func (d *dirServer) createDirEntry(op string, dirEntry *upspin.DirEntry) error {
 		return newDirError(op, path, err.Error())
 	}
 	if err == nil {
-		if otherDir.Metadata.IsDir && !dirEntry.Metadata.IsDir {
-			return newDirError(op, path, "Overwriting dir with file")
+		if otherDir.Metadata.IsDir {
+			return newDirError(op, path, "directory already exists")
 		}
-		if !otherDir.Metadata.IsDir && dirEntry.Metadata.IsDir {
-			return newDirError(op, path, "Overwriting file with dir")
+		if dirEntry.Metadata.IsDir {
+			return newDirError(op, path, "overwriting file with directory")
 		}
 	}
 	// Either err is nil (dir entry existed and is not ovewriting the wrong kind of entry) or it's not found.
@@ -180,7 +187,7 @@ func (d *dirServer) verifyParentWritable(path path.Parsed) error {
 
 // getMeta returns the metadata for the given path.
 func (d *dirServer) getMeta(path upspin.PathName) (*upspin.DirEntry, error) {
-	fmt.Printf("Looking up dir entry %q on storage backend\n", path)
+	logMsg.Printf("Looking up dir entry %q on storage backend\n", path)
 	var dirEntry upspin.DirEntry
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
@@ -201,7 +208,7 @@ func (d *dirServer) putMeta(path upspin.PathName, dirEntry *upspin.DirEntry) err
 	if err != nil {
 		return newDirError("putmeta", path, fmt.Sprintf("conversion to json failed: %v", err))
 	}
-	fmt.Printf("Storing dir entry at %q\n", path)
+	logMsg.Printf("Storing dir entry at %q\n", path)
 	_, err = d.cloudClient.Put(string(path), jsonBuf)
 	return err
 }
@@ -216,11 +223,6 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 }
 
 func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	if r.URL == nil {
-		// This is so bad it's probably a panic at this point. URL should never be nil.
-		netutil.SendJSONErrorString(w, context+"server error: invalid URL")
-		return
-	}
 	err := r.ParseForm()
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
@@ -242,7 +244,7 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 	}
 	// We have a dirEntry. Marshal it and send it back.
 	// TODO: verify ACLs before replying.
-	fmt.Printf("Got dir entry for user %s: path %s: %s\n", sess.User(), pathName, dirEntry)
+	logMsg.Printf("Got dir entry for user %s: path %s: %s\n", sess.User(), pathName, dirEntry)
 	netutil.SendJSONReply(w, dirEntry)
 }
 
@@ -267,7 +269,7 @@ func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *htt
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	fmt.Printf("List request for prefix %q\n", prefix)
+	logMsg.Printf("List request for prefix %q\n", prefix)
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
@@ -294,13 +296,13 @@ func main() {
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
-			log.Fatal(err)
+			logErr.Fatal(err)
 		}
-		log.Println("Starting HTTPS server with SSL.")
-		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
+		logErr.Println("Starting HTTPS server with SSL.")
+		logErr.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
 	} else {
-		log.Println("Not using SSL certificate. Starting regular HTTP server.")
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+		logErr.Println("Not using SSL certificate. Starting regular HTTP server.")
+		logErr.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 	}
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+	logErr.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }

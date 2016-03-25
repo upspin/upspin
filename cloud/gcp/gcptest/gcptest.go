@@ -64,22 +64,26 @@ func (e *ExpectGetGCP) Get(ref string) (link string, error error) {
 }
 
 // ExpectDownloadCapturePutGCP inspects all calls to Download with the
-// given Ref and if it matches, it returns Data. It also captures all
-// Put requests.
+// given Ref and if it matches, it returns Data. Ref matches are strictly sequential.
+// It also captures all Put requests.
 type ExpectDownloadCapturePutGCP struct {
 	DummyGCP
-	// Expectation for calls to Download
-	Ref  string
-	Data []byte
+	// Expectations for calls to Download
+	Ref  []string
+	Data [][]byte
 	// Storage for calls to Put
 	PutRef      []string
 	PutContents [][]byte
+
+	pos int // position of the next Ref to match
 }
 
 // Download implements GCP.
 func (e *ExpectDownloadCapturePutGCP) Download(ref string) ([]byte, error) {
-	if ref == e.Ref {
-		return e.Data, nil
+	if e.pos < len(e.Ref) && ref == e.Ref[e.pos] {
+		data := e.Data[e.pos]
+		e.pos++
+		return data, nil
 	}
 	return nil, errors.New("not found")
 }
