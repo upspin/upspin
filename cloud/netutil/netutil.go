@@ -24,6 +24,12 @@ const (
 
 	// Post is the POST method.
 	Post = "POST"
+
+	// Patch is the PATCH method.
+	Patch = "PATCH"
+
+	// Put is the PUT method.
+	Put = "PUT"
 )
 
 // TODO(edpin): Rename this to get rid of 'Interface'.

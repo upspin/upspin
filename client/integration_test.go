@@ -21,6 +21,8 @@ import (
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
+	"strings"
+
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
@@ -30,10 +32,11 @@ import (
 )
 
 const (
-	fileContents  = "contents"
-	userName      = "upspin-test@google.com"              // not a real GAIA account.
-	userToShare   = "upspin-friend-test@google.com"       // not a real GAIA account.
-	untrustedUser = "upspin-not-a-friend-test@google.com" // not a real GAIA account.
+	fileContents     = "contents"
+	userName         = "upspin-test@google.com"              // not a real GAIA account.
+	userToShare      = "upspin-friend-test@google.com"       // not a real GAIA account.
+	untrustedUser    = "upspin-not-a-friend-test@google.com" // not a real GAIA account.
+	dirAlreadyExists = "directory already exists"
 )
 
 var (
@@ -115,7 +118,7 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 
 	// Ensure user has root.
 	_, err = context.Directory.MakeDirectory(path.Join(upspin.PathName(userName), "/"))
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
 		log.Fatal("Can't create root: %s", err)
 	}
 }
@@ -127,11 +130,14 @@ func testMkdir(context *upspin.Context, t *testing.T) {
 	dirPath := path.Join(upspin.PathName(userName), "mydir")
 	loc, err := c.MakeDirectory(dirPath)
 	if err != nil {
-		t.Fatal(err)
-	}
-	var zeroLoc upspin.Location
-	if loc == zeroLoc {
-		t.Errorf("Expected a real location, got zero")
+		if !strings.Contains(err.Error(), dirAlreadyExists) {
+			t.Fatal(err)
+		}
+	} else {
+		var zeroLoc upspin.Location
+		if loc == zeroLoc {
+			t.Errorf("Expected a real location, got zero")
+		}
 	}
 	// Look inside the dir entry to make sure it got created.
 	entry, err := context.Directory.Lookup(dirPath)
@@ -215,10 +221,9 @@ func testGlob(context *upspin.Context, t *testing.T) {
 	for i := 0; i <= 10; i++ {
 		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", userName, i))
 		_, err := c.MakeDirectory(dirPath)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
 			t.Fatal(err)
 		}
-
 	}
 	dirEntries, err := c.Glob(userName + "/mydir[0-1]*")
 	if err != nil {
