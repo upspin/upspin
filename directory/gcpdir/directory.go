@@ -279,22 +279,28 @@ func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 	prefix := parsed.First(clear).String()
-	log.Printf("Globbing prefix %v with pattern %v\n", prefix, pattern)
+	depth := len(parsed.Elems) - clear
+	dirs := struct{ Names []string }{}
+	if depth > 0 {
+		log.Printf("Globbing prefix %v with pattern %v, depth %d\n", prefix, pattern, depth)
 
-	// Issue request
-	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/list?prefix=%s", d.serverURL, prefix), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := d.requestAndReadResponseBody(op, pathPattern, req)
-	if err != nil {
-		return nil, err
-	}
-	// Interpret bytes as an annonymous JSON struct
-	dirs := &struct{ Names []string }{}
-	err = json.Unmarshal(body, dirs)
-	if err != nil {
-		return nil, err
+		// Issue request
+		req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/list?prefix=%s&depth=%d", d.serverURL, prefix, depth), nil)
+		if err != nil {
+			return nil, err
+		}
+		body, err := d.requestAndReadResponseBody(op, pathPattern, req)
+		if err != nil {
+			return nil, err
+		}
+		// Interpret bytes as an annonymous JSON struct
+		err = json.Unmarshal(body, &dirs)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// There is no depth, meaning we're trying to Glob a single file. Just look it up then.
+		dirs.Names = []string{prefix}
 	}
 	log.Printf("To be globbed: %v", dirs)
 

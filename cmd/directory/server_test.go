@@ -97,7 +97,7 @@ func TestListMissingPrefix(t *testing.T) {
 
 func TestListBadPath(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: bad user name in path"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file", nil)
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file&depth=3", nil)
 
 	ds := newDummyDirServer()
 	ds.listHandler(dummySess, resp, req)
@@ -131,14 +131,13 @@ func TestLookupPathNotFound(t *testing.T) {
 
 func TestList(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"Names":["testuser@google.com/subdir/","testuser@google.com/subdir/test.txt"]}`)
-	req, err := http.NewRequest("GET", "http://localhost:8080/list?prefix=testuser@google.com/sub", nil)
+	req, err := http.NewRequest("GET", "http://localhost:8080/list?prefix=testuser@google.com/sub&depth=3", nil)
 	if err != nil {
 		t.Fatalf("Can't make new request: %v", err)
 	}
 	lgcp := &listGCP{
 		prefix:    "testuser@google.com/sub",
 		fileNames: []string{"testuser@google.com/subdir/", "testuser@google.com/subdir/test.txt"},
-		fileLinks: []string{"http://a.com", "http://b.com"},
 	}
 	ds := newDirServer(lgcp)
 	ds.listHandler(dummySess, resp, req)
@@ -402,12 +401,11 @@ type listGCP struct {
 	gcptest.DummyGCP
 	prefix    string
 	fileNames []string
-	fileLinks []string
 }
 
-func (l *listGCP) List(prefix string) (name []string, link []string, err error) {
+func (l *listGCP) ListPrefix(prefix string, depth int) ([]string, error) {
 	if l.prefix == prefix {
-		return l.fileNames, l.fileLinks, nil
+		return l.fileNames, nil
 	}
-	return []string{}, []string{}, errors.New("Not found")
+	return []string{}, errors.New("Not found")
 }

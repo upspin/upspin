@@ -3,6 +3,7 @@ package gcp
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -113,24 +114,139 @@ func TestPutLocalFile(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
-	_, err := client.Put(fileName, testData)
+func Put(t *testing.T, path string) {
+	_, err := client.Put(path, testData)
 	if err != nil {
 		t.Fatal(err)
 	}
-	names, links, err := client.List("test-f") // prefix for "test-file" above
+}
+
+func setupDirectoryTree(t *testing.T) {
+	Put(t, "a")
+	Put(t, "a/b")
+	Put(t, "a/b/c")
+	Put(t, "a/b/c/d1")
+	Put(t, "a/b/c/d2")
+	Put(t, "a/b/c/d1/e11")
+	Put(t, "a/b/c/d1/e12")
+	Put(t, "a/b/c/d1/e13")
+	Put(t, "a/b/c/d2/e21")
+	Put(t, "a/b/c/d2/e22")
+	Put(t, "a/b/c/d2/e23")
+}
+
+func TestList(t *testing.T) {
+	setupDirectoryTree(t)
+	type testResult struct {
+		prefix   string
+		depth    int
+		expected []string
+	}
+
+	tests := []testResult{
+		testResult{
+			prefix: "a/b",
+			depth:  0,
+			expected: []string{
+				"a/b",
+			},
+		},
+		testResult{
+			prefix: "a/b",
+			depth:  1,
+			expected: []string{
+				"a/b",
+				"a/b/c",
+			},
+		},
+		testResult{
+			prefix: "a/b",
+			depth:  2,
+			expected: []string{
+				"a/b",
+				"a/b/c",
+				"a/b/c/d1",
+				"a/b/c/d2",
+			},
+		},
+		testResult{
+			prefix: "a/b",
+			depth:  3,
+			expected: []string{
+				"a/b",
+				"a/b/c",
+				"a/b/c/d1",
+				"a/b/c/d1/e11",
+				"a/b/c/d1/e12",
+				"a/b/c/d1/e13",
+				"a/b/c/d2",
+				"a/b/c/d2/e21",
+				"a/b/c/d2/e22",
+				"a/b/c/d2/e23",
+			},
+		},
+		testResult{
+			prefix: "a",
+			depth:  4,
+			expected: []string{
+				"a",
+				"a/b",
+				"a/b/c",
+				"a/b/c/d1",
+				"a/b/c/d1/e11",
+				"a/b/c/d1/e12",
+				"a/b/c/d1/e13",
+				"a/b/c/d2",
+				"a/b/c/d2/e21",
+				"a/b/c/d2/e22",
+				"a/b/c/d2/e23",
+			},
+		},
+	}
+	for i, _ := range tests {
+		testListPrefix(t, tests[i].prefix, tests[i].depth, tests[i].expected)
+	}
+}
+
+func contains(needle string, haystack []string) bool {
+	for _, elem := range haystack {
+		if elem == needle {
+			return true
+		}
+	}
+	return false
+}
+
+func testListPrefix(t *testing.T, prefix string, depth int, expected []string) {
+	names, err := client.ListPrefix(prefix, depth)
 	if err != nil {
 		t.Fatalf("Error in client.List: %v", err)
 	}
-	if len(names) != 1 {
-		t.Fatalf("Expected 1 result, got %d", len(names))
+	log.Printf("Prefix: got: %+v", names)
+	if len(names) != len(expected) {
+		t.Fatalf("Expected %d results, got %d", len(expected), len(names))
 	}
-	expectedName := "test-file"
-	if names[0] != expectedName {
-		t.Errorf("Expected file name %v, got %v", expectedName, names[0])
+	for _, e := range expected {
+		if !contains(e, names) {
+			t.Errorf("%s %d: %q not found", prefix, depth, e)
+		}
 	}
-	if !strings.HasPrefix(links[0], "https://") {
-		t.Errorf("Expected download link prefix https:// prefix, got %v", links[0])
+}
+
+func TestListDir(t *testing.T) {
+	prefix := "a/b/c/d1/"
+	names, err := client.ListDir(prefix)
+	if err != nil {
+		t.Fatalf("Error in client.List: %v", err)
+	}
+	expected := []string{prefix + "e11", prefix + "e12", prefix + "e13"}
+	if len(names) != len(expected) {
+		t.Fatalf("Expected 3 results, got %d", len(names))
+	}
+	for _, e := range expected {
+		if !contains(e, names) {
+			t.Errorf("Expected %q, not found", e)
+		}
 	}
 }
 
