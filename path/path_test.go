@@ -16,28 +16,30 @@ func newP(elems []string) Parsed {
 type parseTest struct {
 	path     upspin.PathName
 	parse    Parsed
+	isRoot   bool
 	filePath string
 }
 
 var goodParseTests = []parseTest{
-	{"u@google.com", newP([]string{}), "/"},
-	{"u@google.com/", newP([]string{}), "/"},
-	{"u@google.com/a", newP([]string{"a"}), "/a"},
-	{"u@google.com/a/", newP([]string{"a"}), "/a"},
-	{"u@google.com/a///b/c/d/", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
-	{"u@google.com//a///b/c/d//", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
+	{"u@google.com", newP([]string{}), true, "/"},
+	{"u@google.com/", newP([]string{}), true, "/"},
+	{"u@google.com/a", newP([]string{"a"}), false, "/a"},
+	{"u@google.com/a/", newP([]string{"a"}), false, "/a"},
+	{"u@google.com/a///b/c/d/", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
+	{"u@google.com//a///b/c/d//", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
 	// Longer than the backing array in Parsed.
 	{"u@google.com/a/b/c/d/e/f/g/h/i/j/k/l/m",
 		newP([]string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"}),
+		false,
 		"/a/b/c/d/e/f/g/h/i/j/k/l/m"},
 	// Dot.
-	{"u@google.com/.", newP([]string{}), "/"},
-	{"u@google.com/a/../b", newP([]string{"b"}), "/b"},
-	{"u@google.com/./a///b/./c/d/./.", newP([]string{"a", "b", "c", "d"}), "/a/b/c/d"},
+	{"u@google.com/.", newP([]string{}), true, "/"},
+	{"u@google.com/a/../b", newP([]string{"b"}), false, "/b"},
+	{"u@google.com/./a///b/./c/d/./.", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
 	// Dot-Dot.
-	{"u@google.com/..", newP([]string{}), "/"},
-	{"u@google.com/a/../b", newP([]string{"b"}), "/b"},
-	{"u@google.com/../a///b/../c/d/..", newP([]string{"a", "c"}), "/a/c"},
+	{"u@google.com/..", newP([]string{}), true, "/"},
+	{"u@google.com/a/../b", newP([]string{"b"}), false, "/b"},
+	{"u@google.com/../a///b/../c/d/..", newP([]string{"a", "c"}), false, "/a/c"},
 }
 
 func TestParse(t *testing.T) {
@@ -50,6 +52,9 @@ func TestParse(t *testing.T) {
 		if !pn.Equal(test.parse) {
 			t.Errorf("%q: expected %v got %v", test.path, test.parse, pn)
 			continue
+		}
+		if test.isRoot != pn.IsRoot() {
+			t.Errorf("%q: expected IsRoot %v, got %v", test.path, test.isRoot, pn.IsRoot())
 		}
 		filePath := pn.FilePath()
 		if filePath != test.filePath {
