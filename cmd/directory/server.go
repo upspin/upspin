@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -69,22 +70,7 @@ func newDirError(op string, path upspin.PathName, err string) *dirError {
 	}
 }
 
-// verifyDirEntry checks that the dirEntry given by the user is
-// minimally valid (we can't enforce a crypto verification here, that
-// can only be done in the client). It returns a parsed path or an
-// error if one occurred.
-func verifyDirEntry(dirEntry *upspin.DirEntry) (path.Parsed, error) {
-	// Can we parse this path?
-	parsedPath, err := path.Parse(dirEntry.Name)
-	if err != nil {
-		return parsedPath, newDirError("verifyDirEntry", dirEntry.Name, err.Error())
-	}
-	// Checks the metadata
-	return parsedPath, verifyMetadata(parsedPath.Path(), dirEntry.Metadata)
-}
-
-// verifyMetadata checks that the metadata portion of the DirEntry is
-// minimally valid.
+// verifyMetadata checks that the metadata is minimally valid.
 func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 	if meta.Sequence < 0 {
 		return newDirError("verifyMeta", path, "invalid sequence number")
@@ -92,12 +78,12 @@ func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 	return nil
 }
 
-// putHandler handles file put requests, for storing or updating
+// dirHandler handles file put requests, for storing or updating
 // metadata information.
-func (d *dirServer) putHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "Put"
-	if r.Method != "POST" && r.Method != "PUT" {
-		netutil.SendJSONErrorString(w, "/put only handles POST http requests")
+	if r.Method != netutil.Post && r.Method != netutil.Put && r.Method != netutil.Patch {
+		netutil.SendJSONErrorString(w, "/put only handles POST, PUT or PATCH HTTP requests")
 		return
 	}
 	buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
@@ -113,60 +99,149 @@ func (d *dirServer) putHandler(sess auth.Session, w http.ResponseWriter, r *http
 		logErr.Println(retErr)
 		return
 	}
-	// TODO: verify ACLs before applying put.
-	err = d.createDirEntry(op, dirEntry)
+	parsed, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
-		logErr.Println(err)
 		return
 	}
-	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+
+	// TODO: verify ACLs before applying dir entry
+
+	switch r.Method {
+	case netutil.Post, netutil.Put:
+		d.putDirHandler(sess, w, &parsed, dirEntry)
+	case netutil.Patch:
+		d.patchHandler(sess, w, parsed.Path(), dirEntry)
+	default:
+		netutil.SendJSONError(w, context, fmt.Errorf("invalid HTTP method: %q", r.Method))
+	}
+}
+
+// patchHandler handles directory patch requests, for making partial updates to directory entries. parsedPath is a validated dirEntry.Name.
+func (d *dirServer) patchHandler(sess auth.Session, w http.ResponseWriter, parsedPath upspin.PathName, dirEntry *upspin.DirEntry) {
+	const op = "patch"
+	// Check that only allowed fields are being updated.
+	dirEntry.Name = "" // Name is not updatable.
+	if err := d.verifyUpdatableFields(dirEntry); err != nil {
+		netutil.SendJSONError(w, context, newDirError(op, parsedPath, err.Error()))
+		return
+	}
+	// Lookup original dir entry.
+	origDirEntry, err := d.getMeta(parsedPath)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// Merge fields.
+	mergedDirEntry := d.mergeDirEntries(origDirEntry, dirEntry) // NOTE: mergedDirEntry is an alias for origDirEntry.
+	// Apply mutation on stable storage.
+	err = d.putMeta(parsedPath, mergedDirEntry)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	logMsg.Printf("%s: %q %q", op, sess.User(), mergedDirEntry.Name)
 	netutil.SendJSONErrorString(w, "success")
 }
 
-// createDirEntry will attempt to write a new dirEntry to the back
-// end, provided several checks have passed first.
-func (d *dirServer) createDirEntry(op string, dirEntry *upspin.DirEntry) error {
-	parsedPath, err := verifyDirEntry(dirEntry)
-	if err != nil {
-		return err
+// verifyNonUpdatableFields reports an error if a partial dirEntry contains non-updatable fields.
+func (d *dirServer) verifyUpdatableFields(dir *upspin.DirEntry) error {
+	if dir.Name != "" {
+		return errors.New("Name is not updatable")
 	}
-	err = d.verifyParentWritable(parsedPath)
+	// Location may be updatable in the future, but right now it is not supported.
+	var zeroLoc upspin.Location
+	if dir.Location != zeroLoc {
+		return errors.New("Location is not updatable")
+	}
+	// Here we're simply checking whether there is a non-zero value in IsDir.
+	if dir.Metadata.IsDir {
+		return errors.New("IsDir is not updatable")
+	}
+	// All other metadata fields are updatable.
+	return nil
+}
+
+// mergeDirEntries merges dst and src together and returns dst. Only updatable fields are merged.
+func (d *dirServer) mergeDirEntries(dst, src *upspin.DirEntry) *upspin.DirEntry {
+	if src.Metadata.Sequence != 0 {
+		dst.Metadata.Sequence = src.Metadata.Sequence
+	}
+	if src.Metadata.Size != 0 {
+		dst.Metadata.Size = src.Metadata.Size
+	}
+	if src.Metadata.Time != 0 {
+		dst.Metadata.Time = src.Metadata.Time
+	}
+	if src.Metadata.Readers != nil {
+		dst.Metadata.Readers = src.Metadata.Readers
+	}
+	if src.Metadata.PackData != nil {
+		dst.Metadata.PackData = src.Metadata.PackData
+	}
+	return dst
+}
+
+// putDirHandler writes or overwrites a complete dirEntry to the back
+// end, provided several checks have passed first.
+func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, parsed *path.Parsed, dirEntry *upspin.DirEntry) {
+	const op = "Put"
+	err := verifyMetadata(parsed.Path(), dirEntry.Metadata)
 	if err != nil {
-		return err
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	err = d.verifyParentWritable(parsed)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
 	}
 
 	// Before we can create this entry, we verify that we're not
 	// trying to overwrite a file with a directory or a directory
 	// with a file. That's probably not what the user wanted
 	// anyway.
-	path := parsedPath.Path()
+	path := parsed.Path()
 	otherDir, err := d.getMeta(path)
 	if err != nil && err != errEntryNotFound {
-		return newDirError(op, path, err.Error())
+		netutil.SendJSONError(w, context, newDirError(op, path, err.Error()))
+		return
 	}
 	if err == nil {
 		if otherDir.Metadata.IsDir {
-			return newDirError(op, path, "directory already exists")
+			netutil.SendJSONError(w, context, newDirError(op, path, "directory already exists"))
+			return
 		}
 		if dirEntry.Metadata.IsDir {
-			return newDirError(op, path, "overwriting file with directory")
+			netutil.SendJSONError(w, context, newDirError(op, path, "overwriting file with directory"))
+			return
 		}
 	}
 	// Either err is nil (dir entry existed and is not ovewriting the wrong kind of entry) or it's not found.
 	// In both cases, we proceed to creating or overwriting the entry.
 
-	// Canonicalize the pathname
-	dirEntry.Name = parsedPath.Path()
+	if !parsed.IsRoot() {
+		// Canonicalize the pathname if not root
+		dirEntry.Name = path
+	} else {
+		// The root is special. Remove the backslash so that GCP has a file with metadata for the root.
+		path = upspin.PathName(parsed.User)
+	}
 
 	// Writes the entry
-	return d.putMeta(path, dirEntry)
+	err = d.putMeta(path, dirEntry)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+
+	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	netutil.SendJSONErrorString(w, "success")
 }
 
 // verifyParentWritable returns an error if the parent dir of a path cannot be written to.
-func (d *dirServer) verifyParentWritable(path path.Parsed) error {
-	l := len(path.Elems)
-	if l <= 1 {
+func (d *dirServer) verifyParentWritable(path *path.Parsed) error {
+	if path.IsRoot() {
 		// The root is a writable directory (modulo ACLs).
 		return nil
 	}
@@ -292,7 +367,10 @@ func main() {
 	})
 
 	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate))
-	http.HandleFunc("/put", ah.Handle(d.putHandler))
+
+	// TODO: put and get are HTTP verbs so this is ambiguous. Change this here
+	// and in clients to /dir and /lookup respectively.
+	http.HandleFunc("/put", ah.Handle(d.dirHandler))
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
 	http.HandleFunc("/list", ah.Handle(d.listHandler))
 
