@@ -33,9 +33,14 @@ func (m *DummyGCP) Put(ref string, contents []byte) (refLink string, error error
 	return "", nil
 }
 
-// List implements GCP.
-func (m *DummyGCP) List(prefix string) (name []string, link []string, err error) {
-	return []string{}, []string{}, nil
+// ListPrefix implements GCP.
+func (m *DummyGCP) ListPrefix(prefix string, depth int) ([]string, error) {
+	return []string{}, nil
+}
+
+// ListDir implements GCP.
+func (m *DummyGCP) ListDir(dir string) ([]string, error) {
+	return []string{}, nil
 }
 
 // Delete implements GCP.
