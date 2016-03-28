@@ -50,7 +50,6 @@ type wrappedKeys []wrappedKey
 type common struct {
 	ciphersuite  upspin.Packing
 	curve        elliptic.Curve
-	aesLen       int
 	packerString string
 }
 
@@ -69,6 +68,7 @@ type eep521 struct {
 }
 
 const (
+	aesKeyLen          = 32 // AES-256 because public cloud may receive multifile multikey attack
 	p256               = "p256"
 	p384               = "p384"
 	p521               = "p521"
@@ -80,7 +80,6 @@ func init() {
 		common{
 			ciphersuite:  upspin.EEp256Pack,
 			curve:        elliptic.P256(),
-			aesLen:       16,
 			packerString: p256,
 		},
 	})
@@ -88,7 +87,6 @@ func init() {
 		common{
 			ciphersuite:  upspin.EEp384Pack,
 			curve:        elliptic.P384(),
-			aesLen:       32,
 			packerString: p384,
 		},
 	})
@@ -96,7 +94,6 @@ func init() {
 		common{
 			ciphersuite:  upspin.EEp521Pack,
 			curve:        elliptic.P521(),
-			aesLen:       32,
 			packerString: p521,
 		},
 	})
@@ -157,7 +154,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	dkey := make([]byte, c.aesLen)
+	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
 		return 0, err
@@ -227,7 +224,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 		return 0, errTooShort
 	}
 	cleartext = cleartext[:len(ciphertext)]
-	dkey := make([]byte, c.aesLen)
+	dkey := make([]byte, aesKeyLen)
 	sig, wrap, err := c.pdUnmarshal(meta.PackData, pathname)
 	if err != nil {
 		return 0, err
@@ -324,7 +321,7 @@ func (c common) aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) 
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO reconsider salt
-	strong := make([]byte, c.aesLen)
+	strong := make([]byte, aesKeyLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
 		return
@@ -355,7 +352,7 @@ func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err e
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess)
-	strong := make([]byte, c.aesLen)
+	strong := make([]byte, aesKeyLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
 		log.Printf("Error reading from hkdf: %v", err)
@@ -373,7 +370,7 @@ func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err e
 		log.Printf("Error in creating new GCM block: %v", err)
 		return
 	}
-	dkey = make([]byte, 0, c.aesLen)
+	dkey = make([]byte, 0, aesKeyLen)
 	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
 	return
 }
@@ -383,7 +380,7 @@ func (c common) pdMarshal(dst *[]byte, sig signature, wrap []wrappedKey) error {
 	byteLen := (c.curve.Params().BitSize + 7) >> 3
 	// n big enough for ciphersuite, sig.r, sig.s, len(wrap), {keyHash, encrypted, nonce, X, y}
 	n := 1 + 2*byteLen + (1+5*len(wrap))*binary.MaxVarintLen64 +
-		len(wrap)*(sha256.Size+(c.aesLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
+		len(wrap)*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
 	// TODO great, but how is the ordinary user to know? maybe  PackdataLen(len(usernames))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
@@ -476,7 +473,7 @@ func pdGetBytes(dst *[]byte, src []byte) int {
 }
 
 func (c common) encrypt(ciphertext, cleartext, dkey []byte) (int, error) {
-	if len(dkey) != c.aesLen {
+	if len(dkey) != aesKeyLen {
 		return 0, errKeyLength
 	}
 	block, err := aes.NewCipher(dkey)
@@ -491,7 +488,7 @@ func (c common) encrypt(ciphertext, cleartext, dkey []byte) (int, error) {
 }
 
 func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
-	if len(dkey) != c.aesLen {
+	if len(dkey) != aesKeyLen {
 		return 0, errKeyLength
 	}
 	block, err := aes.NewCipher(dkey)
