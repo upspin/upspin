@@ -325,7 +325,7 @@ func TestGlob(t *testing.T) {
 		newResp(toJSON(t, newDirEntry(upspin.PathName(path1)))),
 	}
 	expectedRequests := []*http.Request{
-		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/list?prefix=a@b.co/dir1", nil),
+		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/list?prefix=a@b.co/dir1&depth=1", nil),
 		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path0), nil),
 		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path1), nil),
 	}

@@ -17,6 +17,8 @@ import (
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
+	"strconv"
+
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
@@ -349,12 +351,32 @@ func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *htt
 		netutil.SendJSONErrorString(w, context+"missing prefix in request")
 		return
 	}
+	depthStr := r.FormValue("depth")
+	if depthStr == "" {
+		netutil.SendJSONErrorString(w, context+"missing depth in request")
+		return
+	}
+	depth, err := strconv.ParseInt(depthStr, 10, 8)
+	if err != nil || depth > 30 {
+		netutil.SendJSONErrorString(w, context+"invalid depth")
+		return
+	}
 	_, err = path.Parse(upspin.PathName(prefix))
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	names, _, err := d.cloudClient.List(prefix)
+	var names []string
+	if depth == 1 {
+		n := len(prefix)
+		log.Printf("Depth: 1")
+		if prefix[n-1:n] != "/" {
+			prefix = prefix + "/"
+		}
+		names, err = d.cloudClient.ListDir(prefix)
+	} else {
+		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
+	}
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return

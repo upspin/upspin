@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 
+	"strings"
+
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
@@ -53,11 +55,12 @@ type GCP interface {
 	// Put stores the contents given as ref on GCP.
 	Put(ref string, contents []byte) (refLink string, error error)
 
-	// List returns all the filenames stored inside a given path
-	// prefix.  If successful, it returns two parallel slices
-	// containing for each file its name and a URL-encoded link to
-	// it.
-	List(prefix string) (name []string, link []string, err error)
+	// ListPrefix lists all files that match a given prefix, up to a certain depth, counting from the prefix,
+	// not absolute
+	ListPrefix(prefix string, depth int) ([]string, error)
+
+	// ListDir lists the contents of a given directory. It's equivalent to ListPrefix(dir, 1) but much more efficient.
+	ListDir(dir string) ([]string, error)
 
 	// Delete permanently removes all storage space associated
 	// with a ref.
@@ -151,43 +154,56 @@ func (gcp *gcpImpl) Put(ref string, contents []byte) (refLink string, error erro
 	return res.MediaLink, err
 }
 
-// List implements GCP.
-func (gcp *gcpImpl) List(prefix string) (name []string, link []string, err error) {
-	nextPageToken := ""
+func (gcp *gcpImpl) ListPrefix(prefix string, depth int) ([]string, error) {
+	var names []string
+	pageToken := ""
+	prefixDepth := strings.Count(prefix, "/")
 	for {
-		moreNames, moreLinks, nextPageToken, err := gcp.innerList(prefix, nextPageToken)
+		objs, err := gcp.service.Objects.List(gcp.bucketName).Prefix(prefix).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		name = append(name, moreNames...)
-		link = append(link, moreLinks...)
-		if nextPageToken == "" {
+		innerNames := make([]string, 0, len(objs.Items))
+		for _, o := range objs.Items {
+			// Only append o.Name if it doesn't violate depth.
+			objDepth := strings.Count(o.Name, "/")
+			netDepth := objDepth - prefixDepth
+			if netDepth < 0 {
+				log.Printf("Prefix match is crazy")
+				continue
+			}
+			if netDepth <= depth {
+				innerNames = append(innerNames, o.Name)
+			}
+		}
+		names = append(names, innerNames...)
+		if objs.NextPageToken == "" {
 			break
 		}
+		pageToken = objs.NextPageToken
 	}
-	return
+	return names, nil
 }
 
-// innerList is an internal function that does what List does, except
-// it accepts a continuation token and possibly returns one if there
-// are more objects to retrieve.
-func (gcp *gcpImpl) innerList(prefix, pageToken string) (name []string, link []string, nextPageToken string, error error) {
-	objs, err := gcp.service.Objects.List(gcp.bucketName).Prefix(prefix).Fields("items(name,mediaLink),nextPageToken").PageToken(pageToken).Do()
-	if err != nil {
-		return nil, nil, "", err
+func (gcp *gcpImpl) ListDir(dir string) ([]string, error) {
+	var names []string
+	pageToken := ""
+	for {
+		objs, err := gcp.service.Objects.List(gcp.bucketName).Prefix(dir).Delimiter("/").Fields("items(name),nextPageToken").PageToken(pageToken).Do()
+		if err != nil {
+			return nil, err
+		}
+		innerNames := make([]string, len(objs.Items))
+		for i, o := range objs.Items {
+			innerNames[i] = o.Name
+		}
+		names = append(names, innerNames...)
+		if objs.NextPageToken == "" {
+			break
+		}
+		pageToken = objs.NextPageToken
 	}
-	// objs.Items is a slice of Objects.
-
-	// Allocate space for all returned objects in this call.
-	name = make([]string, len(objs.Items))
-	link = make([]string, len(objs.Items))
-
-	for i, o := range objs.Items {
-		name[i] = o.Name
-		link[i] = o.MediaLink
-	}
-
-	return name, link, objs.NextPageToken, nil
+	return names, nil
 }
 
 // Delete implements GCP.

@@ -121,17 +121,11 @@ func get(pathName upspin.PathName) {
 }
 
 func ls(pathName upspin.PathName) {
-	var de []*upspin.DirEntry
-	var err error
-	n := len(pathName)
-	if pathName[n-1:n] == "/" {
-		de, err = c.Glob(string(pathName) + "*")
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-
+	de, err := c.Glob(string(pathName))
+	if err != nil {
+		log.Fatal(err)
 	}
+
 	if *longFormat {
 		printLongDirEntries(de)
 	} else {
@@ -141,7 +135,11 @@ func ls(pathName upspin.PathName) {
 
 func printShortDirEntries(de []*upspin.DirEntry) {
 	for _, e := range de {
-		fmt.Printf("%s\n", e.Name)
+		if e.Metadata.IsDir {
+			fmt.Printf("%s/\n", e.Name)
+		} else {
+			fmt.Printf("%s\n", e.Name)
+		}
 	}
 }
 
