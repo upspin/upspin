@@ -99,9 +99,10 @@ func TestMkdir(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	// GCP servers don't have a Reference for directory entries since they're stored locally.
-	location.Reference = ""
-	if loc != location {
-		t.Fatalf("Expected location %v, got %v", location, loc)
+	expectedLoc := location
+	expectedLoc.Reference = ""
+	if loc != expectedLoc {
+		t.Fatalf("Expected location %v, got %v", expectedLoc, loc)
 	}
 	// Verifies request was sent correctly
 	mock.Verify(t)
@@ -391,18 +392,28 @@ func TestAccess(t *testing.T) {
 	store := newStore(storeMock)
 
 	// Set up Directory
-	deParent := dirEntry
-	deParent.Name = parentPathName
-	deParent.Metadata.Readers = []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
-	deParentJSON := toJSON(t, deParent)
-	updateParentReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deParentJSON)
+	readers := []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
+	patchParent := upspin.DirEntry{
+		Name: parentPathName,
+		Metadata: upspin.Metadata{
+			Readers: readers,
+		},
+	}
+	patchParentJSON := toJSON(t, patchParent)
+	updateParentReq := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", patchParentJSON)
 
-	deAccess := deParent
-	deAccess.Name = accessPath
-	deAccess.Metadata.PackData = []byte{byte(upspin.PlainPack)} // Access file does not have packdata
-	deAccess.Metadata.Sequence = 17
-	deAccess.Metadata.Time = now
-	deAccess.Metadata.Size = uint64(len(accessControl))
+	deAccess := upspin.DirEntry{
+		Name:     accessPath,
+		Location: location,
+		Metadata: upspin.Metadata{
+			IsDir:    false,
+			Sequence: 17,
+			Size:     uint64(len(accessControl)),
+			Time:     now,
+			PackData: []byte{byte(upspin.PlainPack)}, // Access file does not have packdata
+			Readers:  readers,
+		},
+	}
 	deAccessJSON := toJSON(t, deAccess)
 	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8081/get?pathname=%s", parentPathName), nil)
 	putAccessReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deAccessJSON)

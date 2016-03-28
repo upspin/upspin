@@ -153,6 +153,11 @@ func (p Parsed) Drop(n int) Parsed {
 	return p
 }
 
+// IsRoot reports whether a parsed name refers to the user's root.
+func (p Parsed) IsRoot() bool {
+	return len(p.Elems) == 0
+}
+
 // Join appends any number of path elements onto a (possibly empty)
 // Upspin path, adding a separating slash if necessary. All empty
 // strings are ignored. The result, if non-empty, is passed through

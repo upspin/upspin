@@ -93,6 +93,7 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	}
 	// Now, let's make a directory entry to Put to the server
 	var dirEntry *upspin.DirEntry
+	var readers []upspin.UserName
 	// Check whether this is an Access file, which is special.
 	if access.IsAccessFile(name) {
 		if upspin.Packing(packdata[0]) != upspin.PlainPack {
@@ -104,16 +105,23 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 			return zeroLoc, newError(op, "", err) // err already contains name
 		}
 		// TODO: no support for groups yet.
-		readers := make([]upspin.UserName, 0, len(accessPerms.Readers))
+		readers = make([]upspin.UserName, 0, len(accessPerms.Readers))
 		for _, r := range accessPerms.Readers {
 			readers = append(readers, r.User)
 		}
 		// Overwrite parent's dir entry with new set of readers
-		parentDirEntry.Metadata.Readers = readers
-		err = d.storeDirEntry(op, parentDirEntry)
+		patchDirEntry := upspin.DirEntry{
+			Name: parentDirEntry.Name,
+			Metadata: upspin.Metadata{
+				Readers: readers,
+			},
+		}
+		err = d.storeDirEntry(op, netutil.Patch, &patchDirEntry)
 		if err != nil {
 			return zeroLoc, err
 		}
+	} else {
+		readers = parentDirEntry.Metadata.Readers
 	}
 
 	// Prepare default optionals.
@@ -158,17 +166,18 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 			Size:     commitOpts.Size,
 			Time:     commitOpts.Time,
 			PackData: packdata,
-			Readers:  parentDirEntry.Metadata.Readers, // Inherited from the parent.
+			Readers:  readers,
 		},
 	}
-	err = d.storeDirEntry(op, dirEntry)
+	err = d.storeDirEntry(op, netutil.Post, dirEntry)
 	if err != nil {
 		return zeroLoc, err
 	}
 	return dirEntry.Location, nil
 }
 
-func (d *Directory) storeDirEntry(op string, dirEntry *upspin.DirEntry) error {
+// storeDirEntry stores the given dirEntry in the server by applying an HTTP method (POST or PATCH accepted by server).
+func (d *Directory) storeDirEntry(op string, HTTPMethod string, dirEntry *upspin.DirEntry) error {
 	name := dirEntry.Name
 	// Encode dirEntry as JSON
 	dirEntryJSON, err := json.Marshal(dirEntry)
@@ -177,7 +186,7 @@ func (d *Directory) storeDirEntry(op string, dirEntry *upspin.DirEntry) error {
 	}
 
 	// Prepare a put request to the server
-	req, err := http.NewRequest(netutil.Post, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
+	req, err := http.NewRequest(HTTPMethod, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
 	if err != nil {
 		return newError(op, name, err)
 	}
@@ -233,7 +242,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Readers:  parentReaders,
 		},
 	}
-	err = d.storeDirEntry(op, &dirEntry)
+	err = d.storeDirEntry(op, netutil.Post, &dirEntry)
 	if err != nil {
 		return zeroLoc, err
 	}
