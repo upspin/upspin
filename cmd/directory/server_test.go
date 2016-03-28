@@ -50,14 +50,14 @@ func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected st
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"DirService: verifyDirEntry: no user name in path"}`)
+	Put(t, newDummyDirServer(), upspin.DirEntry{}, `{"error":"DirService: no user name in path"}`)
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newDummyDirServer(), dir, `{"error":"DirService: verifyDirEntry: a@x/myroot/myfile: no user name in path"}`)
+	Put(t, newDummyDirServer(), dir, `{"error":"DirService: no user name in path"}`)
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -234,6 +234,17 @@ func TestPut(t *testing.T) {
 	ds := newDirServer(egcp)
 	ds.putHandler(dummySess, resp, req)
 	resp.Verify(t)
+
+	// Verify what was actually put
+	if len(egcp.PutContents) != 1 {
+		t.Fatalf("Expected patch to write one dir entry, got %d", len(egcp.PutContents))
+	}
+	if egcp.PutRef[0] != string(dir.Name) {
+		t.Errorf("Expected put to write to %s, wrote to %s", dir.Name, egcp.PutRef)
+	}
+	if !bytes.Equal(dirEntryJSON, egcp.PutContents[0]) {
+		t.Errorf("Expected put to write %s, wrote %s", dirEntryJSON, egcp.PutContents[0])
+	}
 }
 
 func TestClientSendsBadDirEntry(t *testing.T) {
@@ -275,6 +286,102 @@ func TestGet(t *testing.T) {
 	ds := newDirServer(egcp)
 	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
+}
+
+func TestPatchErrorUpdateLocation(t *testing.T) {
+	updateDir := upspin.DirEntry{
+		Name: pathName,
+		Location: upspin.Location{
+			Reference: "new ref",
+		},
+	}
+	updateDirJSON := toJSON(t, updateDir)
+	dirEntryJSON := toJSON(t, dir) // original directory entry
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{pathName},
+		Data: [][]byte{dirEntryJSON}, // original directory entry
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: patch: test@foo.com/mydir/myfile.txt: Location is not updatable"}`)
+	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
+
+	ds := newDirServer(egcp)
+	ds.putHandler(dummySess, resp, req) // putHandler handles /put PATCH requests too
+	resp.Verify(t)
+}
+
+func TestPatchErrorPathNotFound(t *testing.T) {
+	updateDir := upspin.DirEntry{
+		Name: pathName,
+	}
+	updateDirJSON := toJSON(t, updateDir)
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref: []string{"does not match"},
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: download: pathname not found"}`)
+	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
+
+	ds := newDirServer(egcp)
+	ds.putHandler(dummySess, resp, req) // putHandler handles /put PATCH requests too
+	resp.Verify(t)
+}
+
+func TestPatch(t *testing.T) {
+	updateDir := upspin.DirEntry{
+		Name: pathName,
+		Metadata: upspin.Metadata{
+			Sequence: 39,
+			Time:     upspin.Time(2),
+			Size:     42,
+			PackData: []byte("new packdata too"),
+			Readers:  []upspin.UserName{upspin.UserName("updated@email.com")},
+		},
+	}
+	updateDirJSON := toJSON(t, updateDir)
+	dirEntryJSON := toJSON(t, dir) // original directory entry
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{pathName},
+		Data: [][]byte{dirEntryJSON}, // original directory entry
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
+
+	ds := newDirServer(egcp)
+	ds.putHandler(dummySess, resp, req) // putHandler handles /put PATCH requests too
+	resp.Verify(t)
+
+	// Now verify that the DirEntry that was put is the one with the update.
+	if len(egcp.PutContents) != 1 {
+		t.Fatalf("Expected patch to write one dir entry, got %d", len(egcp.PutContents))
+	}
+	var writtenDirEntry upspin.DirEntry
+	err := json.Unmarshal(egcp.PutContents[0], &writtenDirEntry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if writtenDirEntry.Name != pathName {
+		t.Errorf("Expected path %s, got %s", pathName, writtenDirEntry.Name)
+	}
+	if writtenDirEntry.Metadata.Sequence != updateDir.Metadata.Sequence {
+		t.Errorf("Expected sequence %d, got %d", updateDir.Metadata.Sequence, writtenDirEntry.Metadata.Sequence)
+	}
+	if writtenDirEntry.Metadata.Time != updateDir.Metadata.Time {
+		t.Errorf("Expected time %d, got %d", updateDir.Metadata.Time, writtenDirEntry.Metadata.Time)
+	}
+	if writtenDirEntry.Metadata.Size != updateDir.Metadata.Size {
+		t.Errorf("Expected time %d, got %d", updateDir.Metadata.Size, writtenDirEntry.Metadata.Size)
+	}
+	if string(writtenDirEntry.Metadata.PackData) != string(updateDir.Metadata.PackData) {
+		t.Errorf("Expected packdata %s, got %s", updateDir.Metadata.PackData, writtenDirEntry.Metadata.PackData)
+	}
+	if len(writtenDirEntry.Metadata.Readers) != len(updateDir.Metadata.Readers) {
+		t.Fatalf("Expected %d readers, got %d", len(updateDir.Metadata.Readers), len(writtenDirEntry.Metadata.Readers))
+	}
+	if writtenDirEntry.Metadata.Readers[0] != updateDir.Metadata.Readers[0] {
+		t.Errorf("Expected reader %s, got %s", updateDir.Metadata.Readers[0], writtenDirEntry.Metadata.Readers[0])
+	}
 }
 
 func toJSON(t *testing.T, data interface{}) []byte {
