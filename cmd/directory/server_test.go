@@ -78,7 +78,7 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 }
 
 func TestLookupPathError(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: missing pathname in request"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: missing pathname in request"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get", nil)
 
 	ds := newDummyDirServer()
@@ -142,6 +142,80 @@ func TestList(t *testing.T) {
 	ds := newDirServer(lgcp)
 	ds.listHandler(dummySess, resp, req)
 	resp.Verify(t)
+}
+
+func TestGlobComplex(t *testing.T) {
+	// Create dir entries for files that match that will be looked up after Globbing.
+	dir1 := upspin.DirEntry{
+		Name: "f@b.co/subdir/a.pdf",
+	}
+	dir1JSON := toJSON(t, dir1)
+	dir2 := upspin.DirEntry{
+		Name: "f@b.co/subdir2/b.pdf",
+	}
+	dir2JSON := toJSON(t, dir2)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{"f@b.co/subdir/a.pdf", "f@b.co/subdir2/b.pdf"},
+			Data: [][]byte{dir1JSON, dir2JSON},
+		},
+		prefix: "f@b.co/",
+		fileNames: []string{"f@b.co/subdir/a.pdf", "f@b.co/otherdir/b.pdf", "f@b.co/subfile",
+			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf"},
+	}
+
+	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2})
+	resp := nettest.NewExpectingResponseWriter(string(respBody))
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/sub*/*.pdf", nil)
+
+	ds := newDirServer(lgcp)
+	ds.globHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if lgcp.listDirCalled {
+		t.Error("Call to ListDir unexpected")
+	}
+	if !lgcp.listPrefixCalled {
+		t.Error("Expected call to ListPrefix")
+	}
+}
+
+func TestGlobSimple(t *testing.T) {
+	// Create dir entries for files that match that will be looked up after Globbing.
+	dir1 := upspin.DirEntry{
+		Name: "f@b.co/subdir/a.pdf",
+	}
+	dir1JSON := toJSON(t, dir1)
+	dir2 := upspin.DirEntry{
+		Name: "f@b.co/subdir/b.pdf",
+	}
+	dir2JSON := toJSON(t, dir2)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{"f@b.co/subdir/a.pdf", "f@b.co/subdir/b.pdf"},
+			Data: [][]byte{dir1JSON, dir2JSON},
+		},
+		prefix: "f@b.co/subdir/",
+		fileNames: []string{"f@b.co/subdir/a.pdf", "f@b.co/subdir/bpdf", "f@b.co/subdir/foo",
+			"f@b.co/subdir/notpdf", "f@b.co/subdir/b.pdf"},
+	}
+
+	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2})
+	resp := nettest.NewExpectingResponseWriter(string(respBody))
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/subdir/*.pdf", nil)
+
+	ds := newDirServer(lgcp)
+	ds.globHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if !lgcp.listDirCalled {
+		t.Error("Expected call to ListDir")
+	}
+	if lgcp.listPrefixCalled {
+		t.Error("Unexpected call to ListPrefix")
+	}
 }
 
 func TestPutNotDir(t *testing.T) {
@@ -395,16 +469,27 @@ func newDummyDirServer() *dirServer {
 	return newDirServer(&gcptest.DummyGCP{})
 }
 
-// listGCP is a DummyGCP that returns a slice of fileNames and
-// fileLinks if a call to List matches the expected prefix
+// listGCP is an ExpectDownloadCapturePutGCP that returns a slice of fileNames
+// if a call to ListPrefix or ListDir matches the expected prefix or dir.
 type listGCP struct {
-	gcptest.DummyGCP
-	prefix    string
-	fileNames []string
+	gcptest.ExpectDownloadCapturePutGCP
+	prefix           string
+	fileNames        []string
+	listPrefixCalled bool
+	listDirCalled    bool
 }
 
 func (l *listGCP) ListPrefix(prefix string, depth int) ([]string, error) {
+	l.listPrefixCalled = true
 	if l.prefix == prefix {
+		return l.fileNames, nil
+	}
+	return []string{}, errors.New("Not found")
+}
+
+func (l *listGCP) ListDir(dir string) ([]string, error) {
+	l.listDirCalled = true
+	if l.prefix == dir {
 		return l.fileNames, nil
 	}
 	return []string{}, errors.New("Not found")

@@ -267,65 +267,26 @@ func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, newError(op, pathPattern, err)
 	}
 
-	// As an optimization, we look for the longest prefix that
-	// does not contain a metacharacter -- this saves us from
-	// doing a full list operation if the matter of interest is
-	// deep in a sub directory.
-	clear := len(parsed.Elems)
-	for i, elem := range parsed.Elems {
-		if strings.ContainsAny(elem, "*?[]^") {
-			clear = i
-			break
-		}
+	// Issue request
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/glob?pattern=%s", d.serverURL, parsed.Path()), nil)
+	if err != nil {
+		return nil, err
 	}
-	prefix := parsed.First(clear).String()
-	depth := len(parsed.Elems) - clear
-	dirs := struct{ Names []string }{}
-	if depth > 0 {
-		log.Printf("Globbing prefix %v with pattern %v, depth %d\n", prefix, pattern, depth)
-
-		// Issue request
-		req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/list?prefix=%s&depth=%d", d.serverURL, prefix, depth), nil)
-		if err != nil {
-			return nil, err
-		}
-		body, err := d.requestAndReadResponseBody(op, pathPattern, req)
-		if err != nil {
-			return nil, err
-		}
-		// Interpret bytes as an annonymous JSON struct
-		err = json.Unmarshal(body, &dirs)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		// There is no depth, meaning we're trying to Glob a single file. Just look it up then.
-		dirs.Names = []string{prefix}
+	body, err := d.requestAndReadResponseBody(op, pathPattern, req)
+	if err != nil {
+		return nil, err
 	}
-	log.Printf("To be globbed: %v", dirs)
-
-	dirEntries := make([]*upspin.DirEntry, 0, len(dirs.Names))
-	// Now do the actual globbing.
-	var firstError error
-	for _, path := range dirs.Names {
-		// error is ignored as pattern is known valid
-		if match, _ := goPath.Match(pattern, path); match {
-			// Now fetch each DirEntry we need
-			log.Printf("Looking up: %v", path)
-			// TODO: should we include metadata?
-			de, err := d.Lookup(upspin.PathName(path))
-			if err != nil {
-				// Save the error but keep going
-				if firstError == nil {
-					firstError = err
-				}
-				continue
-			}
-			dirEntries = append(dirEntries, de)
-		}
+	// Interpret bytes as an annonymous JSON struct
+	var dirs []upspin.DirEntry
+	err = json.Unmarshal(body, &dirs)
+	if err != nil {
+		return nil, err
 	}
-
-	return dirEntries, firstError
+	dirPtrs := make([]*upspin.DirEntry, len(dirs))
+	for i := 0; i < len(dirs); i++ {
+		dirPtrs[i] = &dirs[i]
+	}
+	return dirPtrs, nil
 }
 
 // requestAndReadResponseBody is an internal helper function that
