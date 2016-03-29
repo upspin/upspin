@@ -78,12 +78,14 @@ func TestMkdirError(t *testing.T) {
 func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
 	mkdirEntry.Location.Reference = ""
-	mkdirEntry.Metadata.IsDir = true
-	mkdirEntry.Metadata.Time = 42
-	mkdirEntry.Metadata.Size = 0
-	mkdirEntry.Metadata.Sequence = 0
-	mkdirEntry.Metadata.PackData = nil
-	mkdirEntry.Metadata.Readers = readers
+	mkdirEntry.Metadata = upspin.Metadata{
+		IsDir:    true,
+		Time:     42,
+		Size:     0,
+		Sequence: 0,
+		PackData: nil,
+		Readers:  nil,
+	}
 	// Mkdir will first Lookup the parent, then perform the Mkdir itself
 	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
 	requestMkdir := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
@@ -224,15 +226,12 @@ func newStore(client netutil.HTTPClientInterface) upspin.Store {
 // inspections.
 func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse, dirClientRequest *http.Request) (upspin.Directory, *nettest.MockHTTPClient) {
 	// The HTTP client will return a sequence of responses, the
-	// first one will be to the Directory server, to Lookup the parent path.
-	// Then, the actual Store.Put request, followed by he Directory.Put request.
+	// first the actual Store.Put request, followed by the Directory.Put request.
 	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
-	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%s", parentPathName), nil)
-	parentLookupResp := newMockLookupParentResponse(t)[0]
 
 	mock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{parentLookupResp, newMockRefResponse(t), dirClientResponse},
-		[]*http.Request{parentLookupReq, storeReq, dirClientRequest})
+		[]nettest.MockHTTPResponse{newMockRefResponse(t), dirClientResponse},
+		[]*http.Request{storeReq, dirClientRequest})
 
 	// Get a Store client
 	s := newStore(mock)
@@ -273,15 +272,13 @@ func TestPutBadMeta(t *testing.T) {
 func TestPut(t *testing.T) {
 	respSuccess := newResp([]byte(`{"error":"success"}`))
 
-	de := dirEntry
-	de.Metadata.Readers = readers
-	dirEntryJSON := toJSON(t, de)
+	dirEntryJSON := toJSON(t, dirEntry)
 	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
 
 	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, &opts) // TODO: Options
+	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, &opts)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -349,7 +346,7 @@ func TestAccessErrorInvalidContents(t *testing.T) {
 	)
 
 	// Does not perform a lookup since the Access file is invalid.
-	mock := nettest.NewMockHTTPClient(newMockLookupParentResponse(t), []*http.Request{nettest.AnyRequest})
+	mock := doNothingHTTPClient
 	d := newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, nil)
 
 	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
@@ -404,15 +401,13 @@ func TestAccess(t *testing.T) {
 			Size:     uint64(len(accessControl)),
 			Time:     now,
 			PackData: []byte{byte(upspin.PlainPack)}, // Access file does not have packdata
-			Readers:  readers,
 		},
 	}
 	deAccessJSON := toJSON(t, deAccess)
-	parentLookupReq := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8081/get?pathname=%s", parentPathName), nil)
 	putAccessReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deAccessJSON)
 
-	requests := []*http.Request{parentLookupReq, updateParentReq, putAccessReq}
-	responses := []nettest.MockHTTPResponse{newMockLookupParentResponse(t)[0], newResp([]byte(success)), newResp([]byte(success))}
+	requests := []*http.Request{updateParentReq, putAccessReq}
+	responses := []nettest.MockHTTPResponse{newResp([]byte(success)), newResp([]byte(success))}
 
 	dirMock := nettest.NewMockHTTPClient(responses, requests)
 	d := newDirectory("http://localhost:8081", store, dirMock, nil)

@@ -85,33 +85,31 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	if err != nil {
 		return zeroLoc, newError(op, name, errors.New("invalid path"))
 	}
+	canonicalName := parsed.Path()
 
-	// Lookup parent directory
-	parentDirEntry, err := d.Lookup(parsed.Drop(1).Path())
-	if err != nil {
-		return zeroLoc, err
-	}
 	// Now, let's make a directory entry to Put to the server
 	var dirEntry *upspin.DirEntry
-	var readers []upspin.UserName
-	// Check whether this is an Access file, which is special.
-	if access.IsAccessFile(name) {
+
+	// Check whether this is an Access file, which is special and must be handled here, since the dir
+	// server does not see file contents.
+	if access.IsAccessFile(canonicalName) {
 		if upspin.Packing(packdata[0]) != upspin.PlainPack {
 			// The directory service must be able to read the bytes passed in.
-			return zeroLoc, newError(op, name, errors.New("packing must be plain for Access file"))
+			return zeroLoc, newError(op, canonicalName, errors.New("packing must be plain for Access file"))
 		}
-		accessPerms, err := access.Parse(name, data)
+		accessPerms, err := access.Parse(canonicalName, data)
 		if err != nil {
-			return zeroLoc, newError(op, "", err) // err already contains name
+			return zeroLoc, newError(op, "", err) // err already contains canonicalName
 		}
 		// TODO: no support for groups yet.
-		readers = make([]upspin.UserName, 0, len(accessPerms.Readers))
+		readers := make([]upspin.UserName, 0, len(accessPerms.Readers))
 		for _, r := range accessPerms.Readers {
 			readers = append(readers, r.User)
 		}
-		// Overwrite parent's dir entry with new set of readers
+
+		// Patch the parent dir with updated readers.
 		patchDirEntry := upspin.DirEntry{
-			Name: parentDirEntry.Name,
+			Name: parsed.Drop(1).Path(),
 			Metadata: upspin.Metadata{
 				Readers: readers,
 			},
@@ -120,8 +118,6 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		if err != nil {
 			return zeroLoc, err
 		}
-	} else {
-		readers = parentDirEntry.Metadata.Readers
 	}
 
 	// Prepare default optionals.
@@ -149,13 +145,13 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		log.Printf("storeService returned error: %v", err)
 		return zeroLoc, err
 	}
-	// We now have a final Location in loc. We now create a
+	// We now have a final Reference in ref. We now create a
 	// directory entry for this Location.  From here on, if an
 	// error occurs, we'll have a dangling block. We could delete
 	// it, but we can always do fsck-style operations to find them
 	// later.
 	dirEntry = &upspin.DirEntry{
-		Name: name,
+		Name: canonicalName,
 		Location: upspin.Location{
 			Reference: ref,
 			Endpoint:  d.storeService.Endpoint(),
@@ -166,13 +162,14 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 			Size:     commitOpts.Size,
 			Time:     commitOpts.Time,
 			PackData: packdata,
-			Readers:  readers,
+			Readers:  nil, // Server will update.
 		},
 	}
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)
 	if err != nil {
 		return zeroLoc, err
 	}
+
 	return dirEntry.Location, nil
 }
 
@@ -210,19 +207,17 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	if err != nil {
 		return zeroLoc, err
 	}
-	// Unless this is the root dir, we do a lookup to find the parent, so we can inherit Readers and Endpoint.
-	var parentReaders []upspin.UserName
+	// Unless this is the root dir, we do a lookup to find the parent, so we can inherit Endpoint.
 	parentEndpoint := upspin.Endpoint{ // Default endpoint, if parent does not have one.
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr(d.serverURL),
 	}
-	if len(parsed.Elems) > 0 {
+	if !parsed.IsRoot() {
 		parentDirEntry, err := d.Lookup(parsed.Drop(1).Path())
 		if err != nil {
 			return zeroLoc, err
 		}
 		parentEndpoint = parentDirEntry.Location.Endpoint
-		parentReaders = parentDirEntry.Metadata.Readers
 	}
 
 	// Prepares a request to put dirName to the server
@@ -230,7 +225,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 		Name: parsed.Path(),
 		Location: upspin.Location{
 			// Reference is ignored.
-			// Endpoint is where the Store server is.
+			// Endpoint for dir entries is where the Directory server is.
 			Endpoint: parentEndpoint,
 		},
 		Metadata: upspin.Metadata{
@@ -239,9 +234,10 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Size:     0, // Being explicit that dir entries have zero size.
 			Time:     d.timeNow(),
 			PackData: nil,
-			Readers:  parentReaders,
+			Readers:  nil, // Must be nil, server will fill in.
 		},
 	}
+	// TODO: dial the endpoint as listed in dirEntry and store it there instead.
 	err = d.storeDirEntry(op, netutil.Post, &dirEntry)
 	if err != nil {
 		return zeroLoc, err
