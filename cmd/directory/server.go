@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
@@ -16,8 +18,6 @@ import (
 	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	"strconv"
 
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
@@ -368,9 +368,8 @@ func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *htt
 	}
 	var names []string
 	if depth == 1 {
-		n := len(prefix)
 		// TODO: Should the server tweak this or let clients learn?
-		if prefix[n-1:n] != "/" {
+		if !strings.HasSuffix(prefix, "/") {
 			prefix = prefix + "/"
 		}
 		names, err = d.cloudClient.ListDir(prefix)
