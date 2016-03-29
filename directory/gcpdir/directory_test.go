@@ -310,24 +310,17 @@ func TestGlobBadPattern(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
-	// Set up all the responses from the server:
-	// First, the server will give us 3 paths from a /list request.
-	// Then it will send two DirEntry due to our two Lookup requests.
-	// We later check that we issued one list request and two Lookup requests.
-
 	const (
 		path0 = "a@b.co/dir1/file1.txt"
 		path1 = "a@b.co/dir1/file2.txt"
 	)
-	responses := []nettest.MockHTTPResponse{
-		newResp([]byte(fmt.Sprintf(`{ "Names": ["%v","%v","a@b.co/dir1/file3.pdf"]}`, path0, path1))),
-		newResp(toJSON(t, newDirEntry(upspin.PathName(path0)))),
-		newResp(toJSON(t, newDirEntry(upspin.PathName(path1)))),
-	}
+	responses := []nettest.MockHTTPResponse{newResp(toJSON(t, []upspin.DirEntry{
+		*newDirEntry(upspin.PathName(path0)),
+		*newDirEntry(upspin.PathName(path1)),
+	}))}
+
 	expectedRequests := []*http.Request{
-		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/list?prefix=a@b.co/dir1&depth=1", nil),
-		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path0), nil),
-		nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:9090/get?pathname=%v", path1), nil),
+		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/glob?pattern=a@b.co/dir1/*.txt", nil),
 	}
 
 	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
