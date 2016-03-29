@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31714554_6da415c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-29T23:53:59Z",
+      "side": 1,
+      "message": "propagated",
+      "revId": "f6f4b46582947cdffa603f211fda40e93cd0b6a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31714554_0db1d109",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-29T23:53:59Z",
+      "side": 1,
+      "message": "d",
+      "revId": "f6f4b46582947cdffa603f211fda40e93cd0b6a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31714554_2dae0da9",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-03-29T23:53:59Z",
+      "side": 1,
+      "message": "usually one would see a slice here, but a map makes sense if you expect a lot of handles for a single node, to keep operations O(1)",
+      "revId": "f6f4b46582947cdffa603f211fda40e93cd0b6a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
