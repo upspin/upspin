@@ -54,11 +54,12 @@ type GCP interface {
 	// Put stores the contents given as ref on GCP.
 	Put(ref string, contents []byte) (refLink string, error error)
 
-	// ListPrefix lists all files that match a given prefix, up to a certain depth, counting from the prefix,
-	// not absolute
+	// ListPrefix lists all files that match a given prefix, up to a
+	// certain depth, counting from the prefix, not absolute
 	ListPrefix(prefix string, depth int) ([]string, error)
 
-	// ListDir lists the contents of a given directory. It's equivalent to ListPrefix(dir, 1) but much more efficient.
+	// ListDir lists the contents of a given directory. It's equivalent to
+	// ListPrefix(dir, 1) but much more efficient.
 	ListDir(dir string) ([]string, error)
 
 	// Delete permanently removes all storage space associated
