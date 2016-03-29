@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	goPath "path"
 	"strconv"
 	"strings"
 
@@ -308,18 +309,14 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 }
 
 func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	pathName := r.FormValue("pathname")
-	if pathName == "" {
-		netutil.SendJSONErrorString(w, context+"missing pathname in request")
+	const op = "Get"
+	pathnames := d.verifyFormParams(op, "", w, r, "pathname")
+	if len(pathnames) == 0 {
+		// Nothing to be done. Error sent to client.
 		return
 	}
 	var parsedPath upspin.PathName
-	p, err := path.Parse(upspin.PathName(pathName))
+	p, err := path.Parse(upspin.PathName(pathnames[0]))
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
@@ -340,6 +337,7 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 	netutil.SendJSONReply(w, dirEntry)
 }
 
+// TODO: remove when all clients have been updated to use globHandler.
 func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -384,6 +382,95 @@ func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *htt
 	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
 }
 
+func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+	const op = "Glob"
+	patterns := d.verifyFormParams(op, "", w, r, "pattern")
+	if len(patterns) != 1 {
+		// Nothing to be done. Error sent to client.
+		return
+	}
+	pathPattern := upspin.PathName(patterns[0])
+	parsed, err := path.Parse(pathPattern)
+	if err != nil {
+		netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+		return
+	}
+	// Check if pattern is a valid go path pattern
+	_, err = goPath.Match(parsed.FilePath(), "")
+	if err != nil {
+		netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+		return
+	}
+
+	// As an optimization, we look for the longest prefix that
+	// does not contain a metacharacter -- this saves us from
+	// doing a full list operation if the matter of interest is
+	// deep in a sub directory.
+	clear := len(parsed.Elems)
+	for i, elem := range parsed.Elems {
+		if strings.ContainsAny(elem, "*?[]^") {
+			clear = i
+			break
+		}
+	}
+	prefix := parsed.First(clear).String()
+	depth := len(parsed.Elems) - clear
+
+	var names []string
+	if depth == 1 {
+		if !strings.HasSuffix(prefix, "/") {
+			prefix = prefix + "/"
+		}
+		names, err = d.cloudClient.ListDir(prefix)
+	} else {
+		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
+	}
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+
+	dirEntries := make([]*upspin.DirEntry, 0, len(names))
+	// Now do the actual globbing.
+	for _, path := range names {
+		// error is ignored as pattern is known valid
+		if match, _ := goPath.Match(patterns[0], path); match {
+			// Now fetch each DirEntry we need
+			logMsg.Printf("Looking up: %s for glob %s", path, patterns[0])
+			de, err := d.getMeta(upspin.PathName(path))
+			if err != nil {
+				netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+			}
+			// TODO: should we include metadata?
+			dirEntries = append(dirEntries, de)
+		}
+	}
+	netutil.SendJSONReply(w, dirEntries)
+}
+
+// verifyFormParams parses the request form and looks for the presence of each one of the listed fields.
+// If a field is not found, it returns an error to the user. If all are found, it returns their value in
+// the same order as requested.
+func (d *dirServer) verifyFormParams(op string, path upspin.PathName, w http.ResponseWriter, r *http.Request, fields ...string) []string {
+	err := r.ParseForm()
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return nil
+	}
+	values := make([]string, len(fields))
+	for i, k := range fields {
+		v := r.FormValue(k)
+		if v == "" {
+			errMsg := fmt.Sprintf("missing %s in request", k)
+			logErr.Print(errMsg)
+			netutil.SendJSONError(w, context, newDirError(op, path, errMsg))
+			return nil
+		}
+		values[i] = v
+	}
+	return values
+}
+
 func newDirServer(cloudClient gcp.GCP) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
@@ -405,7 +492,8 @@ func main() {
 	// and in clients to /dir and /lookup respectively.
 	http.HandleFunc("/put", ah.Handle(d.dirHandler))
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
-	http.HandleFunc("/list", ah.Handle(d.listHandler))
+	http.HandleFunc("/list", ah.Handle(d.listHandler)) // TODO: remove this in favor of glob.
+	http.HandleFunc("/glob", ah.Handle(d.globHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
