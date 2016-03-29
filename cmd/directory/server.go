@@ -198,44 +198,69 @@ func (d *dirServer) mergeDirEntries(dst, src *upspin.DirEntry) *upspin.DirEntry 
 // end, provided several checks have passed first.
 func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, parsed *path.Parsed, dirEntry *upspin.DirEntry) {
 	const op = "Put"
-	err := verifyMetadata(parsed.Path(), dirEntry.Metadata)
-	if err != nil {
+	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	err = d.verifyParentWritable(parsed)
+	// Get the parent dir, unless we're creating the root.
+	if parsed.IsRoot() {
+		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
+		d.handleRootCreation(sess, w, parsed, dirEntry)
+		return
+	}
+	parentParsedPath := parsed.Drop(1)
+	parentDirEntry, err := d.getMeta(canonicalizePath(&parentParsedPath))
 	if err != nil {
+		if err == errEntryNotFound {
+			// Give a more descriptive error
+			err = newDirError(op, parsed.Path(), "parent path not found")
+		}
 		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// Verify parent IsDir (redundant, but just to be safe).
+	if !parentDirEntry.Metadata.IsDir {
+		logErr.Printf("WARN: bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
+		netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), "parent is not a directory"))
 		return
 	}
 
-	// Before we can create this entry, we verify that we're not
-	// trying to overwrite a file with a directory or a directory
-	// with a file. That's probably not what the user wanted
-	// anyway.
-	path := canonicalizePath(parsed)
-	otherDir, err := d.getMeta(path)
+	// Verify whether there's a directory with same name.
+	canonicalPath := canonicalizePath(parsed)
+	existingDirEntry, err := d.getMeta(canonicalPath)
 	if err != nil && err != errEntryNotFound {
-		netutil.SendJSONError(w, context, newDirError(op, path, err.Error()))
+		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, err.Error()))
 		return
 	}
 	if err == nil {
-		if otherDir.Metadata.IsDir {
-			netutil.SendJSONError(w, context, newDirError(op, path, "directory already exists"))
+		if existingDirEntry.Metadata.IsDir {
+			netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "directory already exists"))
 			return
 		}
 		if dirEntry.Metadata.IsDir {
-			netutil.SendJSONError(w, context, newDirError(op, path, "overwriting file with directory"))
+			netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "overwriting file with directory"))
 			return
 		}
 	}
-	// Either err is nil (dir entry existed and is not ovewriting the wrong kind of entry) or it's not found.
-	// In both cases, we proceed to creating or overwriting the entry.
 
-	dirEntry.Name = path // Canonicalize path
+	// Propagate readers from parent to this dirEntry and canonicalize path.
+	if len(dirEntry.Metadata.Readers) > 0 {
+		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "readers list must be empty"))
+		return
+	}
+	dirEntry.Metadata.Readers = parentDirEntry.Metadata.Readers
+	dirEntry.Name = canonicalPath
 
-	// Writes the entry
-	err = d.putMeta(path, dirEntry)
+	// Store the entry.
+	err = d.putMeta(canonicalPath, dirEntry)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+
+	// Patch the parent (bump sequence number).
+	parentDirEntry.Metadata.Sequence++
+	err = d.putMeta(parentDirEntry.Name, parentDirEntry)
 	if err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
@@ -245,26 +270,26 @@ func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, pars
 	netutil.SendJSONErrorString(w, "success")
 }
 
-// verifyParentWritable returns an error if the parent dir of a path cannot be written to.
-func (d *dirServer) verifyParentWritable(path *path.Parsed) error {
-	if path.IsRoot() {
-		// The root is a writable directory (modulo ACLs).
-		return nil
+func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter, parsed *path.Parsed, dirEntry *upspin.DirEntry) {
+	const op = "Put"
+	canonicalPath := canonicalizePath(parsed)
+	_, err := d.getMeta(canonicalPath)
+	if err != nil && err != errEntryNotFound {
+		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, err.Error()))
+		return
 	}
-	// Check that the last entry before the one we're trying to
-	// create is already a directory.
-	p := path.Drop(1)
-	dirEntry, err := d.getMeta(canonicalizePath(&p))
+	if err == nil {
+		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "directory already exists"))
+		return
+	}
+	// Store the entry.
+	err = d.putMeta(canonicalPath, dirEntry)
 	if err != nil {
-		if err == errEntryNotFound {
-			return newDirError("verify", path.Path(), "parent path not found")
-		}
-		return newDirError("verify", path.Path(), err.Error())
+		netutil.SendJSONError(w, context, err)
+		return
 	}
-	if !dirEntry.Metadata.IsDir {
-		return newDirError("verify", path.Path(), "parent of path is not a directory")
-	}
-	return nil
+	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	netutil.SendJSONErrorString(w, "success")
 }
 
 // getMeta returns the metadata for the given path.

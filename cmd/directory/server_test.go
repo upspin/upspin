@@ -32,7 +32,8 @@ var (
 	dirParent = upspin.DirEntry{
 		Name: upspin.PathName(parentPathName),
 		Metadata: upspin.Metadata{
-			IsDir: true,
+			IsDir:   true,
+			Readers: []upspin.UserName{upspin.UserName("peepingtom@curious.com")},
 		},
 	}
 )
@@ -104,7 +105,7 @@ func TestListBadPath(t *testing.T) {
 	resp.Verify(t)
 }
 
-func TestPutErrorFileNoDir(t *testing.T) {
+func TestPutErrorFileNoParentDir(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: makeValidMeta(),
@@ -114,7 +115,7 @@ func TestPutErrorFileNoDir(t *testing.T) {
 	}
 
 	ds := newDirServer(egcp)
-	Put(t, ds, dir, `{"error":"DirService: verify: fred@bob.com/myroot/myfile: parent path not found"}`)
+	Put(t, ds, dir, `{"error":"DirService: Put: fred@bob.com/myroot/myfile: parent path not found"}`)
 }
 
 func TestLookupPathNotFound(t *testing.T) {
@@ -144,15 +145,15 @@ func TestList(t *testing.T) {
 	resp.Verify(t)
 }
 
-func TestPutNotDir(t *testing.T) {
+func TestPutParentNotDir(t *testing.T) {
 	// The DirEntry we're trying to Put, converted to JSON.
 	dirEntryJSON := toJSON(t, dir)
 	// The DirEntry of the parent, converted to JSON.
 	notDirParent := dirParent
-	notDirParent.Metadata.IsDir = false
+	notDirParent.Metadata.IsDir = false // Parent is not dir!
 	dirParentJSON := toJSON(t, notDirParent)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: verify: test@foo.com/mydir/myfile.txt: parent of path is not a directory"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: parent is not a directory"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", dirEntryJSON)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -234,15 +235,61 @@ func TestPut(t *testing.T) {
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 
+	// Check that the parent Sequence number was updated...
+	updatedParent := dirParent
+	updatedParent.Metadata.Sequence++
+	updatedParentJSON := toJSON(t, updatedParent)
+
+	// And that the file's Readers were updated
+	updatedDir := dir
+	updatedDir.Metadata.Readers = dirParent.Metadata.Readers
+	updatedDirJSON := toJSON(t, updatedDir)
+
 	// Verify what was actually put
-	if len(egcp.PutContents) != 1 {
-		t.Fatalf("Expected patch to write one dir entry, got %d", len(egcp.PutContents))
+	if len(egcp.PutContents) != 2 {
+		t.Fatalf("Expected put to write 2 dir entries, got %d", len(egcp.PutContents))
 	}
 	if egcp.PutRef[0] != string(dir.Name) {
 		t.Errorf("Expected put to write to %s, wrote to %s", dir.Name, egcp.PutRef)
 	}
-	if !bytes.Equal(dirEntryJSON, egcp.PutContents[0]) {
-		t.Errorf("Expected put to write %s, wrote %s", dirEntryJSON, egcp.PutContents[0])
+	if !bytes.Equal(updatedDirJSON, egcp.PutContents[0]) {
+		t.Errorf("Expected put to write %s, wrote %s", updatedDirJSON, egcp.PutContents[0])
+	}
+	if egcp.PutRef[1] != string(dirParent.Name) {
+		t.Errorf("Expected put to write to %s, wrote to %s", dirParent.Name, egcp.PutRef[1])
+	}
+	if !bytes.Equal(updatedParentJSON, egcp.PutContents[1]) {
+		t.Errorf("Expected put to write %s, wrote %s", updatedParentJSON, egcp.PutContents[1])
+	}
+}
+
+func TestPutRoot(t *testing.T) {
+	const user = "dude@foo.com"
+	rootDir := upspin.DirEntry{
+		Name: user + "/",
+	}
+
+	rootDirJSON := toJSON(t, rootDir)
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", rootDirJSON)
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref: []string{"does not exist"},
+	}
+
+	ds := newDirServer(egcp)
+	ds.dirHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if len(egcp.PutContents) != 1 {
+		t.Fatalf("Expected put to write 1 dir entry, got %d", len(egcp.PutContents))
+	}
+	if egcp.PutRef[0] != user {
+		t.Errorf("Expected put to write to %s, wrote to %s", user, egcp.PutRef)
+	}
+	if !bytes.Equal(rootDirJSON, egcp.PutContents[0]) {
+		t.Errorf("Expected put to write %s, wrote %s", rootDirJSON, egcp.PutContents[0])
 	}
 }
 
