@@ -203,7 +203,7 @@ func TestList(t *testing.T) {
 			},
 		},
 	}
-	for i, _ := range tests {
+	for i := range tests {
 		testListPrefix(t, tests[i].prefix, tests[i].depth, tests[i].expected)
 	}
 }
