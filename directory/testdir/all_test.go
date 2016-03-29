@@ -489,9 +489,36 @@ func TestSequencing(t *testing.T) {
 	}
 }
 
-func TestTimeAndSize(t *testing.T) {
+func TestRootDirectorySequencing(t *testing.T) {
 	const (
 		user     = "user7@google.com"
+		fileName = user + "/file"
+	)
+	setup(user)
+	// Validate sequence increases after write.
+	seq := int64(-1)
+	for i := 0; i < 10; i++ {
+		// Create a file.
+		text := fmt.Sprintln("version", i)
+		data, packdata := packData(t, []byte(text), fileName)
+		_, err := context.Directory.Put(fileName, data, packdata, nil)
+		if err != nil {
+			t.Fatalf("put file %d: %v", i, err)
+		}
+		entry, err := context.Directory.Lookup(user)
+		if err != nil {
+			t.Fatalf("lookup dir %d: %v", i, err)
+		}
+		if entry.Metadata.Sequence <= seq {
+			t.Fatalf("sequence on dir %d did not increase: old seq %d; new seq %d", i, seq, entry.Metadata.Sequence)
+		}
+		seq = entry.Metadata.Sequence
+	}
+}
+
+func TestTimeAndSize(t *testing.T) {
+	const (
+		user     = "user8@google.com"
 		fileName = user + "/file"
 	)
 	setup(user)
