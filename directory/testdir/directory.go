@@ -51,7 +51,7 @@ type Service struct {
 	// exported API, for simple but slow safety. At least it's an RWMutex
 	// so it's not _too_ bad.
 	mu   sync.RWMutex
-	Root map[upspin.UserName]upspin.Reference // Roots are just refs, all inside Service.Store
+	Root map[upspin.UserName]*upspin.DirEntry
 }
 
 var _ upspin.Directory = (*Service)(nil)
@@ -148,10 +148,11 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirRef, ok := s.Root[parsed.User]
+	dirEntry, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Glob", upspin.PathName(parsed.User), "no such user")
 	}
+	dirRef := dirEntry.Location.Reference
 	// Loop elementwise along the path, growing the list of candidates breadth-first.
 	this := make([]*upspin.DirEntry, 0, 100)
 	next := make([]*upspin.DirEntry, 1, 100)
@@ -215,6 +216,24 @@ func (d dirEntrySlice) Len() int           { return len(d) }
 func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
 func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
+func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq int64) *upspin.DirEntry {
+	return &upspin.DirEntry{
+		Name: upspin.PathName(user + "/"),
+		Location: upspin.Location{
+			Endpoint:  s.StoreEndpoint,
+			Reference: ref,
+		},
+		Metadata: upspin.Metadata{
+			IsDir:    true,
+			Sequence: seq,
+			Size:     0,
+			Time:     upspin.Now(),
+			Readers:  nil, // TODO
+			PackData: dirPackData,
+		},
+	}
+}
+
 // MakeDirectory creates a new directory with the given name. The user's root must be present.
 // TODO: For now at least, only the last entry of the path can be created, as in Unix.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
@@ -239,12 +258,9 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if err != nil {
 			return loc0, err
 		}
-		s.Root[parsed.User] = ref
-		loc := upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: ref,
-		}
-		return loc, nil
+		dirEntry := s.rootDirEntry(parsed.User, ref, 0)
+		s.Root[parsed.User] = dirEntry
+		return dirEntry.Location, nil
 	}
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
 	return s.put("MakeDirectory", parsed.Path(), true, nil, dirPackData, nil)
@@ -276,27 +292,16 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	if len(parsed.Elems) == 0 {
 		return loc0, mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
-	dirRef, ok := s.Root[parsed.User]
+	dirEntry, ok := s.Root[parsed.User]
 	if !ok {
 		// Cannot create user root with Put.
 		return loc0, mkStrError(op, upspin.PathName(parsed.User), "no such user")
 	}
+	dirRef := dirEntry.Location.Reference
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
 	// Invariant: dirRef refers to a directory.
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
-	dirEntry := &upspin.DirEntry{
-		Name: "",
-		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: dirRef,
-		},
-		Metadata: upspin.Metadata{
-			IsDir:    true,
-			Sequence: 0,
-			PackData: packdata,
-		},
-	}
 	entries = append(entries, dirEntry)
 	for i := 0; i < len(parsed.Elems)-1; i++ {
 		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
@@ -366,7 +371,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 			},
 			Metadata: upspin.Metadata{
 				IsDir:    true,
-				Sequence: 0,   // TODO? We never care about Sequence for directories.
+				Sequence: entries[i+1].Metadata.Sequence,
 				Readers:  nil, // TODO
 				PackData: dirPackData,
 			},
@@ -378,7 +383,8 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		}
 	}
 	// Update the root.
-	s.Root[parsed.User] = dirRef
+	seq := s.Root[parsed.User].Metadata.Sequence
+	s.Root[parsed.User] = s.rootDirEntry(parsed.User, dirRef, seq+1)
 
 	// Return the location of the file.
 	return loc, nil
@@ -390,15 +396,16 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, nil
 	}
-	if len(parsed.Elems) == 0 {
-		return nil, mkStrError("Lookup", pathName, "cannot use Get on directory; use Glob")
-	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirRef, ok := s.Root[parsed.User]
+	dirEntry, ok := s.Root[parsed.User]
 	if !ok {
 		return nil, mkStrError("Lookup", upspin.PathName(parsed.User), "no such user")
 	}
+	if len(parsed.Elems) == 0 {
+		return dirEntry, nil
+	}
+	dirRef := dirEntry.Location.Reference
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
 	for i := 0; i < len(parsed.Elems)-1; i++ {
@@ -554,7 +561,7 @@ func init() {
 	s := &Service{
 		endpoint: upspin.Endpoint{}, // uninitialized until Dial time.
 		Store:    nil,               // uninitialized until Dial time.
-		Root:     make(map[upspin.UserName]upspin.Reference),
+		Root:     make(map[upspin.UserName]*upspin.DirEntry),
 	}
 	bind.RegisterDirectory(transport, s)
 }
