@@ -1,7 +1,6 @@
 package auth
 
 // This is copied verbatim from https://github.com/golang/build/blob/master/internal/lru/cache.go
-// TODO(edpin): add a test.
 
 import (
 	"container/list"
