@@ -29,6 +29,14 @@ type expectations struct {
 	packing   upspin.Packing
 }
 
+type envs struct {
+	name      string
+	user      string
+	directory string
+	store     string
+	packing   string
+}
+
 // Endpoint is a helper to make it easier to build vet-error-free upspin.Endpoints.
 func Endpoint(t upspin.Transport, n upspin.NetAddr) upspin.Endpoint {
 	return upspin.Endpoint{
@@ -91,6 +99,35 @@ func makeConfig(expect *expectations) string {
 		endpoint.String(&expect.store),
 		endpoint.String(&expect.directory),
 		pack.Lookup(expect.packing).String())
+}
+
+func saveEnvs(e *envs) {
+	e.name = os.Getenv("upspinname")
+	e.user = os.Getenv("upspinuser")
+	e.directory = os.Getenv("upspindirectory")
+	e.store = os.Getenv("upspinstore")
+	e.packing = os.Getenv("upspinpacking")
+}
+
+func restoreEnvs(e *envs) {
+	os.Setenv("upspinname", e.name)
+	os.Setenv("upspinuser", e.user)
+	os.Setenv("upspindirectory", e.directory)
+	os.Setenv("upspinstore", e.store)
+	os.Setenv("upspinpacking", e.packing)
+}
+
+func resetEnvs() {
+	var emptyEnv envs
+	restoreEnvs(&emptyEnv)
+}
+
+func TestMain(m *testing.M) {
+	var e envs
+	saveEnvs(&e)
+	resetEnvs()
+	m.Run()
+	restoreEnvs(&e)
 }
 
 func testConfig(t *testing.T, expect *expectations, config string) {
