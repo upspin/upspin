@@ -5,16 +5,20 @@
 #
 # Usage:
 #
-# ./deploy-servers.sh [user|directory|store|frontend] [-d] [-b]
+# ./deploy-servers.sh [user|directory|store|frontend] [-d] [-b] [-t]
 #
 # If a server name is not given, all are rebuilt and redeployed.
 # -d deploy only -- does not rebuild servers.
 # -b build only -- does not deploy servers.
+# -t when deploying, deploy testing instances only.
+#    Only store and directory available as testing.
+#    Does not affect the build command.
 
 errors=()
 root=""
 deployonly=0
 buildonly=0
+testing=""
 default_serverlist=(user directory store frontend)
 
 # Builds the named binary statically.
@@ -29,16 +33,16 @@ function build {
 # Deploys the named binary to GCE and restarts it
 function deploy {
     server=$1
-    echo "=== Deploying $server ..."
+    echo "=== Deploying $server$testing ..."
     # Copy binary to GCE
     runsafely scp "/tmp/$server" upspin.io:/tmp
     # Stop service and move binary
-    runsafely ssh upspin.io "cd /var/www; sudo supervisorctl stop upspin-$server; sudo cp /tmp/$server ."
+    runsafely ssh upspin.io "sudo supervisorctl stop upspin-$server$testing; sudo cp /tmp/$server /var/www/$server$testing"
     if [ "$server" == "frontend" ]; then
         runsafely ssh upspin.io "cd /var/www; sudo setcap CAP_NET_BIND_SERVICE=+eip /var/www/frontend"
     fi
     # Re-deploy service
-    runsafely ssh upspin.io "sudo supervisorctl start upspin-$server"
+    runsafely ssh upspin.io "sudo supervisorctl start upspin-$server$testing"
 }
 
 # Finds the root of project upspin by looking in the current directory and in $GOPATH and puts it in $root
@@ -78,6 +82,9 @@ function main {
             ;;
             -b|--build-only)
             buildonly=1
+            ;;
+            -t|--testing)
+            testing="-test"
             ;;
             store)
             serverlist[${#serverlist[*]}]="store"
