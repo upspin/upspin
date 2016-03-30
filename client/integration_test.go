@@ -1,9 +1,6 @@
-// This is an integration test for Client. It requires a local GCP
-// Directory instance running on port 8081. To launch a local GCP Directory use:
+// This is an integration test for Client.
 //
-// ./directory -noauth -cert= -key=
-//
-// The launch this test: 'go test -tags integration'.
+// To launch this test: 'go test -tags integration'.
 //
 // The line below is important or 'go test' will fail:
 
@@ -14,14 +11,13 @@ package client_test
 import (
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	"strings"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
@@ -314,5 +310,17 @@ func TestRunAllTests(t *testing.T) {
 		log.Printf("==== Using packing type %d ...", packing)
 		context := newContext(packing)
 		runAllTests(context, t)
+	}
+}
+
+func BenchmarkPut(b *testing.B) {
+	context := newContext(upspin.PlainPack)
+	setupUser(context, upspin.UserName(userName))
+	c := client.New(context)
+	for i := 0; i < b.N; i++ {
+		_, err := c.Put(upspin.PathName(userName+"/a.txt"), []byte("1"))
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 }

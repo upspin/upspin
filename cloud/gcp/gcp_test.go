@@ -17,8 +17,7 @@ const (
 )
 
 var (
-	client = New(projectID, bucketName, PublicRead)
-	// The time is important because we never delete this file, but instead overwrite it.
+	client      = New(projectID, bucketName, PublicRead)
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
 	fileName    = "test-file"
@@ -264,4 +263,14 @@ func TestDelete(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected an error, but got none")
 	}
+}
+
+func emptyBucket() {
+	const verbose = true
+	client.(*gcpImpl).EmptyBucket(verbose)
+}
+
+func TestMain(m *testing.M) {
+	m.Run()
+	emptyBucket()
 }
