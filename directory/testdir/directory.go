@@ -1,6 +1,4 @@
 // Package testdir implements a simple, non-persistent, in-memory directory service.
-// It stores its directory entries, including user roots, in the in-memory teststore,
-// but allows Put operations to place data in arbitrary locations.
 package testdir
 
 import (
@@ -18,10 +16,6 @@ import (
 
 	// Imported because it's used to pack dir entries.
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
-
-	// Imported because this directory service needs to register a teststore implicitly.
-	// Expecting end users (tests, client, etc) to import it relies on ordering of inits, which is not safe.
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 // Used to store directory entries.

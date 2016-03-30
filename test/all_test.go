@@ -17,6 +17,7 @@ import (
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 // Config defines the configuration for each test setup.
