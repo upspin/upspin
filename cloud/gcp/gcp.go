@@ -215,6 +215,36 @@ func (gcp *gcpImpl) Delete(ref string) error {
 	return nil
 }
 
+// EmptyBucket completely removes all files in a bucket permanently.
+// If verbose is true, every attempt to delete a file is logged to the standard logger.
+// This is an expensive operation. It is also dangerous, so use with care.
+// Exported, but not part of the GCP interface. Use for testing only.
+func (gcp *gcpImpl) EmptyBucket(verbose bool) error {
+	const maxParallelDeletes = 10
+	pageToken := ""
+	var firstErr error
+	for {
+		objs, err := gcp.service.Objects.List(gcp.bucketName).MaxResults(maxParallelDeletes).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
+		for _, o := range objs.Items {
+			if verbose {
+				log.Printf("Deleting: %q", o.Name)
+			}
+			err = gcp.Delete(o.Name)
+			if err != nil {
+				if firstErr == nil {
+					firstErr = err
+				}
+				log.Printf("EmptyBucket: %q: %s", o.Name, err)
+			}
+		}
+		if objs.NextPageToken == "" {
+			break
+		}
+		pageToken = objs.NextPageToken
+	}
+	return firstErr
+}
+
 // Connect implements GCP.
 func (gcp *gcpImpl) Connect() {
 	if gcp.projectID == "" {
