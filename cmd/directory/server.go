@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	goPath "path"
-	"strconv"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/auth"
@@ -362,51 +361,6 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 	netutil.SendJSONReply(w, dirEntry)
 }
 
-// TODO: remove when all clients have been updated to use globHandler.
-func (d *dirServer) listHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	prefix := r.FormValue("prefix")
-	if prefix == "" {
-		netutil.SendJSONErrorString(w, context+"missing prefix in request")
-		return
-	}
-	depthStr := r.FormValue("depth")
-	if depthStr == "" {
-		netutil.SendJSONErrorString(w, context+"missing depth in request")
-		return
-	}
-	depth, err := strconv.ParseInt(depthStr, 10, 8)
-	if err != nil || depth > 30 {
-		netutil.SendJSONErrorString(w, context+"invalid depth")
-		return
-	}
-	_, err = path.Parse(upspin.PathName(prefix))
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	var names []string
-	if depth == 1 {
-		// TODO: Should the server tweak this or let clients learn?
-		if !strings.HasSuffix(prefix, "/") {
-			prefix = prefix + "/"
-		}
-		names, err = d.cloudClient.ListDir(prefix)
-	} else {
-		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
-	}
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	logMsg.Printf("List request for prefix %q", prefix)
-	netutil.SendJSONReply(w, &struct{ Names []string }{Names: names})
-}
-
 func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "Glob"
 	patterns := d.verifyFormParams(op, "", w, r, "pattern")
@@ -517,7 +471,6 @@ func main() {
 	// and in clients to /dir and /lookup respectively.
 	http.HandleFunc("/put", ah.Handle(d.dirHandler))
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
-	http.HandleFunc("/list", ah.Handle(d.listHandler)) // TODO: remove this in favor of glob.
 	http.HandleFunc("/glob", ah.Handle(d.globHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
