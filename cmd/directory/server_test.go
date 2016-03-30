@@ -87,21 +87,21 @@ func TestLookupPathError(t *testing.T) {
 	resp.Verify(t)
 }
 
-func TestListMissingPrefix(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: missing prefix in request"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list", nil)
+func TestGlobMissingPattern(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Glob: missing pattern in request"}`)
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/glob", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(dummySess, resp, req)
+	ds.globHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
-func TestListBadPath(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: bad user name in path"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?prefix=missing/email/dir/file&depth=3", nil)
+func TestGlobBadPath(t *testing.T) {
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Glob: missing/email/dir/file: bad user name in path"}`)
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/list?pattern=missing/email/dir/file", nil)
 
 	ds := newDummyDirServer()
-	ds.listHandler(dummySess, resp, req)
+	ds.globHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
@@ -127,21 +127,6 @@ func TestLookupPathNotFound(t *testing.T) {
 
 	ds := newDirServer(egcp)
 	ds.getHandler(dummySess, resp, req)
-	resp.Verify(t)
-}
-
-func TestList(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"Names":["testuser@google.com/subdir/","testuser@google.com/subdir/test.txt"]}`)
-	req, err := http.NewRequest("GET", "http://localhost:8080/list?prefix=testuser@google.com/sub&depth=3", nil)
-	if err != nil {
-		t.Fatalf("Can't make new request: %v", err)
-	}
-	lgcp := &listGCP{
-		prefix:    "testuser@google.com/sub",
-		fileNames: []string{"testuser@google.com/subdir/", "testuser@google.com/subdir/test.txt"},
-	}
-	ds := newDirServer(lgcp)
-	ds.listHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
 
