@@ -81,6 +81,9 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interfac
 		return nil, err
 	}
 	u.serverURL = serverURL.String()
+	if !netutil.IsServerReachable(u.serverURL) {
+		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
+	}
 	return u, nil
 }
 
