@@ -179,7 +179,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 		return 0, err
 	}
 
-	r, s, err := ecdsa.Sign(rand.Reader, myPrivateKey, c.verHash(pathname, dkey, ciphertext))
+	r, s, err := ecdsa.Sign(rand.Reader, myPrivateKey, c.verHash(pathname, meta.Time, dkey, ciphertext))
 	if err != nil {
 		return 0, err
 	}
@@ -275,7 +275,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
-		if !ecdsa.Verify(ownerPubKey, c.verHash(pathname, dkey, ciphertext), sig.r, sig.s) {
+		if !ecdsa.Verify(ownerPubKey, c.verHash(pathname, meta.Time, dkey, ciphertext), sig.r, sig.s) {
 			log.Println("verify failed")
 			return 0, errVerify
 		}
@@ -285,12 +285,11 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	return 0, errNoWrappedKey
 }
 
-func (c common) verHash(pathname upspin.PathName, dkey, ciphertext []byte) []byte {
-	// TODO Consider alternative crypto that merges verification with wrapping.
-	// TODO If we stick with Sign, consider streaming ciphertext to sha256 here.
-	mess := []byte(fmt.Sprintf("%02x:%s:%x:%x", c.ciphersuite, pathname, dkey, ciphertext))
-	messhash := sha256.Sum256(mess)
-	return messhash[:]
+func (c common) verHash(pathname upspin.PathName, time upspin.Time, dkey, ciphertext []byte) []byte {
+	h := sha256.New()
+	h.Write([]byte(fmt.Sprintf("%02x:%s:%d:%x:", c.ciphersuite, pathname, time, dkey)))
+	h.Write(ciphertext)
+	return h.Sum(nil)
 }
 
 func (c common) keyHash(p *ecdsa.PublicKey) []byte {
