@@ -57,6 +57,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	var cipher []byte
 	meta := &upspin.Metadata{
 		Readers: readers,
+		Time:    upspin.Now(),
 	}
 
 	if !access.IsAccessFile(name) {
@@ -91,7 +92,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	opts := upspin.PutOptions{
 		Sequence: 0, // TODO.
 		Size:     uint64(len(data)),
-		Time:     upspin.Now(),
+		Time:     meta.Time,
 	}
 
 	// Store it.
