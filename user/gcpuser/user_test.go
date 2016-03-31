@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -18,13 +17,6 @@ const (
 	key         = "bla bla bla"
 	rootNetAddr = "http://on-the-net.net"
 )
-
-func TestRegistration(t *testing.T) {
-	u := getUser(t).(*user)
-	if u == nil {
-		t.Fatal("Can't get user service")
-	}
-}
 
 func TestLookup(t *testing.T) {
 	ue := userEntry{
@@ -65,19 +57,6 @@ func TestLookup(t *testing.T) {
 	if string(keys[0]) != key {
 		t.Errorf("Expected key %s, got %s", key, keys[0])
 	}
-}
-
-func getUser(t *testing.T) upspin.User {
-	u, err := bind.User(
-		&upspin.Context{},
-		upspin.Endpoint{
-			Transport: upspin.GCP,
-			NetAddr:   "http://somewhere",
-		})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return u
 }
 
 func getUserForTesting(mock netutil.HTTPClientInterface) *user {

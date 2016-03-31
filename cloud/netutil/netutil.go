@@ -92,3 +92,9 @@ func BufferRequest(resp http.ResponseWriter, req *http.Request, maxBufLen int64)
 	}
 	return buf[:n]
 }
+
+// IsServerReachable reports whether the server at an URL can be reached.
+func IsServerReachable(serverURL string) bool {
+	_, err := http.Get(serverURL)
+	return err == nil
+}
