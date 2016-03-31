@@ -90,7 +90,7 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 	// ... and a real GCP directory and upspin.io User.
 	endpointDir := upspin.Endpoint{
 		Transport: upspin.GCP,
-		NetAddr:   "https://upspin.io:8081",
+		NetAddr:   "https://upspin.io:9981", // Run on test dir server.
 	}
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -244,18 +244,25 @@ func testSharing(context *upspin.Context, t *testing.T) {
 		sharedContent = "Hey man, whatup?"
 	)
 	var (
-		sharedFilePath = path.Join(upspin.PathName(userName), "mydir/sharedfile")
+		sharedDir      = path.Join(upspin.PathName(userName), "mydir")
+		sharedFilePath = path.Join(sharedDir, "sharedfile")
 	)
 	setupUser(context, upspin.UserName(userName))
 	c := client.New(context)
 
-	// Put a new file under a previously created dir
-	_, err := c.Put(sharedFilePath, []byte(sharedContent))
+	// Put an Access file where no one has access (this forces updating the parent dir with no access).
+	_, err := c.Put(path.Join(sharedDir, "Access"), []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Put a new file under a previously created dir.
+	_, err = c.Put(sharedFilePath, []byte(sharedContent))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Now become the other user and read the file.
 	setupUser(context, upspin.UserName(userToShare))
+
 	data, err := c.Get(sharedFilePath)
 	// If packing is strong encryption, the Get will fail:
 	switch context.Packing {
@@ -276,7 +283,12 @@ func testSharing(context *upspin.Context, t *testing.T) {
 
 	// Put an Access file first, giving our friend read access
 	accessFile := "r:upspin-friend-test@google.com"
-	_, err = c.Put(path.Join(upspin.PathName(userName), "mydir/Access"), []byte(accessFile))
+	_, err = c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Re-write file, so we wrap keys for our friend.
+	_, err = c.Put(sharedFilePath, []byte(sharedContent))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +302,6 @@ func testSharing(context *upspin.Context, t *testing.T) {
 	if string(data) != sharedContent {
 		t.Errorf("Expected %s, got %s", sharedContent, data)
 	}
-
 }
 
 func runAllTests(context *upspin.Context, t *testing.T) {
@@ -298,6 +309,7 @@ func runAllTests(context *upspin.Context, t *testing.T) {
 	testPutAndGet(context, t)
 	testCreateAndOpen(context, t)
 	testGlob(context, t)
+	testSharing(context, t)
 }
 
 func TestRunAllTests(t *testing.T) {
