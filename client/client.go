@@ -89,7 +89,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 
 	// Set options.
 	opts := upspin.PutOptions{
-		Sequence: 0, // TODO.
+		Sequence: 0, // Don't set. Will be increased by Directory.
 		Size:     uint64(len(data)),
 		Time:     upspin.Now(),
 	}
