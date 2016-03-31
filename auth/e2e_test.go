@@ -30,11 +30,11 @@ var (
 	url    string
 )
 
-func lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func lookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	if userName == user {
-		return nil, []upspin.PublicKey{p256Key.Public, p521Key.Public}, nil
+		return []upspin.PublicKey{p256Key.Public, p521Key.Public}, nil
 	}
-	return nil, nil, errors.New("No user here")
+	return nil, errors.New("No user here")
 }
 
 func authHelloHandle(sess auth.Session, w http.ResponseWriter, r *http.Request) {

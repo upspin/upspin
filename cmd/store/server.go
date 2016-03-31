@@ -12,7 +12,6 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -158,7 +157,7 @@ func main() {
 	}
 
 	ah := auth.NewHandler(&auth.Config{
-		Lookup: serverauth.PublicUserLookupService(),
+		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
@@ -167,7 +166,7 @@ func main() {
 	http.HandleFunc("/delete", ah.Handle(ss.deleteHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			logErr.Fatal(err)
 		}

@@ -15,7 +15,6 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -461,7 +460,7 @@ func main() {
 	flag.Parse()
 
 	ah := auth.NewHandler(&auth.Config{
-		Lookup: serverauth.PublicUserLookupService(),
+		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
@@ -474,7 +473,7 @@ func main() {
 	http.HandleFunc("/glob", ah.Handle(d.globHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			logErr.Fatal(err)
 		}

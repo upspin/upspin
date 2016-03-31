@@ -77,11 +77,11 @@ func TestWrongKey(t *testing.T) {
 	}
 }
 
-func lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func lookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	if userName == user {
-		return nil, []upspin.PublicKey{p256Key.Public, p521Key.Public}, nil
+		return []upspin.PublicKey{p256Key.Public, p521Key.Public}, nil
 	}
-	return nil, nil, errors.New("No user here")
+	return nil, errors.New("No user here")
 }
 
 func makeTLSRequest(req *http.Request, tlsUnique []byte) {
@@ -185,8 +185,8 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	}
 	// Define a custom Lookup
 	config := &Config{
-		Lookup: func(upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-			return nil, nil, nil // No error, but no keys either.
+		Lookup: func(upspin.UserName) ([]upspin.PublicKey, error) {
+			return nil, nil // No error, but no keys either.
 		},
 	}
 	ah := NewHandler(config)

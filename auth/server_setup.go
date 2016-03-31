@@ -1,5 +1,5 @@
-// Package serverauth provides authentication and SSL functionality common to all Upspin servers.
-package serverauth
+// Package auth provides authentication and SSL functionality common to all Upspin servers.
+package auth
 
 import (
 	"crypto/tls"
@@ -54,9 +54,9 @@ func NewSecureServer(port int, certFile string, certKeyFile string) (*http.Serve
 	return server, nil
 }
 
-// PublicUserLookupService returns a Lookup function that looks up users keys and endpoints.
+// PublicUserKeyService returns a Lookup function that looks up users public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
-func PublicUserLookupService() func(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	context := &upspin.Context{}
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -66,7 +66,10 @@ func PublicUserLookupService() func(userName upspin.UserName) ([]upspin.Endpoint
 	if err != nil {
 		log.Fatalf("Can't bind to User service: %v", err)
 	}
-	return u.Lookup
+	return func(userName upspin.UserName) ([]upspin.PublicKey, error) {
+		_, keys, err := u.Lookup(userName)
+		return keys, err
+	}
 }
 
 // isReadableFile reports whether the file exists and is readable.

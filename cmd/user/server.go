@@ -10,9 +10,9 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cmd/serverauth"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -293,7 +293,7 @@ func main() {
 	http.HandleFunc("/get", u.getHandler)
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := serverauth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}
