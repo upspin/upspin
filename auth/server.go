@@ -36,19 +36,15 @@ type HandlerFunc func(session Session, w http.ResponseWriter, r *http.Request)
 type Handler interface {
 	// Handle is the chained handler function to register an authenticated handler. See example in package document.
 	Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request)
-
-	// TODO: return cipher used and other configuration getters
 }
 
 // Config holds the configuration parameters for an instance of Handler.
 type Config struct {
 	// Lookup looks up user keys.
-	Lookup func(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error)
+	Lookup func(userName upspin.UserName) ([]upspin.PublicKey, error)
 
 	// AllowUnauthenticatedConnections allows unauthenticated connections, making it the caller's responsibility to check Handler.IsAuthenticated.
 	AllowUnauthenticatedConnections bool
-
-	// TODO: set preferred cipher method.
 }
 
 // Session contains information about the connection and the authenticated user, if any.
@@ -74,7 +70,6 @@ var _ Session = (*sessionImpl)(nil)
 
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
-	// TODO: make this thread safe?
 	config       *Config
 	sessionCache *Cache // maps tlsUnique to AuthSession. Thread-safe.
 }
@@ -89,7 +84,6 @@ const (
 
 // NewHandler creates a new instance of a Handler according to the given config, which must not be changed subsequently by the caller.
 func NewHandler(config *Config) Handler {
-	// TODO: look at preferred cipher in config
 	return &authHandler{
 		config:       config,
 		sessionCache: NewLRUCache(maxSessions),
@@ -151,7 +145,7 @@ func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*sessionI
 	if ah.config.Lookup == nil {
 		return nil, errors.New("cannot authenticate: internal error: missing Lookup function")
 	}
-	_, keys, err := ah.config.Lookup(user)
+	keys, err := ah.config.Lookup(user)
 	if err != nil {
 		return nil, err
 	}
