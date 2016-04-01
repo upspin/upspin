@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_f1d06015",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-01T20:45:35Z",
+      "side": 1,
+      "message": "this cl description is unclear: is this the state before or after the CL?\n\ncontext: clear environment for test",
+      "revId": "5c001bc780902c9ad82eb18bd179b16212ad6e59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
