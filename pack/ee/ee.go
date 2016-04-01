@@ -68,7 +68,7 @@ type eep521 struct {
 }
 
 const (
-	aesKeyLen          = 32 // AES-256 because public cloud may receive multifile multikey attack.
+	aesKeyLen          = 2 // AES-256 because public cloud may receive multifile multikey attack.
 	p256               = "p256"
 	p384               = "p384"
 	p521               = "p521"
@@ -163,6 +163,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	if err != nil {
 		return 0, err
 	}
+	dkey[0] = 0
 
 	// Set up readers. The writer of a file is always a reader.
 	usernames := append([]upspin.UserName{ctx.UserName}, meta.Readers...)
