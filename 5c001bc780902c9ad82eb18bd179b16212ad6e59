@@ -16,6 +16,24 @@
       "revId": "5c001bc780902c9ad82eb18bd179b16212ad6e59",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eeca6838_b1f3b8b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-01T20:53:26Z",
+      "side": 1,
+      "message": "Good point. Will keep it in mind for next time as this is submitted already.",
+      "parentUuid": "eeca6838_f1d06015",
+      "revId": "5c001bc780902c9ad82eb18bd179b16212ad6e59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
