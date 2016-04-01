@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_54036233",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-01T22:54:00Z",
+      "side": 1,
+      "message": "after here, you could do\n\nos.Args \u003d []string{\"userserver\"}\n\nso that any sensitive arguments are not published.",
+      "revId": "9565983984e54f706f70288431a5e43818871340",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
