@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_718a3047",
+        "filename": "cmd/user/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-01T22:21:15Z",
+      "side": 1,
+      "message": "I\u0027m nervous that err may contain sensitive data.",
+      "revId": "f6d0c6bfead952d1a5011707edfcd52145058ef0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
