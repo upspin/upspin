@@ -4,11 +4,13 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"expvar"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
@@ -43,6 +45,7 @@ var (
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	errKeyTooShort        = errors.New("key length too short")
 	errInvalidEmail       = errors.New("invalid email format")
+	userStats             *serverStatus
 )
 
 // validateUserEmail checks whether the given email is valid. For
@@ -186,6 +189,9 @@ func (u *userServer) addRootHandler(w http.ResponseWriter, r *http.Request) {
 // information. The user=<email> parameter is required.
 func (u *userServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	context := "get: "
+	if userStats != nil {
+		userStats.addLookup(1)
+	}
 	if r.TLS != nil {
 		log.Printf("Encrypted connection. Cipher: %d", r.TLS.CipherSuite)
 	}
@@ -273,6 +279,32 @@ func (u *userServer) putUserEntry(user string, userEntry *userEntry) error {
 	return err
 }
 
+type serverStatus struct {
+	NumRegisteredUsers int
+	NumLookupsLastHour int
+	LastReset          time.Time
+
+	cloudClient gcp.GCP
+}
+
+func (uc *serverStatus) update() interface{} {
+	users, err := uc.cloudClient.ListDir("")
+	if err == nil {
+		uc.NumRegisteredUsers = len(users)
+	}
+	uc.addLookup(0)
+	return uc
+}
+
+func (uc *serverStatus) addLookup(count int) {
+	now := time.Now()
+	if now.Add(-1 * time.Hour).After(uc.LastReset) {
+		uc.LastReset = now
+		uc.NumLookupsLastHour = 0
+	}
+	uc.NumLookupsLastHour += count
+}
+
 // newUserServer creates a UserService from a pre-configured GCP instance and an HTTP client.
 func newUserServer(cloudClient gcp.GCP) *userServer {
 	u := &userServer{
@@ -283,7 +315,9 @@ func newUserServer(cloudClient gcp.GCP) *userServer {
 
 func main() {
 	flag.Parse()
-	u := newUserServer(gcp.New(*projectID, *bucketName, gcp.BucketOwnerFullCtrl))
+	gcp := gcp.New(*projectID, *bucketName, gcp.BucketOwnerFullCtrl)
+	userStats = &serverStatus{cloudClient: gcp}
+	u := newUserServer(gcp)
 	if !*readOnly {
 		// TODO: these should be authenticated too.
 		http.HandleFunc("/addkey", u.addKeyHandler)
@@ -291,6 +325,7 @@ func main() {
 		http.HandleFunc("/delete", u.deleteHandler)
 	}
 	http.HandleFunc("/get", u.getHandler)
+	expvar.Publish("user stats", expvar.Func(userStats.update))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
