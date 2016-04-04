@@ -16,6 +16,24 @@
       "revId": "e359750895dead03e3221e9a5aebb674cd92b93c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eeca6838_6abb12e9",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-04T20:59:47Z",
+      "side": 1,
+      "message": "Yup, typo. Good catch. Fixed. Thanks.",
+      "parentUuid": "eeca6838_779c5b9c",
+      "revId": "e359750895dead03e3221e9a5aebb674cd92b93c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
