@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_aaf6daa1",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-04T21:22:24Z",
+      "side": 1,
+      "message": "Should probably pass common via pointer to avoid copying data around. \n\nBut, I think taking a non-exported struct (\u0027common\u0027) will likely make it harder to move this out later on. So, how about making c.parsePublicKey and c.publicKey be independent of common? You could have:\n\npublicKey(ctx *upspin.Context, user upspin.UserName, keyType string) (...)\n\nand \n\nparsePublicKey(publicKey upspin.PublicKey, keyType string) ...\n\nWhere keyType needs to match the packer\u0027s expected key.\n\nAnd then setkey could simply be:\n\nReadKey(ctx)\n\nwhere the context would tell you the location of the key instead of the key itself and its type (the keyType used above)?\n\nI\u0027m not sure this suggestion helps where you\u0027re going. Maybe I don\u0027t understand what the next CL will be. I\u0027d expect Factotum to be exported (capital F) at some point. Is that the goal?",
+      "revId": "e0ae18df0490e74dbd7f069154d30e67070c5953",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
