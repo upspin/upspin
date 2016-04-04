@@ -15,8 +15,8 @@ package access
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
-
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/path"
@@ -209,4 +209,52 @@ func parseLine(line []byte) (state, []path.Parsed, int) {
 // IsAccessFile reports whether the pathName contains a file named Access, which is special.
 func IsAccessFile(pathName upspin.PathName) bool {
 	return strings.HasSuffix(string(pathName), accessFile)
+}
+
+// HasAccess reports whether a given user has access to a path, given a slice of allowed users with that access. The
+// slice of allowed users may contain only the following special wildcards: "*" which means anyone has access
+// and "*@<domain>" which means any one from that domain has access"
+func HasAccess(user upspin.UserName, parsedPath path.Parsed, allowedAccess []upspin.UserName) (bool, error) {
+	// First, if user is the owner, access is granted.
+	if user == parsedPath.User {
+		return true, nil
+	}
+	// Save space for this user's domain if we need to match wildcards, but process it lazily.
+	var userDomain string
+	for _, u := range allowedAccess {
+		if u == user {
+			return true, nil
+		}
+		// We interpret "*" and "*@<domain>" specially.
+		if strings.HasPrefix(string(u), "*") {
+			if u == "*" {
+				// Everyone has access.
+				return true, nil
+			}
+			pos := strings.IndexByte(string(u), '@')
+			if pos != 1 {
+				// This should never happen if we took allowedAccess from a valid Metadata entry.
+				return false, errors.New("malformed user name")
+			}
+			// We now need user and owner domains.
+			var err error
+			if userDomain == "" {
+				_, userDomain, err = path.UserAndDomain(user)
+				if err != nil {
+					// This should never happen if we took allowedAccess from a valid Metadata entry.
+					return false, err
+				}
+			}
+			_, accessDomain, err := path.UserAndDomain(u)
+			if err != nil {
+				// This should never happen if we took allowedAccess from a valid Metadata entry.
+				return false, err
+			}
+			// Both userDomain and ownerDomain are guaranteed not empty at this point.
+			if userDomain == accessDomain {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
