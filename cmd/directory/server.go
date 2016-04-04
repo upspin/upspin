@@ -12,6 +12,7 @@ import (
 	goPath "path"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -419,8 +420,16 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			if err != nil {
 				netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
 			}
-			// TODO: should we include metadata?
-			dirEntries = append(dirEntries, de)
+			// Verify if user has proper read ACL.
+			hasAccess, err := access.HasAccess(sess.User(), parsed, de.Metadata.Readers)
+			if err != nil {
+				logErr.Printf("Error checking access for user: %s: %s", sess.User(), err)
+				continue
+			}
+			if hasAccess {
+				// TODO: should we include metadata?
+				dirEntries = append(dirEntries, de)
+			}
 		}
 	}
 	netutil.SendJSONReply(w, dirEntries)
