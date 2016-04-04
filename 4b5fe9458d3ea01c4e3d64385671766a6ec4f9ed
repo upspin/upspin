@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_6d9c8c9c",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-04T22:41:09Z",
+      "side": 1,
+      "message": "s/\"$/./",
+      "revId": "4b5fe9458d3ea01c4e3d64385671766a6ec4f9ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
