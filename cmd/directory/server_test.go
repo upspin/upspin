@@ -15,12 +15,13 @@ import (
 )
 
 const (
-	pathName       = "test@foo.com/mydir/myfile.txt"
-	parentPathName = "test@foo.com/mydir"
+	userName       = "test@foo.com"
+	parentPathName = userName + "/mydir"
+	pathName       = parentPathName + "/myfile.txt"
 )
 
 var (
-	dummySess = testauth.NewSessionForTesting("test@google.com", false, nil)
+	dummySess = testauth.NewSessionForTesting(userName, false, nil)
 	dir       = upspin.DirEntry{
 		Name: upspin.PathName(pathName),
 		Metadata: upspin.Metadata{
@@ -131,27 +132,41 @@ func TestLookupPathNotFound(t *testing.T) {
 }
 
 func TestGlobComplex(t *testing.T) {
+	// Make sure user can read the final returned dir entries.
+	meta := upspin.Metadata{
+		Readers: []upspin.UserName{upspin.UserName("*")},
+	}
 	// Create dir entries for files that match that will be looked up after Globbing.
 	dir1 := upspin.DirEntry{
-		Name: "f@b.co/subdir/a.pdf",
+		Name:     "f@b.co/subdir/a.pdf",
+		Metadata: meta,
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
-		Name: "f@b.co/subdir2/b.pdf",
+		Name:     "f@b.co/subdir2/b.pdf",
+		Metadata: meta,
 	}
 	dir2JSON := toJSON(t, dir2)
+	// dir3 is a match, but is not readable to user.
+	dir3 := upspin.DirEntry{
+		Name: "f@b.co/subdir3/c.pdf",
+		Metadata: upspin.Metadata{
+			Readers: []upspin.UserName{upspin.UserName("notyou@notyou.com")},
+		},
+	}
+	dir3JSON := toJSON(t, dir3)
 
 	lgcp := &listGCP{
 		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
-			Ref:  []string{"f@b.co/subdir/a.pdf", "f@b.co/subdir2/b.pdf"},
-			Data: [][]byte{dir1JSON, dir2JSON},
+			Ref:  []string{"f@b.co/subdir/a.pdf", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
+			Data: [][]byte{dir1JSON, dir2JSON, dir3JSON},
 		},
 		prefix: "f@b.co/",
 		fileNames: []string{"f@b.co/subdir/a.pdf", "f@b.co/otherdir/b.pdf", "f@b.co/subfile",
-			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf"},
+			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
 	}
 
-	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2})
+	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2}) // dir3 is NOT returned to user (no access)
 	resp := nettest.NewExpectingResponseWriter(string(respBody))
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/sub*/*.pdf", nil)
 
@@ -168,13 +183,19 @@ func TestGlobComplex(t *testing.T) {
 }
 
 func TestGlobSimple(t *testing.T) {
+	// Make sure user can read the final returned DirEntry
+	meta := upspin.Metadata{
+		Readers: []upspin.UserName{upspin.UserName(userName)},
+	}
 	// Create dir entries for files that match that will be looked up after Globbing.
 	dir1 := upspin.DirEntry{
-		Name: "f@b.co/subdir/a.pdf",
+		Name:     "f@b.co/subdir/a.pdf",
+		Metadata: meta,
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
-		Name: "f@b.co/subdir/b.pdf",
+		Name:     "f@b.co/subdir/b.pdf",
+		Metadata: meta,
 	}
 	dir2JSON := toJSON(t, dir2)
 
