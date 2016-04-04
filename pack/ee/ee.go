@@ -150,6 +150,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *
 }
 
 func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
+	// Pick fresh file encryption key, and create ciphertext.
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
@@ -159,31 +160,26 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	if err != nil {
 		return 0, err
 	}
-	nCipher, err := c.encrypt(ciphertext, cleartext, dkey)
+	cipherLen, err := c.encrypt(ciphertext, cleartext, dkey)
+	if err != nil {
+		return 0, err
+	}
+	b := sha256.Sum256(ciphertext)
+	cipherSum := b[:]
+
+	// Sign ciphertext.
+	var f factotum
+	err = f.setkey(ctx, c)
+	if err != nil {
+		return 0, err
+	}
+	sig, err := f.sign(c.ciphersuite, pathname, meta.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, err
 	}
 
-	// Set up readers. The writer of a file is always a reader.
+	// Wrap for the readers.  The writer of a file is always a reader.
 	usernames := append([]upspin.UserName{ctx.UserName}, meta.Readers...)
-	myRawPublicKey, err := c.publicKey(ctx, ctx.UserName)
-	if err != nil {
-		return 0, err
-	}
-	myPublicKey, err := c.parsePublicKey(myRawPublicKey)
-	if err != nil {
-		return 0, err
-	}
-	myPrivateKey, err := c.parsePrivateKey(myPublicKey, ctx.KeyPair)
-	if err != nil {
-		return 0, err
-	}
-
-	r, s, err := ecdsa.Sign(rand.Reader, myPrivateKey, c.verHash(pathname, meta.Time, dkey, ciphertext))
-	if err != nil {
-		return 0, err
-	}
-	sig := signature{r, s}
 	var firstErr error
 	wrap := make([]wrappedKey, len(usernames))
 	nwrap := 0
@@ -204,19 +200,22 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 			}
 			continue
 		}
-		log.Printf("Wrapping key for user %s", u)
-		wrap[nwrap], err = c.aesWrap(readerPublicKey, myPrivateKey, dkey)
+		wrap[nwrap], err = c.aesWrap(readerPublicKey, dkey)
+		v := wrap[nwrap].ephemeral
+		log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
 		if err != nil {
 			return 0, err
 		}
 		nwrap++
 	}
 	wrap = wrap[:nwrap]
+
+	// Serialize packer metadata.
 	err = c.pdMarshal(&meta.PackData, sig, wrap)
 	if err != nil {
 		return 0, err
 	}
-	return nCipher, firstErr
+	return cipherLen, firstErr
 }
 
 func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
@@ -256,26 +255,28 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	if err != nil {
 		return 0, err
 	}
-	privateKey, err := c.parsePrivateKey(pubkey, ctx.KeyPair)
+	var f factotum
+	err = f.setkey(ctx, c)
 	if err != nil {
 		return 0, err
 	}
 	// For quick lookup, hash my public key and locate my wrapped
 	// key in the metadata.
 	rhash := c.keyHash(pubkey)
+	b := sha256.Sum256(ciphertext)
+	cipherSum := b[:]
 	for _, w := range wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
-			log.Printf("unequal %x\n        %x\n", rhash, w.keyHash)
 			continue
 		}
 		// Decode my wrapped key using my private key
-		dkey, err = c.aesUnwrap(privateKey, w)
+		dkey, err = c.aesUnwrap(&f, w)
 		if err != nil {
 			log.Printf("unwrap failed: %v", err)
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
-		if !ecdsa.Verify(ownerPubKey, c.verHash(pathname, meta.Time, dkey, ciphertext), sig.r, sig.s) {
+		if !ecdsa.Verify(ownerPubKey, verHash(c.ciphersuite, pathname, meta.Time, dkey, cipherSum), sig.r, sig.s) {
 			log.Println("verify failed")
 			return 0, errVerify
 		}
@@ -283,13 +284,6 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 		return c.decrypt(cleartext, ciphertext, dkey)
 	}
 	return 0, errNoWrappedKey
-}
-
-func (c common) verHash(pathname upspin.PathName, time upspin.Time, dkey, ciphertext []byte) []byte {
-	h := sha256.New()
-	h.Write([]byte(fmt.Sprintf("%02x:%s:%d:%x:", c.ciphersuite, pathname, time, dkey)))
-	h.Write(ciphertext)
-	return h.Sum(nil)
 }
 
 func (c common) keyHash(p *ecdsa.PublicKey) []byte {
@@ -301,7 +295,7 @@ func (c common) keyHash(p *ecdsa.PublicKey) []byte {
 }
 
 // aesWrap implements NIST 800-56Ar2; see also RFC6637 §8.
-func (c common) aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) (w wrappedKey, err error) {
+func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// v, V=vG  ephemeral key pair
 	// S = vR   shared point
@@ -341,10 +335,10 @@ func (c common) aesWrap(R *ecdsa.PublicKey, own *ecdsa.PrivateKey, dkey []byte) 
 	return
 }
 
-func (c common) aesUnwrap(R *ecdsa.PrivateKey, w wrappedKey) (dkey []byte, err error) {
+func (c common) aesUnwrap(f *factotum, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	sx, sy := c.curve.ScalarMult(w.ephemeral.X, w.ephemeral.Y, R.D.Bytes())
+	sx, sy := f.scalarmult(c.curve, w.ephemeral.X, w.ephemeral.Y)
 	S := elliptic.Marshal(c.curve, sx, sy)
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
@@ -500,22 +494,22 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	return len(ciphertext), nil
 }
 
-// parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
-// string representation of the private key.
-func (c common) parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.KeyPair) (priv *ecdsa.PrivateKey, err error) {
-	if n := len(privateKey.Private) - 1; privateKey.Private[n] == '\n' {
-		privateKey.Private = privateKey.Private[:n]
-	}
-	var d big.Int
-	err = d.UnmarshalText([]byte(privateKey.Private))
-	if err != nil {
-		return nil, err
-	}
-	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
+func verHash(ciphersuite upspin.Packing, pathname upspin.PathName, time upspin.Time, dkey, cipherSum []byte) []byte {
+	b := sha256.Sum256([]byte(fmt.Sprintf("%02x:%s:%d:%x:%x", ciphersuite, pathname, time, dkey, cipherSum)))
+	return b[:]
 }
 
 // publicKey returns the string representation of a user's public key.
 func (c common) publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+
+	// KeyPairs have three representations:
+	// 1. string, used for storage and between programs like User.Lookup
+	// 2. ecdsa.PublicKey, parsed for computation
+	// 3. a secret seed sufficient to reconstruct the key pair
+	// In form 1, the first bytes describe the packing name, e.g. "p256".
+	// In form 2, there is an elliptic.Curve field in the struct that plays that role.
+	// Form 3, used only in keygen.go, is simply 128 bits of entropy.
+
 	log.Printf("Getting pub key for user: %s", user)
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName) {
@@ -551,4 +545,49 @@ func (c common) parsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, er
 
 func (c common) isValidKeyForPacker(publicKey upspin.PublicKey) bool {
 	return strings.HasPrefix(string(publicKey), c.packerString)
+}
+
+// factotum prepares for an agent, potentially remote, to handle private key operations.
+type factotum struct {
+	strKeyPair   upspin.KeyPair   // string form of key pair
+	ecdsaKeyPair ecdsa.PrivateKey // ecdsa form of key pair
+}
+
+func (f *factotum) setkey(ctx *upspin.Context, c common) error {
+	strPublicKey, err := c.publicKey(ctx, ctx.UserName)
+	if err != nil {
+		return err
+	}
+	ecdsaPublicKey, err := c.parsePublicKey(strPublicKey)
+	if err != nil {
+		return err
+	}
+	// TODO move reading of private key from Context to here
+	kp := ctx.KeyPair
+	if n := len(kp.Private) - 1; kp.Private[n] == '\n' {
+		kp.Private = kp.Private[:n]
+	}
+	var d big.Int
+	err = d.UnmarshalText([]byte(kp.Private))
+	if err != nil {
+		return err
+	}
+	f.strKeyPair = kp
+	f.ecdsaKeyPair.PublicKey = *ecdsaPublicKey
+	f.ecdsaKeyPair.D = &d
+	return nil
+}
+
+func (f *factotum) sign(p upspin.Packing, pathname upspin.PathName, time upspin.Time, dkey, cipherSum []byte) (signature, error) {
+	log.Printf("factotum.sign %02x %s %d %x\n", p, pathname, time, cipherSum)
+	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, verHash(p, pathname, time, dkey, cipherSum))
+	if err != nil {
+		return sig0, err
+	}
+	return signature{r, s}, nil
+}
+
+func (f *factotum) scalarmult(curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int) {
+	log.Printf("factotum.scalarmult %d %d\n", x, y)
+	return curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
 }
