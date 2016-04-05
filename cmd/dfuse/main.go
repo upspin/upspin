@@ -11,6 +11,9 @@ import (
 	"bazil.org/fuse/fs"
 
 	"upspin.googlesource.com/upspin.git/context"
+	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/testuser"
+
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
@@ -18,7 +21,10 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
+)
+
+var (
+	testFlag = flag.String("test", "", "set up test context with specified user")
 )
 
 func usage() {
@@ -40,6 +46,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Hack for testing
+	if *testFlag != "" {
+		testUser, ok := context.User.(*testuser.Service)
+		if !ok {
+			log.Fatal("Not a testuser Service")
+		}
+
+		if err := testUser.Install(upspin.UserName(*testFlag), context.Directory); err != nil {
+			log.Print(err)
+		}
+	}
+
 	f := newUpspinFS(context, newUserCache(context))
 
 	c, err := fuse.Mount(
