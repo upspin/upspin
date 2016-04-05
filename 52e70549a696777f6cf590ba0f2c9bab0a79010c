@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeca6838_46796502",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-05T19:54:03Z",
+      "side": 1,
+      "message": "if you want to fix Client as well, that would be great. Otherwise, I\u0027ll try to get to it tomorrow or Thurs.",
+      "revId": "52e70549a696777f6cf590ba0f2c9bab0a79010c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eeca6838_867f4dea",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-05T19:54:03Z",
+      "side": 1,
+      "message": "You could, if you wanted a longer hash, use key256 too under key/. No problem with this tho.",
+      "revId": "52e70549a696777f6cf590ba0f2c9bab0a79010c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
