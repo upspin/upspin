@@ -1,7 +1,7 @@
 // Package access parses access control files.
 //
 // Access files have the following format:
-// <access type>: <email>[, <email>, ...]
+// <access type>[, <access type]: <email>[, <email>, ...]
 //
 // Anything after a '#' character is ignored
 //
@@ -9,7 +9,7 @@
 //
 // Read: email@domain,com, email2@domain.com
 // Write: writer@domain.com, writer2@domain.com, writer3@exmaple,com
-// Append: appender@example.com # This is a comment
+// Append,Write: appender@example.com # This is a comment
 package access
 
 import (
@@ -35,43 +35,75 @@ type Parsed struct {
 	Appenders []path.Parsed
 }
 
-type state int
-
 const (
-	newSection state = iota
-	readers
-	writers
-	appenders
-	invalid
+	invalidRight = iota
+	readRight
+	writeRight
+	appendRight
 )
 
 const (
 	invalidFormat = "%s:%d: unrecognized text: %q"
 )
 
-// Parse parses the contents of a path name, in data, and returns the parsed contents if they abide by the rules of Access files.
+// Parse parses the contents of the path name, in data, and returns the parsed contents.
 func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
 	var p Parsed
+	// Temporaries. Pre-allocate so they can be reused in the loop, saving allocations.
+	rights := make([][]byte, 10)
+	users := make([][]byte, 10)
 	s := bufio.NewScanner(bytes.NewReader(data))
-	for lineNum := 0; s.Scan(); lineNum++ {
-		if s.Err() != nil {
-			return nil, s.Err()
-		}
+	for lineNum := 1; s.Scan(); lineNum++ {
 		line := s.Bytes()
-		if isAllBlank(line) {
+
+		// Remove comments.
+		if index := bytes.IndexByte(line, '#'); index >= 0 {
+			line = line[:index]
+		}
+
+		// Ignore blank lines.
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
 			continue
 		}
-		state, elems, offending := parseLine(line)
-		switch state {
-		case readers:
-			p.Readers = append(p.Readers, elems...)
-		case writers:
-			p.Writers = append(p.Writers, elems...)
-		case appenders:
-			p.Appenders = append(p.Appenders, elems...)
-		case invalid:
-			return nil, fmt.Errorf(invalidFormat, pathName, lineNum+1, line[offending:])
+
+		// A line is two non-empty comma-separated lists, separated by a colon.
+		colon := bytes.IndexByte(line, ':')
+		if colon < 0 {
+			return nil, fmt.Errorf("%s:%d: syntax error: no colon on line: %q", pathName, lineNum, line)
 		}
+
+		// Parse rights and users lists.
+		rightsText := bytes.TrimSpace(line[:colon]) // TrimSpace for good error messages below.
+		rights = splitList(rights[:0], rightsText)
+		if rights == nil {
+			return nil, fmt.Errorf("%s:%d: syntax error: invalid rights list: %q", pathName, lineNum, rightsText)
+		}
+		usersText := bytes.TrimSpace(line[colon+1:])
+		users := splitList(users[:0], usersText)
+		if users == nil {
+			return nil, fmt.Errorf("%s:%d: syntax error: invalid users list: %q", pathName, lineNum, usersText)
+		}
+
+		var err error
+		for _, right := range rights {
+			switch which(right) {
+			case readRight:
+				p.Readers, err = parsedAppend(p.Readers, users...)
+			case writeRight:
+				p.Writers, err = parsedAppend(p.Writers, users...)
+			case appendRight:
+				p.Appenders, err = parsedAppend(p.Appenders, users...)
+			case invalidRight:
+				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
+			}
+		}
+		if err != nil {
+			return nil, fmt.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
+		}
+	}
+	if s.Err() != nil {
+		return nil, s.Err()
 	}
 	return &p, nil
 }
@@ -82,8 +114,57 @@ func isSpace(b byte) bool {
 		return true
 	default:
 		return false
-
 	}
+}
+
+// parsedAppend parses the users (as path.Parse values) and appends them to the list.
+func parsedAppend(list []path.Parsed, users ...[]byte) ([]path.Parsed, error) {
+	for _, user := range users {
+		p, err := path.Parse(upspin.PathName(user) + "/")
+		if err != nil {
+			// TODO: should do syntax check of group names if path.Parse fails.
+			continue
+		}
+		if len(p.Elems) > 0 {
+			// TODO: can't handle groups yet; ignore.
+			continue
+		}
+		list = append(list, p)
+	}
+	return list, nil
+}
+
+// splitList parses a comma-separated list, ignoring spaces. It returns nil
+// if the list is badly formed. We avoid bytes.Split because it allocates.
+func splitList(list [][]byte, text []byte) [][]byte {
+	// One comma- or EOF-terminated element per iteration.
+	for i, j := 0, 0; i < len(text); i = j {
+		for j = i; j != len(text) && text[j] != ','; j++ {
+		}
+		list = append(list, text[i:j])
+		if j != len(text) { // Skip the comma.
+			j++
+		}
+	}
+	if len(list) == 0 {
+		return nil
+	}
+	for i, elem := range list {
+		elem = bytes.TrimSpace(elem)
+		if len(elem) == 0 {
+			return nil
+		}
+		// If it's still got spaces, there's trouble.
+		// TODO: One day we may need quoted strings for file names with spaces.
+		// TODO: There is strings.ContainsAny but not bytes.ContainsAny.
+		for _, b := range elem {
+			if isSpace(b) {
+				return nil
+			}
+		}
+		list[i] = elem
+	}
+	return list
 }
 
 // toLower lower cases a single character.
@@ -92,118 +173,27 @@ func toLower(b byte) byte {
 	return b | ('a' - 'A')
 }
 
-func isAllBlank(buf []byte) bool {
-	for _, b := range buf {
-		if b != ' ' && b != '\t' {
-			return false
-		}
+// which reports which right the text represents. Case is ignored and a right may be
+// specified by its first letter only. We know that the text is not empty.
+func which(right []byte) int {
+	for i, c := range right {
+		right[i] = toLower(c)
 	}
-	return true
-}
-
-// equalsLower reports whether word, once lower-cased, is equal to want.
-func equalsLower(word string, want string) bool {
-	if len(word) != len(want) {
-		return false
-	}
-	for i := 0; i < len(word); i++ {
-		if toLower(word[i]) != want[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func stateFromFile(line []byte, first, last int) state {
-	if first < 0 || last < 0 || first > last {
-		return invalid
-	}
-	// Try to avoid allocations here: do not call strings.ToUpper here as it performs allocations.
-	token := string(line[first : last+1])
-	const (
-		read   = "read"
-		append = "append"
-		write  = "write"
-	)
-	switch toLower(line[first]) {
+	switch right[0] {
 	case 'r':
-		if len(token) == 1 || equalsLower(token, read) {
-			return readers
+		if len(right) == 1 || bytes.Equal(right, []byte("read")) {
+			return readRight
 		}
 	case 'w':
-		if len(token) == 1 || equalsLower(token, write) {
-			return writers
+		if len(right) == 1 || bytes.Equal(right, []byte("write")) {
+			return writeRight
 		}
 	case 'a':
-		if len(token) == 1 || equalsLower(token, append) {
-			return appenders
+		if len(right) == 1 || bytes.Equal(right, []byte("append")) {
+			return appendRight
 		}
 	}
-	return invalid
-}
-
-// parseLine returns the section the line belongs to (readers, appenders, etc) and a list of non-comment,
-// non-marker strings as found. In case of error, state will be invalid and the position of the offending character is
-// returned as an int.
-func parseLine(line []byte) (state, []path.Parsed, int) {
-	state := newSection
-	lastNonEmpty := 0
-	firstNonEmpty := -1
-	var ids []path.Parsed
-	lastChar := len(line) - 1
-	for i, c := range line {
-		if c == '#' {
-			return state, ids, -1
-		}
-		if state == newSection {
-			if c != ':' {
-				if !isSpace(c) {
-					if firstNonEmpty < 0 {
-						firstNonEmpty = i
-					}
-					lastNonEmpty = i
-				}
-				continue
-			}
-			// Found a colon. Check what the previous non-whitespace character was.
-			state = stateFromFile(line, firstNonEmpty, lastNonEmpty)
-			if state == invalid {
-				return state, nil, i
-			}
-			lastNonEmpty = i + 1
-			continue
-		}
-		// Have we found a separator?
-		if isSpace(c) || c == ',' || i == lastChar {
-			if i == lastChar {
-				i++
-			}
-			// Our token is from sectionIndex to i, if non-empty
-			token := line[lastNonEmpty:i]
-			if isAllBlank(token) {
-				lastNonEmpty = i + 1
-				continue
-			}
-			lastNonEmpty = i + 1
-			// Perform the necessary allocation and path parsing
-			p, err := path.Parse(upspin.PathName(token) + "/")
-			if err != nil || len(p.Elems) > 0 {
-				// Ignore groups for now.
-				continue
-			}
-			ids = append(ids, p)
-			continue
-		}
-		// Can't have another section on the same line
-		if c == ':' {
-			return invalid, nil, i
-		}
-	}
-	if state == newSection {
-		// This can only happen if there was no ":" found or on blank lines.
-		return invalid, nil, 0
-	}
-	return state, ids, -1
+	return invalidRight
 }
 
 // IsAccessFile reports whether the pathName contains a file named Access, which is special.

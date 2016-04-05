@@ -46,6 +46,16 @@ func TestParse(t *testing.T) {
 	containsAll(t, p.Appenders, []string{"m@n.mn", "appenderjohn@c.com"})
 }
 
+func TestMallocs(t *testing.T) {
+	allocs := testing.AllocsPerRun(100, func() {
+		access.Parse(accessFile, accessText)
+	})
+	t.Log("allocs:", allocs)
+	if allocs != 26 {
+		t.Fatal("expected 26 allocations, got ", allocs)
+	}
+}
+
 func TestHasAccess(t *testing.T) {
 	const (
 		owner    = "foo@bob.com"
@@ -127,7 +137,7 @@ func TestParseContainsGroupName(t *testing.T) {
 
 func TestParseWrongFormat1(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: unrecognized text: "
+		expectedErr = accessFile + ":1: invalid right: \"rrrr\""
 	)
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
 	_, err := access.Parse(accessFile, accessText)
@@ -141,7 +151,7 @@ func TestParseWrongFormat1(t *testing.T) {
 
 func TestParseWrongFormat2(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":2: unrecognized text: "
+		expectedErr = accessFile + ":2: syntax error: invalid users list: "
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
 	_, err := access.Parse(accessFile, accessText)
@@ -155,7 +165,7 @@ func TestParseWrongFormat2(t *testing.T) {
 
 func TestParseWrongFormat3(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: unrecognized text: "
+		expectedErr = accessFile + ":1: syntax error: invalid rights"
 	)
 	accessText := []byte(": bob@abc.com") // missing access format text.
 	_, err := access.Parse(accessFile, accessText)
@@ -169,7 +179,7 @@ func TestParseWrongFormat3(t *testing.T) {
 
 func TestParseWrongFormat4(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: unrecognized text: "
+		expectedErr = accessFile + ":1: invalid right: \"rea\""
 	)
 	accessText := []byte("rea:bob@abc.com") // invalid access format text.
 	_, err := access.Parse(accessFile, accessText)
@@ -183,7 +193,7 @@ func TestParseWrongFormat4(t *testing.T) {
 
 func TestParseMissingAccessField(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: unrecognized text: "
+		expectedErr = accessFile + ":1: syntax error: no colon on line: "
 	)
 	accessText := []byte("bob@abc.com")
 	_, err := access.Parse(accessFile, accessText)
@@ -197,7 +207,7 @@ func TestParseMissingAccessField(t *testing.T) {
 
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":3: unrecognized text: "
+		expectedErr = accessFile + ":3: syntax error: invalid users list: "
 	)
 	accessText := []byte("\n\nr: a@b.co r: c@b.co")
 	_, err := access.Parse(accessFile, accessText)
@@ -232,7 +242,7 @@ func TestIsAccessFile(t *testing.T) {
 
 func containsAll(t *testing.T, p []path.Parsed, expect []string) {
 	if len(p) != len(expect) {
-		t.Fatalf("Expected %d paths, got %d", len(expect), len(p))
+		t.Fatalf("Expected %d paths %q, got %d: %v", len(expect), expect, len(p), p)
 	}
 	for _, path := range p {
 		var compare string
