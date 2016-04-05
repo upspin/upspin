@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	goPath "path"
@@ -28,10 +27,9 @@ const (
 
 // Directory is an implementation of upspin.Directory that uses GCP to store its data.
 type Directory struct {
-	serverURL    string
-	storeService upspin.Store
-	client       netutil.HTTPClientInterface
-	timeNow      func() upspin.Time
+	serverURL string
+	client    netutil.HTTPClientInterface
+	timeNow   func() upspin.Time
 }
 
 // Guarantee we implement the interface
@@ -42,15 +40,14 @@ var (
 )
 
 // newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
-func newDirectory(serverURL string, storeService upspin.Store, client netutil.HTTPClientInterface, timeFunc func() upspin.Time) *Directory {
+func newDirectory(serverURL string, client netutil.HTTPClientInterface, timeFunc func() upspin.Time) *Directory {
 	if timeFunc == nil {
 		timeFunc = upspin.Now
 	}
 	return &Directory{
-		serverURL:    serverURL,
-		storeService: storeService,
-		client:       client,
-		timeNow:      timeFunc,
+		serverURL: serverURL,
+		client:    client,
+		timeNow:   timeFunc,
 	}
 }
 
@@ -75,55 +72,30 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
+func (d *Directory) Put(name upspin.PathName, location upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
 	const op = "Put"
 
 	if len(packdata) < 1 {
-		return zeroLoc, newError(op, name, errors.New("missing packing type in packdata"))
+		return newError(op, name, errors.New("missing packing type in packdata"))
 	}
 	parsed, err := path.Parse(name)
 	if err != nil {
-		return zeroLoc, newError(op, name, errors.New("invalid path"))
+		return newError(op, name, errors.New("invalid path"))
 	}
 	canonicalName := parsed.Path()
 
 	// Now, let's make a directory entry to Put to the server
 	var dirEntry *upspin.DirEntry
 
-	// Check whether this is an Access file, which is special and must be handled here, since the dir
-	// server does not see file contents.
-	if access.IsAccessFile(canonicalName) {
-		if upspin.Packing(packdata[0]) != upspin.PlainPack {
-			// The directory service must be able to read the bytes passed in.
-			return zeroLoc, newError(op, canonicalName, errors.New("packing must be plain for Access file"))
-		}
-		accessPerms, err := access.Parse(canonicalName, data)
-		if err != nil {
-			return zeroLoc, newError(op, "", err) // err already contains canonicalName
-		}
-		// TODO: no support for groups yet.
-		readers := make([]upspin.UserName, 0, len(accessPerms.Readers))
-		for _, r := range accessPerms.Readers {
-			readers = append(readers, r.User)
-		}
-
-		// Patch the parent dir with updated readers.
-		patchDirEntry := upspin.DirEntry{
-			Name: parsed.Drop(1).Path(),
-			Metadata: upspin.Metadata{
-				Readers: readers,
-			},
-		}
-		err = d.storeDirEntry(op, netutil.Patch, &patchDirEntry)
-		if err != nil {
-			return zeroLoc, err
-		}
+	if access.IsAccessFile(canonicalName) && upspin.Packing(packdata[0]) != upspin.PlainPack {
+		// The directory server must be able to read the bytes from the reference.
+		return newError(op, canonicalName, errors.New("packing must be plain for Access file"))
 	}
 
 	// Prepare default optionals.
 	commitOpts := &upspin.PutOptions{
 		Sequence: 0, // Explicit for clarity. 0 = don't care.
-		Size:     uint64(len(data)),
+		Size:     0,
 		Time:     d.timeNow(),
 	}
 	if opts != nil {
@@ -138,24 +110,10 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 		}
 	}
 
-	// First, store the data itself, to find the reference.
-	// TODO: bind to the Store server pointed at by the dirEntry instead of using the default one.
-	ref, err := d.storeService.Put(data)
-	if err != nil {
-		log.Printf("storeService returned error: %v", err)
-		return zeroLoc, err
-	}
-	// We now have a final Reference in ref. We now create a
-	// directory entry for this Location.  From here on, if an
-	// error occurs, we'll have a dangling block. We could delete
-	// it, but we can always do fsck-style operations to find them
-	// later.
+	// We now create a directory entry for this Location.
 	dirEntry = &upspin.DirEntry{
-		Name: canonicalName,
-		Location: upspin.Location{
-			Reference: ref,
-			Endpoint:  d.storeService.Endpoint(),
-		},
+		Name:     canonicalName,
+		Location: location,
 		Metadata: upspin.Metadata{
 			IsDir:    false,
 			Sequence: commitOpts.Sequence,
@@ -167,10 +125,10 @@ func (d *Directory) Put(name upspin.PathName, data []byte, packdata upspin.PackD
 	}
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)
 	if err != nil {
-		return zeroLoc, err
+		return err
 	}
 
-	return dirEntry.Location, nil
+	return nil
 }
 
 // storeDirEntry stores the given dirEntry in the server by applying an HTTP method (POST or PATCH accepted by server).
@@ -325,7 +283,6 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 		return nil, newError(op, "", fmt.Errorf("required endpoint with a valid HTTP address: %v", err))
 	}
 	d.serverURL = serverURL.String()
-	d.storeService = context.Store
 	authClient, isSecure := d.client.(*auth.HTTPClient)
 	if isSecure {
 		authClient.SetUserName(context.UserName)
@@ -365,5 +322,5 @@ func newError(op string, path upspin.PathName, err error) *dirError {
 
 func init() {
 	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
-	bind.RegisterDirectory(upspin.GCP, newDirectory("", nil, auth.NewAnonymousClient(&http.Client{}), nil))
+	bind.RegisterDirectory(upspin.GCP, newDirectory("", auth.NewAnonymousClient(&http.Client{}), nil))
 }
