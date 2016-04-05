@@ -7,7 +7,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/binary"
-	"errors"
 	"fmt"
 
 	"upspin.googlesource.com/upspin.git/pack"
@@ -95,9 +94,6 @@ func encodeKeys(priv *ecdsa.PrivateKey, keyType string) *upspin.KeyPair {
 
 // createKeysFromEntropy creates an ecsda private key from a given entropy.
 func createKeysFromEntropy(curve elliptic.Curve, entropy []byte) (*ecdsa.PrivateKey, error) {
-	if len(entropy) != 16 {
-		return nil, errors.New("only p256 supported at this time")
-	}
 	// Create crypto deterministic random generator from b.
 	d := &drng{}
 	cipher, err := aes.NewCipher(entropy)
