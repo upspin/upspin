@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"bazil.org/fuse"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -21,8 +23,9 @@ import (
 
 type cache struct {
 	sync.Mutex
-	dir  string // Directory for in-the-clear cached files.
-	next int    // The next sequence to use for temp files.
+	dir    string        // Directory for in-the-clear cached files.
+	next   int           // The next sequence to use for temp files.
+	client upspin.Client // A client for writing back files.
 }
 
 type cachedFile struct {
@@ -32,8 +35,8 @@ type cachedFile struct {
 	dirty   bool   // True if it needs to be written back on close.
 }
 
-func newCache(dir string) *cache {
-	c := &cache{dir: dir}
+func newCache(context *upspin.Context, dir string) *cache {
+	c := &cache{dir: dir, client: client.New(context)}
 	os.Mkdir(dir, 0700)
 
 	// Clean out any temporary files.
@@ -109,7 +112,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 				continue
 			}
 		}
-		cf.fname = filepath.Join(c.dir, fingerprint(loc, de.Metadata.Sequence))
+		cf.fname = filepath.Join(c.dir, fingerprint(loc))
 
 		// We assume that plain pack files are mutable and not conpletely
 		// under our control.  Only encrypted files are immutable and can
@@ -134,6 +137,15 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		}
 		if len(locs) > 0 {
 			log.Printf("%v redirects to %v", loc, locs)
+		outer:
+			for _, newLoc := range locs {
+				for _, oldLoc := range locations {
+					if oldLoc == newLoc {
+						continue outer
+					}
+				}
+				locations = append(locations, newLoc)
+			}
 			locations = append(locations, locs...)
 			continue
 		}
@@ -207,59 +219,31 @@ func (cf *cachedFile) writeBack(n *node) error {
 	// Read the whole file into memory. Hope it fits.
 	file, err := os.Open(cf.fname)
 	if err != nil {
-		return eio("%s opening %s (%q)", err, cf.fname, n.uname)
+		return eio("opening %q (%q): %s", cf.fname, n.uname, err)
 	}
 	defer file.Close()
 	info, err := file.Stat()
 	if err != nil {
-		return eio("%s stating %s (%q)", err, cf.fname, n.uname)
+		return eio("stating %q (%q): %s", cf.fname, n.uname, err)
 	}
 	cleartext := make([]byte, info.Size())
 	var sofar int64
 	for sofar != info.Size() {
 		len, err := file.ReadAt(cleartext[sofar:], sofar)
 		if err != nil {
-			return eio("%s reading %s (%q)", err, cf.fname, n.uname)
+			return eio("reading %q (%q): %s", cf.fname, n.uname, err)
 		}
 		sofar += int64(len)
 	}
 
-	// Find the user and packing to use.
-	_, err = n.f.users.lookup(n.user)
-	if err != nil {
-		return eio("looking up %s: %s", n.user, err)
-	}
-	packer := pack.Lookup(n.f.context.Packing)
-	if packer == nil {
-		return eio("unrecognized Packing %d for %q", n.f.context.Packing, n.uname)
-	}
-	meta := &upspin.Metadata{
-		Time: upspin.Now(),
-	}
-
-	// Get a buffer big enough for the packed data.  cipherLen is an upper limit and
-	// not necessarily the exact length of the resulting packed data.
-	cipherLen := packer.PackLen(n.f.context, cleartext, meta, n.uname)
-	if cipherLen < 0 {
-		return eio("PackLen failed for %q", n.uname)
-	}
-	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
-	if len(meta.PackData) == 0 {
-		meta.PackData = []byte{byte(n.f.context.Packing)}
-	}
-	cipher := make([]byte, cipherLen)
-	packedLen, err := packer.Pack(n.f.context, cipher, cleartext, meta, n.uname)
-	if err != nil {
-		return eio("%s Pack(%s)", err, n.uname)
-	}
-	cipher = cipher[:packedLen]
-
-	// Create the directory entry.  The Put will also create a referenced object in the store.
-	// TODO(p): write cipher to Store, pass the Location here instead of cipher. Why not use the Client instead?
-	// _, err = ue.dir.Put(n.uname, cipher, meta.PackData, &upspin.PutOptions{Size: uint64(len(cleartext))})
-	if err != nil {
-		return eio("%s Directory.Put(%s)", err, n.uname)
+	// Use the client library to write it back.
+	if _, err = cf.c.client.Put(n.uname, cleartext); err != nil {
+		return eio("writing back %s (%q): %s", cf.fname, n.uname, err)
 	}
 
 	return nil
+}
+
+func fingerprint(loc upspin.Location) string {
+	return fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
 }
