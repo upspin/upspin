@@ -88,6 +88,16 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		meta.PackData = []byte{byte(upspin.PlainPack)}
 	}
 
+	// Store it.
+	ref, err := c.context.Store.Put(cipher)
+	if err != nil {
+		return zeroLoc, err
+	}
+	loc := upspin.Location{
+		Endpoint:  c.context.Store.Endpoint(),
+		Reference: ref,
+	}
+
 	// Set options.
 	opts := upspin.PutOptions{
 		Sequence: 0, // Don't set. Will be increased by Directory.
@@ -95,8 +105,8 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		Time:     meta.Time,
 	}
 
-	// Store it.
-	return dir.Put(name, cipher, meta.PackData, &opts)
+	// Record it.
+	return loc, dir.Put(name, loc, meta.PackData, &opts)
 }
 
 // MakeDirectory implements upspin.Client.

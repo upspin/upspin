@@ -171,16 +171,16 @@ type Directory interface {
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
 
-	// Put stores the data at the given path and associates packdata with it.
-	// The data should already have been packed by the caller; that is, the
-	// data is not cleartext unless PlainPack is being used.
+	// Put stores the location of data at the given path and associates packdata with it.
+	// It is assumed that the data is available at that location and that
+	// the packdata is correct.
 	// All but the last element of the path name must already exist and be
 	// directories. The final element, if it exists, must not be a directory.
-	// If something is already stored under the path, the new data and
+	// If something is already stored under the path, the new location and
 	// packdata replace the old. If PutOptions is nil, the behavior of the options
 	// is equivalent  to the default behavior for each option value.
 	// See the documentation for PutOptions for more information.
-	Put(path PathName, data []byte, packdata PackData, opts *PutOptions) (Location, error)
+	Put(path PathName, loc Location, packdata PackData, opts *PutOptions) error
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
@@ -203,9 +203,7 @@ type Directory interface {
 type PutOptions struct {
 	// Size represents the size of the original, unpacked data as seen by
 	// the client. It is stored in the Size field of the metadata for the new item.
-	// It is advisory only and is unchecked. If the size is zero,
-	// the Directory service instead records the size of the packed ciphertext.
-	// (For a truly zero-sized, file, these should be equivalent.)
+	// It is advisory only and is unchecked. The default value of Size is zero.
 	Size uint64
 
 	// Time represents a timestamp for the item. It is stored in the Time

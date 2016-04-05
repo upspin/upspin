@@ -257,7 +257,15 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		return dirEntry.Location, nil
 	}
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("MakeDirectory", parsed.Path(), true, nil, dirPackData, nil)
+	ref, err := s.Store.Put([]byte{}) // Nothing to store, but we need a reference.
+	if err != nil {
+		return loc0, err
+	}
+	loc := upspin.Location{
+		Endpoint:  s.Store.Endpoint(),
+		Reference: ref,
+	}
+	return loc, s.put("MakeDirectory", parsed.Path(), true, loc, dirPackData, nil)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -266,30 +274,30 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(pathName upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
+func (s *Service) Put(pathName upspin.PathName, loc upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return loc0, err
+		return err
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("Put", parsed.Path(), false, data, packdata, opts)
+	return s.put("Put", parsed.Path(), false, loc, packdata, opts)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
-func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
+func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return loc0, nil
+		return nil
 	}
 	if len(parsed.Elems) == 0 {
-		return loc0, mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
+		return mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
 	dirEntry, ok := s.Root[parsed.User]
 	if !ok {
 		// Cannot create user root with Put.
-		return loc0, mkStrError(op, upspin.PathName(parsed.User), "no such user")
+		return mkStrError(op, upspin.PathName(parsed.User), "no such user")
 	}
 	dirRef := dirEntry.Location.Reference
 	// Iterate along the path up to but not past the last element.
@@ -300,48 +308,35 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	for i := 0; i < len(parsed.Elems)-1; i++ {
 		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
-			return loc0, err
+			return err
 		}
 		if !entry.Metadata.IsDir {
-			return loc0, mkStrError(op, parsed.First(i+1).Path(), "not a directory")
+			return mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
 		entries = append(entries, entry)
 		dirRef = entry.Location.Reference
 	}
 
-	// Store the data in the storage service.
-	ref, err := s.Store.Put(data)
-	if err != nil {
-		return loc0, err
-	}
-	loc := upspin.Location{
-		Endpoint:  s.Store.Endpoint(),
-		Reference: ref,
-	}
-
 	// Update directory holding the file.
 	// Need the name of the directory we're updating.
 	newEntry := &upspin.DirEntry{
-		Name: pathName,
-		Location: upspin.Location{
-			Endpoint:  s.StoreEndpoint,
-			Reference: ref,
-		},
+		Name:     pathName,
+		Location: loc,
 		Metadata: upspin.Metadata{
 			IsDir:    dataIsDir,
 			Sequence: 0,
-			Size:     uint64(len(data)),
+			Size:     0,
 			Time:     upspin.Now(),
 			Readers:  nil, // TODO
 			PackData: packdata,
 		},
 	}
 	if opts != nil {
+		// Default size is zero, so set it regardless.
+		newEntry.Metadata.Size = opts.Size
+		// Default values for the others affect behavior.
 		if opts.Sequence != 0 {
 			newEntry.Metadata.Sequence = opts.Sequence
-		}
-		if opts.Size != 0 {
-			newEntry.Metadata.Size = opts.Size
 		}
 		if opts.Time != 0 {
 			newEntry.Metadata.Time = opts.Time
@@ -350,7 +345,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
-		return loc0, err
+		return err
 	}
 	// Rewrite the tree up to the root.
 	// Invariant: dirRef identifies the directory that has just been updated.
@@ -373,15 +368,14 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, data 
 		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
-			return loc0, err
+			return err
 		}
 	}
 	// Update the root.
 	seq := s.Root[parsed.User].Metadata.Sequence
 	s.Root[parsed.User] = s.rootDirEntry(parsed.User, dirRef, seq+1)
 
-	// Return the location of the file.
-	return loc, nil
+	return nil
 }
 
 // Lookup returns the directory entry for the named file.
