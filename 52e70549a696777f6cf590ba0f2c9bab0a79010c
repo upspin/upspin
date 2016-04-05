@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "eeca6838_09f7eea0",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-05T20:00:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eeca6838_46796502",
+      "revId": "52e70549a696777f6cf590ba0f2c9bab0a79010c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eeca6838_867f4dea",
         "filename": "cmd/dfuse/cache.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-05T19:54:03Z",
       "side": 1,
       "message": "You could, if you wanted a longer hash, use key256 too under key/. No problem with this tho.",
+      "revId": "52e70549a696777f6cf590ba0f2c9bab0a79010c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eeca6838_c91fa6a7",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-05T20:00:01Z",
+      "side": 1,
+      "message": "Using the shorter because I\u0027m afraid some systems may not like the huge file name lengths.",
+      "parentUuid": "eeca6838_867f4dea",
       "revId": "52e70549a696777f6cf590ba0f2c9bab0a79010c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
