@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"testing"
 
-	"strings"
-
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	store "upspin.googlesource.com/upspin.git/store/gcpstore"
@@ -92,7 +90,7 @@ func TestMkdir(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(append(newMockLookupParentResponse(t), newMockMkdirResponse(t)...),
 		[]*http.Request{requestLookup, requestMkdir})
 
-	d := newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, func() upspin.Time {
+	d := newDirectory("http://localhost:8080", mock, func() upspin.Time {
 		return upspin.Time(42)
 	})
 
@@ -167,7 +165,7 @@ func TestLookupError(t *testing.T) {
 func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(newMockLookupResponse(t), []*http.Request{nettest.AnyRequest})
 
-	d := newDirectory("http://localhost:8080", nil, mock, nil)
+	d := newDirectory("http://localhost:8080", mock, nil)
 
 	dir, err := d.Lookup(pathName)
 	if err != nil {
@@ -211,42 +209,17 @@ func newErroringDirectoryClient() upspin.Directory {
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 
-	return newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, nil)
+	return newDirectory("http://localhost:8080", mock, nil)
 }
 
 func newStore(client netutil.HTTPClientInterface) upspin.Store {
 	return store.New("http://localhost:8080", client)
 }
 
-// newDirectoryClientWithStoreClient creates an upspin.Directory that
-// contains a valid upspin.Store which replies successfully to a Put
-// request. The dirClientResponse is loaded onto the Directory client
-// for testing and we expect a dirClientRequest to trigger it. Returns
-// the Directory as well as the mock client for post-request
-// inspections.
-func newDirectoryClientWithStoreClient(t *testing.T, dirClientResponse nettest.MockHTTPResponse, dirClientRequest *http.Request) (upspin.Directory, *nettest.MockHTTPClient) {
-	// The HTTP client will return a sequence of responses, the
-	// first the actual Store.Put request, followed by the Directory.Put request.
-	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
-
-	mock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{newMockRefResponse(t), dirClientResponse},
-		[]*http.Request{storeReq, dirClientRequest})
-
-	// Get a Store client
-	s := newStore(mock)
-
-	// Get a Directory client
-	return newDirectory("http://localhost:9090", s, mock, nil), mock
-}
-
 func TestPutError(t *testing.T) {
-	d, _ := newDirectoryClientWithStoreClient(t, nettest.MockHTTPResponse{
-		Error:    errBadConnection,
-		Response: nil,
-	}, nettest.AnyRequest)
-
-	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte("Packed metadata"), nil) // TODO: Options
+	var loc upspin.Location
+	d := newErroringDirectoryClient()
+	err := d.Put(upspin.PathName(pathName), loc, []byte("Packed metadata"), nil)
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -257,9 +230,9 @@ func TestPutError(t *testing.T) {
 
 func TestPutBadMeta(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	d := newDirectory("http://localhost:8081", nil, mock, nil)
-
-	_, err := d.Put(upspin.PathName(pathName), []byte("contents"), []byte(""), nil) // TODO: Options
+	d := newDirectory("http://localhost:8081", mock, nil)
+	var loc upspin.Location
+	err := d.Put(upspin.PathName(pathName), loc, []byte(""), nil)
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -275,15 +248,13 @@ func TestPut(t *testing.T) {
 	dirEntryJSON := toJSON(t, dirEntry)
 	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
 
-	d, mock := newDirectoryClientWithStoreClient(t, respSuccess, expectedRequest)
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respSuccess}, []*http.Request{expectedRequest})
+	d := newDirectory("http://localhost:9090", mock, nil)
 
 	// Issue the put request
-	loc, err := d.Put(upspin.PathName(pathName), fileContents, packData, &opts)
+	err := d.Put(upspin.PathName(pathName), location, packData, &opts)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
-	}
-	if loc.Reference != ref {
-		t.Fatalf("Expected ref %v, got %v", ref, loc.Reference)
 	}
 
 	// Verify we sent to the Directory service the ref we got back from the Store server
@@ -294,7 +265,7 @@ func TestGlobBadPattern(t *testing.T) {
 	// No requests are issued
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{}, []*http.Request{})
 
-	d := newDirectory("http://localhost:8080", nil, mock, nil)
+	d := newDirectory("http://localhost:8080", mock, nil)
 
 	_, err := d.Glob(badPathName)
 	if err == nil {
@@ -321,7 +292,7 @@ func TestGlob(t *testing.T) {
 	}
 
 	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
-	d := newDirectory("http://localhost:9090", nil, mock, nil)
+	d := newDirectory("http://localhost:9090", mock, nil)
 
 	dirEntries, err := d.Glob("a@b.co/dir1/*.txt")
 	if err != nil {
@@ -337,92 +308,6 @@ func TestGlob(t *testing.T) {
 		t.Errorf("Expected 1st entry %v, got %v", path1, dirEntries[1].Name)
 	}
 	mock.Verify(t)
-}
-
-func TestAccessErrorInvalidContents(t *testing.T) {
-	const (
-		access        = parentPathName + "/Access"
-		accessControl = "invalidemail.com"
-	)
-
-	// Does not perform a lookup since the Access file is invalid.
-	mock := doNothingHTTPClient
-	d := newDirectory("http://localhost:8080", newStore(doNothingHTTPClient), mock, nil)
-
-	_, err := d.Put(access, []byte(accessControl), []byte{byte(upspin.PlainPack)}, nil) // TODO: Options
-	if err == nil {
-		t.Fatalf("Expected error, got none")
-	}
-	expectedError := "Put: bob@jones.com/mydir/Access:1: unrecognized text: "
-	if !strings.Contains(err.Error(), expectedError) {
-		t.Errorf("Expected %s, got %s", expectedError, err)
-	}
-
-	mock.Verify(t)
-}
-
-func TestAccess(t *testing.T) {
-	const (
-		accessPath    = parentPathName + "/Access"
-		accessControl = "\n r:dalai@lama.org, bill@gatesfoundation.org\n"
-		success       = `{"error":"success"}`
-	)
-
-	// We expect d.Put will cause the following updates:
-	// 1 - Re-write the parent with new Readers to the Directory server
-	// 2 - Write the DirEntry for the actual Access file to the Directory server
-	// 3 - Write the contents of the Access file, in plain packing to the Store server
-	// Note: we ignore groups for now. Only usernames are recorded for now, not full pathnames.
-
-	// Set up Store
-	storeReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("*"))
-	storeMock := nettest.NewMockHTTPClient(
-		[]nettest.MockHTTPResponse{newMockRefResponse(t)},
-		[]*http.Request{storeReq})
-	store := newStore(storeMock)
-
-	// Set up Directory
-	readers := []upspin.UserName{upspin.UserName("dalai@lama.org"), upspin.UserName("bill@gatesfoundation.org")}
-	patchParent := upspin.DirEntry{
-		Name: parentPathName,
-		Metadata: upspin.Metadata{
-			Readers: readers,
-		},
-	}
-	patchParentJSON := toJSON(t, patchParent)
-	updateParentReq := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", patchParentJSON)
-
-	deAccess := upspin.DirEntry{
-		Name:     accessPath,
-		Location: location,
-		Metadata: upspin.Metadata{
-			IsDir:    false,
-			Sequence: 17,
-			Size:     uint64(len(accessControl)),
-			Time:     now,
-			PackData: []byte{byte(upspin.PlainPack)}, // Access file does not have packdata
-		},
-	}
-	deAccessJSON := toJSON(t, deAccess)
-	putAccessReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", deAccessJSON)
-
-	requests := []*http.Request{updateParentReq, putAccessReq}
-	responses := []nettest.MockHTTPResponse{newResp([]byte(success)), newResp([]byte(success))}
-
-	dirMock := nettest.NewMockHTTPClient(responses, requests)
-	d := newDirectory("http://localhost:8081", store, dirMock, nil)
-
-	opts := upspin.PutOptions{
-		Sequence: 17,
-		Time:     now,
-	}
-	_, err := d.Put(accessPath, []byte(accessControl), []byte{byte(upspin.PlainPack)}, &opts)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	dirMock.Verify(t)
-	storeMock.Verify(t)
 }
 
 // newDirEntry creates a new DirEntry with the given path name

@@ -225,7 +225,7 @@ func (cf *cachedFile) writeBack(n *node) error {
 	}
 
 	// Find the user and packing to use.
-	ue, err := n.f.users.lookup(n.user)
+	_, err = n.f.users.lookup(n.user)
 	if err != nil {
 		return eio("looking up %s: %s", n.user, err)
 	}
@@ -255,7 +255,8 @@ func (cf *cachedFile) writeBack(n *node) error {
 	cipher = cipher[:packedLen]
 
 	// Create the directory entry.  The Put will also create a referenced object in the store.
-	_, err = ue.dir.Put(n.uname, cipher, meta.PackData, &upspin.PutOptions{Size: uint64(len(cleartext))})
+	// TODO(p): write cipher to Store, pass the Location here instead of cipher. Why not use the Client instead?
+	// _, err = ue.dir.Put(n.uname, cipher, meta.PackData, &upspin.PutOptions{Size: uint64(len(cleartext))})
 	if err != nil {
 		return eio("%s Directory.Put(%s)", err, n.uname)
 	}
