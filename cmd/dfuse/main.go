@@ -18,11 +18,15 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
+	testuser "upspin.googlesource.com/upspin.git/user/testuser"
+)
+
+var (
+	testFlag = flag.Bool("test", false, "set up test environment.")
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [-t] <mountpoint>\n", os.Args[0])
 	flag.PrintDefaults()
 	os.Exit(2)
 }
@@ -40,6 +44,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Hack for testing
+	if *testFlag {
+		testUser, ok := context.User.(*testuser.Service)
+		if !ok {
+			log.Fatal("Not a testuser Service")
+		}
+
+		if err := testUser.Install("testuser@google.com", context.Directory); err != nil {
+			log.Print(err)
+		}
+	}
+
 	f := newUpspinFS(context, newUserCache(context))
 
 	c, err := fuse.Mount(
