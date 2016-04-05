@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha1"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -73,7 +71,7 @@ func newUpspinFS(context *upspin.Context, users *userCache) *upspinFS {
 	if len(homeDir) == 0 {
 		homeDir = "/etc"
 	}
-	f.cache = newCache(homeDir + "/upspin/cache")
+	f.cache = newCache(context, homeDir+"/upspin/cache")
 	// Preallocate root node.
 	f.root = f.allocNode(nil, "", 0500|os.ModeDir, 0, time.Now())
 	return f
@@ -287,10 +285,6 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 		return nil, err
 	}
 	return h, nil
-}
-
-func fingerprint(loc upspin.Location, seq int64) string {
-	return fmt.Sprintf("%x.%d", sha1.Sum([]byte(loc.Reference)), seq)
 }
 
 // Remove implements fs.Noderemover.
