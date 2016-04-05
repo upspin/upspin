@@ -3,7 +3,6 @@ package context
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -16,8 +15,6 @@ import (
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
-
-var errUnimplemented = errors.New("unimplemented")
 
 var once sync.Once
 
@@ -181,53 +178,55 @@ type dummyDirectory struct {
 	endpoint upspin.Endpoint
 }
 
+const unimplemented = "unimplemented"
+
 func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	return nil, nil, errUnimplemented
+	panic("unimplemented")
 }
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	user := &dummyUser{endpoint: e}
 	return user, nil
 }
 func (d *dummyUser) ServerUserName() string {
-	return "userUser"
+	panic("unimplemented")
 }
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	return nil, nil, errUnimplemented
+	panic("unimplemented")
 }
 func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
-	return "", errUnimplemented
+	panic("unimplemented")
 }
 func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	store := &dummyStore{endpoint: e}
 	return store, nil
 }
 func (d *dummyStore) Endpoint() upspin.Endpoint {
-	return d.endpoint
+	panic("unimplemented")
 }
 func (d *dummyStore) ServerUserName() string {
-	return "userStore"
+	panic("unimplemented")
 }
 func (d *dummyStore) Delete(ref upspin.Reference) error {
-	return errUnimplemented
+	panic("unimplemented")
 }
 
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.New("dummyDirectory.Lookup not implemented")
+	panic("unimplemented")
 }
-func (d *dummyDirectory) Put(name upspin.PathName, data []byte, packdata upspin.PackData, opts *upspin.PutOptions) (upspin.Location, error) {
-	return upspin.Location{}, errors.New("dummyDirectory.Lookup not implemented")
+func (d *dummyDirectory) Put(name upspin.PathName, loc upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
+	panic("unimplemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return upspin.Location{}, errors.New("dummyDirectory.MakeDirectory not implemented")
+	panic("unimplemented")
 }
 func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	return nil, errors.New("dummyDirectory.Glob not implemented")
+	panic("unimplemented")
 }
 func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }
 func (d *dummyDirectory) ServerUserName() string {
-	return "userDirectory"
+	panic("unimplemented")
 }

@@ -104,6 +104,19 @@ func packData(t *testing.T, data []byte, name upspin.PathName) ([]byte, upspin.P
 	return cipher[:n], meta.PackData
 }
 
+func storeData(t *testing.T, data []byte, name upspin.PathName) (upspin.Location, upspin.PackData) {
+	cipher, packdata := packData(t, data, name)
+	ref, err := context.Store.Put(cipher)
+	if err != nil {
+		t.Fatal(err)
+	}
+	loc := upspin.Location{
+		Endpoint:  context.Store.Endpoint(),
+		Reference: ref,
+	}
+	return loc, packdata
+}
+
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	const (
 		user = "user1@google.com"
@@ -115,8 +128,8 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 		text     = "hello sailor"
 	)
 
-	data, packdata := packData(t, []byte(text), fileName)
-	loc, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+	loc, packdata := storeData(t, []byte(text), fileName)
+	err := context.Directory.Put(fileName, loc, packdata, nil)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -164,8 +177,8 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		data, packdata := packData(t, []byte(text), fileName)
-		loc, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+		loc, packdata := storeData(t, []byte(text), fileName)
+		err := context.Directory.Put(fileName, loc, packdata, nil)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -213,12 +226,12 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	for i := 0; i < nFile; i++ {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		data, packdata := packData(t, []byte(text), fileName)
-		h, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+		loc, packdata := storeData(t, []byte(text), fileName)
+		err := context.Directory.Put(fileName, loc, packdata, nil)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
-		href[i] = h
+		href[i] = loc
 	}
 	// Get them all back in funny order.
 	for i := 0; i < nFile; i++ {
@@ -279,8 +292,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	data, packdata := packData(t, []byte(text), fileName)
-	_, err = context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+	loc, packdata := storeData(t, []byte(text), fileName)
+	err = context.Directory.Put(fileName, loc, packdata, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -299,7 +312,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
 	}
-	data, err = unpackBlob(context, cipher, fileName, &entry.Metadata)
+	data, err := unpackBlob(context, cipher, fileName, &entry.Metadata)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -309,8 +322,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	data, packdata = packData(t, []byte(text), fileName)
-	_, err = context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+	loc, packdata = storeData(t, []byte(text), fileName)
+	err = context.Directory.Put(fileName, loc, packdata, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -399,8 +412,8 @@ func TestGlob(t *testing.T) {
 	}
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
-		data, packdata := packData(t, []byte(name), name)
-		_, err := context.Directory.Put(name, data, packdata, nil) // TODO: Options
+		loc, packdata := storeData(t, []byte(name), name)
+		err := context.Directory.Put(name, loc, packdata, nil)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
@@ -447,8 +460,8 @@ func TestSequencing(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
-		data, packdata := packData(t, []byte(text), fileName)
-		_, err := context.Directory.Put(fileName, data, packdata, nil) // TODO: Options
+		loc, packdata := storeData(t, []byte(text), fileName)
+		err := context.Directory.Put(fileName, loc, packdata, nil)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
@@ -462,11 +475,11 @@ func TestSequencing(t *testing.T) {
 		seq = entry.Metadata.Sequence
 	}
 	// Now check it updates if we set the sequence correctly.
-	data, packdata := packData(t, []byte("first seq version"), fileName)
+	loc, packdata := storeData(t, []byte("first seq version"), fileName)
 	opts := upspin.PutOptions{
 		Sequence: seq,
 	}
-	_, err := context.Directory.Put(fileName, data, packdata, &opts)
+	err := context.Directory.Put(fileName, loc, packdata, &opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -478,8 +491,8 @@ func TestSequencing(t *testing.T) {
 		t.Fatalf("wrong sequence: expected %d got %d", seq+1, entry.Metadata.Sequence)
 	}
 	// Now check it fails if we don't. We can just use the previous options.
-	data, packdata = packData(t, []byte("second seq version"), fileName)
-	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	loc, packdata = storeData(t, []byte("second seq version"), fileName)
+	err = context.Directory.Put(fileName, loc, packdata, &opts)
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
@@ -500,8 +513,8 @@ func TestRootDirectorySequencing(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
-		data, packdata := packData(t, []byte(text), fileName)
-		_, err := context.Directory.Put(fileName, data, packdata, nil)
+		loc, packdata := storeData(t, []byte(text), fileName)
+		err := context.Directory.Put(fileName, loc, packdata, nil)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
@@ -523,8 +536,8 @@ func TestTimeAndSize(t *testing.T) {
 	)
 	setup(user)
 	// Default opts provide default values. (We don't check the values carefully; it's tricky.)
-	data, packdata := packData(t, []byte("hello"), fileName)
-	_, err := context.Directory.Put(fileName, data, packdata, nil)
+	loc, packdata := storeData(t, []byte("hello"), fileName)
+	err := context.Directory.Put(fileName, loc, packdata, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -532,16 +545,16 @@ func TestTimeAndSize(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if entry.Metadata.Size < uint64(len("hello")) { // Packed size will be larger.
-		t.Fatalf("default did not set size %d; got %d", len("hello"), entry.Metadata.Size)
+	if entry.Metadata.Size != 0 {
+		t.Fatalf("default did not set size 0; got %d", entry.Metadata.Size)
 	}
 	if entry.Metadata.Time == 0 {
 		t.Fatalf("default did not set time")
 	}
 	// Unset options do not override.
-	data, packdata = packData(t, []byte("sailor"), fileName)
+	loc, packdata = storeData(t, []byte("sailor"), fileName)
 	opts := upspin.PutOptions{}
-	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	err = context.Directory.Put(fileName, loc, packdata, &opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -549,19 +562,19 @@ func TestTimeAndSize(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if entry.Metadata.Size < uint64(len("sailor")) { // Packed size will be larger.
-		t.Fatalf("default did not set size %d; got %d", len("hello"), entry.Metadata.Size)
+	if entry.Metadata.Size != 0 {
+		t.Fatalf("default did not set size 0; got %d", entry.Metadata.Size)
 	}
 	if entry.Metadata.Time == 0 {
 		t.Fatalf("default did not set time")
 	}
 	// Set options override.
-	data, packdata = packData(t, []byte("good bye"), fileName)
+	loc, packdata = storeData(t, []byte("good bye"), fileName)
 	opts = upspin.PutOptions{
 		Size: 1234,
 		Time: 12345,
 	}
-	_, err = context.Directory.Put(fileName, data, packdata, &opts)
+	err = context.Directory.Put(fileName, loc, packdata, &opts)
 	if err != nil {
 		t.Fatal(err)
 	}
