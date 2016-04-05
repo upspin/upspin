@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_3e2e0969",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-05T20:50:25Z",
+      "side": 1,
+      "message": "Yes. The keys are encoded to our upspin.KeyPair format.",
+      "parentUuid": "ae9b108c_c1fce257",
+      "revId": "527d1ca009334fb9b4362875d915d9f5807dc0e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eeca6838_a9f1fa46",
         "filename": "pack/ee/create.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-05T20:28:20Z",
       "side": 1,
       "message": "It would be helpful, for example in factotum, to have this broken out as a function  EllipticCurve(packing).\n\nWe may even be able to remove common in ee.go.",
+      "revId": "527d1ca009334fb9b4362875d915d9f5807dc0e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_1ea10d18",
+        "filename": "pack/ee/create.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-05T20:50:25Z",
+      "side": 1,
+      "message": "Sounds good. But maybe in the next CL or as part of the factotum CL, since in this one it wouldn\u0027t serve any purpose? (I\u0027m happy to do it though).",
+      "parentUuid": "eeca6838_a9f1fa46",
       "revId": "527d1ca009334fb9b4362875d915d9f5807dc0e0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
