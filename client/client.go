@@ -199,12 +199,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			return cleartext[:n], nil
 		}
 		// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
+	outer:
 		for _, newLoc := range locs {
 			for _, oldLoc := range where {
-				if newLoc != oldLoc {
-					where = append(where, newLoc)
+				if oldLoc == newLoc {
+					continue outer
 				}
 			}
+			where = append(where, newLoc)
 		}
 	}
 	// TODO: custom error types.
