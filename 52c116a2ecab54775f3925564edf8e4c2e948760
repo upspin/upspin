@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_342a9d2b",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-06T20:22:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_deca7a1c",
+      "revId": "52c116a2ecab54775f3925564edf8e4c2e948760",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_9ec5120d",
         "filename": "cmd/dfuse/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-06T17:54:13Z",
       "side": 1,
       "message": "s/\\.\"/\"/\n\na more interesting version of this might be\n\ntestFlag \u003d flag.String(\"test\", \"\", \"set up test context for this user name\")",
+      "revId": "52c116a2ecab54775f3925564edf8e4c2e948760",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_142fa13a",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-06T20:22:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_9ec5120d",
       "revId": "52c116a2ecab54775f3925564edf8e4c2e948760",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
