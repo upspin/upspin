@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -71,7 +72,7 @@ var _ Session = (*sessionImpl)(nil)
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
 	config       *Config
-	sessionCache *Cache // maps tlsUnique to AuthSession. Thread-safe.
+	sessionCache *cache.LRU // maps tlsUnique to AuthSession. Thread-safe.
 }
 
 var _ Handler = (*authHandler)(nil)
@@ -86,7 +87,7 @@ const (
 func NewHandler(config *Config) Handler {
 	return &authHandler{
 		config:       config,
-		sessionCache: NewLRUCache(maxSessions),
+		sessionCache: cache.NewLRUCache(maxSessions),
 	}
 }
 

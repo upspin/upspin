@@ -1,4 +1,4 @@
-package auth_test
+package cache_test
 
 // This copied and minimally adapted from: https://github.com/golang/build/blob/master/internal/lru/cache_test.go
 
@@ -10,11 +10,11 @@ import (
 	"reflect"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/cache"
 )
 
 func TestLRU(t *testing.T) {
-	c := auth.NewLRUCache(2)
+	c := cache.NewLRUCache(2)
 
 	expectMiss := func(k string) {
 		v, ok := c.Get(k)
@@ -48,7 +48,7 @@ func TestLRU(t *testing.T) {
 }
 
 func TestRemoveOldest(t *testing.T) {
-	c := auth.NewLRUCache(2)
+	c := cache.NewLRUCache(2)
 	c.Add("1", "one")
 	c.Add("2", "two")
 	if k, v := c.RemoveOldest(); k != "1" || v != "one" {
