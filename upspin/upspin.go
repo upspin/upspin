@@ -83,7 +83,9 @@ type Packer interface {
 	// The slice must be large enough; the PackLen method may be used to
 	// find a suitable allocation size.
 	// The returned count is the length of the ciphertext.
-	Pack(context *Context, ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
+	// A slice of readers indicates user names who must have sufficient priviledge
+	// to unpack the cipher.
+	Pack(context *Context, ciphertext, cleartext []byte, meta *Metadata, readers []UserName, name PathName) (int, error)
 
 	// Unpack takes ciphertext data and packing metadata and stores the
 	// cleartext version in the supplied slice, which must be large enough.
@@ -233,12 +235,11 @@ type DirEntry struct {
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool       // The file is a directory.
-	Sequence int64      // The sequence (version) number of the item.
-	Size     uint64     // Length of file in bytes.
-	Time     Time       // Time associated with file; might be when it was last written.
-	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
-	PackData []byte     // Packing-specific metadata stored in directory.
+	IsDir    bool   // The file is a directory.
+	Sequence int64  // The sequence (version) number of the item.
+	Size     uint64 // Length of file in bytes.
+	Time     Time   // Time associated with file; might be when it was last written.
+	PackData []byte // Packing-specific metadata stored in directory.
 }
 
 // Store service.

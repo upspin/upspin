@@ -181,6 +181,7 @@ func (d domains) writeUsersByDomain(buf *bytes.Buffer) {
 	}
 }
 
+// TODO: decide if ls will parse Access files to show along entries in the long format.
 func formatReaders(readers []upspin.UserName) string {
 	const (
 		maxLen = 44
@@ -213,8 +214,8 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 			}
 		}
 		endpt := endpoint.String(&e.Location.Endpoint)
-		fmt.Printf("%c %d %d %s [%s]\t[%s]\t%s\n", isDirChar, e.Metadata.Sequence, e.Metadata.Size, e.Metadata.Time,
-			endpt, formatReaders(e.Metadata.Readers), e.Name)
+		fmt.Printf("%c %d %d %s [%s]\t%s\n", isDirChar, e.Metadata.Sequence, e.Metadata.Size, e.Metadata.Time,
+			endpt, e.Name)
 	}
 }
 

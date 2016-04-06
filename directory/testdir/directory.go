@@ -69,7 +69,7 @@ func mkError(op string, name upspin.PathName, err error) *os.PathError {
 }
 
 func packDirBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
-	return packBlob(context, cleartext, dirPackData, name)
+	return packBlob(context, cleartext, dirPackData, nil, name)
 }
 
 func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
@@ -84,7 +84,7 @@ func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
 }
 
 // packBlob packs an arbitrary blob and its metadata.
-func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackData, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
+func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackData, readers []upspin.UserName, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
 	packer, err := getPacker(packdata)
 	if err != nil {
 		return nil, nil, err
@@ -98,7 +98,7 @@ func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackDat
 		return nil, nil, errors.New("PackLen failed")
 	}
 	ciphertext := make([]byte, cipherLen)
-	n, err := packer.Pack(context, ciphertext, cleartext, &meta, name)
+	n, err := packer.Pack(context, ciphertext, cleartext, &meta, readers, name)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -222,7 +222,6 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 			Sequence: seq,
 			Size:     0,
 			Time:     upspin.Now(),
-			Readers:  nil, // TODO
 			PackData: dirPackData,
 		},
 	}
@@ -327,7 +326,6 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 			Sequence: 0,
 			Size:     0,
 			Time:     upspin.Now(),
-			Readers:  nil, // TODO
 			PackData: packdata,
 		},
 	}
@@ -361,7 +359,6 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 			Metadata: upspin.Metadata{
 				IsDir:    true,
 				Sequence: entries[i+1].Metadata.Sequence,
-				Readers:  nil, // TODO
 				PackData: dirPackData,
 			},
 		}

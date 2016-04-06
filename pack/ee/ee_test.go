@@ -25,9 +25,9 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, text []byte) []byte {
+func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, readers []upspin.UserName, text []byte) []byte {
 	cipher := make([]byte, packer.PackLen(ctx, text, meta, name))
-	m, err := packer.Pack(ctx, cipher, text, meta, name)
+	m, err := packer.Pack(ctx, cipher, text, meta, readers, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -44,10 +44,10 @@ func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name up
 	return clear[:m]
 }
 
-func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, readers []upspin.UserName, text []byte) {
 	// First pack.
 	meta := &upspin.Metadata{}
-	cipher := packBlob(t, ctx, packer, name, meta, text)
+	cipher := packBlob(t, ctx, packer, name, meta, readers, text)
 
 	// Now unpack.
 	clear := unpackBlob(t, ctx, packer, name, meta, cipher)
@@ -65,7 +65,7 @@ func TestPack256(t *testing.T) {
 		packing                 = upspin.EEp256Pack
 	)
 	ctx, packer := setup(user, packing)
-	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+	testPackAndUnpack(t, ctx, packer, name, nil, []byte(text))
 }
 
 func TestPack521(t *testing.T) {
@@ -76,7 +76,7 @@ func TestPack521(t *testing.T) {
 		packing                 = upspin.EEp521Pack
 	)
 	ctx, packer := setup(user, packing)
-	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+	testPackAndUnpack(t, ctx, packer, name, nil, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, packing upspin.Packing) {
@@ -90,7 +90,7 @@ func benchmarkPack(b *testing.B, packing upspin.Packing) {
 		meta := &upspin.Metadata{}
 		data := []byte(text)
 		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-		m, _ := packer.Pack(ctx, cipher, data, meta, name)
+		m, _ := packer.Pack(ctx, cipher, data, meta, nil, name)
 		cipher = cipher[:m]
 		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
 		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
@@ -130,11 +130,10 @@ func TestLoadingRemoteKeys(t *testing.T) {
 	ctx.KeyPair = dudesPrivKey // Override setup to prevent reading keys from .ssh/
 	ctx.User = mockUser
 
-	// Setup the metadata such that Bob is a reader.
-	meta := &upspin.Metadata{
-		Readers: []upspin.UserName{bobsUserName},
-	}
-	cipher := packBlob(t, ctx, packer, pathName, meta, []byte(text))
+	meta := &upspin.Metadata{}
+	// Setup that Bob is a reader.
+	readers := []upspin.UserName{bobsUserName}
+	cipher := packBlob(t, ctx, packer, pathName, meta, readers, []byte(text))
 
 	// Interim check: dummyUser returned Bob's public key when asked.
 	if mockUser.returnedKeys != 1 {
@@ -179,11 +178,10 @@ func TestLoadingRemoteKeyless(t *testing.T) {
 	ctx.KeyPair = dudettesPrivKey // Override setup to prevent reading keys from .ssh/
 	ctx.User = mockUser
 
-	meta := &upspin.Metadata{
-		Readers: []upspin.UserName{miasUserName},
-	}
+	meta := &upspin.Metadata{}
+	readers := []upspin.UserName{miasUserName}
 	cipher := make([]byte, packer.PackLen(ctx, []byte(text), meta, pathName))
-	m, err := packer.Pack(ctx, cipher, []byte(text), meta, pathName)
+	m, err := packer.Pack(ctx, cipher, []byte(text), meta, readers, pathName)
 	if err == nil || !strings.HasPrefix(err.Error(), "no known keys for user") {
 		t.Error("Pack: ", err)
 	}

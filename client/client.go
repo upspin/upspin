@@ -47,17 +47,16 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 
 	// Lookup parent directory, if any.
 	if len(parsed.Elems) > 1 {
-		parentDirEntry, err := dir.Lookup(parsed.Drop(1).Path())
+		_, err := dir.Lookup(parsed.Drop(1).Path())
 		if err != nil {
 			return zeroLoc, err
 		}
-		readers = parentDirEntry.Metadata.Readers
+		readers = nil // TODO: find an Access in the parent or higher level and parse it.
 	}
 
 	var cipher []byte
 	meta := &upspin.Metadata{
-		Readers: readers,
-		Time:    upspin.Now(),
+		Time: upspin.Now(),
 	}
 
 	if !access.IsAccessFile(name) {
@@ -78,7 +77,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 			meta.PackData = []byte{byte(c.context.Packing)}
 		}
 		cipher = make([]byte, cipherLen)
-		n, err := packer.Pack(c.context, cipher, data, meta, name)
+		n, err := packer.Pack(c.context, cipher, data, meta, readers, name)
 		if err != nil {
 			return zeroLoc, err
 		}

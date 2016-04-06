@@ -19,7 +19,6 @@ var dirEnt = DirEntry{
 		Sequence: 1234,
 		Size:     12345,
 		Time:     123456,
-		Readers:  []UserName{"a@b.com", "c@d.com"},
 		PackData: []byte{1, 2, 3},
 	},
 }

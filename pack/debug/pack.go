@@ -85,7 +85,7 @@ func addSignature(meta *upspin.Metadata, signature byte) error {
 	}
 }
 
-func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, readers []upspin.UserName, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return 0, err
 	}

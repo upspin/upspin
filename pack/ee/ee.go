@@ -135,11 +135,11 @@ func (c common) String() string {
 	return c.packerString
 }
 
-func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, readers []upspin.UserName, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(c, meta); err != nil {
 		return 0, err
 	}
-	return c.eePack(ctx, ciphertext, cleartext, meta, name)
+	return c.eePack(ctx, ciphertext, cleartext, meta, readers, name)
 }
 
 func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
@@ -149,7 +149,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *
 	return c.eeUnpack(ctx, cleartext, ciphertext, meta, name)
 }
 
-func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
+func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, readers []upspin.UserName, pathname upspin.PathName) (int, error) {
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
@@ -165,7 +165,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	}
 
 	// Set up readers. The writer of a file is always a reader.
-	usernames := append([]upspin.UserName{ctx.UserName}, meta.Readers...)
+	usernames := append([]upspin.UserName{ctx.UserName}, readers...)
 	myRawPublicKey, err := c.publicKey(ctx, ctx.UserName)
 	if err != nil {
 		return 0, err

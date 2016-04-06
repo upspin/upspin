@@ -97,7 +97,7 @@ func packData(t *testing.T, data []byte, name upspin.PathName) ([]byte, upspin.P
 		meta.PackData = []byte{byte(context.Packing)}
 	}
 	cipher := make([]byte, cipherLen)
-	n, err := packer.Pack(context, cipher, data, meta, name)
+	n, err := packer.Pack(context, cipher, data, meta, nil, name) // TODO: readers.
 	if err != nil {
 		t.Fatal(err)
 	}

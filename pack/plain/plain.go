@@ -27,7 +27,7 @@ func (plainPack) String() string {
 	return "plain"
 }
 
-func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, readers []upspin.UserName, name upspin.PathName) (int, error) {
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return 0, err
 	}

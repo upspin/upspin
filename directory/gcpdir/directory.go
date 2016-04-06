@@ -120,7 +120,6 @@ func (d *Directory) Put(name upspin.PathName, location upspin.Location, packdata
 			Size:     commitOpts.Size,
 			Time:     commitOpts.Time,
 			PackData: packdata,
-			Readers:  nil, // Server will update.
 		},
 	}
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)
@@ -192,7 +191,6 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Size:     0, // Being explicit that dir entries have zero size.
 			Time:     d.timeNow(),
 			PackData: nil,
-			Readers:  nil, // Must be nil, server will fill in.
 		},
 	}
 	// TODO: dial the endpoint as listed in dirEntry and store it there instead.

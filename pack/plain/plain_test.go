@@ -34,7 +34,7 @@ func TestPack(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	cipher := make([]byte, 1024)
-	m, err := packer.Pack(context, cipher, data, meta, name)
+	m, err := packer.Pack(context, cipher, data, meta, nil, name)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
