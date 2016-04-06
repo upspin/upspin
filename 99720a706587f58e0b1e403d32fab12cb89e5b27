@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_0ac2d8a6",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T23:16:32Z",
+      "side": 1,
+      "message": "maybe \"unknown packing\" so if it shows up in a log we have some idea where it came from",
+      "revId": "99720a706587f58e0b1e403d32fab12cb89e5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_aab1a456",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T23:16:32Z",
+      "side": 1,
+      "message": "keyBytes is better.",
+      "revId": "99720a706587f58e0b1e403d32fab12cb89e5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_6aab9ce1",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T23:16:32Z",
+      "side": 1,
+      "message": "ECDSA?",
+      "revId": "99720a706587f58e0b1e403d32fab12cb89e5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
