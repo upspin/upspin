@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_3e471e4a",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "this should be called testsetup.\nyes the directory name stutters but that\u0027s not important.\nthe import name \"setup\" isn\u0027t right for a testing package.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_be57aed5",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "testsetup.Create won\u0027t read right. it should be called Tree.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_7e212679",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "this is very strange comment.\nhow about\nN (short for New) is a helper function to return a new E.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_9e24f28b",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "see below",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_de395ab7",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "s/Inprocess/InProcess/\n\ni think you can drop all the New parts here. it will read like\ntestsetup.InProcess which is good.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_1e30e2cb",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "it\u0027s overwriting context, which bothers me. i would prefer either that context be the first argument, since it\u0027s being written, or perhaps better that it returns a new context.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_9ef6323c",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "is this a TODO?",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_5e00aae8",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T18:03:13Z",
+      "side": 1,
+      "message": "this would be very confusing out of context. how about\nuser service must be the in-process instance",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
