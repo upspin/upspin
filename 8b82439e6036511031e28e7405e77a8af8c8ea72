@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_f4fc3557",
+        "filename": "cache/lru.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-06T19:40:40Z",
+      "side": 1,
+      "message": "call this NewLRU. that\u0027s what it returns, a new LRU",
+      "revId": "8b82439e6036511031e28e7405e77a8af8c8ea72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
