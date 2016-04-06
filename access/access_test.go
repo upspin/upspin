@@ -14,16 +14,18 @@ const (
 	accessFile = "me@here.com/Access"
 )
 
+var empty = []string{}
+
 var (
 	accessText = []byte(`
   r : foo@bob.com ,a@b.co, x@y.uk # a comment
 
-w:writerjoe@a.bc # comment r: ignored@incomment.com
-a: m@n.mn  # other comment a: ignored@too.com
-Read : extra@reader.org
+w:writer@a.bc # comment r: ignored@incomment.com
+l: lister@n.mn  # other comment a: ignored@too.com
+Read : reader@reader.org
 # Some comment r: a: w: read: write ::::
-WRITE: writerbob@a.bc
-  aPPeNd  :appenderjohn@c.com`)
+WRITE: anotherwriter@a.bc
+  create,DeLeTe  :admin@c.com`)
 )
 
 func BenchmarkParse(b *testing.B) {
@@ -41,9 +43,11 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	containsAll(t, p.Readers, []string{"foo@bob.com", "a@b.co", "x@y.uk", "extra@reader.org"})
-	containsAll(t, p.Writers, []string{"writerjoe@a.bc", "writerbob@a.bc"})
-	containsAll(t, p.Appenders, []string{"m@n.mn", "appenderjohn@c.com"})
+	match(t, p.Read, []string{"foo@bob.com", "a@b.co", "x@y.uk", "reader@reader.org"})
+	match(t, p.Write, []string{"writer@a.bc", "anotherwriter@a.bc"})
+	match(t, p.List, []string{"lister@n.mn"})
+	match(t, p.Create, []string{"admin@c.com"})
+	match(t, p.Delete, []string{"admin@c.com"})
 }
 
 func TestMallocs(t *testing.T) {
@@ -51,8 +55,8 @@ func TestMallocs(t *testing.T) {
 		access.Parse(accessFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 26 {
-		t.Fatal("expected 26 allocations, got ", allocs)
+	if allocs != 29 {
+		t.Fatal("expected 29 allocations, got ", allocs)
 	}
 }
 
@@ -117,9 +121,11 @@ func TestParseEmptyFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	containsAll(t, p.Readers, []string{})
-	containsAll(t, p.Writers, []string{})
-	containsAll(t, p.Appenders, []string{})
+	match(t, p.Read, empty)
+	match(t, p.Write, empty)
+	match(t, p.List, empty)
+	match(t, p.Create, empty)
+	match(t, p.Delete, empty)
 }
 
 func TestParseContainsGroupName(t *testing.T) {
@@ -130,9 +136,11 @@ func TestParseContainsGroupName(t *testing.T) {
 	}
 	// Group names such as "family" are currently ignored.
 	// TODO: implement groups.
-	containsAll(t, p.Readers, []string{"*@google.com"})
-	containsAll(t, p.Writers, []string{})
-	containsAll(t, p.Appenders, []string{})
+	match(t, p.Read, []string{"*@google.com"})
+	match(t, p.Write, empty)
+	match(t, p.List, empty)
+	match(t, p.Create, empty)
+	match(t, p.Delete, empty)
 }
 
 func TestParseWrongFormat1(t *testing.T) {
@@ -226,9 +234,11 @@ func TestParseBadPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	containsAll(t, p.Readers, []string{})
-	containsAll(t, p.Writers, []string{})
-	containsAll(t, p.Appenders, []string{})
+	match(t, p.Read, empty)
+	match(t, p.Write, empty)
+	match(t, p.List, empty)
+	match(t, p.Create, empty)
+	match(t, p.Delete, empty)
 }
 
 func TestIsAccessFile(t *testing.T) {
@@ -240,11 +250,13 @@ func TestIsAccessFile(t *testing.T) {
 	expectState(t, false, upspin.PathName("not a path"))
 }
 
-func containsAll(t *testing.T, p []path.Parsed, expect []string) {
-	if len(p) != len(expect) {
-		t.Fatalf("Expected %d paths %q, got %d: %v", len(expect), expect, len(p), p)
+// match requires the two slices to be equivalent, assuming no duplicates.
+// The print of the path (ignoring the final / for a user name) must match the string.
+func match(t *testing.T, want []path.Parsed, expect []string) {
+	if len(want) != len(expect) {
+		t.Fatalf("Expected %d paths %q, got %d: %v", len(expect), expect, len(want), want)
 	}
-	for _, path := range p {
+	for _, path := range want {
 		var compare string
 		if len(path.Elems) == 0 {
 			compare = string(path.User)

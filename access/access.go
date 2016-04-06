@@ -30,17 +30,29 @@ const (
 
 // Parsed contains the parsed path names found in the ACL file, one for each section.
 type Parsed struct {
-	Readers   []path.Parsed
-	Writers   []path.Parsed
-	Appenders []path.Parsed
+	Read   []path.Parsed
+	Write  []path.Parsed
+	List   []path.Parsed
+	Create []path.Parsed
+	Delete []path.Parsed
 }
 
 const (
-	invalidRight = iota
-	readRight
+	readRight = iota
 	writeRight
-	appendRight
+	listRight
+	createRight
+	deleteRight
+	invalidRight = -1
 )
+
+var rightNames = [][]byte{
+	[]byte("read"),
+	[]byte("write"),
+	[]byte("list"),
+	[]byte("create"),
+	[]byte("delete"),
+}
 
 const (
 	invalidFormat = "%s:%d: unrecognized text: %q"
@@ -89,11 +101,15 @@ func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
 		for _, right := range rights {
 			switch which(right) {
 			case readRight:
-				p.Readers, err = parsedAppend(p.Readers, users...)
+				p.Read, err = parsedAppend(p.Read, users...)
 			case writeRight:
-				p.Writers, err = parsedAppend(p.Writers, users...)
-			case appendRight:
-				p.Appenders, err = parsedAppend(p.Appenders, users...)
+				p.Write, err = parsedAppend(p.Write, users...)
+			case listRight:
+				p.List, err = parsedAppend(p.List, users...)
+			case createRight:
+				p.Create, err = parsedAppend(p.Create, users...)
+			case deleteRight:
+				p.Delete, err = parsedAppend(p.Delete, users...)
 			case invalidRight:
 				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
 			}
@@ -179,18 +195,10 @@ func which(right []byte) int {
 	for i, c := range right {
 		right[i] = toLower(c)
 	}
-	switch right[0] {
-	case 'r':
-		if len(right) == 1 || bytes.Equal(right, []byte("read")) {
-			return readRight
-		}
-	case 'w':
-		if len(right) == 1 || bytes.Equal(right, []byte("write")) {
-			return writeRight
-		}
-	case 'a':
-		if len(right) == 1 || bytes.Equal(right, []byte("append")) {
-			return appendRight
+	for r, name := range rightNames {
+		// Match either a single letter or the exact name.
+		if len(right) == 1 && right[0] == name[0] || bytes.Equal(right, name) {
+			return r
 		}
 	}
 	return invalidRight
