@@ -222,3 +222,9 @@ func (d *dummyClient) Create(name upspin.PathName) (upspin.File, error) {
 func (d *dummyClient) Open(name upspin.PathName) (upspin.File, error) {
 	return nil, nil
 }
+func (d *dummyClient) Directory(name upspin.PathName) (upspin.Directory, error) {
+	return nil, nil
+}
+func (d *dummyClient) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
+	return nil, nil
+}

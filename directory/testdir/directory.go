@@ -543,6 +543,11 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{},
 	return s, nil
 }
 
+// Endpoint implements upspin.Directory.Endpoint.
+func (s *Service) Endpoint() upspin.Endpoint {
+	return s.endpoint
+}
+
 const transport = upspin.InProcess
 
 func init() {
