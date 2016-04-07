@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_c0784cca",
+        "filename": "test/testsetup/testsetup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-07T17:56:50Z",
+      "side": 1,
+      "message": "fix comment",
+      "revId": "c78b596e60df1d5e15b41845541ddbf1c9c0cbc9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
