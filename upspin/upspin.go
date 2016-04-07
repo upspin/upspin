@@ -134,7 +134,7 @@ const (
 	EEp384Pack Packing = 18
 	// EEp521Pack uses AES-256, SHA-512, and curve P521; strength 256.
 	EEp521Pack Packing = 17
-
+	// Ed25519Pack is a TODO packer
 	Ed25519Pack Packing = 19 // TODO(ehg) x/crytpo/curve25519, github.com/agl/ed25519
 )
 
@@ -235,12 +235,11 @@ type DirEntry struct {
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool       // The file is a directory.
-	Sequence int64      // The sequence (version) number of the item.
-	Size     uint64     // Length of file in bytes.
-	Time     Time       // Time associated with file; might be when it was last written.
-	Readers  []UserName // Users (or groups) allowed to read this entry (only used if IsDir).
-	PackData []byte     // Packing-specific metadata stored in directory.
+	IsDir    bool   // The file is a directory.
+	Sequence int64  // The sequence (version) number of the item.
+	Size     uint64 // Length of file in bytes.
+	Time     Time   // Time associated with file; might be when it was last written.
+	PackData []byte // Packing-specific metadata stored in directory.
 }
 
 // Store service.

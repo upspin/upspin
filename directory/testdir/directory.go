@@ -222,7 +222,6 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 			Sequence: seq,
 			Size:     0,
 			Time:     upspin.Now(),
-			Readers:  nil, // TODO
 			PackData: dirPackData,
 		},
 	}
@@ -327,7 +326,6 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 			Sequence: 0,
 			Size:     0,
 			Time:     upspin.Now(),
-			Readers:  nil, // TODO
 			PackData: packdata,
 		},
 	}
@@ -361,7 +359,6 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 			Metadata: upspin.Metadata{
 				IsDir:    true,
 				Sequence: entries[i+1].Metadata.Sequence,
-				Readers:  nil, // TODO
 				PackData: dirPackData,
 			},
 		}
