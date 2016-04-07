@@ -5,66 +5,27 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	"upspin.googlesource.com/upspin.git/test/testsetup"
 )
 
-// Config defines the configuration for each test setup.
-type Config struct {
-	user      upspin.Endpoint
-	directory upspin.Endpoint
-	store     upspin.Endpoint
-	pack      upspin.Packing
-}
-
-var (
-	inProcess = upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "", // ignored
-	}
-
-	dummyKey  = "a dummy key"
-	dummyKeys = upspin.KeyPair{
-		Public:  upspin.PublicKey(dummyKey),
-		Private: upspin.PrivateKey(dummyKey),
-	}
-	p521Keys = upspin.KeyPair{
-		Public:  upspin.PublicKey("p521\n6450881751971713196569094102081239393076079963958900743928198284492339970336929522903654432965250717230023303429579440002827022968286561560707424665790636516\n6112296178924797905471636976280701727548001722247534805995457563858330724205693643226473079857232632790111053373068566276215130870301334200655705076516179704"),
-		Private: upspin.PrivateKey("4521947149785170611891779226481561520929161578837051798262777353868642403465932692054573259457058158914995500557356995179754042449859359445129927600658124810"),
-	}
-	p256Keys = upspin.KeyPair{
-		Public:  upspin.PublicKey("p256\n41791600332717317269223890558424257039864678367319112297252443408877177583918\n31135882230954424983906858071404861049739328230080936198766036208628071024704"),
-		Private: upspin.PrivateKey("9148895919924802165789297199844745269316784374066786715028616676753697458529"),
-	}
-)
+var ()
 
 func TestAll(t *testing.T) {
 	testAllInProcess(t)
 }
 
 func testAllInProcess(t *testing.T) {
-	// Tests create a lot of junk so avoid configs that write to permanent storage.
-	// The user endpoint should almost certainly point to an ephemeral service.
-	var configs = []Config{
-		{inProcess, inProcess, inProcess, upspin.DebugPack},
-		{inProcess, inProcess, inProcess, upspin.PlainPack},
-		{inProcess, inProcess, inProcess, upspin.EEp256Pack},
-		{inProcess, inProcess, inProcess, upspin.EEp521Pack},
-	}
-
-	for _, config := range configs {
-		setup := newSetup(config.user, config.directory, config.store, config.pack)
+	for _, packing := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEp256Pack, upspin.EEp521Pack} {
+		setup := newSetup(t, packing)
 		setup.runAllTests(t)
 	}
 }
@@ -73,40 +34,22 @@ func testAllInProcess(t *testing.T) {
 type Setup struct {
 	context *upspin.Context
 	client  upspin.Client
+	packing upspin.Packing
 }
 
-// newSetup allocates and configures a setup for a test run using a Client.
-// The user's name inside the context is set separately using the newUser method.
-func newSetup(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *Setup {
+// newSetup allocates and configures a setup for a test run using a packing.
+func newSetup(t *testing.T, packing upspin.Packing) *Setup {
 	log.Printf("===== Using packing: %d", packing)
-	context := newContext(userEndpoint, dirEndpoint, storeEndpoint, packing)
+	client, context, err := testsetup.InProcess()
+	if err != nil {
+		t.Fatal(err)
+	}
 	s := &Setup{
 		context: context,
-		client:  client.New(context),
+		client:  client,
+		packing: packing,
 	}
 	return s
-}
-
-// newContext allocates and configures a context according to the given endpoints and packing.
-// The user's name inside the context is set separately using the newUser method.
-func newContext(userEndpoint, dirEndpoint, storeEndpoint upspin.Endpoint, packing upspin.Packing) *upspin.Context {
-	context := new(upspin.Context)
-	var err error
-	context.Packing = packing
-	// TODO: order of creation may not be right for some services.
-	context.User, err = bind.User(context, userEndpoint)
-	if err != nil {
-		panic(err)
-	}
-	context.Store, err = bind.Store(context, storeEndpoint)
-	if err != nil {
-		panic(err)
-	}
-	context.Directory, err = bind.Directory(context, dirEndpoint)
-	if err != nil {
-		panic(err)
-	}
-	return context
 }
 
 var userNameCounter = 0
@@ -116,23 +59,8 @@ var userNameCounter = 0
 func (s *Setup) newUser(t *testing.T) {
 	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 	userNameCounter++
-	s.context.UserName = userName
-
-	// Set a key depending on the packer type:
-	switch s.context.Packing {
-	case upspin.EEp256Pack:
-		s.context.KeyPair = p256Keys
-	case upspin.EEp521Pack:
-		s.context.KeyPair = p521Keys
-	default:
-		s.context.KeyPair = dummyKeys
-	}
-	testUser := s.context.User.(*testuser.Service)
-	// Set the public key for the current user.
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{s.context.KeyPair.Public})
-	err := testUser.Install(userName, s.context.Directory)                 // TODO: this is a hack.
-	if err != nil && !strings.Contains(err.Error(), "already installed") { // TODO: this is a hack.
-		panic(err)
+	if err := testsetup.AddUser(s.context, userName, s.packing); err != nil {
+		t.Fatal(err)
 	}
 }
 
