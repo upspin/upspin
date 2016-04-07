@@ -16,6 +16,24 @@
       "revId": "0eed1ac7c9e14a28916548d27cfbac0a6903332e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_600e1855",
+        "filename": "pack/ee/create.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T18:04:09Z",
+      "side": 0,
+      "message": "Lines 98-100 will cause an error when testing. It does not need to be there in the first place. I put it there as a precaution but the entropy can be as long as we want and each key type will use the amount of randomness they need.",
+      "parentUuid": "4eac54b5_e0922846",
+      "revId": "0eed1ac7c9e14a28916548d27cfbac0a6903332e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
