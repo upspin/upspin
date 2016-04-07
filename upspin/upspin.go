@@ -197,6 +197,9 @@ type Directory interface {
 	// a literal even if it contains metacharacters.
 	// The Metadata contains no key information.
 	Glob(pattern string) ([]*DirEntry, error)
+
+	// Endpoint returns the network endpoint of the server.
+	Endpoint() Endpoint
 }
 
 // PutOptions contains several optional data items relevant to the operation
@@ -310,6 +313,12 @@ type Client interface {
 	// local names?
 	Create(name PathName) (File, error)
 	Open(name PathName) (File, error)
+
+	// Directory returns an error or a reachable bound Directory for the user.
+	Directory(name PathName) (Directory, error)
+
+	// PublicKeys returns an error or a slice of public keys for the user.
+	PublicKeys(name PathName) ([]PublicKey, error)
 }
 
 // The File interface has semantics and API that parallels a subset

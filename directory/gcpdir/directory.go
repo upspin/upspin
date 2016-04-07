@@ -27,6 +27,7 @@ const (
 
 // Directory is an implementation of upspin.Directory that uses GCP to store its data.
 type Directory struct {
+	endpoint  upspin.Endpoint
 	serverURL string
 	client    netutil.HTTPClientInterface
 	timeNow   func() upspin.Time
@@ -289,7 +290,13 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	if !netutil.IsServerReachable(d.serverURL) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
+	d.endpoint = e
 	return d, nil
+}
+
+// Endpoint implements upspin.Directory.Endpoint.
+func (d *Directory) Endpoint() upspin.Endpoint {
+	return d.endpoint
 }
 
 // ServerUserName implements Dialer.

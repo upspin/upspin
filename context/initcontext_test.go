@@ -230,3 +230,6 @@ func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{
 func (d *dummyDirectory) ServerUserName() string {
 	panic("unimplemented")
 }
+func (d *dummyDirectory) Endpoint() upspin.Endpoint {
+	panic("unimplemented")
+}

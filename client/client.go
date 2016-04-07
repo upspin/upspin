@@ -36,7 +36,7 @@ func New(context *upspin.Context) upspin.Client {
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
-	dir, err := c.getRootDir(name)
+	dir, err := c.Directory(name)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -102,39 +102,16 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 
 // MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	dir, err := c.getRootDir(dirName)
+	dir, err := c.Directory(dirName)
 	if err != nil {
 		return zeroLoc, err
 	}
 	return dir.MakeDirectory(dirName)
 }
 
-func (c *Client) getRootDir(name upspin.PathName) (upspin.Directory, error) {
-	// Add a final slash in case it's just a user name and we're referencing the root.
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	endpoints, _, err := c.context.User.Lookup(parsed.User)
-	if err != nil {
-		return nil, err
-	}
-	var dir upspin.Directory
-	for _, e := range endpoints {
-		dir, err = bind.Directory(c.context, e)
-		if dir != nil {
-			return dir, nil
-		}
-	}
-	if err == nil {
-		err = fmt.Errorf("client: no endpoint for user %q", parsed.User)
-	}
-	return nil, err
-}
-
 // Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	dir, err := c.getRootDir(name)
+	dir, err := c.Directory(name)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +186,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	dir, err := c.getRootDir(upspin.PathName(pattern))
+	dir, err := c.Directory(upspin.PathName(pattern))
 	if err != nil {
 		return nil, err
 	}
@@ -229,4 +206,49 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 		return nil, err
 	}
 	return file.Readable(c, name, data), nil
+}
+
+// Directory implements upspin.Client.
+func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	var endpoints []upspin.Endpoint
+	if parsed.User == c.context.UserName {
+		endpoints = append(endpoints, c.context.Directory.Endpoint())
+	}
+	if eps, _, err := c.context.User.Lookup(parsed.User); err == nil {
+		endpoints = append(endpoints, eps...)
+	}
+	var dir upspin.Directory
+	for _, e := range endpoints {
+		dir, err = bind.Directory(c.context, e)
+		if dir != nil {
+			return dir, nil
+		}
+	}
+	if err == nil {
+		err = fmt.Errorf("client: no endpoint for user %q", parsed.User)
+	}
+	return nil, err
+}
+
+// PublicKeys implements upspin.PublicKeys.
+func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	var pubKeys []upspin.PublicKey
+	if parsed.User == c.context.UserName {
+		pubKeys = append(pubKeys, c.context.KeyPair.Public)
+	}
+	if _, pks, err := c.context.User.Lookup(parsed.User); err == nil {
+		pubKeys = append(pubKeys, pks...)
+	}
+	if len(pubKeys) == 0 {
+		return nil, fmt.Errorf("client: no public keys for user %q", parsed.User)
+	}
+	return pubKeys, nil
 }
