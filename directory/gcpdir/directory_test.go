@@ -82,7 +82,6 @@ func TestMkdir(t *testing.T) {
 		Size:     0,
 		Sequence: 0,
 		PackData: nil,
-		Readers:  nil,
 	}
 	// Mkdir will first Lookup the parent, then perform the Mkdir itself
 	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
@@ -141,7 +140,6 @@ func newMockLookupParentResponse(t *testing.T) []nettest.MockHTTPResponse {
 	// Set up the parent to contain default Readers.
 	newDir := dirEntry
 	newDir.Name = parentPathName
-	newDir.Metadata.Readers = readers
 	dir, err := json.Marshal(newDir)
 	if err != nil {
 		t.Fatalf("JSON marshal failed: %v", err)

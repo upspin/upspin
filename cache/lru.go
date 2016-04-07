@@ -22,7 +22,7 @@ type entry struct {
 	key, value interface{}
 }
 
-// NewLRUCache returns a new cache with the provided maximum items.
+// NewLRU returns a new cache with the provided maximum items.
 func NewLRU(maxEntries int) *LRU {
 	return &LRU{
 		maxEntries: maxEntries,

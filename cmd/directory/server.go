@@ -185,9 +185,6 @@ func (d *dirServer) mergeDirEntries(dst, src *upspin.DirEntry) *upspin.DirEntry 
 	if src.Metadata.Time != 0 {
 		dst.Metadata.Time = src.Metadata.Time
 	}
-	if src.Metadata.Readers != nil {
-		dst.Metadata.Readers = src.Metadata.Readers
-	}
 	if src.Metadata.PackData != nil {
 		dst.Metadata.PackData = src.Metadata.PackData
 	}
@@ -243,12 +240,7 @@ func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, pars
 		}
 	}
 
-	// Propagate readers from parent to this dirEntry and canonicalize path.
-	if len(dirEntry.Metadata.Readers) > 0 {
-		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "readers list must be empty"))
-		return
-	}
-	dirEntry.Metadata.Readers = parentDirEntry.Metadata.Readers
+	// Canonicalize path
 	dirEntry.Name = canonicalPath
 
 	// Store the entry.
@@ -421,7 +413,8 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 				netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
 			}
 			// Verify if user has proper read ACL.
-			hasAccess, err := access.HasAccess(sess.User(), parsed, de.Metadata.Readers)
+			// TODO: fetch the relevant Access file.
+			hasAccess, err := access.HasAccess(sess.User(), parsed, []upspin.UserName{upspin.UserName("*")})
 			if err != nil {
 				logErr.Printf("Error checking access for user: %s: %s", sess.User(), err)
 				continue

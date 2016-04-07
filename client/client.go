@@ -11,6 +11,9 @@ import (
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
+
+	// Plain packer used when encoding an Access file.
+	_ "upspin.googlesource.com/upspin.git/pack/plain"
 )
 
 // Client implements upspin.Client.
@@ -38,55 +41,43 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		return zeroLoc, err
 	}
 
-	parsed, err := path.Parse(name)
+	_, err = path.Parse(name)
 	if err != nil {
 		return zeroLoc, err
 	}
 
-	var readers []upspin.UserName
-
-	// Lookup parent directory, if any.
-	if len(parsed.Elems) > 1 {
-		parentDirEntry, err := dir.Lookup(parsed.Drop(1).Path())
-		if err != nil {
-			return zeroLoc, err
-		}
-		readers = parentDirEntry.Metadata.Readers
-	}
-
 	var cipher []byte
 	meta := &upspin.Metadata{
-		Readers: readers,
-		Time:    upspin.Now(),
+		Time: upspin.Now(),
 	}
 
+	var packer upspin.Packer
 	if !access.IsAccessFile(name) {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
-		packer := pack.Lookup(c.context.Packing)
+		packer = pack.Lookup(c.context.Packing)
 		if packer == nil {
 			return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
 		}
-
-		// Get a buffer big enough for this data
-		cipherLen := packer.PackLen(c.context, data, meta, name)
-		if cipherLen < 0 {
-			return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
-		}
-		// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
-		if len(meta.PackData) == 0 {
-			meta.PackData = []byte{byte(c.context.Packing)}
-		}
-		cipher = make([]byte, cipherLen)
-		n, err := packer.Pack(c.context, cipher, data, meta, name)
-		if err != nil {
-			return zeroLoc, err
-		}
-		cipher = cipher[:n]
 	} else {
-		cipher = data
-		meta.PackData = []byte{byte(upspin.PlainPack)}
+		packer = pack.Lookup(upspin.PlainPack)
 	}
+
+	// Get a buffer big enough for this data
+	cipherLen := packer.PackLen(c.context, data, meta, name)
+	if cipherLen < 0 {
+		return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
+	}
+	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
+	if len(meta.PackData) == 0 {
+		meta.PackData = []byte{byte(c.context.Packing)}
+	}
+	cipher = make([]byte, cipherLen)
+	n, err := packer.Pack(c.context, cipher, data, meta, name)
+	if err != nil {
+		return zeroLoc, err
+	}
+	cipher = cipher[:n]
 
 	// Store it.
 	ref, err := c.context.Store.Put(cipher)

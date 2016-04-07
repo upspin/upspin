@@ -33,8 +33,7 @@ var (
 	dirParent = upspin.DirEntry{
 		Name: upspin.PathName(parentPathName),
 		Metadata: upspin.Metadata{
-			IsDir:   true,
-			Readers: []upspin.UserName{upspin.UserName("peepingtom@curious.com")},
+			IsDir: true,
 		},
 	}
 )
@@ -132,27 +131,19 @@ func TestLookupPathNotFound(t *testing.T) {
 }
 
 func TestGlobComplex(t *testing.T) {
-	// Make sure user can read the final returned dir entries.
-	meta := upspin.Metadata{
-		Readers: []upspin.UserName{upspin.UserName("*")},
-	}
 	// Create dir entries for files that match that will be looked up after Globbing.
 	dir1 := upspin.DirEntry{
-		Name:     "f@b.co/subdir/a.pdf",
-		Metadata: meta,
+		Name: "f@b.co/subdir/a.pdf",
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
-		Name:     "f@b.co/subdir2/b.pdf",
-		Metadata: meta,
+		Name: "f@b.co/subdir2/b.pdf",
 	}
 	dir2JSON := toJSON(t, dir2)
 	// dir3 is a match, but is not readable to user.
+	// TODO: make dir3 not readable to user.
 	dir3 := upspin.DirEntry{
 		Name: "f@b.co/subdir3/c.pdf",
-		Metadata: upspin.Metadata{
-			Readers: []upspin.UserName{upspin.UserName("notyou@notyou.com")},
-		},
 	}
 	dir3JSON := toJSON(t, dir3)
 
@@ -166,7 +157,8 @@ func TestGlobComplex(t *testing.T) {
 			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
 	}
 
-	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2}) // dir3 is NOT returned to user (no access)
+	// TODO: remove dir3 from response.
+	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2, dir3}) // dir3 is NOT returned to user (no access)
 	resp := nettest.NewExpectingResponseWriter(string(respBody))
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/sub*/*.pdf", nil)
 
@@ -183,19 +175,13 @@ func TestGlobComplex(t *testing.T) {
 }
 
 func TestGlobSimple(t *testing.T) {
-	// Make sure user can read the final returned DirEntry
-	meta := upspin.Metadata{
-		Readers: []upspin.UserName{upspin.UserName(userName)},
-	}
 	// Create dir entries for files that match that will be looked up after Globbing.
 	dir1 := upspin.DirEntry{
-		Name:     "f@b.co/subdir/a.pdf",
-		Metadata: meta,
+		Name: "f@b.co/subdir/a.pdf",
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
-		Name:     "f@b.co/subdir/b.pdf",
-		Metadata: meta,
+		Name: "f@b.co/subdir/b.pdf",
 	}
 	dir2JSON := toJSON(t, dir2)
 
@@ -322,7 +308,6 @@ func TestPut(t *testing.T) {
 
 	// And that the file's Readers were updated
 	updatedDir := dir
-	updatedDir.Metadata.Readers = dirParent.Metadata.Readers
 	updatedDirJSON := toJSON(t, updatedDir)
 
 	// Verify what was actually put
@@ -461,7 +446,6 @@ func TestPatch(t *testing.T) {
 			Time:     upspin.Time(2),
 			Size:     42,
 			PackData: []byte("new packdata too"),
-			Readers:  []upspin.UserName{upspin.UserName("updated@email.com")},
 		},
 	}
 	updateDirJSON := toJSON(t, updateDir)
@@ -501,12 +485,6 @@ func TestPatch(t *testing.T) {
 	}
 	if string(writtenDirEntry.Metadata.PackData) != string(updateDir.Metadata.PackData) {
 		t.Errorf("Expected packdata %s, got %s", updateDir.Metadata.PackData, writtenDirEntry.Metadata.PackData)
-	}
-	if len(writtenDirEntry.Metadata.Readers) != len(updateDir.Metadata.Readers) {
-		t.Fatalf("Expected %d readers, got %d", len(updateDir.Metadata.Readers), len(writtenDirEntry.Metadata.Readers))
-	}
-	if writtenDirEntry.Metadata.Readers[0] != updateDir.Metadata.Readers[0] {
-		t.Errorf("Expected reader %s, got %s", updateDir.Metadata.Readers[0], writtenDirEntry.Metadata.Readers[0])
 	}
 }
 

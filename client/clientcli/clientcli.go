@@ -213,8 +213,9 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 			}
 		}
 		endpt := endpoint.String(&e.Location.Endpoint)
-		fmt.Printf("%c %d %d %s [%s]\t[%s]\t%s\n", isDirChar, e.Metadata.Sequence, e.Metadata.Size, e.Metadata.Time,
-			endpt, formatReaders(e.Metadata.Readers), e.Name)
+		// TODO: print readers when we have them again.
+		fmt.Printf("%c %d %d %s [%s]\t%s\n", isDirChar, e.Metadata.Sequence, e.Metadata.Size, e.Metadata.Time,
+			endpt, e.Name)
 	}
 }
 

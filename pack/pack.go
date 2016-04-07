@@ -51,8 +51,11 @@ func LookupByName(name string) upspin.Packer {
 }
 
 var (
+	// ErrNilMetadata indicates that the metadata is nil.
 	ErrNilMetadata = errors.New("nil metadata")
-	ErrBadPacking  = errors.New("metadata has incorrect or missing Packing value")
+
+	// ErrBadPacking indicates that the packing code is invalid.
+	ErrBadPacking = errors.New("metadata has incorrect or missing Packing value")
 )
 
 // CheckPackMeta verifies that the metadata satisfies the invariant for Pack and Packlen.

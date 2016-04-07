@@ -81,11 +81,6 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	N = binary.PutVarint(tmp[:], int64(d.Metadata.Time))
 	b = append(b, tmp[:N]...)
 	b = appendBytes(b, d.Metadata.PackData)
-	N = binary.PutUvarint(tmp[:], uint64(len(d.Metadata.Readers)))
-	b = append(b, tmp[:N]...)
-	for _, r := range d.Metadata.Readers {
-		b = appendString(b, string(r))
-	}
 	return b, nil
 }
 
@@ -181,19 +176,6 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	// (All the other slices are turned into strings, so are intrinsically copied.)
 	d.Metadata.PackData = make(PackData, len(bytes))
 	copy(d.Metadata.PackData, bytes)
-	u, N := binary.Uvarint(b)
-	if N == 0 {
-		return nil, ErrTooShort
-	}
-	d.Metadata.Readers = make([]UserName, u)
-	b = b[N:]
-	for i := range d.Metadata.Readers {
-		bytes, b = getBytes(b)
-		if b == nil {
-			return nil, ErrTooShort
-		}
-		d.Metadata.Readers[i] = UserName(bytes)
-	}
 	return b, nil
 }
 

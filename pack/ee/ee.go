@@ -180,7 +180,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	}
 
 	// Wrap for the readers.  The writer of a file is always a reader.
-	usernames := append([]upspin.UserName{ctx.UserName}, meta.Readers...)
+	usernames := []upspin.UserName{ctx.UserName} // TODO: append a readers list
 	var firstErr error
 	wrap := make([]wrappedKey, len(usernames))
 	nwrap := 0
