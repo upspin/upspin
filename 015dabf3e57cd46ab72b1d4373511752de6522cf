@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_55a88051",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_3e471e4a",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_be57aed5",
         "filename": "test/setup/setup.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-06T18:03:13Z",
       "side": 1,
       "message": "testsetup.Create won\u0027t read right. it should be called Tree.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_35adf460",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_be57aed5",
       "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_b5990449",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_7e212679",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_9e24f28b",
         "filename": "test/setup/setup.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-06T18:03:13Z",
       "side": 1,
       "message": "see below",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_95a60880",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_9e24f28b",
       "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_75a37c71",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eac54b5_de395ab7",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_1e30e2cb",
         "filename": "test/setup/setup.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-04-06T18:03:13Z",
       "side": 1,
       "message": "it\u0027s overwriting context, which bothers me. i would prefer either that context be the first argument, since it\u0027s being written, or perhaps better that it returns a new context.",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_55d1a0d3",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done. It was cumbersome to return a new context because we need a testuser and that comes from the context or we have to bind to one. Since we would have to patch the context with keys and username in testing anyway I might as well do this here and reduce the amount of boilerplate in testing.",
+      "parentUuid": "4eac54b5_1e30e2cb",
       "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "4eac54b5_1588b8e2",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "No. Missing code. Fixed.",
+      "parentUuid": "4eac54b5_9ef6323c",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_5e00aae8",
         "filename": "test/setup/setup.go",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2016-04-06T18:03:13Z",
       "side": 1,
       "message": "this would be very confusing out of context. how about\nuser service must be the in-process instance",
+      "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_f58c2cf8",
+        "filename": "test/setup/setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-07T17:39:08Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "4eac54b5_5e00aae8",
       "revId": "015dabf3e57cd46ab72b1d4373511752de6522cf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
