@@ -36,14 +36,17 @@ func setupContext() {
 	}
 	context.Packing = upspin.DebugPack // TODO.
 	var err error
+	context.UserEndpoint = endpoint
 	context.User, err = bind.User(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
+	context.StoreEndpoint = endpoint
 	context.Store, err = bind.Store(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
+	context.DirectoryEndpoint = endpoint
 	context.Directory, err = bind.Directory(context, endpoint)
 	if err != nil {
 		panic(err)

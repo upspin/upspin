@@ -83,19 +83,22 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	if ep, err = endpoint.Parse(vals["user"]); err != nil {
 		return nil, err
 	}
-	if context.User, err = bind.User(context, *ep); err != nil {
+	context.UserEndpoint = *ep
+	if context.User, err = bind.User(context, context.UserEndpoint); err != nil {
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["store"]); err != nil {
 		return nil, err
 	}
-	if context.Store, err = bind.Store(context, *ep); err != nil {
+	context.StoreEndpoint = *ep
+	if context.Store, err = bind.Store(context, context.StoreEndpoint); err != nil {
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["directory"]); err != nil {
 		return nil, err
 	}
-	if context.Directory, err = bind.Directory(context, *ep); err != nil {
+	context.DirectoryEndpoint = *ep
+	if context.Directory, err = bind.Directory(context, context.DirectoryEndpoint); err != nil {
 		return nil, err
 	}
 	return context, nil

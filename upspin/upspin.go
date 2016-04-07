@@ -311,6 +311,12 @@ type Client interface {
 	// local names?
 	Create(name PathName) (File, error)
 	Open(name PathName) (File, error)
+
+	// Directory returns an error or a reachable bound Directory for the user.
+	Directory(name PathName) (Directory, error)
+
+	// Directory returns an error or a slice of public keys for the user.
+	PubKeys(name PathName) ([]PublicKey, error)
 }
 
 // The File interface has semantics and API that parallels a subset
@@ -356,14 +362,17 @@ type Context struct {
 	Packing Packing
 
 	// User is the User service to contact when evaluating names.
-	User User
+	User         User
+	UserEndpoint Endpoint
 
 	// Directory is the Directory in which to place new data items,
 	// usually the location of the user's root.
-	Directory Directory
+	Directory         Directory
+	DirectoryEndpoint Endpoint
 
 	// Store is the Store in which to place new data items.
-	Store Store
+	Store         Store
+	StoreEndpoint Endpoint
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
