@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_959a8899",
+        "filename": "test/testsetup/testsetup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-07T17:42:54Z",
+      "side": 1,
+      "message": "instead of the flag here, i might make it a flag in the package.\n\nvar Verbose bool\n\nsort of analogous to testing.Verbose, and in a test you could even do\n\nfunc init() {\n  testsetup.Verbose \u003d testing.Verbose()\n}",
+      "revId": "7754266d8952dd0add48c2b5d82934cccf80aa45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_f5830c2f",
+        "filename": "test/testsetup/testsetup_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-07T17:42:54Z",
+      "side": 1,
+      "message": "don\u0027t use _test unless there\u0027s an import cycle problem.",
+      "revId": "7754266d8952dd0add48c2b5d82934cccf80aa45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
