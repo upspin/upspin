@@ -3,6 +3,7 @@ package netutil
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,6 +31,10 @@ const (
 
 	// Put is the PUT method.
 	Put = "PUT"
+)
+
+var (
+	ErrTooLong = errors.New("response body too long")
 )
 
 // TODO(edpin): Rename this to get rid of 'Interface'.
@@ -91,6 +96,31 @@ func BufferRequest(resp http.ResponseWriter, req *http.Request, maxBufLen int64)
 		return nil
 	}
 	return buf[:n]
+}
+
+// BufferResponse reads the body of an HTTP response up to maxBufLen bytes. It closes the response body.
+// If the response is larger than maxBufLen, it returns ErrTooLong.
+func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
+	var buf []byte
+	defer resp.Body.Close()
+	if resp.ContentLength > 0 {
+		if resp.ContentLength <= maxBufLen {
+			buf = make([]byte, resp.ContentLength)
+		} else {
+			// Return an error
+			return nil, ErrTooLong
+		}
+	} else {
+		buf = make([]byte, maxBufLen)
+	}
+	n, err := resp.Body.Read(buf)
+	if err != nil && err != io.EOF {
+		if err == io.ErrShortBuffer {
+			return nil, ErrTooLong
+		}
+		return nil, err
+	}
+	return buf[:n], nil
 }
 
 // IsServerReachable reports whether the server at an URL can be reached.
