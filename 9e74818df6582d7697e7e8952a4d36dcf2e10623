@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_a72e6a3b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T16:22:20Z",
+      "side": 1,
+      "message": "No, I mean \"PubKeys returns ...\", not \"Directory returns...\"",
+      "parentUuid": "6e3038ce_67f4729a",
+      "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_2934788d",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
