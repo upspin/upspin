@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_fb3e379c",
+        "filename": "access/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:54:17Z",
+      "side": 1,
+      "message": "one way to do this would be to sort the lists and then use reflect.DeepEqual.\nanother way is to do the n^2 double check (every a is in b and every b is in a), or to verify no duplicates in a (itself n^2) and then the O(n^2) lookup you have now. another is to do what you do now, but have a list of counters of len(b) and as you visit each, increment it. at the end, each counter should be \u003d\u003d 1. i prefer the last method.\n\nthe method you\u0027re using is very roundabout. and expensive, which answers the question on line 398.",
+      "revId": "318263eb3f4f906687d8bbe3e2720450eb8995b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
