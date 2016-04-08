@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_f0e2d647",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "move up to line 18",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_10c84ac9",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "we only encode one field. the comment is misleading.",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_50d2c27c",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "ambiguous\n\n// UnmarshalJSON returns an Access given its path name and its JSON encoding.",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_90bc3a31",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "regroup\n\nwhat is doing this to you?",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_70a8a6e3",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "maybe TestJSON",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_90f7daec",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "why are we doing this? why not just have assert equal return a string that is non-empty if they aren\u0027t equal?",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_303b8e7d",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "s/equal/equal length/",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_50480208",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_f051f6b2",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T20:01:05Z",
+      "side": 1,
+      "message": "this isn\u0027t strictly right.\nif al is a a a and bl is a b c, this will say true.",
+      "revId": "8c9d959dd30e79a47ecb4a9167a4f32f6f86c47a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
