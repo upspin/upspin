@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eac54b5_4974645f",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T05:11:48Z",
+      "side": 1,
+      "message": "s/of of/of/",
+      "revId": "5202a6ab9c4c9d833cc414a62e40ae65f1703da2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_29691884",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T05:11:48Z",
+      "side": 1,
+      "message": "same",
+      "revId": "5202a6ab9c4c9d833cc414a62e40ae65f1703da2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_e983307e",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T05:11:48Z",
+      "side": 1,
+      "message": "should Group be a const (it\u0027s re-used twice below)?",
+      "revId": "5202a6ab9c4c9d833cc414a62e40ae65f1703da2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4eac54b5_e9c8d0cb",
+        "filename": "access/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T05:11:48Z",
+      "side": 1,
+      "message": "Should you check err before ok \u003d\u003d truth just for added safety? Even though groups is nil, maybe there was another error even when ok matches truth?",
+      "revId": "5202a6ab9c4c9d833cc414a62e40ae65f1703da2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
