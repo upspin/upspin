@@ -158,6 +158,22 @@ func (p Parsed) IsRoot() bool {
 	return len(p.Elems) == 0
 }
 
+// Equal reports whether the two parsed path names are equal.
+func (p Parsed) Equal(q Parsed) bool {
+	if len(p.Elems) != len(q.Elems) {
+		return false
+	}
+	if p.User != q.User {
+		return false
+	}
+	for i, elem := range p.Elems {
+		if elem != q.Elems[i] {
+			return false
+		}
+	}
+	return true
+}
+
 // Join appends any number of path elements onto a (possibly empty)
 // Upspin path, adding a separating slash if necessary. All empty
 // strings are ignored. The result, if non-empty, is passed through

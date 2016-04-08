@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -28,24 +29,20 @@ const (
 	accessFile = "Access"
 )
 
-// Parsed contains the parsed path names found in the ACL file, one for each section.
-type Parsed struct {
-	Read   []path.Parsed
-	Write  []path.Parsed
-	List   []path.Parsed
-	Create []path.Parsed
-	Delete []path.Parsed
-}
+// A Right represents a particular access permission: reading, writing, etc.
+type Right int
 
 const (
-	readRight = iota
-	writeRight
-	listRight
-	createRight
-	deleteRight
-	invalidRight = -1
+	Invalid Right = iota - 1
+	Read
+	Write
+	List
+	Create
+	Delete
+	numRights
 )
 
+// rightNames are the names of the rights, in order (and missing invalid).
 var rightNames = [][]byte{
 	[]byte("read"),
 	[]byte("write"),
@@ -54,27 +51,65 @@ var rightNames = [][]byte{
 	[]byte("delete"),
 }
 
+var (
+	// mu controls access to the groups map
+	mu sync.RWMutex
+
+	// groups holds the parsed list of all known groups,
+	// indexed by group name (joe@blow.com/Group/nerds).
+	// It is global so multiple Access files can share
+	// group definitions.
+	groups = make(map[upspin.PathName][]path.Parsed)
+)
+
+// Access represents a parsed Access file.
+type Access struct {
+	// path is parsed path name of the file.
+	parsed path.Parsed
+
+	// user is the user@domain.com name of of the path of the file.
+	owner upspin.UserName
+
+	// domain is the domain.com part of the user name of of the path of the file.
+	domain string
+
+	// list holds the lists of parsed user and group names.
+	// It is indexed by a right.
+	list [][]path.Parsed
+}
+
+// Path returns the full path name of the file that was parsed.
+func (a *Access) Path() upspin.PathName {
+	return a.parsed.Path()
+}
+
 const (
 	invalidFormat = "%s:%d: unrecognized text: %q"
 )
 
-// Parse parses the contents of the path name, in data, and returns the parsed contents.
-func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
-	var p Parsed
+// Parse parses the contents of the path name, in data, and returns the parsed Acces.
+func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return nil, err
+	}
+	_, domain, err := path.UserAndDomain(parsed.User)
+	// We don't expect an error since it's been parsed, but check anyway.
+	if err != nil {
+		return nil, err
+	}
+	a := &Access{
+		parsed: parsed,
+		owner:  parsed.User,
+		domain: domain,
+		list:   make([][]path.Parsed, numRights),
+	}
 	// Temporaries. Pre-allocate so they can be reused in the loop, saving allocations.
 	rights := make([][]byte, 10)
 	users := make([][]byte, 10)
 	s := bufio.NewScanner(bytes.NewReader(data))
 	for lineNum := 1; s.Scan(); lineNum++ {
-		line := s.Bytes()
-
-		// Remove comments.
-		if index := bytes.IndexByte(line, '#'); index >= 0 {
-			line = line[:index]
-		}
-
-		// Ignore blank lines.
-		line = bytes.TrimSpace(line)
+		line := clean(s.Bytes())
 		if len(line) == 0 {
 			continue
 		}
@@ -99,18 +134,10 @@ func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
 
 		var err error
 		for _, right := range rights {
-			switch which(right) {
-			case readRight:
-				p.Read, err = parsedAppend(p.Read, users...)
-			case writeRight:
-				p.Write, err = parsedAppend(p.Write, users...)
-			case listRight:
-				p.List, err = parsedAppend(p.List, users...)
-			case createRight:
-				p.Create, err = parsedAppend(p.Create, users...)
-			case deleteRight:
-				p.Delete, err = parsedAppend(p.Delete, users...)
-			case invalidRight:
+			switch r := which(right); r {
+			case Read, Write, List, Create, Delete:
+				a.list[r], err = parsedAppend(a.list[r], parsed.User, users...)
+			case Invalid:
 				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
 			}
 		}
@@ -121,7 +148,7 @@ func Parse(pathName upspin.PathName, data []byte) (*Parsed, error) {
 	if s.Err() != nil {
 		return nil, s.Err()
 	}
-	return &p, nil
+	return a, nil
 }
 
 func isSpace(b byte) bool {
@@ -133,17 +160,49 @@ func isSpace(b byte) bool {
 	}
 }
 
+// clean takes a line of text and removes comments and starting and leading space.
+// It returns an emtpy slice if nothing is left.
+func clean(line []byte) []byte {
+	// Remove comments.
+	if index := bytes.IndexByte(line, '#'); index >= 0 {
+		line = line[:index]
+	}
+
+	// Ignore blank lines.
+	return bytes.TrimSpace(line)
+}
+
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
-func parsedAppend(list []path.Parsed, users ...[]byte) ([]path.Parsed, error) {
+func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, error) {
 	for _, user := range users {
 		p, err := path.Parse(upspin.PathName(user) + "/")
 		if err != nil {
-			// TODO: should do syntax check of group names if path.Parse fails.
-			continue
+			if bytes.IndexByte(user, '@') >= 0 {
+				// Has user name but doesn't parse: Invalid path.
+				return nil, err
+			}
+			// Is it a badly formed group file?
+			slash := bytes.IndexByte(user, '/')
+			if slash >= 0 && bytes.Index(user, []byte("/Group/")) == slash {
+				// Looks like a group file but is missing the user name.
+				return nil, fmt.Errorf("bad user name in group path %q", user)
+			}
+			// It has no user name, so it might be a path name for a group file.
+			p, err = path.Parse(upspin.PathName(owner) + "/Group/" + upspin.PathName(user))
+			if err != nil {
+				return nil, err
+			}
 		}
+		// Check group syntax.
 		if len(p.Elems) > 0 {
-			// TODO: can't handle groups yet; ignore.
-			continue
+			// First element must be group.
+			if p.Elems[0] != "Group" {
+				return nil, fmt.Errorf("illegal group %q", user)
+			}
+			// Groups cannot be wild cards.
+			if bytes.HasPrefix(user, []byte("*@")) {
+				return nil, fmt.Errorf("cannot have wildcard for group name %q", user)
+			}
 		}
 		list = append(list, p)
 	}
@@ -191,17 +250,17 @@ func toLower(b byte) byte {
 
 // which reports which right the text represents. Case is ignored and a right may be
 // specified by its first letter only. We know that the text is not empty.
-func which(right []byte) int {
+func which(right []byte) Right {
 	for i, c := range right {
 		right[i] = toLower(c)
 	}
 	for r, name := range rightNames {
 		// Match either a single letter or the exact name.
 		if len(right) == 1 && right[0] == name[0] || bytes.Equal(right, name) {
-			return r
+			return Right(r)
 		}
 	}
-	return invalidRight
+	return Invalid
 }
 
 // IsAccessFile reports whether the pathName contains a file named Access, which is special.
@@ -209,50 +268,160 @@ func IsAccessFile(pathName upspin.PathName) bool {
 	return strings.HasSuffix(string(pathName), accessFile)
 }
 
-// HasAccess reports whether a given user has access to a path, given a slice of allowed users with that access. The
-// slice of allowed users may contain only the following special wildcards: "*" which means anyone has access
-// and "*@<domain>" which means any one from that domain has access.
-func HasAccess(user upspin.UserName, parsedPath path.Parsed, allowedAccess []upspin.UserName) (bool, error) {
-	// First, if user is the owner, access is granted.
-	if user == parsedPath.User {
-		return true, nil
+// AddGroup installs a group with the specified name and textual contents,
+// which should have been read from the group file with that name.
+// If the group is already known, its definition is replaced.
+// TODO: This doesn't have to be a method as it affects global state. Leave it this way?
+func (a *Access) AddGroup(pathName upspin.PathName, contents []byte) error {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return err
 	}
-	// Save space for this user's domain if we need to match wildcards, but process it lazily.
-	var userDomain string
-	for _, u := range allowedAccess {
-		if u == user {
-			return true, nil
+	group, err := parseGroup(parsed, contents)
+	if err != nil {
+		return err
+	}
+	mu.Lock()
+	groups[parsed.Path()] = group
+	mu.Unlock()
+	return nil
+}
+
+// parseGroup parses a group file but does not install it in the groups map.
+func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err error) {
+	// Temporary. Pre-allocate so it can be reused in the loop, saving allocations.
+	users := make([][]byte, 10)
+	s := bufio.NewScanner(bytes.NewReader(contents))
+	for lineNum := 1; s.Scan(); lineNum++ {
+		line := clean(s.Bytes())
+		if len(line) == 0 {
+			continue
 		}
-		// We interpret "*" and "*@<domain>" specially.
-		if strings.HasPrefix(string(u), "*") {
-			if u == "*" {
-				// Everyone has access.
+
+		users := splitList(users[:0], line)
+		if users == nil {
+			return nil, fmt.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
+		}
+		group, err = parsedAppend(group, parsed.User, users...)
+		if err != nil {
+			return nil, fmt.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
+		}
+	}
+	if s.Err() != nil {
+		return nil, s.Err()
+	}
+	return group, nil
+}
+
+// ErrNeedGroup is returned by Access.Can when a group file must be provided.
+var ErrNeedGroup = errors.New("need group")
+
+// Can reports whether the requesting user can access the file
+// using the specified right according to the rules of the Access
+// file.
+//
+// The rights are applied to the path itself. For instance, for Create
+// the question is whether the user can create the named file, not
+// whether the user has Create rights in the directory with that name.
+// Similarly, for List the question is whether the user can list the
+// status of this file, or if it is a directory, list the contents
+// of that directory. It is the caller's responsibility to apply the
+// correct Access file to the question, and separately to verify
+// issues such as attempts to write to a directory rather than a file.
+//
+// If the Access file does not know the members of a group that it
+// needs to resolve the answer, it return false, sets the error to
+// ErrNeedGroup, and returns a list of the group files it needs to
+// have read for it. The caller should fetch these and report them
+// with the AddGroup method, then retry.
+//
+func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName) (bool, []upspin.PathName, error) {
+	parsedRequester, err := path.Parse(upspin.PathName(requester + "/"))
+	if err != nil {
+		return false, nil, err
+	}
+	// First, if user is the owner and the request is for read access,
+	// or write or create access to an Access file, access is granted.
+	if requester == a.owner {
+		switch right {
+		case Read, List:
+			// User can always read or list anything in the user's tree.
+			return true, nil, nil
+		case Write, Create:
+			// User always has the right to create or modify an Access file.
+			if IsAccessFile(pathName) {
+				return true, nil, nil
+			}
+		}
+	}
+	var list []path.Parsed
+	switch right {
+	case Read, Write, List, Create, Delete:
+		list = a.list[right]
+	default:
+		return false, nil, fmt.Errorf("unrecognized right value %d", right)
+	}
+	// First try the list of regular users we have loaded. Make a note of groups to check.
+	found, groupsToCheck := a.inList(parsedRequester, list, nil)
+	if found {
+		return true, nil, nil
+	}
+	// Now look at the groups we have to check, and build a list of
+	// groups we don't know about in case we can't answer with
+	// what we know so far.
+	var missingGroups []upspin.PathName
+	// This is not a range loop because the groups list may grow.
+	for i := 0; i < len(groupsToCheck); i++ {
+		// TODO: The call to Path allocates. Would be nice to avoid.
+		group := groupsToCheck[i]
+		groupPath := group.Path()
+		mu.RLock()
+		known, ok := groups[groupPath]
+		mu.RUnlock()
+		if !ok {
+			missingGroups = append(missingGroups, groupPath)
+			continue
+		}
+		found, groupsToCheck = a.inList(parsedRequester, known, groupsToCheck)
+		if found {
+			return true, nil, nil
+		}
+	}
+	if missingGroups != nil {
+		return false, missingGroups, ErrNeedGroup
+	}
+	return false, nil, nil
+}
+
+// inList reports whether the requester is present in the list, either directly or by wildcard.
+// If we encounter a new group in the list, we add it the list of groups to check and will
+// process it in another call from Can.
+func (a *Access) inList(requester path.Parsed, list []path.Parsed, groupsToCheck []path.Parsed) (bool, []path.Parsed) {
+	_, domain, err := path.UserAndDomain(requester.User)
+	// We don't expect an error since it's been parsed, but check anyway.
+	if err != nil {
+		return false, nil
+	}
+Outer:
+	for _, allowed := range list {
+		if len(allowed.Elems) == 0 {
+			if allowed.User == requester.User {
 				return true, nil
 			}
-			pos := strings.IndexByte(string(u), '@')
-			if pos != 1 {
-				// This should never happen if we took allowedAccess from a valid Metadata entry.
-				return false, errors.New("malformed user name")
+			// Wildcard: The path name *@domain.com matches anyone in domain.
+			if strings.HasPrefix(string(allowed.User), "*@") && string(allowed.User[2:]) == domain {
+				return true, nil
 			}
-			// We now need user and access domains.
-			var err error
-			if userDomain == "" {
-				_, userDomain, err = path.UserAndDomain(user)
-				if err != nil {
-					// This should never happen if we took allowedAccess from a valid Metadata entry.
-					return false, err
+		} else {
+			// It's a group. Make sure we don't put the same one in twice. TODO: Could be n^2.
+			for _, group := range groupsToCheck {
+				if allowed.Equal(group) {
+					// Already there, so don't add it again.
+					continue Outer
 				}
 			}
-			_, accessDomain, err := path.UserAndDomain(u)
-			if err != nil {
-				// This should never happen if we took allowedAccess from a valid Metadata entry.
-				return false, err
-			}
-			// Both userDomain and ownerDomain are guaranteed not empty at this point.
-			if userDomain == accessDomain {
-				return true, nil
-			}
+			groupsToCheck = append(groupsToCheck, allowed)
 		}
 	}
-	return false, nil
+	return false, groupsToCheck
 }
