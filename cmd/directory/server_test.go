@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/auth/testauth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -114,7 +116,7 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 		Ref: []string{"something that does not match"},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	Put(t, ds, dir, `{"error":"DirService: Put: fred@bob.com/myroot/myfile: parent path not found"}`)
 }
 
@@ -125,7 +127,7 @@ func TestLookupPathNotFound(t *testing.T) {
 		Ref: []string{"something that does not match"},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -162,7 +164,7 @@ func TestGlobComplex(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(string(respBody))
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/sub*/*.pdf", nil)
 
-	ds := newDirServer(lgcp)
+	ds := newDirServer(lgcp, newDummyStoreClient())
 	ds.globHandler(dummySess, resp, req)
 	resp.Verify(t)
 
@@ -199,7 +201,7 @@ func TestGlobSimple(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(string(respBody))
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob?pattern=f@b.co/subdir/*.pdf", nil)
 
-	ds := newDirServer(lgcp)
+	ds := newDirServer(lgcp, newDummyStoreClient())
 	ds.globHandler(dummySess, resp, req)
 	resp.Verify(t)
 
@@ -227,7 +229,7 @@ func TestPutParentNotDir(t *testing.T) {
 		Data: [][]byte{dirParentJSON},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -251,7 +253,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 		Data: [][]byte{dirParentJSON, existingDirEntryJSON},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -277,7 +279,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 		Data: [][]byte{dirParentJSON, existingDirEntryJSON},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -297,7 +299,7 @@ func TestPut(t *testing.T) {
 		Data: [][]byte{dirParentJSON},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 
@@ -330,11 +332,22 @@ func TestPut(t *testing.T) {
 
 func TestPutRoot(t *testing.T) {
 	const user = "dude@foo.com"
-	rootDir := upspin.DirEntry{
+	rootDir := &upspin.DirEntry{
 		Name: user + "/",
+		Metadata: upspin.Metadata{
+			IsDir:    true,
+			Sequence: 0,
+			Time:     72,
+		},
+	}
+	root := &root{
+		dirEntry: rootDir,
 	}
 
+	// rootDirJSON is what the client requests...
 	rootDirJSON := toJSON(t, rootDir)
+	// ... rootJSON is what the server puts to GCP.
+	rootJSON := toRootJSON(t, root)
 
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", rootDirJSON)
@@ -343,7 +356,7 @@ func TestPutRoot(t *testing.T) {
 		Ref: []string{"does not exist"},
 	}
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 
@@ -353,8 +366,57 @@ func TestPutRoot(t *testing.T) {
 	if egcp.PutRef[0] != user {
 		t.Errorf("Expected put to write to %s, wrote to %s", user, egcp.PutRef)
 	}
-	if !bytes.Equal(rootDirJSON, egcp.PutContents[0]) {
-		t.Errorf("Expected put to write %s, wrote %s", rootDirJSON, egcp.PutContents[0])
+	if !bytes.Equal(rootJSON, egcp.PutContents[0]) {
+		t.Errorf("Expected put to write %s, wrote %s", rootJSON, egcp.PutContents[0])
+	}
+}
+
+func TestMarshalRoot(t *testing.T) {
+	var (
+		fileInRoot       = upspin.PathName("me@here.com/foo.txt")
+		dirRestricted    = upspin.PathName("me@here.com/restricted")
+		accessRoot       = upspin.PathName("me@here.com/Access")
+		accessRestricted = upspin.PathName("me@here.com/restricted/Access")
+	)
+	acc1 := makeAccess(t, accessRoot, "r: bob@foo.com\nw: marie@curie.fr")
+	acc2 := makeAccess(t, accessRestricted, "l: gandhi@peace.in")
+	root := &root{
+		dirEntry: &upspin.DirEntry{
+			Name: upspin.PathName("me@here.com/"),
+			Metadata: upspin.Metadata{
+				IsDir: true,
+			},
+		},
+		accessFiles: accessFileDB{accessRoot: acc1, accessRestricted: acc2},
+	}
+	buf := toRootJSON(t, root)
+	root2, err := unmarshalRoot(buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(root2.accessFiles) != 2 {
+		t.Fatalf("Expected two Access files, got %d", len(root2.accessFiles))
+	}
+	// Make a few assertions about who can access what.
+	// What I really want here is acc1.Equal(acc1saved), but Equal is not publicly implemented. :-(
+	acc1saved, ok := root2.accessFiles[accessRoot]
+	if !ok {
+		t.Fatalf("Expected %s to exist in DB.", accessRoot)
+	}
+	can, _, err := acc1saved.Can(upspin.UserName("bob@foo.com"), access.Read, fileInRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !can {
+		t.Errorf("Expected bob@foo.com to have Read access to %s", fileInRoot)
+	}
+	acc2saved, ok := root2.accessFiles[accessRestricted]
+	can, _, err = acc2saved.Can(upspin.UserName("gandhi@peace.in"), access.List, dirRestricted)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !can {
+		t.Errorf("Expected gandhi@peace.in to have List access to %s", dirRestricted)
 	}
 }
 
@@ -362,7 +424,7 @@ func TestClientSendsBadDirEntry(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: unmarshal: invalid character 'c' looking for beginning of value"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", []byte("crap data"))
 
-	ds := newDirServer(&gcptest.DummyGCP{})
+	ds := newDirServer(&gcptest.DummyGCP{}, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -378,7 +440,7 @@ func TestGCPCorruptsData(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: getmeta: test@foo.com/mydir/myfile.txt: json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"}`)
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/get?pathname="+pathName, dirEntryJSON)
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -394,7 +456,7 @@ func TestGet(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(string(dirEntryJSON))
 	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/get?pathname="+pathName, dirEntryJSON)
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.getHandler(dummySess, resp, req)
 	resp.Verify(t)
 }
@@ -416,7 +478,7 @@ func TestPatchErrorUpdateLocation(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: patch: test@foo.com/mydir/myfile.txt: Location is not updatable"}`)
 	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req) // putHandler handles /put PATCH requests too
 	resp.Verify(t)
 }
@@ -433,7 +495,7 @@ func TestPatchErrorPathNotFound(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: download: pathname not found"}`)
 	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req) // putHandler handles /put PATCH requests too
 	resp.Verify(t)
 }
@@ -458,7 +520,7 @@ func TestPatch(t *testing.T) {
 	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
 	req := nettest.NewRequest(t, netutil.Patch, "http://localhost:8081/put", updateDirJSON)
 
-	ds := newDirServer(egcp)
+	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.dirHandler(dummySess, resp, req) // dirHandler handles /put PATCH requests too
 	resp.Verify(t)
 
@@ -496,8 +558,30 @@ func toJSON(t *testing.T, data interface{}) []byte {
 	return ret
 }
 
+func toRootJSON(t *testing.T, root *root) []byte {
+	json, err := marshalRoot(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return json
+}
+
+func makeAccess(t *testing.T, path upspin.PathName, accessFileContents string) *access.Access {
+	acc, err := access.Parse(path, []byte(accessFileContents))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return acc
+}
+
 func newDummyDirServer() *dirServer {
-	return newDirServer(&gcptest.DummyGCP{})
+	return newDirServer(&gcptest.DummyGCP{}, newDummyStoreClient())
+}
+
+func newDummyStoreClient() *storeClient {
+	mock := nettest.NewMockHTTPClient(nil, nil)
+	authCli := auth.NewClient(upspin.UserName("this-server@upspin.io"), upspin.KeyPair{}, mock)
+	return newStoreClient(authCli)
 }
 
 // listGCP is an ExpectDownloadCapturePutGCP that returns a slice of fileNames
