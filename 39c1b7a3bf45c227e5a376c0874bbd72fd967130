@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_f6f00e44",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T22:58:17Z",
+      "side": 1,
+      "message": "i think both must of of length numRights. the code might depend on that.",
+      "revId": "39c1b7a3bf45c227e5a376c0874bbd72fd967130",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
