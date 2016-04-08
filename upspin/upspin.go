@@ -74,40 +74,48 @@ type Packer interface {
 	// String returns the name of this packer.
 	String() string
 
-	// Pack takes cleartext data, metadata and path name and
-	// stores the ciphertext encoding in the supplied slice.
-	// The ciphertext and cleartext slices must not overlap.
-	// Pack might update the metadata, which must not be
-	// nil but might have a nil PackData field. If meta.PackData has length>0,
-	// the first byte must be the correct value of Packing.
-	// The slice must be large enough; the PackLen method may be used to
-	// find a suitable allocation size.
-	// The returned count is the length of the ciphertext.
-	Pack(context *Context, ciphertext, cleartext []byte, meta *Metadata, name PathName) (int, error)
+	// Pack takes cleartext data and stores its ciphertext encoding
+	// in the ciphertext slice. The ciphertext and cleartext slices
+	// must not overlap. Pack might update the entry's Metadata, which
+	// must not be nil but might have a nil PackData field. If the
+	// PackData has length>0, the first byte must be the correct value
+	// of Packing. Upon return the Packdata will be updated with the
+	// correct information to unpack the ciphertext.
+	// The ciphertext slice must be large enough to hold  the result;
+	// the PackLen method may be used to find a suitable size to
+	// allocate.
+	// The returned count is the written length of the ciphertext.
+	Pack(context *Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
 
-	// Unpack takes ciphertext data and packing metadata and stores the
-	// cleartext version in the supplied slice, which must be large enough.
+	// Unpack takes ciphertext data and stores the cleartext version
+	// in the cleartext slice, which must be large enough, using the
+	// PackData field of the Metadata in the DirEntry to recover
+	// keys and other necessary information.
+	// If appropriate, the result is verified as correct according
+	// to items such as the path name and time stamp in the Metadata.
 	// The ciphertext and cleartext slices must not overlap.
-	// Unpack might update the metadata, which must have the correct Packing
-	// value already present in meta.PackData[0].
-	// It returns the path name and the number of bytes written to the slice.
-	// The returned name will be empty if the ciphertext does not contain one.
-	Unpack(context *Context, cleartext, ciphertext []byte, meta *Metadata, name PathName) (int, error)
+	// Unpack might update the Metadata field of the DirEntry using
+	// data recovered from the PackData. The incoming PackData must
+	// must have the correct Packing value already present in its
+	// first byte.
+	// Unpack returns the number of bytes written to the slice.
+	Unpack(context *Context, cleartext, ciphertext []byte, entry *DirEntry) (int, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
-	// PackLen might update the metadata, which must not be
-	// nil but might have a nil PackData field. If meta.PackData has length>0,
-	// the first byte must be the correct value of Packing.
-	// Returns -1 if there is an error.
-	PackLen(context *Context, cleartext []byte, meta *Metadata, name PathName) int
+	// PackLen might update the entry's Metadata.PackData field, which
+	// must not be nil but might have a nil PackData field. If it has
+	// length greather than 0,  the first byte must be the correct
+	// value of Packing.
+	// PackLen returns -1 if there is an error.
+	PackLen(context *Context, cleartext []byte, entry *DirEntry) int
 
-	// UnpackLen returns an upper bound on the number of bytes required
-	// to store the unpacked cleartext.
-	// UnpackLen might update the metadata, which must have the correct Packing
-	// value already present in meta.PackData[0].
-	// Returns -1 if there is an error.
-	UnpackLen(context *Context, ciphertext []byte, meta *Metadata) int
+	// UnpackLen returns an upper bound on the number of bytes
+	// required to store the unpacked cleartext.  UnpackLen might
+	// update the entry's Metadata, which must have the correct Packing
+	// value already present in PackData[0].
+	// UnpackLen eturns -1 if there is an error.
+	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
 }
 
 const (
@@ -173,55 +181,51 @@ type Directory interface {
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
 
-	// Put stores the location of data at the given path and associates packdata with it.
-	// It is assumed that the data is available at that location and that
-	// the packdata is correct.
-	// All but the last element of the path name must already exist and be
-	// directories. The final element, if it exists, must not be a directory.
-	// If something is already stored under the path, the new location and
-	// packdata replace the old. If PutOptions is nil, the behavior of the options
-	// is equivalent  to the default behavior for each option value.
-	// See the documentation for PutOptions for more information.
-	Put(path PathName, loc Location, packdata PackData, opts *PutOptions) error
+	// Put has the directory service record that the specified DirEntry
+	// describes data stored in a Store service at the Location, and
+	// can thereafter be recovered using the PathName specified in the
+	// DirEntry.
+	//
+	// Before calling Put, the data must be packed using the same
+	// Metadata object, which the Packer might update. That is,
+	// after calling Pack, the Metadata should not be modified
+	// before calling Put.
+	//
+	// Within the Metadata, several fields have special properties.
+	// Size represents the size of the original, unpacked data as
+	// seen by the client. It is advisory only and is unchecked.
+	// Time represents a timestamp for the item. It is advisory only
+	// and is unchecked. If the value is zero, the Directory service
+	// will record the time of the operation.
+	// Sequence represents a sequence number that is incremented
+	// after each Put. If it is non-zero, the Directory service will
+	// reject the Put operation unless Sequence is the same as that
+	// stored in the metadata for the existing item with the same
+	// path name.
+	//
+	// All but the last element of the path name must already exist
+	// and be directories. The final element, if it exists, must not
+	// be a directory. If something is already stored under the path,
+	// the new location and packdata replace the old.
+	Put(loc Location, entry *DirEntry) error
 
 	// MakeDirectory creates a directory with the given name, which
-	// must not already exist. All but the last element of the path name
-	// must already exist and be directories.
+	// must not already exist. All but the last element of the path
+	// name must already exist and be directories.
 	// TODO: Make multiple elems?
 	MakeDirectory(dirName PathName) (Location, error)
 
-	// Glob matches the pattern against the file names of the full rooted tree.
-	// That is, the pattern must look like a full path name, but elements of the
-	// path may contain metacharacters. Matching is done using Go's path.Match
-	// elementwise. The user name must be present in the pattern and is treated as
-	// a literal even if it contains metacharacters.
-	// The Metadata contains no key information.
+	// Glob matches the pattern against the file names of the full
+	// rooted tree. That is, the pattern must look like a full path
+	// name, but elements of the path may contain metacharacters.
+	// Matching is done using Go's path.Match elementwise. The user
+	// name must be present in the pattern and is treated as a literal
+	// even if it contains metacharacters.
+	// The return Metadata in the DirEntry contains no key information.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint
-}
-
-// PutOptions contains several optional data items relevant to the operation
-// of Directory.Put.
-// For each field, the zero value represents the default behavior.
-type PutOptions struct {
-	// Size represents the size of the original, unpacked data as seen by
-	// the client. It is stored in the Size field of the metadata for the new item.
-	// It is advisory only and is unchecked. The default value of Size is zero.
-	Size uint64
-
-	// Time represents a timestamp for the item. It is stored in the Time
-	// field of the metadata for the new item. It is advisory only and is
-	// unchecked. If the value is zero, the Directory service instead
-	// records the time of the operation.
-	Time Time
-
-	// Sequence represents a sequence number for the operation. If it
-	// is non-zero, the Directory service will reject the Put operation
-	// unless Sequence is the same as that currently stored in the metadata
-	// for the item.
-	Sequence int64
 }
 
 // Time represents a timestamp in units of seconds since
