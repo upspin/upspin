@@ -76,21 +76,6 @@ func TestCountMallocs(t *testing.T) {
 	}
 }
 
-func (p Parsed) Equal(q Parsed) bool {
-	if p.User != q.User {
-		return false
-	}
-	if len(p.Elems) != len(q.Elems) {
-		return false
-	}
-	for i := range p.Elems {
-		if p.Elems[i] != q.Elems[i] {
-			return false
-		}
-	}
-	return true
-}
-
 var badParseTests = []upspin.PathName{
 	"u@x/a/b",  // User name too short.
 	"user/a/b", // Invalid user name.
