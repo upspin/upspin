@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"fmt"
+
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -377,6 +379,90 @@ func TestParseBadGroupMember(t *testing.T) {
 	}
 }
 
+func TestMarshal(t *testing.T) {
+	a, err := Parse(testFile, accessText)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf, err := a.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := UnmarshalJSON(testFile, buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertEqual(t, a, b)
+}
+
+// This is unusual, but to be safe we are asserting equal correctly we test that our comparator is good.
+// (Is worth making Equal a method in Access? Not needed outside of this test yet.)
+func TestAssertEqual(t *testing.T) {
+	a, err := Parse(testFile, accessText)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf, err := a.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := UnmarshalJSON(upspin.PathName("me@there.com/random/Access"), buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ac := &asserterCatcher{}
+	assertEqual(ac, a, b) // Should fail
+	// Verify failure
+	expected := "Names don't match: me@here.com/Access != me@there.com/random/Access"
+	if ac.message != expected {
+		t.Fatalf("Expected error %s, got %s", expected, ac.message)
+	}
+
+	// Tweak a to force a failure.
+	p, err := path.Parse("hello@here.com/foo")
+	a.list[Read][1] = p // We know a.list has 3 entries.
+	b, err = UnmarshalJSON(testFile, buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertEqual(ac, a, b) // Should fail
+	// Verify failure
+	expected = "Missing hello@here.com/foo in list b for right read"
+	if ac.message != expected {
+		t.Fatalf("Expected error %s, got %s", expected, ac.message)
+	}
+}
+
+func assertEqual(t asserter, a, b *Access) {
+	if len(a.list) != len(b.list) {
+		t.Fatalf("Lists of rights not equal: %d != %d", len(a.list), len(b.list))
+	}
+	for r, al := range a.list { // for each right r
+		bl := b.list[r]
+		if len(al) != len(bl) {
+			t.Fatalf("Lists for right %s not equal: %d != %d", rightNames[r], len(al), len(bl))
+		}
+	Outer:
+		for _, pa := range al {
+			for _, pb := range bl {
+				if pa.Equal(pb) {
+					continue Outer
+				}
+			}
+			t.Fatalf("Missing %s in list b for right %s", pa, rightNames[r])
+		}
+	}
+	if a.owner != b.owner {
+		t.Fatalf("Owners don't match: %s != %s", a.owner, b.owner)
+	}
+	if a.domain != b.domain {
+		t.Fatalf("Domains don't match: %s != %s", a.domain, b.domain)
+	}
+	if !a.parsed.Equal(b.parsed) {
+		t.Fatalf("Names don't match: %s != %s", a.parsed, b.parsed)
+	}
+}
+
 func TestIsAccessFile(t *testing.T) {
 	expectState(t, true, upspin.PathName("a@b.com/Access"))
 	expectState(t, true, upspin.PathName("a@b.com/dir/subdir/Access"))
@@ -421,4 +507,19 @@ func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
 	if expectIsFile != isFile {
 		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
 	}
+}
+
+type asserter interface {
+	// Fatalf prints a message and fails the assert.
+	Fatalf(format string, args ...interface{})
+}
+
+type asserterCatcher struct {
+	message string
+}
+
+var _ asserter = (*asserterCatcher)(nil)
+
+func (ac *asserterCatcher) Fatalf(format string, args ...interface{}) {
+	ac.message = fmt.Sprintf(format, args...)
 }
