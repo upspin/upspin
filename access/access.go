@@ -15,6 +15,7 @@ package access
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -32,6 +33,7 @@ const (
 // A Right represents a particular access permission: reading, writing, etc.
 type Right int
 
+// All the Rights constants.
 const (
 	Invalid Right = iota - 1
 	Read
@@ -82,10 +84,6 @@ type Access struct {
 func (a *Access) Path() upspin.PathName {
 	return a.parsed.Path()
 }
-
-const (
-	invalidFormat = "%s:%d: unrecognized text: %q"
-)
 
 // Parse parses the contents of the path name, in data, and returns the parsed Acces.
 func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
@@ -392,6 +390,40 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		return false, missingGroups, ErrNeedGroup
 	}
 	return false, nil, nil
+}
+
+// MarshalJSON returns a JSON-encoded representation of this Access struct.
+func (a *Access) MarshalJSON() ([]byte, error) {
+	// We need to export a field of Access but we don't want to make it public,
+	// so we encode it separately.
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	if err := enc.Encode(a.list); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// UnmarshalJSON returns an Access given its path name and its JSON encoding.
+func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
+	var list [][]path.Parsed
+	err := json.Unmarshal(jsonAccess, &list)
+	if err != nil {
+		return nil, err
+	}
+	access := &Access{
+		list: list,
+	}
+	access.parsed, err = path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	access.owner = access.parsed.User
+	_, access.domain, err = path.UserAndDomain(access.parsed.User)
+	if err != nil {
+		return nil, err
+	}
+	return access, nil
 }
 
 // inList reports whether the requester is present in the list, either directly or by wildcard.
