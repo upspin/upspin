@@ -16,6 +16,24 @@
       "revId": "318263eb3f4f906687d8bbe3e2720450eb8995b3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_f61d6ead",
+        "filename": "access/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-08T22:05:42Z",
+      "side": 1,
+      "message": "I implemented the map (as a hash set) method we discussed, just to realize half way through that the map would collapse duplicates, which defeats the purpose of changing this in the first place (my first iteration didn\u0027t catch duplicates).\n\nSo I went ahead with the counter version.\n\nTest passes.",
+      "parentUuid": "6e3038ce_fb3e379c",
+      "revId": "318263eb3f4f906687d8bbe3e2720450eb8995b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
