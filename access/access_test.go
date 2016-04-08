@@ -1,17 +1,16 @@
-package access_test
+package access
 
 import (
-	"log"
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 const (
-	accessFile = "me@here.com/Access"
+	testFile      = "me@here.com/Access"
+	testGroupFile = "me@here.com/Group/family"
 )
 
 var empty = []string{}
@@ -26,11 +25,13 @@ Read : reader@reader.org
 # Some comment r: a: w: read: write ::::
 WRITE: anotherwriter@a.bc
   create,DeLeTe  :admin@c.com`)
+
+	groupText = []byte("#This is my family\nfred@me.com, ann@me.com\njoe@me.com\n")
 )
 
 func BenchmarkParse(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_, err := access.Parse(accessFile, accessText)
+		_, err := Parse(testFile, accessText)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -38,117 +39,230 @@ func BenchmarkParse(b *testing.B) {
 }
 
 func TestParse(t *testing.T) {
-	p, err := access.Parse(accessFile, accessText)
+	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	match(t, p.Read, []string{"foo@bob.com", "a@b.co", "x@y.uk", "reader@reader.org"})
-	match(t, p.Write, []string{"writer@a.bc", "anotherwriter@a.bc"})
-	match(t, p.List, []string{"lister@n.mn"})
-	match(t, p.Create, []string{"admin@c.com"})
-	match(t, p.Delete, []string{"admin@c.com"})
+	match(t, a.list[Read], []string{"foo@bob.com", "a@b.co", "x@y.uk", "reader@reader.org"})
+	match(t, a.list[Write], []string{"writer@a.bc", "anotherwriter@a.bc"})
+	match(t, a.list[List], []string{"lister@n.mn"})
+	match(t, a.list[Create], []string{"admin@c.com"})
+	match(t, a.list[Delete], []string{"admin@c.com"})
 }
 
-func TestMallocs(t *testing.T) {
+func TestParseGroup(t *testing.T) {
+	parsed, err := path.Parse(testGroupFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	group, err := parseGroup(parsed, groupText)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	match(t, group, []string{"fred@me.com", "ann@me.com", "joe@me.com"})
+}
+
+func TestParseAllocs(t *testing.T) {
 	allocs := testing.AllocsPerRun(100, func() {
-		access.Parse(accessFile, accessText)
+		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 29 {
-		t.Fatal("expected 29 allocations, got ", allocs)
+	// TODO: Why so many?
+	if allocs != 31 {
+		t.Fatal("expected 31 allocations, got ", allocs)
 	}
 }
 
-func TestHasAccess(t *testing.T) {
+func TestGroupParseAllocs(t *testing.T) {
+	parsed, err := path.Parse(testGroupFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	allocs := testing.AllocsPerRun(100, func() {
+		parseGroup(parsed, groupText)
+	})
+	t.Log("allocs:", allocs)
+	// TODO: Why so many?
+	if allocs != 11 {
+		t.Fatal("expected 11 allocations, got ", allocs)
+	}
+}
+
+func TestHasAccessNoGroups(t *testing.T) {
 	const (
-		owner    = "foo@bob.com"
-		pathName = owner + "/MyDir/myfile.txt"
+		owner = upspin.UserName("me@here.com")
+
+		// This access file defines readers and writers but no other rights.
+		text = "r: reader@r.com, reader@foo.bar, *@nsa.gov\n" +
+			"w: writer@foo.bar\n"
 	)
-	var (
-		readers    = []upspin.UserName{upspin.UserName("reader@r.com"), upspin.UserName("*@trustedreaders.com"), upspin.UserName("*@nsa.gov")}
-		allReaders = []upspin.UserName{upspin.UserName("reader@r.com"), upspin.UserName("*")}
-	)
-	p, err := path.Parse(upspin.PathName(pathName))
+	a, err := Parse(testFile, []byte(text))
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectAccess(t, upspin.UserName(owner), true, p, readers)
-	expectAccess(t, upspin.UserName("reader@r.com"), true, p, readers)
-	expectAccess(t, upspin.UserName("buffoon@bozo.com"), false, p, readers)
-	expectAccess(t, upspin.UserName("me@trustedreaders.com"), true, p, readers)
-	expectAccess(t, upspin.UserName("snowden@nsa.gov"), true, p, readers)
 
-	// Wildcard access.
-	expectAccess(t, upspin.UserName("buffoon@bozo.com"), true, p, allReaders)
-	expectAccess(t, upspin.UserName("reader@r.com"), true, p, allReaders)
-
-	// No readers list.
-	expectAccess(t, upspin.UserName(owner), true, p, nil)
-	expectAccess(t, upspin.UserName("reader@r.com"), false, p, nil)
-
-	// Now some errors for good form (and perfect line coverage).
-	expectError(t, upspin.UserName("bad user name"), p, readers)
-	expectError(t, upspin.UserName("a@b.com"), p, []upspin.UserName{"********@yo"})
-	expectError(t, upspin.UserName("a@b.com"), p, []upspin.UserName{"*@mama@mia"})
-}
-
-func expectAccess(t *testing.T, user upspin.UserName, expectHasAccess bool, p path.Parsed, allowedAccess []upspin.UserName) {
-	actuallyHasAccess, err := access.HasAccess(user, p, allowedAccess)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if expectHasAccess != actuallyHasAccess {
-		if expectHasAccess {
-			t.Errorf("Expected user %s to have access", user)
+	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
+		ok, groups, err := a.Can(user, right, file)
+		if groups != nil {
+			t.Fatalf("non-empty groups %q", groups)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok == truth {
+			return
+		}
+		if ok {
+			t.Errorf("%s can %s %s", user, rightNames[right], file)
 		} else {
-			t.Errorf("Expected user %s not to have access", user)
+			t.Errorf("%s cannot %s %s", user, rightNames[right], file)
 		}
 	}
+
+	// Owner can read anything and write Access files.
+	check(owner, Read, "me@here.com/foo/bar", true)
+	check(owner, Read, "me@here.com/foo/Access", true)
+	check(owner, List, "me@here.com/foo/bar", true)
+	check(owner, Create, "me@here.com/foo/Access", true)
+	check(owner, Write, "me@here.com/foo/Access", true)
+
+	// Permitted others can read.
+	check("reader@foo.bar", Read, "me@here.com/foo/bar", true)
+
+	// Unpermitted others cannot read.
+	check("writer@foo.bar", List, "me@here.com/foo/bar", false)
+
+	// Permitted others can write.
+	check("writer@foo.bar", Write, "me@here.com/foo/bar", true)
+
+	// Unpermitted others cannot write.
+	check("reader@foo.bar", Write, "me@here.com/foo/bar", false)
+
+	// Non-owners cannot list (it's not in the Access file).
+	check("reader@foo.bar", List, "me@here.com/foo/bar", false)
+	check("writer@foo.bar", List, "me@here.com/foo/bar", false)
+
+	// No one can create (it's not in the Access file).
+	check(owner, Create, "me@here.com/foo/bar", false)
+	check("writer@foo.bar", Create, "me@here.com/foo/bar", false)
+
+	// No one can delete (it's not in the Access file).
+	check(owner, Delete, "me@here.com/foo/bar", false)
+	check("writer@foo.bar", Delete, "me@here.com/foo/bar", false)
+
+	// Wildcard that should match.
+	check("joe@nsa.gov", Read, "me@here.com/foo/bar", true)
+
+	// Wildcard that should not match.
+	check("*@nasa.gov", Read, "me@here.com/foo/bar", false)
 }
 
-func expectError(t *testing.T, user upspin.UserName, p path.Parsed, allowedAccess []upspin.UserName) {
-	_, err := access.HasAccess(user, p, allowedAccess)
-	if err == nil {
-		t.Error("Expected error, got nil")
+// This is a simple test of basic group functioning. We still need a proper full-on test with
+// a populated tree.
+func TestHasAccessWithGroups(t *testing.T) {
+	groups = make(map[upspin.PathName][]path.Parsed) // Forget any existing groups in the cache.
+
+	const (
+		owner = upspin.UserName("me@here.com")
+
+		// This access file defines readers and writers but no other rights.
+		accessText = "r: reader@r.com, reader@foo.bar, family\n" +
+			"w: writer@foo.bar\n"
+
+		// This is a simple group for a family.
+		groupName = upspin.PathName("me@here.com/Group/family")
+		groupText = "# My family\n sister@me.com, brother@me.com\n"
+	)
+	a, err := Parse(testFile, []byte(accessText))
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	loadedGroup := false
+
+	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
+		ok, missingGroups, err := a.Can(user, right, file)
+		if missingGroups != nil {
+			// This is a simple test. There's only one group.
+			if len(missingGroups) != 1 {
+				t.Fatalf("expected one missing group, got %v", missingGroups)
+			}
+			pathName := missingGroups[0]
+			if pathName != groupName {
+				t.Fatalf("expected %q for group name, got %q", groupName, pathName)
+			}
+			if loadedGroup {
+				t.Fatal("group already loaded")
+			}
+			err = a.AddGroup(groupName, []byte(groupText))
+			if err != nil {
+				t.Fatal(err)
+			}
+			loadedGroup = true
+			// It must work now.
+			ok, missingGroups, err = a.Can(user, right, file)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		if ok == truth {
+			return
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok {
+			t.Errorf("%s can %s %s", user, rightNames[right], file)
+		} else {
+			t.Errorf("%s cannot %s %s", user, rightNames[right], file)
+		}
+	}
+
+	// Permitted group can read.
+	check("sister@me.com", Read, "me@here.com/foo/bar", true)
+
+	// Unknown member cannot read.
+	check("aunt@me.com", Read, "me@here.com/foo/bar", false)
+
+	// Group cannot write.
+	check("sister@me.com", Write, "me@here.com/foo/bar", false)
 }
 
 func TestParseEmptyFile(t *testing.T) {
 	accessText := []byte("\n # Just a comment.\n\r\t # Nothing to see here \n \n \n\t\n")
-	p, err := access.Parse(accessFile, accessText)
+	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	match(t, p.Read, empty)
-	match(t, p.Write, empty)
-	match(t, p.List, empty)
-	match(t, p.Create, empty)
-	match(t, p.Delete, empty)
+	match(t, a.list[Read], empty)
+	match(t, a.list[Write], empty)
+	match(t, a.list[List], empty)
+	match(t, a.list[Create], empty)
+	match(t, a.list[Delete], empty)
 }
 
 func TestParseContainsGroupName(t *testing.T) {
-	accessText := []byte("r: family,*@google.com,edpin@google.com/Groups/friends")
-	p, err := access.Parse(accessFile, accessText)
+	accessText := []byte("r: family,*@google.com,edpin@google.com/Group/friends")
+	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Group names such as "family" are currently ignored.
-	// TODO: implement groups.
-	match(t, p.Read, []string{"*@google.com"})
-	match(t, p.Write, empty)
-	match(t, p.List, empty)
-	match(t, p.Create, empty)
-	match(t, p.Delete, empty)
+	match(t, a.list[Read], []string{"me@here.com/Group/family", "*@google.com", "edpin@google.com/Group/friends"})
+	match(t, a.list[Write], empty)
+	match(t, a.list[List], empty)
+	match(t, a.list[Create], empty)
+	match(t, a.list[Delete], empty)
 }
 
 func TestParseWrongFormat1(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: invalid right: \"rrrr\""
+		expectedErr = testFile + ":1: invalid right: \"rrrr\""
 	)
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -159,10 +273,10 @@ func TestParseWrongFormat1(t *testing.T) {
 
 func TestParseWrongFormat2(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":2: syntax error: invalid users list: "
+		expectedErr = testFile + ":2: syntax error: invalid users list: "
 	)
 	accessText := []byte("#A comment\n r: a@b.co : x")
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -173,10 +287,10 @@ func TestParseWrongFormat2(t *testing.T) {
 
 func TestParseWrongFormat3(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: syntax error: invalid rights"
+		expectedErr = testFile + ":1: syntax error: invalid rights"
 	)
 	accessText := []byte(": bob@abc.com") // missing access format text.
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -187,10 +301,10 @@ func TestParseWrongFormat3(t *testing.T) {
 
 func TestParseWrongFormat4(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: invalid right: \"rea\""
+		expectedErr = testFile + ":1: invalid right: \"rea\""
 	)
 	accessText := []byte("rea:bob@abc.com") // invalid access format text.
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -201,10 +315,10 @@ func TestParseWrongFormat4(t *testing.T) {
 
 func TestParseMissingAccessField(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":1: syntax error: no colon on line: "
+		expectedErr = testFile + ":1: syntax error: no colon on line: "
 	)
 	accessText := []byte("bob@abc.com")
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -215,10 +329,10 @@ func TestParseMissingAccessField(t *testing.T) {
 
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	const (
-		expectedErr = accessFile + ":3: syntax error: invalid users list: "
+		expectedErr = testFile + ":3: syntax error: invalid users list: "
 	)
 	accessText := []byte("\n\nr: a@b.co r: c@b.co")
-	_, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -227,18 +341,40 @@ func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
 	}
 }
 
-func TestParseBadPath(t *testing.T) {
-	// TODO: Group names are being ignored. When implemented, this group name should cause an error.
+func TestParseBadGroupPath(t *testing.T) {
 	accessText := []byte("r: notanemail/Group/family")
-	p, err := access.Parse(accessFile, accessText)
+	_, err := Parse(testFile, accessText)
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+	if !strings.Contains(err.Error(), "group") {
+		t.Fatalf("expected group error, got: %v", err)
+	}
+}
+
+func TestParseBadGroupFile(t *testing.T) {
+	parsed, err := path.Parse(testGroupFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	match(t, p.Read, empty)
-	match(t, p.Write, empty)
-	match(t, p.List, empty)
-	match(t, p.Create, empty)
-	match(t, p.Delete, empty)
+	_, err = parseGroup(parsed, []byte("joe@me.com fred@me.com"))
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+}
+
+func TestParseBadGroupMember(t *testing.T) {
+	parsed, err := path.Parse(testGroupFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = parseGroup(parsed, []byte("joe@me.com, fred@"))
+	if err == nil {
+		t.Fatal("expected error, got none")
+	}
+	if !strings.Contains(err.Error(), "no user name") {
+		t.Fatalf("expected missing user name error, got: %v", err)
+	}
 }
 
 func TestIsAccessFile(t *testing.T) {
@@ -263,14 +399,14 @@ func match(t *testing.T, want []path.Parsed, expect []string) {
 		} else {
 			compare = path.String()
 		}
-		if !found(expect, compare) {
+		if !found(t, expect, compare) {
 			t.Fatalf("User not found in list: %s", compare)
 		}
 	}
 }
 
-func found(haystack []string, needle string) bool {
-	log.Printf("Looking for %v in %v", needle, haystack)
+func found(t *testing.T, haystack []string, needle string) bool {
+	t.Logf("Looking for %v in %v", needle, haystack)
 	for _, s := range haystack {
 		if s == needle {
 			return true
@@ -281,7 +417,7 @@ func found(haystack []string, needle string) bool {
 
 // expectState checks whether the results of IsAccessFile match with expectations and if not it fails the test.
 func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
-	isFile := access.IsAccessFile(pathName)
+	isFile := IsAccessFile(pathName)
 	if expectIsFile != isFile {
 		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
 	}
