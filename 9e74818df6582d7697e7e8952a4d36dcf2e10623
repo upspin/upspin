@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "6e3038ce_27fa7a88",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T15:35:58Z",
+      "side": 1,
+      "message": "PubKeys",
+      "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4eac54b5_692a802c",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -13,6 +30,24 @@
       "writtenOn": "2016-04-08T05:18:00Z",
       "side": 1,
       "message": "PubKeys",
+      "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_67f4729a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T15:35:58Z",
+      "side": 1,
+      "message": "i think it\u0027s fine either way",
+      "parentUuid": "4eac54b5_692a802c",
       "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -47,6 +82,24 @@
       "writtenOn": "2016-04-08T05:18:00Z",
       "side": 1,
       "message": "The endpoint for the store is a method in Store already (Store.Endpoint).",
+      "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_8735e62e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-08T15:35:58Z",
+      "side": 1,
+      "message": "yes, this isn\u0027t needed.",
+      "parentUuid": "4eac54b5_e93e906b",
       "revId": "9e74818df6582d7697e7e8952a4d36dcf2e10623",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
