@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_dc0169a2",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-10T21:33:17Z",
+      "side": 1,
+      "message": "i would prefer to call this Install. it\u0027s not really a stack, in that you won\u0027t layer these. in fact it\u0027s probably a good idea to fail if there\u0027s already an instance in place",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_9cf7f1ec",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-10T21:33:17Z",
+      "side": 1,
+      "message": "if it\u0027s expired, should you delete it?",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_bcfcb5cf",
+        "filename": "user/usercache/cache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-10T21:33:17Z",
+      "side": 1,
+      "message": "where is the time being spent?",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
