@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_9f519e58",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-11T20:12:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_dc0169a2",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_9cf7f1ec",
         "filename": "user/usercache/cache.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_1f1e8ea9",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-11T20:12:58Z",
+      "side": 1,
+      "message": "Eduardo\u0027s Cache stuff doesn\u0027t have  a remove.   I\u0027ll add one in a later CL perhaps.",
+      "parentUuid": "6e3038ce_9cf7f1ec",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_bcfcb5cf",
         "filename": "user/usercache/cache_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-04-10T21:33:17Z",
       "side": 1,
       "message": "where is the time being spent?",
+      "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_5f5e4650",
+        "filename": "user/usercache/cache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-11T20:12:58Z",
+      "side": 1,
+      "message": "Heh heh, got distracted and forgot to finish the test.  The check was also wrong...  Fixed.",
+      "parentUuid": "6e3038ce_bcfcb5cf",
       "revId": "0fc391fbaf408b7ccbef76b273f595024151ebb7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
