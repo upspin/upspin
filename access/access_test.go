@@ -39,46 +39,6 @@ func BenchmarkParse(b *testing.B) {
 	}
 }
 
-type pathCompareTest struct {
-	path1, path2 upspin.PathName
-	expect       int
-}
-
-var pathCompareTests = []pathCompareTest{
-	// Some the same
-	{"joe@bar.com", "joe@bar.com", 0},
-	{"joe@bar.com/", "joe@bar.com", 0},
-	{"joe@bar.com/", "joe@bar.com/", 0},
-	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c", 0},
-	// Same domain sorts by user.
-	{"joe@bar.com", "adam@bar.com", 1},
-	{"joe@bar.com/a/b/c", "adam@bar.com/a/b/c", 1},
-	{"adam@bar.com", "joe@bar.com", -1},
-	{"adam@bar.com/a/b/c", "joe@bar.com/a/b/c", -1},
-	// Different paths.
-	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/d", -1},
-	{"joe@bar.com/a/b/d", "joe@bar.com/a/b/c", 1},
-	// Different length paths.
-	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c/d", -1},
-	{"joe@bar.com/a/b/c/d", "joe@bar.com/a/b/c", 1},
-}
-
-func TestPathCompare(t *testing.T) {
-	for _, test := range pathCompareTests {
-		p1, err := path.Parse(test.path1)
-		if err != nil {
-			t.Fatalf("%s: %s\n", test.path1, err)
-		}
-		p2, err := path.Parse(test.path2)
-		if err != nil {
-			t.Fatalf("%s: %s\n", test.path2, err)
-		}
-		if got := pathCompare(p1, p2); got != test.expect {
-			t.Errorf("pathCompare(%q, %q) = %d; expected %d", test.path1, test.path2, got, test.expect)
-		}
-	}
-}
-
 func TestParse(t *testing.T) {
 	a, err := Parse(testFile, accessText)
 	if err != nil {

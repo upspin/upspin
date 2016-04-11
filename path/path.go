@@ -174,6 +174,43 @@ func (p Parsed) Equal(q Parsed) bool {
 	return true
 }
 
+// Compare returns -1, 0, or 1 according to whether p is less than, equal to,
+// or greater than q. The comparison is elementwise starting with the domain name,
+// then the user name, then the path elements.
+func (p Parsed) Compare(q Parsed) int {
+	pUser, pDomain, _ := UserAndDomain(p.User) // Ignoring errors.
+	qUser, qDomain, _ := UserAndDomain(q.User) // Ignoring errors.
+	switch {
+	case pDomain < qDomain:
+		return -1
+	case pDomain > qDomain:
+		return 1
+	}
+	switch {
+	case pUser < qUser:
+		return -1
+	case pUser > qUser:
+		return 1
+	}
+	// User names are equal. Iterate over paths.
+	for i, s := range p.Elems {
+		switch {
+		case i >= len(q.Elems):
+			// p has more path elements but they are all equal up to here.
+			return 1
+		case s > q.Elems[i]:
+			return 1
+		case s < q.Elems[i]:
+			return -1
+		}
+	}
+	if len(p.Elems) == len(q.Elems) {
+		return 0
+	}
+	// q has more path elements but they are all equal up to here.
+	return -1
+}
+
 // Join appends any number of path elements onto a (possibly empty)
 // Upspin path, adding a separating slash if necessary. All empty
 // strings are ignored. The result, if non-empty, is passed through

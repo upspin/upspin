@@ -159,51 +159,11 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 type sliceOfParsed []path.Parsed
 
 func (s sliceOfParsed) Len() int           { return len(s) }
-func (s sliceOfParsed) Less(i, j int) bool { return pathCompare(s[i], s[j]) < 0 }
+func (s sliceOfParsed) Less(i, j int) bool { return s[i].Compare(s[j]) < 0 }
 func (s sliceOfParsed) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
-// pathCompare returns -1, 0, or 1 according to whether p is less than, equal to,
-// or greater than q. The comparison is elementwise starting with the domain name,
-// then the user name, then the path elements.
-func pathCompare(p, q path.Parsed) int {
-	pUser, pDomain, err1 := path.UserAndDomain(p.User) // Ignoring errors.
-	qUser, qDomain, err2 := path.UserAndDomain(q.User) // Ignoring errors.
-	if err1 != nil || err2 != nil {
-		panic(err1)
-	}
-	switch {
-	case pDomain < qDomain:
-		return -1
-	case pDomain > qDomain:
-		return 1
-	}
-	switch {
-	case pUser < qUser:
-		return -1
-	case pUser > qUser:
-		return 1
-	}
-	// User names are equal. Iterate over paths.
-	for i, s := range p.Elems {
-		switch {
-		case i >= len(q.Elems):
-			// p has more path elements but they are all equal up to here.
-			return 1
-		case s > q.Elems[i]:
-			return 1
-		case s < q.Elems[i]:
-			return -1
-		}
-	}
-	if len(p.Elems) == len(q.Elems) {
-		return 0
-	}
-	// q has more path elements but they are all equal up to here.
-	return -1
-}
-
 func (a *Access) Equal(b *Access) bool {
-	if pathCompare(a.parsed, b.parsed) != 0 {
+	if a.parsed.Compare(b.parsed) != 0 {
 		return false
 	}
 	if len(a.list) != len(b.list) {
@@ -215,7 +175,7 @@ func (a *Access) Equal(b *Access) bool {
 			return false
 		}
 		for j, ar := range al {
-			if pathCompare(ar, bl[j]) != 0 {
+			if ar.Compare(bl[j]) != 0 {
 				return false
 			}
 		}
