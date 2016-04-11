@@ -50,7 +50,7 @@ var (
 			PackData: packData,
 		},
 	}
-	opts = upspin.PutOptions{
+	optsMeta = upspin.Metadata{
 		Sequence: 17,
 		Time:     now,
 		Size:     uint64(len(fileContents)),
@@ -217,7 +217,13 @@ func newStore(client netutil.HTTPClientInterface) upspin.Store {
 func TestPutError(t *testing.T) {
 	var loc upspin.Location
 	d := newErroringDirectoryClient()
-	err := d.Put(upspin.PathName(pathName), loc, []byte("Packed metadata"), nil)
+	de := upspin.DirEntry{
+		Name: upspin.PathName(pathName),
+		Metadata: upspin.Metadata{
+			PackData: []byte("Packed metadata"),
+		},
+	}
+	err := d.Put(loc, &de)
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -230,7 +236,13 @@ func TestPutBadMeta(t *testing.T) {
 	mock := nettest.NewMockHTTPClient(nil, nil)
 	d := newDirectory("http://localhost:8081", mock, nil)
 	var loc upspin.Location
-	err := d.Put(upspin.PathName(pathName), loc, []byte(""), nil)
+	de := &upspin.DirEntry{
+		Name: upspin.PathName(pathName),
+		Metadata: upspin.Metadata{
+			PackData: []byte(""),
+		},
+	}
+	err := d.Put(loc, de)
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -249,8 +261,14 @@ func TestPut(t *testing.T) {
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respSuccess}, []*http.Request{expectedRequest})
 	d := newDirectory("http://localhost:9090", mock, nil)
 
+	de := &upspin.DirEntry{
+		Name:     upspin.PathName(pathName),
+		Metadata: optsMeta,
+	}
+	de.Metadata.PackData = packData
+
 	// Issue the put request
-	err := d.Put(upspin.PathName(pathName), location, packData, &opts)
+	err := d.Put(location, de)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
