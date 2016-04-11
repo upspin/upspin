@@ -27,7 +27,8 @@ func (plainPack) String() string {
 	return "plain"
 }
 
-func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return 0, err
 	}
@@ -37,7 +38,8 @@ func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, m
 	return copy(ciphertext, cleartext), nil
 }
 
-func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return 0, err
 	}
@@ -47,14 +49,20 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 	return copy(cleartext, ciphertext), nil
 }
 
-func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
+	}
+	// Add packing to packmeta if not already there
+	if meta != nil && len(meta.PackData) == 0 {
+		meta.PackData = []byte{byte(upspin.PlainPack)}
 	}
 	return len(cleartext)
 }
 
-func (p plainPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (p plainPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1
 	}

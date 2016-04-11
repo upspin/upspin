@@ -46,11 +46,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		return zeroLoc, err
 	}
 
-	var cipher []byte
-	meta := &upspin.Metadata{
-		Time: upspin.Now(),
-	}
-
 	var packer upspin.Packer
 	if !access.IsAccessFile(name) {
 		// Encrypt data according to the preferred packer
@@ -63,17 +58,24 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		packer = pack.Lookup(upspin.PlainPack)
 	}
 
+	de := &upspin.DirEntry{
+		Name: name,
+		Metadata: upspin.Metadata{
+			Time:     upspin.Now(),
+			Sequence: 0, // Don't care for now.
+			Size:     uint64(len(data)),
+		},
+	}
+
+	var cipher []byte
+
 	// Get a buffer big enough for this data
-	cipherLen := packer.PackLen(c.context, data, meta, name)
+	cipherLen := packer.PackLen(c.context, data, de)
 	if cipherLen < 0 {
 		return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
 	}
-	// TODO: Some packers don't update the meta in PackLen, but some do. If not done, update it now.
-	if len(meta.PackData) == 0 {
-		meta.PackData = []byte{byte(c.context.Packing)}
-	}
 	cipher = make([]byte, cipherLen)
-	n, err := packer.Pack(c.context, cipher, data, meta, name)
+	n, err := packer.Pack(c.context, cipher, data, de)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -88,16 +90,8 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		Endpoint:  c.context.Store.Endpoint(),
 		Reference: ref,
 	}
-
-	// Set options.
-	opts := upspin.PutOptions{
-		Sequence: 0, // Don't set. Will be increased by Directory.
-		Size:     uint64(len(data)),
-		Time:     meta.Time,
-	}
-
 	// Record it.
-	return loc, dir.Put(name, loc, meta.PackData, &opts)
+	return loc, dir.Put(loc, de)
 }
 
 // MakeDirectory implements upspin.Client.

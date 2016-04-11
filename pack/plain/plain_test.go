@@ -34,7 +34,14 @@ func TestPack(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	cipher := make([]byte, 1024)
-	m, err := packer.Pack(context, cipher, data, meta, name)
+	de := &upspin.DirEntry{
+		Name: name,
+	}
+	n := packer.PackLen(context, data, de)
+	if n < 0 {
+		t.Fatal("PackLen failed")
+	}
+	m, err := packer.Pack(context, cipher, data, de)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -42,7 +49,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	m, err = packer.Unpack(context, clear, cipher, meta, name)
+	m, err = packer.Unpack(context, clear, cipher, de)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
