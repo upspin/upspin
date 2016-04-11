@@ -73,10 +73,11 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-func (d *Directory) Put(name upspin.PathName, location upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
+func (d *Directory) Put(location upspin.Location, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 
-	if len(packdata) < 1 {
+	name := dirEntry.Name
+	if len(dirEntry.Metadata.PackData) < 1 {
 		return newError(op, name, errors.New("missing packing type in packdata"))
 	}
 	parsed, err := path.Parse(name)
@@ -85,44 +86,19 @@ func (d *Directory) Put(name upspin.PathName, location upspin.Location, packdata
 	}
 	canonicalName := parsed.Path()
 
-	// Now, let's make a directory entry to Put to the server
-	var dirEntry *upspin.DirEntry
-
-	if access.IsAccessFile(canonicalName) && upspin.Packing(packdata[0]) != upspin.PlainPack {
+	if access.IsAccessFile(canonicalName) && upspin.Packing(dirEntry.Metadata.PackData[0]) != upspin.PlainPack {
 		// The directory server must be able to read the bytes from the reference.
 		return newError(op, canonicalName, errors.New("packing must be plain for Access file"))
 	}
 
 	// Prepare default optionals.
-	commitOpts := &upspin.PutOptions{
-		Sequence: 0, // Explicit for clarity. 0 = don't care.
-		Size:     0,
-		Time:     d.timeNow(),
+	if dirEntry.Metadata.Time == 0 {
+		dirEntry.Metadata.Time = d.timeNow()
 	}
-	if opts != nil {
-		if opts.Size != 0 {
-			commitOpts.Size = opts.Size
-		}
-		if opts.Time != 0 {
-			commitOpts.Time = opts.Time
-		}
-		if opts.Sequence != 0 {
-			commitOpts.Sequence = opts.Sequence
-		}
-	}
+	dirEntry.Name = canonicalName
+	dirEntry.Location = location
 
-	// We now create a directory entry for this Location.
-	dirEntry = &upspin.DirEntry{
-		Name:     canonicalName,
-		Location: location,
-		Metadata: upspin.Metadata{
-			IsDir:    false,
-			Sequence: commitOpts.Sequence,
-			Size:     commitOpts.Size,
-			Time:     commitOpts.Time,
-			PackData: packdata,
-		},
-	}
+	// Now, Put to the server.
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)
 	if err != nil {
 		return err
