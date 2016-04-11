@@ -32,9 +32,9 @@ var (
 	post = "POST"
 )
 
-func signReq(t *testing.T, key upspin.KeyPair, req *http.Request) {
+func signReq(t *testing.T, factotum *Factotum, req *http.Request) {
 	req.Header.Set(userNameHeader, string(user)) // Set the username
-	err := signRequest(user, key, req)
+	err := signRequest(user, factotum, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,10 @@ func testSignAndVerify(t *testing.T, key upspin.KeyPair) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, key, req)
+	// TODO once other changes settle, simplify the repeated code
+	ctx := &upspin.Context{KeyPair: key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	verifyReq(t, key.Public, req)
 }
 
@@ -66,7 +69,9 @@ func TestWrongKey(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	err = verifyRequest(user, []upspin.PublicKey{p521Key.Public}, req)
 	if err == nil {
 		t.Fatal("Expected error, got none")
@@ -96,7 +101,9 @@ func TestServerHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
@@ -127,7 +134,9 @@ func TestServerHandlerNotTLS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		called = true
@@ -155,7 +164,9 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	makeTLSRequest(req, []byte("1234"))
 
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
@@ -177,7 +188,9 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	makeTLSRequest(req, []byte("1234"))
 
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
@@ -201,7 +214,9 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	signReq(t, p256Key, req)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	signReq(t, f, req)
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
@@ -262,7 +277,9 @@ func TestClientAuthFlow(t *testing.T) {
 		nettest.NewRequest(t, get, url, nil),
 	})
 
-	client := NewClient(user, p521Key, mock)
+	ctx := &upspin.Context{KeyPair: p521Key}
+	f := NewFactotum(ctx)
+	client := NewClient(user, f, mock)
 
 	sendRequestAndCheckReply := func() {
 		resp, err := client.Do(nettest.NewRequest(t, get, url, nil))
@@ -348,7 +365,9 @@ func TestClientReAuthsWithNewServer(t *testing.T) {
 		nettest.NewRequest(t, get, url2, nil),
 	})
 
-	client := NewClient(user, p521Key, mock)
+	ctx := &upspin.Context{KeyPair: p521Key}
+	f := NewFactotum(ctx)
+	client := NewClient(user, f, mock)
 
 	resp, err := client.Do(nettest.NewRequest(t, get, url1, nil))
 	if err != nil {
@@ -391,7 +410,9 @@ func TestClientDoesNotTryAuthWithoutHTTPS(t *testing.T) {
 	})
 
 	var zeroTime time.Time
-	client := NewClient(user, p521Key, mock)
+	ctx := &upspin.Context{KeyPair: p521Key}
+	f := NewFactotum(ctx)
+	client := NewClient(user, f, mock)
 
 	resp, err := client.Do(nettest.NewRequest(t, get, url, nil))
 	if err != nil {
@@ -436,7 +457,9 @@ func TestClientSignsUnreplayableRequests(t *testing.T) {
 	})
 
 	var zeroTime time.Time
-	client := NewClient(user, p256Key, mock)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
+	client := NewClient(user, f, mock)
 	resp, err := client.Do(nettest.NewRequest(t, get, url, nil))
 	if err != nil {
 		t.Fatal(err)
@@ -470,8 +493,10 @@ func BenchmarkSignp256(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := NewFactotum(ctx)
 	for n := 0; n < b.N; n++ {
-		signReq(nil, p256Key, req)
+		signReq(nil, f, req)
 		verifyReq(nil, p256Key.Public, req)
 	}
 }
@@ -481,8 +506,10 @@ func BenchmarkSignp521(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	ctx := &upspin.Context{KeyPair: p521Key}
+	f := NewFactotum(ctx)
 	for n := 0; n < b.N; n++ {
-		signReq(nil, p521Key, req)
+		signReq(nil, f, req)
 		verifyReq(nil, p521Key.Public, req)
 	}
 }

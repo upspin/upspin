@@ -1,5 +1,10 @@
 package upspin
 
+import (
+	"crypto/elliptic"
+	"math/big"
+)
+
 // A UserName is just a string representing a user.
 // It is given a unique type so the API is clear.
 // Example: gopher@google.com
@@ -50,6 +55,30 @@ type NetAddr string
 
 // A Reference is the string identifying an item in a Store.
 type Reference string
+
+// Signature is an ECDSA signature.
+type Signature struct {
+	R, S *big.Int
+}
+
+// Factotum implements an agent, potentially remote, to handle private key operations.
+// Think of this as a replacement for a *KeyPair, or as ssh-agent.
+// Implementations typically provide NewFactotum() to set the key.
+type Factotum interface {
+	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.
+	FileSign(p Packing, n PathName, t Time, dkey, hash []byte) (Signature, error)
+
+	// ScalarMult is the bare private key operator, used in unwrapping packed data.
+	// Each call needs security review to ensure it can not be abused as a signing
+	// oracle. Read about "confused deputy problem" in wikipedia.
+	ScalarMult(c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int)
+
+	// UserSign signs the http request for authenticating to Upspin servers.
+	UserSign(hash []byte) (Signature, error)
+
+	// PackingString returns the Packing.String() value associated with the key.
+	PackingString() string
+}
 
 // PackData stores the encoded information used to pack the data in an
 // item, such decryption keys. The first byte identifies the Packing
@@ -360,7 +389,8 @@ type Context struct {
 	UserName UserName
 
 	// KeyPair holds the user's private cryptographic keys.
-	KeyPair KeyPair
+	KeyPair  KeyPair
+	Factotum *Factotum // TODO Factotum will replace KeyPair.Private
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related

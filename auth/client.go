@@ -2,15 +2,12 @@
 package auth
 
 import (
-	"crypto/ecdsa"
-	"crypto/rand"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -32,7 +29,7 @@ type HTTPClient struct {
 	user upspin.UserName
 
 	// The user's keys.
-	keys upspin.KeyPair
+	factotum *Factotum
 
 	// The underlying HTTP client
 	client netutil.HTTPClientInterface
@@ -50,16 +47,16 @@ var (
 	errNoKeys = &clientError{"no keys set"}
 )
 
-// NewClient returns a new HTTPClient that handles auth for the named user with the provided key pair and underlying HTTP client.
-func NewClient(user upspin.UserName, keys upspin.KeyPair, httClient netutil.HTTPClientInterface) *HTTPClient {
+// NewClient returns a new HTTPClient that handles auth for the named user and underlying HTTP client.
+func NewClient(user upspin.UserName, factotum *Factotum, httClient netutil.HTTPClientInterface) *HTTPClient {
 	return &HTTPClient{
-		user:   user,
-		keys:   keys,
-		client: httClient,
+		user:     user,
+		factotum: factotum,
+		client:   httClient,
 	}
 }
 
-// NewAnonymousClient returns a new HTTPClient that does not yet know about the user name or user keys.
+// NewAnonymousClient returns a new HTTPClient that does not yet know about the user name.
 // To complete setup, use SetUserName and SetUserKeys.
 func NewAnonymousClient(httClient netutil.HTTPClientInterface) *HTTPClient {
 	return &HTTPClient{
@@ -72,9 +69,9 @@ func (c *HTTPClient) SetUserName(user upspin.UserName) {
 	c.user = user
 }
 
-// SetUserKeys sets the user keys for this HTTPClient instance.
-func (c *HTTPClient) SetUserKeys(keys upspin.KeyPair) {
-	c.keys = keys
+// SetUserKeys sets the factotum for this HTTPClient instance.
+func (c *HTTPClient) SetUserKeys(factotum *Factotum) {
+	c.factotum = factotum
 }
 
 // Do implements netutil.HTTPClientInterface.
@@ -141,11 +138,10 @@ func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 	if c.user == "" {
 		return nil, errNoUser
 	}
-	var zeroKeys upspin.KeyPair
-	if c.keys == zeroKeys {
+	if c.factotum.PackingString() == "" {
 		return nil, errNoKeys
 	}
-	err := signRequest(c.user, c.keys, req)
+	err := signRequest(c.user, c.factotum, req)
 	if err != nil {
 		return nil, newError(err)
 	}
@@ -155,23 +151,15 @@ func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 }
 
 // signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
-func signRequest(userName upspin.UserName, keys upspin.KeyPair, req *http.Request) error {
-	ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(keys.Public)
-	if err != nil {
-		return err
-	}
-	req.Header.Set(signatureTypeHeader, keyType)
-	ecdsaPrivKey, err := keyloader.ParsePrivateKey(ecdsaPubKey, keys.Private)
-	if err != nil {
-		return err
-	}
+func signRequest(userName upspin.UserName, factotum *Factotum, req *http.Request) error {
+	req.Header.Set(signatureTypeHeader, factotum.PackingString())
 	// The hash includes the user name and the key type.
 	hash := hashUserRequest(userName, req)
-	r, s, err := ecdsa.Sign(rand.Reader, ecdsaPrivKey, hash)
+	sig, err := factotum.UserSign(hash)
 	if err != nil {
 		return err
 	}
-	req.Header.Set(signatureHeader, fmt.Sprintf("%s %s", r, s))
+	req.Header.Set(signatureHeader, fmt.Sprintf("%s %s", sig.R, sig.S))
 	return nil
 }
 
