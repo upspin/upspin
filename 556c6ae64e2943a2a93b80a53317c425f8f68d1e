@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "6e3038ce_860ebf51",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-11T17:43:10Z",
+      "side": 1,
+      "message": "To reduce stutter, maybe reword as \"takes cleartext data and encrypts into the ciphertext slice\"?   Or maybe say encode instead of encrypt if you want to emphasize that plain packing does not encrypt.",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_e655bbf7",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-11T17:43:10Z",
+      "side": 1,
+      "message": "I find this version difficult to parse.  Possible rewording:\n\"Put takes the Location of data in a Store and a populated DirEntry and updates the directory storage, ready for future calls to Lookup.\"",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_e6393bb7",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-11T17:43:10Z",
+      "side": 1,
+      "message": "This implies that a \"tar x\" client will not do what one expects for files that had zero time.   I realize such files are always ones that had a missing time from upstream;  the question is whether to preserve that (lack of) information.  I\u0027d like to put the burden on Client to always set Time, even if 0, and allow whatever signatures may happen in Pack to cover that timestamp.",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_c607d73c",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
