@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_867a3f44",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T17:48:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_860ebf51",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_e655bbf7",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2016-04-11T17:43:10Z",
       "side": 1,
       "message": "This implies that a \"tar x\" client will not do what one expects for files that had zero time.   I realize such files are always ones that had a missing time from upstream;  the question is whether to preserve that (lack of) information.  I\u0027d like to put the burden on Client to always set Time, even if 0, and allow whatever signatures may happen in Pack to cover that timestamp.",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_66d2ab7d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T17:48:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_e6393bb7",
       "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
