@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_04d8076d",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "maybe\n\n// updateAccess handles fetching and parsing a new or updated Access file and caches its parsed representation in root.accessFiles.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_44903f7d",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "first you need to check things like putting a directory, writing a directory to a file, etc.\nmaybe you do that elsewhere, but if so make that clear in the comment.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_047f27eb",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "this will allocate (a lot) every time you call it in such a tree. store this once somewhere? or at least put in a TODO.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_84731723",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "this code structure will not be easy to adapt to this. you might need to restructure a bit, but that can wait for a later CL.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_df96b66b",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "you could store a parsed empty Access file here.\nyou\u0027ll always need one unless the user\u0027s root has an access, anyway.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_3fa6f2d3",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "warning: this won\u0027t have a slash but other code may attempt to look this up using a slash for the root. double-check. maybe add the slash here. in any case know whether you use a terminal slash or not, and be consistent.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_9fad1ead",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "this isn\u0027t an HTTP handler, so i\u0027d just call it createRoot.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_ffb45af8",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "marshaling",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_2407cbb5",
+        "filename": "cmd/directory/storage.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "unmarshaling",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_64e9c308",
+        "filename": "cmd/directory/storage.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "why not\nreturn nil, err\nor some wrapping of err?",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_c4f7cfeb",
+        "filename": "cmd/directory/store_client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T19:48:01Z",
+      "side": 1,
+      "message": "s/ as/",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
