@@ -233,3 +233,47 @@ func TestUserAndDomain(t *testing.T) {
 		}
 	}
 }
+
+type compareTest struct {
+	path1, path2 upspin.PathName
+	expect       int
+}
+
+var compareTests = []compareTest{
+	// Some the same
+	{"joe@bar.com", "joe@bar.com", 0},
+	{"joe@bar.com/", "joe@bar.com", 0},
+	{"joe@bar.com/", "joe@bar.com/", 0},
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c", 0},
+	// Same domain sorts by user.
+	{"joe@bar.com", "adam@bar.com", 1},
+	{"joe@bar.com/a/b/c", "adam@bar.com/a/b/c", 1},
+	{"adam@bar.com", "joe@bar.com", -1},
+	{"adam@bar.com/a/b/c", "joe@bar.com/a/b/c", -1},
+	// Different paths.
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/d", -1},
+	{"joe@bar.com/a/b/d", "joe@bar.com/a/b/c", 1},
+	// Different length paths.
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c/d", -1},
+	{"joe@bar.com/a/b/c/d", "joe@bar.com/a/b/c", 1},
+}
+
+func TestCompare(t *testing.T) {
+	for _, test := range compareTests {
+		p1, err := Parse(test.path1)
+		if err != nil {
+			t.Fatalf("%s: %s\n", test.path1, err)
+		}
+		p2, err := Parse(test.path2)
+		if err != nil {
+			t.Fatalf("%s: %s\n", test.path2, err)
+		}
+		if got := p1.Compare(p2); got != test.expect {
+			t.Errorf("Compare(%q, %q) = %d; expected %d", test.path1, test.path2, got, test.expect)
+		}
+		// Verify for compare too.
+		if (p1.Compare(p2) == 0) != p1.Equal(p2) {
+			t.Errorf("Equal(%q, %q) = %t; expected otherwise", test.path1, test.path2, p1.Equal(p2))
+		}
+	}
+}
