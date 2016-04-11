@@ -85,10 +85,12 @@ func addSignature(meta *upspin.Metadata, signature byte) error {
 	}
 }
 
-func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return 0, err
 	}
+	name := dirEntry.Name
 	if len(name) > 64*1024 {
 		return 0, errors.New("name too long")
 	}
@@ -126,7 +128,8 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, me
 	return len(out), nil
 }
 
-func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
+func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return 0, err
 	}
@@ -147,6 +150,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	if err != nil || nameLen > 64*1024 || int(n)+int(nameLen) > len(ciphertext) {
 		return 0, errors.New("testPack.Unpack: namelen overflow")
 	}
+	name := dirEntry.Name
 	if len(name) != int(nameLen) {
 		// Work hard to get a good error message. This has caught bugs.
 		var s []byte
@@ -186,7 +190,8 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	return i, nil
 }
 
-func (p testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
+func (p testPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
 	}
@@ -199,11 +204,13 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, meta *upspi
 		return -1
 	}
 	var buf [16]byte
+	name := dirEntry.Name
 	n := binary.PutUvarint(buf[:], uint64(len(name)))
 	return n + len(name) + len(cleartext)
 }
 
-func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
+func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
+	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1
 	}
