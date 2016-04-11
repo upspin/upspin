@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_5ff3a64c",
+        "filename": "user/usercache/cache_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-11T20:10:29Z",
+      "side": 1,
+      "message": "if testing.Short() {\n    t.Skip(\"Expiration tests skipped in short mode\")\n}",
+      "revId": "6a936cbcce8b88b296440debaf921181de51004e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
