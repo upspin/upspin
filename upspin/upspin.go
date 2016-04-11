@@ -74,8 +74,8 @@ type Packer interface {
 	// String returns the name of this packer.
 	String() string
 
-	// Pack takes cleartext data and stores its ciphertext encoding
-	// in the ciphertext slice. The ciphertext and cleartext slices
+	// Pack takes cleartext data and encodes it
+	// into the ciphertext slice. The ciphertext and cleartext slices
 	// must not overlap. Pack might update the entry's Metadata, which
 	// must not be nil but might have a nil PackData field. If the
 	// PackData has length>0, the first byte must be the correct value
@@ -195,8 +195,8 @@ type Directory interface {
 	// Size represents the size of the original, unpacked data as
 	// seen by the client. It is advisory only and is unchecked.
 	// Time represents a timestamp for the item. It is advisory only
-	// and is unchecked. If the value is zero, the Directory service
-	// will record the time of the operation.
+	// but is included in the packing signature and so should usually
+	// be set to a non-zero value.
 	// Sequence represents a sequence number that is incremented
 	// after each Put. If it is non-zero, the Directory service will
 	// reject the Put operation unless Sequence is the same as that
