@@ -79,7 +79,9 @@ func TestEndToEnd(t *testing.T) {
 	client := &http.Client{
 		Transport: tr,
 	}
-	authClient := auth.NewClient(user, p256Key, client)
+	ctx := &upspin.Context{KeyPair: p256Key}
+	f := auth.NewFactotum(ctx)
+	authClient := auth.NewClient(user, f, client)
 	resp, err := authClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
