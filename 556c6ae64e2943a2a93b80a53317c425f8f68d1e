@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_c607d73c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T17:25:29Z",
+      "side": 1,
+      "message": "Should we say the service will increment the Sequence number?",
+      "revId": "556c6ae64e2943a2a93b80a53317c425f8f68d1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
