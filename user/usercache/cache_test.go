@@ -84,6 +84,9 @@ func TestCache(t *testing.T) {
 
 // TestExpiration tests that cache entries time out.
 func TestExpiration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Expiration tests skipped in short mode")
+	}
 	s, c := setup(t)
 	Install(c)
 	c.User.(*userCache).SetDuration(time.Second)

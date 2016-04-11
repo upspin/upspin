@@ -89,11 +89,11 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	// At this point we may have the reference cached but we first need to look in
 	// the directory to see what the reference is.
 	cf := &cachedFile{c: c, inStore: true}
-	ue, err := n.f.users.lookup(n.user)
+	dir, err := n.f.dc.lookup(n.user)
 	if err != nil {
 		return enoent("%q", n.user)
 	}
-	de, err := ue.dir.Lookup(n.uname)
+	de, err := dir.Lookup(n.uname)
 	if err != nil {
 		return enoent("%q", n.uname)
 	}
@@ -236,10 +236,18 @@ func (cf *cachedFile) writeBack(n *node) error {
 	}
 
 	// Use the client library to write it back.
-	if _, err = cf.c.client.Put(n.uname, cleartext); err != nil {
+	loc, err := cf.c.client.Put(n.uname, cleartext)
+	if err != nil {
 		return eio("writing back %s (%q): %s", cf.fname, n.uname, err)
 	}
+	cf.dirty = false
 
+	// Rename it to reflect the actual reference in the store so that new
+	// opens will find the cached version.
+	fname := filepath.Join(cf.c.dir, fingerprint(loc))
+	if err := os.Rename(cf.fname, fname); err == nil {
+		cf.fname = fname
+	}
 	return nil
 }
 
