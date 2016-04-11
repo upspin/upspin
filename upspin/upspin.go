@@ -1,5 +1,10 @@
 package upspin
 
+import (
+	"crypto/elliptic"
+	"math/big"
+)
+
 // A UserName is just a string representing a user.
 // It is given a unique type so the API is clear.
 // Example: gopher@google.com
@@ -50,6 +55,19 @@ type NetAddr string
 
 // A Reference is the string identifying an item in a Store.
 type Reference string
+
+// Signature is an ECDSA signature.
+type Signature struct {
+	R, S *big.Int
+}
+
+// Factotum implements an agent, potentially remote, to handle private key operations.
+type Factotum interface {
+	FileSign(p Packing, n PathName, t Time, dkey, hash []byte) (Signature, error) // Signs p|n|t|dkey|hash.
+	ScalarMult(c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int)
+	UserSign(hash []byte) (Signature, error) // Authenticates to Upspin servers.
+	PackingString() string
+}
 
 // PackData stores the encoded information used to pack the data in an
 // item, such decryption keys. The first byte identifies the Packing
@@ -360,7 +378,8 @@ type Context struct {
 	UserName UserName
 
 	// KeyPair holds the user's private cryptographic keys.
-	KeyPair KeyPair
+	KeyPair  KeyPair
+	Factotum *Factotum // TODO Factotum will replace KeyPair.Private
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related
