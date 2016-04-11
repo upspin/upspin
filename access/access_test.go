@@ -39,17 +39,108 @@ func BenchmarkParse(b *testing.B) {
 	}
 }
 
+type pathCompareTest struct {
+	path1, path2 upspin.PathName
+	expect       int
+}
+
+var pathCompareTests = []pathCompareTest{
+	// Some the same
+	{"joe@bar.com", "joe@bar.com", 0},
+	{"joe@bar.com/", "joe@bar.com", 0},
+	{"joe@bar.com/", "joe@bar.com/", 0},
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c", 0},
+	// Same domain sorts by user.
+	{"joe@bar.com", "adam@bar.com", 1},
+	{"joe@bar.com/a/b/c", "adam@bar.com/a/b/c", 1},
+	{"adam@bar.com", "joe@bar.com", -1},
+	{"adam@bar.com/a/b/c", "joe@bar.com/a/b/c", -1},
+	// Different paths.
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/d", -1},
+	{"joe@bar.com/a/b/d", "joe@bar.com/a/b/c", 1},
+	// Different length paths.
+	{"joe@bar.com/a/b/c", "joe@bar.com/a/b/c/d", -1},
+	{"joe@bar.com/a/b/c/d", "joe@bar.com/a/b/c", 1},
+}
+
+func TestPathCompare(t *testing.T) {
+	for _, test := range pathCompareTests {
+		p1, err := path.Parse(test.path1)
+		if err != nil {
+			t.Fatalf("%s: %s\n", test.path1, err)
+		}
+		p2, err := path.Parse(test.path2)
+		if err != nil {
+			t.Fatalf("%s: %s\n", test.path2, err)
+		}
+		if got := pathCompare(p1, p2); got != test.expect {
+			t.Errorf("pathCompare(%q, %q) = %d; expected %d", test.path1, test.path2, got, test.expect)
+		}
+	}
+}
+
 func TestParse(t *testing.T) {
 	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	match(t, a.list[Read], []string{"foo@bob.com", "a@b.co", "x@y.uk", "reader@reader.org"})
-	match(t, a.list[Write], []string{"writer@a.bc", "anotherwriter@a.bc"})
+	match(t, a.list[Read], []string{"a@b.co", "foo@bob.com", "reader@reader.org", "x@y.uk"})
+	match(t, a.list[Write], []string{"anotherwriter@a.bc", "writer@a.bc"})
 	match(t, a.list[List], []string{"lister@n.mn"})
 	match(t, a.list[Create], []string{"admin@c.com"})
 	match(t, a.list[Delete], []string{"admin@c.com"})
+}
+
+type accessEqualTest struct {
+	path1   upspin.PathName
+	access1 string
+	path2   upspin.PathName
+	access2 string
+	expect  bool
+}
+
+var accessEqualTests = []accessEqualTest{
+	{
+		// Same, but formatted differently. Parse and sort will fix.
+		"a1@b.com/Access",
+		"r:joe@foo.com, fred@foo.com\n",
+		"a1@b.com/Access",
+		"# A comment\nr:fred@foo.com, joe@foo.com\n",
+		true,
+	},
+	{
+		// Different names.
+		"a1@b.com/Access",
+		"r:joe@foo.com, fred@foo.com\n",
+		"a2@b.com/Access",
+		"# A comment\nr:fred@foo.com, joe@foo.com\n",
+		false,
+	},
+	{
+		// Same name, different contents.
+		"a1@b.com/Access",
+		"r:joe@foo.com, fred@foo.com\n",
+		"a1@b.com/Access",
+		"# A comment\nr:fred@foo.com, zot@foo.com\n",
+		false,
+	},
+}
+
+func TestAccessEqual(t *testing.T) {
+	for i, test := range accessEqualTests {
+		a1, err := Parse(test.path1, []byte(test.access1))
+		if err != nil {
+			t.Fatalf("%d: %s: %s\n", i, test.path1, err)
+		}
+		a2, err := Parse(test.path2, []byte(test.access2))
+		if err != nil {
+			t.Fatalf("%d: %s: %s\n", i, test.path2, err)
+		}
+		if a1.Equal(a2) != test.expect {
+			t.Errorf("%d: equal(%q, %q) should be %t, is not", i, test.path1, test.path2, test.expect)
+		}
+	}
 }
 
 func TestParseGroup(t *testing.T) {
@@ -70,9 +161,9 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	// TODO: Why so many?
-	if allocs != 31 {
-		t.Fatal("expected 31 allocations, got ", allocs)
+	// TODO: Why so many? (5 are for sorting the rights list.)
+	if allocs != 36 {
+		t.Fatal("expected 36 allocations, got ", allocs)
 	}
 }
 
@@ -251,7 +342,7 @@ func TestParseContainsGroupName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	match(t, a.list[Read], []string{"me@here.com/Group/family", "*@google.com", "edpin@google.com/Group/friends"})
+	match(t, a.list[Read], []string{"*@google.com", "edpin@google.com/Group/friends", "me@here.com/Group/family"})
 	match(t, a.list[Write], empty)
 	match(t, a.list[List], empty)
 	match(t, a.list[Create], empty)
@@ -492,31 +583,23 @@ func TestIsAccessFile(t *testing.T) {
 
 // match requires the two slices to be equivalent, assuming no duplicates.
 // The print of the path (ignoring the final / for a user name) must match the string.
+// The lists are sorted, because Access.Parse sorts them.
 func match(t *testing.T, want []path.Parsed, expect []string) {
 	if len(want) != len(expect) {
 		t.Fatalf("Expected %d paths %q, got %d: %v", len(expect), expect, len(want), want)
 	}
-	for _, path := range want {
+	for i, path := range want {
 		var compare string
 		if len(path.Elems) == 0 {
 			compare = string(path.User)
 		} else {
 			compare = path.String()
 		}
-		if !found(t, expect, compare) {
-			t.Fatalf("User not found in list: %s", compare)
+		if compare != expect[i] {
+			t.Errorf("User %s not found in at position %d in list", compare, i)
+			t.Errorf("expect: %q; got %q", expect, want)
 		}
 	}
-}
-
-func found(t *testing.T, haystack []string, needle string) bool {
-	t.Logf("Looking for %v in %v", needle, haystack)
-	for _, s := range haystack {
-		if s == needle {
-			return true
-		}
-	}
-	return false
 }
 
 // expectState checks whether the results of IsAccessFile match with expectations and if not it fails the test.
