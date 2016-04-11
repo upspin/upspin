@@ -16,6 +16,24 @@
       "revId": "9ef6f92c460b0a35ce351547ed57c34e62e94df5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_1f45ae93",
+        "filename": "directory/gcpdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T19:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_9fdb5e35",
+      "revId": "9ef6f92c460b0a35ce351547ed57c34e62e94df5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
