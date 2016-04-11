@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -19,7 +20,7 @@ import (
 type upspinFS struct {
 	sync.Mutex                 // Protects concurrent access to the rest of this struct.
 	context    *upspin.Context // Upspin context used for all requests.
-	users      *userCache      // A cache of lookups in the upspin.User service.
+	dc         *directoryCache // A cache of bindings to user directories.
 	root       *node           // The root of the upspin file system.
 	uid        int             // OS user id of this process' owner.
 	gid        int             // OS group id of this process' owner.
@@ -59,10 +60,10 @@ type handle struct {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context *upspin.Context, users *userCache) *upspinFS {
+func newUpspinFS(context *upspin.Context, dc *directoryCache) *upspinFS {
 	f := &upspinFS{
 		context:  context,
-		users:    users,
+		dc:       dc,
 		uid:      os.Getuid(),
 		gid:      os.Getgid(),
 		userDirs: make(map[string]bool),
@@ -212,12 +213,12 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
-	ue, err := n.f.users.lookup(nn.user)
+	dir, err := n.f.dc.lookup(nn.user)
 	if err != nil {
 		return nil, err
 	}
-	if _, err := ue.dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
-		// TODO(p): remove from user cache and retry?
+	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
+		// TODO(p): remove from directory cache and retry?
 		return nil, eio("%s Directory.MakeDirectory %q", err, nn.uname)
 	}
 	if n.t == rootNode {
@@ -254,14 +255,14 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 		h.de = de
 		return h, nil
 	}
-	ue, err := n.f.users.lookup(n.user)
+	dir, err := n.f.dc.lookup(n.user)
 	if err != nil {
 		return nil, enoent("%s looking up user %q", err, n.user)
 	}
 	// The ? ensures at least one letter in the base component.  For example, Glob("p@google.com/*) also
 	// returns p@google.com/ which is not what we want.
 	pattern := path.Join(n.uname, "?*")
-	de, err := ue.dir.Glob(string(pattern))
+	de, err := dir.Glob(string(pattern))
 	if err != nil {
 		return nil, eio("%s globing %q", err, pattern)
 	}
@@ -294,6 +295,25 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 	return nil
 }
 
+var dirErrors = []string{
+	"not found",
+	"not a directory",
+	"no such directory entry",
+	"no such user",
+}
+
+// expectedError returns true if the error is one from the given list.
+// TODO(p): normalize errors so that we can avoid so many comparisons.
+func expectedError(err error, expected []string) bool {
+	s := err.Error()
+	for _, e := range expected {
+		if strings.Contains(s, e) {
+			return true
+		}
+	}
+	return false
+}
+
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
@@ -305,13 +325,26 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	if n.t == rootNode {
 		user = upspin.UserName(name)
 	}
-	ue, err := n.f.users.lookup(user)
+	dir, err := n.f.dc.lookup(user)
 	if err != nil {
 		return nil, enoent("%s looking for user %q", err, n.user)
 	}
-	de, err := ue.dir.Lookup(path.Join(n.uname, name))
+	de, err := dir.Lookup(path.Join(n.uname, name))
 	if err != nil {
-		return nil, enoent("%s looking for file %q", err, n.uname)
+		if expectedError(err, dirErrors) {
+			return nil, enoent("%s looking for %q", err, n.uname)
+		}
+		// Any other error may imply that our directory connection is
+		// stale.  Forget the cached value and try again.
+		n.f.dc.remove(user)
+		dir, err = n.f.dc.lookup(user)
+		if err != nil {
+			return nil, enoent("%s looking for user %q", err, n.user)
+		}
+		de, err = dir.Lookup(path.Join(n.uname, name))
+		if err != nil {
+			return nil, enoent("%s looking for file %q", err, n.uname)
+		}
 	}
 	mode := os.FileMode(0700)
 	if de.Metadata.IsDir {

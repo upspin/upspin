@@ -13,6 +13,7 @@ import (
 	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
+	"upspin.googlesource.com/upspin.git/user/usercache"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
@@ -47,6 +48,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Turn on caching for users.
+	usercache.Install(context)
+
 	// Hack for testing
 	if *testFlag != "" {
 		testUser, ok := context.User.(*testuser.Service)
@@ -59,7 +63,7 @@ func main() {
 		}
 	}
 
-	f := newUpspinFS(context, newUserCache(context))
+	f := newUpspinFS(context, newDirectoryCache(context))
 
 	c, err := fuse.Mount(
 		mountpoint,
