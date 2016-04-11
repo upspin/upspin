@@ -116,15 +116,15 @@ func (c common) Packing() upspin.Packing {
 	return c.ciphersuite
 }
 
-func (c common) PackLen(ctx *upspin.Context, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) int {
-	if err := pack.CheckPackMeta(c, meta); err != nil {
+func (c common) PackLen(ctx *upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
+	if err := pack.CheckPackMeta(c, &d.Metadata); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (c common) UnpackLen(ctx *upspin.Context, ciphertext []byte, meta *upspin.Metadata) int {
-	if err := pack.CheckUnpackMeta(c, meta); err != nil {
+func (c common) UnpackLen(ctx *upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
+	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
 		return -1
 	}
 	return len(ciphertext)
@@ -134,18 +134,18 @@ func (c common) String() string {
 	return c.packerString
 }
 
-func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckPackMeta(c, meta); err != nil {
+func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
+	if err := pack.CheckPackMeta(c, &d.Metadata); err != nil {
 		return 0, err
 	}
-	return c.eePack(ctx, ciphertext, cleartext, meta, name)
+	return c.eePack(ctx, ciphertext, cleartext, &d.Metadata, d.Name)
 }
 
-func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, name upspin.PathName) (int, error) {
-	if err := pack.CheckUnpackMeta(c, meta); err != nil {
+func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
+	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
 		return 0, err
 	}
-	return c.eeUnpack(ctx, cleartext, ciphertext, meta, name)
+	return c.eeUnpack(ctx, cleartext, ciphertext, &d.Metadata, d.Name)
 }
 
 func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {

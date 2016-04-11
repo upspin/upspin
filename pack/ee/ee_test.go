@@ -25,9 +25,9 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, text []byte) []byte {
-	cipher := make([]byte, packer.PackLen(ctx, text, meta, name))
-	m, err := packer.Pack(ctx, cipher, text, meta, name)
+func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+	cipher := make([]byte, packer.PackLen(ctx, text, d))
+	m, err := packer.Pack(ctx, cipher, text, d)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -35,9 +35,9 @@ func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upsp
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
-func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, meta *upspin.Metadata, cipher []byte) []byte {
-	clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
-	m, err := packer.Unpack(ctx, clear, cipher, meta, name)
+func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
+	m, err := packer.Unpack(ctx, clear, cipher, d)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
@@ -46,11 +46,12 @@ func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name up
 
 func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
-	meta := &upspin.Metadata{}
-	cipher := packBlob(t, ctx, packer, name, meta, text)
+	d := &upspin.DirEntry{}
+	d.Name = name
+	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
-	clear := unpackBlob(t, ctx, packer, name, meta, cipher)
+	clear := unpackBlob(t, ctx, packer, d, cipher)
 
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
@@ -87,13 +88,14 @@ func benchmarkPack(b *testing.B, packing upspin.Packing) {
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
 	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
-		meta := &upspin.Metadata{}
+		d := &upspin.DirEntry{}
+		d.Name = name
 		data := []byte(text)
-		cipher := make([]byte, packer.PackLen(ctx, data, meta, name))
-		m, _ := packer.Pack(ctx, cipher, data, meta, name)
+		cipher := make([]byte, packer.PackLen(ctx, data, d))
+		m, _ := packer.Pack(ctx, cipher, data, d)
 		cipher = cipher[:m]
-		clear := make([]byte, packer.UnpackLen(ctx, cipher, meta))
-		m, _ = packer.Unpack(ctx, clear, cipher, meta, name)
+		clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
+		m, _ = packer.Unpack(ctx, clear, cipher, d)
 		clear = clear[:m]
 	}
 }
@@ -133,8 +135,9 @@ func XXXTestLoadingRemoteKeys(t *testing.T) {
 
 	// TODO: share with bob (make bob a reader).
 	// Setup the metadata such that Bob is a reader.
-	meta := &upspin.Metadata{}
-	cipher := packBlob(t, ctx, packer, pathName, meta, []byte(text))
+	d := &upspin.DirEntry{}
+	d.Name = pathName
+	cipher := packBlob(t, ctx, packer, d, []byte(text))
 
 	// Interim check: dummyUser returned Bob's public key when asked.
 	if mockUser.returnedKeys != 1 {
@@ -145,7 +148,7 @@ func XXXTestLoadingRemoteKeys(t *testing.T) {
 	ctx.UserName = bobsUserName
 	ctx.KeyPair = bobsPrivKey
 
-	clear := unpackBlob(t, ctx, packer, pathName, meta, cipher)
+	clear := unpackBlob(t, ctx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
@@ -181,9 +184,10 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 	ctx.User = mockUser
 
 	// TODO: share with mia (make mia a reader)
-	meta := &upspin.Metadata{}
-	cipher := make([]byte, packer.PackLen(ctx, []byte(text), meta, pathName))
-	m, err := packer.Pack(ctx, cipher, []byte(text), meta, pathName)
+	d := &upspin.DirEntry{}
+	d.Name = pathName
+	cipher := make([]byte, packer.PackLen(ctx, []byte(text), d))
+	m, err := packer.Pack(ctx, cipher, []byte(text), d)
 	if err == nil || !strings.HasPrefix(err.Error(), "no known keys for user") {
 		t.Error("Pack: ", err)
 	}
@@ -192,7 +196,7 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 	// Check that we didn't kid ourselves into wrapping for mia without a key.
 	p, ok := packer.(eep256)
 	if ok {
-		_, wrap, err := p.pdUnmarshal(meta.PackData, pathName)
+		_, wrap, err := p.pdUnmarshal(d.Metadata.PackData, pathName)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -201,7 +205,7 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 		}
 	}
 
-	clear := unpackBlob(t, ctx, packer, pathName, meta, cipher)
+	clear := unpackBlob(t, ctx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
