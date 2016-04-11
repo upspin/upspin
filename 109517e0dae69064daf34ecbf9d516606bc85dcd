@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_1f93ee4b",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_04d8076d",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_44903f7d",
         "filename": "cmd/directory/access.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-11T19:48:01Z",
       "side": 1,
       "message": "first you need to check things like putting a directory, writing a directory to a file, etc.\nmaybe you do that elsewhere, but if so make that clear in the comment.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_5f7566ce",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "It\u0027d done. This is called deep from server.go. Added comment and fixed a comment above.",
+      "parentUuid": "6e3038ce_44903f7d",
       "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_1f6cce01",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Moved to the root until the user creates one.",
+      "parentUuid": "6e3038ce_047f27eb",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_84731723",
         "filename": "cmd/directory/access.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-11T19:48:01Z",
       "side": 1,
       "message": "this code structure will not be easy to adapt to this. you might need to restructure a bit, but that can wait for a later CL.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_5fc2c603",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Ok. I assumed I could just fetch the Group file and AddGroup here, no?",
+      "parentUuid": "6e3038ce_84731723",
       "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_7fbf8a7e",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Good idea. I like that. Done.",
+      "parentUuid": "6e3038ce_df96b66b",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_3fa6f2d3",
         "filename": "cmd/directory/root.go",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2016-04-11T19:48:01Z",
       "side": 1,
       "message": "warning: this won\u0027t have a slash but other code may attempt to look this up using a slash for the root. double-check. maybe add the slash here. in any case know whether you use a terminal slash or not, and be consistent.",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_ff87fad2",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Yeah, this has been the case for a while now. On GCP, I store dir entries as files even when there\u0027s a directory with the same name. The root is special in which I need to remove the backslash. I was doing this in \"canonicalizePath\" before, but that\u0027s now obsolete. getRoot and putRoot should be the only places that need to know about this.",
+      "parentUuid": "6e3038ce_3fa6f2d3",
       "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_ff60dada",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "This is actuall a sub-handler. dirHandler delegates to this. I can put a TODO to make this return an error and dirHandler talks back to the client. Not sure it\u0027s much better or worse, just different.",
+      "parentUuid": "6e3038ce_9fad1ead",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_ffb45af8",
         "filename": "cmd/directory/root.go",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2016-04-11T19:48:01Z",
       "side": 1,
       "message": "marshaling",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_3f7b528e",
+        "filename": "cmd/directory/root.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_ffb45af8",
       "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_df50760a",
+        "filename": "cmd/directory/storage.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_2407cbb5",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_64e9c308",
         "filename": "cmd/directory/storage.go",
         "patchSetId": 5
@@ -172,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "6e3038ce_df0f9613",
+        "filename": "cmd/directory/storage.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "It was getting cumbersome to decipher the many ways that gcp can fail. The error string for a non-existent file is this: \"404 Not Found: 404 not found\". \n\nAlso, errEntryNotFound is special as we rely on this particular error code.\n\nBut I put a TODO to parse the error and differentiate the various forms of \"not found\" from \"GCP is down\", which would be useful to know too.",
+      "parentUuid": "6e3038ce_64e9c308",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e3038ce_c4f7cfeb",
         "filename": "cmd/directory/store_client.go",
         "patchSetId": 5
@@ -183,6 +363,24 @@
       "writtenOn": "2016-04-11T19:48:01Z",
       "side": 1,
       "message": "s/ as/",
+      "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e3038ce_7f194a5d",
+        "filename": "cmd/directory/store_client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-11T20:21:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3038ce_c4f7cfeb",
       "revId": "109517e0dae69064daf34ecbf9d516606bc85dcd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
