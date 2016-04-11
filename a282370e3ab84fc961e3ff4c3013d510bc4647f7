@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e3038ce_a9df1427",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-11T18:12:31Z",
+      "side": 1,
+      "message": "This still doesn\u0027t allow passing through the assertion \"timestamp\u003d0, i.e. I don\u0027t know the actual time.\"\nThat\u0027s how I interpret time\u003d0 when using cross-OS filesystems.\n\nMy proposal is to allow zero and not treat it in Directory as a special case.",
+      "revId": "a282370e3ab84fc961e3ff4c3013d510bc4647f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
