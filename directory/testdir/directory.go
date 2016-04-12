@@ -272,7 +272,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	entry := newDirEntry(s.Context, parsed.Path())
 	entry.Metadata.IsDir = true
 	entry.Location = loc
-	return loc, s.put("MakeDirectory", true, loc, entry)
+	return loc, s.put("MakeDirectory", true, entry)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -281,15 +281,15 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(loc upspin.Location, entry *upspin.DirEntry) error {
+func (s *Service) Put(entry *upspin.DirEntry) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("Put", false, loc, entry)
+	return s.put("Put", false, entry)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
-func (s *Service) put(op string, dataIsDir bool, loc upspin.Location, entry *upspin.DirEntry) error {
+func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil
