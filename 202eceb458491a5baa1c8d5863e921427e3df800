@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb9af677_dbeadfee",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-12T20:53:16Z",
+      "side": 1,
+      "message": "This might be confusing. Let\u0027s say I grant one person Create access to a directory but I don\u0027t want to be able to accidentally write there. So I don\u0027t add myself to the access list for that directory. Now if I want to broaden that to a group of people, I automatically gain access too, by using a group.",
+      "revId": "202eceb458491a5baa1c8d5863e921427e3df800",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
