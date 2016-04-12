@@ -54,6 +54,14 @@ var rightNames = [][]byte{
 	[]byte("delete"),
 }
 
+// String returns a textual representation of the right.
+func (r Right) String() string {
+	if r < 0 || numRights <= r {
+		return "invalidRight"
+	}
+	return string(rightNames[r])
+}
+
 var (
 	// mu controls access to the groups map
 	mu sync.RWMutex
