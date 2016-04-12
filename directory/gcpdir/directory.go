@@ -73,7 +73,7 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-func (d *Directory) Put(location upspin.Location, dirEntry *upspin.DirEntry) error {
+func (d *Directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 
 	name := dirEntry.Name
@@ -92,7 +92,6 @@ func (d *Directory) Put(location upspin.Location, dirEntry *upspin.DirEntry) err
 	}
 
 	dirEntry.Name = canonicalName
-	dirEntry.Location = location
 
 	// Now, Put to the server.
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)

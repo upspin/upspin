@@ -88,7 +88,7 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.Lookup not implemented")
 }
-func (d *dummyDirectory) Put(loc upspin.Location, entry *upspin.DirEntry) error {
+func (d *dummyDirectory) Put(entry *upspin.DirEntry) error {
 	return errors.New("dummyDirectory.Put not implemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
