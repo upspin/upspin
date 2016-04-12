@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb9af677_265aeeff",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-12T21:34:59Z",
+      "side": 1,
+      "message": "cannot",
+      "revId": "f7143b4eb0e58d7baaf4d16f0fb768cae3b073f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb9af677_465ff2ee",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-12T21:34:59Z",
+      "side": 1,
+      "message": "s/about/about the/\n\nbut a link would be better.",
+      "revId": "f7143b4eb0e58d7baaf4d16f0fb768cae3b073f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb9af677_6654f6d0",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-12T21:34:59Z",
+      "side": 1,
+      "message": "s/http/HTTP/\n\nbut where is HTTP? this is poorly expressed",
+      "revId": "f7143b4eb0e58d7baaf4d16f0fb768cae3b073f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
