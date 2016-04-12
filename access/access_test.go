@@ -462,6 +462,21 @@ func TestMarshal(t *testing.T) {
 	assertEqual(t, a, b)
 }
 
+func TestNewDefaultAccess(t *testing.T) {
+	const path = upspin.PathName("bob@foo.com/my/private/sub/dir/Access")
+	a, err := NewDefaultAccess(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected, err := Parse(path, []byte("r,w,d,c,l: bob@foo.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !a.Equal(expected) {
+		t.Errorf("Expected %s to equal %s", a, expected)
+	}
+}
+
 // This is unusual, but to be safe we are asserting equal correctly we test that our comparator is good.
 // (Is worth making Equal a method in Access? Not needed outside of this test yet.)
 func TestAssertEqual(t *testing.T) {
