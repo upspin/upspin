@@ -153,13 +153,13 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			finalErr = eio("couldn't lookup %q ref %q file %q", n.uname, loc.Reference, cf.fname)
 			continue
 		}
-		clearLen := packer.UnpackLen(n.f.context, data, &de.Metadata)
+		clearLen := packer.UnpackLen(n.f.context, data, de)
 		if clearLen < 0 {
 			finalErr = eio("couldn't unpack %q ref %q file %q", h.n.uname, loc.Reference, cf.fname)
 			continue
 		}
 		cleartext := make([]byte, clearLen)
-		rlen, err := packer.Unpack(n.f.context, cleartext, data, &de.Metadata, h.n.uname)
+		rlen, err := packer.Unpack(n.f.context, cleartext, data, de)
 		if err != nil {
 			finalErr = eio("%s unpacking %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
 			continue
