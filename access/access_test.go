@@ -18,7 +18,7 @@ var empty = []string{}
 
 var (
 	accessText = []byte(`
-  r : foo@bob.com ,a@b.co, x@y.uk # a comment
+  r : foo@bob.com ,a@b.co x@y.uk # a comment. Notice commas and spaces.
 
 w:writer@a.bc # comment r: ignored@incomment.com
 l: lister@n.mn  # other comment a: ignored@too.com
@@ -209,6 +209,18 @@ func TestHasAccessNoGroups(t *testing.T) {
 
 	// Wildcard that should not match.
 	check("*@nasa.gov", Read, "me@here.com/foo/bar", false)
+
+	// User can write Access file.
+	check(owner, Write, "me@here.com/foo/Access", true)
+
+	// User can write Group file.
+	check(owner, Write, "me@here.com/Group/bar", true)
+
+	// Other user cannot write Access file.
+	check("writer@foo.bar", Write, "me@here.com/foo/Access", false)
+
+	// Other user cannot write Group file.
+	check("writer@foo.bar", Write, "me@here.com/Group/bar", false)
 }
 
 // This is a simple test of basic group functioning. We still need a proper full-on test with
@@ -221,7 +233,8 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 		// This access file defines readers and writers but no other rights.
 		accessText = "r: reader@r.com, reader@foo.bar, family\n" +
-			"w: writer@foo.bar\n"
+			"w: writer@foo.bar\n" +
+			"d: family"
 
 		// This is a simple group for a family.
 		groupName = upspin.PathName("me@here.com/Group/family")
@@ -280,6 +293,9 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 	// Group cannot write.
 	check("sister@me.com", Write, "me@here.com/foo/bar", false)
+
+	// The owner of a group is a member of the group.
+	check("me@here.com", Delete, "me@here.com/foo/bar", true)
 }
 
 func TestParseEmptyFile(t *testing.T) {
@@ -409,7 +425,8 @@ func TestParseBadGroupFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = parseGroup(parsed, []byte("joe@me.com fred@me.com"))
+	// Multiple commas not allowed.
+	_, err = parseGroup(parsed, []byte("joe@me.com ,, fred@me.com"))
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
