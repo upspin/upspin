@@ -182,9 +182,9 @@ type Directory interface {
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put has the directory service record that the specified DirEntry
-	// describes data stored in a Store service at the Location, and
-	// can thereafter be recovered using the PathName specified in the
-	// DirEntry.
+	// describes data stored in a Store service at the Location recorded
+	// in the DirEntry, and can thereafter be recovered using the PathName
+	// specified in the DirEntry.
 	//
 	// Before calling Put, the data must be packed using the same
 	// Metadata object, which the Packer might update. That is,
@@ -207,7 +207,7 @@ type Directory interface {
 	// and be directories. The final element, if it exists, must not
 	// be a directory. If something is already stored under the path,
 	// the new location and packdata replace the old.
-	Put(loc Location, entry *DirEntry) error
+	Put(entry *DirEntry) error
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path

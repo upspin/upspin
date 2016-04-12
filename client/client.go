@@ -86,12 +86,12 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	if err != nil {
 		return zeroLoc, err
 	}
-	loc := upspin.Location{
+	de.Location = upspin.Location{
 		Endpoint:  c.context.Store.Endpoint(),
 		Reference: ref,
 	}
 	// Record it.
-	return loc, dir.Put(loc, de)
+	return de.Location, dir.Put(de)
 }
 
 // MakeDirectory implements upspin.Client.
