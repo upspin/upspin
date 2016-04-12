@@ -147,14 +147,12 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			if packer == nil {
 				return nil, fmt.Errorf("client: unrecognized Packing %d for %q", entry.Metadata.Packing(), name)
 			}
-			clearLen := packer.UnpackLen(c.context, cipher, &entry.Metadata)
+			clearLen := packer.UnpackLen(c.context, cipher, entry)
 			if clearLen < 0 {
 				return nil, fmt.Errorf("client: UnpackLen failed for %q", name)
 			}
 			cleartext := make([]byte, clearLen)
-			// Must use a canonicalized name. TODO: Put this in package path?
-			parsed, _ := path.Parse(name) // Known to be error-free.
-			n, err := packer.Unpack(c.context, cleartext, cipher, &entry.Metadata, parsed.Path())
+			n, err := packer.Unpack(c.context, cleartext, cipher, entry)
 			if err != nil {
 				return nil, err // Showstopper.
 			}
