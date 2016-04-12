@@ -469,7 +469,8 @@ func TestPutAccessFile(t *testing.T) {
 	reqStore := nettest.NewRequest(t, netutil.Get, "https://store-server.upspin.io/get?ref=1234", nil)
 	respStore := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(accessContents))
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore}, []*http.Request{reqStore})
-	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), serverKeys, mock)
+	f := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	storeClient := newStoreClient(authClient)
 
 	ds := newDirServer(egcp, storeClient)
@@ -713,7 +714,8 @@ func newDummyDirServer() *dirServer {
 
 func newDummyStoreClient() *storeClient {
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	authCli := auth.NewClient(upspin.UserName("this-server@upspin.io"), upspin.KeyPair{}, mock)
+	f := auth.NewFactotum(&upspin.Context{})
+	authCli := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	return newStoreClient(authCli)
 }
 
