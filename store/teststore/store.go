@@ -49,6 +49,9 @@ func (s *Service) Delete(upspin.Reference) error {
 // Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
 func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
+	if ref == "" {
+		return nil, nil, errors.New("empty reference")
+	}
 	s.mu.Lock()
 	data, ok := s.blob[ref]
 	s.mu.Unlock()
