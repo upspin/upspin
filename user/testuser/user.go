@@ -61,25 +61,48 @@ func (s *Service) ListUsers() []upspin.UserName {
 	return users
 }
 
+// validateUserName returns a parsed path if the username is valid.
+func validateUserName(name upspin.UserName) (*path.Parsed, error) {
+	parsed, err := path.Parse(upspin.PathName(name))
+	if err != nil {
+		return nil, err
+	}
+	if len(parsed.Elems) != 0 {
+		return nil, fmt.Errorf("testuser: %q not a user name", name)
+	}
+	return &parsed, nil
+}
+
 // Install installs a user and its root in the provided Directory
 // service. For a real User service, this would be done by some offline
-// adminstrative procedure. For this test version, we just provide a
+// administrative procedure. For this test version, we just provide a
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	// Verify that it is a valid name.
-	parsed, err := path.Parse(upspin.PathName(name))
+	parsed, err := validateUserName(name)
 	if err != nil {
 		return err
-	}
-	if len(parsed.Elems) != 0 {
-		return fmt.Errorf("testuser: %q not a user name", name)
 	}
 	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User + "/"))
 	if err != nil {
 		return err
 	}
+	err = s.AddRoot(name, loc.Endpoint)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// AddRoot adds an endpoint as the user's root endpoint.
+func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error {
+	// Verify that it is a valid name.
+	parsed, err := validateUserName(name)
+	if err != nil {
+		return err
+	}
 	s.mu.Lock()
-	s.root[name] = []upspin.Endpoint{loc.Endpoint}
+	s.root[parsed.User] = append(s.root[parsed.User], endpoint)
 	s.mu.Unlock()
 	return nil
 }

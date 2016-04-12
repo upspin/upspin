@@ -413,7 +413,7 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
-	s := newStoreClient(auth.NewClient(dirServerName, dirServerKeys, &http.Client{}))
+	s := newStoreClient(auth.NewClient(dirServerName, auth.NewFactotum(&upspin.Context{KeyPair: dirServerKeys}), &http.Client{}))
 	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), s)
 
 	// TODO: put and get are HTTP verbs so this is ambiguous. Change this here

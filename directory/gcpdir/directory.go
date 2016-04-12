@@ -256,7 +256,7 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	authClient, isSecure := d.client.(*auth.HTTPClient)
 	if isSecure {
 		authClient.SetUserName(context.UserName)
-		authClient.SetUserKeys(context.KeyPair)
+		authClient.SetUserKeys(auth.NewFactotum(context))
 	}
 	if !netutil.IsServerReachable(d.serverURL) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
