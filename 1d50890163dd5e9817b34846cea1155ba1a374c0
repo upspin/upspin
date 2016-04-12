@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cb9af677_b8236182",
+        "filename": "auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-12T19:08:26Z",
+      "side": 1,
+      "message": "thanks",
+      "parentUuid": "cb9af677_b8f1a142",
+      "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb9af677_38e851cb",
         "filename": "auth/factotum.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-12T18:37:06Z",
       "side": 1,
       "message": "the () aren\u0027t buying you anything\n\n// sig0 is a nil of the correct Signature type.\nvar sig0 upspin.Signature",
+      "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb9af677_186e2d02",
+        "filename": "auth/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-12T19:08:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb9af677_38e851cb",
       "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "cb9af677_78e8199a",
+        "filename": "auth/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-12T19:08:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb9af677_d8e025e0",
+      "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb9af677_58b27509",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-12T18:37:06Z",
       "side": 1,
       "message": "reformat and explain well with inline comments; follow the other interfaces\u0027 example.",
+      "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb9af677_98269d93",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-12T19:08:26Z",
+      "side": 1,
+      "message": "PTAL\n\nI realize the descriptions are cryptic.   We can discuss how to improve at the next meeting.",
+      "parentUuid": "cb9af677_58b27509",
       "revId": "1d50890163dd5e9817b34846cea1155ba1a374c0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
