@@ -19,14 +19,10 @@ import (
 )
 
 // Used to store directory entries.
-// All directories are encoded with this packing/metadata; the user-created
+// All directories are encoded with this packing; the user-created
 // blobs are packed according to the arguments to Put.
 var (
-	dirPacking  = upspin.PlainPack
-	dirPackData = upspin.PackData{byte(dirPacking)}
-	dirMeta     = &upspin.Metadata{
-		PackData: dirPackData,
-	}
+	dirPacking = upspin.PlainPack
 )
 
 var (
@@ -68,8 +64,20 @@ func mkError(op string, name upspin.PathName, err error) *os.PathError {
 	}
 }
 
+func newDirEntry(context *upspin.Context, name upspin.PathName) *upspin.DirEntry {
+	return &upspin.DirEntry{
+		Name: name,
+		Location: upspin.Location{
+			Endpoint: context.Store.Endpoint(),
+		},
+		Metadata: upspin.Metadata{
+			PackData: upspin.PackData{byte(dirPacking)},
+		},
+	}
+}
+
 func packDirBlob(context *upspin.Context, cleartext []byte, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
-	return packBlob(context, cleartext, dirPackData, name)
+	return packBlob(context, cleartext, newDirEntry(context, name))
 }
 
 func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
@@ -84,40 +92,36 @@ func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
 }
 
 // packBlob packs an arbitrary blob and its metadata.
-func packBlob(context *upspin.Context, cleartext []byte, packdata upspin.PackData, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
-	packer, err := getPacker(packdata)
+func packBlob(context *upspin.Context, cleartext []byte, entry *upspin.DirEntry) ([]byte, *upspin.Metadata, error) {
+	packer, err := getPacker(entry.Metadata.PackData)
 	if err != nil {
 		return nil, nil, err
 	}
-	meta := upspin.Metadata{
-		// TODO: Do we need other fields?
-		PackData: packdata,
-	}
-	cipherLen := packer.PackLen(context, cleartext, &meta, name)
+	cipherLen := packer.PackLen(context, cleartext, entry)
 	if cipherLen < 0 {
 		return nil, nil, errors.New("PackLen failed")
 	}
 	ciphertext := make([]byte, cipherLen)
-	n, err := packer.Pack(context, ciphertext, cleartext, &meta, name)
+	n, err := packer.Pack(context, ciphertext, cleartext, entry)
 	if err != nil {
 		return nil, nil, err
 	}
-	return ciphertext[:n], &meta, nil
+	return ciphertext[:n], &entry.Metadata, nil
 }
 
 // unpackBlob unpacks a blob.
 // Other than from unpackDirBlob, only used in tests.
-func unpackBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName, meta *upspin.Metadata) ([]byte, error) {
-	packer, err := getPacker(meta.PackData)
+func unpackBlob(context *upspin.Context, ciphertext []byte, entry *upspin.DirEntry) ([]byte, error) {
+	packer, err := getPacker(entry.Metadata.PackData)
 	if err != nil {
 		return nil, err
 	}
-	clearLen := packer.UnpackLen(context, ciphertext, meta)
+	clearLen := packer.UnpackLen(context, ciphertext, entry)
 	if clearLen < 0 {
 		return nil, errors.New("UnpackLen failed")
 	}
 	cleartext := make([]byte, clearLen)
-	n, err := packer.Unpack(context, cleartext, ciphertext, meta, name)
+	n, err := packer.Unpack(context, cleartext, ciphertext, entry)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +130,7 @@ func unpackBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName
 
 // unpackDirBlob unpacks a blob that is known to be a directory record.
 func unpackDirBlob(context *upspin.Context, ciphertext []byte, name upspin.PathName) ([]byte, error) {
-	return unpackBlob(context, ciphertext, name, dirMeta)
+	return unpackBlob(context, ciphertext, newDirEntry(context, name))
 }
 
 // Glob matches the pattern against the file names of the full rooted tree.
@@ -222,7 +226,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 			Sequence: seq,
 			Size:     0,
 			Time:     upspin.Now(),
-			PackData: dirPackData,
+			PackData: upspin.PackData{byte(dirPacking)},
 		},
 	}
 }
@@ -236,6 +240,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	if err != nil {
 		return loc0, err
 	}
+	pathName := parsed.Path()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if len(parsed.Elems) == 0 {
@@ -243,7 +248,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.Root[parsed.User]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
-		blob, _, err := packDirBlob(s.Context, nil, parsed.Path()) // TODO: Ignoring metadata (but using PlainPack).
+		blob, _, err := packDirBlob(s.Context, nil, pathName) // TODO: Ignoring metadata (but using PlainPack).
 		if err != nil {
 			return loc0, err
 		}
@@ -264,7 +269,10 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		Endpoint:  s.Store.Endpoint(),
 		Reference: ref,
 	}
-	return loc, s.put("MakeDirectory", parsed.Path(), true, loc, dirPackData, nil)
+	entry := newDirEntry(s.Context, parsed.Path())
+	entry.Metadata.IsDir = true
+	entry.Location = loc
+	return loc, s.put("MakeDirectory", true, loc, entry)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -273,23 +281,20 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(pathName upspin.PathName, loc upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
-	parsed, err := path.Parse(pathName)
-	if err != nil {
-		return err
-	}
+func (s *Service) Put(loc upspin.Location, entry *upspin.DirEntry) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("Put", parsed.Path(), false, loc, packdata, opts)
+	return s.put("Put", false, loc, entry)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
-func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc upspin.Location, packdata upspin.PackData, opts *upspin.PutOptions) error {
-	parsed, err := path.Parse(pathName)
+func (s *Service) put(op string, dataIsDir bool, loc upspin.Location, entry *upspin.DirEntry) error {
+	parsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil
 	}
+	pathName := parsed.Path()
 	if len(parsed.Elems) == 0 {
 		return mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
@@ -305,42 +310,17 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
 	entries = append(entries, dirEntry)
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		entry, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		e, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return err
 		}
-		if !entry.Metadata.IsDir {
+		if !e.Metadata.IsDir {
 			return mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
-		entries = append(entries, entry)
-		dirRef = entry.Location.Reference
+		entries = append(entries, e)
+		dirRef = e.Location.Reference
 	}
-
-	// Update directory holding the file.
-	// Need the name of the directory we're updating.
-	newEntry := &upspin.DirEntry{
-		Name:     pathName,
-		Location: loc,
-		Metadata: upspin.Metadata{
-			IsDir:    dataIsDir,
-			Sequence: 0,
-			Size:     0,
-			Time:     upspin.Now(),
-			PackData: packdata,
-		},
-	}
-	if opts != nil {
-		// Default size is zero, so set it regardless.
-		newEntry.Metadata.Size = opts.Size
-		// Default values for the others affect behavior.
-		if opts.Sequence != 0 {
-			newEntry.Metadata.Sequence = opts.Sequence
-		}
-		if opts.Time != 0 {
-			newEntry.Metadata.Time = opts.Time
-		}
-	}
-	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, newEntry, false)
+	dirRef, err = s.installEntry(op, parsed.Drop(1).Path(), dirRef, entry, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return err
@@ -359,7 +339,7 @@ func (s *Service) put(op string, pathName upspin.PathName, dataIsDir bool, loc u
 			Metadata: upspin.Metadata{
 				IsDir:    true,
 				Sequence: entries[i+1].Metadata.Sequence,
-				PackData: dirPackData,
+				PackData: upspin.PackData{byte(dirPacking)},
 			},
 		}
 		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)
@@ -413,7 +393,6 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
-// We always know that the packing is defined by dirPack and dirMeta.
 // It reads the whole directory, so avoid calling it repeatedly.
 func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Reference, elem string) (*upspin.DirEntry, error) {
 	payload, err := s.fetchDir(dirRef, name)
@@ -467,6 +446,9 @@ var errSeq = errors.New("sequence mismatch")
 // installEntry installs the new entry in the directory referenced by dirLeu, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
 func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, dirOverwriteOK bool) (upspin.Reference, error) {
+	if dirRef == "" {
+		panic("nothing")
+	}
 	dirData, err := s.fetchDir(dirRef, dirName)
 	if err != nil {
 		return "", err
