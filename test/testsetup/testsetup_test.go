@@ -13,25 +13,27 @@ func TestInProcess(t *testing.T) {
 	const (
 		userName = "testuser@testdomain.com"
 		content2 = "yo! file2"
-		verbose  = true
 	)
-	client, context, err := InProcess()
+	context, err := NewContextForUser(upspin.UserName(userName), upspin.EEp256Pack)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = AddUser(context, upspin.UserName(userName), upspin.EEp256Pack)
+	client, err := InProcess(context)
 	if err != nil {
 		t.Fatal(err)
 	}
+	InstallUserRoot(context)
 
 	testSetup := Setup{
-		N(userName+"/Dir1/", ""),
-		N(userName+"/Dir1/file1.txt", "yo! file1"),
-		N(userName+"/Dir2/", ""),
-		N(userName+"/Dir2/file2.txt", content2),
+		Tree: Tree{
+			N("Dir1/", ""),
+			N("Dir1/file1.txt", "yo! file1"),
+			N("Dir2/", ""),
+			N("Dir2/file2.txt", content2),
+		},
 	}
 
-	err = Tree(client, testSetup)
+	err = MakeTree(client, userName, testSetup)
 	if err != nil {
 		t.Fatal(err)
 	}
