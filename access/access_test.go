@@ -167,9 +167,9 @@ func TestHasAccessNoGroups(t *testing.T) {
 			return
 		}
 		if ok {
-			t.Errorf("%s can %s %s", user, rightNames[right], file)
+			t.Errorf("%s can %s %s", user, right, file)
 		} else {
-			t.Errorf("%s cannot %s %s", user, rightNames[right], file)
+			t.Errorf("%s cannot %s %s", user, right, file)
 		}
 	}
 
@@ -266,9 +266,9 @@ func TestHasAccessWithGroups(t *testing.T) {
 			t.Fatal(err)
 		}
 		if ok {
-			t.Errorf("%s can %s %s", user, rightNames[right], file)
+			t.Errorf("%s can %s %s", user, right, file)
 		} else {
-			t.Errorf("%s cannot %s %s", user, rightNames[right], file)
+			t.Errorf("%s cannot %s %s", user, right, file)
 		}
 	}
 
@@ -484,7 +484,7 @@ func TestAssertEqual(t *testing.T) {
 
 func assertEqual(t *testing.T, a, b *Access) {
 	if str := differenceString(a, b); str != "" {
-		t.Fatalf(str)
+		t.Fatal(str)
 	}
 }
 
@@ -498,9 +498,10 @@ func differenceString(a, b *Access) string {
 		return fmt.Sprintf("Lists of rights not equal to length of rights %d != %d", len(a.list), numRights)
 	}
 	for r, al := range a.list { // for each right r
-		bl := b.list[r]
+		right := Right(r)
+		bl := b.list[right]
 		if len(al) != len(bl) {
-			return fmt.Sprintf("Lists for right %s not equal length: %d != %d", rightNames[r], len(al), len(bl))
+			return fmt.Sprintf("Lists for right %s not equal length: %d != %d", right, len(al), len(bl))
 		}
 		bChecked := make([]int, len(bl)) // list of times each entry in b was visited.
 	Outer:
@@ -512,7 +513,7 @@ func differenceString(a, b *Access) string {
 					continue Outer
 				}
 			}
-			return fmt.Sprintf("Missing %s in list b for right %s", pa, rightNames[r])
+			return fmt.Sprintf("Missing %s in list b for right %s", pa, right)
 		}
 		for i, b := range bChecked {
 			if b != 1 {
