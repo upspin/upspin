@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebbdfaca_6204c86a",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-12T22:35:55Z",
+      "side": 1,
+      "message": "don\u0027t you have to fix it here too since you fixed it on line 267?",
+      "revId": "7c524ff015a5faea5d2c7ebc446814f59c05adc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8ba47ebb_b92603aa",
+        "filename": "directory/gcpdir/directory_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-12T22:35:55Z",
+      "side": 1,
+      "message": "did this compile?",
+      "revId": "7c524ff015a5faea5d2c7ebc446814f59c05adc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
