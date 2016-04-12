@@ -390,7 +390,7 @@ type Context struct {
 
 	// KeyPair holds the user's private cryptographic keys.
 	KeyPair  KeyPair
-	Factotum *Factotum // TODO Factotum will replace KeyPair.Private
+	Factotum Factotum // TODO Factotum will replace KeyPair.Private
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related

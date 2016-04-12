@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/test/testsetup"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
@@ -14,7 +15,6 @@ import (
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
-	"upspin.googlesource.com/upspin.git/test/testsetup"
 )
 
 func TestAll(t *testing.T) {
@@ -38,13 +38,7 @@ type Setup struct {
 // newSetup allocates and configures a setup for a test run using a packing.
 func newSetup(t *testing.T, packing upspin.Packing) *Setup {
 	log.Printf("===== Using packing: %d", packing)
-	client, context, err := testsetup.InProcess()
-	if err != nil {
-		t.Fatal(err)
-	}
 	s := &Setup{
-		context: context,
-		client:  client,
 		packing: packing,
 	}
 	return s
@@ -57,9 +51,16 @@ var userNameCounter = 0
 func (s *Setup) newUser(t *testing.T) {
 	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 	userNameCounter++
-	if err := testsetup.AddUser(s.context, userName, s.packing); err != nil {
+	var err error
+	s.context, err = testsetup.NewContextForUser(userName, s.packing)
+	if err != nil {
 		t.Fatal(err)
 	}
+	s.client, err = testsetup.InProcess(s.context)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testsetup.InstallUserRoot(s.context)
 }
 
 func (s *Setup) setupFileIO(fileName upspin.PathName, max int, t *testing.T) (upspin.File, []byte) {
