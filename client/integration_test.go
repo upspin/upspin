@@ -23,6 +23,7 @@ import (
 	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
@@ -82,16 +83,17 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 
 	context.UserName = userName
 
-	// For testing, use an InProcess Store...
-	inProcessEndpoint := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "", // ignored
+	// For testing, use a test GCP Store...
+	endpointStore := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   "https://upspin.io:9980",
 	}
-	// ... and a real GCP directory and upspin.io User.
+	// ... and a test GCP directory ...
 	endpointDir := upspin.Endpoint{
 		Transport: upspin.GCP,
-		NetAddr:   "https://upspin.io:9981", // Run on test dir server.
+		NetAddr:   "https://upspin.io:9981",
 	}
+	// ...  and the real upspin.io User.
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   "https://upspin.io:8082",
@@ -103,7 +105,7 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = bind.Store(context, inProcessEndpoint)
+	context.Store, err = bind.Store(context, endpointStore)
 	if err != nil {
 		panic(err)
 	}
@@ -217,6 +219,7 @@ func testGlob(context *upspin.Context, t *testing.T) {
 	for i := 0; i <= 10; i++ {
 		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", userName, i))
 		_, err := c.MakeDirectory(dirPath)
+		log.Printf("mkdir %s: %s", dirPath, err)
 		if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
 			t.Fatal(err)
 		}
