@@ -87,7 +87,7 @@ type Access struct {
 	// list holds the lists of parsed user and group names.
 	// It is indexed by a right. Each list is stored in sorted
 	// order, mostly so Equal can be efficient.
-	list [][]path.Parsed
+	list [numRights][]path.Parsed
 }
 
 // Path returns the full path name of the file that was parsed.
@@ -97,20 +97,9 @@ func (a *Access) Path() upspin.PathName {
 
 // Parse parses the contents of the path name, in data, and returns the parsed Acces.
 func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
-	parsed, err := path.Parse(pathName)
+	a, parsed, err := newAccess(pathName)
 	if err != nil {
 		return nil, err
-	}
-	_, domain, err := path.UserAndDomain(parsed.User)
-	// We don't expect an error since it's been parsed, but check anyway.
-	if err != nil {
-		return nil, err
-	}
-	a := &Access{
-		parsed: parsed,
-		owner:  parsed.User,
-		domain: domain,
-		list:   make([][]path.Parsed, numRights),
 	}
 	// Temporaries. Pre-allocate so they can be reused in the loop, saving allocations.
 	rights := make([][]byte, 10)
@@ -161,6 +150,43 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		sort.Sort(sliceOfParsed(r))
 	}
 	return a, nil
+}
+
+// New returns a new Access granting the owner of pathName all rights.
+// It represents rights equivalent to the those granted to the owner if no Access
+// files are present in the owner's tree.
+func New(pathName upspin.PathName) (*Access, error) {
+	a, parsed, err := newAccess(pathName)
+	if err != nil {
+		return nil, err
+	}
+	// We're being clever here and not parsing a new path just to get the user name from it. Just re-use the
+	// same one with just the user portion of it set.
+	parsed.Elems = nil
+
+	list := []path.Parsed{*parsed}
+	for i := range a.list {
+		a.list[i] = list
+	}
+	return a, nil
+}
+
+func newAccess(pathName upspin.PathName) (*Access, *path.Parsed, error) {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return nil, nil, err
+	}
+	_, domain, err := path.UserAndDomain(parsed.User)
+	// We don't expect an error since it's been parsed, but check anyway.
+	if err != nil {
+		return nil, nil, err
+	}
+	a := &Access{
+		parsed: parsed,
+		owner:  parsed.User,
+		domain: domain,
+	}
+	return a, &parsed, nil
 }
 
 // For sorting the lists of paths.
@@ -479,7 +505,7 @@ func (a *Access) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON returns an Access given its path name and its JSON encoding.
 func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
-	var list [][]path.Parsed
+	var list [numRights][]path.Parsed
 	err := json.Unmarshal(jsonAccess, &list)
 	if err != nil {
 		return nil, err
