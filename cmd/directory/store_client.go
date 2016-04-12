@@ -8,8 +8,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"strings"
+
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -37,31 +40,73 @@ func newStoreClient(http *auth.HTTPClient) *storeClient {
 	}
 }
 
+// innerGet returns the contents of a reference pointed to by a location or returns new locations where to look.
+// It implicitly binds to the endpoint in the location.
+func (s *storeClient) innerGet(loc *upspin.Location) ([]byte, []upspin.Location, error) {
+	const op = "GetRef"
+	ref := loc.Reference
+	var url string
+	if strings.HasPrefix(string(ref), "http://") || strings.HasPrefix(string(ref), "https://") {
+		url = string(ref)
+	} else {
+		url = fmt.Sprintf("%s/get?ref=%s", loc.Endpoint.NetAddr, loc.Reference)
+	}
+
+	logMsg.Printf("Making Get request to Store: %s", url)
+	req, err := http.NewRequest(netutil.Get, url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	buf, answerType, err := s.requestAndReadResponseBody(op, req)
+	if err != nil {
+		return nil, nil, err
+	}
+	switch answerType {
+	case "application/json":
+		// This is either a re-location reply or an error.
+		loc, err := parser.LocationResponse(buf)
+		if err != nil {
+			return nil, nil, err
+		}
+		// If the server did not specify the endpoint, it's
+		// implicitly there; patch it.
+		if len(loc.Endpoint.NetAddr) == 0 {
+			loc.Endpoint.NetAddr = upspin.NetAddr(loc.Endpoint.NetAddr)
+		}
+		locs := []upspin.Location{*loc}
+		return nil, locs, nil
+	}
+	return buf, nil, nil
+}
+
 // Get fetches the contents of a reference pointed to by a location. It implicitly binds to the endpoint in the location.
 func (s *storeClient) Get(loc *upspin.Location) ([]byte, error) {
-	const op = "GetRef"
-	url := fmt.Sprintf("%s/get?ref=%s", loc.Endpoint.NetAddr, loc.Reference)
-	req, err := http.NewRequest(netutil.Get, url, nil)
+	// TODO: this only does one indirection. Fix it.
+	buf, locs, err := s.innerGet(loc)
 	if err != nil {
 		return nil, err
 	}
-	return s.requestAndReadResponseBody(op, req)
+	if len(locs) > 0 {
+		buf, _, err := s.innerGet(&locs[0])
+		return buf, err
+	}
+	return buf, err
 }
 
 // requestAndReadResponseBody sends a request over the HTTP client and reads the body of
-// the reply up to a safe limit.
-func (s *storeClient) requestAndReadResponseBody(op string, req *http.Request) ([]byte, error) {
+// the reply up to a safe limit. It returns the bytes read and the answer type (a string such as "text/html").
+func (s *storeClient) requestAndReadResponseBody(op string, req *http.Request) ([]byte, string, error) {
 	resp, err := s.http.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, newDirError(op, "", fmt.Sprintf("store server error code: %d", resp.StatusCode))
+		return nil, "", newDirError(op, "", fmt.Sprintf("store server error code: %d", resp.StatusCode))
 	}
 	// Read the body of the response
 	buf, err := netutil.BufferResponse(resp, maxBufLen)
 	if err != nil {
-		return nil, newDirError(op, "", err.Error())
+		return nil, "", newDirError(op, "", err.Error())
 	}
-	return buf, nil
+	return buf, resp.Header.Get(netutil.ContentType), nil
 }

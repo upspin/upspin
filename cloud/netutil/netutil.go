@@ -34,6 +34,7 @@ const (
 )
 
 var (
+	// ErrTooLong is returned when a BufferResponse would not fit in the buffer budget.
 	ErrTooLong = errors.New("response body too long")
 )
 

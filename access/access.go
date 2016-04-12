@@ -162,6 +162,7 @@ func (s sliceOfParsed) Len() int           { return len(s) }
 func (s sliceOfParsed) Less(i, j int) bool { return s[i].Compare(s[j]) < 0 }
 func (s sliceOfParsed) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
+// Equal reports whether a and b have equal contents.
 func (a *Access) Equal(b *Access) bool {
 	if a.parsed.Compare(b.parsed) != 0 {
 		return false
