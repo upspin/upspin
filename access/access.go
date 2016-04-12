@@ -201,6 +201,10 @@ func isSpace(b byte) bool {
 	}
 }
 
+func isSeparator(b byte) bool {
+	return b == ',' || isSpace(b)
+}
+
 // clean takes a line of text and removes comments and starting and leading space.
 // It returns an emtpy slice if nothing is left.
 func clean(line []byte) []byte {
@@ -251,16 +255,23 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 	return list, nil
 }
 
-// splitList parses a comma-separated list, ignoring spaces. It returns nil
+// splitList parses a comma- or space-separated list, skipping other
+// white space. It returns nil
 // if the list is badly formed. We avoid bytes.Split because it allocates.
 func splitList(list [][]byte, text []byte) [][]byte {
-	// One comma- or EOF-terminated element per iteration.
+	// One comma-, space- or EOF-terminated element per iteration.
 	for i, j := 0, 0; i < len(text); i = j {
-		for j = i; j != len(text) && text[j] != ','; j++ {
+		for j = i; j != len(text) && !isSeparator(text[j]); j++ {
 		}
 		list = append(list, text[i:j])
-		if j != len(text) { // Skip the comma.
-			j++
+		// Skip separators, but allow only one comma.
+		for sawComma := false; j < len(text) && isSeparator(text[j]); j++ {
+			if text[j] == ',' {
+				if sawComma {
+					return nil
+				}
+				sawComma = true
+			}
 		}
 	}
 	if len(list) == 0 {
@@ -268,20 +279,25 @@ func splitList(list [][]byte, text []byte) [][]byte {
 	}
 	for i, elem := range list {
 		elem = bytes.TrimSpace(elem)
-		if len(elem) == 0 {
+		if !isValidUserOrGroupName(elem) {
 			return nil
-		}
-		// If it's still got spaces, there's trouble.
-		// TODO: One day we may need quoted strings for file names with spaces.
-		// TODO: There is strings.ContainsAny but not bytes.ContainsAny.
-		for _, b := range elem {
-			if isSpace(b) {
-				return nil
-			}
 		}
 		list[i] = elem
 	}
 	return list
+}
+
+// TODO: What is the right syntax for a user/group name?
+func isValidUserOrGroupName(name []byte) bool {
+	if len(name) == 0 {
+		return false
+	}
+	for _, b := range name {
+		if isSpace(b) || b == ':' {
+			return false
+		}
+	}
+	return true
 }
 
 // toLower lower cases a single character.
@@ -308,6 +324,13 @@ func which(right []byte) Right {
 // IsAccessFile reports whether the pathName contains a file named Access, which is special.
 func IsAccessFile(pathName upspin.PathName) bool {
 	return strings.HasSuffix(string(pathName), accessFile)
+}
+
+// IsGroupFile reports whether the pathName contains a directory in the root named Group, which is special.
+func IsGroupFile(pathName upspin.PathName) bool {
+	path := string(pathName)
+	slash := strings.IndexByte(path, '/')
+	return slash > 0 && slash == strings.Index(path, "/Group/")
 }
 
 // AddGroup installs a group with the specified name and textual contents,
@@ -382,18 +405,21 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 	if err != nil {
 		return false, nil, err
 	}
-	// First, if user is the owner and the request is for read access,
-	// or write or create access to an Access file, access is granted.
-	if requester == a.owner {
+	isOwner := requester == a.owner
+	// If user is the owner and the request is for read access, access is granted.
+	if isOwner {
 		switch right {
 		case Read, List:
-			// User can always read or list anything in the user's tree.
+			// Owner can always read or list anything in the owner's tree.
 			return true, nil, nil
-		case Write, Create:
-			// User always has the right to create or modify an Access file.
-			if IsAccessFile(pathName) {
-				return true, nil, nil
-			}
+		}
+	}
+	// If the file is an Access or Group file, the owner has full rights always; no one else
+	// can write it.
+	if IsAccessFile(pathName) || IsGroupFile(pathName) {
+		switch right {
+		case Write, Create, Delete:
+			return isOwner, nil, nil
 		}
 	}
 	var list []path.Parsed
@@ -423,6 +449,10 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		if !ok {
 			missingGroups = append(missingGroups, groupPath)
 			continue
+		}
+		// The owner of a group is automatically a member of the group
+		if group.User == requester {
+			return true, nil, nil
 		}
 		found, groupsToCheck = a.inList(parsedRequester, known, groupsToCheck)
 		if found {
