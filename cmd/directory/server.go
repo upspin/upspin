@@ -293,8 +293,22 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	// We have a dirEntry. Marshal it and send it back.
-	// TODO: verify ACLs before replying.
+	// Check ACLs
+	canRead, err := d.hasRight(op, sess.User(), access.Read, dirEntry.Name)
+	if err != nil {
+		err = newDirError(op, "", err.Error()) // path is included in the original error message.
+		logErr.Printf("Access error: %s", err)
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	log.Printf("=== Can read: %s: %v", dirEntry.Name, canRead)
+	if !canRead {
+		err = newDirError(op, dirEntry.Name, fmt.Sprintf("permission denied: user %s cannot %s", sess.User(), access.Read))
+		logErr.Print(err)
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// We have a dirEntry and ACLs check. Marshal it and send it back.
 	logMsg.Printf("Got dir entry for user %s: path %s: %s", sess.User(), parsedPath.Path(), dirEntry)
 	netutil.SendJSONReply(w, dirEntry)
 }

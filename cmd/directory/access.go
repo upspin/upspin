@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"errors"
 
@@ -52,8 +53,11 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 	for {
 		accessDir = accessDir.Drop(1)
 
+		log.Printf("==== Looking for %s", path.Join(accessDir.Path(), "Access"))
+
 		acc, found := root.accessFiles[path.Join(accessDir.Path(), "Access")]
 		if found {
+			log.Printf("==== found: %+v ", acc)
 			return d.checkRights(user, right, parsedPathToCheck.Path(), acc)
 		}
 
