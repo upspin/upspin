@@ -52,8 +52,10 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 	for {
 		accessDir = accessDir.Drop(1)
 
-		acc, found := root.accessFiles[path.Join(accessDir.Path(), "Access")]
+		accessPath := path.Join(accessDir.Path(), "Access")
+		acc, found := root.accessFiles[accessPath]
 		if found {
+			logMsg.Printf("Found access file in %s: %+v ", accessPath, acc)
 			return d.checkRights(user, right, parsedPathToCheck.Path(), acc)
 		}
 
