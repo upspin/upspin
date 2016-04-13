@@ -31,6 +31,12 @@ const (
 	accessFile = "Access"
 )
 
+var (
+	// ErrPermissionDenied indicates the user does not have sufficient rights on the path.
+	// This error is never returned by package access, but is provided as a convenience for callers.
+	ErrPermissionDenied = errors.New("permission denied")
+)
+
 // A Right represents a particular access permission: reading, writing, etc.
 type Right int
 
@@ -162,9 +168,9 @@ func New(pathName upspin.PathName) (*Access, error) {
 	}
 	// We're being clever here and not parsing a new path just to get the user name from it.
 	// Just re-use the same one with just the user portion of it set.
-	parsed.Elems = nil
+	userPath := parsed.First(0)
 
-	list := []path.Parsed{*parsed}
+	list := []path.Parsed{userPath}
 	for i := range a.list {
 		a.list[i] = list
 	}
