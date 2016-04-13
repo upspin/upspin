@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bd4aa7d_8dffe5c1",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T18:51:04Z",
+      "side": 1,
+      "message": "i would avoid the double parse by refactoring so Install and AddRoot both call one function to  do the lock and append",
+      "revId": "1d477fd18efebe46b6e5e9c2e5043d0f1ece6610",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
