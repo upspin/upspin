@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bd4aa7d_76c07efa",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T22:01:36Z",
+      "side": 1,
+      "message": "i don\u0027t think you start here. i think this goes after you check this guy.\nif i ask for delete(\"x/y/z\") you need to check the access rights for x, not y.\nsee the comment for Access.Can",
+      "revId": "7f025e67128bc1e8b084a4eb5e43fcbd43cd6494",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
