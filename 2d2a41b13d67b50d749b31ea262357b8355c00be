@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b4392e3_234dae6a",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:05:10Z",
+      "side": 1,
+      "message": "// It represents rights equivalent to the those granted to the owner if no Access\n// files are present in the owner\u0027s tree.",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_6343b641",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:05:10Z",
+      "side": 1,
+      "message": "I would just call this Default, but if you insist on NewDefault I won\u0027t protest too much.\nThe \"Access\" part is unnecessary.",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_c3340ad5",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:05:10Z",
+      "side": 1,
+      "message": "cleaner would be parsed.First(0).",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_2324cea0",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:05:10Z",
+      "side": 1,
+      "message": "for i :\u003d range a.list {\n  a.list[i] \u003d list\n}",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
