@@ -21,6 +21,7 @@ const (
 	userName       = "test@foo.com"
 	parentPathName = userName + "/mydir"
 	pathName       = parentPathName + "/myfile.txt"
+	rootAccessFile = userName + "/Access"
 )
 
 var (
@@ -38,6 +39,16 @@ var (
 		Metadata: upspin.Metadata{
 			IsDir: true,
 		},
+	}
+	defaultAccess, _ = access.New(rootAccessFile)
+	userRoot         = root{
+		dirEntry: &upspin.DirEntry{
+			Name: userName + "/",
+			Metadata: upspin.Metadata{
+				IsDir: true,
+			},
+		},
+		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
 )
 
@@ -585,10 +596,11 @@ func TestGCPCorruptsData(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	dirEntryJSON := toJSON(t, dir)
+	rootJSON := toRootJSON(t, &userRoot)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{pathName},
-		Data: [][]byte{dirEntryJSON},
+		Ref:  []string{pathName, userName},
+		Data: [][]byte{dirEntryJSON, rootJSON},
 	}
 
 	resp := nettest.NewExpectingResponseWriter(string(dirEntryJSON))
@@ -596,6 +608,25 @@ func TestGet(t *testing.T) {
 
 	ds := newDirServer(egcp, newDummyStoreClient())
 	ds.getHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
+func TestGetPermissionDenied(t *testing.T) {
+	dirEntryJSON := toJSON(t, dir)
+	rootJSON := toRootJSON(t, &userRoot)
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{pathName, userName},
+		Data: [][]byte{dirEntryJSON, rootJSON},
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: test@foo.com/mydir/myfile.txt: permission denied: user sloppyjoe@unauthorized.com cannot read"}`)
+	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/get?pathname="+pathName, dirEntryJSON)
+
+	ds := newDirServer(egcp, newDummyStoreClient())
+
+	sess := testauth.NewSessionForTesting("sloppyjoe@unauthorized.com", false, nil)
+	ds.getHandler(sess, resp, req)
 	resp.Verify(t)
 }
 
