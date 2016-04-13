@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_877226e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T15:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b4392e3_63f5f62c",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b4392e3_234dae6a",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-13T02:05:10Z",
       "side": 1,
       "message": "// It represents rights equivalent to the those granted to the owner if no Access\n// files are present in the owner\u0027s tree.",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_277b7ac5",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T15:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b4392e3_234dae6a",
       "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_0778f6c4",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T15:44:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b4392e3_6343b641",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b4392e3_c3340ad5",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_678572f9",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T15:44:21Z",
+      "side": 1,
+      "message": "That requires a copy of the object, I think. I left as is unless you see a better way.",
+      "parentUuid": "2b4392e3_c3340ad5",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b4392e3_2324cea0",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-04-13T02:05:10Z",
       "side": 1,
       "message": "for i :\u003d range a.list {\n  a.list[i] \u003d list\n}",
+      "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_4782eef2",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T15:44:21Z",
+      "side": 1,
+      "message": "But I was so proud of a.list[List] \u003d list\n\nDone.",
+      "parentUuid": "2b4392e3_2324cea0",
       "revId": "2d2a41b13d67b50d749b31ea262357b8355c00be",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
