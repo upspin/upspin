@@ -381,7 +381,11 @@ func TestPutRoot(t *testing.T) {
 		accessFiles: make(accessFileDB),
 	}
 	accessFileRoot := upspin.PathName(user + "/Access")
-	root.accessFiles[accessFileRoot] = makeAccess(t, accessFileRoot, "")
+	var err error
+	root.accessFiles[accessFileRoot], err = access.New(accessFileRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// rootDirJSON is what the client requests...
 	rootDirJSON := toJSON(t, rootDir)

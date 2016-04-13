@@ -96,11 +96,12 @@ func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter,
 	}
 	// We make up an empty access file to use in the default case (user has not created any Access files).
 	accessPath := path.Join(upspin.PathName(parsedPath.User), "Access")
-	acc, err := access.Parse(accessPath, []byte(""))
+	acc, err := access.New(accessPath)
 	if err != nil {
-		err := newDirError(op, parsedPath.Path(), "can't parse empty access file")
-		logErr.Printf("WARN: %s", err)
-		netutil.SendJSONError(w, context, err)
+		// This should never happen because accessPath has been parsed already.
+		newErr := newDirError(op, parsedPath.Path(), err.Error())
+		logErr.Printf("WARN: %s", newErr)
+		netutil.SendJSONError(w, context, newErr)
 		return
 	}
 	root.accessFiles[accessPath] = acc
