@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b4392e3_23ffee0e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:09:39Z",
+      "side": 1,
+      "message": "Directories",
+      "revId": "74a2c3e20fb785e20f5c7ca6503f0081a0609a83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_a301beeb",
+        "filename": "cmd/dfuse/directorycache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:09:39Z",
+      "side": 1,
+      "message": "i know it\u0027s %^^\u0026%* painful but full sentences please.\n\n// remove removes a user from the cache.",
+      "revId": "74a2c3e20fb785e20f5c7ca6503f0081a0609a83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_030d121f",
+        "filename": "cmd/dfuse/directorycache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:09:39Z",
+      "side": 1,
+      "message": "do you want to check presence? it might be a good self-check, but it may not be worth more than a log statement. not sure.",
+      "revId": "74a2c3e20fb785e20f5c7ca6503f0081a0609a83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b4392e3_631c164f",
+        "filename": "cmd/dfuse/directorycache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T02:09:39Z",
+      "side": 1,
+      "message": "ditto re: sentences.",
+      "revId": "74a2c3e20fb785e20f5c7ca6503f0081a0609a83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
