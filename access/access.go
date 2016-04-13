@@ -162,9 +162,9 @@ func New(pathName upspin.PathName) (*Access, error) {
 	}
 	// We're being clever here and not parsing a new path just to get the user name from it.
 	// Just re-use the same one with just the user portion of it set.
-	parsed.Elems = nil
+	userPath := parsed.First(0)
 
-	list := []path.Parsed{*parsed}
+	list := []path.Parsed{userPath}
 	for i := range a.list {
 		a.list[i] = list
 	}

@@ -144,6 +144,24 @@ func TestLookupPathNotFound(t *testing.T) {
 	resp.Verify(t)
 }
 
+// Regression test to catch that we don't panic (by going past the root).
+func TestLookupRoot(t *testing.T) {
+	// The root converted to JSON.
+	rootJSON := toRootJSON(t, &userRoot)
+
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"PackData":null}}`)
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname="+userName+"/", nil)
+
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{userName},
+		Data: [][]byte{rootJSON},
+	}
+
+	ds := newDirServer(egcp, newDummyStoreClient())
+	ds.getHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
 func TestGlobComplex(t *testing.T) {
 	// Create dir entries for files that match that will be looked up after Globbing.
 	dir1 := upspin.DirEntry{

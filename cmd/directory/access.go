@@ -3,9 +3,8 @@ package main
 // This file handles parsing Access and Group files, updating the root and verifying access.
 
 import (
-	"fmt"
-
 	"errors"
+	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
@@ -50,7 +49,9 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 	// Now we need to find the relevant Access file. Start with the parent dir.
 	accessDir := parsedPathToCheck
 	for {
-		accessDir = accessDir.Drop(1)
+		if !accessDir.IsRoot() {
+			accessDir = accessDir.Drop(1)
+		}
 
 		accessPath := path.Join(accessDir.Path(), "Access")
 		acc, found := root.accessFiles[accessPath]
