@@ -34,6 +34,42 @@
       "revId": "7f025e67128bc1e8b084a4eb5e43fcbd43cd6494",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_56fc5a17",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T22:13:07Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "6bd4aa7d_5621fa8f",
+      "revId": "7f025e67128bc1e8b084a4eb5e43fcbd43cd6494",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_b6e03675",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T22:13:07Z",
+      "side": 1,
+      "message": "sorry, i meant z not y",
+      "parentUuid": "6bd4aa7d_76c07efa",
+      "revId": "7f025e67128bc1e8b084a4eb5e43fcbd43cd6494",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
