@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bd4aa7d_4df5ed91",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T18:13:18Z",
+      "side": 1,
+      "message": "not sure about this arrangement. you need to verify that name is a valid user name, which requires calling path.Parse, and Install already did that. with the rewrite below, it\u0027s not worth having Install call this. instead, AddRoot becomes almost Install but without the error check, kinda.\n\nit all needs rewriting.",
+      "revId": "3565e8fc1209f5645092625b42151e543412fcbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_6de1d1e1",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-13T18:13:18Z",
+      "side": 1,
+      "message": "this can be just\ns.root[name] \u003d append(s.root[name], endpoint)",
+      "revId": "3565e8fc1209f5645092625b42151e543412fcbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
