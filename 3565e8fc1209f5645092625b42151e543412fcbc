@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_2dcb59cb",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T18:43:49Z",
+      "side": 1,
+      "message": "Okay. I duplicated the check. This is only done in testing, so it\u0027s not that bad.",
+      "parentUuid": "6bd4aa7d_4df5ed91",
+      "revId": "3565e8fc1209f5645092625b42151e543412fcbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_6de1d1e1",
         "filename": "user/testuser/user.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-13T18:13:18Z",
       "side": 1,
       "message": "this can be just\ns.root[name] \u003d append(s.root[name], endpoint)",
+      "revId": "3565e8fc1209f5645092625b42151e543412fcbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_0dc815cb",
+        "filename": "user/testuser/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-13T18:43:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_6de1d1e1",
       "revId": "3565e8fc1209f5645092625b42151e543412fcbc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
