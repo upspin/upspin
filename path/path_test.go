@@ -71,7 +71,7 @@ func TestCountMallocs(t *testing.T) {
 		Parse("u@google.com/a/b/c/d/e/f/g")
 	}
 	mallocs := testing.AllocsPerRun(100, parse)
-	if mallocs > 1 {
+	if mallocs != 1 {
 		t.Errorf("got %d allocs, want <=1", int64(mallocs))
 	}
 }
@@ -274,6 +274,31 @@ func TestCompare(t *testing.T) {
 		// Verify for compare too.
 		if (p1.Compare(p2) == 0) != p1.Equal(p2) {
 			t.Errorf("Equal(%q, %q) = %t; expected otherwise", test.path1, test.path2, p1.Equal(p2))
+		}
+	}
+}
+
+type dropPathTest struct {
+	path   upspin.PathName
+	count  int
+	expect upspin.PathName
+}
+
+var dropPathTests = []dropPathTest{
+	{"a@b.co/a/b", 1, "a@b.co/a"},
+	{"a@b.co/a/b", 2, "a@b.co/"},
+	// Won't go past the root.
+	{"a@b.co/a/b", 3, "a@b.co/"},
+	// Multiple slashes are OK (but we'll not drop the ones we don't see).
+	{"a@b.co/a/b///", 1, "a@b.co/a"},
+	{"a@b.co///a//////b///c/////", 2, "a@b.co///a"},
+}
+
+func TestDropPath(t *testing.T) {
+	for _, test := range dropPathTests {
+		got := DropPath(test.path, test.count)
+		if got != test.expect {
+			t.Errorf("DropPath(%q, %d) = %q; expected %q", test.path, test.count, got, test.expect)
 		}
 	}
 }
