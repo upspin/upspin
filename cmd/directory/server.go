@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -87,8 +86,8 @@ func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 // metadata information.
 func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "Put"
-	if r.Method != netutil.Post && r.Method != netutil.Patch {
-		netutil.SendJSONErrorString(w, "/put only handles POST or PATCH HTTP requests")
+	if r.Method != netutil.Post {
+		netutil.SendJSONErrorString(w, "/put only handles POST requests")
 		return
 	}
 	buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
@@ -109,127 +108,72 @@ func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-
-	// TODO: verify ACLs before applying dir entry
-
-	switch r.Method {
-	case netutil.Post:
-		d.putDirHandler(sess, w, &parsed, dirEntry)
-	case netutil.Patch:
-		d.patchHandler(sess, w, &parsed, dirEntry)
-	default:
-		netutil.SendJSONError(w, context, fmt.Errorf("invalid HTTP method: %q", r.Method))
-	}
-}
-
-// patchHandler handles directory patch requests, for making partial updates to directory entries. parsedPath is a validated dirEntry.Name.
-func (d *dirServer) patchHandler(sess auth.Session, w http.ResponseWriter, parsedPath *path.Parsed, dirEntry *upspin.DirEntry) {
-	const op = "patch"
-	// Check that only allowed fields are being updated.
-	dirEntry.Name = "" // Name is not updatable.
-	if err := d.verifyUpdatableFields(dirEntry); err != nil {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), err.Error()))
-		return
-	}
-	// Lookup original dir entry.
-	origDirEntry, err := d.getDirEntry(parsedPath)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	// Merge fields.
-	mergedDirEntry := d.mergeDirEntries(origDirEntry, dirEntry) // NOTE: mergedDirEntry is an alias for origDirEntry.
-	// Apply mutation on stable storage.
-	err = d.putDirEntry(parsedPath, mergedDirEntry)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	logMsg.Printf("%s: %q %q", op, sess.User(), mergedDirEntry.Name)
-	netutil.SendJSONErrorString(w, "success")
-}
-
-// verifyNonUpdatableFields reports an error if a partial dirEntry contains non-updatable fields.
-func (d *dirServer) verifyUpdatableFields(dir *upspin.DirEntry) error {
-	if dir.Name != "" {
-		return errors.New("Name is not updatable")
-	}
-	// Location may be updatable in the future, but right now it is not supported.
-	var zeroLoc upspin.Location
-	if dir.Location != zeroLoc {
-		return errors.New("Location is not updatable")
-	}
-	// Here we're simply checking whether there is a non-zero value in IsDir.
-	if dir.Metadata.IsDir {
-		return errors.New("IsDir is not updatable")
-	}
-	// All other metadata fields are updatable.
-	return nil
-}
-
-// mergeDirEntries merges dst and src together and returns dst. Only updatable fields are merged.
-func (d *dirServer) mergeDirEntries(dst, src *upspin.DirEntry) *upspin.DirEntry {
-	if src.Metadata.Sequence != 0 {
-		dst.Metadata.Sequence = src.Metadata.Sequence
-	}
-	if src.Metadata.Size != 0 {
-		dst.Metadata.Size = src.Metadata.Size
-	}
-	if src.Metadata.Time != 0 {
-		dst.Metadata.Time = src.Metadata.Time
-	}
-	if src.Metadata.PackData != nil {
-		dst.Metadata.PackData = src.Metadata.PackData
-	}
-	return dst
-}
-
-// putDirHandler writes or overwrites a complete dirEntry to the back
-// end, provided several checks have passed first.
-func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, parsed *path.Parsed, dirEntry *upspin.DirEntry) {
-	const op = "Put"
 	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	// Get the parent dir, unless we're creating the root.
+	// If we're creating the root, handle it elsewhere.
 	if parsed.IsRoot() {
 		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
-		d.handleRootCreation(sess, w, parsed, dirEntry)
+		d.handleRootCreation(sess, w, &parsed, dirEntry)
 		return
 	}
-	parentParsedPath := parsed.Drop(1)
+	err = d.putDir(sess, &parsed, dirEntry)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+
+	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	netutil.SendJSONErrorString(w, "success")
+}
+
+// putDir writes or overwrites a complete dirEntry to the back
+// end, provided several checks have passed first.
+func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
+	const op = "Put"
+
+	// Check ACLs before we go any further, so we don't leak information about the existence of files and directories.
+	canCreate, err := d.hasRight(op, sess.User(), access.Create, dirEntry.Name)
+	if err != nil {
+		return newDirError(op, dirEntry.Name, err.Error())
+	}
+	canWrite, err := d.hasRight(op, sess.User(), access.Write, dirEntry.Name)
+	if err != nil {
+		return newDirError(op, dirEntry.Name, err.Error())
+	}
+	if dirEntry.Metadata.IsDir && !canCreate || !dirEntry.Metadata.IsDir && !canWrite {
+		return newDirError(op, dirEntry.Name, access.ErrPermissionDenied.Error())
+	}
+	// Find parent.
+	parentParsedPath := parsed.Drop(1) // Can't fail as this is not called for roots.
 	parentDirEntry, err := d.getDirEntry(&parentParsedPath)
 	if err != nil {
 		if err == errEntryNotFound {
 			// Give a more descriptive error
 			err = newDirError(op, parsed.Path(), "parent path not found")
 		}
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
 	// Verify parent IsDir (redundant, but just to be safe).
 	if !parentDirEntry.Metadata.IsDir {
 		logErr.Printf("WARN: bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
-		netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), "parent is not a directory"))
-		return
+		return newDirError(op, parsed.Path(), "parent is not a directory")
 	}
 
 	// Verify whether there's a directory with same name.
 	canonicalPath := parsed.Path()
 	existingDirEntry, err := d.getNonRoot(canonicalPath)
 	if err != nil && err != errEntryNotFound {
-		netutil.SendJSONError(w, context, newDirError(op, canonicalPath, err.Error()))
-		return
+		return newDirError(op, canonicalPath, err.Error())
+
 	}
 	if err == nil {
 		if existingDirEntry.Metadata.IsDir {
-			netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "directory already exists"))
-			return
+			return newDirError(op, canonicalPath, "directory already exists")
 		}
 		if dirEntry.Metadata.IsDir {
-			netutil.SendJSONError(w, context, newDirError(op, canonicalPath, "overwriting file with directory"))
-			return
+			return newDirError(op, canonicalPath, "overwriting file with directory")
 		}
 	}
 
@@ -239,30 +183,26 @@ func (d *dirServer) putDirHandler(sess auth.Session, w http.ResponseWriter, pars
 	// Finally, store the new entry.
 	err = d.putNonRoot(canonicalPath, dirEntry)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
 
 	// Patch the parent: bump sequence number.
 	parentDirEntry.Metadata.Sequence++
 	err = d.putDirEntry(&parentParsedPath, parentDirEntry)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
 
 	// If this is an Access file or Group file, we have some extra work to do.
 	if access.IsAccessFile(canonicalPath) {
 		err = d.updateAccess(parsed, &dirEntry.Location)
 		if err != nil {
-			netutil.SendJSONError(w, context, err)
-			return
+			return err
 		}
 	}
 	// TODO: if IsGroup(canonicalPath) must potentially re-parse all Access files.
 
-	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
-	netutil.SendJSONErrorString(w, "success")
+	return nil
 }
 
 func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
@@ -277,6 +217,27 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 		netutil.SendJSONError(w, context, err)
 		return
 	}
+	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
+	canRead, err := d.hasRight(op, sess.User(), access.Read, parsedPath.Path())
+	if err != nil {
+		err = newDirError(op, "", err.Error()) // path is included in the original error message.
+		logErr.Printf("Access error Read: %s", err)
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	canList, err := d.hasRight(op, sess.User(), access.List, parsedPath.Path())
+	if err != nil {
+		err = newDirError(op, "", err.Error()) // path is included in the original error message.
+		logErr.Printf("Access error List: %s", err)
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// If the user has no rights, we're done.
+	if !canRead && !canList {
+		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
+		return
+	}
+	// Look up entry
 	var dirEntry *upspin.DirEntry
 	if !parsedPath.IsRoot() {
 		dirEntry, err = d.getNonRoot(parsedPath.Path())
@@ -293,22 +254,11 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 		netutil.SendJSONError(w, context, err)
 		return
 	}
-	// Check ACLs
-	canRead, err := d.hasRight(op, sess.User(), access.Read, dirEntry.Name)
-	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("Access error: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	logMsg.Printf("User %s can read: %s: %v", sess.User(), dirEntry.Name, canRead)
+	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		err = newDirError(op, dirEntry.Name, fmt.Sprintf("permission denied: user %s cannot %s", sess.User(), access.Read))
-		logErr.Print(err)
-		netutil.SendJSONError(w, context, err)
-		return
+		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsedPath)
+		dirEntry.Location = upspin.Location{}
 	}
-	// We have a dirEntry and ACLs check. Marshal it and send it back.
 	logMsg.Printf("Got dir entry for user %s: path %s: %s", sess.User(), parsedPath.Path(), dirEntry)
 	netutil.SendJSONReply(w, dirEntry)
 }
@@ -373,14 +323,25 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 				netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
 			}
 			// Verify if user has proper list ACL.
-			hasAccess, err := d.hasRight(op, sess.User(), access.List, de.Name)
+			canList, err := d.hasRight(op, sess.User(), access.List, de.Name)
 			if err != nil {
 				logErr.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
 				continue
 			}
-			if hasAccess {
-				dirEntries = append(dirEntries, de)
+			canRead, err := d.hasRight(op, sess.User(), access.Read, de.Name)
+			if err != nil {
+				logErr.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
+				continue
 			}
+			if !canRead && !canList {
+				logMsg.Printf("User %s can't Glob %s", sess.User(), de.Name)
+				continue
+			}
+			// If the user can't read a path, clear out its Location.
+			if !canRead {
+				de.Location = upspin.Location{}
+			}
+			dirEntries = append(dirEntries, de)
 		}
 	}
 	netutil.SendJSONReply(w, dirEntries)

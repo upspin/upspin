@@ -31,6 +31,12 @@ const (
 	accessFile = "Access"
 )
 
+var (
+	// ErrPermissionDenied indicates the user does not have the proper rights on path.
+	// This error is never returned by package access, but is provided as a convenience.
+	ErrPermissionDenied = errors.New("permission denied")
+)
+
 // A Right represents a particular access permission: reading, writing, etc.
 type Right int
 
