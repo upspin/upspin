@@ -1,0 +1,15 @@
+#!/bin/bash
+# mp is the mount point for the upspin root.
+mp=/Volumes/upspin
+
+# Unmount any previous mount.
+umount $mp 2>/dev/null
+
+# Creat the mount point if it doesn't already exist.
+mkdir $mp 2>/dev/null
+
+# Uncomment the following line if you want to start every run with a clean cache.
+#rm -fr $HOME/upspin/cache
+
+# Start the service.
+dfuse $mp

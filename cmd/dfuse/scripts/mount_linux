@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# mp is the mount point of the upspin root.
+mp=/upspin
+
+# create an fstab entry that lets a user mount/unmount.
+if ! grep -q upspin /etc/fstab
+then
+	echo echo upspin $mp fuse.fs user,noauto 0 0 '>>' /etc/fstab | sudo bash
+fi
+
+# Unmount any previous mount.
+umount $mp 2>/dev/null
+
+# Create the mount point if it doesn't exist.
+if ! test -d $mp 
+then
+	sudo mkdir $mp
+	sudo chown $USER $mp
+fi
+
+# Uncomment the following line if you want to start every run with a clean cache.
+rm -fr $HOME/upspin/cache
+
+# Start the service.
+$GOPATH/bin/dfuse $mp
