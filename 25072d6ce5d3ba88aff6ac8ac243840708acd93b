@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_a9c294a5",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_c96388e7",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_899b502d",
         "filename": "store/teststore/store.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-14T17:43:13Z",
       "side": 1,
       "message": "call it DeleteAll",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_29afc4f1",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_899b502d",
       "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_69a9bce9",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Added TODO. I think a lot will change before we can support mixing again so for simplicity let\u0027s keep this as just one for now. When we support mixing, I\u0027ll refactor the tests accordingly.",
+      "parentUuid": "6bd4aa7d_89a99055",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_e9d00ccd",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-14T17:43:13Z",
       "side": 1,
       "message": "indicates\n\nwhat happens if it\u0027s false? what would it do?",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_69441cf5",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_e9d00ccd",
       "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_094ac0ff",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_098760d7",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_e98bece0",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-04-14T17:43:13Z",
       "side": 1,
       "message": "indicates",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_2961847b",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_e98bece0",
       "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_0905a0ad",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_298ea4f0",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_e962cce0",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-04-14T17:43:13Z",
       "side": 1,
       "message": "inProcess here and on line 200",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_49ef9811",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T18:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bd4aa7d_e962cce0",
       "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
