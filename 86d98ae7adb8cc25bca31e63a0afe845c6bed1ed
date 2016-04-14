@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bd4aa7d_a4163b2a",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T19:03:27Z",
+      "side": 1,
+      "message": "s/true/false/ surely\n\nmaybe it should be DeleteTreeAtExit, with false meaning to leave it around. seems clearer to me.",
+      "revId": "86d98ae7adb8cc25bca31e63a0afe845c6bed1ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_243d2ba1",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T19:03:27Z",
+      "side": 1,
+      "message": "check the flag",
+      "revId": "86d98ae7adb8cc25bca31e63a0afe845c6bed1ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
