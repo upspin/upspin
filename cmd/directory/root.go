@@ -75,6 +75,11 @@ func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
 
 func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter, parsedPath *path.Parsed, dirEntry *upspin.DirEntry) {
 	const op = "Put"
+	// Permission for root creation is special: only the owner can do it.
+	if sess.User() != parsedPath.User {
+		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
+		return
+	}
 	_, err := d.getRoot(parsedPath.User)
 	if err != nil && err != errEntryNotFound {
 		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), err.Error()))
