@@ -48,7 +48,7 @@ func (p Parsed) filePath(b *bytes.Buffer) {
 	}
 }
 
-// Path is a helper that returns the string representation with type Name.
+// Path is a helper that returns the string representation with type upspin.PathName.
 func (p Parsed) Path() upspin.PathName {
 	return upspin.PathName(p.String())
 }
@@ -151,6 +151,37 @@ func (p Parsed) First(n int) Parsed {
 func (p Parsed) Drop(n int) Parsed {
 	p.Elems = p.Elems[:len(p.Elems)-n]
 	return p
+}
+
+// DropPath returns the path name with the last n elements dropped.
+// It assumes the path is reasonably well-formed (there must be a
+// user name; multiple slashes are OK) but it does not handle .. (dot-dot).
+func DropPath(pathName upspin.PathName, n int) upspin.PathName {
+	str := dropFinalSlashes(string(pathName))
+	for ; n > 0; n-- {
+		slash := strings.LastIndexByte(str, '/')
+		if slash == strings.IndexByte(str, '/') {
+			// It's the only one, the one after user name; leave it.
+			slash++
+		}
+		str = dropFinalSlashes(str[:slash])
+	}
+	return upspin.PathName(str)
+}
+
+// dropFinalSlashes strips any slashes on the end of str, up to but not
+// including the one that separates the user name from the path.
+func dropFinalSlashes(str string) string {
+	// Fast check - we usually have nothing to do.
+	if len(str) == 0 || str[len(str)-1] != '/' {
+		return str
+	}
+	firstSlash := strings.IndexByte(str, '/') // The slash after the user.
+	// A little protection: drop all final slashes.
+	for len(str) > 0 && str[len(str)-1] == '/' && len(str) > firstSlash+1 {
+		str = str[:len(str)-1]
+	}
+	return str
 }
 
 // IsRoot reports whether a parsed name refers to the user's root.
