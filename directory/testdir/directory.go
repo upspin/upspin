@@ -522,6 +522,13 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{},
 	return s, nil
 }
 
+// DeleteAll deletes all entries from memory.
+func (s *Service) DeleteAll() {
+	s.mu.Lock()
+	s.Root = make(map[upspin.UserName]*upspin.DirEntry)
+	s.mu.Unlock()
+}
+
 // Endpoint implements upspin.Directory.Endpoint.
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.endpoint

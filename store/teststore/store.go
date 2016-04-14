@@ -46,6 +46,13 @@ func (s *Service) Delete(upspin.Reference) error {
 	return errors.New("Not implemented yet")
 }
 
+// DeleteAll deletes all data from memory.
+func (s *Service) DeleteAll() {
+	s.mu.Lock()
+	s.blob = make(map[upspin.Reference][]byte)
+	s.mu.Unlock()
+}
+
 // Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
 func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
