@@ -1,12 +1,9 @@
-package testsetup
+package testenv
 
 import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 func TestInProcess(t *testing.T) {
@@ -14,17 +11,10 @@ func TestInProcess(t *testing.T) {
 		userName = "testuser@testdomain.com"
 		content2 = "yo! file2"
 	)
-	context, err := NewContextForUser(upspin.UserName(userName), upspin.EEp256Pack)
-	if err != nil {
-		t.Fatal(err)
-	}
-	client, err := InProcess(context)
-	if err != nil {
-		t.Fatal(err)
-	}
-	InstallUserRoot(context)
-
-	testSetup := Setup{
+	testSetup := &Setup{
+		OwnerName: upspin.UserName(userName),
+		Packing: upspin.EEp256Pack,
+		Transport: upspin.InProcess,
 		Tree: Tree{
 			N("Dir1/", ""),
 			N("Dir1/file1.txt", "yo! file1"),
@@ -33,13 +23,13 @@ func TestInProcess(t *testing.T) {
 		},
 	}
 
-	err = MakeTree(client, userName, testSetup)
+	env, err := New(testSetup)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Now check the tree was setup correctly
-	de, err := context.Directory.Glob(userName + "/*")
+	de, err := env.Context.Directory.Glob(userName + "/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +42,7 @@ func TestInProcess(t *testing.T) {
 			t.Errorf("Expected entry %s, got %s", expectedDirs[i], de[i].Name)
 		}
 	}
-	data, err := client.Get(upspin.PathName(userName + "/Dir2/file2.txt"))
+	data, err := env.Client.Get(upspin.PathName(userName + "/Dir2/file2.txt"))
 	if err != nil {
 		t.Fatal(err)
 	}

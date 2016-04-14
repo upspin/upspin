@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/test/testsetup"
+	"upspin.googlesource.com/upspin.git/test/testenv"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
@@ -17,54 +17,36 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
-func TestAll(t *testing.T) {
-	testAllInProcess(t)
-}
-
-func testAllInProcess(t *testing.T) {
+func TestAllInProcess(t *testing.T) {
 	for _, packing := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEp256Pack, upspin.EEp521Pack} {
-		setup := newSetup(t, packing)
-		setup.runAllTests(t)
+		env := newEnv(t, packing)
+		runAllTests(t, env)
 	}
-}
-
-// Setup captures the configuration for a test run.
-type Setup struct {
-	context *upspin.Context
-	client  upspin.Client
-	packing upspin.Packing
-}
-
-// newSetup allocates and configures a setup for a test run using a packing.
-func newSetup(t *testing.T, packing upspin.Packing) *Setup {
-	log.Printf("===== Using packing: %d", packing)
-	s := &Setup{
-		packing: packing,
-	}
-	return s
 }
 
 var userNameCounter = 0
 
-// newUser installs a new, previously unseen user. This makes it easy for each test to
-// have a private space.
-func (s *Setup) newUser(t *testing.T) {
+// newEnv configures a test environment using a packing.
+func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
+	log.Printf("===== Using packing: %d", packing)
+
 	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 	userNameCounter++
-	var err error
-	s.context, err = testsetup.NewContextForUser(userName, s.packing)
+
+	s := &testenv.Setup{
+		OwnerName: userName,
+		Transport: upspin.InProcess,
+		Packing: packing,
+	}
+	env, err := testenv.New(s)
 	if err != nil {
 		t.Fatal(err)
 	}
-	s.client, err = testsetup.InProcess(s.context)
-	if err != nil {
-		t.Fatal(err)
-	}
-	testsetup.InstallUserRoot(s.context)
+	return env
 }
 
-func (s *Setup) setupFileIO(fileName upspin.PathName, max int, t *testing.T) (upspin.File, []byte) {
-	f, err := s.client.Create(fileName)
+func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing.T) (upspin.File, []byte) {
+	f, err := env.Client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
 	}
@@ -77,21 +59,22 @@ func (s *Setup) setupFileIO(fileName upspin.PathName, max int, t *testing.T) (up
 	return f, data
 }
 
-func (s *Setup) runAllTests(t *testing.T) {
-	s.TestPutGetTopLevelFile(t)
-	s.TestFileSequentialAccess(t)
+func runAllTests(t *testing.T, env *testenv.Env) {
+	testPutGetTopLevelFile(t, env)
+	testFileSequentialAccess(t, env)
 }
 
-func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
-	s.newUser(t)
+func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {
+	client := env.Client
+	userName := env.Setup.OwnerName
 
-	fileName := upspin.PathName(s.context.UserName + "/" + "file")
+	fileName := upspin.PathName(userName + "/" + "file")
 	const text = "hello sailor"
-	_, err := s.client.Put(fileName, []byte(text))
+	_, err := client.Put(fileName, []byte(text))
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
-	data, err := s.client.Get(fileName)
+	data, err := client.Get(fileName)
 	if err != nil {
 		t.Fatal("get file:", err)
 	}
@@ -100,12 +83,13 @@ func (s *Setup) TestPutGetTopLevelFile(t *testing.T) {
 	}
 }
 
-func (s *Setup) TestFileSequentialAccess(t *testing.T) {
-	s.newUser(t)
+func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
+	client := env.Client
+	userName := env.Setup.OwnerName
 
 	const Max = 100 * 1000 // Must be > 100.
-	fileName := upspin.PathName(s.context.UserName + "/" + "file")
-	f, data := s.setupFileIO(fileName, Max, t)
+	fileName := upspin.PathName(userName + "/" + "file")
+	f, data := setupFileIO(fileName, Max, env, t)
 
 	// Write the file in randomly sized chunks until it's full.
 	for offset, length := 0, 0; offset < Max; offset += length {
@@ -128,7 +112,7 @@ func (s *Setup) TestFileSequentialAccess(t *testing.T) {
 	}
 
 	// Now read it back with a similar scan.
-	f, err = s.client.Open(fileName)
+	f, err = client.Open(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
