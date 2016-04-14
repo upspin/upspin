@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6bd4aa7d_faf1e8b3",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-14T20:37:09Z",
+      "side": 1,
+      "message": "I was hoping the default value (false) would be what most people want (to delete). But the call to Exit() is not mandatory and people might forget so, sure, why not. Done.",
+      "parentUuid": "6bd4aa7d_a4163b2a",
+      "revId": "86d98ae7adb8cc25bca31e63a0afe845c6bed1ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bd4aa7d_243d2ba1",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 2
