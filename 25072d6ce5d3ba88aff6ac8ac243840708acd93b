@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bd4aa7d_c96388e7",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "call it DeleteAll",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_899b502d",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "call it DeleteAll",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_89a99055",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "It would be nice if at some point we could mix, but this is ok for now. Maybe a TODO?\n\nIt would be easy if Transport was a slice that must have either 1 or 3 entries. If 1, it applies to all; if 3, it is User Directory Store, maybe with index constants to help",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_e9d00ccd",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "indicates\n\nwhat happens if it\u0027s false? what would it do?",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_098760d7",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "it should be called E for Entry",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_e98bece0",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "indicates",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_298ea4f0",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "this is confusing and not a specification",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bd4aa7d_e962cce0",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-14T17:43:13Z",
+      "side": 1,
+      "message": "inProcess here and on line 200",
+      "revId": "25072d6ce5d3ba88aff6ac8ac243840708acd93b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
