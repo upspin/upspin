@@ -15,7 +15,7 @@ import (
 
 // root is the user's directory root. It contains server annotations for performance and correctness.
 type root struct {
-	dirEntry    *upspin.DirEntry
+	dirEntry    upspin.DirEntry
 	accessFiles accessFileDB
 }
 
@@ -29,13 +29,13 @@ func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
 
 	// Is it in cache?
 	if r, found := d.rootCache.Get(user); found {
-		rootEntry, ok := r.(*root) // Can't fail, but we check anyway to be abundantly safe.
+		rootEntry, ok := r.(root) // Can't fail, but we check anyway to be abundantly safe.
 		if !ok {
 			err := newDirError(op, userRootPath, "user root cache fubar")
 			logErr.Printf("WARN: %s", err)
 			return nil, err
 		}
-		return rootEntry, nil
+		return &rootEntry, nil
 	}
 	// Not in cache. Go fetch and parse it.
 	buf, err := d.getCloudBytes(userRootPath)
@@ -47,7 +47,7 @@ func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
 		return nil, newDirError(op, userRootPath, err.Error())
 	}
 	// Put it in the cache.
-	d.rootCache.Add(user, root)
+	d.rootCache.Add(user, *root)
 	return root, nil
 }
 
@@ -56,7 +56,7 @@ func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
 	const op = "putRoot"
 
 	// Put it in the root cache.
-	d.rootCache.Add(user, root)
+	d.rootCache.Add(user, *root)
 
 	userRootPath := upspin.PathName(user)
 
@@ -96,7 +96,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter,
 	}
 	// Store the entry.
 	root := &root{
-		dirEntry:    dirEntry,
+		dirEntry:    *dirEntry,
 		accessFiles: make(accessFileDB),
 	}
 	// We make up an empty access file to use in the default case (user has not created any Access files).
@@ -124,7 +124,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter,
 // Fields are exported so JSON can marshal and unmarshal them.
 type savedRoot struct {
 	// DirEntry is the dir entry.
-	DirEntry *upspin.DirEntry
+	DirEntry upspin.DirEntry
 
 	// AccessFiles is an accessFileDB with delayed JSON parsing.
 	AccessFiles map[upspin.PathName]string

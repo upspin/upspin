@@ -17,7 +17,8 @@ var (
 
 func setup(t *testing.T) (upspin.User, *upspin.Context) {
 	c := &upspin.Context{
-		Packing: upspin.DebugPack,
+		Packing:  upspin.DebugPack,
+		UserName: userName,
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
