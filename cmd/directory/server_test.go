@@ -65,6 +65,11 @@ var (
 		},
 		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
+	// This are not real keys. Just *valid* keys so authClient does not complain.
+	serverKeys = upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
+		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
+	}
 )
 
 func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
@@ -554,12 +559,6 @@ func TestPutAccessFile(t *testing.T) {
 		parentDir      = userName + "/subdir"
 		accessPath     = parentDir + "/Access"
 		accessContents = "r: mom@me.com\nl: bro@me.com"
-
-		// This are not real keys. Just *valid* keys so authClient does not complain.
-		serverKeys = upspin.KeyPair{
-			Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
-			Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
-		}
 	)
 
 	// The DirEntry we're trying to Put, converted to JSON.
@@ -632,6 +631,88 @@ func TestPutAccessFile(t *testing.T) {
 	if !bytes.Equal(egcp.PutContents[2], expectedRootJSON) {
 		t.Errorf("Expected new root %s, got %s", expectedRootJSON, egcp.PutContents[2])
 	}
+}
+
+func TestGroupAccessFile(t *testing.T) {
+	// There's an access file that gives rights to a Group called family, which contains one user.
+	const broUserName = "bro@family.com"
+	newRoot := userRoot
+	newRoot.accessFiles = make(accessFileDB)
+	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "r,l,w,c: family, "+userName)
+	rootJSON := toRootJSON(t, &newRoot)
+
+	refOfGroupFile := "sha-256 of Group/family"
+	groupDir := upspin.DirEntry{
+		Name: upspin.PathName(userName + "/Group/family"),
+		Location: upspin.Location{
+			Reference: upspin.Reference(refOfGroupFile),
+			Endpoint:  dir.Location.Endpoint, // Same endpoint as the dir entry itself.
+		},
+	}
+	groupDirJSON := toJSON(t, groupDir)
+
+	groupParentDir := upspin.DirEntry{
+		Name: upspin.PathName(userName + "/Group"),
+		Metadata: upspin.Metadata{
+			IsDir: true,
+		},
+	}
+	groupParentDirJSON := toJSON(t, &groupParentDir)
+
+	// newGroupDir is where the new group file will go when the user puts it. Just the reference changes.
+	newRefOfGroupFile := "new sha-256 of newly-put Group/family"
+	newGroupDir := groupDir
+	newGroupDir.Location.Reference = upspin.Reference(newRefOfGroupFile)
+	newGroupDirJSON := toJSON(t, &newGroupDir)
+
+	contentsOfFamilyGroup := broUserName
+	newContentsOfFamilyGroup := "sister@family.com" // bro@family.com is dropped!
+
+	// We'll now attempt to have broUserName read a file under userName's tree.
+	dirJSON := toJSON(t, dir) // dir is the dirEntry of the file that broUserName will attempt to read
+
+	// Expected success (that is, dir.Get returns the dirJSON entry)
+	resp := nettest.NewExpectingResponseWriter(string(dirJSON))
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/get?pathname="+pathName, nil)
+
+	// Internally, we look up the root, the Group file and finally the pathName requested. Later, a new group file is
+	// put so we lookup its parent and finally we retrieve the new group entry.
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{userName, userName + "/Group/family", pathName, userName + "/Group", userName + "/Group/family"},
+		Data: [][]byte{rootJSON, groupDirJSON, dirJSON, groupParentDirJSON, newGroupDirJSON},
+	}
+
+	// Setup the directory's store client to return the contents of the Group file.
+	reqStore1 := nettest.NewRequest(t, netutil.Get, "https://store-server.com/get?ref="+refOfGroupFile, nil)
+	respStore1 := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(contentsOfFamilyGroup))
+	reqStore2 := nettest.NewRequest(t, netutil.Get, "https://store-server.com/get?ref="+newRefOfGroupFile, nil)
+	respStore2 := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(newContentsOfFamilyGroup))
+
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore1, respStore2}, []*http.Request{reqStore1, reqStore2})
+	f := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
+	storeClient := newStoreClient(authClient)
+
+	// Create a session for broUserName
+	session := testauth.NewSessionForTesting(broUserName, false, nil)
+	ds := newDirServer(egcp, storeClient)
+	ds.getHandler(session, resp, req)
+
+	// Now Put a new Group with new contents that does not include broUserName and check that if we fetch the file
+	// again with access will be denied, because the new definition got picked up (after first being invalidated).
+
+	groupReq := nettest.NewRequest(t, netutil.Post, "http://localhost:8081/put", newGroupDirJSON)
+	resp = nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	ds.dirHandler(dummySess, resp, groupReq) // This is the owner of the file putting the new group file.
+	resp.Verify(t)
+
+	// Expected permission denied this time.
+	resp = nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: test@foo.com/mydir/myfile.txt: permission denied"}`)
+	req = nettest.NewRequest(t, netutil.Get, "http://localhost:8081/get?pathname="+pathName, nil)
+
+	ds.getHandler(session, resp, req) // same session: for broUserName
+	resp.Verify(t)
+	mock.Verify(t)
 }
 
 func TestMarshalRoot(t *testing.T) {
