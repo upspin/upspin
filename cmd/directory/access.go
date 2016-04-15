@@ -4,7 +4,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/path"
@@ -71,11 +70,43 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 
 // checkRights is a convenience function that applies the Can method of the access entry given using the user, right and path provided.
 func (d *dirServer) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access) (bool, error) {
-	can, morePaths, err := acc.Can(user, right, pathName)
-	if err == access.ErrNeedGroup {
-		// TODO: fetch groups.
-		return false, fmt.Errorf("need more groups: %+v TBD", morePaths)
+	var groupErr error
+	for {
+		can, morePaths, err := acc.Can(user, right, pathName)
+		if err == access.ErrNeedGroup {
+			for _, g := range morePaths {
+				err = d.addGroup(g, acc)
+				if err != nil {
+					if groupErr == nil {
+						groupErr = err
+					}
+				}
+			}
+			if groupErr != nil {
+				logErr.Printf("Error checking access: %s", groupErr)
+				return false, groupErr
+			}
+			continue // Try acc.Can again
+		}
+		logMsg.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
+		return can, err
 	}
-	logMsg.Printf("Access check: user %s attempting to %v file %s: allowed=%v", user, right, pathName, can)
-	return can, nil
+}
+
+// addGroup looks up a Group name, fetches its contents if found and calls access.AddGroup with the contents.
+// It is currently limited to group files that belong to this directory service (that is, it does not attempt to dial
+// another directory service to find it).
+func (d *dirServer) addGroup(pathName upspin.PathName, acc *access.Access) error {
+	dirEntry, err := d.getNonRoot(pathName)
+	if err != nil {
+		return err
+	}
+	buf, err := d.storeClient.Get(&dirEntry.Location)
+	if err != nil {
+		// This will happen if we're not the Endpoint for the Location.
+		// TODO: figure out our location -- this is subtle given our IP address may not match our
+		// public DNS record and there might be multiple addresses bound to this server.
+		return err
+	}
+	return access.AddGroup(pathName, buf)
 }

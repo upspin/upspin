@@ -368,8 +368,7 @@ func IsGroupFile(pathName upspin.PathName) bool {
 // AddGroup installs a group with the specified name and textual contents,
 // which should have been read from the group file with that name.
 // If the group is already known, its definition is replaced.
-// TODO: This doesn't have to be a method as it affects global state. Leave it this way?
-func (a *Access) AddGroup(pathName upspin.PathName, contents []byte) error {
+func AddGroup(pathName upspin.PathName, contents []byte) error {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return err
@@ -381,6 +380,21 @@ func (a *Access) AddGroup(pathName upspin.PathName, contents []byte) error {
 	mu.Lock()
 	groups[parsed.Path()] = group
 	mu.Unlock()
+	return nil
+}
+
+// RemoveGroup undoes the installation ofa group added by AddGroup.
+func RemoveGroup(pathName upspin.PathName) error {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return err
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if _, found := groups[parsed.Path()]; !found {
+		return errors.New("unknown group")
+	}
+	delete(groups, parsed.Path())
 	return nil
 }
 
