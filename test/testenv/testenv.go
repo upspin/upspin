@@ -9,12 +9,19 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
+	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/pack/ee"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
+
+	// Imported here because we offer this option to users of testenv.
+	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
+	// Imported here because we offer this option to users of testenv.
+	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
+	"fmt"
 )
 
 // Entry is an entry in the Upspin namespace.
@@ -125,18 +132,20 @@ func E(pathName string, contents string) Entry {
 	}
 }
 
-// Exit indicates the end of the test environment. If LeaveTreeAtExit is false, an attempt is made
+// Exit indicates the end of the test environment. If Setup.DeleteTreeAtExit is true, an attempt is made
 // to clean the test environment.
-func (e *Env) Exit() {
+func (e *Env) Exit() error {
 	if e.Setup.DeleteTreeAtExit {
 		switch e.Setup.Transport {
 		case upspin.GCP:
-		// TODO: more complicated, but possible. Next CL.
+			return e.deleteGCPRootDir()
 		case upspin.InProcess:
 			e.Context.Directory.(*testdir.Service).DeleteAll()
 			e.Context.Store.(*teststore.Service).DeleteAll()
+			return nil
 		}
 	}
+	return nil
 }
 
 func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (*upspin.Context, upspin.Client, error) {
@@ -153,11 +162,14 @@ func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing ups
 	var client upspin.Client
 	switch transport {
 	case upspin.GCP:
-		client, err = gcp(context)
+		client, err = gcpClient(context)
 	case upspin.InProcess:
-		client, err = inProcess(context)
+		client, err = inProcessClient(context)
 	default:
 		return nil, nil, errors.New("invalid transport")
+	}
+	if err != nil {
+		return nil, nil, err
 	}
 	err = installUserRoot(context)
 	if err != nil {
@@ -174,9 +186,9 @@ func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin
 	return client, err
 }
 
-// gcp returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
+// gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
 // with a user and keys.
-func gcp(context *upspin.Context) (upspin.Client, error) {
+func gcpClient(context *upspin.Context) (upspin.Client, error) {
 	// Use a test GCP Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -200,9 +212,9 @@ func gcp(context *upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// inProcess returns a Client pointing to in-process instances given a Context partially initialized
+// inProcessClient returns a Client pointing to in-process instances given a Context partially initialized
 // with a user and keys.
-func inProcess(context *upspin.Context) (upspin.Client, error) {
+func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 	// Use an in-process Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -276,7 +288,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 func installUserRoot(context *upspin.Context) error {
 	testUser, ok := context.User.(*testuser.Service)
 	if !ok {
-		return errors.New("user service must be the in-process instance")
+		return errors.New("installUserRoot: user service must be the in-process instance")
 	}
 	testUser.AddRoot(context.UserName, context.Directory.Endpoint())
 	return nil
@@ -306,4 +318,25 @@ func bindEndpoints(context *upspin.Context, store, dir, user upspin.Endpoint) er
 		return err
 	}
 	return nil
+}
+
+// deleteGCPTestEnv deletes the test environment from GCP. This is a hack that uses an
+// internal API to erase test data without checking permissions.
+// TODO(edpin): write an API on the test instance to wipe a named root if the user name is authenticated and matches the owner name.
+func (e *Env) deleteGCPRootDir() error {
+	// TODO: these constants are a hack and must be in sync with configuration flags on the test instances. Fix it.
+	gcpHandler := gcp.New("upspin", "upspin-test-dir", gcp.BucketOwnerFullCtrl)
+	gcpHandler.Connect()
+	files, err := gcpHandler.ListPrefix(string(e.Setup.OwnerName), 10) // depth of 10 should be enough. TODO: count instead.
+	if err != nil {
+		return fmt.Errorf("Error listing GCP: %s", err)
+	}
+	var firstErr error
+	for _, file := range files {
+		err = gcpHandler.Delete(file)
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
 }
