@@ -261,7 +261,7 @@ func TestHasAccessWithGroups(t *testing.T) {
 			if loadedGroup {
 				t.Fatal("group already loaded")
 			}
-			err = a.AddGroup(groupName, []byte(groupText))
+			err = AddGroup(groupName, []byte(groupText))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -296,6 +296,19 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 	// The owner of a group is a member of the group.
 	check("me@here.com", Delete, "me@here.com/foo/bar", true)
+
+	err = RemoveGroup("me@here.com/Group/family")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Sister can't read anymore and family group is needed.
+	ok, missingGroups, err := a.Can("sister@me.com", Read, "me@here.com/foo/bar")
+	if ok {
+		t.Errorf("Expected no permission")
+	}
+	if len(missingGroups) != 1 {
+		t.Fatalf("Expected one missing group, got %d", len(missingGroups))
+	}
 }
 
 func TestParseEmptyFile(t *testing.T) {
