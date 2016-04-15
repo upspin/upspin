@@ -47,7 +47,7 @@ var (
 			Sequence: 17,
 			Size:     uint64(len(fileContents)),
 			Time:     now,
-			PackData: packData,
+			Packdata: packData,
 		},
 	}
 	optsMeta = upspin.Metadata{
@@ -81,7 +81,7 @@ func TestMkdir(t *testing.T) {
 		Time:     42,
 		Size:     0,
 		Sequence: 0,
-		PackData: nil,
+		Packdata: nil,
 	}
 	// Mkdir will first Lookup the parent, then perform the Mkdir itself
 	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
@@ -191,9 +191,9 @@ func dirEntryEquals(a, b *upspin.DirEntry) bool {
 		log.Println("Sequences differ")
 		return false
 	}
-	for i, k := range a.Metadata.PackData {
-		if k != b.Metadata.PackData[i] {
-			log.Println("PackData differ")
+	for i, k := range a.Metadata.Packdata {
+		if k != b.Metadata.Packdata[i] {
+			log.Println("Packdata differ")
 			return false
 		}
 	}
@@ -219,7 +219,7 @@ func TestPutError(t *testing.T) {
 	de := upspin.DirEntry{
 		Name: upspin.PathName(pathName),
 		Metadata: upspin.Metadata{
-			PackData: []byte("Packed metadata"),
+			Packdata: []byte("Packed metadata"),
 		},
 	}
 	err := d.Put(&de) // No location defined.
@@ -237,7 +237,7 @@ func TestPutBadMeta(t *testing.T) {
 	de := &upspin.DirEntry{
 		Name: upspin.PathName(pathName),
 		Metadata: upspin.Metadata{
-			PackData: []byte(""),
+			Packdata: []byte(""),
 		},
 	}
 	err := d.Put(de) // No Location specified.
@@ -264,7 +264,7 @@ func TestPut(t *testing.T) {
 		Metadata: optsMeta,
 		Location: location,
 	}
-	de.Metadata.PackData = packData
+	de.Metadata.Packdata = packData
 
 	// Issue the put request
 	err := d.Put(de)

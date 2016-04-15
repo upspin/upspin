@@ -19,7 +19,7 @@ var dirEnt = DirEntry{
 		Sequence: 1234,
 		Size:     12345,
 		Time:     123456,
-		PackData: []byte{1, 2, 3},
+		Packdata: []byte{1, 2, 3},
 	},
 }
 

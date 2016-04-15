@@ -196,7 +196,7 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 	// Check that we didn't kid ourselves into wrapping for mia without a key.
 	p, ok := packer.(eep256)
 	if ok {
-		_, wrap, err := p.pdUnmarshal(d.Metadata.PackData, pathName)
+		_, wrap, err := p.pdUnmarshal(d.Metadata.Packdata, pathName)
 		if err != nil {
 			t.Fatal(err)
 		}

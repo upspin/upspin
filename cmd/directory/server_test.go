@@ -173,7 +173,7 @@ func TestLookupRoot(t *testing.T) {
 	// The root converted to JSON.
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"PackData":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname="+userName+"/", nil)
 
@@ -192,7 +192,7 @@ func TestLookup(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	// Non-default Location
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"PackData":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname="+userName+"/", nil)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -214,7 +214,7 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	rootJSON := toRootJSON(t, &newRoot)
 
 	// Default, zero Location.
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"PackData":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?pathname="+userName+"/", nil)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
