@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e82ee08f_9a4eb1b4",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:59:32Z",
+      "side": 1,
+      "message": "Packdata, I think. I haven\u0027t done that on the GCP side yet.",
+      "revId": "926823692489163cea03442801f4f40dc734a751",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
