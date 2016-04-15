@@ -384,6 +384,22 @@ func (a *Access) AddGroup(pathName upspin.PathName, contents []byte) error {
 	return nil
 }
 
+// RemoveGroup removes the specified group name and its contents if the group previously existed.
+// TODO: make AddGroup be a func too since this is better not being a method to avoid having to create an Access instance just for this call.
+func RemoveGroup(pathName upspin.PathName) error {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return err
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if _, found := groups[parsed.Path()]; !found {
+		return errors.New("unknown group")
+	}
+	delete(groups, parsed.Path())
+	return nil
+}
+
 // parseGroup parses a group file but does not install it in the groups map.
 func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err error) {
 	// Temporary. Pre-allocate so it can be reused in the loop, saving allocations.
