@@ -91,7 +91,18 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		Reference: ref,
 	}
 	// Record it.
-	return de.Location, dir.Put(de)
+	err, a := dir.Put(de)
+	if err == nil && len(a.DirEnts) > 0 {
+		// TODO(ehg) if not "Access", warn if a.DirEnts!={de}
+		AddWrap(c.context, a)
+		for d := range a.DirEnts {
+			err, _ = dir.Put(d)
+			if err != nil {
+				break
+			}
+		}
+	}
+	return de.Location, err
 }
 
 // MakeDirectory implements upspin.Client.

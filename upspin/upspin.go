@@ -116,6 +116,11 @@ type Packer interface {
 	// The returned count is the written length of the ciphertext.
 	Pack(context *Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
 
+	// AddWrap, executed by the file owner, extracts dkey from the
+	// packdata, wraps for all the new readers, and updates packdata.
+	// For each element of a.DirEnts, wrap for each element of a.Readers.
+	AddWrap(context *Context, a AddWrap)
+
 	// Unpack takes ciphertext data and stores the cleartext version
 	// in the cleartext slice, which must be large enough, using the
 	// PackData field of the Metadata in the DirEntry to recover
@@ -236,7 +241,11 @@ type Directory interface {
 	// and be directories. The final element, if it exists, must not
 	// be a directory. If something is already stored under the path,
 	// the new location and packdata replace the old.
-	Put(entry *DirEntry) error
+	//
+	// AddWrap is a hint to Client from Directory that the wrapped
+	// keys in the listed DirEntry are not in sync with the listed
+	// UserName with Read rights.
+	Put(entry *DirEntry) (error, AddWrap)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
@@ -276,6 +285,12 @@ type Metadata struct {
 	Size     uint64 // Length of file in bytes.
 	Time     Time   // Time associated with file; might be when it was last written.
 	PackData []byte // Packing-specific metadata stored in directory.
+}
+
+// AddWrap describes work needed to bring wrapped keys in sync with Read rights.
+type AddWrap struct {
+	DirEnts []*DirEntry
+	Readers []UserName
 }
 
 // Store service.
