@@ -42,8 +42,8 @@ var (
 type dirServer struct {
 	cloudClient gcp.GCP // handle for GCP bucket g-upspin-directory
 	storeClient *storeClient
-	dirCache    *cache.LRU // caches <upspin.PathName, *upspin.DirEntry>. It is thread safe.
-	rootCache   *cache.LRU // caches <upspin.UserName, *root>. It is thread safe.
+	dirCache    *cache.LRU // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
+	rootCache   *cache.LRU // caches <upspin.UserName, root>. It is thread safe.
 }
 
 type dirError struct {
@@ -249,7 +249,7 @@ func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http
 	} else {
 		root, err := d.getRoot(parsedPath.User)
 		if err == nil {
-			dirEntry = root.dirEntry
+			dirEntry = &root.dirEntry
 		}
 	}
 	if err != nil {
