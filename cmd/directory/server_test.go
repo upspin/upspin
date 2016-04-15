@@ -50,7 +50,7 @@ var (
 	}
 	defaultAccess, _ = access.New(rootAccessFile)
 	userRoot         = root{
-		dirEntry: &upspin.DirEntry{
+		dirEntry: upspin.DirEntry{
 			Name: rootPath,
 			Location: upspin.Location{
 				// Reference is empty for the root.
@@ -248,7 +248,7 @@ func TestGlobComplex(t *testing.T) {
 	acc1 := makeAccess(t, "f@b.co/Access", "l: "+userName) // current user has list access
 	acc2 := makeAccess(t, "f@b.co/subdir3/Access", "")     // No one has access
 	root := &root{
-		dirEntry: &upspin.DirEntry{
+		dirEntry: upspin.DirEntry{
 			Name: "f@b.co/",
 		},
 		accessFiles: map[upspin.PathName]*access.Access{"f@b.co/Access": acc1, "f@b.co/subdir3/Access": acc2},
@@ -725,7 +725,7 @@ func TestMarshalRoot(t *testing.T) {
 	acc1 := makeAccess(t, accessRoot, "r: bob@foo.com\nw: marie@curie.fr")
 	acc2 := makeAccess(t, accessRestricted, "l: gandhi@peace.in")
 	root := &root{
-		dirEntry: &upspin.DirEntry{
+		dirEntry: upspin.DirEntry{
 			Name: upspin.PathName("me@here.com/"),
 			Metadata: upspin.Metadata{
 				IsDir: true,
