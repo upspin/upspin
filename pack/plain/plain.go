@@ -55,8 +55,8 @@ func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *
 		return -1
 	}
 	// Add packing to packmeta if not already there
-	if meta != nil && len(meta.PackData) == 0 {
-		meta.PackData = []byte{byte(upspin.PlainPack)}
+	if meta != nil && len(meta.Packdata) == 0 {
+		meta.Packdata = []byte{byte(upspin.PlainPack)}
 	}
 	return len(cleartext)
 }

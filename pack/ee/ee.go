@@ -203,7 +203,7 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 	wrap = wrap[:nwrap]
 
 	// Serialize packer metadata.
-	err = c.pdMarshal(&meta.PackData, sig, wrap)
+	err = c.pdMarshal(&meta.Packdata, sig, wrap)
 	if err != nil {
 		return 0, err
 	}
@@ -218,7 +218,7 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 	}
 	cleartext = cleartext[:len(ciphertext)]
 	dkey := make([]byte, aesKeyLen)
-	sig, wrap, err := c.pdUnmarshal(meta.PackData, pathname)
+	sig, wrap, err := c.pdUnmarshal(meta.Packdata, pathname)
 	if err != nil {
 		return 0, err
 	}

@@ -1,6 +1,6 @@
 // Package debugpack contains a trivial implementation of the Packer interface useful in tests.
-// It encrypts the data with a randomly-chosen byte that is recorded in the PackData.
-// It does a trivial digital signature of the data and stores that in the PackData as well.
+// It encrypts the data with a randomly-chosen byte that is recorded in the Packdata.
+// It does a trivial digital signature of the data and stores that in the Packdata as well.
 // It claims the upspin.DebugPack Packing code.
 package debugpack
 
@@ -52,33 +52,33 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 
 // Message is {N, path[N], data}. N is unsigned varint-encoded.
 // Metadata is {DebugPack, cryptByte, signatureByte}.
-// The next two functions update the metadata's PackData.
+// The next two functions update the metadata's Packdata.
 
 func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
-	switch len(meta.PackData) {
+	switch len(meta.Packdata) {
 	case 1:
 		if !packing {
 			// cryptByte must be present to unpack.
 			return 0, errBadMetadata
 		}
-		// Add the crypt byte to the PackData.
+		// Add the crypt byte to the Packdata.
 		cb := byte(rand.Int31())
-		meta.PackData = append(meta.PackData, cb)
+		meta.Packdata = append(meta.Packdata, cb)
 		fallthrough
 	case 2, 3:
-		return meta.PackData[1], nil
+		return meta.Packdata[1], nil
 	default:
 		return 0, errBadMetadata
 	}
 }
 
 func addSignature(meta *upspin.Metadata, signature byte) error {
-	switch len(meta.PackData) {
+	switch len(meta.Packdata) {
 	case 2:
-		meta.PackData = append(meta.PackData, signature)
+		meta.Packdata = append(meta.Packdata, signature)
 		return nil
 	case 3:
-		meta.PackData[2] = signature
+		meta.Packdata[2] = signature
 		return nil
 	default:
 		return errBadMetadata
@@ -184,7 +184,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 		cleartext[i] = c
 	}
 	signature := sign(cleartext[:i], context.KeyPair.Private)
-	if len(meta.PackData) < 3 || signature != meta.PackData[2] {
+	if len(meta.Packdata) < 3 || signature != meta.Packdata[2] {
 		return 0, errBadSignature
 	}
 	return i, nil
@@ -196,8 +196,8 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *u
 		return -1
 	}
 	// Add packing to packmeta if not already there
-	if meta != nil && len(meta.PackData) == 0 {
-		meta.PackData = []byte{byte(upspin.DebugPack)}
+	if meta != nil && len(meta.Packdata) == 0 {
+		meta.Packdata = []byte{byte(upspin.DebugPack)}
 	}
 	_, err := cryptByte(meta, true)
 	if err != nil {

@@ -80,11 +80,11 @@ type Factotum interface {
 	PackingString() string
 }
 
-// PackData stores the encoded information used to pack the data in an
+// Packdata stores the encoded information used to pack the data in an
 // item, such decryption keys. The first byte identifies the Packing
 // used to store the information; the rest of the slice is the data
 // itself.
-type PackData []byte
+type Packdata []byte
 
 // A Packing identifies the technique for turning the data pointed to by
 // a key into the user's data. This may involve checksum verification,
@@ -106,8 +106,8 @@ type Packer interface {
 	// Pack takes cleartext data and encodes it
 	// into the ciphertext slice. The ciphertext and cleartext slices
 	// must not overlap. Pack might update the entry's Metadata, which
-	// must not be nil but might have a nil PackData field. If the
-	// PackData has length>0, the first byte must be the correct value
+	// must not be nil but might have a nil Packdata field. If the
+	// Packdata has length>0, the first byte must be the correct value
 	// of Packing. Upon return the Packdata will be updated with the
 	// correct information to unpack the ciphertext.
 	// The ciphertext slice must be large enough to hold  the result;
@@ -118,13 +118,13 @@ type Packer interface {
 
 	// Unpack takes ciphertext data and stores the cleartext version
 	// in the cleartext slice, which must be large enough, using the
-	// PackData field of the Metadata in the DirEntry to recover
+	// Packdata field of the Metadata in the DirEntry to recover
 	// keys and other necessary information.
 	// If appropriate, the result is verified as correct according
 	// to items such as the path name and time stamp in the Metadata.
 	// The ciphertext and cleartext slices must not overlap.
 	// Unpack might update the Metadata field of the DirEntry using
-	// data recovered from the PackData. The incoming PackData must
+	// data recovered from the Packdata. The incoming Packdata must
 	// must have the correct Packing value already present in its
 	// first byte.
 	// Unpack returns the number of bytes written to the slice.
@@ -132,8 +132,8 @@ type Packer interface {
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
-	// PackLen might update the entry's Metadata.PackData field, which
-	// must not be nil but might have a nil PackData field. If it has
+	// PackLen might update the entry's Metadata.Packdata field, which
+	// must not be nil but might have a nil Packdata field. If it has
 	// length greather than 0,  the first byte must be the correct
 	// value of Packing.
 	// PackLen returns -1 if there is an error.
@@ -142,7 +142,7 @@ type Packer interface {
 	// UnpackLen returns an upper bound on the number of bytes
 	// required to store the unpacked cleartext.  UnpackLen might
 	// update the entry's Metadata, which must have the correct Packing
-	// value already present in PackData[0].
+	// value already present in Packdata[0].
 	// UnpackLen eturns -1 if there is an error.
 	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
 }
@@ -275,7 +275,7 @@ type Metadata struct {
 	Sequence int64  // The sequence (version) number of the item.
 	Size     uint64 // Length of file in bytes.
 	Time     Time   // Time associated with file; might be when it was last written.
-	PackData []byte // Packing-specific metadata stored in directory.
+	Packdata []byte // Packing-specific metadata stored in directory.
 }
 
 // Store service.

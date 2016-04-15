@@ -80,7 +80,7 @@ func setup(userName upspin.UserName) {
 	}
 }
 
-func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin.PackData) {
+func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin.Packdata) {
 	packer := pack.Lookup(context.Packing)
 	if packer == nil {
 		t.Fatalf("Packer is nil for packing %d", context.Packing)
@@ -96,7 +96,7 @@ func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin
 	if err != nil {
 		t.Fatal(err)
 	}
-	return cipher[:n], entry.Metadata.PackData
+	return cipher[:n], entry.Metadata.Packdata
 }
 
 func storeData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry {
@@ -112,7 +112,7 @@ func storeData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry
 			IsDir:    false,
 			Size:     uint64(len(data)),
 			Time:     upspin.Now(),
-			PackData: []byte{byte(upspin.DebugPack)},
+			Packdata: []byte{byte(upspin.DebugPack)},
 		},
 	}
 	cipher, packdata := packData(t, data, entry)
@@ -124,7 +124,7 @@ func storeData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry
 		Endpoint:  context.Store.Endpoint(),
 		Reference: ref,
 	}
-	entry.Metadata.PackData = packdata
+	entry.Metadata.Packdata = packdata
 	return entry
 }
 
