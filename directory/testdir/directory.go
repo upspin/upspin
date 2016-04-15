@@ -281,11 +281,11 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(entry *upspin.DirEntry) error {
+func (s *Service) Put(entry *upspin.DirEntry) (error, upspin.AddWrap) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	return s.put("Put", false, entry)
+	return s.put("Put", false, entry), upspin.AddWrap{nil, nil}
 }
 
 // put is the underlying implementation of Put and MakeDirectory.

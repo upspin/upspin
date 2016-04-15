@@ -222,7 +222,7 @@ func TestPutError(t *testing.T) {
 			PackData: []byte("Packed metadata"),
 		},
 	}
-	err := d.Put(&de) // No location defined.
+	err, _ := d.Put(&de) // No location defined.
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -240,7 +240,7 @@ func TestPutBadMeta(t *testing.T) {
 			PackData: []byte(""),
 		},
 	}
-	err := d.Put(de) // No Location specified.
+	err, _ := d.Put(de) // No Location specified.
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
@@ -267,7 +267,7 @@ func TestPut(t *testing.T) {
 	de.Metadata.PackData = packData
 
 	// Issue the put request
-	err := d.Put(de)
+	err, _ := d.Put(de)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}

@@ -27,6 +27,9 @@ func (plainPack) String() string {
 	return "plain"
 }
 
+func (plainPack) AddWrap(*upspin.Context, upspin.AddWrap) {
+}
+
 func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {

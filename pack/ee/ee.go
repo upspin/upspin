@@ -130,28 +130,19 @@ func (c common) String() string {
 }
 
 func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
+	packer := pack.Lookup(ctx.Packing)
 	if err := pack.CheckPackMeta(c, &d.Metadata); err != nil {
 		return 0, err
 	}
-	return c.eePack(ctx, ciphertext, cleartext, &d.Metadata, d.Name)
-}
-
-func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
-	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
-		return 0, err
-	}
-	return c.eeUnpack(ctx, cleartext, ciphertext, &d.Metadata, d.Name)
-}
-
-func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
-	packer := pack.Lookup(ctx.Packing)
+	meta := &d.Metadata
+	pathname := d.Name
 
 	// Pick fresh file encryption key, and create ciphertext.
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	dkey := make([]byte, aesKeyLen)
+	dkey := make([]byte, aesKeyLen) // TODO(ehg)   var dkey []byte
 	_, err := rand.Read(dkey)
 	if err != nil {
 		return 0, err
@@ -170,55 +161,39 @@ func (c common) eePack(ctx *upspin.Context, ciphertext, cleartext []byte, meta *
 		return 0, err
 	}
 
-	// Wrap for the readers.  The writer of a file is always a reader.
-	usernames := []upspin.UserName{ctx.UserName} // TODO: append a readers list
-	var firstErr error
-	wrap := make([]wrappedKey, len(usernames))
-	nwrap := 0
-	for _, u := range usernames {
-		readerRawPublicKey, err := publicKey(ctx, u, packer)
-		if err != nil {
-			log.Printf("no public key found for user %s: %s", u, err)
-			if firstErr == nil {
-				firstErr = err
-			}
-			continue
-		}
-		readerPublicKey, err := parsePublicKey(readerRawPublicKey, packer)
-		if err != nil {
-			log.Printf("parsing public key for user %s: %s", u, err)
-			if firstErr == nil {
-				firstErr = err
-			}
-			continue
-		}
-		wrap[nwrap], err = c.aesWrap(readerPublicKey, dkey)
-		v := wrap[nwrap].ephemeral
-		log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
-		if err != nil {
-			return 0, err
-		}
-		nwrap++
+	// Wrap for myself;  let AddWrap handle the others.
+	wrap := make([]wrappedKey, 1)
+	p, err := parsePublicKey(ctx.KeyPair.Public, packer)
+	if err != nil {
+		return 0, err
 	}
-	wrap = wrap[:nwrap]
+	wrap[0], err = c.aesWrap(p, dkey)
+	if err != nil {
+		return 0, err
+	}
 
 	// Serialize packer metadata.
 	err = c.pdMarshal(&meta.PackData, sig, wrap)
 	if err != nil {
 		return 0, err
 	}
-	return cipherLen, firstErr
+	return cipherLen, err
 }
 
-func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta *upspin.Metadata, pathname upspin.PathName) (int, error) {
+func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
 	packer := pack.Lookup(ctx.Packing)
+	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
+		return 0, err
+	}
+	meta := &d.Metadata
+	pathname := d.Name
 
 	if len(cleartext) < len(ciphertext) {
 		return 0, errTooShort
 	}
 	cleartext = cleartext[:len(ciphertext)]
 	dkey := make([]byte, aesKeyLen)
-	sig, wrap, err := c.pdUnmarshal(meta.PackData, pathname)
+	sig, wrap, err := c.pdUnmarshal(meta.PackData)
 	if err != nil {
 		return 0, err
 	}
@@ -273,6 +248,64 @@ func (c common) eeUnpack(ctx *upspin.Context, cleartext, ciphertext []byte, meta
 		return c.decrypt(cleartext, ciphertext, dkey)
 	}
 	return 0, errNoWrappedKey
+}
+
+// AddWrap extracts dkey from the packdata, wraps for all the new readers, and updates packdata.
+func (c common) AddWrap(ctx *upspin.Context, a upspin.AddWrap) {
+	packer := pack.Lookup(ctx.Packing)
+
+	// Fetch all the public keys we'll need.
+	pubkey := make([]*ecdsa.PublicKey, len(a.Readers))
+	for i, u := range a.Readers {
+		pubkey[i] = nil
+		readerRawPublicKey, err := publicKey(ctx, u, packer)
+		if err != nil {
+			continue
+		}
+		pubkey[i], err = parsePublicKey(readerRawPublicKey, packer)
+	}
+
+	// Get my own keys ready.
+	mypub, err := parsePublicKey(ctx.KeyPair.Public, packer)
+	if err != nil {
+		log.Printf("cannot parse my own key: %v", err)
+		return // give up
+	}
+	myhash := keyHash(mypub)
+	f := auth.NewFactotum(ctx)
+
+	// For each direntry, wrap for new readers.
+	for _, d := range a.DirEnts {
+		// Extract dkey and existing wrapped keys from packdata.
+		var dkey []byte
+		sig, dwrap, err := c.pdUnmarshal(d.Metadata.PackData)
+		for _, w := range dwrap {
+			if !bytes.Equal(myhash, w.keyHash) {
+				continue
+			}
+			dkey, err = c.aesUnwrap(f, w)
+			if err != nil {
+				log.Printf("dkey unwrap failed: %v", err)
+				return // give up
+			}
+			break
+		}
+		for i, u := range a.Readers {
+			w, err := c.aesWrap(pubkey[i], dkey)
+			v := w.ephemeral
+			log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+			if err != nil {
+				return // give up
+			}
+			dwrap = append(dwrap, w)
+		}
+		dst := make([]byte, len(d.Metadata.PackData)+(1+5*len(a.Readers))*binary.MaxVarintLen64)
+		err = c.pdMarshal(&dst, sig, dwrap)
+		if err != nil {
+			return // give up
+		}
+		d.Metadata.PackData = dst
+	}
 }
 
 func packname(curve elliptic.Curve) string {
@@ -396,7 +429,7 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) 
 	return nil // err impossible for now but the night is young
 }
 
-func (c common) pdUnmarshal(pd []byte, name upspin.PathName) (sig upspin.Signature, wrap []wrappedKey, err error) {
+func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey, err error) {
 	if pd[0] != byte(c.ciphersuite) {
 		return sig0, nil, fmt.Errorf("expected packing %d, got %d", c.ciphersuite, pd[0])
 	}

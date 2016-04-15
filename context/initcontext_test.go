@@ -214,7 +214,7 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	panic("unimplemented")
 }
-func (d *dummyDirectory) Put(entry *upspin.DirEntry) error {
+func (d *dummyDirectory) Put(entry *upspin.DirEntry) (error, upspin.AddWrap) {
 	panic("unimplemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {

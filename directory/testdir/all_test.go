@@ -140,7 +140,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	)
 
 	entry1 := storeData(t, []byte(text), fileName)
-	err := context.Directory.Put(entry1)
+	err, _ := context.Directory.Put(entry1)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -189,7 +189,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err, _ := context.Directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -238,7 +238,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err, _ := context.Directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -304,7 +304,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
 	entry := storeData(t, []byte(text), fileName)
-	err = context.Directory.Put(entry)
+	err, _ = context.Directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -334,7 +334,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	// Now overwrite it.
 	text = "goodnight mother"
 	entry = storeData(t, []byte(text), fileName)
-	err = context.Directory.Put(entry)
+	err, _ = context.Directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -424,7 +424,7 @@ func TestGlob(t *testing.T) {
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
 		entry := storeData(t, []byte(name), name)
-		err := context.Directory.Put(entry)
+		err, _ := context.Directory.Put(entry)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
@@ -472,7 +472,7 @@ func TestSequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err, _ := context.Directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
@@ -488,7 +488,7 @@ func TestSequencing(t *testing.T) {
 	// Now check it updates if we set the sequence correctly.
 	entry := storeData(t, []byte("first seq version"), fileName)
 	entry.Metadata.Sequence = seq
-	err := context.Directory.Put(entry)
+	err, _ := context.Directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -502,7 +502,7 @@ func TestSequencing(t *testing.T) {
 	// Now check it fails if we don't.
 	entry = storeData(t, []byte("second seq version"), fileName)
 	entry.Metadata.Sequence = seq
-	err = context.Directory.Put(entry)
+	err, _ = context.Directory.Put(entry)
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
@@ -524,7 +524,7 @@ func TestRootDirectorySequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err, _ := context.Directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
