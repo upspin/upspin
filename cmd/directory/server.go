@@ -200,7 +200,12 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 			return err
 		}
 	}
-	// TODO: if IsGroup(canonicalPath) must potentially re-parse all Access files.
+	if access.IsGroupFile(canonicalPath) {
+		log.Printf("========== invalidating %s", canonicalPath)
+		// By removing the group we guarantee we won't be using its old definition, if any.
+		// Since we parse groups lazily, this is correct and generally efficient.
+		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group not there, no harm done.
+	}
 
 	return nil
 }
