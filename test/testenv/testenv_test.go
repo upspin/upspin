@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/upspin"
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 )
 
 func TestInProcess(t *testing.T) {

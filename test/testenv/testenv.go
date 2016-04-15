@@ -9,10 +9,8 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
-	"upspin.googlesource.com/upspin.git/directory/testdir"
 	"upspin.googlesource.com/upspin.git/pack/ee"
 	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/store/teststore"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 )
@@ -46,12 +44,15 @@ type Setup struct {
 
 	// Some configuration options follow
 
+	// Verbose indicates whether we should print verbose debug messages.
+	Verbose bool
+
 	// IgnoreExistingDirectories does not report an error if the directories already exist from a previous run.
 	IgnoreExistingDirectories bool
 
-	// DeleteTreeAtExit indicates whether the test environment should delete the tree upon exiting.
-	// If true, the tree is deleted.
-	DeleteTreeAtExit bool
+	// Cleanup, if present, is run at Exit to clean up any test state necessary.
+	// It may return an error, which is returned by Exit.
+	Cleanup func(e *Env) error
 }
 
 // Tree is a full directory tree with path names and their contents.
@@ -67,6 +68,8 @@ type Env struct {
 
 	// Setup contains the original setup options.
 	Setup *Setup
+
+	exitCalled bool
 }
 
 var (
@@ -102,7 +105,9 @@ func New(setup *Setup) (*Env, error) {
 					return nil, err
 				}
 			}
-			log.Printf("Tree: Created dir %s at %v", dir, loc)
+			if setup.Verbose {
+				log.Printf("Tree: Created dir %s at %v", dir, loc)
+			}
 		} else {
 			name := path.Join(upspin.PathName(setup.OwnerName), e.P)
 			loc, err := client.Put(name, []byte(e.C))
@@ -110,10 +115,14 @@ func New(setup *Setup) (*Env, error) {
 				log.Printf("Error creating file %s: %s", name, err)
 				return nil, err
 			}
-			log.Printf("Tree: Created file %s at %v", name, loc)
+			if setup.Verbose {
+				log.Printf("Tree: Created file %s at %v", name, loc)
+			}
 		}
 	}
-	log.Printf("Tree: All entries created.")
+	if setup.Verbose {
+		log.Printf("Tree: All entries created.")
+	}
 	return env, nil
 }
 
@@ -125,18 +134,16 @@ func E(pathName string, contents string) Entry {
 	}
 }
 
-// Exit indicates the end of the test environment. If LeaveTreeAtExit is false, an attempt is made
-// to clean the test environment.
-func (e *Env) Exit() {
-	if e.Setup.DeleteTreeAtExit {
-		switch e.Setup.Transport {
-		case upspin.GCP:
-		// TODO: more complicated, but possible. Next CL.
-		case upspin.InProcess:
-			e.Context.Directory.(*testdir.Service).DeleteAll()
-			e.Context.Store.(*teststore.Service).DeleteAll()
-		}
+// Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
+func (e *Env) Exit() error {
+	if e.exitCalled {
+		return errors.New("exit already called")
 	}
+	e.exitCalled = true
+	if e.Setup.Cleanup != nil {
+		return e.Setup.Cleanup(e)
+	}
+	return nil
 }
 
 func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (*upspin.Context, upspin.Client, error) {
@@ -153,11 +160,14 @@ func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing ups
 	var client upspin.Client
 	switch transport {
 	case upspin.GCP:
-		client, err = gcp(context)
+		client, err = gcpClient(context)
 	case upspin.InProcess:
-		client, err = inProcess(context)
+		client, err = inProcessClient(context)
 	default:
 		return nil, nil, errors.New("invalid transport")
+	}
+	if err != nil {
+		return nil, nil, err
 	}
 	err = installUserRoot(context)
 	if err != nil {
@@ -174,9 +184,9 @@ func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin
 	return client, err
 }
 
-// gcp returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
+// gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
 // with a user and keys.
-func gcp(context *upspin.Context) (upspin.Client, error) {
+func gcpClient(context *upspin.Context) (upspin.Client, error) {
 	// Use a test GCP Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -200,9 +210,9 @@ func gcp(context *upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// inProcess returns a Client pointing to in-process instances given a Context partially initialized
+// inProcessClient returns a Client pointing to in-process instances given a Context partially initialized
 // with a user and keys.
-func inProcess(context *upspin.Context) (upspin.Client, error) {
+func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 	// Use an in-process Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -276,7 +286,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 func installUserRoot(context *upspin.Context) error {
 	testUser, ok := context.User.(*testuser.Service)
 	if !ok {
-		return errors.New("user service must be the in-process instance")
+		return errors.New("installUserRoot: user service must be the in-process instance")
 	}
 	testUser.AddRoot(context.UserName, context.Directory.Endpoint())
 	return nil

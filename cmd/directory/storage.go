@@ -24,7 +24,7 @@ func (d *dirServer) getDirEntry(parsedPath *path.Parsed) (*upspin.DirEntry, erro
 		if err != nil {
 			return nil, err
 		}
-		return root.dirEntry, nil
+		return &root.dirEntry, nil
 	}
 	return d.getNonRoot(parsedPath.Path())
 }
@@ -37,7 +37,7 @@ func (d *dirServer) putDirEntry(parsedPath *path.Parsed, dirEntry *upspin.DirEnt
 		if err != nil {
 			return err
 		}
-		root.dirEntry = dirEntry
+		root.dirEntry = *dirEntry
 		return d.putRoot(parsedPath.User, root)
 	}
 	return d.putNonRoot(parsedPath.Path(), dirEntry)
@@ -49,21 +49,22 @@ func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 
 	// Check cache first.
 	if dir, ok := d.dirCache.Get(path); ok {
-		return dir.(*upspin.DirEntry), nil
+		de := dir.(upspin.DirEntry)
+		return &de, nil
 	}
 
 	// Not in cache.
-	savedDirEntry := new(upspin.DirEntry)
+	var savedDirEntry upspin.DirEntry
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
-		return savedDirEntry, err
+		return nil, err
 	}
-	err = json.Unmarshal(buf, savedDirEntry)
+	err = json.Unmarshal(buf, &savedDirEntry)
 	if err != nil {
-		return savedDirEntry, newDirError("getmeta", path, fmt.Sprintf("json unmarshal failed retrieving metadata: %v", err))
+		return nil, newDirError("getmeta", path, fmt.Sprintf("json unmarshal failed retrieving metadata: %v", err))
 	}
 	d.dirCache.Add(path, savedDirEntry)
-	return savedDirEntry, nil
+	return &savedDirEntry, nil
 }
 
 // putNonRoot forcibly writes to stable storage the given dir entry at the canonical path on the
@@ -71,7 +72,7 @@ func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) error {
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
-	d.dirCache.Add(path, dirEntry)
+	d.dirCache.Add(path, *dirEntry)
 	jsonBuf, err := json.Marshal(dirEntry)
 	if err != nil {
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
