@@ -22,6 +22,24 @@
       "revId": "15e9ba7f6f242944ba1829bb1eb912082a66995f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b3e069d_e3a850b5",
+        "filename": "cmd/dfuse/scripts/mount_linux",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-15T17:16:30Z",
+      "side": 1,
+      "message": "this seems clear to me. you could also use a here document\n\nsudo bash \u003c\u003c!\necho upspin $mp fuse.fs user,noauto 0 0 \u003e\u003e /etc/fstab\n!",
+      "parentUuid": "4b3e069d_f4201033",
+      "revId": "15e9ba7f6f242944ba1829bb1eb912082a66995f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
