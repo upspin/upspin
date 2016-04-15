@@ -116,6 +116,11 @@ type Packer interface {
 	// The returned count is the written length of the ciphertext.
 	Pack(context *Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
 
+	// AddWrap, executed by the file owner, extracts the per-file symmetric
+	// encryption key from packdata, wraps for all new readers, and updates packdata.
+	// In case of error, AddWrap skips the wrapping for that reader or direntry.
+	AddWrap(context *Context, a *WrapNeeded)
+
 	// Unpack takes ciphertext data and stores the cleartext version
 	// in the cleartext slice, which must be large enough, using the
 	// Packdata field of the Metadata in the DirEntry to recover
@@ -236,7 +241,11 @@ type Directory interface {
 	// and be directories. The final element, if it exists, must not
 	// be a directory. If something is already stored under the path,
 	// the new location and packdata replace the old.
-	Put(entry *DirEntry) error
+	//
+	// WrapNeeded is a hint describing skew between the users with
+	// wrapped keys in the existing DirEntry compared with the users
+	// with Read access permisions.
+	Put(entry *DirEntry) (error, *WrapNeeded)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
@@ -254,7 +263,7 @@ type Directory interface {
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.
-        // It does not delete the data it references; use Store.Delete for that.
+	// It does not delete the data it references; use Store.Delete for that.
 	Delete(name PathName) error
 
 	// Endpoint returns the network endpoint of the server.
@@ -280,6 +289,14 @@ type Metadata struct {
 	Size     uint64 // Length of file in bytes.
 	Time     Time   // Time associated with file; might be when it was last written.
 	Packdata []byte // Packing-specific metadata stored in directory.
+}
+
+// WrapNeeded describes work needed to bring list of users with wrapped keys
+// in sync with list of users with Read access permisions. For each element of
+// DirEntries, wrap for each element of Readers to bring two lists in sync.
+type WrapNeeded struct {
+	DirEntries []*DirEntry
+	Readers    []UserName
 }
 
 // Store service.

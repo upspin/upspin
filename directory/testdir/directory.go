@@ -335,39 +335,39 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(entry *upspin.DirEntry) error {
+func (s *Service) Put(entry *upspin.DirEntry) (error, *upspin.WrapNeeded) {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
-		return err
+		return err, nil
 	}
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
-		return err
+		return err, nil
 	}
 	canWrite, err := s.can(access.Write, parsed)
 	if err != nil {
-		return err
+		return err, nil
 	}
 	if !canCreate && !canWrite {
-		return mkError("Put", entry.Name, access.ErrPermissionDenied)
+		return mkError("Put", entry.Name, access.ErrPermissionDenied), nil
 	}
 	// If it doesn't exist, we need Create permission.
 	if !canCreate {
 		if _, err := s.lookup(parsed); err != nil { // TODO: Check exact error?
 			// File does not exist but we do not have Create permission.
-			return mkError("Put", entry.Name, access.ErrPermissionDenied)
+			return mkError("Put", entry.Name, access.ErrPermissionDenied), nil
 		}
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
 		if entry.Metadata.Packing() != upspin.PlainPack {
-			return mkStrError("Put", entry.Name, "not in plain packing")
+			return mkStrError("Put", entry.Name, "not in plain packing"), nil
 		}
 	}
 	err = s.put("Put", false, entry)
 	if err != nil {
-		return err
+		return err, nil
 	}
 	// Put was successful. If it was an Access or Group file, there's more to do.
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
@@ -378,19 +378,20 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 		if access.IsAccessFile(entry.Name) {
 			data, err := s.getData(entry)
 			if err != nil {
-				return err
+				return err, nil
 			}
 			accessFile, err := access.Parse(entry.Name, data)
 			if err != nil {
-				return err
+				return err, nil
 			}
 			s.access[path.DropPath(entry.Name, 1)] = accessFile
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
+// TODO add WrapNeeded ?
 func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
