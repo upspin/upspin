@@ -71,7 +71,7 @@ func newDirEntry(context *upspin.Context, name upspin.PathName) *upspin.DirEntry
 			Endpoint: context.Store.Endpoint(),
 		},
 		Metadata: upspin.Metadata{
-			PackData: upspin.PackData{byte(dirPacking)},
+			Packdata: upspin.Packdata{byte(dirPacking)},
 		},
 	}
 }
@@ -80,7 +80,7 @@ func packDirBlob(context *upspin.Context, cleartext []byte, name upspin.PathName
 	return packBlob(context, cleartext, newDirEntry(context, name))
 }
 
-func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
+func getPacker(packdata upspin.Packdata) (upspin.Packer, error) {
 	if len(packdata) == 0 {
 		return nil, errors.New("no packdata")
 	}
@@ -93,7 +93,7 @@ func getPacker(packdata upspin.PackData) (upspin.Packer, error) {
 
 // packBlob packs an arbitrary blob and its metadata.
 func packBlob(context *upspin.Context, cleartext []byte, entry *upspin.DirEntry) ([]byte, *upspin.Metadata, error) {
-	packer, err := getPacker(entry.Metadata.PackData)
+	packer, err := getPacker(entry.Metadata.Packdata)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -112,7 +112,7 @@ func packBlob(context *upspin.Context, cleartext []byte, entry *upspin.DirEntry)
 // unpackBlob unpacks a blob.
 // Other than from unpackDirBlob, only used in tests.
 func unpackBlob(context *upspin.Context, ciphertext []byte, entry *upspin.DirEntry) ([]byte, error) {
-	packer, err := getPacker(entry.Metadata.PackData)
+	packer, err := getPacker(entry.Metadata.Packdata)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 			Sequence: seq,
 			Size:     0,
 			Time:     upspin.Now(),
-			PackData: upspin.PackData{byte(dirPacking)},
+			Packdata: upspin.Packdata{byte(dirPacking)},
 		},
 	}
 }
@@ -339,7 +339,7 @@ func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 			Metadata: upspin.Metadata{
 				IsDir:    true,
 				Sequence: entries[i+1].Metadata.Sequence,
-				PackData: upspin.PackData{byte(dirPacking)},
+				Packdata: upspin.Packdata{byte(dirPacking)},
 			},
 		}
 		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)

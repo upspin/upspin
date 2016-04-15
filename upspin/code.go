@@ -19,21 +19,21 @@ func (Location) Unmarshal([]byte) error {
 	panic("unimplemented")
 }
 
-// Packing returns the Packing type to which this PackData applies, identified
-// by the initial byte of the PackData.
-func (p PackData) Packing() Packing {
+// Packing returns the Packing type to which this Packdata applies, identified
+// by the initial byte of the Packdata.
+func (p Packdata) Packing() Packing {
 	return Packing(p[0])
 }
 
-// Data returns the data in the PackData, the bytes after the initial Packing metadata byte.
-func (p PackData) Data() []byte {
+// Data returns the data in the Packdata, the bytes after the initial Packing metadata byte.
+func (p Packdata) Data() []byte {
 	return p[1:]
 }
 
 // Packing returns the Packing type to which this Metadata applies, identified
-// by the initial byte of uts PackData.
+// by the initial byte of uts Packdata.
 func (m Metadata) Packing() Packing {
-	return PackData(m.PackData).Packing() // TODO: Maybe Metadata.PackData should be typed.
+	return Packdata(m.Packdata).Packing() // TODO: Maybe Metadata.Packdata should be typed.
 }
 
 // Marshal packs the DirEntry into a new byte slice for transport.
@@ -67,7 +67,7 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	//	Sequence: varint encoded.
 	//	Size: varint encoded.
 	//	Time: varint encoded.
-	//	PackData: count N, followed by N bytes
+	//	Packdata: count N, followed by N bytes
 	//	Readers: count N followed by N*(count N, followed by N bytes)
 	if d.Metadata.IsDir {
 		b = append(b, byte(1))
@@ -80,7 +80,7 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, tmp[:N]...)
 	N = binary.PutVarint(tmp[:], int64(d.Metadata.Time))
 	b = append(b, tmp[:N]...)
-	b = appendBytes(b, d.Metadata.PackData)
+	b = appendBytes(b, d.Metadata.Packdata)
 	return b, nil
 }
 
@@ -143,7 +143,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	//	Sequence: varint encoded.
 	//	Size: varint encoded.
 	//	Time: varint encoded.
-	//	PackData: count N, followed by N bytes
+	//	Packdata: count N, followed by N bytes
 	//	Readers: count N followed by N*(count N, followed by N bytes)
 	if len(b) < 1 {
 		return nil, ErrTooShort
@@ -174,8 +174,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	// Must copy packdata - can't return buffer's own contents.
 	// (All the other slices are turned into strings, so are intrinsically copied.)
-	d.Metadata.PackData = make(PackData, len(bytes))
-	copy(d.Metadata.PackData, bytes)
+	d.Metadata.Packdata = make(Packdata, len(bytes))
+	copy(d.Metadata.Packdata, bytes)
 	return b, nil
 }
 

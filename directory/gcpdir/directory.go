@@ -77,7 +77,7 @@ func (d *Directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 
 	name := dirEntry.Name
-	if len(dirEntry.Metadata.PackData) < 1 {
+	if len(dirEntry.Metadata.Packdata) < 1 {
 		return newError(op, name, errors.New("missing packing type in packdata"))
 	}
 	parsed, err := path.Parse(name)
@@ -86,7 +86,7 @@ func (d *Directory) Put(dirEntry *upspin.DirEntry) error {
 	}
 	canonicalName := parsed.Path()
 
-	if access.IsAccessFile(canonicalName) && upspin.Packing(dirEntry.Metadata.PackData[0]) != upspin.PlainPack {
+	if access.IsAccessFile(canonicalName) && upspin.Packing(dirEntry.Metadata.Packdata[0]) != upspin.PlainPack {
 		// The directory server must be able to read the bytes from the reference.
 		return newError(op, canonicalName, errors.New("packing must be plain for Access file"))
 	}
@@ -162,7 +162,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Sequence: 0, // don't care?
 			Size:     0, // Being explicit that dir entries have zero size.
 			Time:     d.timeNow(),
-			PackData: nil,
+			Packdata: nil,
 		},
 	}
 	// TODO: dial the endpoint as listed in dirEntry and store it there instead.
