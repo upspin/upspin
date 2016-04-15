@@ -39,6 +39,9 @@ func (testPack) String() string {
 	return "debug"
 }
 
+func (testPack) AddWrap(*upspin.Context, *upspin.WrapNeeded) {
+}
+
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.
 type cryptByteReader struct {
 	crypt byte
