@@ -47,15 +47,15 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	var packer upspin.Packer
-	if !access.IsAccessFile(name) {
+	if access.IsAccessFile(name) || access.IsGroupFile(name) {
+		packer = pack.Lookup(upspin.PlainPack)
+	} else {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
 		packer = pack.Lookup(c.context.Packing)
 		if packer == nil {
 			return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
 		}
-	} else {
-		packer = pack.Lookup(upspin.PlainPack)
 	}
 
 	de := &upspin.DirEntry{
