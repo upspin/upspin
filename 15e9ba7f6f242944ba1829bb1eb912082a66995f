@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b3e069d_f4201033",
+        "filename": "cmd/dfuse/scripts/mount_linux",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T00:11:08Z",
+      "side": 1,
+      "message": "Ouch. This hurts my brain. How about double quotes around the whole thing between the first echo and |? That way it\u0027s clearer what you\u0027re doing.\n\nBTW: I found shellcheck to have useful recommendations. It runs on mac too, I think.\n\nhttp://www.shellcheck.net/",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 10
+      },
+      "revId": "15e9ba7f6f242944ba1829bb1eb912082a66995f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
