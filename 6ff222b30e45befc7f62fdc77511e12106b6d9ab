@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e82ee08f_7f7c178e",
+        "filename": "directory/testdir/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "This works but only because it\u0027s DebugPack. The testenv way of doing this would be:\n\nclient, err :\u003d env.NewUser(userName, keys)  // keys \u003d nil is fine here.\n\nThen just use the returned client instead of env.Client.\n\nHowever, NewUser returns a Client, not a Context. Since you\u0027re using it to test a Directory we need to change NewUser to return a context. Right now it has a context ready, but it doesn\u0027t return it. It\u0027s a one line fix though. You could do it in this CL or I can fix it in my next one.",
+      "range": {
+        "startLine": 24,
+        "startChar": 7,
+        "endLine": 24,
+        "endChar": 14
+      },
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_3f5faf1e",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "In GCP, I don\u0027t clear out if you happen to have Read permission too. This is more strict, but as an optimization, it would still be correct to leave Location for Readers. \n\nI\u0027m happy to change GCP, but I think both need to be in sync.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_7f3777dc",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "See below. I think this should be !canList.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_9f48e359",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "This should be !canRead no? Location is for reading the Reference. If you can\u0027t list you shouldn\u0027t be able to Lookup at all right?",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_bf24bfa3",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "if parsed.IsRoot() {",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_7fe09774",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "parsed.Path() does the same thing, but is more expensive, right? I\u0027d add a comment here to explain why we\u0027re doing the same operation seemingly twice.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_9f13433c",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-15T23:30:06Z",
+      "side": 1,
+      "message": "Need to do the same for s.access.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
