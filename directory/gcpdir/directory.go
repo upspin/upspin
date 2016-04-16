@@ -265,6 +265,11 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	return d, nil
 }
 
+// Delete deletes the DirEntry for a name from the backend.
+func (d *Directory) Delete(name upspin.PathName) error {
+	return errors.New("not implemented")
+}
+
 // Endpoint implements upspin.Directory.Endpoint.
 func (d *Directory) Endpoint() upspin.Endpoint {
 	return d.endpoint
