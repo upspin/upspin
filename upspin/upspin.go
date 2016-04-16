@@ -254,7 +254,7 @@ type Directory interface {
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.
-        // It does not delete the data it references; use Store.Delete for that.
+	// It does not delete the data it references; use Store.Delete for that.
 	Delete(name PathName) error
 
 	// Endpoint returns the network endpoint of the server.
