@@ -529,6 +529,11 @@ func (s *Service) DeleteAll() {
 	s.mu.Unlock()
 }
 
+// Delete deletes a name from memory.
+func (s *Service) Delete(name upspin.PathName) error {
+	return errors.New("not implemented")
+}
+
 // Endpoint implements upspin.Directory.Endpoint.
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.endpoint
