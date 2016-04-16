@@ -31,6 +31,9 @@ const (
 
 	// Put is the PUT method.
 	Put = "PUT"
+
+	// Delete is the DELETE method.
+	Delete = "DELETE"
 )
 
 var (

@@ -86,8 +86,14 @@ func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 // metadata information.
 func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "Put"
-	if r.Method != netutil.Post {
-		netutil.SendJSONErrorString(w, "/put only handles POST requests")
+	isDelete := r.Method == netutil.Delete
+	if r.Method != netutil.Post && !isDelete {
+		netutil.SendJSONErrorString(w, "/put only handles POST and DELETE requests")
+		return
+	}
+	if isDelete {
+		// TODO: For now delete is a handler. It will become a method, like putDir is and getDir will become soon.
+		d.deleteHandler(sess, w, r)
 		return
 	}
 	buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
@@ -375,6 +381,52 @@ func (d *dirServer) verifyFormParams(op string, path upspin.PathName, w http.Res
 	return values
 }
 
+func (d *dirServer) deleteHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+	const op = "Delete"
+	pathname := r.URL.Path[5:] // 5 => skip "/dir/"
+	logMsg.Printf("User %s attempting to delete %s", sess.User(), pathname)
+	parsed, err := path.Parse(upspin.PathName(pathname))
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	parsedPath := parsed.Path()
+	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
+	canDelete, err := d.hasRight(op, sess.User(), access.Delete, parsedPath)
+	if err != nil {
+		err = newDirError(op, "", err.Error()) // path is included in the original error message.
+		logErr.Printf("Access error Delete: %s", err)
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	if !canDelete {
+		err = newDirError(op, parsedPath, access.ErrPermissionDenied.Error())
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// Otherwise, locate the entry first.
+	dirEntry, err := d.getDirEntry(&parsed)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	// Only empty directories can be removed.
+	if dirEntry.Metadata.IsDir {
+		err = d.isDirEmpty(parsedPath)
+		if err != nil {
+			netutil.SendJSONError(w, context, newDirError(op, parsedPath, err.Error()))
+			return
+		}
+	}
+	// Attempt to delete it from GCP.
+	if err = d.deleteCloudEntry(parsedPath); err != nil {
+		err = newDirError(op, parsedPath, err.Error())
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	netutil.SendJSONErrorString(w, "success")
+}
+
 func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
@@ -399,6 +451,7 @@ func main() {
 	// TODO: put and get are HTTP verbs so this is ambiguous. Change this here
 	// and in clients to /dir and /lookup respectively.
 	http.HandleFunc("/put", ah.Handle(d.dirHandler))
+	http.HandleFunc("/dir", ah.Handle(d.dirHandler)) // First step in resolving the TODO above.
 	http.HandleFunc("/get", ah.Handle(d.getHandler))
 	http.HandleFunc("/glob", ah.Handle(d.globHandler))
 
