@@ -73,17 +73,32 @@ func (c *LRU) RemoveOldest() (key, value interface{}) {
 	return c.removeOldest()
 }
 
+// Remove removes a key from the cache. If key was present, its associated value is returned, otherwise nil.
+func (c *LRU) Remove(key interface{}) interface{} {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if ele, found := c.cache[key]; found {
+		_, value := c.remove(ele)
+		return value
+	}
+	return nil
+}
+
 // note: must hold c.mu
 func (c *LRU) removeOldest() (key, value interface{}) {
 	ele := c.ll.Back()
 	if ele == nil {
 		return
 	}
+	return c.remove(ele)
+}
+
+// note: must hold c.mu
+func (c *LRU) remove(ele *list.Element) (key, value interface{}) {
 	c.ll.Remove(ele)
 	ent := ele.Value.(*entry)
 	delete(c.cache, ent.key)
 	return ent.key, ent.value
-
 }
 
 // Len returns the number of items in the cache.
