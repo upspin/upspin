@@ -104,6 +104,9 @@ func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{
 func (d *dummyDirectory) ServerUserName() string {
 	return "userDirectory"
 }
+func (d *dummyDirectory) Delete(name upspin.PathName) error {
+	return nil
+}
 func (d *dummyDirectory) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
