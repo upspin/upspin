@@ -825,6 +825,90 @@ func TestGetPermissionDenied(t *testing.T) {
 	resp.Verify(t)
 }
 
+func TestDelete(t *testing.T) {
+	rootJSON := toRootJSON(t, &userRoot)
+	dirEntryJSON := toJSON(t, dir)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{userName, pathName},
+			Data: [][]byte{rootJSON, dirEntryJSON},
+		},
+		deletePathExpected: pathName,
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+pathName, nil)
+
+	ds := newDirServer(lgcp, newDummyStoreClient())
+
+	ds.dirHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if lgcp.listDirCalled {
+		t.Errorf("ListDir should not have been called as pathName is not a directory")
+	}
+	if !lgcp.deleteCalled {
+		t.Errorf("Delete should have been called")
+	}
+}
+
+func TestDeleteDirNotEmpty(t *testing.T) {
+	rootJSON := toRootJSON(t, &userRoot)
+	parentPathJSON := toJSON(t, dirParent)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{userName, parentPathName},
+			Data: [][]byte{rootJSON, parentPathJSON},
+		},
+		prefix:    parentPathName + "/",
+		fileNames: []string{pathName}, // pathName is inside parentPathName.
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Delete: test@foo.com/mydir: directory not empty"}`)
+	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+parentPathName, nil)
+
+	ds := newDirServer(lgcp, newDummyStoreClient())
+
+	ds.dirHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if !lgcp.listDirCalled {
+		t.Errorf("ListDir should have been called as pathName is a directory")
+	}
+	if lgcp.deleteCalled {
+		t.Errorf("Delete should not have been called")
+	}
+}
+
+func TestDeleteDirPermissionDenied(t *testing.T) {
+	rootJSON := toRootJSON(t, &userRoot)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{userName}, // only the root is looked up.
+			Data: [][]byte{rootJSON},
+		},
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Delete: test@foo.com/mydir/myfile.txt: permission denied"}`)
+	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+pathName, nil)
+
+	ds := newDirServer(lgcp, newDummyStoreClient())
+
+	session := testauth.NewSessionForTesting(upspin.UserName("some-random-dude@bozo.com"), false, nil)
+	ds.dirHandler(session, resp, req)
+	resp.Verify(t)
+
+	if lgcp.listDirCalled {
+		t.Errorf("ListDir should not have been called as pathName is not a directory")
+	}
+	if lgcp.deleteCalled {
+		t.Errorf("Delete should not have been called")
+	}
+}
+
 func toJSON(t *testing.T, data interface{}) []byte {
 	ret, err := json.Marshal(data)
 	if err != nil {
@@ -864,10 +948,12 @@ func newDummyStoreClient() *storeClient {
 // if a call to ListPrefix or ListDir matches the expected prefix or dir.
 type listGCP struct {
 	gcptest.ExpectDownloadCapturePutGCP
-	prefix           string
-	fileNames        []string
-	listPrefixCalled bool
-	listDirCalled    bool
+	prefix             string
+	fileNames          []string
+	listPrefixCalled   bool
+	listDirCalled      bool
+	deletePathExpected string
+	deleteCalled       bool
 }
 
 func (l *listGCP) ListPrefix(prefix string, depth int) ([]string, error) {
@@ -884,4 +970,13 @@ func (l *listGCP) ListDir(dir string) ([]string, error) {
 		return l.fileNames, nil
 	}
 	return []string{}, errors.New("Not found")
+}
+
+func (l *listGCP) Delete(path string) error {
+	l.deleteCalled = true
+	if path == l.deletePathExpected {
+		return nil
+	}
+	return errors.New("Not found")
+
 }

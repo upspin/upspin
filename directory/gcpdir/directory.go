@@ -267,7 +267,18 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 
 // Delete deletes the DirEntry for a name from the backend.
 func (d *Directory) Delete(name upspin.PathName) error {
-	return errors.New("not implemented")
+	const op = "Delete"
+	// Prepare a get request to the server
+	req, err := http.NewRequest(netutil.Delete, fmt.Sprintf("%s/dir/%s", d.serverURL, name), nil)
+	if err != nil {
+		return newError(op, name, err)
+	}
+	body, err := d.requestAndReadResponseBody(op, name, req)
+	if err != nil {
+		return err
+	}
+	// Interpret the JSON returned
+	return parser.ErrorResponse(body)
 }
 
 // Endpoint implements upspin.Directory.Endpoint.
