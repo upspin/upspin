@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e82ee08f_2595622c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T03:12:49Z",
+      "side": 1,
+      "message": "// It does not delete the data it references; use Store.Delete for that.",
+      "revId": "536692ec1ac449dd088dd19da40c86cbdb3154e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
