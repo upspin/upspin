@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_65ffeac2",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "I will restore it for readers.",
+      "parentUuid": "e82ee08f_3f5faf1e",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_7f3777dc",
         "filename": "directory/testdir/directory.go",
         "patchSetId": 1
@@ -53,6 +71,24 @@
       "writtenOn": "2016-04-15T23:30:06Z",
       "side": 1,
       "message": "See below. I think this should be !canList.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_4504eeb2",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "No, this one is correct as written. Read is Lookup permission.\nSee below.",
+      "parentUuid": "e82ee08f_7f3777dc",
       "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -76,6 +112,60 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_05eee614",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_9f48e359",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_2509e2c8",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_9f48e359",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_65280a1b",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "This is the one that\u0027s wrong. If we can Lookup on it, we can Read it so we need to find its location. This just goes away",
+      "parentUuid": "e82ee08f_9f48e359",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_bf24bfa3",
         "filename": "directory/testdir/directory.go",
         "patchSetId": 1
@@ -87,6 +177,42 @@
       "writtenOn": "2016-04-15T23:30:06Z",
       "side": 1,
       "message": "if parsed.IsRoot() {",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_e5eabafe",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_bf24bfa3",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_c5f7bee4",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_bf24bfa3",
       "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +247,24 @@
       "writtenOn": "2016-04-15T23:30:06Z",
       "side": 1,
       "message": "Need to do the same for s.access.",
+      "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_8523f640",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-16T17:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_9f13433c",
       "revId": "6ff222b30e45befc7f62fdc77511e12106b6d9ab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
