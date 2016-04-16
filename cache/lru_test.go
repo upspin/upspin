@@ -61,3 +61,23 @@ func TestRemoveOldest(t *testing.T) {
 		t.Fatalf("oldest = %v, %v; want \"\", nil", k, v)
 	}
 }
+
+func TestRemoveOne(t *testing.T) {
+	c := cache.NewLRU(10)
+	c.Add("1", "one")
+	c.Add("2", "two")
+	if c.Len() != 2 {
+		t.Errorf("Expected Len=2, got %d", c.Len())
+	}
+	value := c.Remove("2")
+	if value != "two" {
+		t.Errorf("Expected 'two', got %v", value)
+	}
+	if c.Len() != 1 {
+		t.Errorf("Expected Len=1, got %d", c.Len())
+	}
+	value = c.Remove("99")
+	if value != nil {
+		t.Errorf("Expected nil")
+	}
+}
