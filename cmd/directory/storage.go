@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"errors"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -84,6 +85,19 @@ func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 	return err
 }
 
+// isDirEmpty reports whether the directory path is empty.
+func (d *dirServer) isDirEmpty(path upspin.PathName) error {
+	dirPrefix := string(path) + "/"
+	files, err := d.cloudClient.ListDir(dirPrefix)
+	if err != nil {
+		return err
+	}
+	if len(files) > 0 {
+		return errors.New("directory not empty")
+	}
+	return nil
+}
+
 // getCloudBytes fetches the path from the storage backend.
 func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 	logMsg.Printf("Downloading DirEntry from GCP: %s", path)
@@ -93,4 +107,9 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 		return nil, errEntryNotFound
 	}
 	return data, nil
+}
+
+// deleteCloudEntry deletes the path from the storage backend.
+func (d *dirServer) deleteCloudEntry(path upspin.PathName) error {
+	return d.cloudClient.Delete(string(path))
 }
