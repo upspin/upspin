@@ -31,7 +31,7 @@ var (
 	inFile     = flag.String("in", "", "full pathname of file to be Put or empty for stdin")
 	outFile    = flag.String("out", "", "output file")
 	longFormat = flag.Bool("l", false, "Enables long format for ls")
-	c          = newClient()
+	c, ctx     = newClient()
 )
 
 func main() {
@@ -52,6 +52,8 @@ func main() {
 		get(path)
 	case "ls":
 		ls(path)
+	case "rm":
+		rm(path)
 	default:
 		fmt.Fprintf(os.Stderr, "Can't understand command: %v\n", flag.Arg(0))
 		usage()
@@ -60,10 +62,17 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|get> <path>\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|get|ls|rm> <path>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+func rm(pathName upspin.PathName) {
+	err := ctx.Directory.Delete(pathName)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func mkdir(pathName upspin.PathName) {
@@ -219,10 +228,10 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 	}
 }
 
-func newClient() upspin.Client {
+func newClient() (upspin.Client, *upspin.Context) {
 	ctx, err := context.InitContext(nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return client.New(ctx)
+	return client.New(ctx), ctx
 }

@@ -119,14 +119,6 @@ func newMockSuccessResponse(t *testing.T) nettest.MockHTTPResponse {
 	return newResp(success)
 }
 
-func newMockRefResponse(t *testing.T) nettest.MockHTTPResponse {
-	refJSON, err := json.Marshal(&struct{ Ref upspin.Reference }{Ref: ref})
-	if err != nil {
-		t.Fatalf("JSON marshal failed: %v", err)
-	}
-	return newResp(refJSON)
-}
-
 func newMockLookupResponse(t *testing.T) []nettest.MockHTTPResponse {
 	dir, err := json.Marshal(dirEntry)
 	if err != nil {
@@ -321,6 +313,19 @@ func TestGlob(t *testing.T) {
 	}
 	if string(dirEntries[1].Name) != path1 {
 		t.Errorf("Expected 1st entry %v, got %v", path1, dirEntries[1].Name)
+	}
+	mock.Verify(t)
+}
+
+func TestDelete(t *testing.T) {
+	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8081/dir/"+pathName, nil)
+	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{newMockSuccessResponse(t)}, []*http.Request{req})
+
+	d := newDirectory("http://localhost:8081", mock, nil)
+
+	err := d.Delete(pathName)
+	if err != nil {
+		t.Fatal(err)
 	}
 	mock.Verify(t)
 }
