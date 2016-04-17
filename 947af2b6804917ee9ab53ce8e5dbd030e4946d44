@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_14317532",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "can\u0027t happen",
+      "parentUuid": "e82ee08f_e58e3a5f",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_45a86eb1",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-16T20:13:54Z",
       "side": 1,
       "message": "what is dkey?\ncan there never be an error? what happens if i can\u0027t find a key, or the user in AddWrap doesn\u0027t exist?",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_b4f50196",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "Expanded dkey.\n\nIn case of error, AddWrap skips the wrapping for that reader or direntry.",
+      "parentUuid": "e82ee08f_45a86eb1",
       "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_7439d923",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_05926683",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_658c8a63",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-16T20:13:54Z",
       "side": 1,
       "message": "if the AddWrap were a pointer, it might be nicer. if it\u0027s not, we need a method on AddWrap that says there\u0027s nothing to do.",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_543edd0d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_658c8a63",
       "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_7422f9ed",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "Changed the struct name to WrapNeeded and updated comment.",
+      "parentUuid": "e82ee08f_85877641",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_25ad62c1",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-04-16T20:13:54Z",
       "side": 1,
       "message": "we\u0027ve mostly not been abbreviating, in the interest of Modern Software.\nso DirEntries please. (yes, i see the Dir there but it\u0027s a special case.)",
+      "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_5417fd8d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-17T17:53:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_25ad62c1",
       "revId": "947af2b6804917ee9ab53ce8e5dbd030e4946d44",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
