@@ -498,3 +498,5 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 	h.free()
 	return err
 }
+
+// for the heck of it
