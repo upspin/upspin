@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_b44e21b4",
+        "filename": "test/integration_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-17T18:27:09Z",
+      "side": 1,
+      "message": "Ok. But I\u0027m not sure this is different than the various other ones where we do t.Fatal(err). This is not run in a loop. Perhaps you mean I should include the name of the test too, since this is not a Test func but a test one (lower case t)?\n\nHow about if instead of the regular testing.T I passed in a wrapped testing.T that does some reflection to find the func name somehow? Just an idea...",
+      "parentUuid": "e82ee08f_8090846f",
+      "revId": "f7803c90198dc771f3c86f8fd448c769a5069e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_057b86fb",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_941d65b0",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-17T18:27:09Z",
+      "side": 1,
+      "message": "Done. Also removed teststore and testdir as well. See below.",
+      "parentUuid": "e82ee08f_057b86fb",
+      "revId": "f7803c90198dc771f3c86f8fd448c769a5069e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_c5745e0b",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2016-04-16T20:19:56Z",
       "side": 1,
       "message": "as described in mail, change the API so there is no Exit, just a Cleanup or Shutdown and it calls a user-provided function. this will remove all the dependencies on implementations.\n\nthere should be no dependencies on the implementations, for multiple reasons including cleanliness and maintenance. tomorrow i write a new implementation; i should not have to update this package (which i might not even have access to) to test it.\n\nthere will likely be other adjustments to clean them all out, so it can wait for a later CL if you want but it must happen.",
+      "revId": "f7803c90198dc771f3c86f8fd448c769a5069e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_341c71ae",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-17T18:27:09Z",
+      "side": 1,
+      "message": "Ok. I did something slightly different. I put a Cleanup in Setup instead.",
+      "parentUuid": "e82ee08f_c5745e0b",
       "revId": "f7803c90198dc771f3c86f8fd448c769a5069e10",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
