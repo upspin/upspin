@@ -16,6 +16,24 @@
       "revId": "afbc2aba02e9557e560798b71846758a4ce87cd5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8f6e09c_6ee2efbc",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-18T23:20:09Z",
+      "side": 1,
+      "message": "Yes. If a Group file is removed, I need to remove its contents from memory. I will add that in another CL. \n\nFor an Access file removal, no Group definition needs to be updated though, so this method is correct.",
+      "parentUuid": "e8f6e09c_eb99b134",
+      "revId": "afbc2aba02e9557e560798b71846758a4ce87cd5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
