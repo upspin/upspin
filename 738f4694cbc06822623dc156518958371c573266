@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e82ee08f_6ad8d2f4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-18T16:29:38Z",
+      "side": 1,
+      "message": "Should it return an error? Or perhaps the list of users added successfully? Or, maybe we could return another WrapNeeded instance with those users and dir entries that did not wrap successfully this time, sort of like a continuation.\n\nAlso, I still think we shouldn\u0027t call AddWrap and WrapNeeded, but instead something like Adjust and AdjustmentNeeded. Mostly because wrapping is not something all packers do and also it\u0027s not well-defined (as is) what a wrap is (this is the only point in upspin.go that talks about \"wrap\").",
+      "revId": "738f4694cbc06822623dc156518958371c573266",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_6a8b3214",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
