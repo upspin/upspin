@@ -16,6 +16,24 @@
       "revId": "f63f48ceea93e3c316d4c32fd016af0a0cbe12d7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_0d316832",
+        "filename": "test/integration_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-18T17:32:26Z",
+      "side": 1,
+      "message": "True. I got sloppy (or lazy) here. I\u0027m editing this file now so I will fix it in my next CL, along with other instances of this.",
+      "parentUuid": "e82ee08f_8db9d8ef",
+      "revId": "f63f48ceea93e3c316d4c32fd016af0a0cbe12d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
