@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_6aba1203",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-18T17:33:41Z",
+      "side": 1,
+      "message": "If we\u0027re going to rename it, I\u0027d rather it be more pertinent to the function being performed like AddAccess or ShareWithUsers...",
+      "parentUuid": "e82ee08f_6ad8d2f4",
+      "revId": "738f4694cbc06822623dc156518958371c573266",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_6a8b3214",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "This return was what Dave called a \"By the way...\" value and seemed something the code reader would want to study even lower in priority than errors.   So I kept the whiteboard ordering.\n\nBut I don\u0027t feel strongly.  Reversing will also make golint quieter, so I\u0027ll go do so.",
       "parentUuid": "e82ee08f_6a8b3214",
+      "revId": "738f4694cbc06822623dc156518958371c573266",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_2d9f847d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-18T17:33:41Z",
+      "side": 1,
+      "message": "The convention seems to be error comes last.\n\nNormally, if there is an error, other returns are ignored.  I kind of like the convention because it leads to simpler looking code.  In your case, one could indeed ignore it if they wanted and wait for someone or something else to do the work.",
+      "parentUuid": "e82ee08f_aa459a1b",
       "revId": "738f4694cbc06822623dc156518958371c573266",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
