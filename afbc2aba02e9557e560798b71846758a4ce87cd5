@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8f6e09c_eb99b134",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-18T22:21:54Z",
+      "side": 1,
+      "message": "you need to delete group files too, don\u0027t you?",
+      "revId": "afbc2aba02e9557e560798b71846758a4ce87cd5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
