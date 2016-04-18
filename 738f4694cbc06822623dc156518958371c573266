@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e82ee08f_6a8b3214",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-18T16:20:33Z",
+      "side": 1,
+      "message": "Our convention has been to put the error at the end, consistent with golint. Why reverse it?",
+      "revId": "738f4694cbc06822623dc156518958371c573266",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
