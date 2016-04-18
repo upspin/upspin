@@ -33,6 +33,24 @@ func (d *dirServer) updateAccess(accessPath *path.Parsed, location *upspin.Locat
 	return nil
 }
 
+// deleteAccess removes the contents of an Access file from the root.
+func (d *dirServer) deleteAccess(accessPath *path.Parsed) error {
+	root, err := d.getRoot(accessPath.User)
+	if err != nil {
+		return err
+	}
+	path := accessPath.Path()
+	delete(root.accessFiles, path)
+	// Is this Access file the one at the root? If so, replace it with a default one.
+	if accessPath.Drop(1).IsRoot() {
+		root.accessFiles[path], err = access.New(path)
+		if err != nil {
+			return err
+		}
+	}
+	return d.putRoot(accessPath.User, root)
+}
+
 // hasRight reports whether the user has the right on the path. It's assumed that all prior verifications have taken
 // place, such as verifying whether the user is writing to a file that existed as a directory or vice-versa, etc.
 func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right, pathName upspin.PathName) (bool, error) {

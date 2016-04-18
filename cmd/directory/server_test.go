@@ -626,6 +626,11 @@ func TestPutAccessFile(t *testing.T) {
 	// Check that the root was updated with the new Access file.
 	acc := makeAccess(t, upspin.PathName(accessPath), accessContents)
 	expectedRoot := userRoot // Shallow copy
+	expectedRoot.accessFiles = make(accessFileDB)
+	// Copy map instead of modifying a test global (that will be re-used later)
+	for k, v := range userRoot.accessFiles {
+		expectedRoot.accessFiles[k] = v
+	}
 	expectedRoot.accessFiles[upspin.PathName(accessPath)] = acc
 	expectedRootJSON := toRootJSON(t, &expectedRoot)
 	if !bytes.Equal(egcp.PutContents[2], expectedRootJSON) {
@@ -906,6 +911,55 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 	}
 	if lgcp.deleteCalled {
 		t.Errorf("Delete should not have been called")
+	}
+}
+
+func TestDeleteAccessFile(t *testing.T) {
+	accessDir := upspin.DirEntry{
+		Name: rootAccessFile,
+		Location: upspin.Location{
+			Reference: "some place in store", // We don't need this, but just for completion.
+		},
+	}
+	accessDirJSON := toJSON(t, accessDir)
+	// Let's pretend we had a non-default Access file for the root dir.
+	accessFile := makeAccess(t, rootAccessFile, "r,w,c: somefolks@domain.com")
+	newRoot := userRoot
+	newRoot.accessFiles = accessFileDB{rootAccessFile: accessFile}
+
+	rootJSON := toRootJSON(t, &newRoot)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{userName, rootAccessFile},
+			Data: [][]byte{rootJSON, accessDirJSON},
+		},
+		deletePathExpected: rootAccessFile,
+	}
+
+	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+rootAccessFile, nil)
+
+	ds := newDirServer(lgcp, newDummyStoreClient())
+
+	ds.dirHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	// Verify we put a new root with a plain vanilla Access file.
+	if len(lgcp.PutRef) != 1 {
+		t.Fatalf("Expected one Put, got %d", len(lgcp.PutRef))
+	}
+	if lgcp.PutRef[0] != userName {
+		t.Errorf("Expected a write to the root (%s/), wrote to %s instead", userName, lgcp.PutRef[0])
+	}
+	savedRoot := lgcp.PutContents[0]
+	expectedRoot := toRootJSON(t, &userRoot)
+	if !bytes.Equal(savedRoot, expectedRoot) {
+		t.Errorf("Expected to save root contents %s, saved contents %s instead", expectedRoot, savedRoot)
+	}
+	// Verify we deleted the Access file
+	if !lgcp.deleteCalled {
+		t.Fatal("Delete on GCP was not called")
 	}
 }
 
