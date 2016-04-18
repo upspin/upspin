@@ -36,6 +36,40 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_6de58c83",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-18T17:54:23Z",
+      "side": 1,
+      "message": "it\u0027s already nil. (this isn\u0027t C)",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_ad213493",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-18T17:54:23Z",
+      "side": 1,
+      "message": "DirEntry or maybe just entry",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_8d4e786b",
         "filename": "pack/plain/plain.go",
         "patchSetId": 2
