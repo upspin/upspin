@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_6d8c6c63",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Correct, the err\u003d\u003dnil test is theoretically redundant.  I\u0027m taking the conservative approach of only recording a change if there are no signs of confusion.",
+      "parentUuid": "e82ee08f_4d31b0e3",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_4d58902b",
         "filename": "pack/debug/pack.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-18T17:52:29Z",
       "side": 1,
       "message": "// Nothing to do.",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_689a1a8e",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_4d58902b",
       "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_68b33a0e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_6de58c83",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_ad213493",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-18T17:54:23Z",
       "side": 1,
       "message": "DirEntry or maybe just entry",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_c8c34e55",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_ad213493",
       "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_28a412cc",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_8d4e786b",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_cd7240ad",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "e82ee08f_6dba2c03",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_cd7240ad",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e82ee08f_ad481459",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -115,6 +223,24 @@
       "writtenOn": "2016-04-18T17:52:29Z",
       "side": 1,
       "message": "s/compared with/and/\n\"skew between\" already implies a comparison\n\nneed to state whether WrapNeeded can be set if there is an error. i say no, but be explicit.",
+      "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82ee08f_2dad44c1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-18T18:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e82ee08f_ad481459",
       "revId": "9c41699c5dec1e4b061c95b23ee479e770651915",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
