@@ -429,6 +429,14 @@ func (d *dirServer) deleteHandler(sess auth.Session, w http.ResponseWriter, r *h
 		netutil.SendJSONError(w, context, err)
 		return
 	}
+	// If this was an Access file, we need to delete it from the root as well.
+	if access.IsAccessFile(parsedPath) {
+		err = d.deleteAccess(&parsed)
+		if err != nil {
+			netutil.SendJSONError(w, context, err)
+			return
+		}
+	}
 	netutil.SendJSONErrorString(w, "success")
 }
 

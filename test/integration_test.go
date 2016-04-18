@@ -9,14 +9,13 @@
 package test
 
 import (
+	"log"
 	"strings"
 	"testing"
-	"fmt"
 
 	"upspin.googlesource.com/upspin.git/access"
 	e "upspin.googlesource.com/upspin.git/test/testenv"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
@@ -46,7 +45,7 @@ var (
 		Keys:                      ownersKey,
 		Transport:                 upspin.GCP,
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
-		Cleanup: deleteGCPEnv,
+		Cleanup:                   deleteGCPEnv,
 	}
 
 	ownersKey = upspin.KeyPair{
@@ -111,6 +110,11 @@ func testAllowListAccess(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Errorf("Expected error, got none")
 	}
+	// TODO: this is not an ideal error message. We have list permission, but not read. Need to fix this.
+	expectedError := "empty reference"
+	if !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected error contains %s, got %s", expectedError, err)
+	}
 }
 
 func testAllowReadAccess(t *testing.T, env *e.Env) {
@@ -148,6 +152,43 @@ func testGlobWithLimitedAccess(t *testing.T, env *e.Env) {
 	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 }
 
+func testDelete(t *testing.T, env *e.Env) {
+	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
+	log.Printf("Context: Username: %s", env.Context.UserName)
+	err := env.Context.Directory.Delete(pathName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check it really deleted it (and is not being cached in memory).
+	_, err = env.Client.Get(pathName)
+	if err == nil {
+		t.Fatalf("Expected error, got none")
+	}
+	if !strings.Contains(err.Error(), "not found") {
+		t.Errorf("Expected error contains not found, got %s", err)
+	}
+	// But I can't delete files in dir1, since I lack permission.
+	pathName = upspin.PathName(ownersName + "/dir1/file1.txt")
+	err = env.Context.Directory.Delete(pathName)
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
+		t.Errorf("Expected error %s, got %s", access.ErrPermissionDenied, err)
+	}
+	// But we can always remove the Access file.
+	accessPathName := upspin.PathName(ownersName + "/dir1/Access")
+	err = env.Context.Directory.Delete(accessPathName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Now delete file1.txt
+	err = env.Context.Directory.Delete(pathName)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestAll(t *testing.T) {
 	env, err := e.New(&setup)
 	if err != nil {
@@ -159,6 +200,7 @@ func TestAll(t *testing.T) {
 	testAllowListAccess(t, env)
 	testAllowReadAccess(t, env)
 	testGlobWithLimitedAccess(t, env)
+	testDelete(t, env)
 
 	err = env.Exit()
 	if err != nil {
@@ -186,22 +228,25 @@ func checkDirEntry(t *testing.T, dirEntry *upspin.DirEntry, name upspin.PathName
 	}
 }
 
-// deleteGCPEnv deletes the test environment from GCP. This is a hack that uses an
-// internal API to erase test data without checking permissions.
-// TODO(edpin): this will go away soon with Dir.Delete().
 func deleteGCPEnv(env *e.Env) error {
-	// These constants are a hack that must be in sync with configuration flags on the test instances.
-	gcpHandler := gcp.New("upspin", "upspin-test-dir", gcp.BucketOwnerFullCtrl)
-	gcpHandler.Connect()
-	files, err := gcpHandler.ListPrefix(string(env.Setup.OwnerName), 10)
+	fileSet1, err := env.Client.Glob(ownersName + "/*/*")
 	if err != nil {
-		return fmt.Errorf("Error listing GCP: %s", err)
+		return err
 	}
+	fileSet2, err := env.Client.Glob(ownersName + "/*")
+	if err != nil {
+		return err
+	}
+	entries := append(fileSet1, fileSet2...)
 	var firstErr error
-	for _, file := range files {
-		err = gcpHandler.Delete(file)
-		if err != nil && firstErr == nil {
-			firstErr = err
+	for _, entry := range entries {
+		log.Printf("Deleting %s", entry.Name)
+		err = env.Context.Directory.Delete(entry.Name)
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			log.Printf("Error deleting %s: %s", entry.Name, err)
 		}
 	}
 	return firstErr

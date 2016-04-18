@@ -252,17 +252,15 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	if err != nil {
 		return nil, newError(op, "", fmt.Errorf("required endpoint with a valid HTTP address: %v", err))
 	}
-	d.serverURL = serverURL.String()
-	authClient, isSecure := d.client.(*auth.HTTPClient)
-	if isSecure {
-		authClient.SetUserName(context.UserName)
-		authClient.SetUserKeys(auth.NewFactotum(context))
-	}
-	if !netutil.IsServerReachable(d.serverURL) {
+	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
-	d.endpoint = e
-	return d, nil
+	return &Directory{
+		endpoint:  e,
+		serverURL: serverURL.String(),
+		timeNow:   d.timeNow,
+		client:    auth.NewClient(context.UserName, auth.NewFactotum(context), &http.Client{}),
+	}, nil
 }
 
 // Delete deletes the DirEntry for a name from the backend.
