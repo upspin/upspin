@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e82ee08f_8db9d8ef",
+        "filename": "test/integration_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-18T17:28:10Z",
+      "side": 1,
+      "message": "if you expect a permissions error, as you do here, you should check that that\u0027s what the error is. otherwise it might be something like \"file not found\" and the test isn\u0027t even working.\nthere may be more instances of this",
+      "revId": "f63f48ceea93e3c316d4c32fd016af0a0cbe12d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
