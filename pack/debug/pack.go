@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -124,7 +125,7 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 		// Allocation occurred.
 		return 0, errTooShort
 	}
-	addSignature(meta, sign(cleartext, context.KeyPair.Private))
+	addSignature(meta, sign(context, cleartext, dirEntry.Name))
 	for i, c := range out {
 		out[i] = c ^ cb
 	}
@@ -186,7 +187,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 		}
 		cleartext[i] = c
 	}
-	signature := sign(cleartext[:i], context.KeyPair.Private)
+	signature := sign(context, cleartext[:i], dirEntry.Name)
 	if len(meta.Packdata) < 3 || signature != meta.Packdata[2] {
 		return 0, errBadSignature
 	}
@@ -235,7 +236,19 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry
 	return int(br.Len())
 }
 
-func sign(data []byte, key upspin.PrivateKey) byte {
+func sign(context *upspin.Context, data []byte, name upspin.PathName) byte {
+	slash := strings.IndexByte(string(name), '/')
+	if slash < 0 {
+		panic("no slash in path in DebugPack")
+	}
+	_, keys, err := context.User.Lookup(upspin.UserName(name[:slash]))
+	if err != nil {
+		panic(err)
+	}
+	if len(keys) == 0 {
+		panic("no keys for signing in DebugPack")
+	}
+	key := keys[0]
 	signature := byte(0)
 	for i, c := range data {
 		signature ^= c ^ key[i%len(key)]

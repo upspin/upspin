@@ -78,6 +78,8 @@ func setup(userName upspin.UserName) {
 	if err != nil {
 		panic(err)
 	}
+	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	context.User.(*testuser.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 }
 
 func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin.Packdata) {
