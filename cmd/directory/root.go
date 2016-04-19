@@ -4,11 +4,9 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -73,26 +71,22 @@ func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
 	return nil
 }
 
-func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter, parsedPath *path.Parsed, dirEntry *upspin.DirEntry) {
+func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
-	if sess.User() != parsedPath.User {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
-		return
+	if sess.User() != parsed.User {
+		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
-	_, err := d.getRoot(parsedPath.User)
+	_, err := d.getRoot(parsed.User)
 	if err != nil && err != errEntryNotFound {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), err.Error()))
-		return
+		return newDirError(op, parsed.Path(), err.Error())
 	}
 	if err == nil {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), "directory already exists"))
-		return
+		return newDirError(op, parsed.Path(), "directory already exists")
 	}
 	if !dirEntry.Metadata.IsDir {
 		// We could fix this here, but let's force clients to make their requests crystal clear.
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), "root is not a directory"))
-		return
+		return newDirError(op, parsed.Path(), "root is not a directory")
 	}
 	// Store the entry.
 	root := &root{
@@ -100,23 +94,21 @@ func (d *dirServer) handleRootCreation(sess auth.Session, w http.ResponseWriter,
 		accessFiles: make(accessFileDB),
 	}
 	// We make up an empty access file to use in the default case (user has not created any Access files).
-	accessPath := path.Join(upspin.PathName(parsedPath.User), "Access")
+	accessPath := path.Join(upspin.PathName(parsed.User), "Access")
 	acc, err := access.New(accessPath)
 	if err != nil {
 		// This should never happen because accessPath has been parsed already.
-		newErr := newDirError(op, parsedPath.Path(), err.Error())
+		newErr := newDirError(op, parsed.Path(), err.Error())
 		logErr.Printf("WARN: %s", newErr)
-		netutil.SendJSONError(w, context, newErr)
-		return
+		return newErr
 	}
 	root.accessFiles[accessPath] = acc
-	err = d.putRoot(parsedPath.User, root)
+	err = d.putRoot(parsed.User, root)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
 	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
-	netutil.SendJSONErrorString(w, "success")
+	return nil
 }
 
 // savedRoot is the representation of root on the storage backend.

@@ -82,58 +82,62 @@ func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 	return nil
 }
 
-// dirHandler handles directory requests. Currently it supports POST and DELETE which implement Directory.Put and
-// Directory.Delete respectively.
-// TODO: support GET also, which implements Directory.Lookup.
-func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case netutil.Delete:
-		d.deleteHandler(sess, w, r)
-		return
-	case netutil.Post:
-		// Fall through
-	default:
-		netutil.SendJSONErrorString(w, "Only POST and DELETE requests are accepted")
-		return
+func (d *dirServer) getPathFromRequest(handlerPrefix string, r *http.Request) (*path.Parsed, error) {
+	prefixLen := len(handlerPrefix)    // how many characters to skip from the URL path
+	if len(r.URL.Path) < prefixLen+7 { // 7 is the magic minLen for a root "a@b.co/"
+		return nil, newDirError("", "", "invalid pathname")
 	}
-	// Handle Put.
-	// TODO: move this all into d.putDir.
-	const op = "Put"
-	buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
-	if buf == nil {
-		// Request was invalid and was closed. Nothing else to do.
-		return
-	}
-	dirEntry := new(upspin.DirEntry)
-	err := json.Unmarshal(buf, dirEntry)
+	pathName := upspin.PathName(r.URL.Path[prefixLen:]) // skip this handler's prefix.
+	parsed, err := path.Parse(pathName)
 	if err != nil {
-		retErr := newDirError(op, dirEntry.Name, fmt.Sprintf("unmarshal: %s", err))
-		netutil.SendJSONError(w, context, retErr)
-		logErr.Println(retErr)
-		return
+		return nil, newDirError("", pathName, err.Error())
 	}
-	parsed, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	// If we're creating the root, handle it elsewhere.
-	if parsed.IsRoot() {
-		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
-		d.handleRootCreation(sess, w, &parsed, dirEntry)
-		return
-	}
-	err = d.putDir(sess, &parsed, dirEntry)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
+	return &parsed, nil
+}
 
-	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+// dirHandler handles directory requests. It supports GET, POST/PUT, and DELETE which implement Directory.Get,
+// Directory.Put and Directory.Delete respectively.
+func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+	// First step is verifying the path name
+	parsed, err := d.getPathFromRequest("/dir/", r)
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
+	switch r.Method {
+	case netutil.Get:
+		dirEntry, err := d.getHandler(sess, parsed, r)
+		if err != nil {
+			netutil.SendJSONError(w, context, err)
+			return
+		}
+		netutil.SendJSONReply(w, dirEntry)
+		return
+	case netutil.Delete:
+		err = d.deleteDirEntry(sess, parsed, r)
+	case netutil.Post, netutil.Put:
+		buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
+		if buf == nil {
+			// Request was invalid and was closed. Nothing else to do.
+			return
+		}
+		dirEntry := new(upspin.DirEntry)
+		err = json.Unmarshal(buf, dirEntry)
+		if err != nil {
+			retErr := newDirError("Put", dirEntry.Name, fmt.Sprintf("unmarshal: %s", err))
+			netutil.SendJSONError(w, context, retErr)
+			logErr.Println(retErr)
+			return
+		}
+		err = d.putDir(sess, parsed, dirEntry)
+	default:
+		netutil.SendJSONErrorString(w, "Only POST, PUT, GET and DELETE requests are accepted")
+		return
+	}
+	if err != nil {
+		netutil.SendJSONError(w, context, err)
+		return
+	}
 	netutil.SendJSONErrorString(w, "success")
 }
 
@@ -141,6 +145,21 @@ func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http
 // end, provided several checks have passed first.
 func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
+	parsedAgain, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
+	if err != nil {
+		return err
+	}
+	if !parsed.Equal(parsedAgain) {
+		return newDirError(op, parsed.Path(), "inconsistent DirEntry.Name")
+	}
+	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
+		return err
+	}
+	// If we're creating the root, handle it elsewhere.
+	if parsed.IsRoot() {
+		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
+		return d.handleRootCreation(sess, parsed, dirEntry)
+	}
 
 	// Check ACLs before we go any further, so we don't leak information about the existence of files and directories.
 	canCreate, err := d.hasRight(op, sess.User(), access.Create, dirEntry.Name)
@@ -216,84 +235,65 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group was not there, no harm done.
 	}
 
+	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
 	return nil
 }
 
-func (d *dirServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.Request) (*upspin.DirEntry, error) {
 	const op = "Get"
-	pathnames := d.verifyFormParams(op, "", w, r, "pathname")
-	if len(pathnames) == 0 {
-		// Nothing to be done. Error sent to client.
-		return
-	}
-	parsedPath, err := path.Parse(upspin.PathName(pathnames[0]))
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
-	canRead, err := d.hasRight(op, sess.User(), access.Read, parsedPath.Path())
+	canRead, err := d.hasRight(op, sess.User(), access.Read, parsed.Path())
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		logErr.Printf("Access error Read: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
+		return nil, err
 	}
-	canList, err := d.hasRight(op, sess.User(), access.List, parsedPath.Path())
+	canList, err := d.hasRight(op, sess.User(), access.List, parsed.Path())
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		logErr.Printf("Access error List: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
+		return nil, err
 	}
 	// If the user has no rights, we're done.
 	if !canRead && !canList {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
-		return
+		return nil, newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
 	// Look up entry
 	var dirEntry *upspin.DirEntry
-	if !parsedPath.IsRoot() {
-		dirEntry, err = d.getNonRoot(parsedPath.Path())
+	if !parsed.IsRoot() {
+		dirEntry, err = d.getNonRoot(parsed.Path())
 	} else {
-		root, err := d.getRoot(parsedPath.User)
+		root, err := d.getRoot(parsed.User)
 		if err == nil {
 			dirEntry = &root.dirEntry
 		}
 	}
 	if err != nil {
 		if err == errEntryNotFound {
-			err = newDirError("get", parsedPath.Path(), "path not found")
+			err = newDirError("get", parsed.Path(), "path not found")
 		}
-		netutil.SendJSONError(w, context, err)
-		return
+		return nil, err
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsedPath)
+		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
 		dirEntry.Location = upspin.Location{}
 	}
-	logMsg.Printf("Got dir entry for user %s: path %s: %s", sess.User(), parsedPath.Path(), dirEntry)
-	netutil.SendJSONReply(w, dirEntry)
+	logMsg.Printf("Got dir entry for user %s: path %s: %s", sess.User(), parsed.Path(), dirEntry)
+	return dirEntry, nil
 }
 
 func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
 	const op = "Glob"
-	patterns := d.verifyFormParams(op, "", w, r, "pattern")
-	if len(patterns) == 0 {
-		// Nothing to be done. Error sent to client.
-		return
-	}
-	pathPattern := upspin.PathName(patterns[0])
-	parsed, err := path.Parse(pathPattern)
+	parsed, err := d.getPathFromRequest("/glob/", r)
 	if err != nil {
-		netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+		netutil.SendJSONError(w, context, newDirError(op, "", err.Error()))
 		return
 	}
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
 	if err != nil {
-		netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+		netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), err.Error()))
 		return
 	}
 
@@ -329,12 +329,12 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 	// Now do the actual globbing.
 	for _, path := range names {
 		// error is ignored as pattern is known valid
-		if match, _ := goPath.Match(patterns[0], path); match {
+		if match, _ := goPath.Match(parsed.String(), path); match {
 			// Now fetch each DirEntry we need
-			logMsg.Printf("Looking up: %s for glob %s", path, patterns[0])
+			logMsg.Printf("Looking up: %s for glob %s", path, parsed.String())
 			de, err := d.getNonRoot(upspin.PathName(path))
 			if err != nil {
-				netutil.SendJSONError(w, context, newDirError(op, pathPattern, err.Error()))
+				netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), err.Error()))
 			}
 			// Verify if user has proper list ACL.
 			canList, err := d.hasRight(op, sess.User(), access.List, de.Name)
@@ -361,83 +361,45 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 	netutil.SendJSONReply(w, dirEntries)
 }
 
-// verifyFormParams parses the request form and looks for the presence of each one of the listed fields.
-// If a field is not found, it returns an error to the user. If all are found, it returns their value in
-// the same order as requested.
-func (d *dirServer) verifyFormParams(op string, path upspin.PathName, w http.ResponseWriter, r *http.Request, fields ...string) []string {
-	err := r.ParseForm()
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return nil
-	}
-	values := make([]string, len(fields))
-	for i, k := range fields {
-		v := r.FormValue(k)
-		if v == "" {
-			errMsg := fmt.Sprintf("missing %s in request", k)
-			logErr.Print(errMsg)
-			netutil.SendJSONError(w, context, newDirError(op, path, errMsg))
-			return nil
-		}
-		values[i] = v
-	}
-	return values
-}
-
-// deleteHandler handles deleting names.
-// TODO: This will soon become a simple helper function to support dirHandler.
-func (d *dirServer) deleteHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+// deleteDirEntry handles deleting names and their associated DirEntry.
+func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *http.Request) error {
 	const op = "Delete"
-	pathname := r.URL.Path[len("/dir/"):] // skip this handler's prefix.
-	logMsg.Printf("User %s attempting to delete %s", sess.User(), pathname)
-	parsed, err := path.Parse(upspin.PathName(pathname))
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	parsedPath := parsed.Path()
+
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
-	canDelete, err := d.hasRight(op, sess.User(), access.Delete, parsedPath)
+	canDelete, err := d.hasRight(op, sess.User(), access.Delete, parsed.Path())
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		logErr.Printf("Access error for Delete: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
 	if !canDelete {
-		err = newDirError(op, parsedPath, access.ErrPermissionDenied.Error())
-		netutil.SendJSONError(w, context, err)
-		return
+		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
 	// Otherwise, locate the entry first.
-	dirEntry, err := d.getDirEntry(&parsed)
+	dirEntry, err := d.getDirEntry(parsed)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return err
 	}
+	parsedPath := parsed.Path()
 	// Only empty directories can be removed.
 	if dirEntry.Metadata.IsDir {
 		err = d.isDirEmpty(parsedPath)
 		if err != nil {
-			netutil.SendJSONError(w, context, newDirError(op, parsedPath, err.Error()))
-			return
+			return newDirError(op, parsedPath, err.Error())
 		}
 	}
 	// Attempt to delete it from GCP.
 	if err = d.deletePath(parsedPath); err != nil {
-		err = newDirError(op, parsedPath, err.Error())
-		netutil.SendJSONError(w, context, err)
-		return
+		return newDirError(op, parsedPath, err.Error())
 	}
 	// If this was an Access file, we need to delete it from the root as well.
 	if access.IsAccessFile(parsedPath) {
-		err = d.deleteAccess(&parsed)
+		err = d.deleteAccess(parsed)
 		if err != nil {
-			netutil.SendJSONError(w, context, err)
-			return
+			return err
 		}
 	}
-	netutil.SendJSONErrorString(w, "success")
+	return nil
 }
 
 func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
@@ -465,12 +427,8 @@ func main() {
 	s := newStoreClient(auth.NewClient(dirServerName, factotum, &http.Client{}))
 	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), s)
 
-	// TODO: put and get are HTTP verbs so this is ambiguous. Change this here
-	// and in clients to /dir and /lookup respectively.
-	http.HandleFunc("/put", ah.Handle(d.dirHandler))
-	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // First step in resolving the TODO above.
-	http.HandleFunc("/get", ah.Handle(d.getHandler))
-	http.HandleFunc("/glob", ah.Handle(d.globHandler))
+	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // dir handles GET, PUT/POST and DELETE.
+	http.HandleFunc("/glob/", ah.Handle(d.globHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)

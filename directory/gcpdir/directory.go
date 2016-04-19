@@ -56,7 +56,7 @@ func newDirectory(serverURL string, client netutil.HTTPClientInterface, timeFunc
 func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Lookup"
 	// Prepare a get request to the server
-	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/get?pathname=%s", d.serverURL, name), nil)
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/dir/%s", d.serverURL, name), nil)
 	if err != nil {
 		return nil, newError(op, name, err)
 	}
@@ -112,7 +112,7 @@ func (d *Directory) storeDirEntry(op string, HTTPMethod string, dirEntry *upspin
 	}
 
 	// Prepare a put request to the server
-	req, err := http.NewRequest(HTTPMethod, fmt.Sprintf("%s/put", d.serverURL), bytes.NewBuffer(dirEntryJSON))
+	req, err := http.NewRequest(HTTPMethod, fmt.Sprintf("%s/dir/%s", d.serverURL, dirEntry.Name), bytes.NewBuffer(dirEntryJSON))
 	if err != nil {
 		return newError(op, name, err)
 	}
@@ -192,7 +192,7 @@ func (d *Directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 
 	// Issue request
-	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/glob?pattern=%s", d.serverURL, parsed.Path()), nil)
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/glob/%s", d.serverURL, parsed), nil)
 	if err != nil {
 		return nil, err
 	}

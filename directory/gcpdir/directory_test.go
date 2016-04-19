@@ -84,8 +84,8 @@ func TestMkdir(t *testing.T) {
 		Packdata: nil,
 	}
 	// Mkdir will first Lookup the parent, then perform the Mkdir itself
-	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?pathname=%s", parentPathName), nil)
-	requestMkdir := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/put", toJSON(t, mkdirEntry))
+	requestLookup := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/dir/%s", parentPathName), nil)
+	requestMkdir := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/dir/"+pathName, toJSON(t, mkdirEntry))
 	mock := nettest.NewMockHTTPClient(append(newMockLookupParentResponse(t), newMockMkdirResponse(t)...),
 		[]*http.Request{requestLookup, requestMkdir})
 
@@ -246,7 +246,7 @@ func TestPut(t *testing.T) {
 	respSuccess := newResp([]byte(`{"error":"success"}`))
 
 	dirEntryJSON := toJSON(t, dirEntry)
-	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/put", dirEntryJSON)
+	expectedRequest := nettest.NewRequest(t, netutil.Post, "http://localhost:9090/dir/"+pathName, dirEntryJSON)
 
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respSuccess}, []*http.Request{expectedRequest})
 	d := newDirectory("http://localhost:9090", mock, nil)
@@ -295,7 +295,7 @@ func TestGlob(t *testing.T) {
 	}))}
 
 	expectedRequests := []*http.Request{
-		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/glob?pattern=a@b.co/dir1/*.txt", nil),
+		nettest.NewRequest(t, netutil.Get, "http://localhost:9090/glob/a@b.co/dir1/*.txt", nil),
 	}
 
 	mock := nettest.NewMockHTTPClient(responses, expectedRequests)
