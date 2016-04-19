@@ -1,10 +1,13 @@
-package testdir_test
+package test
 
 import (
+	"fmt"
+	"runtime"
 	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/test/testenv"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -31,21 +34,41 @@ func (r *runner) read(user upspin.UserName, file upspin.PathName, shouldSucceed 
 func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, err error, shouldSucceed bool) {
 	if shouldSucceed {
 		if err != nil {
-			r.t.Errorf("%s: %s %q for user %q failed incorrectly: %v", r.state, op, file, user, err)
+			r.Errorf("%s: %s %q for user %q failed incorrectly: %v", r.state, op, file, user, err)
 		}
 	} else {
 		if err == nil {
-			r.t.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
+			r.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
 		} else if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-			r.t.Errorf("%s: %s %q for user %q failed with wrong error: %v", r.state, op, file, user, err)
+			r.Errorf("%s: %s %q for user %q failed with wrong error: %v", r.state, op, file, user, err)
 		}
 	}
 }
 
-func TestReadAccess(t *testing.T) {
+func (r *runner) Errorf(format string, args ...interface{}) {
+	_, file, line, ok := runtime.Caller(3)
+	if ok { // Should never fail.
+		if slash := strings.LastIndexByte(file, '/'); slash >= 0 {
+			file = file[slash+1:]
+		}
+		r.t.Errorf("called from %s:%d with %s packing:", file, line, pack.Lookup(r.env.Context.Packing))
+	}
+	r.t.Errorf(format, args...)
+}
+
+func testReadAccess(t *testing.T, packing upspin.Packing) {
+	// TODO: Authentication and keys not set up properly, so this only
+	// works for non-cryptographic packings.
+	switch packing {
+	case upspin.PlainPack, upspin.DebugPack:
+	default:
+		return
+	}
+	var (
+		user  = newUserName()
+		owner = newUserName()
+	)
 	const (
-		owner       = "owner1@test.com"
-		user        = "user1@test.com"
 		groupDir    = "Group"
 		publicDir   = "public"
 		privateDir  = "private"
@@ -54,11 +77,11 @@ func TestReadAccess(t *testing.T) {
 	)
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
-		Packing:   upspin.DebugPack,
+		Packing:   packing,
 		Transport: upspin.InProcess,
 		Keys: upspin.KeyPair{
-			Public:  upspin.PublicKey("public key"),
-			Private: upspin.PrivateKey("public key"),
+			Public:  upspin.PublicKey("12345"),
+			Private: upspin.PrivateKey("67890"),
 		},
 		Tree: testenv.Tree{
 			testenv.E(groupDir+"/", ""),
@@ -102,9 +125,9 @@ func TestReadAccess(t *testing.T) {
 	r.read(user, publicFile, false)
 
 	// Add /private/Access, granting Read to user.
-	const (
-		accessFile = owner + "/public/Access"
-		accessText = "r: user1@test.com\n"
+	var (
+		accessFile = upspin.PathName(owner + "/public/Access")
+		accessText = fmt.Sprintf("r:%s\n", user)
 	)
 	_, err = env.Client.Put(accessFile, []byte(accessText))
 	if err != nil {
@@ -143,10 +166,10 @@ func TestReadAccess(t *testing.T) {
 	r.read(user, publicFile, false)
 
 	// Now create a group and put user in it.
-	const (
-		groupFile       = owner + "/Group/mygroup"
-		groupText       = "user1@test.com\n"
-		groupAccessText = "r: mygroup\n"
+	const groupAccessText = "r: mygroup\n"
+	var (
+		groupFile = upspin.PathName(owner + "/Group/mygroup")
+		groupText = fmt.Sprintf("%s\n", user)
 	)
 	_, err = env.Client.Put(groupFile, []byte(groupText))
 	if err != nil {
