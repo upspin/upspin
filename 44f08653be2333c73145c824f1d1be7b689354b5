@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28a718d3_f738c022",
+        "filename": "directory/testdir/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-19T23:44:57Z",
+      "side": 1,
+      "message": "To be really paranoid, I\u0027d check Delete(filename) now returns an error too.",
+      "revId": "44f08653be2333c73145c824f1d1be7b689354b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
