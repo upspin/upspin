@@ -490,6 +490,64 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestUsers(t *testing.T) {
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, groupsNeeded, err := acc.Users(Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 0 {
+		t.Errorf("Expected no groups, got %d", len(groupsNeeded))
+	}
+	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
+	if diffs := stringListsDifferences(expectedReaders, listFromUserName(readersList)); diffs != "" {
+		t.Fatal(diffs)
+	}
+	writersList, groupsNeeded, err := acc.Users(Write)
+	if err != ErrNeedGroup {
+		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	}
+	expectedWriters := []string{"bob@foo.com"}
+	if diffs := stringListsDifferences(expectedWriters, listFromUserName(writersList)); diffs != "" {
+		t.Fatal(diffs)
+	}
+	groupsExpected := []string{"bob@foo.com/Group/family"}
+	if diffs := stringListsDifferences(groupsExpected, listFromPathName(groupsNeeded)); diffs != "" {
+		t.Fatal(diffs)
+	}
+	// Add the missing group.
+	err = AddGroup("bob@foo.com/Group/family", []byte("sis@foo.com, uncle@foo.com, grandparents"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Try again.
+	writersList, groupsNeeded, err = acc.Users(Write)
+	if err != ErrNeedGroup {
+		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	}
+	groupsExpected = []string{"bob@foo.com/Group/grandparents"}
+	if diffs := stringListsDifferences(groupsExpected, listFromPathName(groupsNeeded)); diffs != "" {
+		t.Fatal(diffs)
+	}
+	// Add grandparents and for good measure, add the family again.
+	err = AddGroup("bob@foo.com/Group/grandparents", []byte("grandpamoe@antifoo.com family"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	writersList, groupsNeeded, err = acc.Users(Write)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedWriters = []string{"bob@foo.com", "sis@foo.com", "uncle@foo.com", "grandpamoe@antifoo.com"}
+	if diffs := stringListsDifferences(expectedWriters, listFromUserName(writersList)); diffs != "" {
+		t.Fatal(diffs)
+	}
+}
+
 // This is unusual, but to be safe we are asserting equal correctly we test that our comparator is good.
 // (Is worth making Equal a method in Access? Not needed outside of this test yet.)
 func TestAssertEqual(t *testing.T) {
@@ -614,4 +672,58 @@ func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
 	if expectIsFile != isFile {
 		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
 	}
+}
+
+// stringListsDifferences compares two string lists and returns a string describing differences, if any.
+// Ordering of elements in the list is not considered a difference. Repetition is okay, but repeated elements must
+// be present on both lists.
+func stringListsDifferences(expected []string, gotten []string) string {
+	if len(expected) != len(gotten) {
+		return fmt.Sprintf("Length mismatched, expected %d, got %d", len(expected), len(gotten))
+	}
+	strMap := make(map[string]int)
+	for _, v := range expected {
+		if count, found := strMap[v]; found {
+			count++
+			strMap[v] = count
+		} else {
+			strMap[v] = 1
+		}
+	}
+	for i, v := range gotten {
+		count, found := strMap[v]
+		if found {
+			count--
+			if count == 0 {
+				delete(strMap, v)
+			} else {
+				strMap[v] = count
+				if count < 0 {
+					panic("I'm an idiot")
+				}
+			}
+		} else {
+			return fmt.Sprintf("Index %d: unexpected element %q", i, v)
+		}
+	}
+	if len(strMap) != 0 {
+		return fmt.Sprintf("Expected values not seen: %v", strMap)
+	}
+	return ""
+}
+
+func listFromPathName(p []upspin.PathName) []string {
+	ret := make([]string, len(p))
+	for i, v := range p {
+		ret[i] = string(v)
+	}
+	return ret
+}
+
+func listFromUserName(u []upspin.UserName) []string {
+	ret := make([]string, len(u))
+	for i, v := range u {
+		ret[i] = string(v)
+	}
+	return ret
 }

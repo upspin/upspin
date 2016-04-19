@@ -468,12 +468,9 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 			return isOwner, nil, nil
 		}
 	}
-	var list []path.Parsed
-	switch right {
-	case Read, Write, List, Create, Delete:
-		list = a.list[right]
-	default:
-		return false, nil, fmt.Errorf("unrecognized right value %d", right)
+	list, err := a.getListFor(right)
+	if err != nil {
+		return false, nil, err
 	}
 	// First try the list of regular users we have loaded. Make a note of groups to check.
 	found, groupsToCheck := a.inList(parsedRequester, list, nil)
@@ -509,6 +506,109 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		return false, missingGroups, ErrNeedGroup
 	}
 	return false, nil, nil
+}
+
+// expandGroups expands a list of groups to the user names they represent.
+// If the Access file does not know the members of a group that it
+// needs to resolve the answer, it sets the error to ErrNeedGroup, and
+// returns a list of the group files it needs to have read for it.
+// The caller should fetch these and report them with the AddGroup method, then retry.
+func (a *Access) expandGroups(toExpand []upspin.PathName) ([]upspin.UserName, []upspin.PathName, error) {
+	var missingGroups []upspin.PathName
+	var userNames []upspin.UserName
+Outer:
+	for i := 0; i < len(toExpand); i++ { // not range since list may grow
+		group := toExpand[i]
+		mu.RLock()
+		usersFromGroup, found := groups[group]
+		mu.RUnlock()
+		if found {
+			for _, p := range usersFromGroup {
+				if len(p.Elems) == 0 {
+					userNames = append(userNames, p.User)
+				} else {
+					// This means there are nested Groups.
+					// Add it to the list to expand if not already there.
+					newGroupToExpand := p.Path()
+					for _, te := range toExpand {
+						if te == newGroupToExpand {
+							continue Outer
+						}
+					}
+					toExpand = append(toExpand, newGroupToExpand)
+				}
+			}
+		} else {
+			// Add to missingGroups if not already there.
+			for _, mg := range missingGroups {
+				if string(group) == string(mg) {
+					continue Outer
+				}
+			}
+			missingGroups = append(missingGroups, group)
+		}
+	}
+	if len(missingGroups) > 0 {
+		return userNames, missingGroups, ErrNeedGroup
+	}
+	return userNames, nil, nil
+}
+
+func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
+	switch right {
+	case Read, Write, List, Create, Delete:
+		return a.list[right], nil
+	default:
+		return nil, fmt.Errorf("unrecognized right value %d", right)
+	}
+}
+
+// Users returns the user names granted a given right according to the rules
+// of the Access file.
+//
+// If the Access file does not know the members of a group that it
+// needs to resolve the answer, it sets the error to
+// ErrNeedGroup, and returns a list of the group files it needs to
+// have read for it. The caller should fetch these and report them
+// with the AddGroup method, then retry.
+func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error) {
+	list, err := a.getListFor(right)
+	if err != nil {
+		return nil, nil, err
+	}
+	userNames := make([]upspin.UserName, 0, len(list))
+	var groups []upspin.PathName
+	for _, user := range list {
+		if len(user.Elems) == 0 {
+			// It's a user
+			userNames = append(userNames, user.User)
+		} else {
+			// It's a group. Need to unroll groups.
+			groups = append(groups, user.Path())
+		}
+	}
+	if len(groups) > 0 {
+		users, missingGroups, err := a.expandGroups(groups)
+		userNames = mergeUsers(userNames, users)
+		if err != nil {
+			return userNames, missingGroups, err
+		}
+	}
+	return userNames, nil, nil
+}
+
+// mergeUsers merges src into dst skipping duplicates and returns the updated dst.
+func mergeUsers(dst []upspin.UserName, src []upspin.UserName) []upspin.UserName {
+	known := make(map[upspin.UserName]bool)
+	for _, d := range dst {
+		known[d] = true
+	}
+	for _, s := range src {
+		if _, found := known[s]; !found {
+			dst = append(dst, s)
+		}
+	}
+	return dst
 }
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
