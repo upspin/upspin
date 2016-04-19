@@ -19,8 +19,7 @@ import (
 
 func TestAllInProcess(t *testing.T) {
 	for _, packing := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEp256Pack, upspin.EEp521Pack} {
-		env := newEnv(t, packing)
-		runAllTests(t, env)
+		runAllTests(t, packing)
 	}
 }
 
@@ -30,8 +29,7 @@ var userNameCounter = 0
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 	log.Printf("===== Using packing: %d", packing)
 
-	userName := upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
-	userNameCounter++
+	userName := newUserName()
 
 	s := &testenv.Setup{
 		OwnerName: userName,
@@ -43,6 +41,11 @@ func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 		t.Fatal(err)
 	}
 	return env
+}
+
+func newUserName() upspin.UserName {
+	userNameCounter++
+	return upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 }
 
 func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing.T) (upspin.File, []byte) {
@@ -59,9 +62,11 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 	return f, data
 }
 
-func runAllTests(t *testing.T, env *testenv.Env) {
+func runAllTests(t *testing.T, packing upspin.Packing) {
+	env := newEnv(t, packing)
 	testPutGetTopLevelFile(t, env)
 	testFileSequentialAccess(t, env)
+	testReadAccess(t, packing)
 }
 
 func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {
