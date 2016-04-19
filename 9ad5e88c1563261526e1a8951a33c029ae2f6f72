@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "28a718d3_60e98c9a",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-19T18:34:33Z",
+      "side": 1,
+      "message": "I think so. It\u0027s a terrible situation, so nothing will work anyway.",
+      "parentUuid": "28a718d3_208144ee",
+      "revId": "9ad5e88c1563261526e1a8951a33c029ae2f6f72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "28a718d3_405d704e",
         "filename": "pack/debug/testpack_test.go",
         "patchSetId": 1
@@ -30,6 +48,42 @@
       "writtenOn": "2016-04-19T18:32:27Z",
       "side": 1,
       "message": "Probably doesn\u0027t matter, but Dial returns an instance of User. return d, nil would be more accurate.",
+      "revId": "9ad5e88c1563261526e1a8951a33c029ae2f6f72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28a718d3_e0059c38",
+        "filename": "pack/debug/testpack_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-19T18:34:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28a718d3_405d704e",
+      "revId": "9ad5e88c1563261526e1a8951a33c029ae2f6f72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28a718d3_8015b864",
+        "filename": "pack/debug/testpack_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-19T18:34:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28a718d3_405d704e",
       "revId": "9ad5e88c1563261526e1a8951a33c029ae2f6f72",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
