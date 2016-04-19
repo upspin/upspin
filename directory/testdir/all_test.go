@@ -28,6 +28,10 @@ var (
 	useGCPStore = "" // leave empty for in-process. see init below
 )
 
+func init() {
+	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
+}
+
 var context *upspin.Context
 
 func setupContext() {
@@ -530,7 +534,7 @@ func TestRootDirectorySequencing(t *testing.T) {
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
-		entry, err = context.Directory.Lookup(user)
+		entry, err = context.Directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("lookup dir %d: %v", i, err)
 		}
@@ -541,6 +545,86 @@ func TestRootDirectorySequencing(t *testing.T) {
 	}
 }
 
-func init() {
-	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
+func TestDelete(t *testing.T) {
+	const (
+		user     = "user8@google.com"
+		fileName = user + "/file"
+	)
+	setup(user)
+	dir := context.Directory
+	entry := storeData(t, []byte("hello"), fileName)
+	_, err := dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = dir.Delete(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err == nil {
+		t.Fatal("file still exists after deletion")
+	}
+	// Another Delete should fail.
+	err = dir.Delete(fileName)
+	if err == nil {
+		t.Fatal("second Delete succeeds")
+	}
+	const expect = "no such directory entry"
+	if !strings.Contains(err.Error(), expect) {
+		t.Fatalf("second delete gives wrong error: %q; expected %q", err, expect)
+	}
+}
+
+func TestDeleteDirectory(t *testing.T) {
+	const (
+		user     = "user9@google.com"
+		dirName  = user + "/dir"
+		fileName = dirName + "/file"
+	)
+	setup(user)
+	dir := context.Directory
+	_, err := dir.MakeDirectory(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry := storeData(t, []byte("hello"), fileName)
+	_, err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// File exists. First attempt to delete directory should fail.
+	err = dir.Delete(dirName)
+	if err == nil {
+		t.Fatal("deleted non-empty directory")
+	}
+	if !strings.Contains(err.Error(), "empty") {
+		t.Fatalf("deleting non-empty directory succeeded with wrong error: %v", err)
+	}
+	// Now delete the file.
+	err = context.Directory.Delete(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err == nil {
+		t.Fatal("file still exists after deletion")
+	}
+	// Now try again to delete the directory.
+	err = dir.Delete(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(dirName)
+	if err == nil {
+		t.Fatal("directory still exists after deletion")
+	}
 }

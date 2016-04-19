@@ -326,7 +326,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	entry := newDirEntry(s.context, parsed.Path())
 	entry.Metadata.IsDir = true
 	entry.Location = loc
-	return loc, s.put("MakeDirectory", true, entry)
+	return loc, s.put("MakeDirectory", entry, false)
 }
 
 // Put creates or overwrites the blob with the specified path.
@@ -365,7 +365,7 @@ func (s *Service) Put(entry *upspin.DirEntry) (*upspin.WrapNeeded, error) {
 			return nil, mkStrError("Put", entry.Name, "not in plain packing")
 		}
 	}
-	err = s.put("Put", false, entry)
+	err = s.put("Put", entry, false)
 	if err != nil {
 		return nil, err
 	}
@@ -391,8 +391,9 @@ func (s *Service) Put(entry *upspin.DirEntry) (*upspin.WrapNeeded, error) {
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
-// TODO add WrapNeeded ?
-func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
+// If deleting, we expect the entry to already be present and skip it on the rewrite.
+// TODO add Share?
+func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return err
@@ -413,7 +414,7 @@ func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
 	entries = append(entries, dirEntry)
 	for i := 0; i < len(parsed.Elems)-1; i++ {
-		e, err := s.fetchEntry("Put", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+		e, err := s.fetchEntry(op, parsed.First(i).Path(), dirRef, parsed.Elems[i])
 		if err != nil {
 			return err
 		}
@@ -423,7 +424,7 @@ func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 		entries = append(entries, e)
 		dirRef = e.Location.Reference
 	}
-	dirRef, err = s.installEntry(op, path.DropPath(pathName, 1), dirRef, entry, false)
+	dirRef, err = s.installEntry(op, path.DropPath(pathName, 1), dirRef, entry, deleting, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return err
@@ -445,7 +446,7 @@ func (s *Service) put(op string, dataIsDir bool, entry *upspin.DirEntry) error {
 				Packdata: upspin.Packdata{byte(dirPacking)},
 			},
 		}
-		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, true)
+		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, false, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
 			return err
@@ -470,6 +471,52 @@ func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
 		return nil, err
 	}
 	return data, err
+}
+
+// Delete deletes a name from memory.
+func (s *Service) Delete(pathName upspin.PathName) error {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return err
+	}
+	canDelete, err := s.can(access.Delete, parsed)
+	if err != nil {
+		return err
+	}
+	if !canDelete {
+		return mkError("Delete", pathName, access.ErrPermissionDenied)
+	}
+	if parsed.IsRoot() {
+		return mkStrError("Delete", pathName, "cannot delete user root") // Should be done in User service.
+	}
+
+	entry, err := s.lookup(parsed) // File must exist.
+	if err != nil {
+		return err
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// If it is a directory, it must be empty.
+	if entry.Metadata.IsDir {
+		empty, err := s.isEmptyDirectory(entry)
+		if err != nil {
+			return err
+		}
+		if !empty {
+			return mkStrError("Delete", pathName, "directory not empty")
+		}
+	}
+
+	return s.put("Delete", entry, true)
+}
+
+func (s *Service) isEmptyDirectory(entry *upspin.DirEntry) (bool, error) {
+	data, err := s.fetchDir(entry.Location.Reference, entry.Name)
+	if err != nil {
+		return false, err
+	}
+	return len(data) == 0, nil
 }
 
 // Lookup returns the directory entry for the named file.
@@ -639,7 +686,7 @@ var errSeq = errors.New("sequence mismatch")
 
 // installEntry installs the new entry in the directory referenced by dirLeu, appending or overwriting the
 // entry as required. It returns the ref for the updated directory.
-func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, dirOverwriteOK bool) (upspin.Reference, error) {
+func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (upspin.Reference, error) {
 	if dirRef == "" {
 		panic("nothing")
 	}
@@ -649,7 +696,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 	}
 	found := false
 	var nextEntry upspin.DirEntry
-	for payload := dirData; len(payload) > 0 && !found; {
+	for payload := dirData; len(payload) > 0; {
 		// Remember where this entry starts.
 		start := len(dirData) - len(payload)
 		remaining, err := nextEntry.Unmarshal(payload)
@@ -661,30 +708,41 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		if nextEntry.Name != newEntry.Name {
 			continue
 		}
-		// We found the item.
+		// We found the item with that name.
+		found = true
 		// If it's already there and is not expected to be a directory, this is an error.
-		if nextEntry.Metadata.IsDir && !dirOverwriteOK {
+		if !deleting && nextEntry.Metadata.IsDir && !dirOverwriteOK {
 			return "", mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
-		// Drop this entry so we can append the updated one.
+		// Drop this entry so we can append the updated one (or skip it, if we're deleting).
 		// It may have changed length because of the metadata being unpredictable,
 		// so we cannot overwrite it in place.
 		copy(dirData[start:], remaining)
 		dirData = dirData[:len(dirData)-length]
-		// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
-		if newEntry.Metadata.Sequence != 0 {
-			if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
-				return "", mkError(op, newEntry.Name, errSeq)
+		if !deleting {
+			// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
+			if newEntry.Metadata.Sequence != 0 {
+				if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
+					return "", mkError(op, newEntry.Name, errSeq)
+				}
 			}
+			newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
 		}
-		newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
 		break
 	}
-	data, err := newEntry.Marshal()
-	if err != nil {
-		return "", err
+	if deleting {
+		// Must exist.
+		if !found {
+			return "", mkStrError(op, newEntry.Name, "not found")
+		}
+	} else {
+		// Add new entry to directory.
+		data, err := newEntry.Marshal()
+		if err != nil {
+			return "", err
+		}
+		dirData = append(dirData, data...)
 	}
-	dirData = append(dirData, data...)
 	blob, _, err := packDirBlob(s.context, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
 	ref, err := s.store.Put(blob)
 	if err != nil {
@@ -700,11 +758,6 @@ func (s *Service) DeleteAll() {
 	s.root = make(map[upspin.UserName]*upspin.DirEntry)
 	s.access = make(map[upspin.PathName]*access.Access)
 	s.mu.Unlock()
-}
-
-// Delete deletes a name from memory.
-func (s *Service) Delete(name upspin.PathName) error {
-	return errors.New("not implemented")
 }
 
 // Methods to implement upspin.Dialer
