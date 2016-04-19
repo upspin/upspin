@@ -399,6 +399,9 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 			return err
 		}
 	}
+	if access.IsGroupFile(parsedPath) {
+		access.RemoveGroup(parsedPath) // ignore error since it doesn't matter if the group was added already.
+	}
 	return nil
 }
 
