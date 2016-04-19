@@ -468,12 +468,9 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 			return isOwner, nil, nil
 		}
 	}
-	var list []path.Parsed
-	switch right {
-	case Read, Write, List, Create, Delete:
-		list = a.list[right]
-	default:
-		return false, nil, fmt.Errorf("unrecognized right value %d", right)
+	list, err := a.getListFor(right)
+	if err != nil {
+		return false, nil, err
 	}
 	// First try the list of regular users we have loaded. Make a note of groups to check.
 	found, groupsToCheck := a.inList(parsedRequester, list, nil)
@@ -509,6 +506,40 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		return false, missingGroups, ErrNeedGroup
 	}
 	return false, nil, nil
+}
+
+func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
+	switch right {
+	case Read, Write, List, Create, Delete:
+		return a.list[right], nil
+	default:
+		return nil, fmt.Errorf("unrecognized right value %d", right)
+	}
+}
+
+// UserNames returns the user names granted a given right.
+// If ErrGroupNeeded is returned, the path names of the necessary group
+// files for evaluation are also returned; add them with AddGroup.
+func (a *Access) UserNames(right Right) ([]upspin.UserName, []upspin.PathName, error) {
+	list, err := a.getListFor(right)
+	if err != nil {
+		return nil, nil, err
+	}
+	userNames := make([]upspin.UserName, 0, len(list))
+	groupNames := make([]upspin.PathName, 0, len(list))
+	for _, user := range list {
+		if len(user.Elems) == 0 {
+			// It's a user
+			userNames = append(userNames, user.User)
+		} else {
+			// It's a group
+			groupNames = append(groupNames, user.Path())
+		}
+	}
+	if len(groupNames) > 0 {
+		return userNames, groupNames, ErrNeedGroup
+	}
+	return userNames, nil, nil
 }
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
