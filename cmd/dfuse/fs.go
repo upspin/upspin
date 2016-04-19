@@ -288,10 +288,66 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	return h, nil
 }
 
-// Remove implements fs.Noderemover.
-// TODO(p): implement Directory.Remove
+func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin.DirEntry, error) {
+	if n.attr.Mode&os.ModeDir != os.ModeDir {
+		return nil, nil, enotdir("%q", n.uname)
+	}
+	user := n.user
+	if n.t == rootNode {
+		user = upspin.UserName(uname)
+	}
+	dir, err := n.f.dc.lookup(user)
+	if err != nil {
+		return nil, nil, enoent("lookup user %q: %s", n.user, err)
+	}
+	de, err := dir.Lookup(uname)
+	if err != nil {
+		if expectedError(err, dirErrors) {
+			return nil, nil, enoent("lookup %q: %s", uname, err)
+		}
+		// Any other error may imply that our directory connection is
+		// stale.  Forget the cached value and try again.
+		n.f.dc.remove(user)
+		dir, err = n.f.dc.lookup(user)
+		if err != nil {
+			return nil, nil, enoent("lookup user %q: %s", n.user, err)
+		}
+		de, err = dir.Lookup(uname)
+		if err != nil {
+			return nil, nil, enoent("lookup %q: %s", uname, err)
+		}
+	}
+	return dir, de, nil
+}
+
+// Remove implements fs.Noderemover.  'n' is the directory in which the file
+// req.Name resides.  req.Dir flags this as an rmdir.
 func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
-	log.Printf("Remove %q", n.uname)
+	uname := path.Join(n.uname, req.Name)
+	log.Printf("Remove %q", uname)
+
+	// Find the node in question.
+	dir, de, err := n.directoryLookup(uname)
+	if err != nil {
+		return err
+	}
+
+	// Make sure the requested type (directory or not) matches.
+	if req.Dir {
+		if !de.Metadata.IsDir {
+			return enotdir("%q", uname)
+		}
+	} else {
+		if de.Metadata.IsDir {
+			return eisdir("%q", uname)
+		}
+	}
+
+	// Delete from the directory (but not the store).
+	err = dir.Delete(uname)
+	if err != nil {
+		return eperm("%q: %s", uname, err)
+	}
 	return nil
 }
 
@@ -317,35 +373,16 @@ func expectedError(err error, expected []string) bool {
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
-	log.Printf("Lookup %q in %q", name, n.uname)
-	if n.attr.Mode&os.ModeDir != os.ModeDir {
-		return nil, enotdir("%q", n.uname)
-	}
-	user := n.user
-	if n.t == rootNode {
-		user = upspin.UserName(name)
-	}
-	dir, err := n.f.dc.lookup(user)
+	uname := path.Join(n.uname, name)
+	log.Printf("Lookup %q", uname)
+
+	// Ask the Directory.
+	_, de, err := n.directoryLookup(uname)
 	if err != nil {
-		return nil, enoent("%s looking for user %q", err, n.user)
+		return nil, err
 	}
-	de, err := dir.Lookup(path.Join(n.uname, name))
-	if err != nil {
-		if expectedError(err, dirErrors) {
-			return nil, enoent("%s looking for %q", err, n.uname)
-		}
-		// Any other error may imply that our directory connection is
-		// stale.  Forget the cached value and try again.
-		n.f.dc.remove(user)
-		dir, err = n.f.dc.lookup(user)
-		if err != nil {
-			return nil, enoent("%s looking for user %q", err, n.user)
-		}
-		de, err = dir.Lookup(path.Join(n.uname, name))
-		if err != nil {
-			return nil, enoent("%s looking for file %q", err, n.uname)
-		}
-	}
+
+	// Make a node to hand back to fuse.
 	mode := os.FileMode(0700)
 	if de.Metadata.IsDir {
 		mode |= os.ModeDir
