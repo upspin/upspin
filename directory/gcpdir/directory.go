@@ -255,11 +255,15 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{
 	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
+	factotum, err := auth.NewFactotum(context)
+	if err != nil {
+		return nil, err
+	}
 	return &Directory{
 		endpoint:  e,
 		serverURL: serverURL.String(),
 		timeNow:   d.timeNow,
-		client:    auth.NewClient(context.UserName, auth.NewFactotum(context), &http.Client{}),
+		client:    auth.NewClient(context.UserName, factotum, &http.Client{}),
 	}, nil
 }
 

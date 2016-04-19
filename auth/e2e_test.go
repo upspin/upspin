@@ -80,7 +80,10 @@ func TestEndToEnd(t *testing.T) {
 		Transport: tr,
 	}
 	ctx := &upspin.Context{KeyPair: p256Key}
-	f := auth.NewFactotum(ctx)
+	f, err := auth.NewFactotum(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
 	authClient := auth.NewClient(user, f, client)
 	resp, err := authClient.Do(req)
 	if err != nil {

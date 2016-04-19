@@ -598,7 +598,10 @@ func TestPutAccessFile(t *testing.T) {
 	reqStore := nettest.NewRequest(t, netutil.Get, "https://store-server.upspin.io/get?ref=1234", nil)
 	respStore := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(accessContents))
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore}, []*http.Request{reqStore})
-	f := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	if err != nil {
+		t.Fatal(err)
+	}
 	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	storeClient := newStoreClient(authClient)
 
@@ -694,7 +697,10 @@ func TestGroupAccessFile(t *testing.T) {
 	respStore2 := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(newContentsOfFamilyGroup))
 
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore1, respStore2}, []*http.Request{reqStore1, reqStore2})
-	f := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	if err != nil {
+		t.Fatal(err)
+	}
 	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	storeClient := newStoreClient(authClient)
 
@@ -993,7 +999,10 @@ func newDummyDirServer() *dirServer {
 
 func newDummyStoreClient() *storeClient {
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	f := auth.NewFactotum(&upspin.Context{})
+	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	if err != nil {
+		panic(err)
+	}
 	authCli := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	return newStoreClient(authCli)
 }
