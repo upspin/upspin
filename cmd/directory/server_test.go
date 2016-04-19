@@ -1027,6 +1027,15 @@ func TestDeleteGroupFile(t *testing.T) {
 	resp.Verify(t)
 }
 
+func TestGenerateWorkForSharing(t *testing.T) {
+	// General strategy:
+	// 1) Add/modify an Access file.
+	// 2) Server will trigger a traversal of all children of the parent dir of that Access file.
+	// 3) Server will lookup the parsed Access file and query it.
+	// 4) Server will return 2+3 above.
+
+}
+
 func toJSON(t *testing.T, data interface{}) []byte {
 	ret, err := json.Marshal(data)
 	if err != nil {
