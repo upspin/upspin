@@ -468,12 +468,9 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 			return isOwner, nil, nil
 		}
 	}
-	var list []path.Parsed
-	switch right {
-	case Read, Write, List, Create, Delete:
-		list = a.list[right]
-	default:
-		return false, nil, fmt.Errorf("unrecognized right value %d", right)
+	list, err := a.getListFor(right)
+	if err != nil {
+		return false, nil, err
 	}
 	// First try the list of regular users we have loaded. Make a note of groups to check.
 	found, groupsToCheck := a.inList(parsedRequester, list, nil)
@@ -509,6 +506,54 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		return false, missingGroups, ErrNeedGroup
 	}
 	return false, nil, nil
+}
+
+func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
+	switch right {
+	case Read, Write, List, Create, Delete:
+		return a.list[right], nil
+	default:
+		return nil, fmt.Errorf("unrecognized right value %d", right)
+	}
+}
+
+// Users returns the user names granted a given right.
+// If ErrGroupNeeded is returned, the path names of the necessary group
+// files for evaluation are also returned; add them with AddGroup.
+func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error) {
+	list, err := a.getListFor(right)
+	if err != nil {
+		return nil, nil, err
+	}
+	userNames := make([]upspin.UserName, 0, len(list))
+	missingGroups := make([]upspin.PathName, 0, len(list))
+	for _, user := range list {
+		if len(user.Elems) == 0 {
+			// It's a user
+			userNames = append(userNames, user.User)
+		} else {
+			// It's a group. Need to unroll groups.
+			mu.Lock()
+			usersFromGroup, found := groups[user.Path()]
+			mu.Unlock()
+			if found {
+				for _, p := range usersFromGroup {
+					if len(p.Elems) == 0 {
+						userNames = append(userNames, p.User)
+					} else {
+						// This means there are nested Groups. Do we support this?
+						missingGroups = append(missingGroups, p.Path())
+					}
+				}
+			} else {
+				missingGroups = append(missingGroups, user.Path())
+			}
+		}
+	}
+	if len(missingGroups) > 0 {
+		return userNames, missingGroups, ErrNeedGroup
+	}
+	return userNames, nil, nil
 }
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
