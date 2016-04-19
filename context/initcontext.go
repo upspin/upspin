@@ -78,9 +78,12 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	// TODO(edpin): fix this by re-checking keys when they're needed.
 	// TODO(ehg): remove loading of private key
 	keyloader.Load(context)
-	context.Factotum = auth.NewFactotum(context)
-
 	var err error
+	context.Factotum, err = auth.NewFactotum(context)
+	if err != nil {
+		return nil, err
+	}
+
 	var ep *upspin.Endpoint
 	if ep, err = endpoint.Parse(vals["user"]); err != nil {
 		return nil, err

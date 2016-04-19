@@ -155,7 +155,10 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	f := auth.NewFactotum(ctx)
+	f, err := auth.NewFactotum(ctx)
+	if err != nil {
+		return 0, err
+	}
 	sig, err := f.FileSign(ctx.Packing, pathname, meta.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, err
@@ -224,7 +227,11 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	if err != nil {
 		return 0, err
 	}
-	f := auth.NewFactotum(ctx)
+	f, err := auth.NewFactotum(ctx)
+	if err != nil {
+		return 0, err
+	}
+
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := keyHash(pubkey)
 	b := sha256.Sum256(ciphertext)
@@ -272,7 +279,11 @@ func (c common) AddWrap(ctx *upspin.Context, a *upspin.WrapNeeded) {
 		return // can't happen
 	}
 	myhash := keyHash(mypub)
-	f := auth.NewFactotum(ctx)
+	f, err := auth.NewFactotum(ctx)
+	if err != nil {
+		log.Printf("cannot create factotum: %v", err)
+		return
+	}
 
 	// For each direntry, wrap for new readers.
 	for _, d := range a.DirEntries {

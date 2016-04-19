@@ -55,8 +55,12 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interfa
 	s.serverURL = serverURL.String()
 	authClient, isSecure := s.httpClient.(*auth.HTTPClient)
 	if isSecure {
+		factotum, err := auth.NewFactotum(context)
+		if err != nil {
+			return nil, newStoreError(op, err.Error(), "")
+		}
 		authClient.SetUserName(context.UserName)
-		authClient.SetUserKeys(auth.NewFactotum(context))
+		authClient.SetUserKeys(factotum)
 	}
 	if !netutil.IsServerReachable(s.serverURL) {
 		return nil, newStoreError(op, "Store server unreachable", "")

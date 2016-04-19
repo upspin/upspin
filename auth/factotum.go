@@ -26,10 +26,10 @@ type Factotum struct {
 }
 
 // NewFactotum returns a new Factotum providing all needed private key operations.
-func NewFactotum(ctx *upspin.Context) (f *Factotum) {
+func NewFactotum(ctx *upspin.Context) (*Factotum, error) {
 	ePublicKey, packingString, err := keyloader.ParsePublicKey(ctx.KeyPair.Public)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	kp := ctx.KeyPair
 	if n := len(kp.Private) - 1; kp.Private[n] == '\n' {
@@ -38,13 +38,14 @@ func NewFactotum(ctx *upspin.Context) (f *Factotum) {
 	var d big.Int
 	err = d.UnmarshalText([]byte(kp.Private))
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return &Factotum{
+	f := &Factotum{
 		strKeyPair:    kp,
 		ecdsaKeyPair:  ecdsa.PrivateKey{PublicKey: *ePublicKey, D: &d},
 		packingString: packingString,
 	}
+	return f, nil
 }
 
 // PackingString returns the Packing.String() value associated with the key inside f.
