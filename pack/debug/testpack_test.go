@@ -24,14 +24,18 @@ func TestRegister(t *testing.T) {
 }
 
 const (
-	name upspin.PathName = "user@google.com/file/of/user"
-	text                 = "this is some text"
+	name     upspin.PathName = "user@google.com/file/of/user"
+	text                     = "this is some text"
+	userName                 = "joe@blow.com"
 )
 
 var (
 	context = &upspin.Context{
+		User:     &dummyUser{},
+		UserName: userName,
 		KeyPair: upspin.KeyPair{
-			Private: upspin.PrivateKey("privacy please"),
+			Public:  "publicity please",
+			Private: "privacy please",
 		},
 	}
 )
@@ -113,4 +117,30 @@ func TestPack(t *testing.T) {
 	if str != text {
 		t.Errorf("text: expected %q; got %q", text, str)
 	}
+}
+
+// Dummy interface for User, so we can look up a user and get a key.
+
+type dummyUser struct {
+	endpoint upspin.Endpoint
+}
+
+type dummyStore struct {
+	endpoint upspin.Endpoint
+}
+
+type dummyDirectory struct {
+	endpoint upspin.Endpoint
+}
+
+func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+	return nil, []upspin.PublicKey{"a key"}, nil
+}
+
+func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+	return userName, nil
+}
+
+func (d *dummyUser) ServerUserName() string {
+	return "dummyUser"
 }
