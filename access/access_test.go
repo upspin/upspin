@@ -2,6 +2,8 @@ package access
 
 import (
 	"fmt"
+	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -490,6 +492,54 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestUsers(t *testing.T) {
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, groupsNeeded, err := acc.Users(Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 0 {
+		t.Errorf("Expected no groups, got %d", len(groupsNeeded))
+	}
+	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+	writersList, groupsNeeded, err := acc.Users(Write)
+	if err != ErrNeedGroup {
+		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	}
+	expectedWriters := []string{"bob@foo.com"}
+	expectEqual(t, expectedWriters, listFromUserName(writersList))
+	groupsExpected := []string{"bob@foo.com/Group/family"}
+	expectEqual(t, groupsExpected, listFromPathName(groupsNeeded))
+	// Add the missing group.
+	err = AddGroup("bob@foo.com/Group/family", []byte("sis@foo.com, uncle@foo.com, grandparents"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Try again.
+	writersList, groupsNeeded, err = acc.Users(Write)
+	if err != ErrNeedGroup {
+		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	}
+	groupsExpected = []string{"bob@foo.com/Group/grandparents"}
+	expectEqual(t, groupsExpected, listFromPathName(groupsNeeded))
+	// Add grandparents and for good measure, add the family again.
+	err = AddGroup("bob@foo.com/Group/grandparents", []byte("grandpamoe@antifoo.com family"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	writersList, groupsNeeded, err = acc.Users(Write)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedWriters = []string{"bob@foo.com", "sis@foo.com", "uncle@foo.com", "grandpamoe@antifoo.com"}
+	expectEqual(t, expectedWriters, listFromUserName(writersList))
+}
+
 // This is unusual, but to be safe we are asserting equal correctly we test that our comparator is good.
 // (Is worth making Equal a method in Access? Not needed outside of this test yet.)
 func TestAssertEqual(t *testing.T) {
@@ -614,4 +664,32 @@ func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
 	if expectIsFile != isFile {
 		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
 	}
+}
+
+// expectEqual fails if the two lists do not have the same contents, irrespective of order.
+func expectEqual(t *testing.T, expected []string, gotten []string) {
+	sort.Strings(expected)
+	sort.Strings(gotten)
+	if len(expected) != len(gotten) {
+		t.Fatalf("Length mismatched, expected %d, got %d: %v vs %v", len(expected), len(gotten), expected, gotten)
+	}
+	if !reflect.DeepEqual(expected, gotten) {
+		t.Fatalf("Expected %v got %v", expected, gotten)
+	}
+}
+
+func listFromPathName(p []upspin.PathName) []string {
+	ret := make([]string, len(p))
+	for i, v := range p {
+		ret[i] = string(v)
+	}
+	return ret
+}
+
+func listFromUserName(u []upspin.UserName) []string {
+	ret := make([]string, len(u))
+	for i, v := range u {
+		ret[i] = string(v)
+	}
+	return ret
 }
