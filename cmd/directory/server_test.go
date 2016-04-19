@@ -966,6 +966,67 @@ func TestDeleteAccessFile(t *testing.T) {
 	}
 }
 
+func TestDeleteGroupFile(t *testing.T) {
+	// There's an access file that gives rights to a Group called family, which contains one user.
+	const broUserName = "bro@family.com"
+	newRoot := userRoot
+	newRoot.accessFiles = make(accessFileDB)
+	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "r,l,w,c: family, "+userName)
+	rootJSON := toRootJSON(t, &newRoot)
+
+	dirJSON := toJSON(t, dir)
+
+	groupPathName := upspin.PathName(userName + "/Group/family")
+	access.AddGroup(groupPathName, []byte(broUserName))
+
+	refOfGroupFile := "sha-256 of Group/family"
+	groupDir := upspin.DirEntry{
+		Name: groupPathName,
+		Location: upspin.Location{
+			Reference: upspin.Reference(refOfGroupFile),
+			Endpoint:  dir.Location.Endpoint, // Same endpoint as the dir entry itself.
+		},
+	}
+	groupDirJSON := toJSON(t, groupDir)
+
+	lgcp := &listGCP{
+		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+			Ref:  []string{userName, pathName, string(groupPathName)},
+			Data: [][]byte{rootJSON, dirJSON, groupDirJSON},
+		},
+		deletePathExpected: string(groupPathName),
+	}
+
+	// Verify that bro@family.com has access.
+	resp := nettest.NewExpectingResponseWriter(string(dirJSON))
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
+
+	ds := newDirServer(lgcp, newDummyStoreClient())
+
+	broSess := testauth.NewSessionForTesting(upspin.UserName(broUserName), false, nil)
+	ds.dirHandler(broSess, resp, req)
+	resp.Verify(t)
+
+	// Now the owner deletes the group file.
+	resp = nettest.NewExpectingResponseWriter(`{"error":"success"}`)
+	req = nettest.NewRequest(t, netutil.Delete, u("http://localhost:8080/dir/", groupPathName), nil)
+
+	ds.dirHandler(dummySess, resp, req)
+	resp.Verify(t)
+
+	if !lgcp.deleteCalled {
+		t.Errorf("Expected delete to be called on %s", groupPathName)
+	}
+
+	// And now the session for bro (broSess) can no longer read it.
+	// TODO: this error message is not helpful. It should contain permission denied plus the path
+	// to the missing Group file.
+	resp = nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: download: pathname not found"}`)
+	req = nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
+	ds.dirHandler(broSess, resp, req)
+	resp.Verify(t)
+}
+
 func toJSON(t *testing.T, data interface{}) []byte {
 	ret, err := json.Marshal(data)
 	if err != nil {
