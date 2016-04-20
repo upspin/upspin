@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_25f62ea1",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T01:15:10Z",
+      "side": 1,
+      "message": "I would just call this Users.",
+      "revId": "23b97f609010ef33751c5f04b4c3da5b9be7dc71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_0552125a",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T01:15:10Z",
+      "side": 1,
+      "message": "This is not right. If it\u0027s a group, you need to form the transitive closure. ErrGroupNames should only happen if a group isn\u0027t loaded yet.",
+      "revId": "23b97f609010ef33751c5f04b4c3da5b9be7dc71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
