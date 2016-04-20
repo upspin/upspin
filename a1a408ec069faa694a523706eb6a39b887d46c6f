@@ -34,6 +34,24 @@
       "revId": "a1a408ec069faa694a523706eb6a39b887d46c6f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_14a24220",
+        "filename": "access/access_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T20:46:51Z",
+      "side": 1,
+      "message": "Here\u0027s an even simpler way.\nsort list 1\nsort list 2\nstr1 :\u003d strings.Join(list 1, \" \")\nstr2 :\u003d strings.Join(list 2, \" \")\nif str1 !\u003d str2 {\nt.Fatal(....)\n}",
+      "parentUuid": "285ab8dd_1449e235",
+      "revId": "a1a408ec069faa694a523706eb6a39b887d46c6f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
