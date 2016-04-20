@@ -209,6 +209,24 @@
       "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_ae943b30",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T17:22:00Z",
+      "side": 1,
+      "message": "No. An empty Access file is more restrictive than no Access file (owner loses Write and Create privileges).",
+      "parentUuid": "285ab8dd_ee21d3e8",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
