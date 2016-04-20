@@ -149,7 +149,7 @@ type Packer interface {
 	// Share updates each packdata element to enable all the readers,
 	// and only those readers, to be able to decrypt the associated ciphertext,
 	// which is held separate from this call. It is invoked in response to
-	// Directory.Put returning information about entries that need updating due to
+	// Directory updates returning information about entries that need updating due to
 	// changes in the set of users with permissions to read the associated items.
 	// In case of error, Share skips key wrapping for that reader or packdata.
 	// If packdata[i] is nil on return, processing that packdata was skipped.
@@ -222,6 +222,9 @@ type KeyPair struct {
 type Directory interface {
 	Dialer
 
+	// Endpoint returns the network endpoint of the server.
+	Endpoint() Endpoint
+
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
 
@@ -251,11 +254,7 @@ type Directory interface {
 	// and be directories. The final element, if it exists, must not
 	// be a directory. If something is already stored under the path,
 	// the new location and packdata replace the old.
-	//
-	// If no error, Put returns a hint describing skew between the
-	// users with wrapped keys for the paths and the users with Read
-	// access permisions. If no skew, readers and paths slices are empty.
-	Put(entry *DirEntry) (readers []UserName, paths []PathName, err error)
+	Put(entry *DirEntry) error
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
@@ -276,8 +275,11 @@ type Directory interface {
 	// It does not delete the data it references; use Store.Delete for that.
 	Delete(name PathName) error
 
-	// Endpoint returns the network endpoint of the server.
-	Endpoint() Endpoint
+	// WhichAccess returns the path name of the Access file that is
+	// reponsible for the access rights defined for the named item.
+	// If there is no such file, that is, there are no Access files that
+	// apply, it returns the empty string.
+	WhichAccess(name PathName) (PathName, error)
 }
 
 // Time represents a timestamp in units of seconds since

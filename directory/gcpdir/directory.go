@@ -73,22 +73,22 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Put implements Directory.
-func (d *Directory) Put(dirEntry *upspin.DirEntry) (readers []upspin.UserName, paths []upspin.PathName, err error) {
+func (d *Directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 
 	name := dirEntry.Name
 	if len(dirEntry.Metadata.Packdata) < 1 {
-		return nil, nil, newError(op, name, errors.New("missing packing type in packdata"))
+		return newError(op, name, errors.New("missing packing type in packdata"))
 	}
 	parsed, err := path.Parse(name)
 	if err != nil {
-		return nil, nil, newError(op, name, errors.New("invalid path"))
+		return newError(op, name, errors.New("invalid path"))
 	}
 	canonicalName := parsed.Path()
 
 	if access.IsAccessFile(canonicalName) && upspin.Packing(dirEntry.Metadata.Packdata[0]) != upspin.PlainPack {
 		// The directory server must be able to read the bytes from the reference.
-		return nil, nil, newError(op, canonicalName, errors.New("packing must be plain for Access file"))
+		return newError(op, canonicalName, errors.New("packing must be plain for Access file"))
 	}
 
 	dirEntry.Name = canonicalName
@@ -96,10 +96,15 @@ func (d *Directory) Put(dirEntry *upspin.DirEntry) (readers []upspin.UserName, p
 	// Now, Put to the server.
 	err = d.storeDirEntry(op, netutil.Post, dirEntry)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
-	return nil, nil, nil
+	return nil
+}
+
+// WhichAccess implements Directory.
+func (d *Directory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
+	return "", newError("WhichAccess", name, errors.New("unimplemented"))
 }
 
 // storeDirEntry stores the given dirEntry in the server by applying an HTTP method (POST or PATCH accepted by server).

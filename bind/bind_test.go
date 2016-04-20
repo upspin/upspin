@@ -88,8 +88,8 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.New("dummyDirectory.Lookup not implemented")
 }
-func (d *dummyDirectory) Put(entry *upspin.DirEntry) (readers []upspin.UserName, paths []upspin.PathName, err error) {
-	return nil, nil, errors.New("dummyDirectory.Put not implemented")
+func (d *dummyDirectory) Put(entry *upspin.DirEntry) error {
+	return errors.New("dummyDirectory.Put not implemented")
 }
 func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
 	return upspin.Location{}, errors.New("dummyDirectory.MakeDirectory not implemented")
@@ -109,4 +109,8 @@ func (d *dummyDirectory) Delete(name upspin.PathName) error {
 }
 func (d *dummyDirectory) Endpoint() upspin.Endpoint {
 	return d.endpoint
+}
+
+func (d *dummyDirectory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
+	return "", errors.New("dummyDirectory.WhichAccess not implemented")
 }

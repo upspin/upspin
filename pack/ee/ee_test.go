@@ -48,6 +48,7 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
+	fmt.Printf("%+v\n", ctx)
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
