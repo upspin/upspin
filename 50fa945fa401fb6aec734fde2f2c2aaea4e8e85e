@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_2bfb5d21",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-20T17:18:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_0b7301b3",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_4b42593f",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_6ea163bb",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-20T17:18:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_4b42593f",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_0b4c616c",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-04-20T16:02:59Z",
       "side": 1,
       "message": "it\u0027s not so much old as previous. prevWrap?",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_0eaeafaa",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-20T17:18:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_0b4c616c",
       "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -134,6 +188,24 @@
       "writtenOn": "2016-04-20T17:13:03Z",
       "side": 1,
       "message": "Sorry for jumping late on this, but as I implement the new Put I realized that Delete will have the same possibility -- we need to remove readers that just lost access because an Access file was removed.\n\nThis can be done in another CL, of course.",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_ee21d3e8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-20T17:18:48Z",
+      "side": 1,
+      "message": "Are the semantics the same if we Put an empty Access file before deleting?",
+      "parentUuid": "285ab8dd_4ecd8782",
       "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
