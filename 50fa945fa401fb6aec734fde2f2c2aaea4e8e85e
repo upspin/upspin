@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "285ab8dd_0b7301b3",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T16:02:59Z",
+      "side": 1,
+      "message": "yes",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_4b42593f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T16:02:59Z",
+      "side": 1,
+      "message": "i never liked variable names that are just their type. think what this would look like if the type were \u0027int\u0027. keyHashArray is OK because its raison d\u0027être is to be an array, but oldmap (which should be oldMap) is just empty of meaning.\n\nprevKeys maybe?",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_0b4c616c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T16:02:59Z",
+      "side": 1,
+      "message": "it\u0027s not so much old as previous. prevWrap?",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_8b6851f3",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
