@@ -88,27 +88,22 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 
 // checkRights is a convenience function that applies the Can method of the access entry given using the user, right and path provided.
 func (d *dirServer) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access) (bool, error) {
-	var groupErr error
-	for {
+	for retries := 0; retries < 10; retries++ {
 		can, morePaths, err := acc.Can(user, right, pathName)
 		if err == access.ErrNeedGroup {
-			for _, g := range morePaths {
-				err = d.addGroup(g, acc)
-				if err != nil {
-					if groupErr == nil {
-						groupErr = err
-					}
-				}
-			}
+			groupErr := d.addAllGroups(morePaths, acc)
 			if groupErr != nil {
-				logErr.Printf("Error checking access: %s", groupErr)
 				return false, groupErr
 			}
 			continue // Try acc.Can again
 		}
+		if err != nil {
+			return false, err
+		}
 		logMsg.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
-		return can, err
+		return can, nil
 	}
+	return false, newDirError("checkRights", pathName, "too many retries parsing Access files")
 }
 
 // addGroup looks up a Group name, fetches its contents if found and calls access.AddGroup with the contents.
@@ -127,4 +122,62 @@ func (d *dirServer) addGroup(pathName upspin.PathName, acc *access.Access) error
 		return err
 	}
 	return access.AddGroup(pathName, buf)
+}
+
+// addAllGroups attempts to add all given group path names into acc by calling addGroup for each entry of groups.
+func (d *dirServer) addAllGroups(groups []upspin.PathName, acc *access.Access) error {
+	var groupErr error
+	for _, g := range groups {
+		err := d.addGroup(g, acc)
+		if err != nil {
+			if groupErr == nil {
+				groupErr = err
+			}
+		}
+	}
+	return groupErr
+}
+
+// generateWrappingRequest generates two lists (as slices): 1) all the path names that need to
+// be "shared" (made readable) and 2) the user names that must be able to read the first list.
+func (d *dirServer) generateWrappingRequest(accessParsedPath *path.Parsed) ([]upspin.PathName, []upspin.UserName, error) {
+	// TODO: we should keep track of the user's longest path name. But the depth being unbounded is something that
+	// opens us up to DoS attacks. But so is the fan-out (number of entries per dir). Oh well.
+	const maxDepth = 10
+	paths, err := d.cloudClient.ListPrefix(accessParsedPath.Drop(1).String()+"/", maxDepth)
+	if err != nil {
+		return nil, nil, err
+	}
+	// Now get the Access file and retrieve all readers from it.
+	root, err := d.getRoot(accessParsedPath.User)
+	if err != nil {
+		return nil, nil, err
+	}
+	acc, found := root.accessFiles[accessParsedPath.Path()]
+	if !found {
+		return nil, nil, newDirError("genWork", accessParsedPath.Path(), "no such Access file")
+	}
+	var readers []upspin.UserName
+	var morePaths []upspin.PathName
+	var groupErr error
+	for retries := 0; retries < 10; retries++ {
+		readers, morePaths, err = acc.UserNames(access.Read)
+		if err == access.ErrNeedGroup {
+			groupErr = d.addAllGroups(morePaths, acc)
+			continue
+		}
+		if err != nil {
+			return nil, nil, err
+		}
+		break
+	}
+	if groupErr != nil {
+		return nil, nil, groupErr
+	}
+	// Convert string paths to upspin.PathName
+	pathNames := make([]upspin.PathName, len(paths))
+	for i, p := range paths {
+		pathNames[i] = upspin.PathName(p)
+	}
+	return pathNames, readers, nil
 }
