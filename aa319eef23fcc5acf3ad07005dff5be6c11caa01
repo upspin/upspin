@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_b409ee82",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:02:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_2eaa8bde",
+      "revId": "aa319eef23fcc5acf3ad07005dff5be6c11caa01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_0e46afff",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_54ff5a76",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:02:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_0e46afff",
+      "revId": "aa319eef23fcc5acf3ad07005dff5be6c11caa01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_4e658787",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2016-04-20T18:11:34Z",
       "side": 1,
       "message": "still not right. you need to see if this group is available now, and if so add it to the to-scan list. see the code in Can for an example how to do this.\n\nin short: you need to compute the transitive closure",
+      "revId": "aa319eef23fcc5acf3ad07005dff5be6c11caa01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_74fcd680",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:02:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_4e658787",
       "revId": "aa319eef23fcc5acf3ad07005dff5be6c11caa01",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
