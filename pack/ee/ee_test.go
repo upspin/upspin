@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -224,11 +225,16 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 	priv, err := ecdsa.GenerateKey(curve[packing], rand.Reader)
 	if err != nil {
 		// would be nice to t.Fatal but then can't call from Benchmark?
+		panic("ecdsa.GenerateKey failed")
 		return ctx, packer
 	}
 	ctx.KeyPair = upspin.KeyPair{
 		Public:  upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
 		Private: upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
+	}
+	ctx.Factotum, err = auth.NewFactotum(ctx)
+	if err != nil {
+		panic("NewFactotum failed")
 	}
 	return ctx, packer
 }

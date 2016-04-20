@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/pack/ee"
@@ -279,6 +280,10 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 	}
 	// Set the public key for the registered user.
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
+	context.Factotum, err = auth.NewFactotum(context)
+	if err != nil {
+		panic("NewFactotum failed")
+	}
 	return context, nil
 }
 

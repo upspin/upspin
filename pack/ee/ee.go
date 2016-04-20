@@ -475,7 +475,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	for i := 0; i < nwrap; i++ {
 		var w wrappedKey
 		w.keyHash = make([]byte, sha256.Size)
-		w.dkey = make([]byte, aesKeyLen)
+		w.dkey = make([]byte, 100) // TODO(ehg)
 		w.nonce = make([]byte, gcmStandardNonceSize)
 		w.ephemeral = ecdsa.PublicKey{Curve: c.curve, X: big.NewInt(0), Y: big.NewInt(0)}
 		n += pdGetBytes(&w.keyHash, pd[n:])
