@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_742e16d5",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T20:10:18Z",
+      "side": 1,
+      "message": "every time you do this, you\u0027re comparing the result to \"\" and then printing the result.\nwhy not have the function print the result using t.Logf and/or t.Fatalf. then you don\u0027t even need an if.\nmustBeEqual(t, l1, l2)",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_547afabf",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T20:10:18Z",
+      "side": 1,
+      "message": "see above\n\ni wouldn\u0027t bother to be so fastidious about the differences. i would just\nsort expected\nsort gotten\nif reflect.DeepEqual(expected, gotten) return true\nprint lengths\nprint expected\nprint gotten\nt.FailNow\n\ni mean, this is fine but it\u0027s so much work for such a simple job.",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_5448baab",
+        "filename": "test/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T20:10:18Z",
+      "side": 1,
+      "message": "weird",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
