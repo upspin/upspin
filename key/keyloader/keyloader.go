@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -39,10 +40,7 @@ func Load(context *upspin.Context) error {
 // ParsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
 // string representation of the private key.
 func ParsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
-	n := len(privateKey) - 1
-	if n > 0 && privateKey[n] == '\n' {
-		privateKey = privateKey[:n]
-	}
+	privateKey = upspin.PrivateKey(strings.TrimSpace(string(privateKey)))
 	var d big.Int
 	err = d.UnmarshalText([]byte(privateKey))
 	if err != nil {
@@ -100,14 +98,11 @@ func privateKey() (upspin.KeyPair, error) {
 	}
 	defer f.Close()
 	buf := make([]byte, 200) // enough for p521
-	n, err := f.Read(buf)
+	_, err = f.Read(buf)
 	if err != nil {
 		return zeroPrivKey, fmt.Errorf(keyloaderErr, err)
 	}
-	if buf[n-1] == '\n' {
-		n--
-	}
-	buf = buf[:n]
+	buf = []byte(strings.TrimSpace(string(buf)))
 	pubkey, err := publicKey()
 	if err != nil {
 		return zeroPrivKey, err
