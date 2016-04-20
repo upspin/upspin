@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_d436eade",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:28:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_f473e6e4",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_742e16d5",
         "filename": "access/access_test.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-20T20:10:18Z",
       "side": 1,
       "message": "every time you do this, you\u0027re comparing the result to \"\" and then printing the result.\nwhy not have the function print the result using t.Logf and/or t.Fatalf. then you don\u0027t even need an if.\nmustBeEqual(t, l1, l2)",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_747616a4",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:28:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_742e16d5",
       "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_d44d8a70",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:28:43Z",
+      "side": 1,
+      "message": "I\u0027ve simplified the string comparison part, but in name of not re-implementing this, I\u0027m leaving it as is. I hope it\u0027s okay. But if you feel strongly, I\u0027ll shorten this.",
+      "parentUuid": "285ab8dd_547afabf",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_5448baab",
         "filename": "test/access_test.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-20T20:10:18Z",
       "side": 1,
       "message": "weird",
+      "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_34497e5d",
+        "filename": "test/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T20:28:43Z",
+      "side": 1,
+      "message": "This was done automatically by Intellij. Somewhere along the lines a bad merge committed the wrong gofmt identation.",
+      "parentUuid": "285ab8dd_5448baab",
       "revId": "63f63d4f92f3cd106ac11c2dbfa76b306d6dcb5e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
