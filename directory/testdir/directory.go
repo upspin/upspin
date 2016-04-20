@@ -335,39 +335,39 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 //	gopher@google.com/
 //	gopher@google.com/a/b/c
 // Directories are created with MakeDirectory. Roots are anyway. TODO.
-func (s *Service) Put(entry *upspin.DirEntry) (*upspin.WrapNeeded, error) {
+func (s *Service) Put(entry *upspin.DirEntry) (readers []upspin.UserName, paths []upspin.PathName, err error) {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	canWrite, err := s.can(access.Write, parsed)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if !canCreate && !canWrite {
-		return nil, mkError("Put", entry.Name, access.ErrPermissionDenied)
+		return nil, nil, mkError("Put", entry.Name, access.ErrPermissionDenied)
 	}
 	// If it doesn't exist, we need Create permission.
 	if !canCreate {
 		if _, err := s.lookup(parsed); err != nil { // TODO: Check exact error?
 			// File does not exist but we do not have Create permission.
-			return nil, mkError("Put", entry.Name, access.ErrPermissionDenied)
+			return nil, nil, mkError("Put", entry.Name, access.ErrPermissionDenied)
 		}
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
 		if entry.Metadata.Packing() != upspin.PlainPack {
-			return nil, mkStrError("Put", entry.Name, "not in plain packing")
+			return nil, nil, mkStrError("Put", entry.Name, "not in plain packing")
 		}
 	}
 	err = s.put("Put", entry, false)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	// Put was successful. If it was an Access or Group file, there's more to do.
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
@@ -378,16 +378,16 @@ func (s *Service) Put(entry *upspin.DirEntry) (*upspin.WrapNeeded, error) {
 		if access.IsAccessFile(entry.Name) {
 			data, err := s.getData(entry)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			accessFile, err := access.Parse(entry.Name, data)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			s.access[path.DropPath(entry.Name, 1)] = accessFile
 		}
 	}
-	return nil, nil
+	return nil, nil, nil
 }
 
 // put is the underlying implementation of Put and MakeDirectory.

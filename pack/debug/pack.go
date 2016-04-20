@@ -40,7 +40,8 @@ func (testPack) String() string {
 	return "debug"
 }
 
-func (testPack) AddWrap(*upspin.Context, *upspin.WrapNeeded) {
+func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+	// Nothing to do.
 }
 
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.

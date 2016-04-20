@@ -34,11 +34,13 @@ import (
 // wrappedKey encodes a key that will decrypt and verify the ciphertext.
 type wrappedKey struct {
 	keyHash   []byte // sha256(recipient PublicKey)
-	encrypted []byte // ciphertext key, encrypted for recipient PublicKey
+	dkey      []byte // ciphertext symmetric decryption key, encrypted for recipient PublicKey
 	nonce     []byte
 	ephemeral ecdsa.PublicKey
 }
 type wrappedKeys []wrappedKey
+
+type keyHashArray [sha256.Size]byte // sometimes we need the array
 
 // common implements common functions parameterized by cipher-specific values.
 type common struct {
@@ -62,7 +64,7 @@ type eep521 struct {
 }
 
 const (
-	aesKeyLen          = 32 // AES-256 because public cloud may receive multifile multikey attack.
+	aesKeyLen          = 32 // AES-256 because public cloud should withstand multifile multikey attack.
 	p256               = "p256"
 	p384               = "p384"
 	p521               = "p521"
@@ -94,7 +96,7 @@ func init() {
 }
 
 const (
-	// TODO unfortunately cipher/gcm.go doesn't export these
+	// unfortunately cipher/gcm.go doesn't export these
 	gcmStandardNonceSize = 12
 	gcmTagSize           = 16
 )
@@ -142,7 +144,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	dkey := make([]byte, aesKeyLen) // TODO(ehg)   var dkey []byte
+	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
 		return 0, err
@@ -155,16 +157,12 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	f, err := auth.NewFactotum(ctx)
-	if err != nil {
-		return 0, err
-	}
-	sig, err := f.FileSign(ctx.Packing, pathname, meta.Time, dkey, cipherSum)
+	sig, err := ctx.Factotum.FileSign(ctx.Packing, pathname, meta.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, err
 	}
 
-	// Wrap for myself;  let AddWrap handle the others.
+	// Wrap for myself;  let Share handle the others.
 	wrap := make([]wrappedKey, 1)
 	p, err := parsePublicKey(ctx.KeyPair.Public, packer)
 	if err != nil {
@@ -227,10 +225,6 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	if err != nil {
 		return 0, err
 	}
-	f, err := auth.NewFactotum(ctx)
-	if err != nil {
-		return 0, err
-	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := keyHash(pubkey)
@@ -241,7 +235,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 			continue
 		}
 		// Decode my wrapped key using my private key
-		dkey, err = c.aesUnwrap(f, w)
+		dkey, err = c.aesUnwrap(ctx.Factotum, w)
 		if err != nil {
 			log.Printf("unwrap failed: %v", err)
 			return 0, err
@@ -257,68 +251,84 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	return 0, errNoWrappedKey
 }
 
-// AddWrap extracts dkey from the packdata, wraps for all the new readers, and updates packdata.
-func (c common) AddWrap(ctx *upspin.Context, a *upspin.WrapNeeded) {
+// Share extracts dkey from the packdata, wraps for readers, and updates packdata.
+func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	packer := pack.Lookup(ctx.Packing)
 
 	// Fetch all the public keys we'll need.
-	pubkey := make([]*ecdsa.PublicKey, len(a.Readers))
-	for i, u := range a.Readers {
-		pubkey[i] = nil
-		readerRawPublicKey, err := publicKey(ctx, u, packer)
+	pubkey := make([]*ecdsa.PublicKey, len(readers))
+	hash := make([]keyHashArray, len(readers))
+	for i, pub := range readers {
+		// TODO(ehg) someday deal with diverse key types amongst readers
+		var err error
+		pubkey[i], err = parsePublicKey(pub, packer)
 		if err != nil {
 			continue
 		}
-		pubkey[i], err = parsePublicKey(readerRawPublicKey, packer)
+		copy(hash[i][:], keyHash(pubkey[i]))
 	}
 
-	// Get my own keys ready.
+	// Get my own key.
 	mypub, err := parsePublicKey(ctx.KeyPair.Public, packer)
 	if err != nil {
 		log.Printf("cannot parse my own key: %v", err)
 		return // can't happen
 	}
 	myhash := keyHash(mypub)
-	f, err := auth.NewFactotum(ctx)
-	if err != nil {
-		log.Printf("cannot create factotum: %v", err)
-		return
-	}
 
-	// For each direntry, wrap for new readers.
-	for _, d := range a.DirEntries {
+	// For each packdata, wrap for new readers.
+	for i, d := range packdata {
+
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
-		sig, dwrap, err := c.pdUnmarshal(d.Metadata.Packdata)
-		for _, w := range dwrap {
+		alreadyWrapped := make(map[keyHashArray]wrappedKey)
+		sig, wrap, err := c.pdUnmarshal(*d)
+		for i, w := range wrap {
+			var h keyHashArray
+			copy(h[:], w.keyHash)
+			alreadyWrapped[h] = wrap[i]
 			if !bytes.Equal(myhash, w.keyHash) {
 				continue
 			}
-			dkey, err = c.aesUnwrap(f, w)
+			dkey, err = c.aesUnwrap(ctx.Factotum, w)
 			if err != nil {
 				log.Printf("dkey unwrap failed: %v", err)
-				return // give up;  might mean that owner has changed keys
+				break // give up;  might mean that owner has changed keys
 			}
-			break
 		}
+		packdata[i] = nil
 		if len(dkey) == 0 {
 			continue // failed to get dkey
 		}
-		for i, u := range a.Readers {
-			w, err := c.aesWrap(pubkey[i], dkey)
-			if err != nil {
+
+		// Create new list of wrapped keys.
+		wrap = make([]wrappedKey, len(readers))
+		nwrap := 0
+		for i, u := range readers {
+			if pubkey[i] == nil {
 				continue
 			}
-			dwrap = append(dwrap, w)
-			v := w.ephemeral
-			log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+			w, ok := alreadyWrapped[hash[i]]
+			if !ok { // then need to wrap
+				w, err = c.aesWrap(pubkey[i], dkey)
+				if err != nil {
+					continue
+				}
+				v := w.ephemeral
+				log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+			} // else reuse the existing wrapped key
+			wrap[nwrap] = w
+			nwrap++
 		}
-		dst := make([]byte, len(d.Metadata.Packdata)+(1+5*len(a.Readers))*binary.MaxVarintLen64)
-		err = c.pdMarshal(&dst, sig, dwrap)
+		wrap = wrap[:nwrap]
+
+		// Rebuild packdata[i] from existing sig and new wrapped keys.
+		dst := make([]byte, c.packdataLen(nwrap))
+		err = c.pdMarshal(&dst, sig, wrap)
 		if err != nil {
 			continue
 		}
-		d.Metadata.Packdata = dst
+		packdata[i] = &dst
 	}
 }
 
@@ -361,7 +371,7 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 	w.keyHash = keyHash(R)
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
 	hash := sha256.New
-	hkdf := hkdf.New(hash, S, nil, mess) // TODO reconsider salt
+	hkdf := hkdf.New(hash, S, nil, mess) // TODO(security-reviewer) reconsider salt
 	strong := make([]byte, aesKeyLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
@@ -377,12 +387,14 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 	if err != nil {
 		return
 	}
-	w.encrypted = make([]byte, 0, len(dkey)+gcmTagSize)
-	w.encrypted = aead.Seal(w.encrypted, w.nonce, dkey, nil)
-	// TODO figure out why aead.Seal allocated memory here
+	w.dkey = make([]byte, 0, len(dkey)+gcmTagSize)
+	w.dkey = aead.Seal(w.dkey, w.nonce, dkey, nil)
+	// TODO(ehg) figure out why aead.Seal allocated memory here
 	return
 }
 
+// Extract per-file symmetric key from w.
+// If error, len(dkey)==0.
 func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
@@ -412,21 +424,18 @@ func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err err
 		return
 	}
 	dkey = make([]byte, 0, aesKeyLen)
-	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
+	dkey, err = aead.Open(dkey, w.nonce, w.dkey, nil)
+	if err != nil {
+		dkey = dkey[:0]
+	}
 	return
 }
 
 func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) error {
-	// byteLen is copied from elliptic.go:Marshal()
-	byteLen := (c.curve.Params().BitSize + 7) >> 3
-	// n big enough for ciphersuite, sig.R, sig.S, len(wrap), {keyHash, encrypted, nonce, X, y}
-	n := 1 + 2*byteLen + (1+5*len(wrap))*binary.MaxVarintLen64 +
-		len(wrap)*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
-	// TODO great, but how is the ordinary user to know? maybe  PackdataLen(len(usernames))
+	n := c.packdataLen(len(wrap))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
-	// dst is now guaranteed large enough
 	(*dst)[0] = byte(c.ciphersuite)
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
@@ -434,7 +443,7 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) 
 	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
 	for _, w := range wrap {
 		n += pdPutBytes((*dst)[n:], w.keyHash)
-		n += pdPutBytes((*dst)[n:], w.encrypted)
+		n += pdPutBytes((*dst)[n:], w.dkey)
 		n += pdPutBytes((*dst)[n:], w.nonce)
 		n += pdPutBytes((*dst)[n:], w.ephemeral.X.Bytes())
 		n += pdPutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
@@ -466,11 +475,11 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	for i := 0; i < nwrap; i++ {
 		var w wrappedKey
 		w.keyHash = make([]byte, sha256.Size)
-		w.encrypted = make([]byte, 100) // TODO len
+		w.dkey = make([]byte, aesKeyLen)
 		w.nonce = make([]byte, gcmStandardNonceSize)
 		w.ephemeral = ecdsa.PublicKey{Curve: c.curve, X: big.NewInt(0), Y: big.NewInt(0)}
 		n += pdGetBytes(&w.keyHash, pd[n:])
-		n += pdGetBytes(&w.encrypted, pd[n:])
+		n += pdGetBytes(&w.dkey, pd[n:])
 		n += pdGetBytes(&w.nonce, pd[n:])
 		n += pdGetBytes(&buf, pd[n:])
 		w.ephemeral.X.SetBytes(buf)
@@ -540,6 +549,14 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	stream := cipher.NewCTR(block, iv)
 	stream.XORKeyStream(cleartext, ciphertext)
 	return len(ciphertext), nil
+}
+
+// packdataLen returns n big enough for ciphersuite, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
+func (c common) packdataLen(nwrap int) int {
+	// byteLen is copied from elliptic.go:Marshal()
+	byteLen := (c.curve.Params().BitSize + 7) >> 3
+	return 1 + 2*byteLen + (1+5*nwrap)*binary.MaxVarintLen64 +
+		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
 }
 
 // publicKey returns the string representation of a user's public key.

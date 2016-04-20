@@ -116,11 +116,6 @@ type Packer interface {
 	// The returned count is the written length of the ciphertext.
 	Pack(context *Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
 
-	// AddWrap, executed by the file owner, extracts the per-file symmetric
-	// encryption key from packdata, wraps for all new readers, and updates packdata.
-	// In case of error, AddWrap skips the wrapping for that reader or direntry.
-	AddWrap(context *Context, a *WrapNeeded)
-
 	// Unpack takes ciphertext data and stores the cleartext version
 	// in the cleartext slice, which must be large enough, using the
 	// Packdata field of the Metadata in the DirEntry to recover
@@ -150,6 +145,16 @@ type Packer interface {
 	// value already present in Packdata[0].
 	// UnpackLen eturns -1 if there is an error.
 	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
+
+	// Share updates each packdata element to enable all the readers,
+	// and only those readers, to be able to decrypt the associated ciphertext,
+	// which is held separate from this call. It is invoked in response to
+	// Directory.Put returning information about entries that need updating due to
+	// changes in the set of users with permissions to read the associated items.
+	// In case of error, Share skips key wrapping for that reader or packdata.
+	// If packdata[i] is nil on return, processing that packdata was skipped.
+	// Share trusts the caller to check the arguments are not malicious.
+	Share(context *Context, readers []PublicKey, packdata []*[]byte)
 }
 
 const (
@@ -170,6 +175,9 @@ const (
 	// EEp256Pack and EEp521Pack store AES-encrypted data, with metadata
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// See NIST SP 800-57 Pt.1 Rev.4 section 5.6.1
+	// These use: pathname, cleartext, context.Factotum, context.Packing,
+	// Metadata.Time, public keys of readers.  They generate a per-file
+	// symmetric encryption key, which they encode in Packdata.
 	// EEp256Pack uses AES-128, SHA-256, and curve P256; strength 128.
 	EEp256Pack Packing = 16
 	// EEp384Pack uses AES-256, SHA-512, and curve P384; strength 192.
@@ -197,10 +205,12 @@ type User interface {
 type PublicKey string
 
 // A PrivateKey is paired with PublicKey but never leaves the Client.
+// (This is largely being replaced by Factotum;  avoid new uses.)
 type PrivateKey string
 
 // A KeyPair is used when exchanging data with other users. It
 // always contains both the public and private keys.
+// (This is largely being replaced by Factotum;  avoid new uses.)
 type KeyPair struct {
 	Public  PublicKey
 	Private PrivateKey
@@ -242,10 +252,10 @@ type Directory interface {
 	// be a directory. If something is already stored under the path,
 	// the new location and packdata replace the old.
 	//
-	// WrapNeeded is a hint describing skew between the users with
-	// wrapped keys in the existing DirEntry compared with the users
-	// with Read access permisions.
-	Put(entry *DirEntry) (*WrapNeeded, error)
+	// If no error, Put returns a hint describing skew between the
+	// users with wrapped keys for the paths and the users with Read
+	// access permisions. If no skew, readers and paths slices are empty.
+	Put(entry *DirEntry) (readers []UserName, paths []PathName, err error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
@@ -289,14 +299,6 @@ type Metadata struct {
 	Size     uint64 // Length of file in bytes.
 	Time     Time   // Time associated with file; might be when it was last written.
 	Packdata []byte // Packing-specific metadata stored in directory.
-}
-
-// WrapNeeded describes work needed to bring list of users with wrapped keys
-// in sync with list of users with Read access permisions. For each element of
-// DirEntries, wrap for each element of Readers to bring two lists in sync.
-type WrapNeeded struct {
-	DirEntries []*DirEntry
-	Readers    []UserName
 }
 
 // Store service.

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
@@ -32,13 +33,11 @@ func NewFactotum(ctx *upspin.Context) (*Factotum, error) {
 		return nil, err
 	}
 	kp := ctx.KeyPair
-	if n := len(kp.Private) - 1; kp.Private[n] == '\n' {
-		kp.Private = kp.Private[:n]
-	}
+	kp.Private = upspin.PrivateKey(strings.TrimSpace(string(kp.Private)))
 	var d big.Int
 	err = d.UnmarshalText([]byte(kp.Private))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("private key doesn't parse")
 	}
 	f := &Factotum{
 		strKeyPair:    kp,
