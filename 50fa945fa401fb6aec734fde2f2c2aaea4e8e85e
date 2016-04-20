@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_8b6851f3",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T15:31:30Z",
+      "side": 1,
+      "message": "I still think we haven\u0027t talked much about wrapping and keys.\n\nHow about:\n\n// Share, executed by the file owner, extracts any per-file encryption key from packdata and recompute the packdata so that all readers can decrypt the files they are supposed to read. In case of error...",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
