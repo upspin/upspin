@@ -91,42 +91,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		Reference: ref,
 	}
 	// Record it.
-	readers, paths, err := dir.Put(de)
-
-	// Update sharing information as requested.
-	if len(readers) > 0 {
-		// TODO(ehg) if not Access change, warn if path!=de?
-		readerkeys := make([]upspin.PublicKey, len(readers))
-		for i, r := range readers {
-			_, pubkeys, err := c.context.User.Lookup(r)
-			if err != nil {
-				// really bad if we're given a bogus reader name!
-				return de.Location, err
-			}
-			readerkeys[i] = pubkeys[0]
-		}
-		direntries := make([]*upspin.DirEntry, len(paths))
-		packdata := make([]*[]byte, len(paths))
-		for i, p := range paths {
-			direntries[i], err = dir.Lookup(p)
-			if err != nil {
-				// really bad if we're given a bogus path name!
-				return de.Location, err
-			}
-			packdata[i] = &direntries[i].Metadata.Packdata
-		}
-		packer.Share(c.context, readerkeys, packdata)
-		for i, pd := range packdata {
-			if pd == nil {
-				continue
-			}
-			direntries[i].Metadata.Packdata = *pd
-			_, _, err = dir.Put(direntries[i])
-			if err != nil {
-				break
-			}
-		}
-	}
+	err = dir.Put(de)
 
 	return de.Location, err
 }
