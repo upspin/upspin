@@ -34,6 +34,23 @@
       "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_8bccd13a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-20T15:50:51Z",
+      "side": 1,
+      "message": "\"file owner\": what file? there is no file here. that problem is solved by having Put only return the relevant data to a client with the power to do the updates.\n\n// Share updates each packdata element with information to enable all the readers,\n// and only those readers, to be able to read and decrypt the associated ciphertext,\n// which is held separate from this call. It is invoked in response to an invocation\n// of Directory.Put returning information about entries that need updating due to\n// changes in the set of users with permissions to read the associated items.\n// In case of error ... (continue as above).",
+      "revId": "50fa945fa401fb6aec734fde2f2c2aaea4e8e85e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
