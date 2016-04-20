@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_cee652ce",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-20T22:59:55Z",
+      "side": 1,
+      "message": "It would be nice to call packer.Share here preemptively before being told to Update(). But this can be another CL.",
+      "revId": "4296f0e70b7ff2a72953fb9d365ffb7c930a2bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
