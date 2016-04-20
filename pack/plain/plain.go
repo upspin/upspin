@@ -27,7 +27,8 @@ func (plainPack) String() string {
 	return "plain"
 }
 
-func (plainPack) AddWrap(*upspin.Context, *upspin.WrapNeeded) {
+func (plainPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+	// Nothing to do.
 }
 
 func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {

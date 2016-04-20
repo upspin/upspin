@@ -40,6 +40,8 @@ type wrappedKey struct {
 }
 type wrappedKeys []wrappedKey
 
+type keyHashArray [sha256.Size]byte // sometimes we need the array
+
 // common implements common functions parameterized by cipher-specific values.
 type common struct {
 	ciphersuite  upspin.Packing
@@ -164,7 +166,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 		return 0, err
 	}
 
-	// Wrap for myself;  let AddWrap handle the others.
+	// Wrap for myself;  let Share handle the others.
 	wrap := make([]wrappedKey, 1)
 	p, err := parsePublicKey(ctx.KeyPair.Public, packer)
 	if err != nil {
@@ -257,22 +259,24 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	return 0, errNoWrappedKey
 }
 
-// AddWrap extracts dkey from the packdata, wraps for all the new readers, and updates packdata.
-func (c common) AddWrap(ctx *upspin.Context, a *upspin.WrapNeeded) {
+// Share extracts dkey from the packdata, wraps for readers, and updates packdata.
+func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	packer := pack.Lookup(ctx.Packing)
 
 	// Fetch all the public keys we'll need.
-	pubkey := make([]*ecdsa.PublicKey, len(a.Readers))
-	for i, u := range a.Readers {
-		pubkey[i] = nil
-		readerRawPublicKey, err := publicKey(ctx, u, packer)
+	pubkey := make([]*ecdsa.PublicKey, len(readers))
+	hash := make([]keyHashArray, len(readers))
+	for i, pub := range readers {
+		// TODO someday deal with diverse key types amongst readers
+		var err error
+		pubkey[i], err = parsePublicKey(pub, packer)
 		if err != nil {
 			continue
 		}
-		pubkey[i], err = parsePublicKey(readerRawPublicKey, packer)
+		copy(hash[i][:], keyHash(pubkey[i]))
 	}
 
-	// Get my own keys ready.
+	// Get my own key.
 	mypub, err := parsePublicKey(ctx.KeyPair.Public, packer)
 	if err != nil {
 		log.Printf("cannot parse my own key: %v", err)
@@ -285,40 +289,59 @@ func (c common) AddWrap(ctx *upspin.Context, a *upspin.WrapNeeded) {
 		return
 	}
 
-	// For each direntry, wrap for new readers.
-	for _, d := range a.DirEntries {
+	// For each packdata, wrap for new readers.
+	for i, d := range packdata {
+
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
-		sig, dwrap, err := c.pdUnmarshal(d.Metadata.Packdata)
-		for _, w := range dwrap {
+		alreadyWrapped := make(map[keyHashArray]wrappedKey)
+		sig, wrap, err := c.pdUnmarshal(*d)
+		for i, w := range wrap {
+			var h keyHashArray
+			copy(h[:], w.keyHash)
+			alreadyWrapped[h] = wrap[i]
 			if !bytes.Equal(myhash, w.keyHash) {
 				continue
 			}
 			dkey, err = c.aesUnwrap(f, w)
 			if err != nil {
 				log.Printf("dkey unwrap failed: %v", err)
-				return // give up;  might mean that owner has changed keys
+				break // give up;  might mean that owner has changed keys
 			}
-			break
 		}
+		packdata[i] = nil
 		if len(dkey) == 0 {
 			continue // failed to get dkey
 		}
-		for i, u := range a.Readers {
-			w, err := c.aesWrap(pubkey[i], dkey)
-			if err != nil {
+
+		// Create new list of wrapped keys.
+		wrap = make([]wrappedKey, len(readers))
+		nwrap := 0
+		for i, u := range readers {
+			if pubkey[i] == nil {
 				continue
 			}
-			dwrap = append(dwrap, w)
-			v := w.ephemeral
-			log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+			w, ok := alreadyWrapped[hash[i]]
+			if !ok { // then need to wrap
+				w, err = c.aesWrap(pubkey[i], dkey)
+				if err != nil {
+					continue
+				}
+				v := w.ephemeral
+				log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+			} // else reuse the existing wrapped key
+			wrap[nwrap] = w
+			nwrap++
 		}
-		dst := make([]byte, len(d.Metadata.Packdata)+(1+5*len(a.Readers))*binary.MaxVarintLen64)
-		err = c.pdMarshal(&dst, sig, dwrap)
+		wrap = wrap[:nwrap]
+
+		// Rebuild packdata[i] from existing sig and new wrapped keys.
+		dst := make([]byte, c.packdataLen(nwrap))
+		err = c.pdMarshal(&dst, sig, wrap)
 		if err != nil {
 			continue
 		}
-		d.Metadata.Packdata = dst
+		packdata[i] = &dst
 	}
 }
 
@@ -383,6 +406,8 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 	return
 }
 
+// Extract per-file symmetric key from w.
+// If error, len(dkey)==0.
 func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
@@ -413,20 +438,17 @@ func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err err
 	}
 	dkey = make([]byte, 0, aesKeyLen)
 	dkey, err = aead.Open(dkey, w.nonce, w.encrypted, nil)
+	if err != nil {
+		dkey = dkey[:0]
+	}
 	return
 }
 
 func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) error {
-	// byteLen is copied from elliptic.go:Marshal()
-	byteLen := (c.curve.Params().BitSize + 7) >> 3
-	// n big enough for ciphersuite, sig.R, sig.S, len(wrap), {keyHash, encrypted, nonce, X, y}
-	n := 1 + 2*byteLen + (1+5*len(wrap))*binary.MaxVarintLen64 +
-		len(wrap)*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
-	// TODO great, but how is the ordinary user to know? maybe  PackdataLen(len(usernames))
+	n := c.packdataLen(len(wrap))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
-	// dst is now guaranteed large enough
 	(*dst)[0] = byte(c.ciphersuite)
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
@@ -540,6 +562,14 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	stream := cipher.NewCTR(block, iv)
 	stream.XORKeyStream(cleartext, ciphertext)
 	return len(ciphertext), nil
+}
+
+// packdataLen returns n big enough for ciphersuite, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
+func (c common) packdataLen(nwrap int) int {
+	// byteLen is copied from elliptic.go:Marshal()
+	byteLen := (c.curve.Params().BitSize + 7) >> 3
+	return 1 + 2*byteLen + (1+5*nwrap)*binary.MaxVarintLen64 +
+		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
 }
 
 // publicKey returns the string representation of a user's public key.
