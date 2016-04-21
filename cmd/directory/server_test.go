@@ -1027,15 +1027,36 @@ func TestDeleteGroupFile(t *testing.T) {
 	resp.Verify(t)
 }
 
+func TestWhichAccessImplicitAtRoot(t *testing.T) {
+	rootJSON := toRootJSON(t, &userRoot)
+
+	resp := nettest.NewExpectingResponseWriter(`{"Access":""}`)
+	req := nettest.NewRequest(t, netutil.Get, u("http://localhost:8080/whichaccess/", pathName), nil)
+
+	// The Access file at the root really exists.
+	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+		Ref:  []string{userName},
+		Data: [][]byte{rootJSON},
+	}
+
+	ds := newDirServer(egcp, newDummyStoreClient())
+	ds.whichAccessHandler(dummySess, resp, req)
+	resp.Verify(t)
+}
+
 func TestWhichAccess(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
+	accessJSON := toJSON(t, upspin.DirEntry{
+		Name: rootAccessFile,
+	})
 
 	resp := nettest.NewExpectingResponseWriter(fmt.Sprintf(`{"Access":"%s"}`, rootAccessFile))
 	req := nettest.NewRequest(t, netutil.Get, u("http://localhost:8080/whichaccess/", pathName), nil)
 
+	// The Access file at the root really exists.
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{userName},
-		Data: [][]byte{rootJSON},
+		Ref:  []string{userName, rootAccessFile},
+		Data: [][]byte{rootJSON, accessJSON},
 	}
 
 	ds := newDirServer(egcp, newDummyStoreClient())

@@ -11,7 +11,9 @@ import (
 
 // SendWhichAccessResponse marshals accessPathName and sends it on w.
 func SendWhichAccessResponse(accessPathName upspin.PathName, w http.ResponseWriter) {
-	netutil.SendJSONReply(w, whichAccessMessage{Access: accessPathName})
+	netutil.SendJSONReply(w, whichAccessMessage{
+		Access: accessPathName,
+	})
 }
 
 // SendReferenceResponse marshals ref and sends it on w.

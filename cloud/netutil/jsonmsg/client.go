@@ -34,7 +34,7 @@ type errorMessage struct {
 
 // whichAccessMessage is a message used to reply to Directory.WhichAccess.
 type whichAccessMessage struct {
-	Access upspin.PathName
+	Access upspin.PathName // The path to an Access file, if not empty.
 }
 
 // userEntry stores publicly known information for a given user.
@@ -120,9 +120,15 @@ func WhichAccessResponse(body []byte) (upspin.PathName, error) {
 	if len(body) == 0 {
 		return "", errEmptyServerResponse
 	}
-	var access whichAccessMessage
+	// json.Unmarshal does not return an error if a message does not fit the format expected. Instead, it leaves it
+	// empty. But empty Access is a valid server response. So we use some non-empty string to differentiate
+	// an error from an unparsed message.
+	const nonEmpty = "bla"
+	access := whichAccessMessage{
+		Access: nonEmpty,
+	}
 	err := json.Unmarshal(body, &access)
-	if err != nil || access == zeroWhichAccess {
+	if err != nil || access.Access == nonEmpty {
 		return "", ErrorResponse(body)
 	}
 	return access.Access, nil
