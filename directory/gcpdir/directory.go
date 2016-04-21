@@ -104,7 +104,23 @@ func (d *Directory) Put(dirEntry *upspin.DirEntry) error {
 
 // WhichAccess implements Directory.
 func (d *Directory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
-	return "", newError("WhichAccess", name, errors.New("unimplemented"))
+	const op = "WhichAccess"
+	// Prepare a get request to the server
+	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/whichaccess/%s", d.serverURL, name), nil)
+	if err != nil {
+		return "", newError(op, name, err)
+	}
+	body, err := d.requestAndReadResponseBody(op, name, req)
+	if err != nil {
+		return "", err
+	}
+	// Interpret the JSON returned
+	acc, err := parser.WhichAccessResponse(body)
+	if err != nil {
+		return "", err
+	}
+	return acc, nil
+
 }
 
 // storeDirEntry stores the given dirEntry in the server by applying an HTTP method (POST or PATCH accepted by server).
