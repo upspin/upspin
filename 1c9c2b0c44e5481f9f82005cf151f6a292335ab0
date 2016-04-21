@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "285ab8dd_42c1d3fd",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-21T05:30:41Z",
+      "side": 1,
+      "message": "I know you\u0027re following the pattern above, but \"c\" is already \"the packer\", so this shouldn\u0027t be necessary. I think packer is only used in parsePublicKey below and that only needs a PackString, which c.packerString will give you.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_22d857f4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-21T05:30:41Z",
+      "side": 1,
+      "message": "You public key is in ctx.KeyPair",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_62ddef25",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -47,6 +81,40 @@
       "writtenOn": "2016-04-21T04:50:02Z",
       "side": 1,
       "message": "It may be worth a comment here that the 1 is for the length field binary.Varint representing 32\u003dsha256.Size.   Or not;  it was obvious to me, but I know the code better than the casual reader.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_027c3b8c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-21T05:30:41Z",
+      "side": 1,
+      "message": "Comment for Eric: looks like this doesn\u0027t need the whole packer, but just a packerString. Would obviate the need for pack.Lookup in the code above.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_42a8f34d",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-21T05:30:41Z",
+      "side": 1,
+      "message": "maybe s/name2/newName/ ?",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
