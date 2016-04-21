@@ -1,12 +1,14 @@
 package gcpuser
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
+	"net/http/httptest"
+
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -19,20 +21,16 @@ const (
 )
 
 func TestLookup(t *testing.T) {
-	ue := userEntry{
-		User: userName,
-		Keys: []upspin.PublicKey{upspin.PublicKey(key)},
-		Endpoints: []upspin.Endpoint{upspin.Endpoint{
-			Transport: upspin.GCP,
-			NetAddr:   upspin.NetAddr(rootNetAddr),
-		}},
-	}
-	jsonUE, err := json.Marshal(ue)
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := httptest.NewRecorder()
+	eps := []upspin.Endpoint{upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr(rootNetAddr),
+	}}
+	keys := []upspin.PublicKey{upspin.PublicKey(key)}
+	message.SendUserLookupResponse(userName, eps, keys, w)
+
 	requestExpected := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("%s/get?user=%s", location, userName), nil)
-	responseToSend := nettest.NewMockHTTPResponse(200, "application/json", jsonUE)
+	responseToSend := nettest.NewMockHTTPResponse(200, "application/json", w.Body.Bytes())
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{responseToSend}, []*http.Request{requestExpected})
 	u := getUserForTesting(mock)
 

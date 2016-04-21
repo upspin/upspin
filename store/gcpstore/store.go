@@ -14,7 +14,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -70,7 +70,7 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interfa
 
 // ServerUserName implements Dialer.
 func (s *Store) ServerUserName() string {
-	return "GPC Store"
+	return "GCP Store"
 }
 
 // Get implements Store.
@@ -104,7 +104,7 @@ func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	switch answerType {
 	case "application/json":
 		// This is either a re-location reply or an error.
-		loc, err := parser.LocationResponse(body)
+		loc, err := message.LocationResponse(body)
 		if err != nil {
 			return nil, nil, newStoreError(op, err.Error(), ref)
 		}
@@ -159,7 +159,7 @@ func (s *Store) Put(data []byte) (upspin.Reference, error) {
 	}
 
 	// Parse the response
-	ref, err := parser.ReferenceResponse(respBody)
+	ref, err := message.ReferenceResponse(respBody)
 	if err != nil {
 		return zeroRef, newStoreError(op, fmt.Sprintf(serverError, err), "")
 	}
@@ -187,7 +187,7 @@ func (s *Store) Delete(ref upspin.Reference) error {
 	}
 
 	// Parse the response for any errors
-	err = parser.ErrorResponse(respBody)
+	err = message.ErrorResponse(respBody)
 	if err != nil {
 		return err
 	}

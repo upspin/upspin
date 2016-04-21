@@ -16,7 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -65,7 +65,7 @@ func (d *Directory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	// Interpret the JSON returned
-	dirEntry, err := parser.DirEntryResponse(body)
+	dirEntry, err := message.DirEntryResponse(body)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (d *Directory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
 		return "", err
 	}
 	// Interpret the JSON returned
-	acc, err := parser.WhichAccessResponse(body)
+	acc, err := message.WhichAccessResponse(body)
 	if err != nil {
 		return "", err
 	}
@@ -141,7 +141,7 @@ func (d *Directory) storeDirEntry(op string, HTTPMethod string, dirEntry *upspin
 	if err != nil {
 		return err
 	}
-	err = parser.ErrorResponse(respBody)
+	err = message.ErrorResponse(respBody)
 	if err != nil {
 		return newError(op, name, err)
 	}
@@ -301,7 +301,7 @@ func (d *Directory) Delete(name upspin.PathName) error {
 		return err
 	}
 	// Interpret the JSON returned
-	return parser.ErrorResponse(body)
+	return message.ErrorResponse(body)
 }
 
 // Endpoint implements upspin.Directory.Endpoint.
