@@ -98,10 +98,11 @@ func privateKey() (upspin.KeyPair, error) {
 	}
 	defer f.Close()
 	buf := make([]byte, 200) // enough for p521
-	_, err = f.Read(buf)
+	n, err := f.Read(buf)
 	if err != nil {
 		return zeroPrivKey, fmt.Errorf(keyloaderErr, err)
 	}
+	buf = buf[:n]
 	buf = []byte(strings.TrimSpace(string(buf)))
 	pubkey, err := publicKey()
 	if err != nil {
