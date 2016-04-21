@@ -150,6 +150,12 @@ type Packer interface {
 	// value already present in Packdata[0].
 	// UnpackLen eturns -1 if there is an error.
 	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
+
+	// Retarget updates the DirEntry to refer to a new path. If the new
+	// path is in a different directory, the wrapped keys are reduced to
+	// only the client's. The Packdata in entry must contain a wrapped
+	// key for the client.
+	Retarget(context *Context, entry *DirEntry, path PathName) error
 }
 
 const (
