@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_99ec1dad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T19:48:05Z",
+      "side": 1,
+      "message": "s/Retarget/Name/",
+      "revId": "8c4fb79330770ffb91d417f40a531a0f70b16552",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_59f6a57a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T19:48:05Z",
+      "side": 1,
+      "message": "s/client/Upspin user invoking the method/",
+      "revId": "8c4fb79330770ffb91d417f40a531a0f70b16552",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
