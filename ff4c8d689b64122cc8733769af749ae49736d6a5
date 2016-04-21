@@ -16,6 +16,24 @@
       "revId": "ff4c8d689b64122cc8733769af749ae49736d6a5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_7c282fc5",
+        "filename": "cloud/netutil/message/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-21T20:47:14Z",
+      "side": 1,
+      "message": "Makes sense. Done.\n\nPTAL.\n\nThanks.",
+      "parentUuid": "285ab8dd_96cdcc85",
+      "revId": "ff4c8d689b64122cc8733769af749ae49736d6a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
