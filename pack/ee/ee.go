@@ -174,7 +174,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	}
 
 	// Serialize packer metadata.
-	err = c.pdMarshal(&meta.Packdata, sig, wrap)
+	err = c.pdMarshal(&meta.Packdata, sig, wrap, cipherSum)
 	if err != nil {
 		return 0, err
 	}
@@ -194,7 +194,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	}
 	cleartext = cleartext[:len(ciphertext)]
 	dkey := make([]byte, aesKeyLen)
-	sig, wrap, err := c.pdUnmarshal(meta.Packdata)
+	sig, wrap, _, err := c.pdUnmarshal(meta.Packdata)
 	if err != nil {
 		return 0, err
 	}
@@ -282,7 +282,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]wrappedKey)
-		sig, wrap, err := c.pdUnmarshal(*d)
+		sig, wrap, cipherSum, err := c.pdUnmarshal(*d)
 		for i, w := range wrap {
 			var h keyHashArray
 			copy(h[:], w.keyHash)
@@ -324,12 +324,111 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 
 		// Rebuild packdata[i] from existing sig and new wrapped keys.
 		dst := make([]byte, c.packdataLen(nwrap))
-		err = c.pdMarshal(&dst, sig, wrap)
+		err = c.pdMarshal(&dst, sig, wrap, cipherSum)
 		if err != nil {
 			continue
 		}
 		packdata[i] = &dst
 	}
+}
+
+// Name implements upspin.Name.
+func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+	packer := pack.Lookup(ctx.Packing)
+	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
+		return err
+	}
+	meta := &d.Metadata
+	pathname := d.Name
+
+	dkey := make([]byte, aesKeyLen)
+	sig, wrap, cipherSum, err := c.pdUnmarshal(meta.Packdata)
+	if err != nil {
+		return err
+	}
+	// TODO(p): take this out when the sum is mandatory since the check will happen in pdUnmarshal
+	if cipherSum == nil {
+		return errTooShort
+	}
+
+	// File owner is part of the pathname
+	parsed, err := path.Parse(pathname)
+	owner := parsed.User
+	if err != nil {
+		return err
+	}
+	// The owner has a well-known public key
+	ownerRawPubKey, err := publicKey(ctx, owner, packer)
+	if err != nil {
+		return err
+	}
+	ownerPubKey, err := parsePublicKey(ownerRawPubKey, packer)
+	if err != nil {
+		return err
+	}
+
+	// Now get my own keys
+	me := ctx.UserName // Recipient of the file is me (the user in the context)
+	rawPublicKey, err := publicKey(ctx, me, packer)
+	if err != nil {
+		return err
+	}
+	pubkey, err := parsePublicKey(rawPublicKey, packer)
+	if err != nil {
+		return err
+	}
+
+	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
+	rhash := keyHash(pubkey)
+	wrapFound := false
+	var w wrappedKey
+	for _, w = range wrap {
+		if bytes.Equal(rhash, w.keyHash) {
+			wrapFound = true
+			break
+		}
+	}
+	if !wrapFound {
+		log.Printf("unwrap failed: %s", errNoWrappedKey)
+		return errNoWrappedKey
+	}
+
+	// Decode my wrapped key using my private key
+	dkey, err = c.aesUnwrap(ctx.Factotum, w)
+	if err != nil {
+		log.Printf("unwrap failed: %s", err)
+		return err
+	}
+
+	// Verify that the owner signed this with his/her public key.
+	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, pathname, meta.Time, dkey, cipherSum), sig.R, sig.S) {
+		log.Println("verify failed")
+		return errVerify
+	}
+
+	// If we are changing directories, remove all wrapped keys except my own.
+	parsedNew, err := path.Parse(newName)
+	if err != nil {
+		return err
+	}
+	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
+		wrap = []wrappedKey{w}
+	}
+
+	// Compute new signature.
+	sig, err = ctx.Factotum.FileSign(ctx.Packing, newName, meta.Time, dkey, cipherSum)
+	if err != nil {
+		return err
+	}
+
+	// Serialize packer metadata. We do not reallocate Packdata since the new data
+	// should be the same size or smaller.
+	if err := c.pdMarshal(&meta.Packdata, sig, wrap, cipherSum); err != nil {
+		return err
+	}
+	d.Name = newName
+
+	return nil
 }
 
 func packname(curve elliptic.Curve) string {
@@ -431,7 +530,7 @@ func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err err
 	return
 }
 
-func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) error {
+func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey, cipherSum []byte) error {
 	n := c.packdataLen(len(wrap))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
@@ -448,13 +547,17 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey) 
 		n += pdPutBytes((*dst)[n:], w.ephemeral.X.Bytes())
 		n += pdPutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
 	}
+	// TODO(p): eventually make hash mandatory.  Currently not for backward compatability.
+	if cipherSum != nil {
+		n += pdPutBytes((*dst)[n:], cipherSum)
+	}
 	*dst = (*dst)[:n]
 	return nil // err impossible for now but the night is young
 }
 
-func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey, err error) {
+func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
 	if pd[0] != byte(c.ciphersuite) {
-		return sig0, nil, fmt.Errorf("expected packing %d, got %d", c.ciphersuite, pd[0])
+		return sig0, nil, nil, fmt.Errorf("expected packing %d, got %d", c.ciphersuite, pd[0])
 	}
 	n := 1
 	sig.R = big.NewInt(0)
@@ -469,7 +572,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	n += vlen
 	nwrap := int(nwrap64)
 	if int64(nwrap) != nwrap64 {
-		return sig0, nil, fmt.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
+		return sig0, nil, nil, fmt.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
 	}
 	wrap = make([]wrappedKey, nwrap)
 	for i := 0; i < nwrap; i++ {
@@ -487,10 +590,16 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 		w.ephemeral.Y.SetBytes(buf)
 		wrap[i] = w
 	}
-	if n != len(pd) { // sanity check, not a thorough parser test
-		return sig0, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
+	// TODO(p): eventually make hash mandatory.  Currently not for backward compatability.
+	// The +1 is for the varint size preceding the hash.
+	if len(pd)-n == sha256.Size+1 {
+		hash = make([]byte, sha256.Size)
+		n += pdGetBytes(&hash, pd[n:])
 	}
-	return sig, wrap, nil
+	if n != len(pd) { // sanity check, not a thorough parser test
+		return sig0, nil, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
+	}
+	return sig, wrap, hash, nil
 }
 
 // pdPutBytes puts length header in dst and then copies src to dst; returns bytes consumed
@@ -556,7 +665,8 @@ func (c common) packdataLen(nwrap int) int {
 	// byteLen is copied from elliptic.go:Marshal()
 	byteLen := (c.curve.Params().BitSize + 7) >> 3
 	return 1 + 2*byteLen + (1+5*nwrap)*binary.MaxVarintLen64 +
-		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen)
+		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*byteLen) +
+		sha256.Size + 1
 }
 
 // publicKey returns the string representation of a user's public key.
