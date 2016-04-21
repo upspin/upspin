@@ -2,7 +2,6 @@
 package gcpuser
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -20,14 +20,6 @@ type user struct {
 }
 
 var _ upspin.User = (*user)(nil)
-
-// userEntry stores all known information for a given user. The fields
-// are exported because JSON parsing needs access to them.
-type userEntry struct {
-	User      string             // User's email address (e.g. bob@bar.com).
-	Keys      []upspin.PublicKey // Known keys for the user.
-	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
-}
 
 const (
 	serverError = "server error code %d"
@@ -60,16 +52,15 @@ func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicK
 		return nil, nil, newUserError(err, name)
 	}
 
-	var ue userEntry
-	err = json.Unmarshal(respBody, &ue)
+	user, endpoints, keys, err := jsonmsg.UserLookupResponse(respBody)
 	if err != nil {
-		return nil, nil, newUserError(err, name)
+		return nil, nil, err
 	}
 	// Last check so we know the server is not crazy
-	if ue.User != string(name) {
-		return nil, nil, newUserError(fmt.Errorf("invalid user returned %s", ue.User), name)
+	if user != name {
+		return nil, nil, newUserError(fmt.Errorf("invalid user returned %s", user), name)
 	}
-	return ue.Endpoints, ue.Keys, nil
+	return endpoints, keys, nil
 }
 
 func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
