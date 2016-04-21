@@ -279,6 +279,24 @@
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_78260097",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T16:23:52Z",
+      "side": 1,
+      "message": "OK, I see why it\u0027s not Rename. It sounds like you\u0027re objecting to the \"Re\" part. You could use this for Link and Rename.\n\nSo why Retarget?\n\nYou used the word \u0027updates\u0027 in the comment. That\u0027s a clue. Maybe Update?",
+      "parentUuid": "285ab8dd_02d3dbdc",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
