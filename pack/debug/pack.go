@@ -26,10 +26,11 @@ func init() {
 }
 
 var (
-	errTooShort     = errors.New("TestPack: destination slice too short")
-	errBadMetadata  = errors.New("bad metadata")
-	errBadSignature = errors.New("signature validation failed")
-	errNoKey        = errors.New("no key for signature")
+	errTooShort      = errors.New("TestPack: destination slice too short")
+	errBadMetadata   = errors.New("bad metadata")
+	errBadSignature  = errors.New("signature validation failed")
+	errNoKey         = errors.New("no key for signature")
+	errUnimplemented = errors.New("unimplemented operation")
 )
 
 func (testPack) Packing() upspin.Packing {
@@ -41,6 +42,10 @@ func (testPack) String() string {
 }
 
 func (testPack) AddWrap(*upspin.Context, *upspin.WrapNeeded) {
+}
+
+func (testPack) Retarget(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	return errUnimplemented
 }
 
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.
