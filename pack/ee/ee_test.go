@@ -35,6 +35,8 @@ func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin
 	return cipher[:m]
 }
 
+// retargetBlob binds the blob to
+
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
 func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
 	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
@@ -51,6 +53,28 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	d.Name = name
 	fmt.Printf("%+v\n", ctx)
 	cipher := packBlob(t, ctx, packer, d, text)
+
+	// Now unpack.
+	clear := unpackBlob(t, ctx, packer, d, cipher)
+
+	if !bytes.Equal(text, clear) {
+		t.Errorf("text: expected %q; got %q", text, clear)
+	}
+}
+
+func testPackRetargetAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name, name2 upspin.PathName, text []byte) {
+	// First pack.
+	d := &upspin.DirEntry{}
+	d.Name = name
+	cipher := packBlob(t, ctx, packer, d, text)
+
+	// Retarget to name2.
+	if err := packer.Retarget(ctx, d, name2); err != nil {
+		t.Errorf("Retarget failed: %s", err)
+	}
+	if d.Name != name2 {
+		t.Errorf("Retarget failed to change name")
+	}
 
 	// Now unpack.
 	clear := unpackBlob(t, ctx, packer, d, cipher)
@@ -80,6 +104,30 @@ func TestPack521(t *testing.T) {
 	)
 	ctx, packer := setup(user, packing)
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+}
+
+func TestRetarget256(t *testing.T) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.256")
+		name2                   = upspin.PathName(user + "/file/of/user.256.2")
+		text                    = "this is some text 256"
+		packing                 = upspin.EEp256Pack
+	)
+	ctx, packer := setup(user, packing)
+	testPackRetargetAndUnpack(t, ctx, packer, name, name2, []byte(text))
+}
+
+func TestRetarget521(t *testing.T) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.521")
+		name2                   = upspin.PathName(user + "/file/of/user.521.2")
+		text                    = "this is some text 521"
+		packing                 = upspin.EEp521Pack
+	)
+	ctx, packer := setup(user, packing)
+	testPackRetargetAndUnpack(t, ctx, packer, name, name2, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, packing upspin.Packing) {
@@ -198,7 +246,7 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 	// Check that we didn't kid ourselves into wrapping for mia without a key.
 	p, ok := packer.(eep256)
 	if ok {
-		_, wrap, err := p.pdUnmarshal(d.Metadata.Packdata)
+		_, wrap, _, err := p.pdUnmarshal(d.Metadata.Packdata)
 		if err != nil {
 			t.Fatal(err)
 		}
