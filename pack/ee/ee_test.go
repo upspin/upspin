@@ -59,6 +59,28 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	}
 }
 
+func testPackNameAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
+	// First pack.
+	d := &upspin.DirEntry{}
+	d.Name = name
+	cipher := packBlob(t, ctx, packer, d, text)
+
+	// Name to newName.
+	if err := packer.Name(ctx, d, newName); err != nil {
+		t.Errorf("Name failed: %s", err)
+	}
+	if d.Name != newName {
+		t.Errorf("Name failed to set the name")
+	}
+
+	// Now unpack.
+	clear := unpackBlob(t, ctx, packer, d, cipher)
+
+	if !bytes.Equal(text, clear) {
+		t.Errorf("text: expected %q; got %q", text, clear)
+	}
+}
+
 func TestPack256(t *testing.T) {
 	const (
 		user    upspin.UserName = "user@google.com"
@@ -79,6 +101,30 @@ func TestPack521(t *testing.T) {
 	)
 	ctx, packer := setup(user, packing)
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+}
+
+func TestName256(t *testing.T) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.256")
+		newName                 = upspin.PathName(user + "/file/of/user.256.2")
+		text                    = "this is some text 256"
+		packing                 = upspin.EEp256Pack
+	)
+	ctx, packer := setup(user, packing)
+	testPackNameAndUnpack(t, ctx, packer, name, newName, []byte(text))
+}
+
+func TestName521(t *testing.T) {
+	const (
+		user    upspin.UserName = "user@google.com"
+		name                    = upspin.PathName(user + "/file/of/user.521")
+		name2                   = upspin.PathName(user + "/file/of/user.521.2")
+		text                    = "this is some text 521"
+		packing                 = upspin.EEp521Pack
+	)
+	ctx, packer := setup(user, packing)
+	testPackNameAndUnpack(t, ctx, packer, name, name2, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, packing upspin.Packing) {
@@ -197,7 +243,7 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 	// Check that we didn't kid ourselves into wrapping for mia without a key.
 	p, ok := packer.(eep256)
 	if ok {
-		_, wrap, err := p.pdUnmarshal(d.Metadata.Packdata)
+		_, wrap, _, err := p.pdUnmarshal(d.Metadata.Packdata)
 		if err != nil {
 			t.Fatal(err)
 		}
