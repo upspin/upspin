@@ -195,7 +195,7 @@ func TestDirEntryResponseWithProperError(t *testing.T) {
 }
 
 func TestWhichAccessResponse(t *testing.T) {
-	acc, err := WhichAccessResponse([]byte(`{"error": "not found"}`))
+	acc, err := WhichAccessResponse([]byte(`{"Error": "not found"}`))
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}

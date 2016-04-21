@@ -71,13 +71,17 @@ func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 	// Find the relevant Access file. Start with the parent dir.
 	accessDir := *parsedPath
 	for {
-		if !accessDir.IsRoot() {
-			accessDir = accessDir.Drop(1)
-		}
-
 		accessPath := path.Join(accessDir.Path(), "Access")
 		acc, found := root.accessFiles[accessPath]
 		if found {
+			// If it's the root one, verify the pathname actually exists.
+			if accessDir.IsRoot() {
+				_, err := d.getNonRoot(accessPath)
+				if err == errEntryNotFound {
+					return "", acc, nil // The Access file does not exist.
+				}
+				return accessPath, acc, err
+			}
 			logMsg.Printf("Found access file in %s: %+v ", accessPath, acc)
 			return accessPath, acc, nil
 		}
@@ -86,6 +90,8 @@ func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 		if accessDir.IsRoot() {
 			break
 		}
+
+		accessDir = accessDir.Drop(1)
 	}
 	// We did not find any Access file. The root should have an implicit one. This is a serious error.
 	err = errors.New("No Access file found anywhere")
