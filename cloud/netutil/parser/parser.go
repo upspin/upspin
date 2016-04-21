@@ -14,14 +14,21 @@ var (
 	zeroLoc                upspin.Location
 	zeroRef                refMessage
 	zeroErr                errorMessage
+	zeroWhichAccess        WhichAccessMessage
 )
 
+// TODO: export all of these so we don't duplicate them or write wrapper functions to send them out on the wire.
 type refMessage struct {
 	Ref upspin.Reference
 }
 
 type errorMessage struct {
 	Error string
+}
+
+// WhichAccessMessage is a message used to reply to Directory.WhichAccess.
+type WhichAccessMessage struct {
+	Access upspin.PathName
 }
 
 // LocationResponse interprets the body of an HTTP response as
@@ -91,4 +98,19 @@ func ErrorResponse(body []byte) error {
 		return nil
 	}
 	return errors.New(serverErr.Error)
+}
+
+// WhichAccessResponse interprets the body of an HTTP response as the
+// path name to an Access file. If the body is not a path name, it tries to
+// read an error message instead.
+func WhichAccessResponse(body []byte) (upspin.PathName, error) {
+	if len(body) == 0 {
+		return "", errEmptyServerResponse
+	}
+	var access WhichAccessMessage
+	err := json.Unmarshal(body, &access)
+	if err != nil || access == zeroWhichAccess {
+		return "", ErrorResponse(body)
+	}
+	return access.Access, nil
 }

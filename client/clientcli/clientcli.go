@@ -54,6 +54,8 @@ func main() {
 		ls(path)
 	case "rm":
 		rm(path)
+	case "whichaccess":
+		whichAccess(path)
 	default:
 		fmt.Fprintf(os.Stderr, "Can't understand command: %v\n", flag.Arg(0))
 		usage()
@@ -62,10 +64,18 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|get|ls|rm> <path>\n")
+	fmt.Fprintf(os.Stderr, "\tcli [flags] <mkdir|put|get|ls|rm|whichaccess> <path>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+func whichAccess(pathName upspin.PathName) {
+	acc, err := ctx.Directory.WhichAccess(pathName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(acc)
 }
 
 func rm(pathName upspin.PathName) {

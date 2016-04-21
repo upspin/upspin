@@ -53,18 +53,23 @@ func (d *dirServer) deleteAccess(accessPath *path.Parsed) error {
 
 // hasRight reports whether the user has the right on the path. It's assumed that all prior verifications have taken
 // place, such as verifying whether the user is writing to a file that existed as a directory or vice-versa, etc.
-func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right, pathName upspin.PathName) (bool, error) {
-	parsedPathToCheck, err := path.Parse(pathName)
-	if err != nil {
-		return false, newDirError(op, pathName, err.Error())
-	}
-	root, err := d.getRoot(parsedPathToCheck.User)
+func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right, parsedPath *path.Parsed) (bool, error) {
+	_, acc, err := d.whichAccess(op, parsedPath)
 	if err != nil {
 		return false, err
 	}
+	return d.checkRights(user, right, parsedPath.Path(), acc)
+}
 
-	// Now we need to find the relevant Access file. Start with the parent dir.
-	accessDir := parsedPathToCheck
+// whichAccess returns the path name and the parsed contents of the ruling Access file for a given path name.
+// TODO: we should cache this computation as it requires a parsing paths, traversing them, doing drop, joins, etc.
+func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.PathName, *access.Access, error) {
+	root, err := d.getRoot(parsedPath.User)
+	if err != nil {
+		return "", nil, err
+	}
+	// Find the relevant Access file. Start with the parent dir.
+	accessDir := *parsedPath
 	for {
 		if !accessDir.IsRoot() {
 			accessDir = accessDir.Drop(1)
@@ -74,7 +79,7 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 		acc, found := root.accessFiles[accessPath]
 		if found {
 			logMsg.Printf("Found access file in %s: %+v ", accessPath, acc)
-			return d.checkRights(user, right, parsedPathToCheck.Path(), acc)
+			return accessPath, acc, nil
 		}
 
 		// If we reached the root, there's nothing else to do.
@@ -82,8 +87,10 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 			break
 		}
 	}
-	// We did not find any Access file. The root should have an implicit one. This is an error.
-	return false, errors.New("No Access file found anywhere")
+	// We did not find any Access file. The root should have an implicit one. This is a serious error.
+	err = errors.New("No Access file found anywhere")
+	logErr.Printf("WARN: %s", err)
+	return "", nil, err
 }
 
 // checkRights is a convenience function that applies the Can method of the access entry given using the user, right and path provided.
