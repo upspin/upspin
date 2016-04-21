@@ -16,6 +16,24 @@
       "revId": "99c3bd2c5cf57ae5c0c0c45feff35948f9116aa1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_c2faa358",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T05:16:21Z",
+      "side": 1,
+      "message": "it used to be, as you can see, but then WhichAccess cannot distinguish a default access file fro no access file.",
+      "parentUuid": "285ab8dd_625acf59",
+      "revId": "99c3bd2c5cf57ae5c0c0c45feff35948f9116aa1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
