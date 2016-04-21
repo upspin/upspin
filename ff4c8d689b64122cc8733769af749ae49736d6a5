@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_96cdcc85",
+        "filename": "cloud/netutil/message/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T18:34:40Z",
+      "side": 1,
+      "message": "This is too generic a package name. (So was \"parser\", if we\u0027re being honest.) There are likely to be other messages in the system by the time we\u0027re done, and it\u0027s likely a program will depend on several of them. Plus it\u0027s not specific, but this is a very specific package.\n\nThis package is really about JSON on the net. How about jsonmsg? If json\u0027s in the package name, client code will be easier to understand.",
+      "revId": "ff4c8d689b64122cc8733769af749ae49736d6a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
