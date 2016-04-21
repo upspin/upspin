@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_93907e0c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T18:09:56Z",
+      "side": 1,
+      "message": "I will investigate and clean up consistently across ee.go in a separate CL after this one lands.",
+      "parentUuid": "285ab8dd_a27687a0",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_22d857f4",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -72,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_13656eec",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T18:09:56Z",
+      "side": 1,
+      "message": "I had made just this cleanup before.  Either I missed one or my change got lost.  Again, I\u0027ll clean this along with packer.",
+      "parentUuid": "285ab8dd_226a97bc",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_62ddef25",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -101,6 +137,24 @@
       "side": 1,
       "message": "My bad, I got it from your old code and didn\u0027t look at the more recent CLs.",
       "parentUuid": "285ab8dd_62ddef25",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_93795e94",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T18:09:56Z",
+      "side": 1,
+      "message": "Feel free to make it match the more recent CLs or leave as is for the moment and I\u0027ll take care of it.",
+      "parentUuid": "285ab8dd_c2cce33b",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -205,6 +259,24 @@
       "writtenOn": "2016-04-21T05:52:16Z",
       "side": 1,
       "message": "Leaving up to ehg.",
+      "parentUuid": "285ab8dd_027c3b8c",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_3353ca14",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T18:09:56Z",
+      "side": 1,
+      "message": "I\u0027ll do it.",
       "parentUuid": "285ab8dd_027c3b8c",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
