@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_9c9e4b2d",
+        "filename": "cloud/netutil/jsonmsg/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-21T20:56:13Z",
+      "side": 1,
+      "message": "delete. you only need one package comment and this isn\u0027t it",
+      "revId": "31213ae556d5343af255938f0ddc7a5e957859a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
