@@ -155,6 +155,12 @@ type Packer interface {
 	// If packdata[i] is nil on return, processing that packdata was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
 	Share(context *Context, readers []PublicKey, packdata []*[]byte)
+
+	// Name updates the DirEntry to refer to a new path. If the new
+	// path is in a different directory, the wrapped keys are reduced to
+	// only that of the Upspin user invoking the method. The Packdata
+	// in entry must contain a wrapped key for that user.
+	Name(context *Context, entry *DirEntry, path PathName) error
 }
 
 const (
