@@ -172,6 +172,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	if err != nil {
 		return 0, err
 	}
+	fmt.Printf("   after %d\n", len(wrap[0].dkey))
 
 	// Serialize packer metadata.
 	err = c.pdMarshal(&meta.Packdata, sig, wrap)
@@ -475,7 +476,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	for i := 0; i < nwrap; i++ {
 		var w wrappedKey
 		w.keyHash = make([]byte, sha256.Size)
-		w.dkey = make([]byte, 100) // TODO(ehg)
+		w.dkey = make([]byte, aesKeyLen+gcmTagSize)
 		w.nonce = make([]byte, gcmStandardNonceSize)
 		w.ephemeral = ecdsa.PublicKey{Curve: c.curve, X: big.NewInt(0), Y: big.NewInt(0)}
 		n += pdGetBytes(&w.keyHash, pd[n:])
