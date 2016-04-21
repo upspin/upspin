@@ -53,6 +53,12 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 	return copy(cleartext, ciphertext), nil
 }
 
+// Retarget implements upspin.Retarget.
+func (p plainPack) Retarget(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	dirEntry.Name = newName
+	return nil
+}
+
 func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
