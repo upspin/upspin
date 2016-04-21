@@ -38,15 +38,14 @@ type wrappedKey struct {
 	nonce     []byte
 	ephemeral ecdsa.PublicKey
 }
-type wrappedKeys []wrappedKey
 
 type keyHashArray [sha256.Size]byte // sometimes we need the array
 
 // common implements common functions parameterized by cipher-specific values.
 type common struct {
-	ciphersuite  upspin.Packing
 	curve        elliptic.Curve
 	packerString string
+	packing      upspin.Packing
 }
 
 var _ upspin.Packer = common{}
@@ -74,23 +73,23 @@ const (
 func init() {
 	pack.Register(eep256{
 		common{
-			ciphersuite:  upspin.EEp256Pack,
 			curve:        elliptic.P256(),
 			packerString: p256,
+			packing:      upspin.EEp256Pack,
 		},
 	})
 	pack.Register(eep384{
 		common{
-			ciphersuite:  upspin.EEp384Pack,
 			curve:        elliptic.P384(),
 			packerString: p384,
+			packing:      upspin.EEp384Pack,
 		},
 	})
 	pack.Register(eep521{
 		common{
-			ciphersuite:  upspin.EEp521Pack,
 			curve:        elliptic.P521(),
 			packerString: p521,
+			packing:      upspin.EEp521Pack,
 		},
 	})
 }
@@ -110,7 +109,7 @@ var (
 )
 
 func (c common) Packing() upspin.Packing {
-	return c.ciphersuite
+	return c.packing
 }
 
 func (c common) PackLen(ctx *upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
@@ -132,18 +131,15 @@ func (c common) String() string {
 }
 
 func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
-	packer := pack.Lookup(ctx.Packing)
 	if err := pack.CheckPackMeta(c, &d.Metadata); err != nil {
 		return 0, err
 	}
-	meta := &d.Metadata
-	pathname := d.Name
-
-	// Pick fresh file encryption key, and create ciphertext.
 	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
+
+	// Pick fresh file encryption key.
 	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
@@ -157,14 +153,15 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	sig, err := ctx.Factotum.FileSign(ctx.Packing, pathname, meta.Time, dkey, cipherSum)
+	sig, err := ctx.Factotum.FileSign(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, err
 	}
 
-	// Wrap for myself;  let Share handle the others.
+	// Wrap for myself.
+	// TODO Update this other readers, as soon as we can get the list.
 	wrap := make([]wrappedKey, 1)
-	p, err := parsePublicKey(ctx.KeyPair.Public, packer)
+	p, err := parsePublicKey(ctx.KeyPair.Public, c.packerString)
 	if err != nil {
 		return 0, err
 	}
@@ -172,10 +169,9 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	if err != nil {
 		return 0, err
 	}
-	fmt.Printf("   after %d\n", len(wrap[0].dkey))
 
 	// Serialize packer metadata.
-	err = c.pdMarshal(&meta.Packdata, sig, wrap, cipherSum)
+	err = c.pdMarshal(&d.Metadata.Packdata, sig, wrap, cipherSum)
 	if err != nil {
 		return 0, err
 	}
@@ -183,46 +179,44 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 }
 
 func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
-	packer := pack.Lookup(ctx.Packing)
 	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
 		return 0, err
 	}
-	meta := &d.Metadata
-	pathname := d.Name
-
 	if len(cleartext) < len(ciphertext) {
 		return 0, errTooShort
 	}
 	cleartext = cleartext[:len(ciphertext)]
+
+	// Retrieve file decryption key.
 	dkey := make([]byte, aesKeyLen)
-	sig, wrap, _, err := c.pdUnmarshal(meta.Packdata)
+	sig, wrap, _, err := c.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
 		return 0, err
 	}
 
 	// File owner is part of the pathname
-	parsed, err := path.Parse(pathname)
+	parsed, err := path.Parse(d.Name)
 	owner := parsed.User
 	if err != nil {
 		return 0, err
 	}
 	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(ctx, owner, packer)
+	ownerRawPubKey, err := publicKey(ctx, owner, c.packerString)
 	if err != nil {
 		return 0, err
 	}
-	ownerPubKey, err := parsePublicKey(ownerRawPubKey, packer)
+	ownerPubKey, err := parsePublicKey(ownerRawPubKey, c.packerString)
 	if err != nil {
 		return 0, err
 	}
 
 	// Now get my own keys
 	me := ctx.UserName // Recipient of the file is me (the user in the context)
-	rawPublicKey, err := publicKey(ctx, me, packer)
+	rawPublicKey, err := publicKey(ctx, me, c.packerString)
 	if err != nil {
 		return 0, err
 	}
-	pubkey, err := parsePublicKey(rawPublicKey, packer)
+	pubkey, err := parsePublicKey(rawPublicKey, c.packerString)
 	if err != nil {
 		return 0, err
 	}
@@ -242,7 +236,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
-		if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, pathname, meta.Time, dkey, cipherSum), sig.R, sig.S) {
+		if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 			log.Println("verify failed")
 			return 0, errVerify
 		}
@@ -254,7 +248,6 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 
 // Share extracts dkey from the packdata, wraps for readers, and updates packdata.
 func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
-	packer := pack.Lookup(ctx.Packing)
 
 	// Fetch all the public keys we'll need.
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
@@ -262,7 +255,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 	for i, pub := range readers {
 		// TODO(ehg) someday deal with diverse key types amongst readers
 		var err error
-		pubkey[i], err = parsePublicKey(pub, packer)
+		pubkey[i], err = parsePublicKey(pub, c.packerString)
 		if err != nil {
 			continue
 		}
@@ -270,7 +263,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 	}
 
 	// Get my own key.
-	mypub, err := parsePublicKey(ctx.KeyPair.Public, packer)
+	mypub, err := parsePublicKey(ctx.KeyPair.Public, c.packerString)
 	if err != nil {
 		log.Printf("cannot parse my own key: %v", err)
 		return // can't happen
@@ -469,7 +462,7 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 		return
 	}
 	w.keyHash = keyHash(R)
-	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
+	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.packing, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO(security-reviewer) reconsider salt
 	strong := make([]byte, aesKeyLen)
@@ -502,7 +495,7 @@ func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err err
 	S := elliptic.Marshal(c.curve, sx, sy)
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
-	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.ciphersuite, w.keyHash, w.nonce))
+	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.packing, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess)
 	strong := make([]byte, aesKeyLen)
@@ -536,7 +529,7 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey, 
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
-	(*dst)[0] = byte(c.ciphersuite)
+	(*dst)[0] = byte(c.packing)
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
@@ -557,8 +550,8 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey, 
 }
 
 func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
-	if pd[0] != byte(c.ciphersuite) {
-		return sig0, nil, nil, fmt.Errorf("expected packing %d, got %d", c.ciphersuite, pd[0])
+	if pd[0] != byte(c.packing) {
+		return sig0, nil, nil, fmt.Errorf("expected packing %d, got %d", c.packing, pd[0])
 	}
 	n := 1
 	sig.R = big.NewInt(0)
@@ -661,7 +654,7 @@ func (c common) decrypt(cleartext, ciphertext, dkey []byte) (int, error) {
 	return len(ciphertext), nil
 }
 
-// packdataLen returns n big enough for ciphersuite, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
+// packdataLen returns n big enough for packing, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
 func (c common) packdataLen(nwrap int) int {
 	// byteLen is copied from elliptic.go:Marshal()
 	byteLen := (c.curve.Params().BitSize + 7) >> 3
@@ -671,7 +664,7 @@ func (c common) packdataLen(nwrap int) int {
 }
 
 // publicKey returns the string representation of a user's public key.
-func publicKey(ctx *upspin.Context, user upspin.UserName, p upspin.Packer) (upspin.PublicKey, error) {
+func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (upspin.PublicKey, error) {
 
 	// KeyPairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup
@@ -694,7 +687,7 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, p upspin.Packer) (upsp
 		return "", fmt.Errorf(noKnownKeysForUser, user)
 	}
 	for _, k := range keys {
-		if isValidKeyForPacker(k, p) {
+		if isValidKeyForPacker(k, packerString) {
 			return k, nil
 		}
 	}
@@ -703,17 +696,17 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, p upspin.Packer) (upsp
 
 // parsePublicKey takes a string representation of a
 // public key and converts it into an ECDSA public key.
-func parsePublicKey(publicKey upspin.PublicKey, p upspin.Packer) (*ecdsa.PublicKey, error) {
+func parsePublicKey(publicKey upspin.PublicKey, packerString string) (*ecdsa.PublicKey, error) {
 	ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
-	if keyType != p.String() {
-		return nil, fmt.Errorf("expected packing %s, got %s", p.String(), keyType)
+	if keyType != packerString {
+		return nil, fmt.Errorf("expected packing %s, got %s", packerString, keyType)
 	}
 	return ecdsaPubKey, nil
 }
 
-func isValidKeyForPacker(publicKey upspin.PublicKey, p upspin.Packer) bool {
-	return strings.HasPrefix(string(publicKey), p.String())
+func isValidKeyForPacker(publicKey upspin.PublicKey, packerString string) bool {
+	return strings.HasPrefix(string(publicKey), packerString)
 }
