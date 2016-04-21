@@ -297,6 +297,42 @@
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_18ba6c02",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T17:05:16Z",
+      "side": 1,
+      "message": "Name it is.",
+      "parentUuid": "285ab8dd_78260097",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_b8aeb8c4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T17:05:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_02d3dbdc",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
