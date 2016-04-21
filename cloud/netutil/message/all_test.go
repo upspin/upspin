@@ -1,4 +1,4 @@
-package parser
+package message
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -209,5 +210,56 @@ func TestWhichAccessResponse(t *testing.T) {
 	}
 	if acc != upspin.PathName(path) {
 		t.Fatalf("Expected path %s, got %s", path, acc)
+	}
+}
+
+func TestUserLookupResponse(t *testing.T) {
+	user, endpoints, keys, err := UserLookupResponse([]byte(`{"error":"unknown user"}`))
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	expectedError := "unknown user"
+	if err.Error() != expectedError {
+		t.Fatalf("Expected error %s, got %s", expectedError, err)
+	}
+	// Now a valid response
+	const (
+		userName = "bob@foo.com"
+		pubKey1  = "pub key 1"
+		pubKey2  = "pub key 2"
+	)
+	ue := userEntry{
+		User: userName,
+		Endpoints: []upspin.Endpoint{upspin.Endpoint{
+			Transport: upspin.GCP,
+			NetAddr:   upspin.NetAddr("http://hello.com"),
+		}},
+		Keys: []upspin.PublicKey{pubKey1, pubKey2},
+	}
+	ueJSON, err := json.Marshal(ue)
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, endpoints, keys, err = UserLookupResponse(ueJSON)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user != userName {
+		t.Fatalf("Expected user %s, got %s", userName, user)
+	}
+	if len(endpoints) != 1 {
+		t.Fatalf("Expected 1 endpoint, got %d", len(endpoints))
+	}
+	if endpoint.String(&endpoints[0]) != endpoint.String(&ue.Endpoints[0]) {
+		t.Fatalf("Expected endpoint %v, got %v", ue.Endpoints[0], endpoints[0])
+	}
+	if len(keys) != 2 {
+		t.Fatalf("Expected 2 keys, got %d", len(keys))
+	}
+	if keys[0] != pubKey1 {
+		t.Fatalf("Expected key %s, got %s", pubKey1, keys[0])
+	}
+	if keys[1] != pubKey2 {
+		t.Fatalf("Expected key %s, got %s", pubKey2, keys[0])
 	}
 }

@@ -10,7 +10,6 @@ import (
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -330,11 +329,8 @@ func TestWhichAccess(t *testing.T) {
 	const expectedAccessFile = parentPathName + "/Access"
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/whichaccess/"+pathName, nil)
 
-	accessFileResponse, err := json.Marshal(parser.WhichAccessMessage{Access: expectedAccessFile})
-	if err != nil {
-		t.Fatalf("JSON marshal failed: %v", err)
-	}
-	resp := newResp(accessFileResponse)
+	accessFileResponse := fmt.Sprintf(`{"Access": %q}`, expectedAccessFile)
+	resp := newResp([]byte(accessFileResponse))
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{req})
 
 	d := newDirectory("http://localhost:8081", mock, nil)

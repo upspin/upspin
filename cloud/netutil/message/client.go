@@ -1,4 +1,8 @@
-package parser
+// Package message handles marshaling and unmarshaling Upspin data structures to and from JSON.
+// The goal of this package is two-fold:
+// 1) hide types that only exist on the wire and
+// 2) make so that JSON replies from the server can be as "strongly typed" as JSON can be.
+package message
 
 import (
 	"encoding/json"
@@ -14,10 +18,12 @@ var (
 	zeroLoc                upspin.Location
 	zeroRef                refMessage
 	zeroErr                errorMessage
-	zeroWhichAccess        WhichAccessMessage
+	zeroWhichAccess        whichAccessMessage
 )
 
-// TODO: export all of these so we don't duplicate them or write wrapper functions to send them out on the wire.
+// The messages in this package only exist on the wire and as such are not exported, to avoid confusion with their
+// very similar counterparts defined in upspin.go and other places.
+
 type refMessage struct {
 	Ref upspin.Reference
 }
@@ -26,9 +32,16 @@ type errorMessage struct {
 	Error string
 }
 
-// WhichAccessMessage is a message used to reply to Directory.WhichAccess.
-type WhichAccessMessage struct {
+// whichAccessMessage is a message used to reply to Directory.WhichAccess.
+type whichAccessMessage struct {
 	Access upspin.PathName
+}
+
+// userEntry stores publicly known information for a given user.
+type userEntry struct {
+	User      upspin.UserName    // User's email address (e.g. bob@bar.com).
+	Keys      []upspin.PublicKey // Known keys for the user.
+	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
 }
 
 // LocationResponse interprets the body of an HTTP response as
@@ -107,10 +120,24 @@ func WhichAccessResponse(body []byte) (upspin.PathName, error) {
 	if len(body) == 0 {
 		return "", errEmptyServerResponse
 	}
-	var access WhichAccessMessage
+	var access whichAccessMessage
 	err := json.Unmarshal(body, &access)
 	if err != nil || access == zeroWhichAccess {
 		return "", ErrorResponse(body)
 	}
 	return access.Access, nil
+}
+
+// UserLookupResponse interprets the body of an HTTP response as the user name, endpoints
+// and public keys. If the body doesn't conform, it tries to read an error message instead.
+func UserLookupResponse(body []byte) (upspin.UserName, []upspin.Endpoint, []upspin.PublicKey, error) {
+	if len(body) == 0 {
+		return "", nil, nil, errEmptyServerResponse
+	}
+	var ue userEntry
+	err := json.Unmarshal(body, &ue)
+	if err != nil || len(ue.User) == 0 {
+		return "", nil, nil, ErrorResponse(body)
+	}
+	return ue.User, ue.Endpoints, ue.Keys, nil
 }
