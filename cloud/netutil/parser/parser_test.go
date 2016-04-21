@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -189,5 +190,24 @@ func TestDirEntryResponseWithProperError(t *testing.T) {
 	expectedError := "something terrible happened"
 	if err.Error() != expectedError {
 		t.Fatalf("Expected error %q, got %q", expectedError, err)
+	}
+}
+
+func TestWhichAccessResponse(t *testing.T) {
+	acc, err := WhichAccessResponse([]byte(`{"error": "not found"}`))
+	if err == nil {
+		t.Fatal("Expected error, got none")
+	}
+	if err.Error() != "not found" {
+		t.Fatalf("Expected 'not found', got %s", err)
+	}
+	// Now try a valid one
+	const path = "foo@bar.com/Access"
+	acc, err = WhichAccessResponse([]byte(fmt.Sprintf(`{"Access":"%s"}`, path)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if acc != upspin.PathName(path) {
+		t.Fatalf("Expected path %s, got %s", path, acc)
 	}
 }
