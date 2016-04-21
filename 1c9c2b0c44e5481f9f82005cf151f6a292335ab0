@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_62ddef25",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T04:50:02Z",
+      "side": 1,
+      "message": "If ctx is properly initialized, ctx.Factotum should already give you f.    (I realize this is mysterious because some old code also did it wrong.)",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_42f9d38e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T04:50:02Z",
+      "side": 1,
+      "message": "Wouldn\u0027t you rather wrap keys for yourself and all readers in the new directory (with the new Access file)?\n\nBut fine to leave that for a later CL after the new design settles for getting a readers list.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_a2452795",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-21T04:50:02Z",
+      "side": 1,
+      "message": "It may be worth a comment here that the 1 is for the length field binary.Varint representing 32\u003dsha256.Size.   Or not;  it was obvious to me, but I know the code better than the casual reader.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
