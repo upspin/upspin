@@ -86,8 +86,8 @@ func setup(userName upspin.UserName) {
 	context.User.(*testuser.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 }
 
-func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin.Packdata) {
-	packer := pack.Lookup(context.Packing)
+func packData(t *testing.T, data []byte, entry *upspin.DirEntry, packing upspin.Packing) ([]byte, upspin.Packdata) {
+	packer := pack.Lookup(packing)
 	if packer == nil {
 		t.Fatalf("Packer is nil for packing %d", context.Packing)
 	}
@@ -106,6 +106,14 @@ func packData(t *testing.T, data []byte, entry *upspin.DirEntry) ([]byte, upspin
 }
 
 func storeData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry {
+	return storeDataHelper(t, data, name, upspin.DebugPack)
+}
+
+func storePlainData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry {
+	return storeDataHelper(t, data, name, upspin.PlainPack)
+}
+
+func storeDataHelper(t *testing.T, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
 	// TODO: we'd really like a path.Clean.
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -118,10 +126,10 @@ func storeData(t *testing.T, data []byte, name upspin.PathName) *upspin.DirEntry
 			IsDir:    false,
 			Size:     uint64(len(data)),
 			Time:     upspin.Now(),
-			Packdata: []byte{byte(upspin.DebugPack)},
+			Packdata: []byte{byte(packing)},
 		},
 	}
-	cipher, packdata := packData(t, data, entry)
+	cipher, packdata := packData(t, data, entry, packing)
 	ref, err := context.Store.Put(cipher)
 	if err != nil {
 		t.Fatal(err)
@@ -626,5 +634,55 @@ func TestDeleteDirectory(t *testing.T) {
 	_, err = dir.Lookup(dirName)
 	if err == nil {
 		t.Fatal("directory still exists after deletion")
+	}
+}
+
+func TestWhichAccess(t *testing.T) {
+	const (
+		user           = "user10@google.com"
+		dir1Name       = user + "/dir1"
+		dir2Name       = dir1Name + "/dir2"
+		fileName       = dir2Name + "/file"
+		accessFileName = dir1Name + "/Access"
+	)
+	setup(user)
+	dir := context.Directory
+	_, err := dir.MakeDirectory(dir1Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.MakeDirectory(dir2Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry := storeData(t, []byte("hello"), fileName)
+	err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// No Access file exists. Should get root.
+	accessName, err := dir.WhichAccess(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessName != "" {
+		t.Errorf("expected no Access file, got %q", accessName)
+	}
+	// Add an Access file to dir1.
+	entry = storePlainData(t, []byte("r:*@google.com\n"), accessFileName)
+	err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	accessName, err = dir.WhichAccess(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessName != accessFileName {
+		t.Errorf("expected %q, got %q", accessFileName, accessName)
 	}
 }
