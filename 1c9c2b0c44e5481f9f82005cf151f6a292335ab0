@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_a27687a0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "I\u0027ll leave this up to ehg.  I\u0027d rather look like the rest of the code.",
+      "parentUuid": "285ab8dd_42c1d3fd",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_22d857f4",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-21T05:30:41Z",
       "side": 1,
       "message": "You public key is in ctx.KeyPair",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_226a97bc",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "Just following what is already done in Unpack.  Eric, is there a reason you don\u0027t just use what\u0027s in Context?",
+      "parentUuid": "285ab8dd_22d857f4",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_c2cce33b",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "My bad, I got it from your old code and didn\u0027t look at the more recent CLs.",
+      "parentUuid": "285ab8dd_62ddef25",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_42f9d38e",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2016-04-21T04:50:02Z",
       "side": 1,
       "message": "Wouldn\u0027t you rather wrap keys for yourself and all readers in the new directory (with the new Access file)?\n\nBut fine to leave that for a later CL after the new design settles for getting a readers list.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_e2d1dfd0",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "For now I\u0027m doing exactly what Pack does above.   Once Pack gets updated, I\u0027ll do this to be consistent.",
+      "parentUuid": "285ab8dd_42f9d38e",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_228137c4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_a2452795",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_027c3b8c",
         "filename": "pack/ee/ee.go",
         "patchSetId": 6
@@ -98,6 +188,24 @@
       "writtenOn": "2016-04-21T05:30:41Z",
       "side": 1,
       "message": "Comment for Eric: looks like this doesn\u0027t need the whole packer, but just a packerString. Would obviate the need for pack.Lookup in the code above.",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_a23f67b4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "Leaving up to ehg.",
+      "parentUuid": "285ab8dd_027c3b8c",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_424c736d",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "Or maybe otherNameThatIWantToUseForThisTestToSeeIfMultipleNamesWork?\n\nSure",
+      "parentUuid": "285ab8dd_42a8f34d",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_02d8bb0c",
         "filename": "upspin/upspin.go",
         "patchSetId": 6
@@ -132,6 +258,24 @@
       "writtenOn": "2016-04-21T05:13:18Z",
       "side": 1,
       "message": "why is it called Retarget rather than Rename?",
+      "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_02d3dbdc",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-21T05:52:16Z",
+      "side": 1,
+      "message": "Because I felt that Rename was a bit misleading.  This is going to be used by client and dfuse to create a new name pointing to a Reference without necessarily removing the old one, i.e., to do both Link and Rename.  I didn\u0027t want to confuse people that would see client.Link calling packer.Rename.  However, I\u0027ll rename it to Rename if of you really want that.",
+      "parentUuid": "285ab8dd_02d8bb0c",
       "revId": "1c9c2b0c44e5481f9f82005cf151f6a292335ab0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
