@@ -16,6 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -28,7 +29,7 @@ type userServer struct {
 // userEntry stores all known information for a given user. The fields
 // are exported because JSON parsing needs access to them.
 type userEntry struct {
-	User      string             // User's email address (e.g. bob@bar.com).
+	User      upspin.UserName    // User's email address (e.g. bob@bar.com).
 	Keys      []upspin.PublicKey // Known keys for the user.
 	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
 }
@@ -114,7 +115,7 @@ func (u *userServer) addKeyHandler(w http.ResponseWriter, r *http.Request) {
 		if isNotFound(err) {
 			log.Printf("User %q not found on GCP, adding new one", user)
 			ue = &userEntry{
-				User: user,
+				User: upspin.UserName(user),
 				Keys: make([]upspin.PublicKey, 0, 1),
 			}
 		} else {
@@ -168,7 +169,7 @@ func (u *userServer) addRootHandler(w http.ResponseWriter, r *http.Request) {
 		if isNotFound(err) {
 			log.Printf("User %q not found on GCP, adding new one", user)
 			ue = &userEntry{
-				User:      user,
+				User:      upspin.UserName(user),
 				Endpoints: make([]upspin.Endpoint, 0, 1),
 			}
 		} else {
@@ -209,7 +210,7 @@ func (u *userServer) getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Reply to user
 	log.Printf("Lookup request for user %v", user)
-	netutil.SendJSONReply(w, *ue)
+	jsonmsg.SendUserLookupResponse(ue.User, ue.Endpoints, ue.Keys, w)
 }
 
 func (u *userServer) deleteHandler(w http.ResponseWriter, r *http.Request) {
