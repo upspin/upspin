@@ -12,6 +12,7 @@ import (
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -82,13 +83,8 @@ func (s *storeServer) putHandler(sess auth.Session, w http.ResponseWriter, r *ht
 	}()
 
 	// Answer something sensible to the client.
-	refMessage := &struct {
-		Ref string
-	}{
-		Ref: ref,
-	}
-	logMsg.Printf("Put: %s: %v", sess.User(), refMessage)
-	netutil.SendJSONReply(w, refMessage)
+	logMsg.Printf("Put: %s: %s", sess.User(), ref)
+	message.SendReferenceResponse(upspin.Reference(ref), w)
 }
 
 func (s *storeServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {

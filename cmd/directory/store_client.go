@@ -12,7 +12,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -64,7 +64,7 @@ func (s *storeClient) innerGet(loc *upspin.Location) ([]byte, []upspin.Location,
 	switch answerType {
 	case "application/json":
 		// This is either a re-location reply or an error.
-		loc, err := parser.LocationResponse(buf)
+		loc, err := message.LocationResponse(buf)
 		if err != nil {
 			return nil, nil, err
 		}

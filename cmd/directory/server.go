@@ -16,7 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/message"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -316,7 +316,7 @@ func (d *dirServer) whichAccessHandler(sess auth.Session, w http.ResponseWriter,
 		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
 		return
 	}
-	netutil.SendJSONReply(w, parser.WhichAccessMessage{Access: accessPath})
+	message.SendWhichAccessResponse(accessPath, w)
 }
 
 func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
