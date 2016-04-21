@@ -14,7 +14,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/parser"
+	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -102,7 +102,7 @@ func addRoot(user upspin.UserName, endpointStr string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = parser.ErrorResponse(body)
+	err = jsonmsg.ErrorResponse(body)
 	if err != nil {
 		log.Fatalf("Server replied with error: %s", err)
 	}
