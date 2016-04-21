@@ -151,8 +151,8 @@ type Packer interface {
 	// which is held separate from this call. It is invoked in response to
 	// Directory updates returning information about entries that need updating due to
 	// changes in the set of users with permissions to read the associated items.
-	// In case of error, Share skips key wrapping for that reader or packdata.
-	// If packdata[i] is nil on return, processing that packdata was skipped.
+	// In case of error, Share skips processing for that reader or packdata.
+	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
 	Share(context *Context, readers []PublicKey, packdata []*[]byte)
 
