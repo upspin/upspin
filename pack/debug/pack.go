@@ -44,6 +44,11 @@ func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packd
 	// Nothing to do.
 }
 
+func (testPack) Retarget(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	dirEntry.Name = newName
+	return nil
+}
+
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.
 type cryptByteReader struct {
 	crypt byte
