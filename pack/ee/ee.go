@@ -328,15 +328,12 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 
 // Name implements upspin.Name.
 func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
-	packer := pack.Lookup(ctx.Packing)
 	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
 		return err
 	}
-	meta := &d.Metadata
-	pathname := d.Name
 
 	dkey := make([]byte, aesKeyLen)
-	sig, wrap, cipherSum, err := c.pdUnmarshal(meta.Packdata)
+	sig, wrap, cipherSum, err := c.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
 		return err
 	}
@@ -346,28 +343,28 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// File owner is part of the pathname
-	parsed, err := path.Parse(pathname)
+	parsed, err := path.Parse(d.Name)
 	owner := parsed.User
 	if err != nil {
 		return err
 	}
 	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(ctx, owner, packer)
+	ownerRawPubKey, err := publicKey(ctx, owner, c.packerString)
 	if err != nil {
 		return err
 	}
-	ownerPubKey, err := parsePublicKey(ownerRawPubKey, packer)
+	ownerPubKey, err := parsePublicKey(ownerRawPubKey, c.packerString)
 	if err != nil {
 		return err
 	}
 
 	// Now get my own keys
 	me := ctx.UserName // Recipient of the file is me (the user in the context)
-	rawPublicKey, err := publicKey(ctx, me, packer)
+	rawPublicKey, err := publicKey(ctx, me, c.packerString)
 	if err != nil {
 		return err
 	}
-	pubkey, err := parsePublicKey(rawPublicKey, packer)
+	pubkey, err := parsePublicKey(rawPublicKey, c.packerString)
 	if err != nil {
 		return err
 	}
@@ -395,7 +392,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// Verify that the owner signed this with his/her public key.
-	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, pathname, meta.Time, dkey, cipherSum), sig.R, sig.S) {
+	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 		log.Println("verify failed")
 		return errVerify
 	}
@@ -410,14 +407,14 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// Compute new signature.
-	sig, err = ctx.Factotum.FileSign(ctx.Packing, newName, meta.Time, dkey, cipherSum)
+	sig, err = ctx.Factotum.FileSign(ctx.Packing, newName, d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return err
 	}
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
-	if err := c.pdMarshal(&meta.Packdata, sig, wrap, cipherSum); err != nil {
+	if err := c.pdMarshal(&d.Metadata.Packdata, sig, wrap, cipherSum); err != nil {
 		return err
 	}
 	d.Name = newName
