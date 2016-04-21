@@ -46,6 +46,10 @@ type Service struct {
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
 
+	// rootAccess stores the default Access file for each user's root.
+	// Computed lazily and only used if needed.
+	rootAccess map[upspin.UserName]*access.Access
+
 	// access stores the parsed contents of any Access file stored
 	// in this directory. Inherited rights are computed from this map.
 	access map[upspin.PathName]*access.Access
@@ -392,8 +396,27 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 
 // WhichAccess returns the path of the Access file that defines the access rights
 // for the named path.
-func (s *Service) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
-	return "", errors.New("WhichAccess unimplemented")
+func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return "", err
+	}
+	pathName = parsed.Path()
+	for {
+		s.mu.RLock()
+		accessFile := s.access[pathName]
+		s.mu.RUnlock()
+		if accessFile != nil {
+			return accessFile.Path(), nil
+		}
+		if parsed.IsRoot() {
+			// We've reached the root but there is no access file there.
+			return "", nil
+		}
+		// Step up to parent directory.
+		parsed = parsed.Drop(1)
+		pathName = path.DropPath(pathName, 1)
+	}
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
@@ -623,20 +646,33 @@ func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
 		retries = 0
 		// Step up to parent directory (if there is one).
 		if parsed.IsRoot() {
-			// We've reached the root but there is no access file there. Add one and retry.
-			rootAccess, err := access.New(pathName)
-			if err != nil {
-				return false, err
-			}
-			s.mu.Lock()
-			s.access[pathName] = rootAccess
-			s.mu.Unlock()
+			// We've reached the root but there is no access file there. Use the defaults.
+			granted, _, err := s.rootAccessFile(parsed).Can(s.context.UserName, right, pathName)
+			return granted, err // Err should always be nil, but be thorough.
 			continue
 		}
 		// Drop the last entry.
 		parsed = parsed.Drop(1)
 		dirName = path.DropPath(dirName, 1)
 	}
+}
+
+// rootAccess file returns the parsed Access file providing default permissions for the root of this path.
+func (s *Service) rootAccessFile(parsed path.Parsed) *access.Access {
+	s.mu.RLock()
+	accessFile := s.rootAccess[parsed.User]
+	s.mu.RUnlock()
+	if accessFile == nil {
+		var err error
+		accessFile, err = access.New(parsed.Path())
+		if err != nil {
+			panic(err)
+		}
+		s.mu.Lock()
+		s.rootAccess[parsed.User] = accessFile
+		s.mu.Unlock()
+	}
+	return accessFile
 }
 
 // fetchEntry returns the reference for the named elem within the named directory referenced by dirRef.
@@ -796,10 +832,11 @@ const transport = upspin.InProcess
 
 func init() {
 	s := &Service{
-		endpoint: upspin.Endpoint{}, // uninitialized until Dial time.
-		store:    nil,               // uninitialized until Dial time.
-		root:     make(map[upspin.UserName]*upspin.DirEntry),
-		access:   make(map[upspin.PathName]*access.Access),
+		endpoint:   upspin.Endpoint{}, // uninitialized until Dial time.
+		store:      nil,               // uninitialized until Dial time.
+		root:       make(map[upspin.UserName]*upspin.DirEntry),
+		rootAccess: make(map[upspin.UserName]*access.Access),
+		access:     make(map[upspin.PathName]*access.Access),
 	}
 	bind.RegisterDirectory(transport, s)
 }
