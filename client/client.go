@@ -4,16 +4,17 @@ package client
 
 import (
 	"fmt"
+	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client/common/file"
 	"upspin.googlesource.com/upspin.git/pack"
+	"upspin.googlesource.com/upspin.git/pack/ee"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
-	// Plain packer used when encoding an Access file.
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.googlesource.com/upspin.git/pack/plain" // Plain packer used when encoding an Access file.
 )
 
 // Client implements upspin.Client.
@@ -81,7 +82,61 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 	cipher = cipher[:n]
 
-	// Store it.
+	packerString := packer.String()
+	if packerString[0] == 'p' && strings.IndexByte("235", packerString[1]) >= 0 { // TODO generalize for more packers when some exist
+		// Add other readers to Packdata.
+		// We do this before "Store contents", so an error return wastes little.
+		accessName, err := c.context.Directory.WhichAccess(name)
+		if err != nil {
+			return zeroLoc, err
+		}
+		var readers []upspin.UserName
+		if accessName != "" {
+			accessData, err := c.Get(accessName)
+			if err != nil {
+				return zeroLoc, err
+			}
+			acc, err := access.Parse(accessName, accessData)
+			if err != nil {
+				return zeroLoc, err
+			}
+			readers, _, err = acc.Users(access.Read)
+			if err == access.ErrNeedGroup {
+				return zeroLoc, fmt.Errorf("Groups not implemented yet for Client.Put sharing")
+			}
+			if err != nil {
+				return zeroLoc, err
+			}
+		}
+		readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
+		readersPublicKey[0] = c.context.KeyPair.Public
+		n = 1
+		for _, r := range readers {
+			_, pubkeys, err := c.context.User.Lookup(r)
+			if err != nil || len(pubkeys) < 1 {
+				// TODO warn that we can't process one of the readers?
+				continue
+			}
+			for _, pubkey := range pubkeys { // pick first key of correct type
+				pubkey = upspin.PublicKey(strings.TrimSpace(string(pubkey)))
+				if ee.IsValidKeyForPacker(pubkey, packerString) {
+					if pubkey != readersPublicKey[0] { // don't duplicate self
+						// TODO(ehg) maybe should check for other duplicates?
+						readersPublicKey[n] = pubkey
+						n++
+					}
+					break
+				}
+			}
+		}
+		readersPublicKey = readersPublicKey[:n]
+		packdata := make([]*[]byte, 1)
+		packdata[0] = &de.Metadata.Packdata
+		packer.Share(c.context, readersPublicKey, packdata)
+		de.Metadata.Packdata = *packdata[0]
+	}
+
+	// Store contents.
 	ref, err := c.context.Store.Put(cipher)
 	if err != nil {
 		return zeroLoc, err
@@ -90,7 +145,8 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		Endpoint:  c.context.Store.Endpoint(),
 		Reference: ref,
 	}
-	// Record it.
+
+	// Record directory entry.
 	err = dir.Put(de)
 
 	return de.Location, err

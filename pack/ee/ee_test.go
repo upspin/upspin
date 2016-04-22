@@ -271,7 +271,7 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 	if err != nil {
 		// would be nice to t.Fatal but then can't call from Benchmark?
 		panic("ecdsa.GenerateKey failed")
-		return ctx, packer
+		// return ctx, packer
 	}
 	ctx.KeyPair = upspin.KeyPair{
 		Public:  upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
