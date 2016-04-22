@@ -242,7 +242,7 @@ func testGlob(context *upspin.Context, t *testing.T) {
 	}
 }
 
-func testSharing(context *upspin.Context, t *testing.T) {
+func TestSharing(context *upspin.Context, t *testing.T) {
 	const (
 		sharedContent = "Hey man, whatup?"
 	)
