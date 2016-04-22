@@ -133,7 +133,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		packdata := make([]*[]byte, 1)
 		packdata[0] = &de.Metadata.Packdata
 		packer.Share(c.context, readersPublicKey, packdata)
-		de.Metadata.Packdata = *packdata[0]
 	}
 
 	// Store contents.

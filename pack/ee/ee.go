@@ -271,16 +271,17 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 	myhash := keyHash(mypub)
 
 	// For each packdata, wrap for new readers.
+	skipped := make([]bool, len(packdata))
 	for i, d := range packdata {
 
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
-		alreadyWrapped := make(map[keyHashArray]wrappedKey)
+		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
 		sig, wrap, cipherSum, err := c.pdUnmarshal(*d)
 		for i, w := range wrap {
 			var h keyHashArray
 			copy(h[:], w.keyHash)
-			alreadyWrapped[h] = wrap[i]
+			alreadyWrapped[h] = &wrap[i]
 			if !bytes.Equal(myhash, w.keyHash) {
 				continue
 			}
@@ -290,7 +291,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 				break // give up;  might mean that owner has changed keys
 			}
 		}
-		packdata[i] = nil
+		skipped[i] = true
 		if len(dkey) == 0 {
 			continue // failed to get dkey
 		}
@@ -302,16 +303,17 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 			if pubkey[i] == nil {
 				continue
 			}
-			w, ok := alreadyWrapped[hash[i]]
+			pw, ok := alreadyWrapped[hash[i]]
 			if !ok { // then need to wrap
-				w, err = c.aesWrap(pubkey[i], dkey)
+				w, err := c.aesWrap(pubkey[i], dkey)
 				if err != nil {
 					continue
 				}
 				v := w.ephemeral
 				log.Printf("Wrap for %x [%d %d]", hash[i], v.X, v.Y)
+				pw = &w
 			} // else reuse the existing wrapped key
-			wrap[nwrap] = w
+			wrap[nwrap] = *pw
 			nwrap++
 		}
 		wrap = wrap[:nwrap]
@@ -322,7 +324,12 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		if err != nil {
 			continue
 		}
-		packdata[i] = &dst
+		*packdata[i] = dst
+	}
+	for i := range packdata {
+		if skipped[i] {
+			packdata[i] = nil
+		}
 	}
 }
 
