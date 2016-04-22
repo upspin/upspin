@@ -349,3 +349,54 @@ func TestGlob(t *testing.T) {
 	paths, err = client.Glob("multiuser@a.co/*1*.txt")
 	checkPaths("multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt")
 }
+
+func TestLinkAndRename(t *testing.T) {
+	const user = "link@a.com"
+	setup(user)
+	client := New(context)
+	original := upspin.PathName(fmt.Sprintf("%s/original", user))
+	text := "the rain in spain"
+	if _, err := client.Put(original, []byte(text)); err != nil {
+		t.Fatal("put file:", err)
+	}
+
+	// Link a new file to the same reference.
+	linked := upspin.PathName(fmt.Sprintf("%s/link", user))
+	entry, err := client.Link(original, linked)
+	if err != nil {
+		t.Fatal("link file:", err)
+	}
+	if entry.Name != linked {
+		t.Fatal("directory entry has wrong name")
+	}
+	in, err := client.Get(original)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(in) != text {
+		t.Fatal(fmt.Sprintf("contents of %q corrupted", original))
+	}
+	in, err = client.Get(linked)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(in) != text {
+		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", original, linked))
+	}
+
+	// Rename the new file.
+	renamed := upspin.PathName(fmt.Sprintf("%s/renamed", user))
+	if err := client.Rename(linked, renamed); err != nil {
+		t.Fatal("link file:", err)
+	}
+	if _, err := client.Get(linked); err == nil {
+		t.Fatal("renamed file still exists")
+	}
+	in, err = client.Get(renamed)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(in) != text {
+		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", renamed, original))
+	}
+}

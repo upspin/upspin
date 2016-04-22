@@ -228,3 +228,9 @@ func (d *dummyClient) Directory(name upspin.PathName) (upspin.Directory, error) 
 func (d *dummyClient) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 	return nil, nil
 }
+func (d *dummyClient) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
+}
+func (d *dummyClient) Rename(oldName, newName upspin.PathName) error {
+	return nil
+}
