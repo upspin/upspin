@@ -16,6 +16,24 @@
       "revId": "f26cae851cc1c0c2e464c9f687671002b4a1ed35",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_a665298a",
+        "filename": "client/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T20:37:55Z",
+      "side": 1,
+      "message": "I\u0027m inclined to go with Dave\u0027s suggestion of a flag for which packers encrypt.\n\nWe can decide at the meeting.",
+      "parentUuid": "285ab8dd_06e51d51",
+      "revId": "f26cae851cc1c0c2e464c9f687671002b4a1ed35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
