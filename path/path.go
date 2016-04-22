@@ -3,6 +3,7 @@ package path
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -18,15 +19,40 @@ import (
 
 // Parsed represents a successfully parsed path name.
 type Parsed struct {
-	User  upspin.UserName // Must be present and non-empty.
-	Elems []string        // If empty, refers to the root for the user.
+	User      upspin.UserName // Must be present and non-empty.
+	Elems     []string        // If empty, refers to the root for the user.
+	cleanPath upspin.PathName // The path of the file in canonical form; always accurate.
 }
 
-func (p Parsed) String() string {
+// UnmarshalJSON is needed because cleanPath must be created when the object
+// is constructed, but it is not exported.
+func (p *Parsed) UnmarshalJSON(data []byte) error {
+	// Use this type because it won't have the method already bound; we get the default.
+	type jsonParsed Parsed
+	var j jsonParsed
+	err := json.Unmarshal(data, &j)
+	if err != nil {
+		return err
+	}
+	*p = Parsed(j)
+	p.cleanPath = upspin.PathName(p.toString())
+	return nil
+}
+
+func (p Parsed) toString() string {
 	var b bytes.Buffer
 	b.WriteString(string(p.User))
 	p.filePath(&b)
 	return b.String()
+}
+
+func (p Parsed) String() string {
+	return string(p.cleanPath)
+}
+
+// Path is a helper that returns the string representation with type upspin.PathName.
+func (p Parsed) Path() upspin.PathName {
+	return p.cleanPath
 }
 
 // FilePath returns just the path under the root directory part of the
@@ -46,11 +72,6 @@ func (p Parsed) filePath(b *bytes.Buffer) {
 			b.WriteByte('/')
 		}
 	}
-}
-
-// Path is a helper that returns the string representation with type upspin.PathName.
-func (p Parsed) Path() upspin.PathName {
-	return upspin.PathName(p.String())
 }
 
 var (
@@ -138,18 +159,33 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 		}
 	}
 	p.Elems = elems
+	// Compute the canonical path, avoiding allocations where possible
+	// but making sure there is always a slash after the user name.
+	// TODO: Write a proper Clean that handles all cases properly.
+	if p.IsRoot() {
+		// It may be good already.
+		if strings.Count(string(pathName), "/") == 1 {
+			p.cleanPath = pathName
+		} else {
+			p.cleanPath = upspin.PathName(p.toString())
+		}
+	} else {
+		p.cleanPath = Clean(pathName)
+	}
 	return p, nil
 }
 
 // First returns a parsed name with only the first n elements after the user name.
 func (p Parsed) First(n int) Parsed {
 	p.Elems = p.Elems[:n]
+	p.cleanPath = upspin.PathName(p.toString()) // TODO
 	return p
 }
 
 // Drop returns a parsed name with the last n elements dropped.
 func (p Parsed) Drop(n int) Parsed {
 	p.Elems = p.Elems[:len(p.Elems)-n]
+	p.cleanPath = DropPath(p.cleanPath, n)
 	return p
 }
 
