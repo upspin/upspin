@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_a61d294b",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T20:22:50Z",
+      "side": 1,
+      "message": "I agree with adding a flag of some sort.",
+      "parentUuid": "285ab8dd_0600bd24",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_75c7dd63",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -261,6 +279,24 @@
       "side": 1,
       "message": "This should be a method in the Packer interface.",
       "parentUuid": "285ab8dd_f5faed57",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_263299d4",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T20:22:50Z",
+      "side": 1,
+      "message": "But only implemented for the ones with encrypted flag?  I\u0027ll think about it more.",
+      "parentUuid": "285ab8dd_e6cc813b",
       "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
