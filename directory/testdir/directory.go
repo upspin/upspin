@@ -401,21 +401,29 @@ func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error)
 	if err != nil {
 		return "", err
 	}
-	pathName = parsed.Path()
+	accessFile := s.whichAccess(parsed)
+	if accessFile == nil {
+		return "", err
+	}
+	return accessFile.Path(), nil
+}
+
+// whichAccess is the workings of WhichAccess, accepting a parsed path name
+// and returning a parsed access file.
+func (s *Service) whichAccess(parsed path.Parsed) *access.Access {
 	for {
 		s.mu.RLock()
-		accessFile := s.access[pathName]
+		accessFile := s.access[parsed.Path()]
 		s.mu.RUnlock()
 		if accessFile != nil {
-			return accessFile.Path(), nil
+			return accessFile
 		}
 		if parsed.IsRoot() {
 			// We've reached the root but there is no access file there.
-			return "", nil
+			return nil
 		}
 		// Step up to parent directory.
 		parsed = parsed.Drop(1)
-		pathName = path.DropPath(pathName, 1)
 	}
 }
 
@@ -605,55 +613,38 @@ func (s *Service) lookup(parsed path.Parsed) (*upspin.DirEntry, error) {
 // access right for this file or directory.
 // s.mu is _not_ held.
 func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
-	pathName := parsed.Path()
-	dirName := pathName // The (potential) directory with an Access file.
-	for retries := 0; ; {
-		s.mu.RLock()
-		accessFile := s.access[dirName]
-		s.mu.RUnlock()
-		if accessFile != nil {
-			granted, missing, err := accessFile.Can(s.context.UserName, right, pathName)
-			if err != nil {
-				if err != access.ErrNeedGroup {
-					return false, err
-				}
-				if retries > 10 {
-					return false, errors.New("group retry loop")
-				}
-				for _, group := range missing {
-					gParsed, err := path.Parse(group)
-					if err != nil {
-						return false, err
-					}
-					entry, err := s.lookup(gParsed)
-					if err != nil {
-						return false, err
-					}
-					data, err := s.getData(entry)
-					if err != nil {
-						return false, err
-					}
-					err = access.AddGroup(group, data)
-					if err != nil {
-						return false, err
-					}
-				}
-				retries++
-				continue // Retry with this access file.
-			}
+	accessFile := s.whichAccess(parsed)
+	if accessFile == nil {
+		accessFile = s.rootAccessFile(parsed)
+	}
+	for attempt := 0; attempt < 10; attempt++ {
+		granted, missing, err := accessFile.Can(s.context.UserName, right, parsed.Path())
+		if err == nil {
 			return granted, nil
 		}
-		retries = 0
-		// Step up to parent directory (if there is one).
-		if parsed.IsRoot() {
-			// We've reached the root but there is no access file there. Use the defaults.
-			granted, _, err := s.rootAccessFile(parsed).Can(s.context.UserName, right, pathName)
-			return granted, err // Err should always be nil, but be thorough.
+		if err != access.ErrNeedGroup {
+			return false, err
 		}
-		// Drop the last entry.
-		parsed = parsed.Drop(1)
-		dirName = path.DropPath(dirName, 1)
+		for _, group := range missing {
+			gParsed, err := path.Parse(group)
+			if err != nil {
+				return false, err
+			}
+			entry, err := s.lookup(gParsed)
+			if err != nil {
+				return false, err
+			}
+			data, err := s.getData(entry)
+			if err != nil {
+				return false, err
+			}
+			err = access.AddGroup(group, data)
+			if err != nil {
+				return false, err
+			}
+		}
 	}
+	return false, errors.New("group retry loop")
 }
 
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.
