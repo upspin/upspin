@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_06e51d51",
+        "filename": "client/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-22T20:31:30Z",
+      "side": 1,
+      "message": "This would be clearer, I think:\nif packer.Packing() \u003d\u003d upspin.EEP256Pack || packer.Packing() \u003d\u003d upspin.EEP384Pack() ... {",
+      "revId": "f26cae851cc1c0c2e464c9f687671002b4a1ed35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
