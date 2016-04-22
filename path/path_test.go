@@ -184,6 +184,13 @@ var cleantests = []pathTest{
 	{"abc/./../def", "def"},
 	{"abc//./../def", "def"},
 	{"abc/../../././../def", "../../def"},
+
+	// Now some real Upspin paths.
+	{"joe@blow.com", "joe@blow.com/"}, // User root always has a trailing slash.
+	{"joe@blow.com/", "joe@blow.com/"},
+	{"joe@blow.com/..", "joe@blow.com/"},
+	{"joe@blow.com/../", "joe@blow.com/"},
+	{"joe@blow.com/a/b/../b/c", "joe@blow.com/a/b/c"},
 }
 
 func TestClean(t *testing.T) {
@@ -289,9 +296,9 @@ var dropPathTests = []dropPathTest{
 	{"a@b.co/a/b", 2, "a@b.co/"},
 	// Won't go past the root.
 	{"a@b.co/a/b", 3, "a@b.co/"},
-	// Multiple slashes are OK (but we'll not drop the ones we don't see).
+	// Multiple slashes are OK.
 	{"a@b.co/a/b///", 1, "a@b.co/a"},
-	{"a@b.co///a//////b///c/////", 2, "a@b.co///a"},
+	{"a@b.co///a//////b///c/////", 2, "a@b.co/a"},
 }
 
 func TestDropPath(t *testing.T) {
@@ -299,6 +306,28 @@ func TestDropPath(t *testing.T) {
 		got := DropPath(test.path, test.count)
 		if got != test.expect {
 			t.Errorf("DropPath(%q, %d) = %q; expected %q", test.path, test.count, got, test.expect)
+		}
+	}
+}
+
+var firstPathTests = []dropPathTest{
+	{"a@b.co/a/b/c/d", 0, "a@b.co/"},
+	{"a@b.co/a/b/c/d", 1, "a@b.co/a"},
+	{"a@b.co/a/b/c/d", 2, "a@b.co/a/b"},
+	{"a@b.co/a/b/c/d/", 3, "a@b.co/a/b/c"},
+	{"a@b.co/a/b/c/d/", 4, "a@b.co/a/b/c/d"},
+	{"a@b.co/a/b/c/d", 10, "a@b.co/a/b/c/d"},
+	{"a@b.co/a/b/c/d/", 10, "a@b.co/a/b/c/d"},
+	// Multiple slashes are OK.
+	{"a@b.co/a/b///", 1, "a@b.co/a"},
+	{"a@b.co///a//////b///c/////", 2, "a@b.co/a/b"},
+}
+
+func TestFirstPath(t *testing.T) {
+	for _, test := range firstPathTests {
+		got := FirstPath(test.path, test.count)
+		if got != test.expect {
+			t.Errorf("FirstPath(%q, %d) = %q; expected %q", test.path, test.count, got, test.expect)
 		}
 	}
 }

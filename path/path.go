@@ -160,26 +160,14 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 		}
 	}
 	p.Elems = elems
-	// Compute the canonical path, avoiding allocations where possible
-	// but making sure there is always a slash after the user name.
-	// TODO: Write a proper Clean that handles all cases properly.
-	if p.IsRoot() {
-		// It may be good already.
-		if strings.Count(string(pathName), "/") == 1 {
-			p.cleanPath = pathName
-		} else {
-			p.cleanPath = upspin.PathName(p.toString())
-		}
-	} else {
-		p.cleanPath = Clean(pathName)
-	}
+	p.cleanPath = Clean(pathName)
 	return p, nil
 }
 
 // First returns a parsed name with only the first n elements after the user name.
 func (p Parsed) First(n int) Parsed {
 	p.Elems = p.Elems[:n]
-	p.cleanPath = upspin.PathName(p.toString()) // TODO
+	p.cleanPath = FirstPath(p.cleanPath, n)
 	return p
 }
 
@@ -193,31 +181,43 @@ func (p Parsed) Drop(n int) Parsed {
 // DropPath returns the path name with the last n elements dropped.
 // It assumes the path is reasonably well-formed (there must be a
 // user name; multiple slashes are OK) but it does not handle .. (dot-dot).
+// The result has been "cleaned" by the Clean function.
 func DropPath(pathName upspin.PathName, n int) upspin.PathName {
-	str := dropFinalSlashes(string(pathName))
+	str := string(Clean(pathName))
+	firstSlash := strings.IndexByte(str, '/')
 	for ; n > 0; n-- {
-		slash := strings.LastIndexByte(str, '/')
-		if slash == strings.IndexByte(str, '/') {
-			// It's the only one, the one after user name; leave it.
-			slash++
+		lastSlash := strings.LastIndexByte(str, '/')
+		if lastSlash == firstSlash {
+			lastSlash++
+			str = str[:lastSlash]
+			break
 		}
-		str = dropFinalSlashes(str[:slash])
+		str = str[:lastSlash]
 	}
 	return upspin.PathName(str)
 }
 
-// dropFinalSlashes strips any slashes on the end of str, up to but not
-// including the one that separates the user name from the path.
-func dropFinalSlashes(str string) string {
-	// Fast check - we usually have nothing to do.
-	if len(str) == 0 || str[len(str)-1] != '/' {
-		return str
+// FirstPath returns the path name with the first n elements dropped.
+// It assumes the path is reasonably well-formed (there must be a
+// user name; multiple slashes are OK) but it does not handle .. (dot-dot).
+// The result has been "cleaned" by the Clean function.
+func FirstPath(pathName upspin.PathName, n int) upspin.PathName {
+	str := string(Clean(pathName))
+	slash := strings.IndexByte(str, '/')
+	firstSlash := slash
+	for i := 0; i < n; i++ {
+		nextSlash := strings.IndexByte(str[slash+1:], '/')
+		if nextSlash < 0 {
+			// End of string.
+			return upspin.PathName(str)
+		}
+		slash += 1 + nextSlash
 	}
-	firstSlash := strings.IndexByte(str, '/') // The slash after the user.
-	for len(str) > 0 && str[len(str)-1] == '/' && len(str) > firstSlash+1 {
-		str = str[:len(str)-1]
+	// If all we have left is a user name, make sure to include the trailing slash.
+	if slash == firstSlash {
+		slash++
 	}
-	return str
+	return upspin.PathName(str[:slash])
 }
 
 // IsRoot reports whether a parsed name refers to the user's root.
@@ -308,7 +308,32 @@ func Join(path upspin.PathName, elems ...string) upspin.PathName {
 
 // Clean applies Go's path.Clean to an Upspin path.
 func Clean(path upspin.PathName) upspin.PathName {
-	return upspin.PathName(gopath.Clean(string(path)))
+	// First slash separates user from path. It might not be there.
+	slash := strings.IndexByte(string(path), '/')
+	var userPart, filePart upspin.PathName
+	if slash >= 0 {
+		userPart = path[:slash] // Exclude the slash itself.
+		filePart = path[slash:] // Include the slash itself.
+	} else {
+		userPart = path
+		filePart = "/"
+	}
+	_, _, err := UserAndDomain(upspin.UserName(userPart))
+	if err != nil {
+		// No user name at all, so just call Go's clean. Probably won't happen
+		// outside of tests, but one could imagine calling it on the file part
+		// of a path.
+		return upspin.PathName(gopath.Clean(string(path)))
+	}
+	// Path is a good user name plus a path name, separated by a slash.
+	// Assume the user name is OK and process the rest.
+	cleanFilePart := upspin.PathName(gopath.Clean(string(filePart)))
+	// If that's the path we started with, the original was clean.
+	if slash >= 0 && cleanFilePart == filePart {
+		// All is well in the original.
+		return path
+	}
+	return userPart + cleanFilePart
 }
 
 // UserAndDomain splits an upspin.UserName into user and domain and returns the pair.
