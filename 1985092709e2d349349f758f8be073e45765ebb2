@@ -16,6 +16,24 @@
       "revId": "1985092709e2d349349f758f8be073e45765ebb2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_0b1c46ad",
+        "filename": "path/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-22T18:39:04Z",
+      "side": 1,
+      "message": "there\u0027s already a pathTest and i didn\u0027t have a better idea....\n\nbut now i do.",
+      "parentUuid": "285ab8dd_abd6520d",
+      "revId": "1985092709e2d349349f758f8be073e45765ebb2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
