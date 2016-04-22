@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_0600bd24",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T19:59:41Z",
+      "side": 1,
+      "message": "Some packers should at least do nothing if asked to wrap.   However, I agree that its a waste of time to even try given the amount of work finding, fetching, and parsing the access file will be.  Perhaps an encrypting flag in the packer would be appropriate.",
+      "parentUuid": "285ab8dd_15e789cb",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_75c7dd63",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -178,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_e6b321c4",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T19:59:41Z",
+      "side": 1,
+      "message": "Might I suggest a?  It is only used once three lines lower.",
+      "parentUuid": "285ab8dd_55066145",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_15f1c9b3",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -207,6 +243,24 @@
       "side": 1,
       "message": "Agreed.   There\u0027s already a TODO in ee.go:Share that touches on this point.",
       "parentUuid": "285ab8dd_15f1c9b3",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_e6cc813b",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T19:59:41Z",
+      "side": 1,
+      "message": "This should be a method in the Packer interface.",
+      "parentUuid": "285ab8dd_f5faed57",
       "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
