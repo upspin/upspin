@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_30097314",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T18:32:50Z",
+      "side": 1,
+      "message": "Can you make this a separate routine that I can use in the client.Rename and client.Link that I want to add?  Or I can once you submit...",
+      "range": {
+        "startLine": 85,
+        "startChar": 1,
+        "endLine": 85,
+        "endChar": 13
+      },
+      "revId": "29537828296dcca1fd98e378f8b32e56a9938d49",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_9078674c",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T18:32:50Z",
+      "side": 1,
+      "message": "Access.Parse should do the uniquing rather than everyone that calls it.",
+      "revId": "29537828296dcca1fd98e378f8b32e56a9938d49",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_5060afab",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-22T18:32:50Z",
+      "side": 1,
+      "message": "since you are doing this in client, do you want to take out this comment?",
+      "range": {
+        "startLine": 162,
+        "startChar": 9,
+        "endLine": 162,
+        "endChar": 15
+      },
+      "revId": "29537828296dcca1fd98e378f8b32e56a9938d49",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
