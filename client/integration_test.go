@@ -14,6 +14,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/path"
@@ -73,12 +74,17 @@ func newContext(packing upspin.Packing) *upspin.Context {
 }
 
 func setupUser(context *upspin.Context, userName upspin.UserName) {
+	var err error
 	// Packing and keys are different things. We need a key for signing HTTPS requests, even if packing is Plain or Debug.
 	switch context.Packing {
 	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack:
 		context.KeyPair = keyMap[userName][context.Packing]
 	default:
 		context.KeyPair = keyMap[userName][upspin.EEp256Pack]
+	}
+	context.Factotum, err = auth.NewFactotum(context)
+	if err != nil {
+		panic(err)
 	}
 
 	context.UserName = userName
@@ -100,7 +106,6 @@ func setupUser(context *upspin.Context, userName upspin.UserName) {
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	var err error
 	context.User, err = bind.User(context, endpointUser)
 	if err != nil {
 		panic(err)
@@ -254,7 +259,7 @@ func testSharing(context *upspin.Context, t *testing.T) {
 	c := client.New(context)
 
 	// Put an Access file where no one has access (this forces updating the parent dir with no access).
-	_, err := c.Put(path.Join(sharedDir, "Access"), []byte(""))
+	_, err := c.Put(path.Join(sharedDir, "Access"), []byte("r,c,w,d,l:"+userName))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -265,27 +270,16 @@ func testSharing(context *upspin.Context, t *testing.T) {
 	}
 	// Now become the other user and read the file.
 	setupUser(context, upspin.UserName(userToShare))
-
 	data, err := c.Get(sharedFilePath)
-	// If packing is strong encryption, the Get will fail:
-	switch context.Packing {
-	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack:
-		if err == nil {
-			t.Fatal("Expected Get to fail, but it didn't")
-		}
-	default:
-		if err != nil {
-			t.Fatal(err)
-		}
-		if string(data) != sharedContent {
-			t.Errorf("Expected %s, got %s", sharedContent, data)
-		}
+	if err == nil {
+		t.Fatal("Expected Get to fail, but it didn't")
 	}
+
 	// Become the test user once again
 	setupUser(context, upspin.UserName(userName))
 
 	// Put an Access file first, giving our friend read access
-	accessFile := "r:upspin-friend-test@google.com"
+	accessFile := "r:upspin-friend-test@google.com\nr,c,w,d,l:" + userName
 	_, err = c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
 	if err != nil {
 		t.Fatal(err)
@@ -312,8 +306,7 @@ func runAllTests(context *upspin.Context, t *testing.T) {
 	testPutAndGet(context, t)
 	testCreateAndOpen(context, t)
 	testGlob(context, t)
-	// Disabled until we can share again.
-	//testSharing(context, t)
+	testSharing(context, t)
 }
 
 func TestRunAllTests(t *testing.T) {

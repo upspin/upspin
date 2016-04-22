@@ -298,7 +298,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		// Create new list of wrapped keys.
 		wrap = make([]wrappedKey, len(readers))
 		nwrap := 0
-		for i, u := range readers {
+		for i := range readers {
 			if pubkey[i] == nil {
 				continue
 			}
@@ -309,7 +309,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 					continue
 				}
 				v := w.ephemeral
-				log.Printf("Wrap for %s [%d %d]", u, v.X, v.Y)
+				log.Printf("Wrap for %x [%d %d]", hash[i], v.X, v.Y)
 			} // else reuse the existing wrapped key
 			wrap[nwrap] = w
 			nwrap++
@@ -684,7 +684,7 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (
 		return "", fmt.Errorf(noKnownKeysForUser, user)
 	}
 	for _, k := range keys {
-		if isValidKeyForPacker(k, packerString) {
+		if IsValidKeyForPacker(k, packerString) {
 			return k, nil
 		}
 	}
@@ -704,6 +704,7 @@ func parsePublicKey(publicKey upspin.PublicKey, packerString string) (*ecdsa.Pub
 	return ecdsaPubKey, nil
 }
 
-func isValidKeyForPacker(publicKey upspin.PublicKey, packerString string) bool {
+// IsValidKeyForPacker returns true if key is used for the specified packing.
+func IsValidKeyForPacker(publicKey upspin.PublicKey, packerString string) bool {
 	return strings.HasPrefix(string(publicKey), packerString)
 }
