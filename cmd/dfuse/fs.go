@@ -533,3 +533,20 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 	h.free()
 	return err
 }
+
+// Link implements fs.Link. It creates a new node in directory n that points to the same
+// reference as old.
+func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
+	oldPath := old.(*node).uname
+	newPath := path.Join(n.uname, req.NewName)
+	log.Printf("Link %q to %q/%q", oldPath, newPath)
+	return nil, eio("oops")
+}
+
+// Rename implements fs.rename. It renames the old node to r.NewName in directory n.
+func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
+	oldPath := old.(*node).uname
+	newPath := path.Join(n.uname, req.NewName)
+	log.Printf("Rename %q to %q/%q", oldPath, newPath)
+	return eio("oops")
+}

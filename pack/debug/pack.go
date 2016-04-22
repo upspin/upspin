@@ -8,12 +8,11 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"math/rand"
-	"strings"
 
 	"upspin.googlesource.com/upspin.git/pack"
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -44,11 +43,6 @@ func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packd
 	// Nothing to do.
 }
 
-func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
-	dirEntry.Name = newName
-	return nil
-}
-
 // cryptByteReader wraps a bytes.Reader and encrypts/decrypts the bytes its reads by xoring with cryptByte.
 type cryptByteReader struct {
 	crypt byte
@@ -60,12 +54,13 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 	return c ^ cr.crypt, err
 }
 
-// Message is {N, path[N], data}. N is unsigned varint-encoded.
-// Metadata is {DebugPack, cryptByte, signatureByte}.
+// Metadata is {DebugPack, cryptByte, signatureByte, N, path[N]}.
 // The next two functions update the metadata's Packdata.
 
 func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
 	switch len(meta.Packdata) {
+	case 0:
+		return 0, errBadMetadata
 	case 1:
 		if !packing {
 			// cryptByte must be present to unpack.
@@ -74,24 +69,22 @@ func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
 		// Add the crypt byte to the Packdata.
 		cb := byte(rand.Int31())
 		meta.Packdata = append(meta.Packdata, cb)
-		fallthrough
-	case 2, 3:
 		return meta.Packdata[1], nil
 	default:
-		return 0, errBadMetadata
+		return meta.Packdata[1], nil
 	}
 }
 
 func addSignature(meta *upspin.Metadata, signature byte) error {
 	switch len(meta.Packdata) {
+	case 0, 1:
+		return errBadMetadata
 	case 2:
 		meta.Packdata = append(meta.Packdata, signature)
 		return nil
-	case 3:
+	default:
 		meta.Packdata[2] = signature
 		return nil
-	default:
-		return errBadMetadata
 	}
 }
 
@@ -107,9 +100,10 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 	if len(cleartext) > 1024*1024*1024 {
 		return 0, errors.New("cleartext too long")
 	}
-	if len(ciphertext) <= 4 {
+	if len(ciphertext) < len(cleartext) {
 		return 0, errTooShort
 	}
+	ciphertext = ciphertext[:len(cleartext)]
 	if len(context.KeyPair.Private) == 0 {
 		return 0, errNoKey
 	}
@@ -117,25 +111,12 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 	if err != nil {
 		return 0, err
 	}
-	// Simple: Append to ciphertext and complain at the end if an allocation has happened.
-	// Constrain the allocation through a slice with cap==len(ciphertext).
-	// Thus it allocates only when there's an overflow. Silly but easy. Fine for tests.
-	out := ciphertext[0:0:len(ciphertext)]
-	capacity := cap(out)
-	var buf [16]byte
-	n := binary.PutUvarint(buf[:], uint64(len(name)))
-	out = append(out, buf[:n]...)
-	out = append(out, name...)
-	out = append(out, cleartext...)
-	if cap(out) != capacity {
-		// Allocation occurred.
-		return 0, errTooShort
-	}
 	addSignature(meta, sign(context, cleartext, dirEntry.Name))
-	for i, c := range out {
-		out[i] = c ^ cb
+	putPath(meta, dirEntry.Name)
+	for i, c := range cleartext {
+		ciphertext[i] = byte(c) ^ cb
 	}
-	return len(out), nil
+	return len(ciphertext), nil
 }
 
 func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
@@ -155,33 +136,6 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	}
 	br := bytes.NewReader(ciphertext)
 	cr := cryptByteReader{cb, br}
-	nameLen, err := binary.ReadUvarint(cr)
-	n, _ := br.Seek(0, 1) // Number of bytes consumed reading nameLen.
-	if err != nil || nameLen > 64*1024 || int(n)+int(nameLen) > len(ciphertext) {
-		return 0, errors.New("testPack.Unpack: namelen overflow")
-	}
-	name := dirEntry.Name
-	if len(name) != int(nameLen) {
-		// Work hard to get a good error message. This has caught bugs.
-		var s []byte
-		for i := 0; i < int(nameLen); i++ {
-			c, _ := cr.ReadByte()
-			if err != nil { // Cannot happen, really.
-				break
-			}
-			s = append(s, c)
-		}
-		return 0, fmt.Errorf("testPack.Unpack: want %q; found %q\n", name, s)
-	}
-	for i := 0; i < int(nameLen); i++ {
-		c, err := cr.ReadByte()
-		if err != nil { // Cannot happen, really.
-			return 0, err
-		}
-		if c != name[i] {
-			return 0, errors.New("testPack.Unpack: name mismatch")
-		}
-	}
 	var i int
 	for i = 0; ; i++ {
 		c, err := cr.ReadByte()
@@ -213,10 +167,7 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *u
 	if err != nil {
 		return -1
 	}
-	var buf [16]byte
-	name := dirEntry.Name
-	n := binary.PutUvarint(buf[:], uint64(len(name)))
-	return n + len(name) + len(cleartext)
+	return len(cleartext)
 }
 
 func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
@@ -224,40 +175,91 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1
 	}
-	cb, err := cryptByte(meta, false)
-	if err != nil {
-		return -1
-	}
-	br := bytes.NewReader(ciphertext)
-	cr := cryptByteReader{cb, br}
-	nameLen, err := binary.ReadUvarint(cr)
-	if err != nil {
-		return -1
-	}
-	n, err := br.Seek(0, 1) // Number of bytes consumed reading nameLen.
-	if err != nil || nameLen > 64*1024 || int(n)+int(nameLen) > len(ciphertext) {
-		return -1
-	}
-	br.Seek(int64(nameLen), 1)
-	return int(br.Len())
+	return len(ciphertext)
 }
 
-func sign(context *upspin.Context, data []byte, name upspin.PathName) byte {
-	slash := strings.IndexByte(string(name), '/')
-	if slash < 0 {
-		panic("no slash in path in DebugPack")
-	}
-	_, keys, err := context.User.Lookup(upspin.UserName(name[:slash]))
+func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
+	key, err := getKey(ctx, name)
 	if err != nil {
 		panic(err)
 	}
-	if len(keys) == 0 {
-		panic("no keys for signing in DebugPack")
-	}
-	key := keys[0]
 	signature := byte(0)
 	for i, c := range data {
 		signature ^= c ^ key[i%len(key)]
 	}
+	for i, c := range []byte(name) {
+		signature ^= c ^ key[i%len(key)]
+	}
 	return signature
+}
+
+// Name implements upspin.Pack.Name.
+func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, name upspin.PathName) error {
+	meta := &dirEntry.Metadata
+
+	// Update directory entry and metadata with new name.
+	dirEntry.Name = name
+	oldName, err := getPath(meta)
+	if err != nil {
+		return err
+	}
+	putPath(meta, name)
+
+	// Remove old name from signature.
+	signature := meta.Packdata[2]
+	key, err := getKey(ctx, oldName)
+	for i, c := range []byte(oldName) {
+		signature ^= c ^ key[i%len(key)]
+	}
+
+	// Add new name to signature. The key may also be different since this
+	// may be a different user.
+	key, err = getKey(ctx, name)
+	for i, c := range []byte(name) {
+		signature ^= c ^ key[i%len(key)]
+	}
+	meta.Packdata[2] = signature
+
+	return nil
+}
+
+// getKey returns the first user key for the user in name.
+func getKey(ctx *upspin.Context, name upspin.PathName) (upspin.PublicKey, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return "", err
+	}
+	_, keys, err := ctx.User.Lookup(parsed.User())
+	if err != nil {
+		return "", err
+	}
+	if len(keys) == 0 {
+		return "", errors.New("no keys for signing in DebugPack")
+	}
+	return keys[0], nil
+}
+
+// putPath adds (or replaces) the path in the packdata.
+func putPath(meta *upspin.Metadata, path upspin.PathName) {
+	meta.Packdata = meta.Packdata[:3]
+	var buf [16]byte
+	n := binary.PutUvarint(buf[:], uint64(len(path)))
+	meta.Packdata = append(meta.Packdata, buf[:n]...)
+	meta.Packdata = append(meta.Packdata, path...)
+}
+
+// getPath returns the path from the packdata.
+func getPath(meta *upspin.Metadata) (upspin.PathName, error) {
+	if len(meta.Packdata) < 4 {
+		return "", errBadMetadata
+	}
+	m, n := binary.Uvarint(meta.Packdata[3:])
+	if n < 0 {
+		return "", errBadMetadata
+	}
+	buf := meta.Packdata[3+int(n):]
+	if len(buf) != int(m) {
+		return "", errBadMetadata
+	}
+	return upspin.PathName(buf), nil
 }

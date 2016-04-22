@@ -384,6 +384,13 @@ type Client interface {
 
 	// PublicKeys returns an error or a slice of public keys for the user.
 	PublicKeys(name PathName) ([]PublicKey, error)
+
+	// Link creates a new name for the reference referred to by the old name.
+	// The old name is still a valid name for the reference.
+	Link(oldName, newName PathName) (*DirEntry, error)
+
+	// Rename renames oldName to newName. The old name is no longer valid.
+	Rename(oldName, newName PathName) error
 }
 
 // The File interface has semantics and API that parallels a subset
