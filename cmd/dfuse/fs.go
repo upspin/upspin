@@ -259,9 +259,7 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	if err != nil {
 		return nil, enoent("%s looking up user %q", err, n.user)
 	}
-	// The ? ensures at least one letter in the base component.  For example, Glob("p@google.com/*) also
-	// returns p@google.com/ which is not what we want.
-	pattern := path.Join(n.uname, "?*")
+	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
 	if err != nil {
 		return nil, eio("%s globing %q", err, pattern)
@@ -534,4 +532,21 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 	h.n.Unlock()
 	h.free()
 	return err
+}
+
+// Link implements fs.Link. It creates a new node in directory n that points to the same
+// reference as old.
+func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
+	oldPath := old.(*node).uname
+	newPath := path.Join(n.uname, req.NewName)
+	log.Printf("Link %q to %q/%q", oldPath, newPath)
+	return nil, eio("oops")
+}
+
+// Rename implements fs.rename. It renames the old node to r.NewName in directory n.
+func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
+	oldPath := old.(*node).uname
+	newPath := path.Join(n.uname, req.NewName)
+	log.Printf("Rename %q to %q/%q", oldPath, newPath)
+	return eio("oops")
 }

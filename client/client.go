@@ -82,57 +82,9 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 	cipher = cipher[:n]
 
-	packerString := packer.String()
-	if packerString[0] == 'p' && strings.IndexByte("235", packerString[1]) >= 0 { // TODO generalize for more packers when some exist
-		// Add other readers to Packdata.
-		// We do this before "Store contents", so an error return wastes little.
-		accessName, err := c.context.Directory.WhichAccess(name)
-		if err != nil {
-			return zeroLoc, err
-		}
-		var readers []upspin.UserName
-		if accessName != "" {
-			accessData, err := c.Get(accessName)
-			if err != nil {
-				return zeroLoc, err
-			}
-			acc, err := access.Parse(accessName, accessData)
-			if err != nil {
-				return zeroLoc, err
-			}
-			readers, _, err = acc.Users(access.Read)
-			if err == access.ErrNeedGroup {
-				return zeroLoc, fmt.Errorf("Groups not implemented yet for Client.Put sharing")
-			}
-			if err != nil {
-				return zeroLoc, err
-			}
-		}
-		readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-		readersPublicKey[0] = c.context.KeyPair.Public
-		n = 1
-		for _, r := range readers {
-			_, pubkeys, err := c.context.User.Lookup(r)
-			if err != nil || len(pubkeys) < 1 {
-				// TODO warn that we can't process one of the readers?
-				continue
-			}
-			for _, pubkey := range pubkeys { // pick first key of correct type
-				pubkey = upspin.PublicKey(strings.TrimSpace(string(pubkey)))
-				if ee.IsValidKeyForPacker(pubkey, packerString) {
-					if pubkey != readersPublicKey[0] { // don't duplicate self
-						// TODO(ehg) maybe should check for other duplicates?
-						readersPublicKey[n] = pubkey
-						n++
-					}
-					break
-				}
-			}
-		}
-		readersPublicKey = readersPublicKey[:n]
-		packdata := make([]*[]byte, 1)
-		packdata[0] = &de.Metadata.Packdata
-		packer.Share(c.context, readersPublicKey, packdata)
+	// Add other readers from the access file.
+	if err := c.addReaders(de, name, packer); err != nil {
+		return zeroLoc, err
 	}
 
 	// Store contents.
@@ -149,6 +101,64 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	err = dir.Put(de)
 
 	return de.Location, err
+}
+
+func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
+	packerString := packer.String()
+	if packerString[0] != 'p' || strings.IndexByte("235", packerString[1]) < 0 { // TODO generalize for more packers when some exist
+		return nil
+	}
+
+	// Add other readers to Packdata.
+	// We do this before "Store contents", so an error return wastes little.
+	accessName, err := c.context.Directory.WhichAccess(name)
+	if err != nil {
+		return err
+	}
+	var readers []upspin.UserName
+	if accessName != "" {
+		accessData, err := c.Get(accessName)
+		if err != nil {
+			return err
+		}
+		acc, err := access.Parse(accessName, accessData)
+		if err != nil {
+			return err
+		}
+		readers, _, err = acc.Users(access.Read)
+		if err == access.ErrNeedGroup {
+			return fmt.Errorf("Groups not implemented yet for Client.Put sharing")
+		}
+		if err != nil {
+			return err
+		}
+	}
+	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
+	readersPublicKey[0] = c.context.KeyPair.Public
+	n := 1
+	for _, r := range readers {
+		_, pubkeys, err := c.context.User.Lookup(r)
+		if err != nil || len(pubkeys) < 1 {
+			// TODO warn that we can't process one of the readers?
+			continue
+		}
+		for _, pubkey := range pubkeys { // pick first key of correct type
+			pubkey = upspin.PublicKey(strings.TrimSpace(string(pubkey)))
+			if ee.IsValidKeyForPacker(pubkey, packerString) {
+				if pubkey != readersPublicKey[0] { // don't duplicate self
+					// TODO(ehg) maybe should check for other duplicates?
+					readersPublicKey[n] = pubkey
+					n++
+				}
+				break
+			}
+		}
+	}
+	readersPublicKey = readersPublicKey[:n]
+	packdata := make([]*[]byte, 1)
+	packdata[0] = &de.Metadata.Packdata
+	packer.Share(c.context, readersPublicKey, packdata)
+	return nil
 }
 
 // MakeDirectory implements upspin.Client.
@@ -300,4 +310,80 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 		return nil, fmt.Errorf("client: no public keys for user %q", parsed.User())
 	}
 	return pubKeys, nil
+}
+
+// Link implements upspin.Link. This is more a copy on write than a Unix style Link. As soon as
+// one of the two files is written, then will diverge.
+func (c *Client) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
+	return c.linkOrRename(oldName, newName, false)
+}
+
+// Rename implements upspin.Rename.  Performed by linking to the new name and deleting the old one.
+func (c *Client) Rename(oldName, newName upspin.PathName) error {
+	_, err := c.linkOrRename(oldName, newName, true)
+	return err
+}
+
+func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*upspin.DirEntry, error) {
+	newParsed, err := path.Parse(newName)
+	if err != nil {
+		return nil, err
+	}
+	oldParsed, err := path.Parse(oldName)
+	if err != nil {
+		return nil, err
+	}
+
+	oldDir, err := c.Directory(oldName)
+	if err != nil {
+		return nil, err
+	}
+	entry, err := oldDir.Lookup(oldName)
+	if err != nil {
+		return nil, err
+	}
+
+	packer := pack.Lookup(entry.Metadata.Packing())
+	if packer == nil {
+		return nil, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, oldName)
+	}
+	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
+		if entry.Metadata.Packing() != upspin.PlainPack {
+			return nil, fmt.Errorf("can only link plain packed files to access or group files")
+		}
+	}
+
+	// Rewrap reader keys only if changing directory.
+	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
+		if err := c.addReaders(entry, newName, packer); err != nil {
+			return nil, err
+		}
+	}
+
+	// Get the destination upspin.Directory.
+	newDir := oldDir
+	if oldParsed.User() != newParsed.User() {
+		newDir, err = c.Directory(oldName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Update the directory entry with the new name.
+	if err := packer.Name(c.context, entry, newName); err != nil {
+		return nil, err
+	}
+
+	// Record directory entry.
+	if err := newDir.Put(entry); err != nil {
+		return nil, err
+	}
+
+	if rename {
+		// Remove original entry.
+		if err := oldDir.Delete(oldName); err != nil {
+			return entry, err
+		}
+	}
+	return entry, nil
 }
