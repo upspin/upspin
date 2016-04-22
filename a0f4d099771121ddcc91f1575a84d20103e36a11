@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_f5e18db7",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T16:27:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "285ab8dd_35b965ee",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_15b8e9e5",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-22T16:00:35Z",
       "side": 1,
       "message": "This should work for all packers. If it doesn\u0027t, we did something wrong.",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_15e789cb",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T16:27:39Z",
+      "side": 1,
+      "message": "This chunk of code is all about rewrapping aes keys for reader public keys.  Probably it will apply for some future packer, but I\u0027m not sure.  Certainly it doesn\u0027t apply or plain or debug or my contemplated integrity-only packer.",
+      "parentUuid": "285ab8dd_15b8e9e5",
       "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_75f6fd7a",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T16:27:39Z",
+      "side": 1,
+      "message": "Thanks; added a test.  But I\u0027m still a little unclear on implicit Access case.",
+      "parentUuid": "285ab8dd_75c7dd63",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_35e2c5ee",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "285ab8dd_55066145",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T16:27:39Z",
+      "side": 1,
+      "message": "acc was my first choice for consistency with code elsewhere.  Then I thought it better to be consistent with the other variables nearby.  I will happily do whatever is considered most idiomatic.",
+      "parentUuid": "285ab8dd_35e2c5ee",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "285ab8dd_15f1c9b3",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-04-22T16:00:35Z",
       "side": 1,
       "message": "Oh, I see why you need to limit this to specific packers. \n\nI think we\u0027ll need to change Share to take a list of keys and let the packer choose which one to use.\n\nThis is good for now then. You can ignore my comment above. Leaving it there and here just for discussion.",
+      "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "285ab8dd_f5faed57",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-04-22T16:27:39Z",
+      "side": 1,
+      "message": "Agreed.   There\u0027s already a TODO in ee.go:Share that touches on this point.",
+      "parentUuid": "285ab8dd_15f1c9b3",
       "revId": "a0f4d099771121ddcc91f1575a84d20103e36a11",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
