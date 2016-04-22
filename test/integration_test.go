@@ -2,18 +2,29 @@
 // This particular integration test runs on GCP and as such we disable it
 // from normal 'go test ./...' runs since it's too
 // expensive. To run it, do 'go test -tags integration'
-// TODO: move all or most of client/integration_test here.
+//
+// Note: if this test fails with "directory already exists" it means a bad run of it left data behind.
+// For now, the quickest way to recover is to manually erase everything under
+// gs://upspin-test-dir/upspin-test@google.com and restart the test servers. This will do both:
+//
+// gsutil rm -R gs://upspin-test-dir/upspin-test@google.com
+// cd <your_upspin_srcdir>/cmd/admin
+// ./deploy-servers.sh -t -r directory
+//
+// None of this is needed if the tests complete normally.
 
 // +build integration
 
 package test
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/path"
 	e "upspin.googlesource.com/upspin.git/test/testenv"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -22,12 +33,12 @@ import (
 )
 
 const (
-	ownersName       = "upspin-test@google.com"
-	readerName       = "upspin-friend-test@google.com"
-	unauthorizedUser = "sally@unauthorized.com"
-	contentsOfFile1  = "contents of file 1"
-	contentsOfFile2  = "contents of file 2..."
-	contentsOfFile3  = "===PDF PDF PDF=="
+	unauthorizedUser    = "sally@unauthorized.com"
+	contentsOfFile1     = "contents of file 1"
+	contentsOfFile2     = "contents of file 2..."
+	contentsOfFile3     = "===PDF PDF PDF=="
+	genericFileContents = "contents"
+	dirAlreadyExists    = "directory already exists" // TODO: make this a global error in /upspin/errors.go?
 
 	hasLocation = true
 )
@@ -42,7 +53,6 @@ var (
 			e.E("/dir2/file3.pdf", contentsOfFile3),
 		},
 		OwnerName:                 ownersName,
-		Keys:                      ownersKey,
 		Transport:                 upspin.GCP,
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   deleteGCPEnv,
@@ -52,10 +62,6 @@ var (
 
 func testNoReadersAllowed(t *testing.T, env *e.Env) {
 	var err error
-	readerClient, err = env.NewUser(readerName, &readersKey)
-	if err != nil {
-		t.Fatal(err)
-	}
 	fileName := upspin.PathName(ownersName + "/dir1/file1.txt")
 	_, err = readerClient.Get(fileName)
 	if err == nil {
@@ -75,7 +81,7 @@ func testNoReadersAllowed(t *testing.T, env *e.Env) {
 }
 
 func testAllowListAccess(t *testing.T, env *e.Env) {
-	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l:"+readerName))
+	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l:"+readersName))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +109,14 @@ func testAllowListAccess(t *testing.T, env *e.Env) {
 }
 
 func testAllowReadAccess(t *testing.T, env *e.Env) {
-	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("r:"+readerName))
+	// Owner has no delete permission.
+	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("r:"+readersName+"\nc,w,l,r:"+ownersName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Must Put the file again.
+	// TODO: remove this from here when Update is ready.
+	_, err = env.Client.Put(ownersName+"/dir1/file1.txt", []byte(contentsOfFile1))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,6 +126,43 @@ func testAllowReadAccess(t *testing.T, env *e.Env) {
 	}
 	if string(data) != contentsOfFile1 {
 		t.Errorf("Expected contents %q, got %q", contentsOfFile1, data)
+	}
+}
+
+func testCreateAndOpen(t *testing.T, env *e.Env) {
+	filePath := upspin.PathName(path.Join(ownersName, "myotherfile.txt"))
+	c := env.Client
+
+	f, err := c.Create(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	n, err := f.Write([]byte(genericFileContents))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != len(genericFileContents) {
+		t.Fatalf("Expected to write %d bytes, got %d", len(genericFileContents), n)
+	}
+	err = f.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err = c.Open(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf := make([]byte, 30)
+	n, err = f.Read(buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != len(genericFileContents) {
+		t.Fatalf("Expected to read %d bytes, got %d", len(genericFileContents), n)
+	}
+	buf = buf[:n]
+	if string(buf) != genericFileContents {
+		t.Errorf("Expected to read %q, got %q", genericFileContents, buf)
 	}
 }
 
@@ -135,6 +185,35 @@ func testGlobWithLimitedAccess(t *testing.T, env *e.Env) {
 		t.Fatalf("Expected 2 dirs, got %d", len(dirs))
 	}
 	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+}
+
+func testGlobWithPattern(t *testing.T, env *e.Env) {
+	c := env.Client
+
+	for i := 0; i <= 10; i++ {
+		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", ownersName, i))
+		_, err := c.MakeDirectory(dirPath)
+		log.Printf("mkdir %s: %s", dirPath, err)
+		if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
+			t.Fatal(err)
+		}
+	}
+	dirEntries, err := c.Glob(ownersName + "/mydir[0-1]*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(dirEntries) != 3 {
+		t.Fatalf("Expected 3 paths, got %d", len(dirEntries))
+	}
+	if string(dirEntries[0].Name) != ownersName+"/mydir0" {
+		t.Errorf("Expected mydir0, got %s", dirEntries[0].Name)
+	}
+	if string(dirEntries[1].Name) != ownersName+"/mydir1" {
+		t.Errorf("Expected mydir1, got %s", dirEntries[1].Name)
+	}
+	if string(dirEntries[2].Name) != ownersName+"/mydir10" {
+		t.Errorf("Expected mydir10, got %s", dirEntries[2].Name)
+	}
 }
 
 func testDelete(t *testing.T, env *e.Env) {
@@ -174,8 +253,74 @@ func testDelete(t *testing.T, env *e.Env) {
 	}
 }
 
-func TestAll(t *testing.T) {
+func testSharing(t *testing.T, env *e.Env) {
+	const (
+		sharedContent = "Hey man, whatup?"
+	)
+	var (
+		sharedDir      = path.Join(ownersName, "mydir")
+		sharedFilePath = path.Join(sharedDir, "sharedfile")
+	)
+	c := env.Client
+
+	// Put an Access file where no one has access (this forces updating the parent dir with no access).
+	accessFile := "r,c,w,d,l:" + ownersName // all rights to the owner.
+	_, err := c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Put a new file under a previously created dir.
+	_, err = c.Put(sharedFilePath, []byte(sharedContent))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Use the other user to read the file and get told no.
+	data, err := readerClient.Get(sharedFilePath)
+	if err == nil {
+		t.Fatal("Expected Get to fail, but it didn't")
+	}
+
+	// Put an Access file first, giving our friend read access. The owner retains all rights.
+	accessFile = fmt.Sprintf("r: %s\nr,c,w,d,l:%s", readersName, ownersName)
+	_, err = c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Re-write file, so we wrap keys for our friend.
+	_, err = c.Put(sharedFilePath, []byte(sharedContent))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Now become some other user again and verify that he has access now.
+	data, err = readerClient.Get(sharedFilePath)
+	// And this should not fail under any packing.
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != sharedContent {
+		t.Errorf("Expected %s, got %s", sharedContent, data)
+	}
+}
+
+func testAllOnePacking(t *testing.T, packing upspin.Packing) {
+	setup.Packing = packing
+	var readersKey upspin.KeyPair
+	switch packing {
+	case upspin.EEp256Pack, upspin.EEp521Pack:
+		setup.Keys = keyStore[setup.OwnerName][packing]
+		readersKey = keyStore[readersName][packing]
+	default:
+		// Keys are needed with any packing type (even Plain) for auth purposes.
+		setup.Keys = keyStore[setup.OwnerName][upspin.EEp256Pack]
+		readersKey = keyStore[readersName][upspin.EEp256Pack]
+	}
+
 	env, err := e.New(&setup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	readerClient, _, err = env.NewUser(readersName, &readersKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,12 +329,26 @@ func TestAll(t *testing.T) {
 	testNoReadersAllowed(t, env)
 	testAllowListAccess(t, env)
 	testAllowReadAccess(t, env)
+	testCreateAndOpen(t, env)
 	testGlobWithLimitedAccess(t, env)
+	testGlobWithPattern(t, env)
 	testDelete(t, env)
 
 	err = env.Exit()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestAll(t *testing.T) {
+	for _, packing := range []upspin.Packing{
+		upspin.PlainPack,
+		upspin.EEp256Pack,
+		upspin.DebugPack,
+		upspin.EEp521Pack,
+	} {
+		log.Printf("=== Packing %d", packing)
+		testAllOnePacking(t, packing)
 	}
 }
 
@@ -224,15 +383,24 @@ func deleteGCPEnv(env *e.Env) error {
 	}
 	entries := append(fileSet1, fileSet2...)
 	var firstErr error
-	for _, entry := range entries {
-		log.Printf("Deleting %s", entry.Name)
-		err = env.Context.Directory.Delete(entry.Name)
+	deleteNow := func(name upspin.PathName) {
+		err = env.Context.Directory.Delete(name)
 		if err != nil {
 			if firstErr == nil {
 				firstErr = err
 			}
-			log.Printf("Error deleting %s: %s", entry.Name, err)
+			log.Printf("Error deleting %s: %s", name, err)
 		}
+	}
+	// First, delete all Access files, so we don't lock ourselves out if our tests above remove delete rights.
+	for _, entry := range entries {
+		if strings.HasSuffix(string(entry.Name), "Access") {
+			deleteNow(entry.Name)
+		}
+	}
+	for _, entry := range entries {
+		log.Printf("Deleting %s", entry.Name)
+		deleteNow(entry.Name)
 	}
 	return firstErr
 }

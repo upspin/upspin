@@ -79,7 +79,7 @@ var (
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	context, client, err := innerNewUser(setup.OwnerName, &setup.Keys, setup.Packing, setup.Transport)
+	client, context, err := innerNewUser(setup.OwnerName, &setup.Keys, setup.Packing, setup.Transport)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (*upspin.Context, upspin.Client, error) {
+func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
 	var context *upspin.Context
 	var err error
 	if keyPair == nil || *keyPair == zeroKey {
@@ -174,15 +174,14 @@ func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing ups
 	if err != nil {
 		return nil, nil, err
 	}
-	return context, client, err
+	return client, context, err
 }
 
 // NewUser creates a new client for a user, generating new keys of the right packing type if the provided
 // keys are nil or empty. The new user will not have a root created. Callers should use the client to
 // MakeDirectory if necessary.
-func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin.Client, error) {
-	_, client, err := innerNewUser(userName, keyPair, e.Setup.Packing, e.Setup.Transport)
-	return client, err
+func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin.Client, *upspin.Context, error) {
+	return innerNewUser(userName, keyPair, e.Setup.Packing, e.Setup.Transport)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
