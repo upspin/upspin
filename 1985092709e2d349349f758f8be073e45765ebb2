@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_abd6520d",
+        "filename": "path/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-04-22T18:33:58Z",
+      "side": 1,
+      "message": "Not very important since this is just a test, but this type could now be called pathTest or something more generic. Drop was more suitable for the other one. Feel free to ignore.",
+      "revId": "1985092709e2d349349f758f8be073e45765ebb2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
