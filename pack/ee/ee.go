@@ -684,7 +684,7 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (
 		return "", fmt.Errorf(noKnownKeysForUser, user)
 	}
 	for _, k := range keys {
-		if isValidKeyForPacker(k, packerString) {
+		if IsValidKeyForPacker(k, packerString) {
 			return k, nil
 		}
 	}
@@ -704,6 +704,7 @@ func parsePublicKey(publicKey upspin.PublicKey, packerString string) (*ecdsa.Pub
 	return ecdsaPubKey, nil
 }
 
-func isValidKeyForPacker(publicKey upspin.PublicKey, packerString string) bool {
+// IsValidKeyForPacker returns true if key is used for the specified packing.
+func IsValidKeyForPacker(publicKey upspin.PublicKey, packerString string) bool {
 	return strings.HasPrefix(string(publicKey), packerString)
 }
