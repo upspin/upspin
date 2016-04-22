@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "285ab8dd_109f977c",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-22T17:30:33Z",
+      "side": 1,
+      "message": "yes, a bad variable name. the return value isn\u0027t even an interface!\n\u0027acc\u0027 seems to be a common one, according to grep.",
+      "revId": "be86b1f383f23697be9ef91c9f44b9ce9b46b2c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
