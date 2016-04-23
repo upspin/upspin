@@ -74,10 +74,10 @@ func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
 func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
-	if sess.User() != parsed.User {
+	if sess.User() != parsed.User() {
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
-	_, err := d.getRoot(parsed.User)
+	_, err := d.getRoot(parsed.User())
 	if err != nil && err != errEntryNotFound {
 		return newDirError(op, parsed.Path(), err.Error())
 	}
@@ -94,7 +94,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 		accessFiles: make(accessFileDB),
 	}
 	// We make up an empty access file to use in the default case (user has not created any Access files).
-	accessPath := path.Join(upspin.PathName(parsed.User), "Access")
+	accessPath := path.Join(upspin.PathName(parsed.User()), "Access")
 	acc, err := access.New(accessPath)
 	if err != nil {
 		// This should never happen because accessPath has been parsed already.
@@ -103,7 +103,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 		return newErr
 	}
 	root.accessFiles[accessPath] = acc
-	err = d.putRoot(parsed.User, root)
+	err = d.putRoot(parsed.User(), root)
 	if err != nil {
 		return err
 	}

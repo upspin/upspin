@@ -6,59 +6,42 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-func newP(elems []string) Parsed {
-	return Parsed{
-		User:  "u@google.com",
-		Elems: elems,
-	}
-}
-
 type parseTest struct {
-	path     upspin.PathName
-	parse    Parsed
-	isRoot   bool
-	filePath string
+	path      upspin.PathName
+	cleanPath upspin.PathName
+	isRoot    bool
 }
 
 var goodParseTests = []parseTest{
-	{"u@google.com", newP([]string{}), true, "/"},
-	{"u@google.com/", newP([]string{}), true, "/"},
-	{"u@google.com/a", newP([]string{"a"}), false, "/a"},
-	{"u@google.com/a/", newP([]string{"a"}), false, "/a"},
-	{"u@google.com/a///b/c/d/", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
-	{"u@google.com//a///b/c/d//", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
-	// Longer than the backing array in Parsed.
-	{"u@google.com/a/b/c/d/e/f/g/h/i/j/k/l/m",
-		newP([]string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"}),
-		false,
-		"/a/b/c/d/e/f/g/h/i/j/k/l/m"},
+	{"u@google.com", "u@google.com/", true},
+	{"u@google.com/", "u@google.com/", true},
+	{"u@google.com///", "u@google.com/", true},
+	{"u@google.com/a", "u@google.com/a", false},
+	{"u@google.com/a////", "u@google.com/a", false},
+	{"u@google.com/a///b/c/d/", "u@google.com/a/b/c/d", false},
 	// Dot.
-	{"u@google.com/.", newP([]string{}), true, "/"},
-	{"u@google.com/a/../b", newP([]string{"b"}), false, "/b"},
-	{"u@google.com/./a///b/./c/d/./.", newP([]string{"a", "b", "c", "d"}), false, "/a/b/c/d"},
+	{"u@google.com/.", "u@google.com/", true},
+	{"u@google.com/a/../b", "u@google.com/b", false},
+	{"u@google.com/./a///b/./c/d/./.", "u@google.com/a/b/c/d", false},
 	// Dot-Dot.
-	{"u@google.com/..", newP([]string{}), true, "/"},
-	{"u@google.com/a/../b", newP([]string{"b"}), false, "/b"},
-	{"u@google.com/../a///b/../c/d/..", newP([]string{"a", "c"}), false, "/a/c"},
+	{"u@google.com/..", "u@google.com/", true},
+	{"u@google.com/a/../b", "u@google.com/b", false},
+	{"u@google.com/../a///b/../c/d/..", "u@google.com/a/c", false},
 }
 
 func TestParse(t *testing.T) {
 	for _, test := range goodParseTests {
-		pn, err := Parse(test.path)
+		p, err := Parse(test.path)
 		if err != nil {
 			t.Errorf("%q: unexpected error %v", test.path, err)
 			continue
 		}
-		if !pn.Equal(test.parse) {
-			t.Errorf("%q: expected %v got %v", test.path, test.parse, pn)
+		if p.path != test.cleanPath {
+			t.Errorf("%q: expected %v got %v", test.path, test.cleanPath, p.path)
 			continue
 		}
-		if test.isRoot != pn.IsRoot() {
-			t.Errorf("%q: expected IsRoot %v, got %v", test.path, test.isRoot, pn.IsRoot())
-		}
-		filePath := pn.FilePath()
-		if filePath != test.filePath {
-			t.Errorf("%q: DirPath expected %v got %v", test.path, test.filePath, filePath)
+		if test.isRoot != p.IsRoot() {
+			t.Errorf("%q: expected IsRoot %v, got %v", test.path, test.isRoot, p.IsRoot())
 		}
 	}
 }
@@ -71,8 +54,8 @@ func TestCountMallocs(t *testing.T) {
 		Parse("u@google.com/a/b/c/d/e/f/g")
 	}
 	mallocs := testing.AllocsPerRun(100, parse)
-	if mallocs != 1 {
-		t.Errorf("got %d allocs, want <=1", int64(mallocs))
+	if mallocs != 0 {
+		t.Errorf("got %d allocs, want 0", int64(mallocs))
 	}
 }
 
@@ -87,6 +70,74 @@ func TestBadParse(t *testing.T) {
 		if err == nil {
 			t.Errorf("%q: error, got none", test)
 			continue
+		}
+	}
+}
+
+var userTests = []upspin.PathName{"a@b.co/", "a@b.co/a", "a@b.co/a/b/c", "a@b.co/a/b/c/d"}
+
+func TestUser(t *testing.T) {
+	const want = "a@b.co"
+	for _, test := range userTests {
+		p, err := Parse(test)
+		if err != nil {
+			t.Errorf("error parsing %q: %v\n", test, err)
+		}
+		user := p.User()
+		if user != want {
+			t.Errorf("User(%q)=%q; expected %q", test, user, want)
+		}
+	}
+}
+
+type nelemTest struct {
+	path  upspin.PathName
+	nelem int
+}
+
+var nelemTests = []nelemTest{
+	{"a@b.co", 0},
+	{"a@b.co/", 0},
+	{"a@b.co/a", 1},
+	{"a@b.co/a/b", 2},
+}
+
+func TestNelem(t *testing.T) {
+	const want = "a@b.co"
+	for _, test := range nelemTests {
+		p, err := Parse(test.path)
+		if err != nil {
+			t.Errorf("error parsing %q: %v\n", test, err)
+		}
+		nelem := p.NElem()
+		if nelem != test.nelem {
+			t.Errorf("NElem(%q)=%d; expected %d", test, nelem, want)
+		}
+	}
+}
+
+type pathTestWithCount struct {
+	path   upspin.PathName
+	count  int
+	expect upspin.PathName
+}
+
+var elemTests = []pathTestWithCount{
+	{"a@b.co/a/b/c", 0, "a"},
+	{"a@b.co/a/b/c", 1, "b"},
+	{"a@b.co/a/b/c", 2, "c"},
+	{"a@b.co/a", 0, "a"},
+}
+
+func TestElem(t *testing.T) {
+	for _, test := range elemTests {
+		p, err := Parse(test.path)
+		if err != nil {
+			t.Errorf("error parsing %q: %v\n", test, err)
+		}
+		elem := p.Elem(test.count)
+		if elem != string(test.expect) {
+			t.Errorf("Elem(%q, %d)=%q; expected %q", test.path, test.count, elem, test.expect)
 		}
 	}
 }
@@ -283,12 +334,6 @@ func TestCompare(t *testing.T) {
 			t.Errorf("Equal(%q, %q) = %t; expected otherwise", test.path1, test.path2, p1.Equal(p2))
 		}
 	}
-}
-
-type pathTestWithCount struct {
-	path   upspin.PathName
-	count  int
-	expect upspin.PathName
 }
 
 var dropPathTests = []pathTestWithCount{

@@ -21,7 +21,7 @@ var (
 
 func (d *dirServer) getDirEntry(parsedPath *path.Parsed) (*upspin.DirEntry, error) {
 	if parsedPath.IsRoot() {
-		root, err := d.getRoot(parsedPath.User)
+		root, err := d.getRoot(parsedPath.User())
 		if err != nil {
 			return nil, err
 		}
@@ -34,12 +34,12 @@ func (d *dirServer) getDirEntry(parsedPath *path.Parsed) (*upspin.DirEntry, erro
 // If it's a root dir entry, it first attempts to read an expected-to-exist root in order to update it.
 func (d *dirServer) putDirEntry(parsedPath *path.Parsed, dirEntry *upspin.DirEntry) error {
 	if parsedPath.IsRoot() {
-		root, err := d.getRoot(parsedPath.User)
+		root, err := d.getRoot(parsedPath.User())
 		if err != nil {
 			return err
 		}
 		root.dirEntry = *dirEntry
-		return d.putRoot(parsedPath.User, root)
+		return d.putRoot(parsedPath.User(), root)
 	}
 	return d.putNonRoot(parsedPath.Path(), dirEntry)
 }

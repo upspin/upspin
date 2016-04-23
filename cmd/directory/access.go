@@ -21,12 +21,12 @@ func (d *dirServer) updateAccess(accessPath *path.Parsed, location *upspin.Locat
 		// access.Parse already sets the path, no need to duplicate it here.
 		return newDirError("UpdateAccess", "", err.Error())
 	}
-	root, err := d.getRoot(accessPath.User)
+	root, err := d.getRoot(accessPath.User())
 	if err != nil {
 		return err
 	}
 	root.accessFiles[accessPath.Path()] = acc
-	err = d.putRoot(accessPath.User, root)
+	err = d.putRoot(accessPath.User(), root)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (d *dirServer) updateAccess(accessPath *path.Parsed, location *upspin.Locat
 
 // deleteAccess removes the contents of an Access file from the root.
 func (d *dirServer) deleteAccess(accessPath *path.Parsed) error {
-	root, err := d.getRoot(accessPath.User)
+	root, err := d.getRoot(accessPath.User())
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (d *dirServer) deleteAccess(accessPath *path.Parsed) error {
 			return err
 		}
 	}
-	return d.putRoot(accessPath.User, root)
+	return d.putRoot(accessPath.User(), root)
 }
 
 // hasRight reports whether the user has the right on the path. It's assumed that all prior verifications have taken
@@ -64,7 +64,7 @@ func (d *dirServer) hasRight(op string, user upspin.UserName, right access.Right
 // whichAccess returns the path name and the parsed contents of the ruling Access file for a given path name.
 // TODO: we should cache this computation as it requires a parsing paths, traversing them, doing drop, joins, etc.
 func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.PathName, *access.Access, error) {
-	root, err := d.getRoot(parsedPath.User)
+	root, err := d.getRoot(parsedPath.User())
 	if err != nil {
 		return "", nil, err
 	}
