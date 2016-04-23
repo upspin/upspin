@@ -264,10 +264,10 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 		return nil, err
 	}
 	var endpoints []upspin.Endpoint
-	if parsed.User == c.context.UserName {
+	if parsed.User() == c.context.UserName {
 		endpoints = append(endpoints, c.context.Directory.Endpoint())
 	}
-	if eps, _, err := c.context.User.Lookup(parsed.User); err == nil {
+	if eps, _, err := c.context.User.Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	var dir upspin.Directory
@@ -278,7 +278,7 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 		}
 	}
 	if err == nil {
-		err = fmt.Errorf("client: no endpoint for user %q", parsed.User)
+		err = fmt.Errorf("client: no endpoint for user %q", parsed.User())
 	}
 	return nil, err
 }
@@ -290,14 +290,14 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 		return nil, err
 	}
 	var pubKeys []upspin.PublicKey
-	if parsed.User == c.context.UserName {
+	if parsed.User() == c.context.UserName {
 		pubKeys = append(pubKeys, c.context.KeyPair.Public)
 	}
-	if _, pks, err := c.context.User.Lookup(parsed.User); err == nil {
+	if _, pks, err := c.context.User.Lookup(parsed.User()); err == nil {
 		pubKeys = append(pubKeys, pks...)
 	}
 	if len(pubKeys) == 0 {
-		return nil, fmt.Errorf("client: no public keys for user %q", parsed.User)
+		return nil, fmt.Errorf("client: no public keys for user %q", parsed.User())
 	}
 	return pubKeys, nil
 }

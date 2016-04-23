@@ -67,7 +67,7 @@ func validateUserName(name upspin.UserName) (*path.Parsed, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(parsed.Elems) != 0 {
+	if !parsed.IsRoot() {
 		return nil, fmt.Errorf("testuser: %q not a user name", name)
 	}
 	return &parsed, nil
@@ -83,11 +83,11 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	if err != nil {
 		return err
 	}
-	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User + "/"))
+	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User() + "/"))
 	if err != nil {
 		return err
 	}
-	s.innerAddRoot(parsed.User, loc.Endpoint)
+	s.innerAddRoot(parsed.User(), loc.Endpoint)
 	return nil
 }
 
@@ -105,7 +105,7 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 	if err != nil {
 		return err
 	}
-	s.innerAddRoot(parsed.User, endpoint)
+	s.innerAddRoot(parsed.User(), endpoint)
 	return nil
 }
 

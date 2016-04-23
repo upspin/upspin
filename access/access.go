@@ -139,7 +139,7 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		for _, right := range rights {
 			switch r := which(right); r {
 			case Read, Write, List, Create, Delete:
-				a.list[r], err = parsedAppend(a.list[r], parsed.User, users...)
+				a.list[r], err = parsedAppend(a.list[r], parsed.User(), users...)
 			case Invalid:
 				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
 			}
@@ -182,14 +182,14 @@ func newAccess(pathName upspin.PathName) (*Access, *path.Parsed, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	_, domain, err := path.UserAndDomain(parsed.User)
+	_, domain, err := path.UserAndDomain(parsed.User())
 	// We don't expect an error since it's been parsed, but check anyway.
 	if err != nil {
 		return nil, nil, err
 	}
 	a := &Access{
 		parsed: parsed,
-		owner:  parsed.User,
+		owner:  parsed.User(),
 		domain: domain,
 	}
 	return a, &parsed, nil
@@ -272,9 +272,9 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 			}
 		}
 		// Check group syntax.
-		if len(p.Elems) > 0 {
+		if !p.IsRoot() {
 			// First element must be group.
-			if p.Elems[0] != "Group" {
+			if p.Elem(0) != "Group" {
 				return nil, fmt.Errorf("illegal group %q", user)
 			}
 			// Groups cannot be wild cards.
@@ -413,7 +413,7 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 		if users == nil {
 			return nil, fmt.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
 		}
-		group, err = parsedAppend(group, parsed.User, users...)
+		group, err = parsedAppend(group, parsed.User(), users...)
 		if err != nil {
 			return nil, fmt.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
 		}
@@ -494,7 +494,7 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 			continue
 		}
 		// The owner of a group is automatically a member of the group
-		if group.User == requester {
+		if group.User() == requester {
 			return true, nil, nil
 		}
 		found, groupsToCheck = a.inList(parsedRequester, known, groupsToCheck)
@@ -525,8 +525,8 @@ Outer:
 		mu.RUnlock()
 		if found {
 			for _, p := range usersFromGroup {
-				if len(p.Elems) == 0 {
-					userNames = append(userNames, p.User)
+				if p.IsRoot() {
+					userNames = append(userNames, p.User())
 				} else {
 					// This means there are nested Groups.
 					// Add it to the list to expand if not already there.
@@ -580,9 +580,9 @@ func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error
 	userNames := make([]upspin.UserName, 0, len(list))
 	var groups []upspin.PathName
 	for _, user := range list {
-		if len(user.Elems) == 0 {
+		if user.IsRoot() {
 			// It's a user
-			userNames = append(userNames, user.User)
+			userNames = append(userNames, user.User())
 		} else {
 			// It's a group. Need to unroll groups.
 			groups = append(groups, user.Path())
@@ -638,8 +638,8 @@ func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
 	if err != nil {
 		return nil, err
 	}
-	access.owner = access.parsed.User
-	_, access.domain, err = path.UserAndDomain(access.parsed.User)
+	access.owner = access.parsed.User()
+	_, access.domain, err = path.UserAndDomain(access.parsed.User())
 	if err != nil {
 		return nil, err
 	}
@@ -650,19 +650,19 @@ func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
 // If we encounter a new group in the list, we add it the list of groups to check and will
 // process it in another call from Can.
 func (a *Access) inList(requester path.Parsed, list []path.Parsed, groupsToCheck []path.Parsed) (bool, []path.Parsed) {
-	_, domain, err := path.UserAndDomain(requester.User)
+	_, domain, err := path.UserAndDomain(requester.User())
 	// We don't expect an error since it's been parsed, but check anyway.
 	if err != nil {
 		return false, nil
 	}
 Outer:
 	for _, allowed := range list {
-		if len(allowed.Elems) == 0 {
-			if allowed.User == requester.User {
+		if allowed.IsRoot() {
+			if allowed.User() == requester.User() {
 				return true, nil
 			}
 			// Wildcard: The path name *@domain.com matches anyone in domain.
-			if strings.HasPrefix(string(allowed.User), "*@") && string(allowed.User[2:]) == domain {
+			if strings.HasPrefix(string(allowed.User()), "*@") && string(allowed.User()[2:]) == domain {
 				return true, nil
 			}
 		} else {

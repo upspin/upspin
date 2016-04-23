@@ -472,8 +472,8 @@ func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 	for _, de := range h.de {
 		parsed, _ := path.Parse(de.Name)
 		name := string(de.Name)
-		if len(parsed.Elems) > 0 {
-			name = parsed.Elems[len(parsed.Elems)-1]
+		if !parsed.IsRoot() {
+			name = parsed.Elem(parsed.NElem() - 1)
 		}
 		fde = append(fde, fuse.Dirent{Name: name})
 	}

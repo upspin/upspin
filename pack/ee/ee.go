@@ -196,7 +196,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
-	owner := parsed.User
+	owner := parsed.User()
 	if err != nil {
 		return 0, err
 	}
@@ -351,7 +351,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
-	owner := parsed.User
+	owner := parsed.User()
 	if err != nil {
 		return err
 	}

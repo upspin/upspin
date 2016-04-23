@@ -264,7 +264,7 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 	if !parsed.IsRoot() {
 		dirEntry, err = d.getNonRoot(parsed.Path())
 	} else {
-		root, err := d.getRoot(parsed.User)
+		root, err := d.getRoot(parsed.User())
 		if err == nil {
 			dirEntry = &root.dirEntry
 		}
@@ -337,15 +337,15 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 	// does not contain a metacharacter -- this saves us from
 	// doing a full list operation if the matter of interest is
 	// deep in a sub directory.
-	clear := len(parsed.Elems)
-	for i, elem := range parsed.Elems {
-		if strings.ContainsAny(elem, "*?[]^") {
+	clear := parsed.NElem()
+	for i := 0; i < clear; i++ {
+		if strings.ContainsAny(parsed.Elem(i), "*?[]^") {
 			clear = i
 			break
 		}
 	}
 	prefix := parsed.First(clear).String()
-	depth := len(parsed.Elems) - clear
+	depth := parsed.NElem() - clear
 
 	var names []string
 	if depth == 1 {

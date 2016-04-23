@@ -123,9 +123,8 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	// TODO: Why so many? (5 are for sorting the rights list.)
-	if allocs != 36 {
-		t.Fatal("expected 36 allocations, got ", allocs)
+	if allocs != 26 {
+		t.Fatal("expected 26 allocations, got ", allocs)
 	}
 }
 
@@ -138,9 +137,8 @@ func TestGroupParseAllocs(t *testing.T) {
 		parseGroup(parsed, groupText)
 	})
 	t.Log("allocs:", allocs)
-	// TODO: Why so many?
-	if allocs != 11 {
-		t.Fatal("expected 11 allocations, got ", allocs)
+	if allocs != 8 {
+		t.Fatal("expected 8 allocations, got ", allocs)
 	}
 }
 
@@ -579,6 +577,8 @@ func TestAssertEqual(t *testing.T) {
 
 func assertEqual(t *testing.T, a, b *Access) {
 	if str := differenceString(a, b); str != "" {
+		t.Log(a)
+		t.Log(b)
 		t.Fatal(str)
 	}
 }
@@ -646,8 +646,8 @@ func match(t *testing.T, want []path.Parsed, expect []string) {
 	}
 	for i, path := range want {
 		var compare string
-		if len(path.Elems) == 0 {
-			compare = string(path.User)
+		if path.IsRoot() {
+			compare = string(path.User())
 		} else {
 			compare = path.String()
 		}

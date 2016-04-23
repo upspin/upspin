@@ -159,9 +159,9 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirEntry, ok := s.root[parsed.User]
+	dirEntry, ok := s.root[parsed.User()]
 	if !ok {
-		return nil, mkStrError("Glob", upspin.PathName(parsed.User), "no such user")
+		return nil, mkStrError("Glob", upspin.PathName(parsed.User()), "no such user")
 	}
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
@@ -183,11 +183,12 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			IsDir: true,
 		},
 	}
-	for i, elem := range parsed.Elems {
+	for i := 0; i < parsed.NElem(); i++ {
+		elem := parsed.Elem(i)
 		// Need to check List permission. Permission check is done for any
 		// intermediate step (directory) if it's matched by a pattern, and for the final
 		// entry always.
-		if isGlobPattern(elem) || i == len(parsed.Elems)-1 {
+		if isGlobPattern(elem) || i == parsed.NElem()-1 {
 			ok, err := s.can(access.List, parsed.First(i))
 			if err != nil {
 				return nil, err
@@ -218,7 +219,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					return nil, err
 				}
 				// No need to check error; pattern is validated above.
-				if matched, _ := goPath.Match(elem, parsed.Elems[len(parsed.Elems)-1]); !matched {
+				if matched, _ := goPath.Match(elem, parsed.Elem(parsed.NElem()-1)); !matched {
 					continue
 				}
 				next = append(next, &nextEntry)
@@ -228,7 +229,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	var checked, canRead bool
 	for _, entry := range next {
 		// Need a / on the root if it's matched.
-		if entry.Name == upspin.PathName(parsed.User) {
+		if entry.Name == upspin.PathName(parsed.User()) {
 			entry.Name += "/"
 		}
 		// Clear out the location information if we can't read this.
@@ -299,11 +300,11 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if len(parsed.Elems) == 0 {
+	if parsed.IsRoot() {
 		// Creating a root: easy!
 		// Only the onwer can create the root, but the check above is sufficient since a
 		// non-existent root has no Access file yet.
-		if _, present := s.root[parsed.User]; present {
+		if _, present := s.root[parsed.User()]; present {
 			return loc0, mkStrError("MakeDirectory", directoryName, "already exists")
 		}
 		blob, _, err := packDirBlob(s.context, nil, pathName) // TODO: Ignoring metadata (but using PlainPack).
@@ -314,8 +315,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if err != nil {
 			return loc0, err
 		}
-		dirEntry := s.rootDirEntry(parsed.User, ref, 0)
-		s.root[parsed.User] = dirEntry
+		dirEntry := s.rootDirEntry(parsed.User(), ref, 0)
+		s.root[parsed.User()] = dirEntry
 		return dirEntry.Location, nil
 	}
 	// Use parsed.Path() rather than directoryName so it's canonicalized.
@@ -436,13 +437,13 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		return err
 	}
 	pathName := parsed.Path()
-	if len(parsed.Elems) == 0 {
+	if parsed.IsRoot() {
 		return mkStrError(op, pathName, "cannot create root with Put; use MakeDirectory")
 	}
-	dirEntry, ok := s.root[parsed.User]
+	dirEntry, ok := s.root[parsed.User()]
 	if !ok {
 		// Cannot create user root with Put.
-		return mkStrError(op, upspin.PathName(parsed.User), "no such user")
+		return mkStrError(op, upspin.PathName(parsed.User()), "no such user")
 	}
 	dirRef := dirEntry.Location.Reference
 	// Iterate along the path up to but not past the last element.
@@ -450,8 +451,8 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	// Invariant: dirRef refers to a directory.
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
 	entries = append(entries, dirEntry)
-	for i := 0; i < len(parsed.Elems)-1; i++ {
-		e, err := s.fetchEntry(op, parsed.First(i).Path(), dirRef, parsed.Elems[i])
+	for i := 0; i < parsed.NElem()-1; i++ {
+		e, err := s.fetchEntry(op, parsed.First(i).Path(), dirRef, parsed.Elem(i))
 		if err != nil {
 			return err
 		}
@@ -490,8 +491,8 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		}
 	}
 	// Update the root.
-	seq := s.root[parsed.User].Metadata.Sequence
-	s.root[parsed.User] = s.rootDirEntry(parsed.User, dirRef, seq+1)
+	seq := s.root[parsed.User()].Metadata.Sequence
+	s.root[parsed.User()] = s.rootDirEntry(parsed.User(), dirRef, seq+1)
 
 	return nil
 }
@@ -580,9 +581,9 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 func (s *Service) lookup(parsed path.Parsed) (*upspin.DirEntry, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	dirEntry, ok := s.root[parsed.User]
+	dirEntry, ok := s.root[parsed.User()]
 	if !ok {
-		return nil, mkStrError("Lookup", upspin.PathName(parsed.User), "no such user")
+		return nil, mkStrError("Lookup", upspin.PathName(parsed.User()), "no such user")
 	}
 	if parsed.IsRoot() {
 		return dirEntry, nil
@@ -590,8 +591,8 @@ func (s *Service) lookup(parsed path.Parsed) (*upspin.DirEntry, error) {
 	dirRef := dirEntry.Location.Reference
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
-	for i := 0; i < len(parsed.Elems)-1; i++ {
-		entry, err := s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elems[i])
+	for i := 0; i < parsed.NElem()-1; i++ {
+		entry, err := s.fetchEntry("Lookup", parsed.First(i).Path(), dirRef, parsed.Elem(i))
 		if err != nil {
 			return nil, err
 		}
@@ -600,7 +601,7 @@ func (s *Service) lookup(parsed path.Parsed) (*upspin.DirEntry, error) {
 		}
 		dirRef = entry.Location.Reference
 	}
-	lastElem := parsed.Elems[len(parsed.Elems)-1]
+	lastElem := parsed.Elem(parsed.NElem() - 1)
 	// Destination must exist. If so we need to update the parent directory record.
 	entry, err := s.fetchEntry("Lookup", parsed.Drop(1).Path(), dirRef, lastElem)
 	if err != nil {
@@ -650,7 +651,7 @@ func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.
 func (s *Service) rootAccessFile(parsed path.Parsed) *access.Access {
 	s.mu.RLock()
-	accessFile := s.rootAccess[parsed.User]
+	accessFile := s.rootAccess[parsed.User()]
 	s.mu.RUnlock()
 	if accessFile == nil {
 		var err error
@@ -659,7 +660,7 @@ func (s *Service) rootAccessFile(parsed path.Parsed) *access.Access {
 			panic(err)
 		}
 		s.mu.Lock()
-		s.rootAccess[parsed.User] = accessFile
+		s.rootAccess[parsed.User()] = accessFile
 		s.mu.Unlock()
 	}
 	return accessFile
