@@ -261,7 +261,7 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	}
 	// The ? ensures at least one letter in the base component.  For example, Glob("p@google.com/*) also
 	// returns p@google.com/ which is not what we want.
-	pattern := path.Join(n.uname, "?*")
+	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
 	if err != nil {
 		return nil, eio("%s globing %q", err, pattern)
