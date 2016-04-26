@@ -139,6 +139,10 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		for _, right := range rights {
 			switch r := which(right); r {
 			case Read, Write, List, Create, Delete:
+				// Save allocations by doing some pre-emptively.
+				if a.list[r] == nil {
+					a.list[r] = make([]path.Parsed, 0, preallocSize(len(users)))
+				}
 				a.list[r], err = parsedAppend(a.list[r], parsed.User(), users...)
 			case Invalid:
 				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
@@ -413,6 +417,9 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 		if users == nil {
 			return nil, fmt.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
 		}
+		if group == nil {
+			group = make([]path.Parsed, 0, preallocSize(len(users)))
+		}
 		group, err = parsedAppend(group, parsed.User(), users...)
 		if err != nil {
 			return nil, fmt.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
@@ -422,6 +429,19 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 		return nil, s.Err()
 	}
 	return group, nil
+}
+
+// preallocSize returns a sensible preallocation size for a list that will contain
+// at least n users, providing a little headroom.
+func preallocSize(n int) int {
+	switch {
+	case n > 100:
+		return n + 20
+	case n > 10:
+		return 2 * n
+	default:
+		return 16
+	}
 }
 
 // ErrNeedGroup is returned by Access.Can when a group file must be provided.
