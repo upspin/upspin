@@ -49,6 +49,7 @@ const (
 	Create
 	Delete
 	numRights
+	AllRights // The superset, written as '*'.
 )
 
 // rightNames are the names of the rights, in order (and missing invalid).
@@ -101,7 +102,7 @@ func (a *Access) Path() upspin.PathName {
 	return a.parsed.Path()
 }
 
-// Parse parses the contents of the path name, in data, and returns the parsed Acces.
+// Parse parses the contents of the path name, in data, and returns the parsed Access.
 func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 	a, parsed, err := newAccess(pathName)
 	if err != nil {
@@ -138,18 +139,18 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		var err error
 		for _, right := range rights {
 			switch r := which(right); r {
-			case Read, Write, List, Create, Delete:
-				// Save allocations by doing some pre-emptively.
-				if a.list[r] == nil {
-					a.list[r] = make([]path.Parsed, 0, preallocSize(len(users)))
+			case AllRights:
+				for r := Right(0); r < numRights; r++ {
+					err = a.addRight(r, parsed.User(), users)
 				}
-				a.list[r], err = parsedAppend(a.list[r], parsed.User(), users...)
+			case Read, Write, List, Create, Delete:
+				err = a.addRight(r, parsed.User(), users)
 			case Invalid:
-				return nil, fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
+				err = fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
 			}
-		}
-		if err != nil {
-			return nil, fmt.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
+			if err != nil {
+				return nil, fmt.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
+			}
 		}
 	}
 	if s.Err() != nil {
@@ -160,6 +161,16 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		sort.Sort(sliceOfParsed(r))
 	}
 	return a, nil
+}
+
+func (a *Access) addRight(r Right, owner upspin.UserName, users [][]byte) error {
+	// Save allocations by doing some pre-emptively.
+	if a.list[r] == nil {
+		a.list[r] = make([]path.Parsed, 0, preallocSize(len(users)))
+	}
+	var err error
+	a.list[r], err = parsedAppend(a.list[r], owner, users...)
+	return err
 }
 
 // New returns a new Access granting the owner of pathName all rights.
@@ -345,6 +356,9 @@ func toLower(b byte) byte {
 // which reports which right the text represents. Case is ignored and a right may be
 // specified by its first letter only. We know that the text is not empty.
 func which(right []byte) Right {
+	if bytes.Equal(right, []byte{'*'}) {
+		return AllRights
+	}
 	for i, c := range right {
 		right[i] = toLower(c)
 	}
