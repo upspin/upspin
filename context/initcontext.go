@@ -43,12 +43,17 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		scanner := bufio.NewScanner(r)
 		for scanner.Scan() {
 			line := scanner.Text()
+			// Remove comments.
+			if sharp := strings.IndexByte(line, '#'); sharp >= 0 {
+				line = line[:sharp]
+			}
+			line = strings.TrimSpace(line)
 			tokens := strings.SplitN(line, "=", 2)
 			if len(tokens) != 2 {
 				continue
 			}
-			val := strings.Trim(tokens[1], " \t")
-			attr := strings.Trim(tokens[0], " \t")
+			val := strings.TrimSpace(tokens[1])
+			attr := strings.TrimSpace(tokens[0])
 			if _, ok := vals[attr]; ok {
 				vals[attr] = val
 			}
