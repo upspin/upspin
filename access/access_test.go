@@ -123,8 +123,8 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 26 {
-		t.Fatal("expected 26 allocations, got ", allocs)
+	if allocs != 23 {
+		t.Fatal("expected 23 allocations, got ", allocs)
 	}
 }
 
@@ -137,8 +137,8 @@ func TestGroupParseAllocs(t *testing.T) {
 		parseGroup(parsed, groupText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 8 {
-		t.Fatal("expected 8 allocations, got ", allocs)
+	if allocs != 6 {
+		t.Fatal("expected 6 allocations, got ", allocs)
 	}
 }
 
