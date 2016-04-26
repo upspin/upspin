@@ -54,6 +54,18 @@ func TestInitContext(t *testing.T) {
 	testConfig(t, &expect, makeConfig(&expect))
 }
 
+func TestComments(t *testing.T) {
+	once.Do(func() { registerDummies(t) })
+	expect := expectations{
+		userName:  "p@google.com",
+		user:      Endpoint(upspin.InProcess, ""),
+		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		store:     Endpoint(upspin.GCP, "who.knows:1234"),
+		packing:   upspin.EEp256Pack,
+	}
+	testConfig(t, &expect, makeCommentedConfig(&expect))
+}
+
 func TestDefaults(t *testing.T) {
 	once.Do(func() { registerDummies(t) })
 	expect := expectations{
@@ -91,6 +103,15 @@ func TestEnv(t *testing.T) {
 
 func makeConfig(expect *expectations) string {
 	return fmt.Sprintf("name = %s\nuser= %s\nstore = %s\n  directory =%s   \npacking=%s",
+		expect.userName,
+		endpoint.String(&expect.user),
+		endpoint.String(&expect.store),
+		endpoint.String(&expect.directory),
+		pack.Lookup(expect.packing).String())
+}
+
+func makeCommentedConfig(expect *expectations) string {
+	return fmt.Sprintf("# Line one is a comment\nname = %s # Ignore this.\nuser= %s\nstore = %s\n  directory =%s   \npacking=%s #Ignore this",
 		expect.userName,
 		endpoint.String(&expect.user),
 		endpoint.String(&expect.store),
