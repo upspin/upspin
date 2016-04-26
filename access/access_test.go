@@ -325,6 +325,20 @@ func TestParseEmptyFile(t *testing.T) {
 	match(t, a.list[Delete], empty)
 }
 
+func TestParseStar(t *testing.T) {
+	accessText := []byte("*: joe@blow.com")
+	a, err := Parse(testFile, accessText)
+	if err != nil {
+		t.Fatal(err)
+	}
+	joe := []string{"joe@blow.com"}
+	match(t, a.list[Read], joe)
+	match(t, a.list[Write], joe)
+	match(t, a.list[List], joe)
+	match(t, a.list[Create], joe)
+	match(t, a.list[Delete], joe)
+}
+
 func TestParseContainsGroupName(t *testing.T) {
 	accessText := []byte("r: family,*@google.com,edpin@google.com/Group/friends")
 	a, err := Parse(testFile, accessText)
