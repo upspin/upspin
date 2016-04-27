@@ -153,7 +153,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	sig, err := ctx.Factotum.FileSign(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum)
+	sig, err := ctx.Factotum.FileSign(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, err
 	}
@@ -236,7 +236,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
-		if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
+		if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 			log.Println("verify failed")
 			return 0, errVerify
 		}
@@ -351,10 +351,10 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
-	owner := parsed.User()
 	if err != nil {
 		return err
 	}
+	owner := parsed.User()
 	// The owner has a well-known public key
 	ownerRawPubKey, err := publicKey(ctx, owner, c.packerString)
 	if err != nil {
@@ -399,7 +399,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// Verify that the owner signed this with his/her public key.
-	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, d.Name, d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
+	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 		log.Println("verify failed")
 		return errVerify
 	}
@@ -409,6 +409,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	if err != nil {
 		return err
 	}
+	newName = parsedNew.Path()
 	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
 		wrap = []wrappedKey{w}
 	}

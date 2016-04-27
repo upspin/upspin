@@ -335,6 +335,8 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	if err != nil {
 		return err
 	}
+	// Use the clean name, in case the caller forgot.
+	entry.Name = parsed.Path()
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
 		return err
@@ -353,6 +355,7 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 			return mkError("Put", entry.Name, access.ErrPermissionDenied)
 		}
 	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {

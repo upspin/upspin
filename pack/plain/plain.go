@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"upspin.googlesource.com/upspin.git/pack"
+	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -55,7 +56,11 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 
 // Name implements upspin.Name.
 func (p plainPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
-	dirEntry.Name = newName
+	parsed, err := path.Parse(newName)
+	if err != nil {
+		return err
+	}
+	dirEntry.Name = parsed.Path()
 	return nil
 }
 
