@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e84d01b0_42609625",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-27T21:39:33Z",
+      "side": 1,
+      "message": "I would have been happy with Glob implements upspin.Directory.Glob.   Why repeat the explanation here?",
+      "range": {
+        "startLine": 147,
+        "startChar": 3,
+        "endLine": 147,
+        "endChar": 7
+      },
+      "revId": "b3213eb5faebd107fc6a86aa0a11f949a7855522",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e84d01b0_0277aef3",
+        "filename": "directory/testdir/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-27T21:39:33Z",
+      "side": 1,
+      "message": "This cl does that.",
+      "range": {
+        "startLine": 153,
+        "startChar": 3,
+        "endLine": 153,
+        "endChar": 7
+      },
+      "revId": "b3213eb5faebd107fc6a86aa0a11f949a7855522",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
