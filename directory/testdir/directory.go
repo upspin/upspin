@@ -144,13 +144,7 @@ func unpackDirBlob(context *upspin.Context, ciphertext []byte, name upspin.PathN
 	return unpackBlob(context, ciphertext, newDirEntry(context, name))
 }
 
-// Glob matches the pattern against the file names of the full rooted tree.
-// That is, the pattern must look like a full path name, but elements of the
-// path may contain metacharacters. Matching is done using Go's path.Match
-// elementwise. The user name must be present in the pattern and is treated
-// as a literal even if it contains metacharacters. The metadata in each entry
-// has no Location information. TODO: What else should be wiped?
-// TODO: Update upspin.go's comment for this method.
+// Glob implements upspin.Directory.Glob.
 // TODO: Test access control for this method.
 func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	parsed, err := path.Parse(upspin.PathName(pattern))
@@ -243,6 +237,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 		if !canRead {
 			entry.Location = loc0
+			entry.Metadata.Packdata = nil
 		}
 	}
 	sort.Sort(dirEntrySlice(next))
@@ -278,8 +273,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 	}
 }
 
-// MakeDirectory creates a new directory with the given name. The user's root must be present.
-// TODO: For now at least, only the last entry of the path can be created, as in Unix.
+// MakeDirectory implements upspin.Directory.MakeDirectory.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
@@ -334,12 +328,8 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	return loc, s.put("MakeDirectory", entry, false)
 }
 
-// Put creates or overwrites the blob with the specified path.
-// The path begins with the user name (which contains no slashes),
-// always followed by at least one slash:
-//	gopher@google.com/
-//	gopher@google.com/a/b/c
-// Directories are created with MakeDirectory. Roots are anyway. TODO.
+// Put implements upspin.Directory.Put.
+// Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (s *Service) Put(entry *upspin.DirEntry) error {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
@@ -395,8 +385,7 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	return nil
 }
 
-// WhichAccess returns the path of the Access file that defines the access rights
-// for the named path.
+// WhichAccess implements upspin.Directory.WhichAccess.
 func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -511,7 +500,7 @@ func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
 	return data, err
 }
 
-// Delete deletes a name from memory.
+// Delete implements upspin.Directory.Delete.
 func (s *Service) Delete(pathName upspin.PathName) error {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -557,7 +546,7 @@ func (s *Service) isEmptyDirectory(entry *upspin.DirEntry) (bool, error) {
 	return len(data) == 0, nil
 }
 
-// Lookup returns the directory entry for the named file.
+// Lookup implements upspin.Directory.Lookup.
 func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -785,7 +774,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 	return ref, nil
 }
 
-// DeleteAll deletes all entries from memory.
+// DeleteAll implements upspin.Directory.DeleteAll.
 func (s *Service) DeleteAll() {
 	s.mu.Lock()
 	s.root = make(map[upspin.UserName]*upspin.DirEntry)
