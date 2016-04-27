@@ -460,7 +460,20 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 // will write the file to the directory and store.
 func (h *handle) Flush(context xcontext.Context, req *fuse.FlushRequest) error {
 	log.Printf("Flush %q", h.n.uname)
-	return nil
+
+	// Write back to upspin.
+	h.n.Lock()
+	var err error
+	if h.n.cf != nil {
+		err = h.n.cf.writeBack(h.n)
+
+		// If this is the last handle, forget about the cached entry.
+		if len(h.n.handles) == 0 {
+			h.n.cf = nil
+		}
+	}
+	h.n.Unlock()
+	return err
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.

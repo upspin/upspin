@@ -71,6 +71,7 @@ func main() {
 		fuse.Subtype("fs"),
 		fuse.LocalVolume(),
 		fuse.VolumeName(string(f.context.UserName)),
+		fuse.DaemonTimeout("240"),
 	)
 	if err != nil {
 		log.Fatal(err)
