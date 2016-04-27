@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "286d5911_39182b74",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-27T01:00:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "688e71f1_540eec25",
+      "revId": "9ca98e2a519a9212bd7e748fd96507075293b3bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "688e71f1_f412a047",
         "filename": "upspin/upspin.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-04-26T21:51:15Z",
       "side": 1,
       "message": "s/$/./\n// The old name is no longer valid.",
+      "revId": "9ca98e2a519a9212bd7e748fd96507075293b3bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "286d5911_191d6f64",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-04-27T01:00:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "688e71f1_f412a047",
       "revId": "9ca98e2a519a9212bd7e748fd96507075293b3bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
