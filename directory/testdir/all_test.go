@@ -114,12 +114,9 @@ func storePlainData(t *testing.T, data []byte, name upspin.PathName) *upspin.Dir
 }
 
 func storeDataHelper(t *testing.T, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
-	// TODO: we'd really like a path.Clean.
-	parsed, err := path.Parse(name)
-	if err != nil {
-		panic(err) // Really shouldn't happen here.
+	if path.Clean(name) != name {
+		t.Fatalf("%q is not a clean path name", name)
 	}
-	name = parsed.Path()
 	entry := &upspin.DirEntry{
 		Name: name,
 		Metadata: upspin.Metadata{

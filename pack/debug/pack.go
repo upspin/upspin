@@ -194,10 +194,15 @@ func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
 }
 
 // Name implements upspin.Pack.Name.
-func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, name upspin.PathName) error {
+func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	parsed, err := path.Parse(newName)
+	if err != nil {
+		return err
+	}
 	meta := &dirEntry.Metadata
 
 	// Update directory entry and metadata with new name.
+	name := parsed.Path()
 	dirEntry.Name = name
 	oldName, err := getPath(meta)
 	if err != nil {
