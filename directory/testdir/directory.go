@@ -148,8 +148,8 @@ func unpackDirBlob(context *upspin.Context, ciphertext []byte, name upspin.PathN
 // That is, the pattern must look like a full path name, but elements of the
 // path may contain metacharacters. Matching is done using Go's path.Match
 // elementwise. The user name must be present in the pattern and is treated
-// as a literal even if it contains metacharacters. The metadata in each entry
-// has no Location information. TODO: What else should be wiped?
+// as a literal even if it contains metacharacters. If the caller has no read
+// permission, the metadata in each entry has no Location or Packdata.
 // TODO: Update upspin.go's comment for this method.
 // TODO: Test access control for this method.
 func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
@@ -243,6 +243,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 		if !canRead {
 			entry.Location = loc0
+			entry.Metadata.Packdata = nil
 		}
 	}
 	sort.Sort(dirEntrySlice(next))

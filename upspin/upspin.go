@@ -274,7 +274,8 @@ type Directory interface {
 	// Matching is done using Go's path.Match elementwise. The user
 	// name must be present in the pattern and is treated as a literal
 	// even if it contains metacharacters.
-	// The return Metadata in the DirEntry contains no key information.
+	// If the caller has no read permission for the items named in the
+	// DirEntries, the returned Locations and Packdata fields are cleared.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.
