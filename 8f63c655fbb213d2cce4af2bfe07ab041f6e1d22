@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "68f031dd_d6ba54d0",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-28T22:10:03Z",
+      "side": 1,
+      "message": "is this a related change?",
+      "revId": "8f63c655fbb213d2cce4af2bfe07ab041f6e1d22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
