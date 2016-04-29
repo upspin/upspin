@@ -112,7 +112,8 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 				continue
 			}
 		}
-		cf.fname = filepath.Join(c.dir, fingerprint(loc))
+		var cdir string
+		cdir, cf.fname = c.cacheName(loc)
 
 		// We assume that plain pack files are mutable and not conpletely
 		// under our control.  Only encrypted files are immutable and can
@@ -168,7 +169,10 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		// Save a copy of the cleartext in the local file system.
 		var file *os.File
 		if file, err = os.Create(cf.fname); err != nil {
-			return eio("%s creating %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
+			os.Mkdir(cdir, 0777)
+			if file, err = os.Create(cf.fname); err != nil {
+				return eio("%s creating %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
+			}
 		}
 		if wlen, err := file.Write(cleartext); err != nil || rlen != wlen {
 			file.Close()
@@ -244,13 +248,20 @@ func (cf *cachedFile) writeBack(n *node) error {
 
 	// Rename it to reflect the actual reference in the store so that new
 	// opens will find the cached version.
-	fname := filepath.Join(cf.c.dir, fingerprint(loc))
-	if err := os.Rename(cf.fname, fname); err == nil {
-		cf.fname = fname
+	cdir, fname := cf.c.cacheName(loc)
+	if err := os.Rename(cf.fname, fname); err != nil {
+		os.Mkdir(cdir, 0700)
+		if err := os.Rename(cf.fname, fname); err != nil {
+			return err
+		}
 	}
+	cf.fname = fname
 	return nil
 }
 
-func fingerprint(loc upspin.Location) string {
-	return fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
+func (c *cache) cacheName(loc upspin.Location) (string, string) {
+	hash := fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
+	dir := c.dir + "/" + hash[:2]
+	file := dir + "/" + hash
+	return dir, file
 }
