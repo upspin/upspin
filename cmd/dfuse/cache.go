@@ -112,7 +112,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 				continue
 			}
 		}
-		cf.fname = filepath.Join(c.dir, fingerprint(loc))
+		cf.fname = c.cacheName(loc)
 
 		// We assume that plain pack files are mutable and not conpletely
 		// under our control.  Only encrypted files are immutable and can
@@ -244,13 +244,15 @@ func (cf *cachedFile) writeBack(n *node) error {
 
 	// Rename it to reflect the actual reference in the store so that new
 	// opens will find the cached version.
-	fname := filepath.Join(cf.c.dir, fingerprint(loc))
+	fname := cf.c.cacheName(loc)
 	if err := os.Rename(cf.fname, fname); err == nil {
 		cf.fname = fname
 	}
 	return nil
 }
 
-func fingerprint(loc upspin.Location) string {
-	return fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
+func (c *cache) cacheName(loc upspin.Location) string {
+	hash := fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
+	os.Mkdir(fmt.Sprintf("%s/%s", c.dir, hash[:2]), 0700)
+	return fmt.Sprintf("%s/%s/%s", c.dir, hash[:2], hash)
 }
