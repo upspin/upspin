@@ -1,4 +1,4 @@
-// Testdir is a wrapper for the directory/testdir implementation that presents it as a Go net/rpc interface.
+// Dirserver is a wrapper for a directory implementation that presents it as a Go net/rpc interface.
 // TODO: Switch to grpc one day.
 package main
 
@@ -15,7 +15,11 @@ import (
 	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
 
+	// TODO: Other than the directory implementations, most of these
+	// are only necessary because of InitContext.
+
 	// Load useful packers
+	_ "upspin.googlesource.com/upspin.git/pack/debug"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
 
