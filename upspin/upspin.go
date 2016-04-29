@@ -26,6 +26,10 @@ const (
 
 	// GCP indicates a Google Cloud Store instance.
 	GCP
+
+	// Remote indicates a connection to a remote server through RPC.
+	// The Endpoint's location contains the HTTP address of the remote server.
+	Remote
 )
 
 // A Location identifies where a piece of data is stored and how to retrieve it.

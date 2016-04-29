@@ -111,7 +111,7 @@ func TestNelem(t *testing.T) {
 		}
 		nelem := p.NElem()
 		if nelem != test.nelem {
-			t.Errorf("NElem(%q)=%d; expected %d", test, nelem, want)
+			t.Errorf("NElem(%q)=%d; expected %d", test, nelem, test.nelem)
 		}
 	}
 }
