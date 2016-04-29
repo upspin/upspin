@@ -556,10 +556,30 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	return nil, eio("oops")
 }
 
-// Rename implements fs.rename. It renames the old node to r.NewName in directory n.
+// Rename implements fs.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
 	oldPath := old.(*node).uname
 	newPath := path.Join(n.uname, req.NewName)
 	log.Printf("Rename %q to %q/%q", oldPath, newPath)
 	return eio("oops")
+}
+
+// Getxattr implements fs.Getxattr.
+func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
+	return fuse.ErrNoXattr
+}
+
+// Listxattr implements fs.Listxattr.
+func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
+	return nil
+}
+
+// Setxattr implements fs.Setxattr.
+func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
+	return nil
+}
+
+// Removexattr implements fs.Removexattr.
+func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
+	return nil
 }
