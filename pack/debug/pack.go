@@ -195,6 +195,9 @@ func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
 
 // Name implements upspin.Pack.Name.
 func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	if dirEntry.Metadata.IsDir {
+		return errors.New("Name: cannot rename directory")
+	}
 	parsed, err := path.Parse(newName)
 	if err != nil {
 		return err

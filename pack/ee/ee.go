@@ -335,6 +335,9 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 
 // Name implements upspin.Name.
 func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+	if d.Metadata.IsDir {
+		return errors.New("Name: cannot rename directory")
+	}
 	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
 		return err
 	}
