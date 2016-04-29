@@ -16,6 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/user/usercache"
 
 	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
+	_ "upspin.googlesource.com/upspin.git/directory/remote"
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/pack/ee"
 	_ "upspin.googlesource.com/upspin.git/pack/plain"
