@@ -1,4 +1,4 @@
-// Package testdir implements an inprocess directory server that uses RPC to
+// Package remote implements an inprocess directory server that uses RPC to
 // connect to a remote directory server.
 package remote
 
@@ -11,9 +11,6 @@ import (
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	// Imported because it's used to pack dir entries.
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
 )
 
 // remote implements upspin.Directory.
