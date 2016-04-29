@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "683e714b_147ea4d4",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-04-29T22:56:34Z",
+      "side": 1,
+      "message": "os.Create will give you the path name in the error message (it\u0027s an os.PathError) so there\u0027s no need to print cf.fname again.\n\ns/ file %q//\ns/, cf.fname//",
+      "revId": "b76ac7019c1f25672541eccd7b968d62edaf484e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
