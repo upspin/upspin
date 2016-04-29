@@ -566,20 +566,24 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 
 // Getxattr implements fs.Getxattr.
 func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
+	log.Printf("Getxattr %q", n.uname)
 	return fuse.ErrNoXattr
 }
 
 // Listxattr implements fs.Listxattr.
 func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
+	log.Printf("Listxattr %q", n.uname)
 	return nil
 }
 
 // Setxattr implements fs.Setxattr.
 func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
+	log.Printf("Setxattr %q", n.uname)
 	return nil
 }
 
 // Removexattr implements fs.Removexattr.
 func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
+	log.Printf("Removexattr %q", n.uname)
 	return nil
 }
