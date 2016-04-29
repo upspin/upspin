@@ -27,6 +27,9 @@ import (
 	_ "upspin.googlesource.com/upspin.git/directory/testdir"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
 	_ "upspin.googlesource.com/upspin.git/user/testuser"
+
+	// Load required remote services
+	_ "upspin.googlesource.com/upspin.git/directory/remote"
 )
 
 var (

@@ -19,7 +19,11 @@ func Parse(v string) (*upspin.Endpoint, error) {
 		return &upspin.Endpoint{Transport: upspin.GCP, NetAddr: upspin.NetAddr(elems[1])}, nil
 	case "inprocess":
 		return &upspin.Endpoint{Transport: upspin.InProcess, NetAddr: upspin.NetAddr("")}, nil
-
+	case "remote":
+		if len(elems) < 2 {
+			return nil, fmt.Errorf("remote endpoint %q requires a netaddr", v)
+		}
+		return &upspin.Endpoint{Transport: upspin.Remote, NetAddr: upspin.NetAddr(elems[1])}, nil
 	}
 	return nil, fmt.Errorf("unknown transport type in endpoint %q", v)
 }
@@ -31,6 +35,8 @@ func String(ep *upspin.Endpoint) string {
 		return fmt.Sprintf("gcp,%s", string(ep.NetAddr))
 	case upspin.InProcess:
 		return "inprocess"
+	case upspin.Remote:
+		return "remote"
 	}
 	return fmt.Sprintf("%v", ep)
 }
