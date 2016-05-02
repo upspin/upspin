@@ -5,7 +5,7 @@ import (
 	"log"
 	"syscall"
 
-	"bazil.org/fuse"
+	"github.com/presotto/fuse"
 )
 
 // upspinError is an error string with a POSIX syscall error number.

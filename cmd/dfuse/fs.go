@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"bazil.org/fuse"
-	"bazil.org/fuse/fs"
+	"github.com/presotto/fuse"
+	"github.com/presotto/fuse/fs"
 	xcontext "golang.org/x/net/context"
 
 	"upspin.googlesource.com/upspin.git/path"
@@ -563,6 +563,9 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 	log.Printf("Rename %q to %q/%q", oldPath, newPath)
 	return eio("oops")
 }
+
+// The following Xattr calls exist to short circuit any xattr calls.  Without them,
+// the MacOS kernel will constantly look for ._ files.
 
 // Getxattr implements fs.Getxattr.
 func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {

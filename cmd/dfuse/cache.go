@@ -8,7 +8,7 @@ import (
 	filepath "path"
 	"sync"
 
-	"bazil.org/fuse"
+	"github.com/presotto/fuse"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
