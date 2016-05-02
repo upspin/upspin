@@ -458,11 +458,19 @@ type Context struct {
 // the Upspin "bind" package to connect to services.
 type Dialer interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(*Context, Endpoint) (interface{}, error)
+	Dial(*Context, Endpoint) (Service, error)
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.
 	// TODO(p): Should I distinguish a server which didn't pass authentication
 	// from one which has no user name?
 	ServerUserName() string
+}
+
+// Service is the general interface returned by a dialer. It includes
+// methods to configure the service.
+type Service interface {
+	// Configure configures a service once it has been dialed.
+	// The details of the configuration are implementation-defined.
+	Configure(options ...string) error
 }

@@ -43,7 +43,7 @@ func New(serverURL string, httpClient netutil.HTTPClientInterface) *Store {
 }
 
 // Dial implements Dialer.
-func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
+func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
 	const op = "Dial"
 	if context == nil {
 		return nil, newStoreError(op, "nil context", "")
@@ -71,6 +71,11 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interfa
 // ServerUserName implements Dialer.
 func (s *Store) ServerUserName() string {
 	return "GCP Store"
+}
+
+// Configure implements upspin.Service.
+func (s *Store) Configure(options ...string) error {
+	return nil
 }
 
 // Get implements Store.

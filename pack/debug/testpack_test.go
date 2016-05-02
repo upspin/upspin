@@ -137,10 +137,14 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 	return nil, []upspin.PublicKey{"a key"}, nil
 }
 
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
 }
 
 func (d *dummyUser) ServerUserName() string {
 	return "dummyUser"
+}
+
+func (d *dummyUser) Configure(options ...string) error {
+	return nil
 }

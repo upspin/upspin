@@ -264,7 +264,7 @@ func (d *Directory) requestAndReadResponseBody(op string, path upspin.PathName, 
 }
 
 // Dial implements Dialer.
-func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "Dial"
 	if context == nil {
 		return nil, newError(op, "", errors.New("nil Context"))
@@ -307,6 +307,11 @@ func (d *Directory) Delete(name upspin.PathName) error {
 // Endpoint implements upspin.Directory.Endpoint.
 func (d *Directory) Endpoint() upspin.Endpoint {
 	return d.endpoint
+}
+
+// Configure implements Service.
+func (d *Directory) Configure(options ...string) error {
+	return nil
 }
 
 // ServerUserName implements Dialer.

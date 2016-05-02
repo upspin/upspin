@@ -67,13 +67,18 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 }
 
 // Dial implements upspin.User.Dial.
-func (c *userCache) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (c *userCache) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return c, nil
 }
 
 // ServerUserName implements upspin.User.ServerUserName.
 func (c *userCache) ServerUserName() string {
 	return c.uncached.ServerUserName()
+}
+
+// Configure implements upspin.Service.
+func (c *userCache) Configure(options ...string) error {
+	return nil
 }
 
 // SetDuration sets the duration until entries expire.  Primarily

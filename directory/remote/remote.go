@@ -80,7 +80,14 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return resp.Entry, err
 }
 
-// Methods to implement upspin.Dialer
+// Methods to implement upspin.Service
+
+// Configure implements upspin.Service.
+func (r *remote) Configure(options ...string) error {
+	return nil
+}
+
+// Methods to implement upspin.Dialer.
 
 // ServerUserName implements upspin.Dialer.
 func (r *remote) ServerUserName() string {
@@ -90,7 +97,7 @@ func (r *remote) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
 		return nil, errors.New("remote: unrecognized transport")
 	}
