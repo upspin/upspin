@@ -63,7 +63,7 @@ func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicK
 	return endpoints, keys, nil
 }
 
-func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interface{}, error) {
+func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
 	if context == nil {
 		return nil, newUserError(fmt.Errorf("nil context"), "")
 	}
@@ -76,6 +76,10 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (interfac
 		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
 	}
 	return u, nil
+}
+
+func (u *user) Configure(options ...string) error {
+	return nil
 }
 
 func (u *user) ServerUserName() string {

@@ -155,6 +155,10 @@ func (s *service) ServerUserName() string {
 	return "?"
 }
 
-func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return s, nil
+}
+
+func (s *service) Configure(options ...string) error {
+	return nil
 }

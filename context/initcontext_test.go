@@ -204,9 +204,12 @@ const unimplemented = "unimplemented"
 func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	panic("unimplemented")
 }
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	user := &dummyUser{endpoint: e}
 	return user, nil
+}
+func (d *dummyUser) Configure(options ...string) error {
+	panic("unimplemented")
 }
 func (d *dummyUser) ServerUserName() string {
 	panic("unimplemented")
@@ -218,7 +221,7 @@ func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error
 func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 	panic("unimplemented")
 }
-func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	store := &dummyStore{endpoint: e}
 	return store, nil
 }
@@ -226,6 +229,9 @@ func (d *dummyStore) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
 func (d *dummyStore) ServerUserName() string {
+	panic("unimplemented")
+}
+func (d *dummyStore) Configure(options ...string) error {
 	panic("unimplemented")
 }
 func (d *dummyStore) Delete(ref upspin.Reference) error {
@@ -244,11 +250,14 @@ func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location
 func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	panic("unimplemented")
 }
-func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }
 func (d *dummyDirectory) ServerUserName() string {
+	panic("unimplemented")
+}
+func (d *dummyDirectory) Configure(options ...string) error {
 	panic("unimplemented")
 }
 func (d *dummyDirectory) Delete(name upspin.PathName) error {

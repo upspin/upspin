@@ -785,7 +785,14 @@ func (s *Service) DeleteAll() {
 	s.mu.Unlock()
 }
 
-// Methods to implement upspin.Dialer
+// Methods to implement upspin.Service.
+
+// Configure implements upspin.Service.
+func (s *Service) Configure(options ...string) error {
+	return nil
+}
+
+// Methods to implement upspin.Dialer.
 
 // ServerUserName implements upspin.Dialer.
 func (s *Service) ServerUserName() string {
@@ -795,7 +802,7 @@ func (s *Service) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (interface{}, error) {
+func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testdir: unrecognized transport")
 	}
