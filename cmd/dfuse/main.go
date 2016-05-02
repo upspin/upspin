@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	"bazil.org/fuse"
-	"bazil.org/fuse/fs"
+	"github.com/presotto/fuse"
+	"github.com/presotto/fuse/fs"
 
 	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/upspin"
