@@ -15,6 +15,7 @@ import (
 )
 
 type user struct {
+	upspin.NoConfiguration
 	serverURL  string
 	httpClient netutil.HTTPClientInterface
 }
@@ -76,10 +77,6 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
 	}
 	return u, nil
-}
-
-func (u *user) Configure(options ...string) error {
-	return nil
 }
 
 func (u *user) ServerUserName() string {

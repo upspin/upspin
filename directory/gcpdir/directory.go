@@ -27,6 +27,7 @@ const (
 
 // Directory is an implementation of upspin.Directory that uses GCP to store its data.
 type Directory struct {
+	upspin.NoConfiguration
 	endpoint  upspin.Endpoint
 	serverURL string
 	client    netutil.HTTPClientInterface
@@ -307,11 +308,6 @@ func (d *Directory) Delete(name upspin.PathName) error {
 // Endpoint implements upspin.Directory.Endpoint.
 func (d *Directory) Endpoint() upspin.Endpoint {
 	return d.endpoint
-}
-
-// Configure implements Service.
-func (d *Directory) Configure(options ...string) error {
-	return nil
 }
 
 // ServerUserName implements Dialer.
