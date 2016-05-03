@@ -180,7 +180,7 @@ func (d *Directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Endpoint: parentEndpoint,
 		},
 		Metadata: upspin.Metadata{
-			IsDir:    true,
+			Attr:     upspin.AttrDirectory,
 			Sequence: 0, // don't care?
 			Size:     0, // Being explicit that dir entries have zero size.
 			Time:     d.timeNow(),

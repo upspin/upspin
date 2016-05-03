@@ -239,7 +239,7 @@ func ls(args ...string) {
 
 func printShortDirEntries(de []*upspin.DirEntry) {
 	for _, e := range de {
-		if e.Metadata.IsDir {
+		if e.IsDir() {
 			fmt.Printf("%s/\n", e.Name)
 		} else {
 			fmt.Printf("%s\n", e.Name)
@@ -262,7 +262,7 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 	}
 	for _, e := range de {
 		isDirChar := '_'
-		if e.Metadata.IsDir {
+		if e.IsDir() {
 			isDirChar = 'd'
 			n := len(e.Name)
 			if e.Name[n-1:n] != "/" {

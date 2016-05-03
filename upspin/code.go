@@ -75,17 +75,13 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	b = appendString(b, string(d.Location.Reference))
 
 	// Metadata.
-	//	IsDir: 1 byte (0 false, 1 true)
+	//	Attr: 1 byte bit mask
 	//	Sequence: varint encoded.
 	//	Size: varint encoded.
 	//	Time: varint encoded.
 	//	Packdata: count N, followed by N bytes
 	//	Readers: count N followed by N*(count N, followed by N bytes)
-	if d.Metadata.IsDir {
-		b = append(b, byte(1))
-	} else {
-		b = append(b, byte(0))
-	}
+	b = append(b, byte(d.Metadata.Attr))
 	N := binary.PutVarint(tmp[:], d.Metadata.Sequence)
 	b = append(b, tmp[:N]...)
 	N = binary.PutUvarint(tmp[:], d.Metadata.Size)
@@ -151,7 +147,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	d.Location.Reference = Reference(bytes)
 
 	// Metadata.
-	//	IsDir: 1 byte (0 false, 1 true)
+	//	Attr: 1 byte bit mask
 	//	Sequence: varint encoded.
 	//	Size: varint encoded.
 	//	Time: varint encoded.
@@ -160,7 +156,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	if len(b) < 1 {
 		return nil, ErrTooShort
 	}
-	d.Metadata.IsDir = b[0] != 0
+	d.Metadata.Attr = FileAttributes(b[0])
 	b = b[1:]
 	seq, N := binary.Varint(b)
 	if N == 0 {
@@ -223,4 +219,50 @@ func TimeFromGo(t time.Time) Time {
 // Now returns the current Upspin Time.
 func Now() Time {
 	return TimeFromGo(time.Now())
+}
+
+// IsDir returns true if the entry is for a directory.
+func (d *DirEntry) IsDir() bool {
+	return d.Metadata.Attr == AttrDirectory
+}
+
+// IsRedirect returns true if the entry is a redirection to
+// something perhaps outside of Upspin. It is currently only
+// used by FUSE to represent a symlink.
+func (d *DirEntry) IsRedirect() bool {
+	return d.Metadata.Attr == AttrRedirect
+}
+
+// ErrIncompatible is returned by SetDir and SetRedirect to indicate the
+// current attribute bits are incompatible with a directory or redirect.
+var ErrIncompatible = errors.New("Attribute incompatible with directory entry")
+
+// SetDir marks this entry as a directory. If any other bits are set,
+// it is an error.
+func (d *DirEntry) SetDir() error {
+	if d.Metadata.Attr|AttrDirectory != AttrDirectory {
+		return ErrIncompatible
+	}
+	d.Metadata.Attr = AttrDirectory
+	return nil
+}
+
+// SetRedirect marks this entry as a redirection. If any other bits are set,
+// it is an error.
+func (d *DirEntry) SetRedirect() error {
+	if d.Metadata.Attr|AttrRedirect != AttrRedirect {
+		return ErrIncompatible
+	}
+	d.Metadata.Attr = AttrRedirect
+	return nil
+}
+
+// ClearDir clears the directory bit.
+func (d *DirEntry) ClearDir() {
+	d.Metadata.Attr = d.Metadata.Attr & (^AttrDirectory & 0XFF)
+}
+
+// ClearRedirect clears the redirect bit.
+func (d *DirEntry) ClearRedirect() {
+	d.Metadata.Attr = d.Metadata.Attr & (^AttrRedirect & 0XFF)
 }

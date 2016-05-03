@@ -84,7 +84,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 	if err == nil {
 		return newDirError(op, parsed.Path(), "directory already exists")
 	}
-	if !dirEntry.Metadata.IsDir {
+	if !dirEntry.IsDir() {
 		// We could fix this here, but let's force clients to make their requests crystal clear.
 		return newDirError(op, parsed.Path(), "root is not a directory")
 	}

@@ -120,7 +120,7 @@ func storeDataHelper(t *testing.T, data []byte, name upspin.PathName, packing up
 	entry := &upspin.DirEntry{
 		Name: name,
 		Metadata: upspin.Metadata{
-			IsDir:    false,
+			Attr:     upspin.AttrNone,
 			Size:     uint64(len(data)),
 			Time:     upspin.Now(),
 			Packdata: []byte{byte(packing)},

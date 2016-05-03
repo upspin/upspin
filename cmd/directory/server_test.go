@@ -37,15 +37,15 @@ var (
 			},
 		},
 		Metadata: upspin.Metadata{
-			IsDir: false,
-			Size:  32,
-			Time:  upspin.Now(),
+			Attr: upspin.AttrNone,
+			Size: 32,
+			Time: upspin.Now(),
 		},
 	}
 	dirParent = upspin.DirEntry{
 		Name: upspin.PathName(parentPathName),
 		Metadata: upspin.Metadata{
-			IsDir: true,
+			Attr: upspin.AttrDirectory,
 		},
 	}
 	defaultAccess, _ = access.New(rootAccessFile)
@@ -60,11 +60,12 @@ var (
 				},
 			},
 			Metadata: upspin.Metadata{
-				IsDir: true,
+				Attr: upspin.AttrDirectory,
 			},
 		},
 		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
+	dirVal = fmt.Sprintf("%d", upspin.AttrDirectory)
 	// These are not real keys. Just *valid* keys so authClient does not complain.
 	serverKeys = upspin.KeyPair{
 		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
@@ -94,7 +95,7 @@ func TestPutErrorParseUser(t *testing.T) {
 
 func makeValidMeta() upspin.Metadata {
 	return upspin.Metadata{
-		IsDir:    true,
+		Attr:     upspin.AttrDirectory,
 		Sequence: 0,
 	}
 }
@@ -170,7 +171,7 @@ func TestLookupRoot(t *testing.T) {
 	// The root converted to JSON.
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
 
@@ -189,7 +190,7 @@ func TestLookup(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	// Non-default Location
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -211,7 +212,7 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	rootJSON := toRootJSON(t, &newRoot)
 
 	// Default, zero Location.
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"IsDir":true,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
+	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -358,7 +359,7 @@ func TestPutParentNotDir(t *testing.T) {
 	dirEntryJSON := toJSON(t, dir)
 	// The DirEntry of the parent, converted to JSON.
 	notDirParent := dirParent
-	notDirParent.Metadata.IsDir = false // Parent is not dir!
+	notDirParent.ClearDir() // Parent is not dir!
 	dirParentJSON := toJSON(t, notDirParent)
 
 	rootJSON := toRootJSON(t, &userRoot)
@@ -384,7 +385,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	// The dir entry we're trying to add already exists as a directory.
 	existingDirEntry := dir
-	existingDirEntry.Metadata.IsDir = true
+	existingDirEntry.SetDir()
 	existingDirEntryJSON := toJSON(t, existingDirEntry)
 
 	rootJSON := toRootJSON(t, &userRoot)
@@ -405,7 +406,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 func TestPutDirOverwritesFile(t *testing.T) {
 	// The DirEntry we're trying to Put, converted to JSON.
 	newDir := dir
-	newDir.Metadata.IsDir = true
+	newDir.SetDir()
 	dirEntryJSON := toJSON(t, newDir)
 
 	// The DirEntry of the parent, converted to JSON.
@@ -578,7 +579,7 @@ func TestPutAccessFile(t *testing.T) {
 	dirParent := upspin.DirEntry{
 		Name: upspin.PathName(parentDir),
 		Metadata: upspin.Metadata{
-			IsDir: true,
+			Attr: upspin.AttrDirectory,
 		},
 	}
 	dirParentJSON := toJSON(t, dirParent)
@@ -659,7 +660,7 @@ func TestGroupAccessFile(t *testing.T) {
 	groupParentDir := upspin.DirEntry{
 		Name: upspin.PathName(userName + "/Group"),
 		Metadata: upspin.Metadata{
-			IsDir: true,
+			Attr: upspin.AttrDirectory,
 		},
 	}
 	groupParentDirJSON := toJSON(t, &groupParentDir)
@@ -736,7 +737,7 @@ func TestMarshalRoot(t *testing.T) {
 		dirEntry: upspin.DirEntry{
 			Name: upspin.PathName("me@here.com/"),
 			Metadata: upspin.Metadata{
-				IsDir: true,
+				Attr: upspin.AttrDirectory,
 			},
 		},
 		accessFiles: accessFileDB{accessRoot: acc1, accessRestricted: acc2},
