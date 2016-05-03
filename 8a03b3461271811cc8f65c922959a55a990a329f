@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ed0513ff_7050b823",
+        "filename": "bind/bind_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-03T18:12:19Z",
+      "side": 1,
+      "message": "Why didn\u0027t you just include NoConfiguration?   Just curious.",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 19
+      },
+      "revId": "8a03b3461271811cc8f65c922959a55a990a329f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
