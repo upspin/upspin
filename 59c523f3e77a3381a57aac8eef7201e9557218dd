@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ed4d13b0_3c2771a9",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-03T20:23:35Z",
+      "side": 1,
+      "message": "s/\"A/\"a/",
+      "revId": "59c523f3e77a3381a57aac8eef7201e9557218dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed4d13b0_3c4c9165",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-03T20:23:35Z",
+      "side": 1,
+      "message": "these last two are fine but when would you ever use them?",
+      "revId": "59c523f3e77a3381a57aac8eef7201e9557218dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed4d13b0_7c08d917",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-03T20:23:35Z",
+      "side": 1,
+      "message": "// FileAttributes define the attributes for a DirEntry.",
+      "revId": "59c523f3e77a3381a57aac8eef7201e9557218dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
