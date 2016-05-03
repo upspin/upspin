@@ -303,14 +303,23 @@ type DirEntry struct {
 	Metadata Metadata
 }
 
+// FileAttributes define the attributes for a DirEntry.
+type FileAttributes byte
+
+const (
+	AttrNone      = FileAttributes(0)
+	AttrDirectory = FileAttributes(1 << 0)
+	AttrRedirect  = FileAttributes(1 << 1)
+)
+
 // Metadata stores (among other things) the keys that enable the
 // file to be decrypted by the appropriate recipient.
 type Metadata struct {
-	IsDir    bool   // The file is a directory.
-	Sequence int64  // The sequence (version) number of the item.
-	Size     uint64 // Length of file in bytes.
-	Time     Time   // Time associated with file; might be when it was last written.
-	Packdata []byte // Packing-specific metadata stored in directory.
+	Attr     FileAttributes // File attributes.
+	Sequence int64          // The sequence (version) number of the item.
+	Size     uint64         // Length of file in bytes.
+	Time     Time           // Time associated with file; might be when it was last written.
+	Packdata []byte         // Packing-specific metadata stored in directory.
 }
 
 // Store service.

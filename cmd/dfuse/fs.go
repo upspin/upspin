@@ -248,7 +248,7 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 		defer n.f.Unlock()
 		var de []*upspin.DirEntry
 		for u := range n.f.userDirs {
-			de = append(de, &upspin.DirEntry{Name: upspin.PathName(u), Metadata: upspin.Metadata{IsDir: true}})
+			de = append(de, &upspin.DirEntry{Name: upspin.PathName(u), Metadata: upspin.Metadata{Attr: upspin.AttrDirectory}})
 		}
 		h := allocHandle(n)
 		h.flags = req.Flags
@@ -332,11 +332,11 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 
 	// Make sure the requested type (directory or not) matches.
 	if req.Dir {
-		if !de.Metadata.IsDir {
+		if !de.IsDir() {
 			return enotdir("%q", uname)
 		}
 	} else {
-		if de.Metadata.IsDir {
+		if de.IsDir() {
 			return eisdir("%q", uname)
 		}
 	}
@@ -382,7 +382,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 
 	// Make a node to hand back to fuse.
 	mode := os.FileMode(0700)
-	if de.Metadata.IsDir {
+	if de.IsDir() {
 		mode |= os.ModeDir
 	}
 	nn := n.f.allocNode(n, name, mode, de.Metadata.Size, de.Metadata.Time.Go())

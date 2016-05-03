@@ -175,7 +175,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			Endpoint:  s.store.Endpoint(),
 		},
 		Metadata: upspin.Metadata{
-			IsDir: true,
+			Attr: upspin.AttrDirectory,
 		},
 	}
 	for i := 0; i < parsed.NElem(); i++ {
@@ -195,7 +195,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		this, next = next, this[:0]
 		for _, ent := range this {
 			// ent must refer to a directory.
-			if !ent.Metadata.IsDir {
+			if !ent.IsDir() {
 				continue
 			}
 			payload, err := s.fetchDir(ent.Location.Reference, ent.Name)
@@ -265,7 +265,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 			Reference: ref,
 		},
 		Metadata: upspin.Metadata{
-			IsDir:    true,
+			Attr:     upspin.AttrDirectory,
 			Sequence: seq,
 			Size:     0,
 			Time:     upspin.Now(),
@@ -324,7 +324,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		Reference: ref,
 	}
 	entry := newDirEntry(s.context, parsed.Path())
-	entry.Metadata.IsDir = true
+	entry.SetDir()
 	entry.Location = loc
 	return loc, s.put("MakeDirectory", entry, false)
 }
@@ -449,7 +449,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		if err != nil {
 			return err
 		}
-		if !e.Metadata.IsDir {
+		if !e.IsDir() {
 			return mkStrError(op, parsed.First(i+1).Path(), "not a directory")
 		}
 		entries = append(entries, e)
@@ -472,7 +472,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 				Reference: dirRef,
 			},
 			Metadata: upspin.Metadata{
-				IsDir:    true,
+				Attr:     upspin.AttrDirectory,
 				Sequence: entries[i+1].Metadata.Sequence,
 				Packdata: upspin.Packdata{byte(dirPacking)},
 			},
@@ -529,7 +529,7 @@ func (s *Service) Delete(pathName upspin.PathName) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// If it is a directory, it must be empty.
-	if entry.Metadata.IsDir {
+	if entry.IsDir() {
 		empty, err := s.isEmptyDirectory(entry)
 		if err != nil {
 			return err
@@ -589,7 +589,7 @@ func (s *Service) lookup(parsed path.Parsed) (*upspin.DirEntry, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !entry.Metadata.IsDir {
+		if !entry.IsDir() {
 			return nil, mkStrError("Lookup", parsed.Path(), "not a directory")
 		}
 		dirRef = entry.Location.Reference
@@ -737,7 +737,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		// We found the item with that name.
 		found = true
 		// If it's already there and is not expected to be a directory, this is an error.
-		if !deleting && nextEntry.Metadata.IsDir && !dirOverwriteOK {
+		if !deleting && nextEntry.IsDir() && !dirOverwriteOK {
 			return "", mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
 		}
 		// Drop this entry so we can append the updated one (or skip it, if we're deleting).

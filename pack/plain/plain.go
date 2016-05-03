@@ -56,7 +56,7 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 
 // Name implements upspin.Name.
 func (p plainPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
-	if dirEntry.Metadata.IsDir {
+	if dirEntry.IsDir() {
 		return errors.New("Name: cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
