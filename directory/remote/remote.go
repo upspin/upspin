@@ -15,6 +15,7 @@ import (
 
 // remote implements upspin.Directory.
 type remote struct {
+	upspin.NoConfiguration
 	endpoint  upspin.Endpoint
 	rpcClient *rpc.Client
 }
@@ -78,13 +79,6 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	var resp proto.LookupResponse
 	err := r.rpcClient.Call("Server.Lookup", &req, &resp)
 	return resp.Entry, err
-}
-
-// Methods to implement upspin.Service
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
-	return nil
 }
 
 // Methods to implement upspin.Dialer.

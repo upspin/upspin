@@ -15,6 +15,7 @@ import (
 
 // remote implements upspin.Store.
 type remote struct {
+	upspin.NoConfiguration
 	endpoint  upspin.Endpoint
 	rpcClient *rpc.Client
 }
@@ -52,13 +53,6 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	}
 	var resp proto.DeleteResponse
 	return r.rpcClient.Call("Server.Delete", &req, &resp)
-}
-
-// Methods to implement upspin.Service.
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
-	return nil
 }
 
 // Methods to implement upspin.Dialer

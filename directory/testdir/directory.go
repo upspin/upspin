@@ -33,6 +33,7 @@ var (
 
 // Service implements directories and file-level I/O.
 type Service struct {
+	upspin.NoConfiguration
 	endpoint upspin.Endpoint
 	store    upspin.Store
 	context  *upspin.Context
@@ -783,13 +784,6 @@ func (s *Service) DeleteAll() {
 	s.root = make(map[upspin.UserName]*upspin.DirEntry)
 	s.access = make(map[upspin.PathName]*access.Access)
 	s.mu.Unlock()
-}
-
-// Methods to implement upspin.Service.
-
-// Configure implements upspin.Service.
-func (s *Service) Configure(options ...string) error {
-	return nil
 }
 
 // Methods to implement upspin.Dialer.

@@ -12,6 +12,7 @@ import (
 
 // Service returns data and metadata referenced by the request.
 type Service struct {
+	upspin.NoConfiguration
 	// mu protects the fields below.
 	mu       sync.Mutex
 	endpoint upspin.Endpoint
@@ -69,13 +70,6 @@ func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 		return nil, nil, errors.New("internal hash mismatch in Store.Get")
 	}
 	return copyOf(data), nil, nil
-}
-
-// Methods to implement upspin.Service
-
-// Configure implements upspin.Service.
-func (s *Service) Configure(options ...string) error {
-	return nil
 }
 
 // Methods to implement upspin.Dialer
