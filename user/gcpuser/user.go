@@ -16,6 +16,7 @@ import (
 
 type user struct {
 	upspin.NoConfiguration
+	endpoint   upspin.Endpoint
 	serverURL  string
 	httpClient netutil.HTTPClientInterface
 }
@@ -76,11 +77,16 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 	if !netutil.IsServerReachable(u.serverURL) {
 		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
 	}
+	u.endpoint = endpoint
 	return u, nil
 }
 
 func (u *user) ServerUserName() string {
 	return "GCP User"
+}
+
+func (u *user) Endpoint() upspin.Endpoint {
+	return u.endpoint
 }
 
 // Implements Error

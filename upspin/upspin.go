@@ -203,6 +203,7 @@ const (
 // The User interface provides access to public information about users.
 type User interface {
 	Dialer
+	Service
 
 	// Lookup returns a list (slice) of Endpoints of Directory
 	// services that may hold the root directory for the named
@@ -231,9 +232,7 @@ type KeyPair struct {
 // The Directory service manages the name space for one or more users.
 type Directory interface {
 	Dialer
-
-	// Endpoint returns the network endpoint of the server.
-	Endpoint() Endpoint
+	Service
 
 	// Lookup returns the directory entry for the named file.
 	Lookup(name PathName) (*DirEntry, error)
@@ -319,6 +318,7 @@ type Metadata struct {
 // The Store service saves and retrieves data without interpretation.
 type Store interface {
 	Dialer
+	Service
 
 	// Get attempts to retrieve the data identified by the reference.
 	// Three things might happen:
@@ -340,9 +340,6 @@ type Store interface {
 	// same key will fail. If a key is not found, an error is
 	// returned.
 	Delete(ref Reference) error
-
-	// Endpoint returns the network endpoint of the server.
-	Endpoint() Endpoint
 }
 
 // Client API.
@@ -459,18 +456,21 @@ type Context struct {
 type Dialer interface {
 	// Dial connects to the service and performs any needed authentication.
 	Dial(*Context, Endpoint) (Service, error)
+}
+
+// Service is the general interface returned by a dialer. It includes
+// methods to configure the service and report its setup.
+type Service interface {
+	// Configure configures a service once it has been dialed.
+	// The details of the configuration are implementation-defined.
+	Configure(options ...string) error
+
+	// Endpoint returns the network endpoint of the server.
+	Endpoint() Endpoint
 
 	// ServerUserName returns the authenticated user name of the server.
 	// If there is no authenticated name an empty string is returned.
 	// TODO(p): Should I distinguish a server which didn't pass authentication
 	// from one which has no user name?
 	ServerUserName() string
-}
-
-// Service is the general interface returned by a dialer. It includes
-// methods to configure the service.
-type Service interface {
-	// Configure configures a service once it has been dialed.
-	// The details of the configuration are implementation-defined.
-	Configure(options ...string) error
 }

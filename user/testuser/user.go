@@ -14,6 +14,8 @@ import (
 // Service maps user names to potential machines holding root of the user's tree.
 // It implements the upspin.User interface.
 type Service struct {
+	endpoint upspin.Endpoint
+
 	// mu protects the fields below.
 	mu       sync.RWMutex
 	root     map[upspin.UserName][]upspin.Endpoint
@@ -115,6 +117,9 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 func (s *Service) Configure(options ...string) error {
 	return nil
 }
+func (s *Service) Endpoint() upspin.Endpoint {
+	return s.endpoint
+}
 
 // Methods to implement upspin.Dialer
 
@@ -129,6 +134,7 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("testuser: unrecognized transport")
 	}
+	s.endpoint = e
 	return s, nil
 }
 

@@ -81,6 +81,11 @@ func (c *userCache) Configure(options ...string) error {
 	return nil
 }
 
+// Endpoint implements upspin.Service.
+func (c *userCache) Endpoint() upspin.Endpoint {
+	panic("unimplemented")
+}
+
 // SetDuration sets the duration until entries expire.  Primarily
 // intended for testing.
 func (c *userCache) SetDuration(d time.Duration) {
