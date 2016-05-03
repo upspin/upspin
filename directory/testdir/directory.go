@@ -786,9 +786,7 @@ func (s *Service) DeleteAll() {
 	s.mu.Unlock()
 }
 
-// Methods to implement upspin.Dialer.
-
-// ServerUserName implements upspin.Dialer.
+// ServerUserName implements upspin.Service.
 func (s *Service) ServerUserName() string {
 	return "" // No one is authenticated.
 }
