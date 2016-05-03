@@ -25,6 +25,7 @@ const (
 
 // Store is an implementation of upspin.Store that uses GCP to manage its storage.
 type Store struct {
+	upspin.NoConfiguration
 	serverURL  string
 	httpClient netutil.HTTPClientInterface
 }
@@ -71,11 +72,6 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.
 // ServerUserName implements Dialer.
 func (s *Store) ServerUserName() string {
 	return "GCP Store"
-}
-
-// Configure implements upspin.Service.
-func (s *Store) Configure(options ...string) error {
-	return nil
 }
 
 // Get implements Store.
