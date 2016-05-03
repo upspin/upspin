@@ -50,3 +50,27 @@ type WhichAccessRequest struct {
 type WhichAccessResponse struct {
 	Name upspin.PathName
 }
+
+// Types for the methods of upspin.Service.
+// TODO: Put somewhere shared?
+
+type ConfigureRequest struct {
+	Options []string
+}
+
+type ConfigureResponse struct {
+}
+
+type EndpointRequest struct {
+}
+
+type EndpointResponse struct {
+	Endpoint upspin.Endpoint
+}
+
+type ServerUserNameRequest struct {
+}
+
+type ServerUserNameResponse struct {
+	UserName string
+}

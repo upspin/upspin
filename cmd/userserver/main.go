@@ -12,10 +12,10 @@ import (
 	"os"
 
 	"upspin.googlesource.com/upspin.git/context"
-	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/user/proto"
 
-	// TODO: Other than the directory implementations, most of these
+	// TODO: Other than the user implementations, most of these
 	// are only necessary because of InitContext.
 
 	// Load useful packers
@@ -35,8 +35,8 @@ import (
 )
 
 var (
-	port    = flag.Int("port", 8081, "TCP port number")
-	ctxfile = flag.String("context", os.Getenv("HOME")+"/upspin/rc.dirserver", "context file to use to configure server")
+	port    = flag.Int("port", 8082, "TCP port number")
+	ctxfile = flag.String("context", os.Getenv("HOME")+"/upspin/rc.userserver", "context file to use to configure server")
 )
 
 type Server struct {
@@ -73,62 +73,17 @@ func main() {
 }
 
 func (s *Server) Lookup(req *proto.LookupRequest, resp *proto.LookupResponse) (err error) {
-	log.Printf("Lookup %q", req.Name)
-	resp.Entry, err = s.context.Directory.Lookup(req.Name)
+	log.Printf("Lookup %q", req.UserName)
+	resp.Endpoints, resp.PublicKeys, err = s.context.User.Lookup(req.UserName)
 	if err != nil {
-		log.Printf("Lookup %q failed: %v", req.Name, err)
-	}
-	return err
-}
-
-func (s *Server) Put(req *proto.PutRequest, resp *proto.PutResponse) error {
-	log.Printf("Put %q", req.Entry.Name)
-	err := s.context.Directory.Put(req.Entry)
-	if err != nil {
-		log.Printf("Put %q failed: %v", req.Entry.Name, err)
-	}
-	return err
-}
-
-func (s *Server) MakeDirectory(req *proto.MakeDirectoryRequest, resp *proto.MakeDirectoryResponse) (err error) {
-	log.Printf("MakeDirectory %q", req.Name)
-	resp.Location, err = s.context.Directory.MakeDirectory(req.Name)
-	if err != nil {
-		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
-	}
-	return err
-}
-
-func (s *Server) Glob(req *proto.GlobRequest, resp *proto.GlobResponse) (err error) {
-	log.Printf("Glob %q", req.Pattern)
-	resp.Entries, err = s.context.Directory.Glob(req.Pattern)
-	if err != nil {
-		log.Printf("Glob %q failed: %v", req.Pattern, err)
-	}
-	return err
-}
-
-func (s *Server) Delete(req *proto.DeleteRequest, resp *proto.DeleteResponse) error {
-	log.Printf("Delete %q", req.Name)
-	err := s.context.Directory.Delete(req.Name)
-	if err != nil {
-		log.Printf("Delete %q failed: %v", req.Name, err)
-	}
-	return err
-}
-
-func (s *Server) WhichAccess(req *proto.WhichAccessRequest, resp *proto.WhichAccessResponse) (err error) {
-	log.Printf("WhichAccess %q", req.Name)
-	resp.Name, err = s.context.Directory.WhichAccess(req.Name)
-	if err != nil {
-		log.Printf("WhichAccess %q failed: %v", req.Name, err)
+		log.Printf("Lookup %q failed: %v", req.UserName, err)
 	}
 	return err
 }
 
 func (s *Server) Configure(req *proto.ConfigureRequest, resp *proto.ConfigureResponse) error {
 	log.Printf("Configure %q", req.Options)
-	err := s.context.Directory.Configure(req.Options...)
+	err := s.context.User.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
@@ -137,12 +92,12 @@ func (s *Server) Configure(req *proto.ConfigureRequest, resp *proto.ConfigureRes
 
 func (s *Server) Endpoint(req *proto.EndpointRequest, resp *proto.EndpointResponse) error {
 	log.Print("Endpoint")
-	resp.Endpoint = s.context.Directory.Endpoint()
+	resp.Endpoint = s.context.User.Endpoint()
 	return nil
 }
 
 func (s *Server) ServerUserName(req *proto.ServerUserNameRequest, resp *proto.ServerUserNameResponse) error {
 	log.Print("ServerUserName")
-	resp.UserName = s.context.Directory.ServerUserName()
+	resp.UserName = s.context.User.ServerUserName()
 	return nil
 }

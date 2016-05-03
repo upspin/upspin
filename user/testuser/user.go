@@ -121,9 +121,7 @@ func (s *Service) Endpoint() upspin.Endpoint {
 	return s.endpoint
 }
 
-// Methods to implement upspin.Dialer
-
-// ServerUserName implements upspin.Dialer.
+// ServerUserName implements upspin.Service.
 func (s *Service) ServerUserName() string {
 	return "testuser"
 }

@@ -98,3 +98,24 @@ func (s *Server) Delete(req *proto.DeleteRequest, resp *proto.DeleteResponse) er
 	}
 	return err
 }
+
+func (s *Server) Configure(req *proto.ConfigureRequest, resp *proto.ConfigureResponse) error {
+	log.Printf("Configure %q", req.Options)
+	err := s.context.Store.Configure(req.Options...)
+	if err != nil {
+		log.Printf("Configure %q failed: %v", req.Options, err)
+	}
+	return err
+}
+
+func (s *Server) Endpoint(req *proto.EndpointRequest, resp *proto.EndpointResponse) error {
+	log.Print("Endpoint")
+	resp.Endpoint = s.context.Store.Endpoint()
+	return nil
+}
+
+func (s *Server) ServerUserName(req *proto.ServerUserNameRequest, resp *proto.ServerUserNameResponse) error {
+	log.Print("ServerUserName")
+	resp.UserName = s.context.Store.ServerUserName()
+	return nil
+}
