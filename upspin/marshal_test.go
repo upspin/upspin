@@ -15,7 +15,7 @@ var dirEnt = DirEntry{
 		Reference: "Chubb",
 	},
 	Metadata: Metadata{
-		IsDir:    true,
+		Attr:     AttrDirectory,
 		Sequence: 1234,
 		Size:     12345,
 		Time:     123456,

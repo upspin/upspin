@@ -42,7 +42,7 @@ var (
 		Name:     pathName,
 		Location: location,
 		Metadata: upspin.Metadata{
-			IsDir:    false,
+			Attr:     upspin.AttrNone,
 			Sequence: 17,
 			Size:     uint64(len(fileContents)),
 			Time:     now,
@@ -76,7 +76,7 @@ func TestMkdir(t *testing.T) {
 	mkdirEntry := dirEntry
 	mkdirEntry.Location.Reference = ""
 	mkdirEntry.Metadata = upspin.Metadata{
-		IsDir:    true,
+		Attr:     upspin.AttrDirectory,
 		Time:     42,
 		Size:     0,
 		Sequence: 0,
@@ -174,7 +174,7 @@ func dirEntryEquals(a, b *upspin.DirEntry) bool {
 		log.Println("Pathnames differ")
 		return false
 	}
-	if a.Metadata.IsDir != b.Metadata.IsDir {
+	if a.IsDir() != b.IsDir() {
 		log.Println("IsDir differ")
 		return false
 	}

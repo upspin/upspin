@@ -171,7 +171,7 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
-	if dirEntry.Metadata.IsDir && !canCreate || !dirEntry.Metadata.IsDir && !canWrite {
+	if dirEntry.IsDir() && !canCreate || !dirEntry.IsDir() && !canWrite {
 		return newDirError(op, dirEntry.Name, access.ErrPermissionDenied.Error())
 	}
 	// Find parent.
@@ -185,7 +185,7 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 		return err
 	}
 	// Verify parent IsDir (redundant, but just to be safe).
-	if !parentDirEntry.Metadata.IsDir {
+	if !parentDirEntry.IsDir() {
 		logErr.Printf("WARN: bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
 		return newDirError(op, parsed.Path(), "parent is not a directory")
 	}
@@ -198,10 +198,10 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 
 	}
 	if err == nil {
-		if existingDirEntry.Metadata.IsDir {
+		if existingDirEntry.IsDir() {
 			return newDirError(op, canonicalPath, "directory already exists")
 		}
-		if dirEntry.Metadata.IsDir {
+		if dirEntry.IsDir() {
 			return newDirError(op, canonicalPath, "overwriting file with directory")
 		}
 	}
@@ -423,7 +423,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	}
 	parsedPath := parsed.Path()
 	// Only empty directories can be removed.
-	if dirEntry.Metadata.IsDir {
+	if dirEntry.IsDir() {
 		err = d.isDirEmpty(parsedPath)
 		if err != nil {
 			return newDirError(op, parsedPath, err.Error())
