@@ -55,9 +55,7 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	return r.rpcClient.Call("Server.Delete", &req, &resp)
 }
 
-// Methods to implement upspin.Dialer
-
-// ServerUserName implements upspin.Dialer.
+// ServerUserName implements upspin.Service.
 func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
 }

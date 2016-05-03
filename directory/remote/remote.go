@@ -81,9 +81,7 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return resp.Entry, err
 }
 
-// Methods to implement upspin.Dialer.
-
-// ServerUserName implements upspin.Dialer.
+// ServerUserName implements upspin.Service.
 func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
 }

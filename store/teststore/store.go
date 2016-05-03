@@ -72,9 +72,7 @@ func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 	return copyOf(data), nil, nil
 }
 
-// Methods to implement upspin.Dialer
-
-// ServerUserName implements upspin.Dialer
+// ServerUserName implements upspin.Service.
 func (s *Service) ServerUserName() string {
 	return "testuser"
 }
