@@ -214,6 +214,9 @@ func (d *dummyUser) Configure(options ...string) error {
 func (d *dummyUser) ServerUserName() string {
 	panic("unimplemented")
 }
+func (d *dummyUser) Endpoint() upspin.Endpoint {
+	panic("unimplemented")
+}
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	panic("unimplemented")

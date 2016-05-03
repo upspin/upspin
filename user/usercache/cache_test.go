@@ -159,6 +159,10 @@ func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	return s, nil
 }
 
+func (s *service) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{}
+}
+
 func (s *service) Configure(options ...string) error {
 	return nil
 }

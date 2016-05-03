@@ -57,6 +57,9 @@ type dummyDirectory struct {
 func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	return nil, nil, errors.New("dummyUser.Lookup not implemented")
 }
+func (d *dummyUser) Endpoint() upspin.Endpoint {
+	return d.endpoint
+}
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	user := &dummyUser{endpoint: e}
 	return user, nil
