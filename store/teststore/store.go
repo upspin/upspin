@@ -10,17 +10,33 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// Service returns data and metadata referenced by the request.
-type Service struct {
+// service returns data and metadata referenced by the request.
+// There is one for each Dial call.
+type service struct {
 	upspin.NoConfiguration
-	// mu protects the fields below.
-	mu       sync.Mutex
-	endpoint upspin.Endpoint
-	blob     map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
+	// userName identifies the user accessing the service. TODO: unused.
+	userName upspin.UserName
+	data     *dataService
 }
 
-// This package (well, the Servie type) implements the upspin.Store interface.
-var _ upspin.Store = (*Service)(nil)
+// A dataService is the underlying service object.
+// There is one for the entire system, created in init.
+type dataService struct {
+	endpoint upspin.Endpoint
+	// mu protects the fields of dataService.
+	mu sync.Mutex
+	// ownerName identifies the user running the dataService. TODO: unused.
+	ownerName upspin.UserName
+	// users maintains a cache of existing service objects.
+	// Note the key is by value, so multiple equivalent contexts will end up
+	// with the same service.
+	user map[upspin.Context]*service
+	// blob contains the underlying data.
+	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
+}
+
+// This package (well, the service type) implements the upspin.Store interface.
+var _ upspin.Store = (*service)(nil)
 
 func copyOf(in []byte) (out []byte) {
 	out = make([]byte, len(in))
@@ -29,40 +45,40 @@ func copyOf(in []byte) (out []byte) {
 }
 
 // Endpoint implements upspin.Store
-func (s *Service) Endpoint() upspin.Endpoint {
-	return s.endpoint
+func (s *service) Endpoint() upspin.Endpoint {
+	return s.data.endpoint
 }
 
 // Put implements upspin.Store
-func (s *Service) Put(ciphertext []byte) (upspin.Reference, error) {
+func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 	ref := upspin.Reference(sha256key.Of(ciphertext).String())
-	s.mu.Lock()
-	s.blob[ref] = ciphertext
-	s.mu.Unlock()
+	s.data.mu.Lock()
+	s.data.blob[ref] = ciphertext
+	s.data.mu.Unlock()
 	return ref, nil
 }
 
 // Delete implements upspin.Store
-func (s *Service) Delete(upspin.Reference) error {
+func (s *service) Delete(upspin.Reference) error {
 	return errors.New("Not implemented yet")
 }
 
 // DeleteAll deletes all data from memory.
-func (s *Service) DeleteAll() {
-	s.mu.Lock()
-	s.blob = make(map[upspin.Reference][]byte)
-	s.mu.Unlock()
+func (s *service) DeleteAll() {
+	s.data.mu.Lock()
+	s.data.blob = make(map[upspin.Reference][]byte)
+	s.data.mu.Unlock()
 }
 
 // Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
-func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
+func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
 	if ref == "" {
 		return nil, nil, errors.New("empty reference")
 	}
-	s.mu.Lock()
-	data, ok := s.blob[ref]
-	s.mu.Unlock()
+	s.data.mu.Lock()
+	data, ok := s.data.blob[ref]
+	s.data.mu.Unlock()
 	if !ok {
 		return nil, nil, errors.New("no such blob")
 	}
@@ -72,30 +88,47 @@ func (s *Service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 	return copyOf(data), nil, nil
 }
 
-// ServerUserName implements upspin.Service.
-func (s *Service) ServerUserName() string {
+// ServerUserName implements upspin.service.
+func (s *service) ServerUserName() string {
 	return "testuser"
 }
 
-// Dial always returns the same instance, so there is only one instance of the service
-// running in the address space. It ignores the address within the endpoint but
-// requires that the transport be InProcess.
-func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+// Dial always returns an authenticated instance to the underlying service.
+// There is only one data set in the address space.
+// Dial ignores the address within the endpoint but requires that the transport be InProcess.
+// TODO: Authenticate the caller.
+func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.New("teststore: unrecognized transport")
 	}
-	return s, nil
+	s.data.mu.Lock()
+	defer s.data.mu.Unlock()
+	if s.data.ownerName == "" {
+		// This is the first call; set the owner.
+		s.data.ownerName = context.UserName
+	}
+	// Is there already a service for this user?
+	if thisUser := s.data.user[*context]; thisUser != nil {
+		return thisUser, nil
+	}
+	thisUser := *s // Make a copy.
+	thisUser.userName = context.UserName
+	s.data.user[*context] = &thisUser
+	return &thisUser, nil
 }
 
 const transport = upspin.InProcess
 
 func init() {
-	s := &Service{
-		endpoint: upspin.Endpoint{
-			Transport: upspin.InProcess,
-			NetAddr:   "", // Ignored.
+	s := &service{
+		data: &dataService{
+			endpoint: upspin.Endpoint{
+				Transport: upspin.InProcess,
+				NetAddr:   "", // Ignored.
+			},
+			user: make(map[upspin.Context]*service),
+			blob: make(map[upspin.Reference][]byte),
 		},
-		blob: make(map[upspin.Reference][]byte),
 	}
 	bind.RegisterStore(transport, s)
 }
