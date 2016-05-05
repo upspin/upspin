@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/rpc"
 	"strings"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/directory/proto"
@@ -20,6 +21,12 @@ type remote struct {
 	userName  upspin.UserName
 	id        int
 	rpcClient *rpc.Client
+}
+
+// connections contains a list of all extant connections.
+var connections struct {
+	sync.Mutex
+	c []*remote
 }
 
 var _ upspin.Directory = (*remote)(nil)
@@ -112,6 +119,17 @@ func (*remote) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
+	// If we already have an authenticated dial for the endpoint and user
+	// return it.
+	connections.Lock()
+	for _, r := range connections.c {
+		if r.endpoint.NetAddr == endpoint.NetAddr && r.userName == context.UserName {
+			connections.Unlock()
+			return r, nil
+		}
+	}
+	connections.Unlock()
+
 	r := &remote{
 		endpoint: endpoint,
 		userName: context.UserName,
@@ -133,6 +151,9 @@ func (*remote) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 		return nil, err
 	}
 
+	connections.Lock()
+	connections.c = append(connections.c, r)
+	connections.Unlock()
 	return r, nil
 }
 
