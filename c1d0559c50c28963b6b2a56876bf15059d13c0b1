@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2d772b10_43e199e0",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-05T02:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d772b10_bb727bd2",
+      "revId": "c1d0559c50c28963b6b2a56876bf15059d13c0b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d772b10_fb7cf3a6",
         "filename": "store/teststore/store.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "2d772b10_63e695fb",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-05T02:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d772b10_fb7cf3a6",
+      "revId": "c1d0559c50c28963b6b2a56876bf15059d13c0b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d772b10_7bbac3ee",
         "filename": "store/teststore/store.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-05-05T00:20:28Z",
       "side": 1,
       "message": "just for my understanding...\nAre you making a copy here in order to prevent problems if the caller modifies the return value?    I\u0027m guessing that can\u0027t happen if it is returned across the network.",
+      "revId": "c1d0559c50c28963b6b2a56876bf15059d13c0b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d772b10_83eb91be",
+        "filename": "store/teststore/store.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-05T02:40:19Z",
+      "side": 1,
+      "message": "correct. but this also can be run in the same address.",
+      "parentUuid": "2d772b10_7bbac3ee",
       "revId": "c1d0559c50c28963b6b2a56876bf15059d13c0b1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
