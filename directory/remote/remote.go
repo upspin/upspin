@@ -17,10 +17,17 @@ import (
 type remote struct {
 	upspin.NoConfiguration
 	endpoint  upspin.Endpoint
+	userName  upspin.UserName
+	id        int
 	rpcClient *rpc.Client
 }
 
 var _ upspin.Directory = (*remote)(nil)
+
+// call calls the RPC method for the user associated with the remote.
+func (r *remote) call(method string, req, resp interface{}) error {
+	return r.rpcClient.Call(fmt.Sprintf("Server_%d.%s", r.id, method), req, resp)
+}
 
 // Glob implements upspin.Directory.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
@@ -28,7 +35,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Pattern: pattern,
 	}
 	var resp proto.GlobResponse
-	err := r.rpcClient.Call("Server.Glob", &req, &resp)
+	err := r.call("Glob", &req, &resp)
 	return resp.Entries, err
 }
 
@@ -38,7 +45,7 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, 
 		Name: directoryName,
 	}
 	var resp proto.MakeDirectoryResponse
-	err := r.rpcClient.Call("Server.MakeDirectory", &req, &resp)
+	err := r.call("MakeDirectory", &req, &resp)
 	return resp.Location, err
 }
 
@@ -49,7 +56,7 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 		Entry: entry,
 	}
 	var resp proto.PutResponse
-	return r.rpcClient.Call("Server.Put", &req, &resp)
+	return r.call("Put", &req, &resp)
 }
 
 // WhichAccess implements upspin.Directory.WhichAccess.
@@ -58,7 +65,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) 
 		Name: pathName,
 	}
 	var resp proto.WhichAccessResponse
-	err := r.rpcClient.Call("Server.WhichAccess", &req, &resp)
+	err := r.call("WhichAccess", &req, &resp)
 	return resp.Name, err
 }
 
@@ -68,7 +75,7 @@ func (r *remote) Delete(pathName upspin.PathName) error {
 		Name: pathName,
 	}
 	var resp proto.DeleteResponse
-	return r.rpcClient.Call("Server.Delete", &req, &resp)
+	return r.call("Delete", &req, &resp)
 }
 
 // Lookup implements upspin.Directory.Lookup.
@@ -77,8 +84,19 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		Name: pathName,
 	}
 	var resp proto.LookupResponse
-	err := r.rpcClient.Call("Server.Lookup", &req, &resp)
+	err := r.call("Lookup", &req, &resp)
 	return resp.Entry, err
+}
+
+// Authenticate tells the server which user this is.
+// TODO: Do something cryptographic.
+func (r *remote) Authenticate(userName upspin.UserName) (int, error) {
+	req := &proto.AuthenticateRequest{
+		UserName: userName,
+	}
+	var resp proto.AuthenticateResponse
+	err := r.rpcClient.Call("Server.Authenticate", &req, &resp)
+	return resp.ID, err
 }
 
 // ServerUserName implements upspin.Service.
@@ -89,13 +107,18 @@ func (r *remote) ServerUserName() string {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	if e.Transport != upspin.Remote {
+func (*remote) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
+	if endpoint.Transport != upspin.Remote {
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
+	r := &remote{
+		endpoint: endpoint,
+		userName: context.UserName,
+	}
+
 	var err error
-	addr := string(e.NetAddr)
+	addr := string(endpoint.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"):
 		r.rpcClient, err = rpc.DialHTTP("tcp", addr[7:])
@@ -105,7 +128,11 @@ func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servic
 	if err != nil {
 		return nil, err
 	}
-	r.endpoint = e
+	r.id, err = r.Authenticate(context.UserName)
+	if err != nil {
+		return nil, err
+	}
+
 	return r, nil
 }
 
