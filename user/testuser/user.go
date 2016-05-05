@@ -146,7 +146,8 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
 	if s.db.serviceOwner == "" {
-		// This is the first call; set the owner.
+		// This is the first call; set the owner and endpoint.
+		s.db.endpoint = e
 		s.db.serviceOwner = context.UserName
 	}
 	// Is there already a service for this user?
