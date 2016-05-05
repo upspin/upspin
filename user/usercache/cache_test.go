@@ -32,7 +32,8 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 	s.add("d@d.com")
 
 	c := &upspin.Context{
-		Packing: upspin.DebugPack,
+		UserName: "unused@unused.com",
+		Packing:  upspin.DebugPack,
 	}
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,

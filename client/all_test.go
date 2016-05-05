@@ -17,24 +17,20 @@ import (
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.
 
-var context *upspin.Context
-
-func setupContext() {
-	if context != nil {
-		return
-	}
-
+func newContext(name upspin.UserName) *upspin.Context {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	context = new(upspin.Context)
-	context.KeyPair = upspin.KeyPair{
-		Private: upspin.PrivateKey("privacy is next to lunacy"),
+	context := &upspin.Context{
+		UserName: name,
+		KeyPair: upspin.KeyPair{
+			Private: upspin.PrivateKey("privacy is next to lunacy"),
+		},
+		Packing: upspin.DebugPack, // TODO.
 	}
-	context.Packing = upspin.DebugPack // TODO.
 	var err error
 	context.User, err = bind.User(context, endpoint)
 	if err != nil {
@@ -48,17 +44,18 @@ func setupContext() {
 	if err != nil {
 		panic(err)
 	}
+	return context
 }
 
-func setup(userName upspin.UserName) {
-	setupContext()
-	context.UserName = userName
+func setup(userName upspin.UserName) *upspin.Context {
+	context := newContext(userName)
 	err := context.User.(*testuser.Service).Install(userName, context.Directory)
 	if err != nil {
 		panic(err)
 	}
 	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	context.User.(*testuser.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
+	return context
 }
 
 // TODO: End of copied code.
@@ -68,8 +65,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	setup(user)
-	client := New(context)
+	client := New(setup(user))
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -92,8 +88,7 @@ const (
 )
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
-	setup(user)
-	client := New(context)
+	client := New(setup(user))
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -313,8 +308,7 @@ func TestFileZeroFill(t *testing.T) {
 
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
-	setup(user)
-	client := New(context)
+	client := New(setup(user))
 	var err error
 	var paths []*upspin.DirEntry
 	checkPaths := func(expPaths ...string) {
@@ -352,8 +346,7 @@ func TestGlob(t *testing.T) {
 
 func TestLinkAndRename(t *testing.T) {
 	const user = "link@a.com"
-	setup(user)
-	client := New(context)
+	client := New(setup(user))
 	original := upspin.PathName(fmt.Sprintf("%s/original", user))
 	text := "the rain in spain"
 	if _, err := client.Put(original, []byte(text)); err != nil {
