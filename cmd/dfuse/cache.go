@@ -265,3 +265,27 @@ func (c *cache) cacheName(loc upspin.Location) (string, string) {
 	file := dir + "/" + hash
 	return dir, file
 }
+
+func (c *cache) putRedirect(n *node, target string) error {
+	// Use the client library to write it.
+	loc, err := c.client.Put(n.uname, []byte(target))
+	if err != nil {
+		return eio("writing symlink %s: %s", n.uname, err)
+	}
+
+	// Save it in the cache. If we can't, that's fine.
+	cdir, fname := c.cacheName(loc)
+	file, err := os.Create(fname)
+	if err != nil {
+		os.Mkdir(cdir, 0700)
+		file, err = os.Create(fname)
+		if err != nil {
+			return nil
+		}
+	}
+	if _, err := file.Write([]byte(target)); err != nil {
+		os.Remove(fname)
+	}
+	file.Close()
+	return nil
+}
