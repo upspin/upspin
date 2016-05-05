@@ -12,6 +12,7 @@ import (
 	"github.com/presotto/fuse/fs"
 	xcontext "golang.org/x/net/context"
 
+	"upspin.googlesource.com/upspin.git/client"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -20,6 +21,7 @@ import (
 type upspinFS struct {
 	sync.Mutex                 // Protects concurrent access to the rest of this struct.
 	context    *upspin.Context // Upspin context used for all requests.
+	client     upspin.Client   // A client to use for client methods.
 	dc         *directoryCache // A cache of bindings to user directories.
 	root       *node           // The root of the upspin file system.
 	uid        int             // OS user id of this process' owner.
@@ -63,6 +65,7 @@ type handle struct {
 func newUpspinFS(context *upspin.Context, dc *directoryCache) *upspinFS {
 	f := &upspinFS{
 		context:  context,
+		client:   client.New(context),
 		dc:       dc,
 		uid:      os.Getuid(),
 		gid:      os.Getgid(),
@@ -385,6 +388,9 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	if de.IsDir() {
 		mode |= os.ModeDir
 	}
+	if de.IsRedirect() {
+		mode |= os.ModeSymlink
+	}
 	nn := n.f.allocNode(n, name, mode, de.Metadata.Size, de.Metadata.Time.Go())
 
 	// If this is the root, add an entry for this user directory so ReadDirAll will work.
@@ -552,16 +558,21 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	oldPath := old.(*node).uname
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Link %q to %q/%q", oldPath, newPath)
-	return nil, eio("oops")
+	log.Printf("Link %q to %q", oldPath, newPath)
+	de, err := n.f.client.Link(oldPath, newPath)
+	if err != nil {
+		return nil, err
+	}
+	nn := n.f.allocNode(n, req.NewName, 0700, de.Metadata.Size, time.Unix(int64(de.Metadata.Time), 0))
+	return nn, nil
 }
 
 // Rename implements fs.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
-	oldPath := old.(*node).uname
+	oldPath := path.Join(old.(*node).uname, req.OldName)
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Rename %q to %q/%q", oldPath, newPath)
-	return eio("oops")
+	log.Printf("Rename %q to %q", oldPath, newPath)
+	return n.f.client.Rename(oldPath, newPath)
 }
 
 // The following Xattr calls exist to short circuit any xattr calls.  Without them,
@@ -589,4 +600,35 @@ func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
 func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
 	log.Printf("Removexattr %q", n.uname)
 	return nil
+}
+
+// Symlink implements fs.Symlink.
+func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
+	link := path.Join(n.uname, req.NewName)
+	log.Printf("Symlink %q/%q to %q", link, req.Target)
+	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(req.Target)), time.Now())
+	if err := n.f.cache.putRedirect(nn, req.Target); err != nil {
+		return nil, err
+	}
+	return nn, nil
+}
+
+// Symlink implements fs.Readlink.
+func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string, error) {
+	log.Printf("Readlink %q", n.uname)
+	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
+	if err != nil {
+		return "", err
+	}
+	realh := h.(*handle)
+	defer realh.free()
+	buf := make([]byte, n.attr.Size)
+	l, err := realh.file.ReadAt(buf, 0)
+	if err != nil {
+		return "", err
+	}
+	if uint64(l) != n.attr.Size {
+		return "", eio("short read")
+	}
+	return string(buf), nil
 }
