@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d772b10_81270955",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-05T16:49:06Z",
+      "side": 1,
+      "message": "this is a braces and belts check. write is guaranteed to return an error if the length isn\u0027t right.\n\nthat said, i don\u0027t mind the double check, but i also don\u0027t mind deleting int.\n\ntype Writer interface {\n\tWrite(p []byte) (n int, err error)\n}\n    Writer is the interface that wraps the basic Write method.\n\n    Write writes len(p) bytes from p to the underlying data stream. It returns\n    the number of bytes written from p (0 \u003c\u003d n \u003c\u003d len(p)) and any error\n    encountered that caused the write to stop early. Write must return a non-nil\n    error if it returns n \u003c len(p). Write must not modify the slice data, even\n    temporarily.\n\n    Implementations must not retain p.",
+      "revId": "b2486bca3640fe8cf9524cb9f15f1f5fba859267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
