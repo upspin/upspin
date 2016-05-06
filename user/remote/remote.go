@@ -7,17 +7,29 @@ import (
 	"fmt"
 	"net/rpc"
 	"strings"
+	"sync"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/proto"
 )
 
+// dialContext contains the destination and authenticated user of the dial.
+type dialContext struct {
+	endpoint upspin.Endpoint
+	userName upspin.UserName
+}
+
 // remote implements upspin.User.
 type remote struct {
-	upspin.NoConfiguration // TODO: Change this so configuration can initialize users?
-	endpoint               upspin.Endpoint
-	rpcClient              *rpc.Client
+	ctx       dialContext
+	rpcClient *rpc.Client
+}
+
+// remotes contains a list of all established remote connections.
+var remotes struct {
+	sync.Mutex
+	r map[dialContext]*remote
 }
 
 var _ upspin.User = (*remote)(nil)
@@ -43,13 +55,27 @@ func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
 }
 
-// Dial always returns the same instance, so there is only one instance of the service
-// running in the address space. It ignores the address within the endpoint but
-// requires that the transport be InProcess.
-func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+// Dial implements upspin.Service.
+func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
 		return nil, errors.New("remote: unrecognized transport")
 	}
+
+	r := &remote{
+		ctx: dialContext{
+			endpoint: e,
+			userName: context.UserName,
+		},
+	}
+
+	// If we already have an authenticated dial for the endpoint and user
+	// return it.
+	remotes.Lock()
+	if nr, ok := remotes.r[r.ctx]; ok {
+		remotes.Unlock()
+		return nr, nil
+	}
+	remotes.Unlock()
 
 	var err error
 	addr := string(e.NetAddr)
@@ -62,13 +88,21 @@ func (r *remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servic
 	if err != nil {
 		return nil, err
 	}
-	r.endpoint = e
+
+	remotes.Lock()
+	remotes.r[r.ctx] = r
+	remotes.Unlock()
 	return r, nil
 }
 
 // Endpoint implements upspin.User.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
-	return r.endpoint
+	return r.ctx.endpoint
+}
+
+// Configure implements upspin.Service.
+func (r *remote) Configure(options ...string) error {
+	return nil
 }
 
 const transport = upspin.Remote
@@ -76,4 +110,5 @@ const transport = upspin.Remote
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterUser(transport, r)
+	remotes.r = make(map[dialContext]*remote)
 }
