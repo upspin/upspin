@@ -164,7 +164,6 @@ func unpackDirBlob(context *upspin.Context, ciphertext []byte, name upspin.PathN
 func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err != nil {
-		fmt.Printf("oops 1: %s\n", pattern)
 		return nil, err
 	}
 	s.db.mu.RLock()
@@ -228,7 +227,6 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				payload = remaining
 				parsed, err := path.Parse(nextEntry.Name)
 				if err != nil {
-					fmt.Printf("oops 2: %s\n", pattern)
 					return nil, err
 				}
 				// No need to check error; pattern is validated above.

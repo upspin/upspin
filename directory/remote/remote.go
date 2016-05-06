@@ -23,10 +23,10 @@ type remote struct {
 	rpcClient *rpc.Client
 }
 
-// connections contains a list of all extant connections.
-var connections struct {
+// remotes contains a list of all established remote connections.
+var remotes struct {
 	sync.Mutex
-	c []*remote
+	r map[string]*remote
 }
 
 var _ upspin.Directory = (*remote)(nil)
@@ -121,14 +121,13 @@ func (*remote) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 
 	// If we already have an authenticated dial for the endpoint and user
 	// return it.
-	connections.Lock()
-	for _, r := range connections.c {
-		if r.endpoint.NetAddr == endpoint.NetAddr && r.userName == context.UserName {
-			connections.Unlock()
-			return r, nil
-		}
+	key := string(context.UserName) + "@" + string(endpoint.NetAddr)
+	remotes.Lock()
+	if r, ok := remotes.r[key]; ok {
+		remotes.Unlock()
+		return r, nil
 	}
-	connections.Unlock()
+	remotes.Unlock()
 
 	r := &remote{
 		endpoint: endpoint,
@@ -151,9 +150,9 @@ func (*remote) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 		return nil, err
 	}
 
-	connections.Lock()
-	connections.c = append(connections.c, r)
-	connections.Unlock()
+	remotes.Lock()
+	remotes.r[key] = r
+	remotes.Unlock()
 	return r, nil
 }
 
@@ -167,4 +166,5 @@ const transport = upspin.Remote
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterDirectory(transport, r)
+	remotes.r = make(map[string]*remote)
 }
