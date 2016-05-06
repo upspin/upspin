@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd1bef59_c3fef679",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-06T20:14:36Z",
+      "side": 1,
+      "message": "this is fine an simple. you could also use a struct by value. either works.",
+      "revId": "755bb999b18e9877eceaf3cdfaa609e018c64d37",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd1bef59_a3e01adf",
+        "filename": "path/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-06T20:14:36Z",
+      "side": 1,
+      "message": "this looks wrong",
+      "revId": "755bb999b18e9877eceaf3cdfaa609e018c64d37",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
