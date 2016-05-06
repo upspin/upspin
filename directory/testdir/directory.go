@@ -167,8 +167,8 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, err
 	}
 	s.db.mu.RLock()
-	defer s.db.mu.RUnlock()
 	dirEntry, ok := s.db.root[parsed.User()]
+	s.db.mu.RUnlock()
 	if !ok {
 		return nil, mkStrError("Glob", upspin.PathName(parsed.User()), "no such user")
 	}
@@ -212,7 +212,9 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			if !ent.IsDir() {
 				continue
 			}
+			s.db.mu.RLock()
 			payload, err := s.fetchDir(ent.Location.Reference, ent.Name)
+			s.db.mu.RUnlock()
 			if err != nil {
 				return nil, mkStrError("Glob", ent.Name, "internal error: invalid reference: "+err.Error())
 			}
