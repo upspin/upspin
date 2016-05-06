@@ -16,6 +16,24 @@
       "revId": "b2486bca3640fe8cf9524cb9f15f1f5fba859267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d6817a0_dc826111",
+        "filename": "cmd/dfuse/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-06T17:58:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d772b10_81270955",
+      "revId": "b2486bca3640fe8cf9524cb9f15f1f5fba859267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
