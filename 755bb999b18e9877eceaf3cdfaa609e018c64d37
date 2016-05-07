@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cd1bef59_a33ada85",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-07T18:18:03Z",
+      "side": 1,
+      "message": "I am paying extra for an allocation here so I could do the struct value instead.   Have to add it to all the rest anyways so I might as well make it cheap.",
+      "parentUuid": "cd1bef59_c3fef679",
+      "revId": "755bb999b18e9877eceaf3cdfaa609e018c64d37",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cd1bef59_a3e01adf",
         "filename": "path/path.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-06T20:14:36Z",
       "side": 1,
       "message": "this looks wrong",
+      "revId": "755bb999b18e9877eceaf3cdfaa609e018c64d37",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd1bef59_034ace16",
+        "filename": "path/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-07T18:18:03Z",
+      "side": 1,
+      "message": "Ya, I\u0027d already git mail\u0027d another version without it.",
+      "parentUuid": "cd1bef59_a3e01adf",
       "revId": "755bb999b18e9877eceaf3cdfaa609e018c64d37",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
