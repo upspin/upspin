@@ -369,7 +369,8 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		}
 	}
 
-	// Update the directory entry with the new name.
+	// Update the directory entry with the new name and sequence.
+	entry.Metadata.Sequence = 0
 	if err := packer.Name(c.context, entry, newName); err != nil {
 		return nil, err
 	}
