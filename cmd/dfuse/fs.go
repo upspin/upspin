@@ -556,6 +556,12 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 	return err
 }
 
+// Fsync implements fs.NodeFsyncer.Fsync.
+func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
+	log.Printf("Fsync %q", n.uname)
+	return nil
+}
+
 // Link implements fs.Link. It creates a new node in directory n that points to the same
 // reference as old.
 func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
