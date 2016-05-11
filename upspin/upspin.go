@@ -28,7 +28,7 @@ const (
 	GCP
 
 	// Remote indicates a connection to a remote server through RPC.
-	// The Endpoint's location contains the HTTP address of the remote server.
+	// The Endpoint's NetAddr contains the HTTP address of the remote server.
 	Remote
 )
 

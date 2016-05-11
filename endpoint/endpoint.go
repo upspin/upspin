@@ -36,7 +36,7 @@ func String(ep *upspin.Endpoint) string {
 	case upspin.InProcess:
 		return "inprocess"
 	case upspin.Remote:
-		return "remote"
+		return fmt.Sprintf("remote,%s", string(ep.NetAddr))
 	}
 	return fmt.Sprintf("%v", ep)
 }
