@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f25894e7_c4d393e2",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:30:30Z",
+      "side": 1,
+      "message": "We have readers now, but we\u0027d have to call WhichAccess, fetch it and parse it. I can try implementing this at some point, but it\u0027s low priority given the other stuff on my plate.",
+      "revId": "f52948535e1425142b28146599bd58adc477902c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
