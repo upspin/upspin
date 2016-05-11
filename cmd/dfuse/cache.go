@@ -6,7 +6,9 @@ import (
 	"log"
 	"os"
 	filepath "path"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/presotto/fuse"
 
@@ -113,7 +115,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			}
 		}
 		var cdir string
-		cdir, cf.fname = c.cacheName(loc)
+		cdir, cf.fname = c.cacheName(loc, n.uname)
 
 		// We assume that plain pack files are mutable and not conpletely
 		// under our control.  Only encrypted files are immutable and can
@@ -239,28 +241,35 @@ func (cf *cachedFile) writeBack(n *node) error {
 		sofar += int64(len)
 	}
 
-	// Use the client library to write it back.
-	loc, err := cf.c.client.Put(n.uname, cleartext)
-	if err != nil {
-		return eio("writing back %s (%q): %s", cf.fname, n.uname, err)
+	// Use the client library to write it back.  Try multiple times on error.
+	var loc upspin.Location
+	for tries := 0; ; tries++ {
+		loc, err = cf.c.client.Put(n.uname, cleartext)
+		if err == nil {
+			break
+		}
+		if tries > 5 || !strings.Contains(err.Error(), "unreachable") {
+			return eio("writing back %s (%q): %s", cf.fname, n.uname, err)
+		}
+		time.Sleep(100 * time.Millisecond)
 	}
 	cf.dirty = false
 
 	// Rename it to reflect the actual reference in the store so that new
 	// opens will find the cached version.
-	cdir, fname := cf.c.cacheName(loc)
+	cdir, fname := cf.c.cacheName(loc, n.uname)
 	if err := os.Rename(cf.fname, fname); err != nil {
 		os.Mkdir(cdir, 0700)
 		if err := os.Rename(cf.fname, fname); err != nil {
-			return err
+			return eio("renaming %s to %s: %s", cf.fname, fname, err)
 		}
 	}
 	cf.fname = fname
 	return nil
 }
 
-func (c *cache) cacheName(loc upspin.Location) (string, string) {
-	hash := fmt.Sprintf("%x", sha1.Sum([]byte(loc.Reference)))
+func (c *cache) cacheName(loc upspin.Location, uname upspin.PathName) (string, string) {
+	hash := fmt.Sprintf("%x", sha1.Sum([]byte(string(loc.Reference)+"!"+string(uname))))
 	dir := c.dir + "/" + hash[:2]
 	file := dir + "/" + hash
 	return dir, file
@@ -274,7 +283,7 @@ func (c *cache) putRedirect(n *node, target string) error {
 	}
 
 	// Save it in the cache. If we can't, that's fine.
-	cdir, fname := c.cacheName(loc)
+	cdir, fname := c.cacheName(loc, n.uname)
 	file, err := os.Create(fname)
 	if err != nil {
 		os.Mkdir(cdir, 0700)
