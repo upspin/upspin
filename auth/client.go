@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"time"
 
+	"sync"
+
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -16,6 +18,9 @@ import (
 // It will work with any number of servers, but it keeps state about the last one, so using it with many servers will
 // decrease its performance.
 type HTTPClient struct {
+	// Protects all fields from concurrent access, except client, which does not need locking.
+	sync.Mutex
+
 	// Caches the base URL of the last server connected with.
 	url *url.URL
 
@@ -66,12 +71,16 @@ func NewAnonymousClient(httClient netutil.HTTPClientInterface) *HTTPClient {
 
 // SetUserName sets the user name for this HTTPClient instance.
 func (c *HTTPClient) SetUserName(user upspin.UserName) {
+	c.Lock()
 	c.user = user
+	c.Unlock()
 }
 
 // SetUserKeys sets the factotum for this HTTPClient instance.
 func (c *HTTPClient) SetUserKeys(factotum *Factotum) {
+	c.Lock()
 	c.factotum = factotum
+	c.Unlock()
 }
 
 // Do implements netutil.HTTPClientInterface.
@@ -85,6 +94,7 @@ func (c *HTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
 		// No point in doing authentication.
 		return c.doWithoutSign(req)
 	}
+	c.Lock() // Will be unlocked by doWithSign.
 	if c.url == nil || c.url.Host != req.URL.Host {
 		// Must sign gain.
 		return c.doWithSign(req)
@@ -97,6 +107,7 @@ func (c *HTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
 	if c.timeLastAuth.Add(time.Duration(AuthIntervalSec) * time.Second).Before(now) {
 		return c.doWithSign(req)
 	}
+	c.Unlock()
 	return c.doWithoutSign(req)
 }
 
@@ -119,7 +130,7 @@ func isReplayable(req *http.Request) bool {
 }
 
 // doWithoutSign does not initially sign the request, but if the request fails with error code 401, we try up to one more
-// time with signing, if possible.
+// time with signing, if possible. It must be called with the mutex NOT held.
 func (c *HTTPClient) doWithoutSign(req *http.Request) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -127,6 +138,7 @@ func (c *HTTPClient) doWithoutSign(req *http.Request) (*http.Response, error) {
 	}
 	if resp.StatusCode == http.StatusUnauthorized && req.URL.Scheme == "https" {
 		if isReplayable(req) {
+			c.Lock()
 			return c.doWithSign(req)
 		}
 	}
@@ -134,19 +146,24 @@ func (c *HTTPClient) doWithoutSign(req *http.Request) (*http.Response, error) {
 }
 
 // doAuth performs signature authentication and caches the server and time of this last signed request.
+// It must be called with the mutex held.
 func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 	if c.user == "" {
+		c.Unlock()
 		return nil, errNoUser
 	}
 	if c.factotum.PackingString() == "" {
+		c.Unlock()
 		return nil, errNoKeys
 	}
 	err := signRequest(c.user, c.factotum, req)
 	if err != nil {
+		c.Unlock()
 		return nil, newError(err)
 	}
 	c.url = req.URL
 	c.timeLastAuth = time.Now()
+	c.Unlock()
 	return c.client.Do(req)
 }
 
