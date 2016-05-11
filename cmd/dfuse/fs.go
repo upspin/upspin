@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -53,12 +54,21 @@ type node struct {
 	handles    map[*handle]bool // Handles (open instances) of this node.
 }
 
+func (n *node) String() string {
+	return fmt.Sprintf("node %s %d", n.uname, n.id)
+}
+
 // handle represents an open file.
 type handle struct {
 	n     *node              // Associated node.
 	file  *os.File           // An open file of the in the clear cached contents.
 	de    []*upspin.DirEntry // If this is a directory, its contents.
 	flags fuse.OpenFlags     // flags used to  open the file.
+	id    int
+}
+
+func (h *handle) String() string {
+	return fmt.Sprintf("handle %s %d %d", h.n.uname, h.n.id, h.id)
 }
 
 // newUpspinFS creates a new upspin file system.
@@ -128,17 +138,28 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 	return n
 }
 
+var handleId int
+var hl sync.Mutex
+
 func allocHandle(n *node) *handle {
 	h := &handle{n: n}
 	n.Lock()
 	n.handles[h] = true
 	n.Unlock()
+	hl.Lock()
+	h.id = handleId
+	handleId++
+	hl.Unlock()
 	return h
 }
 
 func allocHandleNoLock(n *node) *handle {
 	h := &handle{n: n}
 	n.handles[h] = true
+	hl.Lock()
+	h.id = handleId
+	handleId++
+	hl.Unlock()
 	return h
 }
 
@@ -162,13 +183,16 @@ func (h *handle) freeNoLock() {
 
 // Attr implements fs.Node.Attr.
 func (n *node) Attr(addscontext xcontext.Context, attr *fuse.Attr) error {
+	log.Printf("Attr %s", n)
 	*attr = n.attr
+	log.Printf("Attr %s returns %v", n, attr)
 	return nil
 }
 
 // Access implements fs.NodeAccesser.Access.
 func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 	// Allow all access.
+	log.Printf("Access %q %o", n, req.Mask)
 	return nil
 }
 
@@ -176,7 +200,7 @@ func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 // Every created file is initially backed by a clear text local file which is
 // Put in an upspin Directory on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
-	log.Printf("Create %q in %q", req.Name, n.uname)
+	log.Printf("Create %q in %q", req.Name, n)
 	f := n.f
 	if n.t == rootNode {
 		// User directories are directly below the root.  We can't create
@@ -205,14 +229,15 @@ func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *f
 
 	resp.Node = nn.id
 	resp.Attr = nn.attr
-	resp.EntryValid = time.Hour // TODO(p): figure out what would be right.
+	//resp.EntryValid = time.Hour // TODO(p): figure out what would be right.
+	log.Printf("Create %q in %q returns %q", req.Name, n, h)
 	return nn, h, nil
 }
 
 // Mkdir implements fs.NodeMkdirer.Mkdir.
 // Creates a directory without opening it.
 func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node, error) {
-	log.Printf("Mkdir %q in %q", req.Name, n.uname)
+	log.Printf("Mkdir %q in %q", req.Name, n)
 	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
@@ -227,6 +252,7 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 	if n.t == rootNode {
 		n.f.addUserDir(req.Name)
 	}
+	log.Printf("Mkdir %q in %q returns", req.Name, n, nn)
 	return nn, nil
 }
 
@@ -241,7 +267,7 @@ func (n *node) Open(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.
 
 // openDir opens the directory and reads its contents.
 func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	log.Printf("openDir %q %d", n.uname, n.t)
+	log.Printf("openDir %q", n)
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, enotdir("%q", n.uname)
 	}
@@ -271,12 +297,13 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	h := allocHandle(n)
 	h.de = de
 	h.flags = req.Flags
+	log.Printf("openDir %q returns %q", n, h)
 	return h, nil
 }
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
 func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	log.Printf("openFile %q %v", n.uname, req.Flags)
+	log.Printf("openFile %q %v", n, req.Flags)
 	if n.attr.Mode&os.ModeDir != 0 {
 		return nil, eisdir("%q", n.uname)
 	}
@@ -287,6 +314,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	if err := n.f.cache.open(h, req.Flags); err != nil {
 		return nil, err
 	}
+	log.Printf("openFile %q %v returns %q", n, req.Flags, h)
 	return h, nil
 }
 
@@ -325,8 +353,8 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 // Remove implements fs.Noderemover.  'n' is the directory in which the file
 // req.Name resides.  req.Dir flags this as an rmdir.
 func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
+	log.Printf("Remove %q from %q", req.Name, n)
 	uname := path.Join(n.uname, req.Name)
-	log.Printf("Remove %q", uname)
 
 	// Find the node in question.
 	dir, de, err := n.directoryLookup(uname)
@@ -350,7 +378,7 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 	if err != nil {
 		return eperm("%q: %s", uname, err)
 	}
-	log.Printf("Remove %q OK", uname)
+	log.Printf("Remove %q from %q OK", req.Name, n)
 	return nil
 }
 
@@ -376,8 +404,8 @@ func expectedError(err error, expected []string) bool {
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
+	log.Printf("Lookup %q in %q", name, n)
 	uname := path.Join(n.uname, name)
-	log.Printf("Lookup %q", uname)
 
 	// Ask the Directory.
 	_, de, err := n.directoryLookup(uname)
@@ -399,7 +427,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	if n.t == rootNode {
 		n.f.addUserDir(name)
 	}
-	log.Printf("Lookup %q OK", uname)
+	log.Printf("Lookup %q in %q returns %q", name, n, nn)
 	return nn, nil
 }
 
@@ -415,7 +443,7 @@ func (f *upspinFS) addUserDir(name string) {
 //
 // Files are only truncated by Setattr calls.
 func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
-	log.Printf("Setattr %q", n.uname)
+	log.Printf("Setattr %q", n)
 	if req.Valid.Size() {
 		// Truncate.  Lots of cases:
 		// 1) we have it opened. Truncate the cached file and
@@ -462,32 +490,21 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 		// Set the modify time.
 		// TODO(p): should we actually set the modify time?
 	}
+	log.Printf("Setattr %q OK", n)
 	return nil
 }
 
-// Flush implements fs.HandleFlusher.Flush.  Called when a file is closed.  This is the point where we
-// will write the file to the directory and store.
+// Flush implements fs.HandleFlusher.Flush.  Called when a file is closed.  We can't
+// really do anything here because if it takes any significant time something in
+// the kernel or git times out the flush and we get errors.
 func (h *handle) Flush(context xcontext.Context, req *fuse.FlushRequest) error {
-	log.Printf("Flush %q", h.n.uname)
-
-	// Write back to upspin.
-	h.n.Lock()
-	var err error
-	if h.n.cf != nil {
-		err = h.n.cf.writeBack(h.n)
-
-		// If this is the last handle, forget about the cached entry.
-		if len(h.n.handles) == 0 {
-			h.n.cf = nil
-		}
-	}
-	h.n.Unlock()
-	return err
+	log.Printf("Flush %q", h)
+	return nil
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
 func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
-	log.Printf("ReadDirAll %q", h.n.uname)
+	log.Printf("ReadDirAll %q", h)
 	var fde []fuse.Dirent
 	for _, de := range h.de {
 		parsed, _ := path.Parse(de.Name)
@@ -497,28 +514,29 @@ func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 		}
 		fde = append(fde, fuse.Dirent{Name: name})
 	}
-	log.Printf("ReadDirAll %q returns %v", h.n.uname, fde)
+	log.Printf("ReadDirAll %q returns %v", h, fde)
 	return fde, nil
 }
 
 // Read implements fs.HandleReader.Read.
 func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
-	log.Printf("Read %q %d bytes at %d", h.n.uname, cap(resp.Data), req.Offset)
+	log.Printf("Read %q %d bytes at %d", h, cap(resp.Data), req.Offset)
 	resp.Data = make([]byte, cap(resp.Data))
 	n, err := h.file.ReadAt(resp.Data, req.Offset)
 	if n != len(resp.Data) {
 		resp.Data = resp.Data[:n]
 	}
 	if err == io.EOF {
-		return nil
+		err = nil
 	}
+	log.Printf("Read %q %d bytes at %d returns %s", h, cap(resp.Data), req.Offset, err)
 	return err
 }
 
 // Write implements fs.HandleWriter.Write.  We lock the node for the extent of the write to serialize
 // changes to the node.
 func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
-	log.Printf("Write %q %d bytes at %d", h.n.uname, len(req.Data), req.Offset)
+	log.Printf("Write %q %d bytes at %d", h, len(req.Data), req.Offset)
 	h.n.Lock()
 	defer h.n.Unlock()
 	h.n.cf.markDirty()
@@ -531,6 +549,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 	if newSize > h.n.attr.Size {
 		h.n.attr.Size = newSize
 	}
+	log.Printf("Write %q %d bytes at %d OK", h, len(req.Data), req.Offset)
 	return nil
 }
 
@@ -538,7 +557,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 // it is written back to the store.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
 func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) error {
-	log.Printf("Release %q", h.n.uname)
+	log.Printf("Release %q %v", h.n.uname, h)
 
 	// Write back to upspin.
 	h.n.Lock()
@@ -553,6 +572,7 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 	}
 	h.n.Unlock()
 	h.free()
+	log.Printf("Release %q %v -> %s", h.n.uname, h, err)
 	return err
 }
 
@@ -613,11 +633,12 @@ func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) e
 
 // Symlink implements fs.Symlink.
 func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
-	log.Printf("Symlink %q/%q to %q", n.uname, req.NewName, req.Target)
+	log.Printf("Symlink %q/%q to %q", n, req.NewName, req.Target)
 	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(req.Target)), time.Now())
 	if err := n.f.cache.putRedirect(nn, req.Target); err != nil {
 		return nil, err
 	}
+	log.Printf("Symlink %q/%q to %q returns %q", n, req.NewName, req.Target, nn)
 	return nn, nil
 }
 
