@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f25894e7_84d03b06",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "s/Testdir/Dirserver/?",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_24f4e792",
+        "filename": "directory/proto/proto.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "Don\u0027t these need documentation? Or is the style not to document them because they mimic the interface for Directory already? Maybe there should be at least a pointer here to interface Directory in upspin.go?",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_843a7b21",
+        "filename": "directory/proto/proto.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "This is something I need to learn by looking at Go RPCs, but... how are custom (non-networking) errors returned?",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 19
+      },
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_244707b0",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "s/testdir/remote/",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_04152b88",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "I don\u0027t really understand this comment. Did the syntax of ServerUserName change? Shouldn\u0027t this simply be \"inprocess dir\" or some other fixed string?",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_e47a4fdf",
+        "filename": "endpoint/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "Isn\u0027t this missing the NetAddr, like the GCP case above?",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f25894e7_247947e5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-11T14:20:09Z",
+      "side": 1,
+      "message": "s/location/netaddr/?",
+      "revId": "6f8ddeb8ebff51f27c54a4b29394e350b411d212",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
