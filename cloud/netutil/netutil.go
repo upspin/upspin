@@ -58,6 +58,7 @@ func SendJSONError(resp http.ResponseWriter, prefix string, error error) {
 // SendJSONErrorString sends a free-form error string in a JSON struct.
 func SendJSONErrorString(resp http.ResponseWriter, error string) {
 	resp.Header().Set(ContentType, "application/json")
+	DisableCaching(resp)
 	resp.Write([]byte(fmt.Sprintf(`{"error":%q}`, error)))
 }
 
@@ -72,7 +73,15 @@ func SendJSONReply(resp http.ResponseWriter, reply interface{}) {
 		return
 	}
 	resp.Header().Set(ContentType, "application/json")
+	DisableCaching(resp)
 	resp.Write(js)
+}
+
+// DisableCaching adds HTTP headers to the response that instructs all known browsers and proxies not to cache results.
+func DisableCaching(resp http.ResponseWriter) {
+	resp.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	resp.Header().Set("Pragma", "no-cache")
+	resp.Header().Set("Expires", "0")
 }
 
 // BufferRequest reads the body of the request 'req' into a buffer of
