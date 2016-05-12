@@ -45,6 +45,7 @@ type dirServer struct {
 	storeClient *storeClient
 	dirCache    *cache.LRU // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
 	rootCache   *cache.LRU // caches <upspin.UserName, root>. It is thread safe.
+	dirNegCache *cache.LRU // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
 }
 
 type dirError struct {
@@ -280,7 +281,7 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
 		dirEntry.Location = upspin.Location{}
 	}
-	logMsg.Printf("Got dir entry for user %s: path %s: %s", sess.User(), parsed.Path(), dirEntry)
+	logMsg.Printf("Got dir entry for user %s: path %s: %v", sess.User(), parsed.Path(), dirEntry)
 	return dirEntry, nil
 }
 
@@ -443,6 +444,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	if access.IsGroupFile(parsedPath) {
 		access.RemoveGroup(parsedPath) // ignore error since it doesn't matter if the group was added already.
 	}
+	logMsg.Printf("Deleted %s", parsedPath)
 	return nil
 }
 
@@ -452,6 +454,7 @@ func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
 		storeClient: store,
 		dirCache:    cache.NewLRU(1000), // TODO: adjust numbers
 		rootCache:   cache.NewLRU(1000), // TODO: adjust numbers
+		dirNegCache: cache.NewLRU(1000), // TODO: adjust numbers
 	}
 	return d
 }

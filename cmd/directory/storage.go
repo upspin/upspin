@@ -54,10 +54,18 @@ func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 		return &de, nil
 	}
 
-	// Not in cache.
+	// Not in cache. Is it in the negative cache?
+	if _, ok := d.dirNegCache.Get(path); ok {
+		// It *is* in the *negative* cache, so we know it's not found.
+		return nil, errEntryNotFound
+	}
 	var savedDirEntry upspin.DirEntry
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
+		if err == errEntryNotFound {
+			// Add to the negative cache
+			d.dirNegCache.Add(path, nil)
+		}
 		return nil, err
 	}
 	err = json.Unmarshal(buf, &savedDirEntry)
@@ -74,6 +82,7 @@ func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
 	d.dirCache.Add(path, *dirEntry)
+	d.dirNegCache.Remove(path) // remove from the negative cache in case it was there.
 	jsonBuf, err := json.Marshal(dirEntry)
 	if err != nil {
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
@@ -117,5 +126,6 @@ func (d *dirServer) deletePath(path upspin.PathName) error {
 	}
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)
+	d.dirNegCache.Add(path, nil) // a deleted entry goes into the negative cache.
 	return nil
 }
