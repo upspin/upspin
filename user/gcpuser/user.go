@@ -28,6 +28,8 @@ const (
 )
 
 func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+	// TODO(edpin): we should cache user roots and keys for a few hours as these things change infrequently.
+	// It is akin to DNS changes, so a few hours is okay (or a hard reset of the client).
 	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/get?user=%s", u.serverURL, name), nil)
 	if err != nil {
 		return nil, nil, newUserError(err, name)
@@ -66,6 +68,8 @@ func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicK
 }
 
 func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
+	// TODO(edpin): this works because we mostly only use one instance and talk to the same URL. However, it will
+	// break if we create two instances, each pointing to a different key server. Fix it.
 	if context == nil {
 		return nil, newUserError(fmt.Errorf("nil context"), "")
 	}

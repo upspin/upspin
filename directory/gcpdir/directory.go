@@ -15,6 +15,7 @@ import (
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/path"
@@ -38,7 +39,8 @@ type Directory struct {
 var _ upspin.Directory = (*Directory)(nil)
 
 var (
-	zeroLoc upspin.Location
+	zeroLoc       upspin.Location
+	instanceCache = cache.NewLRU(20) // cache of instantiated Directory services. Thread safe.
 )
 
 // newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
@@ -274,19 +276,27 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 	if err != nil {
 		return nil, newError(op, "", fmt.Errorf("required endpoint with a valid HTTP address: %v", err))
 	}
+	// Checking for reachability is done on the default HTTP client, so no new allocations happen here.
 	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
+	// Re-use a bound instance if it's in the cache.
+	if dir, found := instanceCache.Get(*context); found {
+		return dir.(*Directory), nil
+	}
+	// Need to create a new instance.
 	factotum, err := auth.NewFactotum(context)
 	if err != nil {
 		return nil, err
 	}
-	return &Directory{
+	dir := &Directory{
 		endpoint:  e,
 		serverURL: serverURL.String(),
 		timeNow:   d.timeNow,
 		client:    auth.NewClient(context.UserName, factotum, &http.Client{}),
-	}, nil
+	}
+	instanceCache.Add(*context, dir)
+	return dir, nil
 }
 
 // Delete deletes the DirEntry for a name from the backend.

@@ -21,12 +21,14 @@ type HTTPClient struct {
 	sync.Mutex
 
 	// Caches the base URL of the last server connected with.
+	// TODO(edpin): this must be a small LRU cache, since we often make requests to more than one server (dir, store, user).
 	url *url.URL
 
 	// Records the time we last authenticated with the server.
 	// NOTE: this may seem like a premature optimization, but a comment in tls.ConnectionState indicates that
 	// resumed connections don't get a TLS unique token, which prevents us from implicitly authenticating the
-	// connection. To prevent a round-trip to the server, we preemptly re-auth every AuthIntervalSec
+	// connection. To prevent a round-trip to the server, we preemptively re-auth every AuthIntervalSec
+	// TODO(edpin): ditto. This goes with the URL above.
 	timeLastAuth time.Time
 
 	// The user we authenticate for.
@@ -118,8 +120,8 @@ func (c *HTTPClient) prepareRequest(req *http.Request) {
 
 // isReplayable reports whether the request can be played back to the server safely.
 func isReplayable(req *http.Request) bool {
-	if req.Body == nil && req.Method != "POST" {
-		// A request without payload is always replayable
+	if req.Body == nil && req.Method == "GET" {
+		// A GET request without payload is always replayable.
 		return true
 	}
 	// Note: In general, if the body can seek to the beginning again, it should be replayable. However, Go's HTTP
