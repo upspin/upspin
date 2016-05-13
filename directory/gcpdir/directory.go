@@ -38,9 +38,15 @@ type Directory struct {
 // Guarantee we implement the interface
 var _ upspin.Directory = (*Directory)(nil)
 
+// instanceKey is used to key into instanceCache.
+type instanceKey struct {
+	context  upspin.Context
+	endpoint upspin.Endpoint
+}
+
 var (
 	zeroLoc       upspin.Location
-	instanceCache = cache.NewLRU(20) // cache of instantiated Directory services. Thread safe.
+	instanceCache = cache.NewLRU(20) // cache of instantiated Directory services <instanceKey, *Directory>. Thread safe.
 )
 
 // newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
@@ -281,7 +287,11 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
 	// Re-use a bound instance if it's in the cache.
-	if dir, found := instanceCache.Get(*context); found {
+	key := instanceKey{
+		context:  *context,
+		endpoint: e,
+	}
+	if dir, found := instanceCache.Get(key); found {
 		return dir.(*Directory), nil
 	}
 	// Need to create a new instance.
@@ -295,7 +305,7 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		timeNow:   d.timeNow,
 		client:    auth.NewClient(context.UserName, factotum, &http.Client{}),
 	}
-	instanceCache.Add(*context, dir)
+	instanceCache.Add(key, dir)
 	return dir, nil
 }
 
