@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -23,8 +24,18 @@ type user struct {
 
 var _ upspin.User = (*user)(nil)
 
+// instanceKey is used to key into instanceCache.
+type instanceKey struct {
+	context  upspin.Context
+	endpoint upspin.Endpoint
+}
+
 const (
 	serverError = "server error code %d"
+)
+
+var (
+	instanceCache = cache.NewLRU(20) // cache of instantiated user instances <instanceKey, *user>. Thread safe.
 )
 
 func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
@@ -68,8 +79,6 @@ func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicK
 }
 
 func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
-	// TODO(edpin): this works because we mostly only use one instance and talk to the same URL. However, it will
-	// break if we create two instances, each pointing to a different key server. Fix it.
 	if context == nil {
 		return nil, newUserError(fmt.Errorf("nil context"), "")
 	}
@@ -77,12 +86,26 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 	if err != nil {
 		return nil, err
 	}
-	u.serverURL = serverURL.String()
-	if !netutil.IsServerReachable(u.serverURL) {
+	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
 	}
-	u.endpoint = endpoint
-	return u, nil
+	// Re-use a bound instance if it's in the cache.
+	key := instanceKey{
+		context:  *context,
+		endpoint: endpoint,
+	}
+	if instance, found := instanceCache.Get(key); found {
+		return instance.(*user), nil
+	}
+	// Not in cache. Create a new instance now.
+
+	instance := &user{
+		serverURL:  serverURL.String(),
+		httpClient: &http.Client{},
+		endpoint:   endpoint,
+	}
+	instanceCache.Add(key, instance)
+	return instance, nil
 }
 
 func (u *user) ServerUserName() string {
