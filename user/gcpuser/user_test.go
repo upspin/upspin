@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -33,8 +34,7 @@ func TestLookup(t *testing.T) {
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{responseToSend}, []*http.Request{requestExpected})
 	u := getUserForTesting(mock)
 
-	roots, keys, err := u.Lookup(upspin.UserName(userName))
-	mock.Verify(t)
+	roots, keys, err := u.Lookup(userName)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -54,6 +54,18 @@ func TestLookup(t *testing.T) {
 	if string(keys[0]) != key {
 		t.Errorf("Expected key %s, got %s", key, keys[0])
 	}
+	// Check that we get the same results, and now they're cached.
+	roots2, keys2, err := u.Lookup(userName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(roots2, roots) {
+		t.Fatal("Expected same roots.")
+	}
+	if !reflect.DeepEqual(keys2, keys) {
+		t.Fatal("Expected the same keys.")
+	}
+	mock.Verify(t)
 }
 
 func getUserForTesting(mock netutil.HTTPClientInterface) *user {
