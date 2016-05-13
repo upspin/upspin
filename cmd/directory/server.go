@@ -36,8 +36,8 @@ var (
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 
-	logErr = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC)
-	logMsg = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LUTC)
+	logErr = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
+	logMsg = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
 )
 
 type dirServer struct {
