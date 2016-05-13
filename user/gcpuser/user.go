@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"time"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -30,17 +31,46 @@ type instanceKey struct {
 	endpoint upspin.Endpoint
 }
 
+// lookupEntry is the cached result of a Lookup call.
+type lookupEntry struct {
+	endpoints   []upspin.Endpoint
+	keys        []upspin.PublicKey
+	timeFetched time.Time
+}
+
 const (
-	serverError = "server error code %d"
+	serverError         = "server error code %d"
+	lookupCacheDuration = time.Hour * 2
 )
 
 var (
-	instanceCache = cache.NewLRU(20) // cache of instantiated user instances <instanceKey, *user>. Thread safe.
+	instanceCache = cache.NewLRU(20)  // cache of instantiated user instances <instanceKey, *user>. Thread safe.
+	lookupCache   = cache.NewLRU(100) // <upspin.UserName, lookupEntry>
 )
 
 func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	// TODO(edpin): we should cache user roots and keys for a few hours as these things change infrequently.
-	// It is akin to DNS changes, so a few hours is okay (or a hard reset of the client).
+	if entry, found := lookupCache.Get(name); found {
+		e := entry.(lookupEntry)
+		if !e.timeFetched.Add(lookupCacheDuration).Before(time.Now()) {
+			// Cache is still valid. We're done.
+			return e.endpoints, e.keys, nil
+		}
+		// expired
+	}
+	endpoints, keys, err := u.doLookup(name)
+	if err != nil {
+		return nil, nil, err
+	}
+	le := lookupEntry{
+		endpoints:   endpoints,
+		keys:        keys,
+		timeFetched: time.Now(),
+	}
+	lookupCache.Add(name, le)
+	return endpoints, keys, nil
+}
+
+func (u *user) doLookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	req, err := http.NewRequest(netutil.Get, fmt.Sprintf("%s/get?user=%s", u.serverURL, name), nil)
 	if err != nil {
 		return nil, nil, newUserError(err, name)
