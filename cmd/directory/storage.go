@@ -46,7 +46,7 @@ func (d *dirServer) putDirEntry(parsedPath *path.Parsed, dirEntry *upspin.DirEnt
 
 // getNonRoot returns the dir entry for the given path, possibly going to stable storage to find it.
 func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
-	logMsg.Printf("Looking up dir entry %q on storage backend", path)
+	logMsg.Printf("Looking up dir entry %q", path)
 
 	// Check cache first.
 	if dir, ok := d.dirCache.Get(path); ok {
@@ -60,6 +60,12 @@ func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errEntryNotFound
 	}
 	var savedDirEntry upspin.DirEntry
+
+	// Lock the dir entry
+	dirEntryLock := PathLock(path)
+	dirEntryLock.Lock()
+	defer dirEntryLock.Unlock()
+
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
 		if err == errEntryNotFound {
@@ -81,6 +87,12 @@ func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) error {
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
+
+	// Lock the dir entry
+	dirEntryLock := PathLock(path)
+	dirEntryLock.Lock()
+	defer dirEntryLock.Unlock()
+
 	d.dirCache.Add(path, *dirEntry)
 	d.dirNegCache.Remove(path) // remove from the negative cache in case it was there.
 	jsonBuf, err := json.Marshal(dirEntry)
@@ -121,11 +133,17 @@ func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
 
 // deletePath deletes the path from the storage backend and if successful also deletes it from all caches.
 func (d *dirServer) deletePath(path upspin.PathName) error {
+	// Lock the dir entry
+	dirEntryLock := PathLock(path)
+	dirEntryLock.Lock()
+	defer dirEntryLock.Unlock()
+
 	if err := d.cloudClient.Delete(string(path)); err != nil {
 		return err
 	}
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)
 	d.dirNegCache.Add(path, nil) // a deleted entry goes into the negative cache.
+	logMsg.Printf("Deleted %s from GCP and caches", path)
 	return nil
 }
