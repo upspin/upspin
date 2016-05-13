@@ -37,9 +37,10 @@ var (
 			},
 		},
 		Metadata: upspin.Metadata{
-			Attr: upspin.AttrNone,
-			Size: 32,
-			Time: upspin.Now(),
+			Attr:     upspin.AttrNone,
+			Size:     32,
+			Time:     upspin.Now(),
+			Packdata: []byte("12345"),
 		},
 	}
 	dirParent = upspin.DirEntry{
@@ -211,13 +212,19 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "l:lister-dude@me.com")
 	rootJSON := toRootJSON(t, &newRoot)
 
+	dirJSON := toJSON(t, dir)
+	dirAnswer := dir // make a copy.
+	dirAnswer.Metadata.Packdata = nil
+	dirAnswer.Location = upspin.Location{}
+	dirAnswerJSON := toJSON(t, dirAnswer)
+
 	// Default, zero Location.
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":0,"NetAddr":""},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
+	resp := nettest.NewExpectingResponseWriter(string(dirAnswerJSON))
+	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{userName},
-		Data: [][]byte{rootJSON},
+		Ref:  []string{userName, pathName},
+		Data: [][]byte{rootJSON, dirJSON},
 	}
 
 	ds := newDirServer(egcp, newDummyStoreClient())
@@ -295,12 +302,18 @@ func TestGlobSimple(t *testing.T) {
 		Location: upspin.Location{
 			Reference: upspin.Reference("xxxx"),
 		},
+		Metadata: upspin.Metadata{
+			Packdata: []byte("blah"),
+		},
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
 		Name: userName + "/subdir/b.pdf",
 		Location: upspin.Location{
 			Reference: upspin.Reference("yyyy"),
+		},
+		Metadata: upspin.Metadata{
+			Packdata: []byte("bleh"),
 		},
 	}
 	dir2JSON := toJSON(t, dir2)
@@ -345,8 +358,11 @@ func TestGlobSimple(t *testing.T) {
 	// Now check that another user who doesn't have read permission, but does have list permission would get the
 	// same list, but without the location in them.
 	session := testauth.NewSessionForTesting(upspin.UserName("listerdude@me.com"), false, nil)
+	// Location and Packdata are anonymized.
 	dir1.Location = upspin.Location{}
 	dir2.Location = upspin.Location{}
+	dir1.Metadata.Packdata = nil
+	dir2.Metadata.Packdata = nil
 	respBody = toJSON(t, []upspin.DirEntry{dir1, dir2}) // new expected response does not have Location.
 	resp = nettest.NewExpectingResponseWriter(string(respBody))
 

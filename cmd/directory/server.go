@@ -280,6 +280,7 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 	if !canRead {
 		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
 		dirEntry.Location = upspin.Location{}
+		dirEntry.Metadata.Packdata = nil
 	}
 	logMsg.Printf("Got dir entry for user %s: path %s: %v", sess.User(), parsed.Path(), dirEntry)
 	return dirEntry, nil
@@ -396,6 +397,7 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			// If the user can't read a path, clear out its Location.
 			if !canRead {
 				de.Location = upspin.Location{}
+				de.Metadata.Packdata = nil
 			}
 			dirEntries = append(dirEntries, de)
 		}
