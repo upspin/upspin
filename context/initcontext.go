@@ -10,7 +10,6 @@ import (
 	"path"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
@@ -82,9 +81,8 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	// This must be done before bind so that keys are ready for authenticating to servers.
 	// TODO(edpin): fix this by re-checking keys when they're needed.
 	// TODO(ehg): remove loading of private key
-	keyloader.Load(context)
 	var err error
-	context.Factotum, err = auth.NewFactotum(context)
+	err = keyloader.Load(context)
 	if err != nil {
 		return nil, err
 	}

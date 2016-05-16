@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -177,7 +177,11 @@ func XXXTestLoadingRemoteKeys(t *testing.T) {
 		userToMatch: []upspin.UserName{bobsUserName, dudesUserName},
 		keyToReturn: []upspin.PublicKey{bobsPrivKey.Public, dudesPrivKey.Public},
 	}
-	ctx.KeyPair = dudesPrivKey // Override setup to prevent reading keys from .ssh/
+	f, err := keyloader.NewFactotum(dudesPrivKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.Factotum = f // Override setup to prevent reading keys from .ssh/
 	ctx.User = mockUser
 
 	// TODO: share with bob (make bob a reader).
@@ -193,7 +197,11 @@ func XXXTestLoadingRemoteKeys(t *testing.T) {
 
 	// Now load Bob as the current user.
 	ctx.UserName = bobsUserName
-	ctx.KeyPair = bobsPrivKey
+	f, err = keyloader.NewFactotum(bobsPrivKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.Factotum = f
 
 	clear := unpackBlob(t, ctx, packer, d, cipher)
 	if string(clear) != text {
@@ -227,7 +235,11 @@ func XXXTestLoadingRemoteKeyless(t *testing.T) {
 		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
 		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPrivKey.Public},
 	}
-	ctx.KeyPair = dudettesPrivKey // Override setup to prevent reading keys from .ssh/
+	f, err := keyloader.NewFactotum(dudettesPrivKey) // Override setup to prevent reading keys from .ssh/
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.Factotum = f
 	ctx.User = mockUser
 
 	// TODO: share with mia (make mia a reader)
@@ -273,11 +285,11 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 		panic("ecdsa.GenerateKey failed")
 		// return ctx, packer
 	}
-	ctx.KeyPair = upspin.KeyPair{
+	keyPair := upspin.KeyPair{
 		Public:  upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
 		Private: upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
 	}
-	ctx.Factotum, err = auth.NewFactotum(ctx)
+	ctx.Factotum, err = keyloader.NewFactotum(keyPair)
 	if err != nil {
 		panic("NewFactotum failed")
 	}

@@ -33,7 +33,7 @@ type HTTPClient struct {
 	user upspin.UserName
 
 	// The user's keys.
-	factotum *Factotum
+	factotum upspin.Factotum
 
 	// The underlying HTTP client
 	client netutil.HTTPClientInterface
@@ -52,7 +52,7 @@ var (
 )
 
 // NewClient returns a new HTTPClient that handles auth for the named user and underlying HTTP client.
-func NewClient(user upspin.UserName, factotum *Factotum, httClient netutil.HTTPClientInterface) *HTTPClient {
+func NewClient(user upspin.UserName, factotum upspin.Factotum, httClient netutil.HTTPClientInterface) *HTTPClient {
 	return &HTTPClient{
 		user:     user,
 		factotum: factotum,
@@ -76,7 +76,7 @@ func (c *HTTPClient) SetUserName(user upspin.UserName) {
 }
 
 // SetUserKeys sets the factotum for this HTTPClient instance.
-func (c *HTTPClient) SetUserKeys(factotum *Factotum) {
+func (c *HTTPClient) SetUserKeys(factotum upspin.Factotum) {
 	c.Lock()
 	c.factotum = factotum
 	c.Unlock()
@@ -167,7 +167,7 @@ func (c *HTTPClient) doWithSign(req *http.Request) (*http.Response, error) {
 }
 
 // signRequest sets the necessary headers in the HTTP request to authenticate a user, by signing the request with the given key.
-func signRequest(userName upspin.UserName, factotum *Factotum, req *http.Request) error {
+func signRequest(userName upspin.UserName, factotum upspin.Factotum, req *http.Request) error {
 	req.Header.Set(signatureTypeHeader, factotum.PackingString())
 	// The hash includes the user name and the key type.
 	hash := hashUserRequest(userName, req)

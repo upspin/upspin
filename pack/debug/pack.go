@@ -104,9 +104,6 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 		return 0, errTooShort
 	}
 	ciphertext = ciphertext[:len(cleartext)]
-	if len(context.KeyPair.Private) == 0 {
-		return 0, errNoKey
-	}
 	cb, err := cryptByte(meta, true)
 	if err != nil {
 		return 0, err
@@ -126,9 +123,6 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	}
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
 		return 0, errors.New("testPack.Unpack: crazy length")
-	}
-	if len(context.KeyPair.Private) == 0 {
-		return 0, errNoKey
 	}
 	cb, err := cryptByte(meta, false)
 	if err != nil {
