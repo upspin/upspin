@@ -33,10 +33,6 @@ var (
 	context = &upspin.Context{
 		User:     &dummyUser{},
 		UserName: userName,
-		KeyPair: upspin.KeyPair{
-			Public:  "publicity please",
-			Private: "privacy please",
-		},
 	}
 )
 

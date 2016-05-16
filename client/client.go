@@ -134,7 +134,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		}
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-	readersPublicKey[0] = c.context.KeyPair.Public
+	readersPublicKey[0] = c.context.Factotum.PublicKey()
 	n := 1
 	for _, r := range readers {
 		_, pubkeys, err := c.context.User.Lookup(r)
@@ -301,7 +301,7 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 	}
 	var pubKeys []upspin.PublicKey
 	if parsed.User() == c.context.UserName {
-		pubKeys = append(pubKeys, c.context.KeyPair.Public)
+		pubKeys = append(pubKeys, c.context.Factotum.PublicKey())
 	}
 	if _, pks, err := c.context.User.Lookup(parsed.User()); err == nil {
 		pubKeys = append(pubKeys, pks...)
