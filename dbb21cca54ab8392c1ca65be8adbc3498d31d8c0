@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "323eac9c_559e22c7",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-16T22:08:31Z",
+      "side": 1,
+      "message": "Rather than removing the check entirely, should we ask Factotum to confirm it is ok by requesting the PublicKey?\n\nMore generally, I can imagine that there will be obscure bugs caused by a Factotum that has lost its keys or never been initialized, and we want to be sure we give a good error message.  I\u0027m not sure at the moment where that belongs.",
+      "revId": "dbb21cca54ab8392c1ca65be8adbc3498d31d8c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
