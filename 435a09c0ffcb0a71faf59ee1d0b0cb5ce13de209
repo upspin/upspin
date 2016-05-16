@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "323eac9c_d2fdc84a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-16T20:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "323eac9c_5267183f",
+      "revId": "435a09c0ffcb0a71faf59ee1d0b0cb5ce13de209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "323eac9c_720a546d",
         "filename": "upspin/upspin.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-16T20:38:39Z",
       "side": 1,
       "message": "maybe s/factotum/Factotum/",
+      "revId": "435a09c0ffcb0a71faf59ee1d0b0cb5ce13de209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "323eac9c_f2fac450",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-16T20:41:48Z",
+      "side": 1,
+      "message": "Done. Fixed in factotum.go as well.",
+      "parentUuid": "323eac9c_720a546d",
       "revId": "435a09c0ffcb0a71faf59ee1d0b0cb5ce13de209",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
