@@ -295,15 +295,11 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		return dir.(*Directory), nil
 	}
 	// Need to create a new instance.
-	factotum, err := auth.NewFactotum(context)
-	if err != nil {
-		return nil, err
-	}
 	dir := &Directory{
 		endpoint:  e,
 		serverURL: serverURL.String(),
 		timeNow:   d.timeNow,
-		client:    auth.NewClient(context.UserName, factotum, &http.Client{}),
+		client:    auth.NewClient(context.UserName, context.Factotum, &http.Client{}),
 	}
 	instanceCache.Add(key, dir)
 	return dir, nil

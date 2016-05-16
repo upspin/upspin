@@ -33,7 +33,10 @@ func Load(context *upspin.Context) error {
 		return errNilContext
 	}
 	k, err := privateKey()
-	context.KeyPair = k
+	if err != nil {
+		return err
+	}
+	context.Factotum, err = NewFactotum(k)
 	return err
 }
 

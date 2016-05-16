@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -79,8 +80,7 @@ func TestEndToEnd(t *testing.T) {
 	client := &http.Client{
 		Transport: tr,
 	}
-	ctx := &upspin.Context{KeyPair: p256Key}
-	f, err := auth.NewFactotum(ctx)
+	f, err := keyloader.NewFactotum(p256Key)
 	if err != nil {
 		t.Fatal(err)
 	}

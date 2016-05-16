@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/hkdf"
-	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/path"
@@ -161,7 +160,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	// Wrap for myself.
 	// TODO Update this other readers, as soon as we can get the list.
 	wrap := make([]wrappedKey, 1)
-	p, err := parsePublicKey(ctx.KeyPair.Public, c.packerString)
+	p, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
 	if err != nil {
 		return 0, err
 	}
@@ -236,7 +235,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 			return 0, err
 		}
 		// Verify that the owner signed this with his/her public key.
-		if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
+		if !ecdsa.Verify(ownerPubKey, keyloader.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 			log.Println("verify failed")
 			return 0, errVerify
 		}
@@ -263,7 +262,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 	}
 
 	// Get my own key.
-	mypub, err := parsePublicKey(ctx.KeyPair.Public, c.packerString)
+	mypub, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
 	if err != nil {
 		log.Printf("cannot parse my own key: %v", err)
 		return // can't happen
@@ -402,7 +401,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// Verify that the owner signed this with his/her public key.
-	if !ecdsa.Verify(ownerPubKey, auth.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
+	if !ecdsa.Verify(ownerPubKey, keyloader.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 		log.Println("verify failed")
 		return errVerify
 	}
@@ -685,7 +684,7 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (
 	log.Printf("Getting pub key for user: %s", user)
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName) {
-		return ctx.KeyPair.Public, nil
+		return ctx.Factotum.PublicKey(), nil
 	}
 	_, keys, err := ctx.User.Lookup(user)
 	if err != nil {
