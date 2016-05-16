@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "323eac9c_4d7f7c54",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-16T18:58:13Z",
+      "side": 1,
+      "message": "I wonder if this is right. Perhaps it should be the old sequence number + 1.",
+      "revId": "fe5fa9a6fa098d8beac290404fa70a12468f7642",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
