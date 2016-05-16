@@ -16,6 +16,24 @@
       "revId": "1f77f831fefe6913b4f19c88c14970ea505a8336",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "323eac9c_f879c5e5",
+        "filename": "auth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-16T22:32:11Z",
+      "side": 1,
+      "message": "Ok. Sent a new CL for this.",
+      "parentUuid": "323eac9c_4dfa1cee",
+      "revId": "1f77f831fefe6913b4f19c88c14970ea505a8336",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
