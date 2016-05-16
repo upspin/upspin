@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "323eac9c_c84d1ab7",
+        "filename": "cmd/directory/pathlock.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-16T19:39:21Z",
+      "side": 1,
+      "message": "this lock is unnecessary. no idea why you think it is.",
+      "revId": "7ba46d70690737f5678108aab3ce6ab81ecb134a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "323eac9c_68242600",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-16T19:39:21Z",
+      "side": 1,
+      "message": "it might make sense to switch to the logs we can see from the GCP console. there\u0027s a go package that drives that. i\u0027ll find out what it is.",
+      "revId": "7ba46d70690737f5678108aab3ce6ab81ecb134a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
