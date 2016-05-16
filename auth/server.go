@@ -26,7 +26,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
+	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -215,7 +215,7 @@ func verifyRequest(userName upspin.UserName, keys []upspin.PublicKey, req *http.
 		return errMissingSignature
 	}
 	for _, k := range keys {
-		ecdsaPubKey, keyType, err := keyloader.ParsePublicKey(k)
+		ecdsaPubKey, keyType, err := factotum.ParsePublicKey(k)
 		if err != nil {
 			return err
 		}

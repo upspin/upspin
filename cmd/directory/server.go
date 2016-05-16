@@ -17,6 +17,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
+	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -469,7 +470,7 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	})
 
-	factotum, err := auth.NewFactotum(&upspin.Context{KeyPair: dirServerKeys})
+	factotum, err := factotum.New(dirServerKeys)
 	if err != nil {
 		log.Fatal(err)
 	}
