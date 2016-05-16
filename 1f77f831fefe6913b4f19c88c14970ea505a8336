@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "323eac9c_4dfa1cee",
+        "filename": "auth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-16T18:59:44Z",
+      "side": 1,
+      "message": "the usual way to do this is to put client above the mutex and all the rest below, then say the mutex protects the rest of the fields.",
+      "revId": "1f77f831fefe6913b4f19c88c14970ea505a8336",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
