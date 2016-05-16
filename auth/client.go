@@ -17,7 +17,10 @@ import (
 // It will work with any number of servers, but it keeps state about the last one, so using it with many servers will
 // decrease its performance.
 type HTTPClient struct {
-	// Protects all fields from concurrent access, except client, which does not need locking.
+	// The underlying HTTP client
+	client netutil.HTTPClientInterface
+
+	// Protects all fields below from concurrent access (client does not need locking).
 	sync.Mutex
 
 	// Caches the base URL of the last server connected with.
@@ -34,9 +37,6 @@ type HTTPClient struct {
 
 	// The user's keys.
 	factotum upspin.Factotum
-
-	// The underlying HTTP client
-	client netutil.HTTPClientInterface
 }
 
 var _ netutil.HTTPClientInterface = (*HTTPClient)(nil)
