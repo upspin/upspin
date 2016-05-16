@@ -14,6 +14,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
+	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -612,7 +613,7 @@ func TestPutAccessFile(t *testing.T) {
 	reqStore := nettest.NewRequest(t, netutil.Get, "https://store-server.upspin.io/get?ref=1234", nil)
 	respStore := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(accessContents))
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore}, []*http.Request{reqStore})
-	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	f, err := factotum.New(serverKeys)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -711,7 +712,7 @@ func TestGroupAccessFile(t *testing.T) {
 	respStore2 := nettest.NewMockHTTPResponse(http.StatusOK, "text", []byte(newContentsOfFamilyGroup))
 
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{respStore1, respStore2}, []*http.Request{reqStore1, reqStore2})
-	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	f, err := factotum.New(serverKeys)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1128,7 +1129,7 @@ func newDummyDirServer() *dirServer {
 
 func newDummyStoreClient() *storeClient {
 	mock := nettest.NewMockHTTPClient(nil, nil)
-	f, err := auth.NewFactotum(&upspin.Context{KeyPair: serverKeys})
+	f, err := factotum.New(serverKeys)
 	if err != nil {
 		panic(err)
 	}

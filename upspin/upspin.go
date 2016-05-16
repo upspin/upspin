@@ -82,6 +82,9 @@ type Factotum interface {
 
 	// PackingString returns the Packing.String() value associated with the key.
 	PackingString() string
+
+	// PublicKey returns the user's public key as loaded by the Factotum.
+	PublicKey() PublicKey
 }
 
 // Packdata stores the encoded information used to pack the data in an
@@ -437,9 +440,8 @@ type Context struct {
 	// The name of the user requesting access.
 	UserName UserName
 
-	// KeyPair holds the user's private cryptographic keys.
-	KeyPair  KeyPair
-	Factotum Factotum // TODO Factotum will replace KeyPair.Private
+	// Factotum holds the user's cryptographic keys and encapsulates crypto operations.
+	Factotum Factotum
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related

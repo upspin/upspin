@@ -26,10 +26,7 @@ func newContext(name upspin.UserName) *upspin.Context {
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context := &upspin.Context{
 		UserName: name,
-		KeyPair: upspin.KeyPair{
-			Private: upspin.PrivateKey("privacy is next to lunacy"),
-		},
-		Packing: upspin.DebugPack, // TODO.
+		Packing:  upspin.DebugPack, // TODO.
 	}
 	var err error
 	context.User, err = bind.User(context, endpoint)

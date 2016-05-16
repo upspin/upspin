@@ -2,16 +2,13 @@
 package keyloader
 
 import (
-	"bytes"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"errors"
 	"fmt"
-	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -33,46 +30,11 @@ func Load(context *upspin.Context) error {
 		return errNilContext
 	}
 	k, err := privateKey()
-	context.KeyPair = k
+	if err != nil {
+		return err
+	}
+	context.Factotum, err = factotum.New(k)
 	return err
-}
-
-// ParsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
-// string representation of the private key.
-func ParsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
-	privateKey = upspin.PrivateKey(strings.TrimSpace(string(privateKey)))
-	var d big.Int
-	err = d.UnmarshalText([]byte(privateKey))
-	if err != nil {
-		return nil, err
-	}
-	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
-}
-
-// ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key, returning its type.
-func ParsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
-	var keyType string
-	var x, y big.Int
-
-	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &keyType, &x, &y)
-	if err != nil {
-		return nil, "", err
-	}
-	if n != 3 {
-		return nil, "", fmt.Errorf("expected keytype and two big ints, got %d", n)
-	}
-	var curve elliptic.Curve
-	switch keyType {
-	case "p256":
-		curve = elliptic.P256()
-	case "p521":
-		curve = elliptic.P521()
-	case "p384":
-		curve = elliptic.P384()
-	default:
-		return nil, "", fmt.Errorf("unknown key type: %q", keyType)
-	}
-	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, keyType, nil
 }
 
 // publicKey returns the public key of the current user by reading from $HOME/.ssh/.
