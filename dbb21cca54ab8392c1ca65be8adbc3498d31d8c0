@@ -16,6 +16,24 @@
       "revId": "dbb21cca54ab8392c1ca65be8adbc3498d31d8c0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "323eac9c_f51c6e02",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-16T22:16:27Z",
+      "side": 1,
+      "message": "I removed this because Debug pack does not use the Private key at all (or the Public one either). It creates a random byte as the key. So, as it\u0027s written, Debug pack *can* be used with a bogus (or even nil) Factotum (maybe it shouldn\u0027t).\n\nAnyway, I can check len(context.Factotum.PublicKey) \u003e 0, but it\u0027s probably not the right thing to do here given how Debug pack works right now. Your call.",
+      "parentUuid": "323eac9c_559e22c7",
+      "revId": "dbb21cca54ab8392c1ca65be8adbc3498d31d8c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
