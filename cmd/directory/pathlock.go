@@ -11,17 +11,12 @@ const (
 )
 
 var (
-	mu    sync.Mutex
 	locks []*sync.Mutex
 )
 
 // pathLock returns a mutex associated with a given path.
 func pathLock(path upspin.PathName) *sync.Mutex {
-	mu.Lock()
-	defer mu.Unlock()
-
 	lockNum := hashCode(string(path))
-
 	return locks[lockNum%numLocks]
 }
 
