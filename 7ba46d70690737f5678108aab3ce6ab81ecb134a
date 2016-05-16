@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "323eac9c_888872d9",
+        "filename": "cmd/directory/pathlock.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-16T19:45:17Z",
+      "side": 1,
+      "message": "Ah, yeah, left over code. Will clean up shortly. Thx.",
+      "parentUuid": "323eac9c_c84d1ab7",
+      "revId": "7ba46d70690737f5678108aab3ce6ab81ecb134a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "323eac9c_68242600",
         "filename": "cmd/directory/server.go",
         "patchSetId": 4
