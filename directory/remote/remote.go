@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"strings"
 	"sync"
+	"time"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/directory/proto"
@@ -18,6 +19,7 @@ import (
 type dialContext struct {
 	endpoint upspin.Endpoint
 	userName upspin.UserName
+	factotum upspin.Factotum
 }
 
 // remote implements upspin.Directory.
@@ -101,13 +103,18 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Authenticate tells the server which user this is.
-// TODO: Do something cryptographic.
 func (r *remote) Authenticate(userName upspin.UserName) (int, error) {
 	req := &proto.AuthenticateRequest{
 		UserName: userName,
+		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
 	}
+	sig, err := r.ctx.factotum.UserSign([]byte(string(req.UserName) + " DirectoryAuthenticate " + req.Now))
+	if err != nil {
+		return -1, err
+	}
+	req.Signature = sig
 	var resp proto.AuthenticateResponse
-	err := r.rpcClient.Call("Server.Authenticate", &req, &resp)
+	err = r.rpcClient.Call("Server.Authenticate", &req, &resp)
 	return resp.ID, err
 }
 
@@ -126,6 +133,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,
+			factotum: context.Factotum,
 		},
 	}
 
@@ -156,6 +164,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 
 	remotes.Lock()
 	remotes.r[r.ctx] = r
+	// TODO(ehg) make sure it is safe to share factotum here
 	remotes.Unlock()
 	return r, nil
 }
