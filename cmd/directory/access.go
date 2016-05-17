@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"upspin.googlesource.com/upspin.git/access"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -82,7 +83,7 @@ func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 				}
 				return accessPath, acc, err
 			}
-			logMsg.Printf("Found access file in %s: %+v ", accessPath, acc)
+			log.Printf("Found access file in %s: %+v ", accessPath, acc)
 			return accessPath, acc, nil
 		}
 
@@ -95,7 +96,7 @@ func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 	}
 	// We did not find any Access file. The root should have an implicit one. This is a serious error.
 	err = errors.New("No Access file found anywhere")
-	logErr.Printf("WARN: %s", err)
+	log.Logger(log.Critical).Print(err)
 	return "", nil, err
 }
 
@@ -114,12 +115,12 @@ func (d *dirServer) checkRights(user upspin.UserName, right access.Right, pathNa
 				}
 			}
 			if groupErr != nil {
-				logErr.Printf("Error checking access: %s", groupErr)
+				log.Printf("Error checking access: %s", groupErr)
 				return false, groupErr
 			}
 			continue // Try acc.Can again
 		}
-		logMsg.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
+		log.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
 		return can, err
 	}
 }

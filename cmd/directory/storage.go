@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -46,7 +47,7 @@ func (d *dirServer) putDirEntry(parsedPath *path.Parsed, dirEntry *upspin.DirEnt
 
 // getNonRoot returns the dir entry for the given path, possibly going to stable storage to find it.
 func (d *dirServer) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
-	logMsg.Printf("Looking up dir entry %q", path)
+	log.Printf("Looking up dir entry %q", path)
 
 	// Check cache first.
 	if dir, ok := d.dirCache.Get(path); ok {
@@ -99,10 +100,10 @@ func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 	if err != nil {
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
 		errMsg := fmt.Sprintf("internal server error: conversion to json failed: %s", err)
-		logErr.Printf("WARN: %s: %s: %+v", errMsg, path, dirEntry)
+		log.Logger(log.Critical).Printf("%s: %s: %+v", errMsg, path, dirEntry)
 		return newDirError("putmeta", path, errMsg)
 	}
-	logMsg.Printf("Storing dir entry at %q", path)
+	log.Printf("Storing dir entry at %q", path)
 	_, err = d.cloudClient.Put(string(path), jsonBuf)
 	return err
 }
@@ -122,7 +123,7 @@ func (d *dirServer) isDirEmpty(path upspin.PathName) error {
 
 // getCloudBytes fetches the path from the storage backend.
 func (d *dirServer) getCloudBytes(path upspin.PathName) ([]byte, error) {
-	logMsg.Printf("Downloading DirEntry from GCP: %s", path)
+	log.Printf("Downloading DirEntry from GCP: %s", path)
 	data, err := d.cloudClient.Download(string(path))
 	if err != nil {
 		// TODO: differentiate FILE NOT FOUND from other errors.
@@ -144,6 +145,6 @@ func (d *dirServer) deletePath(path upspin.PathName) error {
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)
 	d.dirNegCache.Add(path, nil) // a deleted entry goes into the negative cache.
-	logMsg.Printf("Deleted %s from GCP and caches", path)
+	log.Printf("Deleted %s from GCP and caches", path)
 	return nil
 }
