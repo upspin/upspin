@@ -77,7 +77,9 @@ type ServerUserNameResponse struct {
 
 // Authenticate is not part of upspin.Directory. It is used only in the remote implementation.
 type AuthenticateRequest struct {
-	UserName upspin.UserName
+	UserName  upspin.UserName
+	Now       string
+	Signature upspin.Signature
 }
 
 type AuthenticateResponse struct {

@@ -88,7 +88,7 @@ type Factotum interface {
 }
 
 // Packdata stores the encoded information used to pack the data in an
-// item, such decryption keys. The first byte identifies the Packing
+// item, such as decryption keys. The first byte identifies the Packing
 // used to store the information; the rest of the slice is the data
 // itself.
 type Packdata []byte

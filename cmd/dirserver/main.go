@@ -3,18 +3,22 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"math/big"
 	"net"
 	"net/http"
 	"net/rpc"
 	"os"
 	"sync"
+	"time"
 
 	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/directory/proto"
+	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	// TODO: Other than the directory implementations, most of these
@@ -90,13 +94,34 @@ func main() {
 
 // Authenticate must be done before any other methods. It authenticates
 // the calling user.
-// TODO: Do something cryptographic.
 func (s *Server) Authenticate(req *proto.AuthenticateRequest, resp *proto.AuthenticateResponse) (err error) {
-	log.Printf("Authenticate %q", req.UserName)
+	log.Printf("Authenticate %q %q", req.UserName, req.Now)
 	// Must be a valid name.
 	parsed, err := path.Parse(upspin.PathName(req.UserName))
 	if err != nil {
 		log.Fatalf("Authenticate %q: %v", req.UserName, err)
+		return err
+	}
+
+	// Time should be sane.
+	reqNow, err := time.Parse(time.ANSIC, req.Now)
+	if err != nil {
+		log.Fatalf("time failed to parse: %q", req.Now)
+		return err
+	}
+	now := time.Now()
+	if reqNow.After(now.Add(30*time.Second)) || reqNow.Before(now.Add(-45*time.Second)) {
+
+		log.Printf("timestamp is far wrong, but proceeding anyway")
+	}
+
+	// Signature should verify.
+	_, keys, err := s.context.User.Lookup(req.UserName)
+	if err != nil {
+		return err
+	}
+	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), req.Signature.R, req.Signature.S)
+	if err != nil {
 		return err
 	}
 
@@ -132,6 +157,20 @@ func (s *Server) Authenticate(req *proto.AuthenticateRequest, resp *proto.Authen
 
 	resp.ID = userID
 	return nil
+}
+
+// verifySignature verifies that the hash was signed by one of the keys.
+func verifySignature(keys []upspin.PublicKey, hash []byte, r, s *big.Int) error {
+	for _, k := range keys {
+		ecdsaPubKey, _, err := factotum.ParsePublicKey(k)
+		if err != nil {
+			return err
+		}
+		if ecdsa.Verify(ecdsaPubKey, hash, r, s) {
+			return nil
+		}
+	}
+	return fmt.Errorf("no keys verified signature")
 }
 
 var ErrUnauthenticated = errors.New("user not authenticated")

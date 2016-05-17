@@ -3,7 +3,7 @@ Package auth handles authentication of Upspin users.
 
 Sample usage:
 
-   authHandler := auth.NewHandler(&auth.Config{Lookup: context.User.Lookup})
+   authHandler := auth.NewHandler(&auth.Config{Lookup: auth.PublicUserKeyService()})
 
    rawHandler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
    	user := session.User()
