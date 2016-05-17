@@ -7,6 +7,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -30,7 +31,7 @@ func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
 		rootEntry, ok := r.(root) // Can't fail, but we check anyway to be abundantly safe.
 		if !ok {
 			err := newDirError(op, userRootPath, "user root cache fubar")
-			logErr.Printf("WARN: %s", err)
+			log.Printf("WARN: %s", err)
 			return nil, err
 		}
 		return &rootEntry, nil
@@ -99,7 +100,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 	if err != nil {
 		// This should never happen because accessPath has been parsed already.
 		newErr := newDirError(op, parsed.Path(), err.Error())
-		logErr.Printf("WARN: %s", newErr)
+		log.Printf("WARN: %s", newErr)
 		return newErr
 	}
 	root.accessFiles[accessPath] = acc
@@ -107,7 +108,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 	if err != nil {
 		return err
 	}
-	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	log.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
 	return nil
 }
 
@@ -150,7 +151,7 @@ func unmarshalRoot(buf []byte) (*root, error) {
 			// This is bad. Our map serialization included a duplicate, which should never happen unless
 			// the JSON entry on disk was modified manually or somehow strangely corrupted.
 			err = newDirError("getRoot", path, "Access file duplicated in root")
-			logErr.Printf("WARN: %s", err)
+			log.Printf("WARN: %s", err)
 			saveError(err)
 		}
 		root.accessFiles[path] = acc
@@ -174,7 +175,7 @@ func marshalRoot(root *root) ([]byte, error) {
 		jsonAccess, err := acc.MarshalJSON()
 		if err != nil {
 			saveError(err)
-			logErr.Printf("Error marshaling access file %s: %s", path, err)
+			log.Printf("Error marshaling access file %s: %s", path, err)
 			continue
 		}
 		sroot.AccessFiles[path] = string(jsonAccess)

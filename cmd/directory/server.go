@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	goPath "path"
 	"strings"
 
@@ -18,6 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/factotum"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 
@@ -36,9 +35,6 @@ var (
 	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
-
-	logErr = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
-	logMsg = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
 )
 
 type dirServer struct {
@@ -129,7 +125,7 @@ func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http
 		if err != nil {
 			retErr := newDirError("Put", dirEntry.Name, fmt.Sprintf("unmarshal: %s", err))
 			netutil.SendJSONError(w, context, retErr)
-			logErr.Println(retErr)
+			log.Println(retErr)
 			return
 		}
 		err = d.putDir(sess, parsed, dirEntry)
@@ -188,7 +184,7 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 	}
 	// Verify parent IsDir (redundant, but just to be safe).
 	if !parentDirEntry.IsDir() {
-		logErr.Printf("WARN: bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
+		log.Printf("WARN: bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
 		return newDirError(op, parsed.Path(), "parent is not a directory")
 	}
 
@@ -232,13 +228,13 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 		}
 	}
 	if access.IsGroupFile(canonicalPath) {
-		logMsg.Printf("Invalidating group file %s", canonicalPath)
+		log.Printf("Invalidating group file %s", canonicalPath)
 		// By removing the group we guarantee we won't be using its old definition, if any.
 		// Since we parse groups lazily, this is correct and generally efficient.
 		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group was not there, no harm done.
 	}
 
-	logMsg.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	log.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
 	return nil
 }
 
@@ -248,13 +244,13 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 	canRead, err := d.hasRight(op, sess.User(), access.Read, parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("Access error Read: %s", err)
+		log.Printf("Access error Read: %s", err)
 		return nil, err
 	}
 	canList, err := d.hasRight(op, sess.User(), access.List, parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("Access error List: %s", err)
+		log.Printf("Access error List: %s", err)
 		return nil, err
 	}
 	// If the user has no rights, we're done.
@@ -279,11 +275,11 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		logMsg.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
+		log.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
 		dirEntry.Location = upspin.Location{}
 		dirEntry.Metadata.Packdata = nil
 	}
-	logMsg.Printf("Got dir entry for user %s: path %s: %v", sess.User(), parsed.Path(), dirEntry)
+	log.Printf("Got dir entry for user %s: path %s: %v", sess.User(), parsed.Path(), dirEntry)
 	return dirEntry, nil
 }
 
@@ -304,14 +300,14 @@ func (d *dirServer) whichAccessHandler(sess auth.Session, w http.ResponseWriter,
 	canRead, err := d.checkRights(sess.User(), access.Read, parsedPath.Path(), acc)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("WhichAccess error Read: %s", err)
+		log.Printf("WhichAccess error Read: %s", err)
 		netutil.SendJSONError(w, context, err)
 		return
 	}
 	canList, err := d.checkRights(sess.User(), access.List, parsedPath.Path(), acc)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("WhichAccess error List: %s", err)
+		log.Printf("WhichAccess error List: %s", err)
 		netutil.SendJSONError(w, context, err)
 		return
 	}
@@ -370,7 +366,7 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 		// error is ignored as pattern is known valid
 		if match, _ := goPath.Match(parsed.String(), lookupPath); match {
 			// Now fetch each DirEntry we need
-			logMsg.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
+			log.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
 			de, err := d.getNonRoot(upspin.PathName(lookupPath))
 			if err != nil {
 				netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), err.Error()))
@@ -378,21 +374,21 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			// Verify if user has proper list ACL.
 			parsedDirName, err := path.Parse(de.Name)
 			if err != nil {
-				logErr.Printf("WARN: internal inconsistency: dir entry name does not parse: %s", err)
+				log.Printf("WARN: internal inconsistency: dir entry name does not parse: %s", err)
 				continue
 			}
 			canList, err := d.hasRight(op, sess.User(), access.List, &parsedDirName)
 			if err != nil {
-				logErr.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
+				log.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
 				continue
 			}
 			canRead, err := d.hasRight(op, sess.User(), access.Read, &parsedDirName)
 			if err != nil {
-				logErr.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
+				log.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
 				continue
 			}
 			if !canRead && !canList {
-				logMsg.Printf("User %s can't Glob %s", sess.User(), de.Name)
+				log.Printf("User %s can't Glob %s", sess.User(), de.Name)
 				continue
 			}
 			// If the user can't read a path, clear out its Location.
@@ -414,7 +410,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	canDelete, err := d.hasRight(op, sess.User(), access.Delete, parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
-		logErr.Printf("Access error for Delete: %s", err)
+		log.Printf("Access error for Delete: %s", err)
 		return err
 	}
 	if !canDelete {
@@ -447,7 +443,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	if access.IsGroupFile(parsedPath) {
 		access.RemoveGroup(parsedPath) // ignore error since it doesn't matter if the group was added already.
 	}
-	logMsg.Printf("Deleted %s", parsedPath)
+	log.Printf("Deleted %s", parsedPath)
 	return nil
 }
 
@@ -464,6 +460,10 @@ func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
 
 func main() {
 	flag.Parse()
+
+	// Somehow the Logging API requires a 'google.com:' prefix, but the GCS buckets do not.
+	// Use the bucketname as the logging prefix so we can differentiate the main dir server and the test dir server.
+	log.Connect("google.com:"+*projectID, *bucketName)
 
 	ah := auth.NewHandler(&auth.Config{
 		Lookup: auth.PublicUserKeyService(),
@@ -484,13 +484,13 @@ func main() {
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
-			logErr.Fatal(err)
+			log.Fatal(err)
 		}
-		logErr.Println("Starting HTTPS server with SSL.")
-		logErr.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
+		log.Println("Starting HTTPS server with SSL.")
+		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
 	} else {
-		logErr.Println("Not using SSL certificate. Starting regular HTTP server.")
-		logErr.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+		log.Println("Not using SSL certificate. Starting regular HTTP server.")
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 	}
-	logErr.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
