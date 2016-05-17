@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"strings"
@@ -52,7 +53,7 @@ func (s *storeClient) innerGet(loc *upspin.Location) ([]byte, []upspin.Location,
 		url = fmt.Sprintf("%s/get?ref=%s", loc.Endpoint.NetAddr, loc.Reference)
 	}
 
-	logMsg.Printf("Making Get request to Store: %s", url)
+	log.Printf("Making Get request to Store: %s", url)
 	req, err := http.NewRequest(netutil.Get, url, nil)
 	if err != nil {
 		return nil, nil, err
