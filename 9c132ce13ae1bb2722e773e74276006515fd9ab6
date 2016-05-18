@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "972aeabd_e638b7c3",
+        "filename": "store/proto/proto.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T21:53:37Z",
+      "side": 1,
+      "message": "For the GCP json stuff, I have similar conversion functions tucked away in cloud/netutil/jsonmsg (formerly called parser). One benefit of only supporting grpc would be to deprecate that. It also appears to be in the wrong place since all json messages are in that package as opposed to one sub-package per service type as it is now with \u003cservice\u003e/proto.\n\nJust a thought.",
+      "revId": "9c132ce13ae1bb2722e773e74276006515fd9ab6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
