@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package proto;
+
+// Endpoint mirrors upspin.Endpoint.
+message Endpoint {
+	int32 transport = 1;
+	string net_addr = 2;
+}
+
+// Location mirrors upspin.Location.
+message Location {
+	Endpoint endpoint = 1;
+	string reference = 2;
+}
+
+message GetRequest {
+	string reference = 1;
+}
+
+message GetResponse {
+	bytes data = 1;
+	repeated Location locations = 2;
+}
+
+message PutRequest {
+	bytes data = 1;
+}
+
+message PutResponse {
+	string reference = 1;
+}
+
+message DeleteRequest {
+	string reference = 1;
+}
+
+message DeleteResponse {
+}
+
+// Types for the methods of upspin.Service.
+// TODO: Put somewhere shared?
+
+message ConfigureRequest {
+	repeated string options = 1;
+}
+
+message ConfigureResponse {
+}
+
+message EndpointRequest {
+}
+
+message EndpointResponse {
+	Endpoint endpoint = 1;
+}
+
+message ServerUserNameRequest {
+}
+
+message ServerUserNameResponse {
+	string user_name = 1;
+}
+
+service Store {
+	rpc Get (GetRequest) returns (GetResponse) {}
+	rpc Put (PutRequest) returns (PutResponse) {}
+	rpc Delete (DeleteRequest) returns (DeleteResponse) {}
+	rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
+	rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
+	rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
+}
