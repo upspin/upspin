@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
-	"net/rpc"
 	"os"
+
+	gContext "golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	"upspin.googlesource.com/upspin.git/context"
 	"upspin.googlesource.com/upspin.git/store/proto"
@@ -49,7 +50,7 @@ type Server struct {
 }
 
 func main() {
-	log.SetFlags(0)
+	log.SetFlags(log.Lshortfile)
 	log.SetPrefix("storeserver: ")
 
 	flag.Parse()
@@ -67,60 +68,76 @@ func main() {
 		context: ctx,
 	}
 
-	rpc.Register(s)
 	// TODO: FIGURE OUT HTTPS
-	rpc.HandleHTTP()
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
-	log.Fatal(http.Serve(listener, nil))
+	grpcServer := grpc.NewServer()
+	proto.RegisterStoreServer(grpcServer, s)
+	grpcServer.Serve(listener)
 }
 
-func (s *Server) Get(req *proto.GetRequest, resp *proto.GetResponse) (err error) {
+func (s *Server) Get(ctx gContext.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
 	log.Printf("Get %q", req.Reference)
-	resp.Data, resp.Locations, err = s.context.Store.Get(req.Reference)
+	data, locs, err := s.context.Store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
 	}
-	return err
+	resp := &proto.GetResponse{
+		Data:      data,
+		Locations: proto.Locations(locs),
+	}
+	return resp, err
 }
 
-func (s *Server) Put(req *proto.PutRequest, resp *proto.PutResponse) (err error) {
+func (s *Server) Put(ctx gContext.Context, req *proto.PutRequest) (*proto.PutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
-	resp.Reference, err = s.context.Store.Put(req.Data)
+	ref, err := s.context.Store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
 	}
-	return err
+	resp := &proto.PutResponse{
+		Reference: string(ref),
+	}
+	return resp, err
 }
 
-func (s *Server) Delete(req *proto.DeleteRequest, resp *proto.DeleteResponse) error {
+func (s *Server) Delete(ctx gContext.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
-	err := s.context.Store.Delete(req.Reference)
+	err := s.context.Store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Reference, err)
 	}
-	return err
+	return nil, err
 }
 
-func (s *Server) Configure(req *proto.ConfigureRequest, resp *proto.ConfigureResponse) error {
+func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 	err := s.context.Store.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
-	return err
+	return nil, err
 }
 
-func (s *Server) Endpoint(req *proto.EndpointRequest, resp *proto.EndpointResponse) error {
+func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
-	resp.Endpoint = s.context.Store.Endpoint()
-	return nil
+	endpoint := s.context.Store.Endpoint()
+	resp := &proto.EndpointResponse{
+		Endpoint: &proto.Endpoint{
+			Transport: int32(endpoint.Transport),
+			NetAddr:   string(endpoint.NetAddr),
+		},
+	}
+	return resp, nil
 }
 
-func (s *Server) ServerUserName(req *proto.ServerUserNameRequest, resp *proto.ServerUserNameResponse) error {
+func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
-	resp.UserName = s.context.Store.ServerUserName()
-	return nil
+	userName := s.context.Store.ServerUserName()
+	resp := &proto.ServerUserNameResponse{
+		UserName: string(userName),
+	}
+	return resp, nil
 }
