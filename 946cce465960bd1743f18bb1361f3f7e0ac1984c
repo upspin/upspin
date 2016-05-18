@@ -104,6 +104,24 @@
       "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_c8fae281",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T19:38:58Z",
+      "side": 1,
+      "message": "The other problem here is that just being a bool won\u0027t let me know which log level is requested.\n\nin your example, currentLevel \u003e\u003d Linfo would return a bool, but that bool would have no notion of a level.  And I need a level to invoke the underlying logger.\n\nHmmmm...",
+      "parentUuid": "972aeabd_d5955f50",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
