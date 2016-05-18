@@ -55,7 +55,7 @@ type node struct {
 }
 
 func (n *node) String() string {
-	return fmt.Sprintf("node %s %d", n.uname, n.id)
+	return fmt.Sprintf("%s %#x", n.uname, uint64(n.id))
 }
 
 // handle represents an open file.
@@ -68,7 +68,7 @@ type handle struct {
 }
 
 func (h *handle) String() string {
-	return fmt.Sprintf("handle %s %d %d", h.n.uname, h.n.id, h.id)
+	return fmt.Sprintf("%q %#x", h.n, h.id)
 }
 
 // newUpspinFS creates a new upspin file system.
@@ -557,7 +557,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 // it is written back to the store.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
 func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) error {
-	log.Printf("Release %q %v", h.n.uname, h)
+	log.Printf("Release %q %v", h.n, h)
 
 	// Write back to upspin.
 	h.n.Lock()
@@ -571,14 +571,14 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 		}
 	}
 	h.n.Unlock()
+	log.Printf("Release %q -> %s", h, err)
 	h.free()
-	log.Printf("Release %q %v -> %s", h.n.uname, h, err)
 	return err
 }
 
 // Fsync implements fs.NodeFsyncer.Fsync.
 func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
-	log.Printf("Fsync %q", n.uname)
+	log.Printf("Fsync %q", n)
 	return nil
 }
 
@@ -587,7 +587,7 @@ func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
 func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	oldPath := old.(*node).uname
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Link %q to %q", oldPath, newPath)
+	log.Printf("Link %q to %q in %q", old.(*node), n, req.NewName)
 	de, err := n.f.client.Link(oldPath, newPath)
 	if err != nil {
 		return nil, err
@@ -600,7 +600,7 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
 	oldPath := path.Join(old.(*node).uname, req.OldName)
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Rename %q to %q", oldPath, newPath)
+	log.Printf("Rename %q in %s to %q in %q", req.OldName, old.(*node), req.NewName, n)
 	return n.f.client.Rename(oldPath, newPath)
 }
 
@@ -609,25 +609,25 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 
 // Getxattr implements fs.Getxattr.
 func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
-	log.Printf("Getxattr %q %v", n.uname, req)
+	log.Printf("Getxattr %q %v", n, req)
 	return fuse.ErrNoXattr
 }
 
 // Listxattr implements fs.Listxattr.
 func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
-	log.Printf("Listxattr %q", n.uname)
+	log.Printf("Listxattr %q", n)
 	return nil
 }
 
 // Setxattr implements fs.Setxattr.
 func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
-	log.Printf("Setxattr %q", n.uname)
+	log.Printf("Setxattr %q", n)
 	return nil
 }
 
 // Removexattr implements fs.Removexattr.
 func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
-	log.Printf("Removexattr %q", n.uname)
+	log.Printf("Removexattr %q", n)
 	return nil
 }
 
@@ -644,7 +644,7 @@ func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node,
 
 // Symlink implements fs.Readlink.
 func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string, error) {
-	log.Printf("Readlink %q", n.uname)
+	log.Printf("Readlink %q", n)
 	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
 	if err != nil {
 		return "", err
@@ -659,5 +659,6 @@ func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string
 	if uint64(l) != n.attr.Size {
 		return "", eio("short read")
 	}
+	log.Printf("Readlink %q -> %q", n, string(buf))
 	return string(buf), nil
 }
