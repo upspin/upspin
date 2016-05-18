@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "972aeabd_b56a6b09",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T19:06:52Z",
+      "side": 1,
+      "message": "these don\u0027t need to be new\u0027ed do they? needless indirection",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_f59063fd",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T19:06:52Z",
+      "side": 1,
+      "message": "my problem with this is that i don\u0027t see the advantages of having all these loggers. see my suggestion below.",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_f5a98335",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T19:06:52Z",
+      "side": 1,
+      "message": "If the bool this returned implemented Logger (call it X below) things can get a lot nicer. You\u0027ve written clear simple code, and that\u0027s good, but it can be prettier.\n\nYou can have functions like\n\nfunc Info() X {\n return currentLevel \u003e\u003d Linfo\n}\n\nand use it like this\n\nlog.Info().Printf(....)\n\nand you can avoid argument evaluation by saying things like\n\n\nif log.Info() {\n   log.Printf(....)\n}",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
