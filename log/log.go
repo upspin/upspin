@@ -37,28 +37,18 @@ type Level int
 
 // Different levels of logging.
 const (
-	Ldefault   = Level(logging.Default)
-	Ldebug     = Level(logging.Debug)
-	Linfo      = Level(logging.Info)
-	Lwarning   = Level(logging.Warning)
-	Lerror     = Level(logging.Error)
-	Lcritical  = Level(logging.Critical)
-	Lalert     = Level(logging.Alert)
-	Lemergency = Level(logging.Emergency)
+	Ldebug = Level(logging.Debug)
+	Linfo  = Level(logging.Info)
+	Lerror = Level(logging.Error)
 )
 
 // Pre-allocated Loggers at each logging level.
 var (
-	Default   = newLogger(Ldefault)
-	Debug     = newLogger(Ldebug)
-	Info      = newLogger(Linfo)
-	Warning   = newLogger(Lwarning)
-	Error     = newLogger(Lerror)
-	Critical  = newLogger(Lcritical)
-	Alert     = newLogger(Lalert)
-	Emergency = newLogger(Lemergency)
+	Debug = newLogger(Ldebug)
+	Info  = newLogger(Linfo)
+	Error = newLogger(Lerror)
 
-	currentLevel  Level = Ldefault
+	currentLevel  Level = Linfo
 	defaultClient *logging.Client
 	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
@@ -165,27 +155,27 @@ func At(level Level) bool {
 
 // Printf writes a formated message to the log.
 func Printf(format string, v ...interface{}) {
-	Default.Printf(format, v...)
+	Info.Printf(format, v...)
 }
 
 // Print writes a message to the log.
 func Print(v ...interface{}) {
-	Default.Print(v...)
+	Info.Print(v...)
 }
 
 // Println writes a line to the log.
 func Println(v ...interface{}) {
-	Default.Println(v...)
+	Info.Println(v...)
 }
 
 // Fatal writes a message to the log and aborts.
 func Fatal(v ...interface{}) {
-	Default.Fatal(v...)
+	Info.Fatal(v...)
 }
 
 // Fatalf writes a formated message to the log and aborts.
 func Fatalf(format string, v ...interface{}) {
-	Default.Fatalf(format, v...)
+	Info.Fatalf(format, v...)
 }
 
 // Connect connects all non-custom loggers (those not created by New) in this address space to a GCP Logging

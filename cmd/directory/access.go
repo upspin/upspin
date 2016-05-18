@@ -96,7 +96,7 @@ func (d *dirServer) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 	}
 	// We did not find any Access file. The root should have an implicit one. This is a serious error.
 	err = errors.New("No Access file found anywhere")
-	log.Critical.Print(err)
+	log.Error.Print(err)
 	return "", nil, err
 }
 
