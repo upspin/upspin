@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "972aeabd_95a2c70d",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T19:31:50Z",
+      "side": 1,
+      "message": "new is not Go\u0027s new. It\u0027s a func at the end of this file to create a new logger instance.",
+      "parentUuid": "972aeabd_b56a6b09",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "972aeabd_f59063fd",
         "filename": "log/log.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "972aeabd_15b6d74d",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T19:31:50Z",
+      "side": 1,
+      "message": "ok.",
+      "parentUuid": "972aeabd_f59063fd",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "972aeabd_f5a98335",
         "filename": "log/log.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-05-18T19:06:52Z",
       "side": 1,
       "message": "If the bool this returned implemented Logger (call it X below) things can get a lot nicer. You\u0027ve written clear simple code, and that\u0027s good, but it can be prettier.\n\nYou can have functions like\n\nfunc Info() X {\n return currentLevel \u003e\u003d Linfo\n}\n\nand use it like this\n\nlog.Info().Printf(....)\n\nand you can avoid argument evaluation by saying things like\n\n\nif log.Info() {\n   log.Printf(....)\n}",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_d5955f50",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T19:31:50Z",
+      "side": 1,
+      "message": "The problem with Logger being a bool is that I need to hold a client inside it or we can\u0027t create a new Logger pointing at another instance of GCP in the same address space. \n\nThat said, I\u0027m not sure having this feature is really useful. But I can see for example Packer having its own set of logs for internal debugging, separately from the default logger.\n\nI\u0027ll think a bit more and get a new version out shortly. But in the mean time, please let me know if you agree we won\u0027t need the New call as written below. The log package will log locally and/or to one and only one GCP logging repository. Agreed?\n\nThanks.",
+      "parentUuid": "972aeabd_f5a98335",
       "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
