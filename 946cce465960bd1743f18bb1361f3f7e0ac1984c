@@ -122,6 +122,24 @@
       "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_a8216ef1",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T19:42:32Z",
+      "side": 1,
+      "message": "But that\u0027s just it. There don\u0027t need to be so many loggers. There only needs to be one, and the question is not which logger to write to but rather whether for this statement the logger generates any output.",
+      "parentUuid": "972aeabd_c8fae281",
+      "revId": "946cce465960bd1743f18bb1361f3f7e0ac1984c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
