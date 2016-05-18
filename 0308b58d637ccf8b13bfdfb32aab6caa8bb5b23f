@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "972aeabd_12942df0",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T18:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "972aeabd_f8e7bd51",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "972aeabd_d88bd977",
         "filename": "log/log.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-18T14:08:01Z",
       "side": 1,
       "message": "s/shorter/it\u0027s shorter/\nalso good style to put these numbered entries on separate lines.",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_d2b295a2",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T18:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "972aeabd_d88bd977",
       "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "972aeabd_b2af213b",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T18:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "972aeabd_b8dd4580",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "972aeabd_98da0184",
         "filename": "log/log.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-05-18T14:08:01Z",
       "side": 1,
       "message": "don\u0027t you want something like pre-defined loggers for these levels? otherwise different packages will have competing loggers. then you could say things like log.Info.Print(...). you could also have \n\nvar OuputLevel Error // Default level for logs to appear.\nfunc SetOutputLevel(Level)\nfunc At(Level) Logger\n\nand say things like\n\nlog.At(log.Debug).Print(...)\n\nthat will only log when the level is Debug or above, allowing us to easily enable greater log details. to do that efficiently, you can also define the type of At to be a boolean type that satisfies the logger interface, so you can say\n\nif log.At(Debug) {\n/// lots of stuff\n}\n\nand make this kind of logging very cheap",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_12ad4d42",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-18T18:19:49Z",
+      "side": 1,
+      "message": "Done. Modulo the bool implementing Logger because it would be cumbersome to duplicate all standard loggers and the same can be accomplished with what I have now.",
+      "parentUuid": "972aeabd_98da0184",
       "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
