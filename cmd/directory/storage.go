@@ -100,7 +100,7 @@ func (d *dirServer) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 	if err != nil {
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
 		errMsg := fmt.Sprintf("internal server error: conversion to json failed: %s", err)
-		log.Logger(log.Critical).Printf("%s: %s: %+v", errMsg, path, dirEntry)
+		log.Critical.Printf("%s: %s: %+v", errMsg, path, dirEntry)
 		return newDirError("putmeta", path, errMsg)
 	}
 	log.Printf("Storing dir entry at %q", path)
