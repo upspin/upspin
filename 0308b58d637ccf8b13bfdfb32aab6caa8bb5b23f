@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "972aeabd_f8e7bd51",
+        "filename": "cmd/directory/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T14:08:01Z",
+      "side": 1,
+      "message": "this is ugly. i\u0027d rather see log.Critical.Print(err)",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_d88bd977",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T14:08:01Z",
+      "side": 1,
+      "message": "s/shorter/it\u0027s shorter/\nalso good style to put these numbered entries on separate lines.",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_b8dd4580",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T14:08:01Z",
+      "side": 1,
+      "message": "this isn\u0027t a re-export, it\u0027s a redefinition. it\u0027s very unlikely to change but it would be safer to actually define these values by assignment from the other package. that would also be marginally clearer.",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_98da0184",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T14:08:01Z",
+      "side": 1,
+      "message": "don\u0027t you want something like pre-defined loggers for these levels? otherwise different packages will have competing loggers. then you could say things like log.Info.Print(...). you could also have \n\nvar OuputLevel Error // Default level for logs to appear.\nfunc SetOutputLevel(Level)\nfunc At(Level) Logger\n\nand say things like\n\nlog.At(log.Debug).Print(...)\n\nthat will only log when the level is Debug or above, allowing us to easily enable greater log details. to do that efficiently, you can also define the type of At to be a boolean type that satisfies the logger interface, so you can say\n\nif log.At(Debug) {\n/// lots of stuff\n}\n\nand make this kind of logging very cheap",
+      "revId": "0308b58d637ccf8b13bfdfb32aab6caa8bb5b23f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
