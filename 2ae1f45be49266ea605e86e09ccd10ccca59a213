@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "972aeabd_989161ac",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-18T13:56:46Z",
+      "side": 1,
+      "message": "is it really your intention to quote the node\u0027s representation?",
+      "revId": "2ae1f45be49266ea605e86e09ccd10ccca59a213",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
