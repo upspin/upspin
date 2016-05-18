@@ -5,9 +5,13 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"net/rpc"
+	"log"
 	"strings"
 	"sync"
+
+	gContext "golang.org/x/net/context"
+
+	"google.golang.org/grpc"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/store/proto"
@@ -22,8 +26,8 @@ type dialContext struct {
 
 // remote implements upspin.Store.
 type remote struct {
-	ctx       dialContext
-	rpcClient *rpc.Client
+	ctx         dialContext
+	storeClient proto.StoreClient
 }
 
 // remotes contains a list of all established remote connections.
@@ -37,34 +41,29 @@ var _ upspin.Store = (*remote)(nil)
 // Get implements upspin.Store.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	req := &proto.GetRequest{
-		Reference: ref,
+		Reference: string(ref),
 	}
-	var resp proto.GetResponse
-	err := r.rpcClient.Call("Server.Get", &req, &resp)
-	if len(resp.Locations) == 0 {
-		resp.Locations = nil
-	}
-	return resp.Data, resp.Locations, err
+	resp, err := r.storeClient.Get(gContext.Background(), req)
+	return resp.Data, proto.UpspinLocations(resp.Locations), err
 }
 
 // Put implements upspin.Store.Put.
-// Directories are created with MakeDirectory. Roots are anyway. TODO?.
+// Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	req := &proto.PutRequest{
 		Data: data,
 	}
-	var resp proto.PutResponse
-	err := r.rpcClient.Call("Server.Put", &req, &resp)
-	return resp.Reference, err
+	resp, err := r.storeClient.Put(gContext.Background(), req)
+	return upspin.Reference(resp.Reference), err
 }
 
 // Delete implements upspin.Store.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
 	req := &proto.DeleteRequest{
-		Reference: ref,
+		Reference: string(ref),
 	}
-	var resp proto.DeleteResponse
-	return r.rpcClient.Call("Server.Delete", &req, &resp)
+	_, err := r.storeClient.Delete(gContext.Background(), req)
+	return err
 }
 
 // ServerUserName implements upspin.Service.
@@ -97,8 +96,13 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	var err error
 	addr := string(e.NetAddr)
 	switch {
-	case strings.HasPrefix(addr, "http://"):
-		r.rpcClient, err = rpc.DialHTTP("tcp", addr[7:])
+	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
+		conn, err := grpc.Dial(addr[7:], grpc.WithInsecure()) // TODO: Enable TLS.
+		if err != nil {
+			log.Fatalf("remote store: gprc did not connect: %v", err)
+		}
+		// TODO: When can we do conn.Close()?
+		r.storeClient = proto.NewStoreClient(conn)
 	default:
 		err = fmt.Errorf("unrecognized net address in remote: %q", addr)
 	}
