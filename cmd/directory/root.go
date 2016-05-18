@@ -31,7 +31,7 @@ func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
 		rootEntry, ok := r.(root) // Can't fail, but we check anyway to be abundantly safe.
 		if !ok {
 			err := newDirError(op, userRootPath, "user root cache fubar")
-			log.Critical.Print(err)
+			log.Error.Print(err)
 			return nil, err
 		}
 		return &rootEntry, nil
@@ -100,7 +100,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 	if err != nil {
 		// This should never happen because accessPath has been parsed already.
 		newErr := newDirError(op, parsed.Path(), err.Error())
-		log.Critical.Print(newErr)
+		log.Error.Print(newErr)
 		return newErr
 	}
 	root.accessFiles[accessPath] = acc
@@ -151,7 +151,7 @@ func unmarshalRoot(buf []byte) (*root, error) {
 			// This is bad. Our map serialization included a duplicate, which should never happen unless
 			// the JSON entry on disk was modified manually or somehow strangely corrupted.
 			err = newDirError("getRoot", path, "Access file duplicated in root")
-			log.Critical.Print(err)
+			log.Error.Print(err)
 			saveError(err)
 		}
 		root.accessFiles[path] = acc

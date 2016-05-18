@@ -184,7 +184,7 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 	}
 	// Verify parent IsDir (redundant, but just to be safe).
 	if !parentDirEntry.IsDir() {
-		log.Critical.Printf("Bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
+		log.Error.Printf("Bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
 		return newDirError(op, parsed.Path(), "parent is not a directory")
 	}
 
@@ -374,7 +374,7 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			// Verify if user has proper list ACL.
 			parsedDirName, err := path.Parse(de.Name)
 			if err != nil {
-				log.Critical.Printf("Internal inconsistency: dir entry name does not parse: %s", err)
+				log.Error.Printf("Internal inconsistency: dir entry name does not parse: %s", err)
 				continue
 			}
 			canList, err := d.hasRight(op, sess.User(), access.List, &parsedDirName)
