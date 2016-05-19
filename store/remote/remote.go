@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc"
 
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/store/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
 
 // dialContext contains the destination and authenticated user of the dial.
