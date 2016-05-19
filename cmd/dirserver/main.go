@@ -122,7 +122,7 @@ func (s *Server) Authenticate(req *proto.AuthenticateRequest, resp *proto.Authen
 	}
 	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), req.Signature.R, req.Signature.S)
 	if err != nil {
-		return err
+		log.Printf("bad signature, but proceeding anyway: %s", err)
 	}
 
 	mu.Lock()
