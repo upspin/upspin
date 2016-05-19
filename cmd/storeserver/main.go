@@ -13,31 +13,13 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/store/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/upspin/proto"
 
-	// TODO: Other than the store implementations, most of these
-	// are only necessary because of InitContext.
-
-	// Load useful packers
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/pack/ee"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
-
-	// Load required gcp services
-	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
+	// Load required services
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
-
-	// Load required test services
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
-
-	// Load required remote services
-	_ "upspin.googlesource.com/upspin.git/directory/remote"
 	_ "upspin.googlesource.com/upspin.git/store/remote"
-	_ "upspin.googlesource.com/upspin.git/user/remote"
+	_ "upspin.googlesource.com/upspin.git/store/teststore"
 )
 
 var (

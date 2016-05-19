@@ -1,5 +1,5 @@
-// Package proto contains the definitions shared between RPC store server and client,
-// one pair for each remote call.
+// Package proto contains the protocol buffer definitions shared between RPC servers and clients,
+// mirroring the interfaces and types in the upspin package itself.
 package proto
 
 import "upspin.googlesource.com/upspin.git/upspin"
@@ -7,7 +7,7 @@ import "upspin.googlesource.com/upspin.git/upspin"
 // To regenerate the protocol buffer output for this package, run
 //	go generate
 
-//go:generate protoc store.proto --go_out=plugins=grpc:.
+//go:generate protoc upspin.proto --go_out=plugins=grpc:.
 
 // UpspinLocations converts from slices of proto's Location struct to upspin's.
 // An unfortunate side-effect of not letting protobufs rule our types.
