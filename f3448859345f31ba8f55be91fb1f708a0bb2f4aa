@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7f702e0_374640b4",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T21:58:37Z",
+      "side": 1,
+      "message": "Maybe add a TODO to say this is temporary? It is right? We should not allow the authentication to proceed if it fails the signature step, right?\n\nMaybe the hybrid way to do this is to return a isAuthenticated boolean so that the server can choose to fail or not depending on flags. The GCP servers do this. By default, it refuses to proceed, but for local testing, it will allow unauthenticated requests.",
+      "revId": "f3448859345f31ba8f55be91fb1f708a0bb2f4aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
