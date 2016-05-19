@@ -16,6 +16,24 @@
       "revId": "22fcb61a42a87c92cd2c471a040ebcf8c0d3e32c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d7f702e0_776b98a9",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T22:38:45Z",
+      "side": 1,
+      "message": "The error contains useful info. How\u0027s this now?",
+      "parentUuid": "d7f702e0_7710383f",
+      "revId": "22fcb61a42a87c92cd2c471a040ebcf8c0d3e32c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
