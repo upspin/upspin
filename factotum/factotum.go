@@ -8,10 +8,10 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"math/big"
 	"strings"
 
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )

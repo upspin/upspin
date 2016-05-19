@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
