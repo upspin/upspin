@@ -324,7 +324,7 @@ func (d *dummyUser) ServerUserName() string {
 	return "dummyUser"
 }
 func (d *dummyUser) Configure(options ...string) error {
-	return nil
+	panic("unimplemented")
 }
 func (d *dummyUser) Endpoint() upspin.Endpoint {
 	panic("unimplemented")

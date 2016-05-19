@@ -102,7 +102,11 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) error {
-	return nil
+	req := &proto.ConfigureRequest{
+		Options: options,
+	}
+	var resp proto.ConfigureResponse
+	return r.rpcClient.Call("Server.Configure", &req, &resp)
 }
 
 const transport = upspin.Remote

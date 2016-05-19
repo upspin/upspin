@@ -146,5 +146,5 @@ func (d *dummyUser) Endpoint() upspin.Endpoint {
 }
 
 func (d *dummyUser) Configure(options ...string) error {
-	return nil
+	panic("unimplemented")
 }
