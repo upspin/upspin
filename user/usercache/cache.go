@@ -78,7 +78,7 @@ func (c *userCache) ServerUserName() string {
 
 // Configure implements upspin.Service.
 func (c *userCache) Configure(options ...string) error {
-	return nil
+	panic("unimplemented")
 }
 
 // Endpoint implements upspin.Service.

@@ -123,7 +123,11 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) error {
-	return nil
+	req := &proto.ConfigureRequest{
+		Options: options,
+	}
+	_, err := r.storeClient.Configure(gContext.Background(), req)
+	return err
 }
 
 const transport = upspin.Remote
