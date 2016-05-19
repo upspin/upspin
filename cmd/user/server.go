@@ -7,7 +7,6 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -17,6 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -318,6 +318,9 @@ func newUserServer(cloudClient gcp.GCP) *userServer {
 func main() {
 	flag.Parse()
 	os.Args = nil
+
+	log.Connect("google.com:"+*projectID, *bucketName)
+
 	gcp := gcp.New(*projectID, *bucketName, gcp.BucketOwnerFullCtrl)
 	userStats = &serverStatus{cloudClient: gcp}
 	u := newUserServer(gcp)

@@ -19,7 +19,6 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
-	"log"
 	"math/big"
 	"net/http"
 	"strings"
@@ -27,6 +26,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/factotum"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 

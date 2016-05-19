@@ -4,9 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/auth"
@@ -15,6 +13,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
 
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
@@ -34,8 +33,6 @@ var (
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	context               = "StoreService: "
 	errInvalidRef         = errors.New("invalid reference")
-	logErr                = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC)
-	logMsg                = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LUTC)
 )
 
 type storeServer struct {
@@ -83,7 +80,7 @@ func (s *storeServer) putHandler(sess auth.Session, w http.ResponseWriter, r *ht
 	}()
 
 	// Answer something sensible to the client.
-	logMsg.Printf("Put: %s: %s", sess.User(), ref)
+	log.Printf("Put: %s: %s", sess.User(), ref)
 	jsonmsg.SendReferenceResponse(upspin.Reference(ref), w)
 }
 
@@ -93,12 +90,12 @@ func (s *storeServer) getHandler(sess auth.Session, w http.ResponseWriter, r *ht
 		netutil.SendJSONError(w, context, errInvalidRef)
 		return
 	}
-	logMsg.Printf("Looking up ref %s in cache for user %s", ref, sess.User())
+	log.Printf("Looking up ref %s in cache for user %s", ref, sess.User())
 
 	file, err := s.fileCache.OpenRefForRead(ref)
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
-		logMsg.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
+		log.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
 		defer file.Close()
 		http.ServeFile(w, r, file.Name())
 		return
@@ -114,14 +111,14 @@ func (s *storeServer) getHandler(sess auth.Session, w http.ResponseWriter, r *ht
 	if !strings.HasPrefix(link, "http") {
 		errMsg := fmt.Sprintf("get: invalid link returned from GCP: %s", link)
 		netutil.SendJSONError(w, context, errors.New(errMsg))
-		logErr.Println(errMsg)
+		log.Error.Println(errMsg)
 		return
 	}
 
 	location := upspin.Location{}
 	location.Reference = upspin.Reference(link)
 	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
-	logMsg.Printf("Ref %s returned as link: %s", ref, link)
+	log.Printf("Ref %s returned as link: %s", ref, link)
 	netutil.SendJSONReply(w, location)
 }
 
@@ -141,12 +138,15 @@ func (s *storeServer) deleteHandler(sess auth.Session, w http.ResponseWriter, r 
 		netutil.SendJSONError(w, context, fmt.Errorf("delete: %s: %s", ref, err))
 		return
 	}
-	logMsg.Printf("Delete: %s: Success", ref)
+	log.Printf("Delete: %s: Success", ref)
 	netutil.SendJSONErrorString(w, "success")
 }
 
 func main() {
 	flag.Parse()
+
+	log.Connect("google.com:"+*projectID, *bucketName)
+
 	ss := &storeServer{
 		cloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
 		fileCache:   cache.NewFileCache(*tempDir),
@@ -164,12 +164,12 @@ func main() {
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
 		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
-			logErr.Fatal(err)
+			log.Error.Fatal(err)
 		}
-		logErr.Println("Starting HTTPS server with SSL.")
-		logErr.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
+		log.Error.Println("Starting HTTPS server with SSL.")
+		log.Error.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
 	} else {
-		logErr.Println("Not using SSL certificate. Starting regular HTTP server.")
-		logErr.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+		log.Error.Println("Not using SSL certificate. Starting regular HTTP server.")
+		log.Error.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 	}
 }
