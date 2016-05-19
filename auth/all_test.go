@@ -138,7 +138,10 @@ func TestServerHandlerNotTLS(t *testing.T) {
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		called = true
 		if session.IsAuthenticated() {
-			t.Errorf("Expected not IsAuthenticated")
+			t.Error("Expected not IsAuthenticated")
+		}
+		if session.User() != user {
+			t.Errorf("Expected user %q, got %q", user, session.User())
 		}
 	}
 	config := &Config{

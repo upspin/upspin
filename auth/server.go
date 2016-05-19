@@ -122,12 +122,7 @@ func (ah *authHandler) getSessionByTLSUnique(tlsUnique string) *sessionImpl {
 	return session.(*sessionImpl)
 }
 
-func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*sessionImpl, error) {
-	// The username must be in all communications, even after a TLS handshake.
-	user := upspin.UserName(r.Header.Get(userNameHeader))
-	if user == "" {
-		return nil, errors.New("missing username in HTTP header")
-	}
+func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *http.Request) (*sessionImpl, error) {
 	// Is this a TLS connection?
 	if r.TLS == nil {
 		// Not a TLS connection, so nothing else to do here.
@@ -170,25 +165,38 @@ func (ah *authHandler) doAuth(w http.ResponseWriter, r *http.Request) (*sessionI
 func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request) {
 	httpHandler := func(w http.ResponseWriter, r *http.Request) {
 		// Perform authentication here, return the handler func used by the HTTP handler.
+		user := upspin.UserName(r.Header.Get(userNameHeader))
+		if user == "" {
+			// The username must be in all communications, even after a TLS handshake.
+			failAuth(w, errors.New("missing username in HTTP header"))
+			return
+		}
 		var session *sessionImpl
-		session, err := ah.doAuth(w, r)
+		session, err := ah.doAuth(user, w, r)
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
-				// Return an error to the client and do not call the underlying handler function.
-				log.Printf("HTTPClient: auth error: %v", err)
-				// To be precise, the user is only unauthenticated. But an unauthenticated user is also not authorized.
-				w.WriteHeader(http.StatusUnauthorized)
-				netutil.SendJSONError(w, "AuthHandler:", err)
+				failAuth(w, err)
 				return
 			}
+			// Fall through if we allow unauthenticated requests.
+			log.Error.Printf("AuthHandler: authentication failed for user %q with error: %q. However, allowing unauthenticated connections.", user, err)
 			session = &sessionImpl{
-				err: err,
+				user:   user,
+				isAuth: false,
+				err:    err,
 			}
 		}
 		// session is guaranteed non-nil here.
 		authHandlerFunc(session, w, r)
 	}
 	return httpHandler
+}
+
+// failAuth returns the authError to the client with an appropriate HTTP error code.
+func failAuth(w http.ResponseWriter, authErr error) {
+	log.Printf("HTTPClient: auth error: %v", authErr)
+	w.WriteHeader(http.StatusUnauthorized)
+	netutil.SendJSONError(w, "AuthHandler:", authErr)
 }
 
 // verifyRequest verifies whether named user has signed the HTTP request using one of the possible keys.
