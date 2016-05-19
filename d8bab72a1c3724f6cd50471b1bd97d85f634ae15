@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7f702e0_49fec546",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-19T18:41:41Z",
+      "side": 1,
+      "message": "while you\u0027re here, please put log statements into these failures.\nwhen one dies it\u0027s hard to know what actually went wrong.",
+      "revId": "d8bab72a1c3724f6cd50471b1bd97d85f634ae15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
