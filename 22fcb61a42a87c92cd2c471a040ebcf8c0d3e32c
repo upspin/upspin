@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7f702e0_7710383f",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-19T22:30:54Z",
+      "side": 1,
+      "message": "that\u0027s not what i meant.\nlog.Error.Print(\"InitContext: cannot parse user\")",
+      "revId": "22fcb61a42a87c92cd2c471a040ebcf8c0d3e32c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
