@@ -16,6 +16,24 @@
       "revId": "9c132ce13ae1bb2722e773e74276006515fd9ab6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_d7dd5f7f",
+        "filename": "store/proto/proto.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-19T00:37:06Z",
+      "side": 1,
+      "message": "I agree some unification will be nice, but I\u0027d like to see what\u0027s needed once I have all the servers done.",
+      "parentUuid": "972aeabd_e638b7c3",
+      "revId": "9c132ce13ae1bb2722e773e74276006515fd9ab6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
