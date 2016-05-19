@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7f702e0_8c6e0bf0",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T20:45:07Z",
+      "side": 1,
+      "message": "if you want to move to upspin/log, it\u0027s fairly easy. Just change imports and in main call: \n\nlog.Connect(\"google.com:upspin\", \u003cthis server\u0027s name, maybe with the username appended to it or a date, etc\u003e)\n\n(if you use date, don\u0027t use the time or the list of logs will grow too much).",
+      "revId": "7fe8a6dad387c501982b33e90dd9c3db575b9452",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
