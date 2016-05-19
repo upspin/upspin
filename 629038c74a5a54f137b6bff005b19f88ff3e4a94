@@ -16,6 +16,24 @@
       "revId": "629038c74a5a54f137b6bff005b19f88ff3e4a94",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "972aeabd_77075276",
+        "filename": "log/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T01:21:34Z",
+      "side": 1,
+      "message": "It should always exit because this is the go logger. Are you concerned future changes to this package could install a different logger here?",
+      "parentUuid": "972aeabd_b791cbab",
+      "revId": "629038c74a5a54f137b6bff005b19f88ff3e4a94",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
