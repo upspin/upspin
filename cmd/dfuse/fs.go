@@ -68,7 +68,7 @@ type handle struct {
 }
 
 func (h *handle) String() string {
-	return fmt.Sprintf("%q %#x", h.n, h.id)
+	return fmt.Sprintf("%s %#x", h.n, h.id)
 }
 
 // newUpspinFS creates a new upspin file system.
@@ -94,7 +94,7 @@ func newUpspinFS(context *upspin.Context, dc *directoryCache) *upspinFS {
 // All capitailized *upspinFS, *node, and *handle methods represent the interface
 // to fuse/fs.
 
-// Mkdir implements fs.Root.  It returns the root node of the file system.
+// Root implements fs.Root.  It returns the root node of the file system.
 func (f *upspinFS) Root() (fs.Node, error) {
 	return f.root, nil
 }
