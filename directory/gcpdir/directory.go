@@ -18,6 +18,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -295,6 +296,7 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		return dir.(*Directory), nil
 	}
 	// Need to create a new instance.
+	log.Printf("Dial: Creating a new instance for key=%v", key)
 	dir := &Directory{
 		endpoint:  e,
 		serverURL: serverURL.String(),

@@ -138,6 +138,6 @@ func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 
 // IsServerReachable reports whether the server at an URL can be reached.
 func IsServerReachable(serverURL string) bool {
-	_, err := http.Get(serverURL)
-	return err == nil
+	_, err := http.Head(serverURL)
+	return err != nil
 }
