@@ -52,6 +52,24 @@
       "revId": "629038c74a5a54f137b6bff005b19f88ff3e4a94",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d7f702e0_63d2c211",
+        "filename": "log/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T15:03:08Z",
+      "side": 1,
+      "message": "Makes sense. But I\u0027ll submit without it for now because otherwise I can\u0027t test since panic is not mockable. :-(",
+      "parentUuid": "972aeabd_da0bc319",
+      "revId": "629038c74a5a54f137b6bff005b19f88ff3e4a94",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
