@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/key/keyloader"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -84,26 +84,33 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	var err error
 	err = keyloader.Load(context)
 	if err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 
 	var ep *upspin.Endpoint
 	if ep, err = endpoint.Parse(vals["user"]); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	if context.User, err = bind.User(context, *ep); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["store"]); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	if context.Store, err = bind.Store(context, *ep); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	if ep, err = endpoint.Parse(vals["directory"]); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	if context.Directory, err = bind.Directory(context, *ep); err != nil {
+		log.Error.Print(err)
 		return nil, err
 	}
 	return context, nil
