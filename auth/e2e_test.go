@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -111,8 +112,10 @@ func TestMain(m *testing.M) {
 		ch <- true
 	}()
 	ready := <-ch
+	var code int
 	if ready {
-		m.Run()
+		code = m.Run()
 	}
-	log.Println("Finishing e2e tests")
+	log.Printf("Finishing e2e tests: %d", code)
+	os.Exit(code)
 }
