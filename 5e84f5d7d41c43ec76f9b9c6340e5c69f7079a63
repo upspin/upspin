@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7f702e0_4368e6aa",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-19T16:31:37Z",
+      "side": 1,
+      "message": "If/when you need a keypair, the GCP servers have them registered and publicly available on the user server.",
+      "revId": "5e84f5d7d41c43ec76f9b9c6340e5c69f7079a63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
