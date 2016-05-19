@@ -5,7 +5,6 @@ package gcp
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -13,6 +12,8 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
+
+	"upspin.googlesource.com/upspin.git/log"
 )
 
 const (
@@ -106,9 +107,9 @@ func (gcp *gcpImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink s
 	acl := string(gcp.defaultWriteACL)
 	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(file).PredefinedAcl(acl).Do()
 	if err == nil {
-		log.Printf("Created object %v at location %v", res.Name, res.SelfLink)
+		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
 	} else {
-		log.Printf("Objects.Insert failed: %v", err)
+		log.Error.Printf("Objects.Insert failed: %v", err)
 		return "", err
 	}
 	return res.MediaLink, err
@@ -121,7 +122,7 @@ func (gcp *gcpImpl) Get(ref string) (link string, error error) {
 	if err != nil {
 		return "", err
 	}
-	log.Printf("The media download link for %v/%v is %v.", gcp.bucketName, res.Name, res.MediaLink)
+	log.Debug.Printf("The media download link for %v/%v is %v.", gcp.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
 }
 
@@ -146,9 +147,9 @@ func (gcp *gcpImpl) Put(ref string, contents []byte) (refLink string, error erro
 	object := &storage.Object{Name: ref}
 	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
 	if err == nil {
-		log.Printf("Created object %v at location %v", res.Name, res.SelfLink)
+		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
 	} else {
-		log.Printf("Objects.Insert failed: %v", err)
+		log.Error.Printf("Objects.Insert failed: %v", err)
 		return "", err
 	}
 	return res.MediaLink, err
@@ -169,7 +170,7 @@ func (gcp *gcpImpl) ListPrefix(prefix string, depth int) ([]string, error) {
 			objDepth := strings.Count(o.Name, "/")
 			netDepth := objDepth - prefixDepth
 			if netDepth < 0 {
-				log.Printf("WARN: Negative depth should never happen.")
+				log.Error.Printf("WARN: Negative depth should never happen.")
 				continue
 			}
 			if netDepth <= depth {
@@ -227,14 +228,14 @@ func (gcp *gcpImpl) EmptyBucket(verbose bool) error {
 		objs, err := gcp.service.Objects.List(gcp.bucketName).MaxResults(maxParallelDeletes).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
 		for _, o := range objs.Items {
 			if verbose {
-				log.Printf("Deleting: %q", o.Name)
+				log.Debug.Printf("Deleting: %q", o.Name)
 			}
 			err = gcp.Delete(o.Name)
 			if err != nil {
 				if firstErr == nil {
 					firstErr = err
 				}
-				log.Printf("EmptyBucket: %q: %s", o.Name, err)
+				log.Debug.Printf("EmptyBucket: %q: %s", o.Name, err)
 			}
 		}
 		if objs.NextPageToken == "" {
