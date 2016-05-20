@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"net/rpc"
 	"strings"
-	"sync"
 	"time"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -28,12 +28,6 @@ type remote struct {
 	ctx       dialContext
 	id        int
 	rpcClient *rpc.Client
-}
-
-// remotes contains a list of all established remote connections.
-var remotes struct {
-	sync.Mutex
-	r map[dialContext]*remote
 }
 
 var _ upspin.Directory = (*remote)(nil)
@@ -137,15 +131,6 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		},
 	}
 
-	// If we already have an authenticated dial for the endpoint and user
-	// return it.
-	remotes.Lock()
-	if nr, ok := remotes.r[r.ctx]; ok {
-		remotes.Unlock()
-		return nr, nil
-	}
-	remotes.Unlock()
-
 	var err error
 	addr := string(e.NetAddr)
 	switch {
@@ -162,10 +147,6 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, err
 	}
 
-	remotes.Lock()
-	remotes.r[r.ctx] = r
-	// TODO(ehg) make sure it is safe to share factotum here
-	remotes.Unlock()
 	return r, nil
 }
 
@@ -183,10 +164,14 @@ func (r *remote) Configure(options ...string) error {
 	return r.rpcClient.Call("Server.Configure", &req, &resp)
 }
 
+func (r *remote) Ping() bool {
+	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
+	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
+}
+
 const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterDirectory(transport, r)
-	remotes.r = make(map[dialContext]*remote)
 }

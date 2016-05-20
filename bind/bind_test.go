@@ -2,14 +2,18 @@ package bind
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
 func TestSwitch(t *testing.T) {
+	var ctx upspin.Context
+
 	// These should succeed.
-	if err := RegisterUser(upspin.InProcess, &dummyUser{}); err != nil {
+	du := &dummyUser{}
+	if err := RegisterUser(upspin.InProcess, du); err != nil {
 		t.Errorf("registerUser failed")
 	}
 	if err := RegisterStore(upspin.InProcess, &dummyStore{}); err != nil {
@@ -31,21 +35,60 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := Store(nil, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
-	s2, _ := Store(nil, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
+	s1, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	s2, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
 	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := Store(nil, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
+	if _, err := Store(&ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
 		t.Errorf("expected bind.Store of undefined to fail")
+	}
+
+	// Directory is never reachable (our dummyDirectory answers false to ping)
+	_, err := Directory(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	if err == nil {
+		t.Error("Expected error")
+	}
+	const expectedError = "Ping failed"
+	if !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected %q error, got %q", expectedError, err)
+	}
+
+	// Test caching. dummyUser has a dial count.
+	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"}
+	u1, err := User(&ctx, e) // Dials once.
+	if err != nil {
+		t.Fatal(err)
+	}
+	u2, err := User(&ctx, e) // Does not dial; hits the cache.
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u1 != u2 {
+		t.Errorf("Expected the same instance.")
+	}
+	if du.dialed != 1 {
+		t.Errorf("Expected only one dial. Got %d", du.dialed)
+	}
+	// But a different context forces a new dial.
+	ctx2 := upspin.Context{
+		UserName: upspin.UserName("bob@foo.com"),
+	}
+	_, err = User(&ctx2, e) // Dials again,
+	if err != nil {
+		t.Fatal(err)
+	}
+	if du.dialed != 2 {
+		t.Errorf("Expected two dials. Got %d", du.dialed)
 	}
 }
 
 // Some dummy interfaces.
 type dummyUser struct {
 	endpoint upspin.Endpoint
+	dialed   int
 }
 type dummyStore struct {
 	endpoint upspin.Endpoint
@@ -62,6 +105,7 @@ func (d *dummyUser) Endpoint() upspin.Endpoint {
 }
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	user := &dummyUser{endpoint: e}
+	d.dialed++
 	return user, nil
 }
 func (d *dummyUser) ServerUserName() string {
@@ -69,6 +113,9 @@ func (d *dummyUser) ServerUserName() string {
 }
 func (d *dummyUser) Configure(options ...string) error {
 	return nil
+}
+func (d *dummyUser) Ping() bool {
+	return true
 }
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
@@ -92,6 +139,9 @@ func (d *dummyStore) Configure(options ...string) error {
 }
 func (d *dummyStore) Delete(ref upspin.Reference) error {
 	return errors.New("dummyStore.Delete not implemented")
+}
+func (d *dummyStore) Ping() bool {
+	return true
 }
 
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
@@ -124,4 +174,8 @@ func (d *dummyDirectory) Endpoint() upspin.Endpoint {
 }
 func (d *dummyDirectory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
 	return "", errors.New("dummyDirectory.WhichAccess not implemented")
+}
+func (d *dummyDirectory) Ping() bool {
+	// This directory is broken and never reachable.
+	return false
 }
