@@ -27,10 +27,6 @@ type dataService struct {
 	mu sync.Mutex
 	// serviceOwner identifies the user running the dataService. TODO: unused.
 	serviceOwner upspin.UserName
-	// serviceCache maintains a cache of existing service objects.
-	// Note the key is by value, so multiple equivalent contexts will end up
-	// with the same service.
-	serviceCache map[upspin.Context]*service
 	// blob contains the underlying data.
 	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
 }
@@ -108,14 +104,14 @@ func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 		s.data.endpoint = e
 		s.data.serviceOwner = context.UserName
 	}
-	// Is there already a service for this user?
-	if thisUser := s.data.serviceCache[*context]; thisUser != nil {
-		return thisUser, nil
-	}
 	thisUser := *s // Make a copy.
 	thisUser.userName = context.UserName
-	s.data.serviceCache[*context] = &thisUser
 	return &thisUser, nil
+}
+
+// Ping implements upspin.Service.
+func (s *service) Ping() bool {
+	return true
 }
 
 const transport = upspin.InProcess
@@ -127,8 +123,7 @@ func init() {
 				Transport: upspin.InProcess,
 				NetAddr:   "", // Ignored.
 			},
-			serviceCache: make(map[upspin.Context]*service),
-			blob:         make(map[upspin.Reference][]byte),
+			blob: make(map[upspin.Reference][]byte),
 		},
 	}
 	bind.RegisterStore(transport, s)

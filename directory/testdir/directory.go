@@ -53,11 +53,6 @@ type database struct {
 	// serviceOwner identifies the user running the user service. TODO: unused.
 	serviceOwner upspin.UserName
 
-	// serviceCache maintains a cache of existing service objects.
-	// Note the key is by value, so multiple equivalent contexts will end up
-	// with the same service.
-	serviceCache map[upspin.Context]*Service
-
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
 
@@ -827,19 +822,19 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 		s.db.dirContext = context
 		s.db.serviceOwner = context.UserName
 	}
-	// Is there already a service for this user?
-	if this := s.db.serviceCache[*context]; this != nil {
-		return this, nil
-	}
 	this := *s // Make a copy.
 	this.context = *context
-	s.db.serviceCache[*context] = &this
 	return &this, nil
 }
 
 // Endpoint implements upspin.Directory.Endpoint.
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.db.endpoint
+}
+
+// Ping implements upspin.Directory.Ping.
+func (s *Service) Ping() bool {
+	return true
 }
 
 const transport = upspin.InProcess
@@ -851,10 +846,9 @@ func init() {
 				Transport: upspin.InProcess,
 				NetAddr:   "", // Ignored.
 			},
-			serviceCache: make(map[upspin.Context]*Service),
-			root:         make(map[upspin.UserName]*upspin.DirEntry),
-			rootAccess:   make(map[upspin.UserName]*access.Access),
-			access:       make(map[upspin.PathName]*access.Access),
+			root:       make(map[upspin.UserName]*upspin.DirEntry),
+			rootAccess: make(map[upspin.UserName]*access.Access),
+			access:     make(map[upspin.PathName]*access.Access),
 		},
 	}
 	bind.RegisterDirectory(transport, s)
