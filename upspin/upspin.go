@@ -484,4 +484,7 @@ type Service interface {
 	// TODO(p): Should I distinguish a server which didn't pass authentication
 	// from one which has no user name?
 	ServerUserName() string
+
+	// Ping reports whether the Service is currently reachable.
+	Ping() bool
 }

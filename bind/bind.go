@@ -2,17 +2,32 @@
 package bind
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
+	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
+
+type dialKey struct {
+	context  upspin.Context
+	endpoint upspin.Endpoint
+}
+
+const cacheSize = 20
 
 var (
 	mu           sync.Mutex
 	userMap      = make(map[upspin.Transport]upspin.User)
 	directoryMap = make(map[upspin.Transport]upspin.Directory)
 	storeMap     = make(map[upspin.Transport]upspin.Store)
+
+	// These caches hold <dialKey, upspin.Service> for each respective service type.
+	// They are thread safe.
+	userBoundCache      = cache.NewLRU(cacheSize)
+	directoryBoundCache = cache.NewLRU(cacheSize)
+	storeBoundCache     = cache.NewLRU(cacheSize)
 )
 
 // RegisterUser registers a User interface for the transport.
@@ -59,7 +74,11 @@ func User(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	if !ok {
 		return nil, fmt.Errorf("User service with transport %q not registered", e.Transport)
 	}
-	x, err := u.Dial(cc, e)
+	key := dialKey{
+		context:  *cc,
+		endpoint: e,
+	}
+	x, err := reachableService(key, userBoundCache, u)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +93,11 @@ func Store(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	if !ok {
 		return nil, fmt.Errorf("Store service with transport %q not registered", e.Transport)
 	}
-	x, err := s.Dial(cc, e)
+	key := dialKey{
+		context:  *cc,
+		endpoint: e,
+	}
+	x, err := reachableService(key, storeBoundCache, s)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +112,35 @@ func Directory(cc *upspin.Context, e upspin.Endpoint) (upspin.Directory, error) 
 	if !ok {
 		return nil, fmt.Errorf("Directory service with transport %q not registered", e.Transport)
 	}
-	x, err := d.Dial(cc, e)
+	key := dialKey{
+		context:  *cc,
+		endpoint: e,
+	}
+	x, err := reachableService(key, directoryBoundCache, d)
 	if err != nil {
 		return nil, err
 	}
 	return x.(upspin.Directory), nil
+}
+
+// reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
+func reachableService(key dialKey, cache *cache.LRU, dialer upspin.Dialer) (upspin.Service, error) {
+	s, found := cache.Get(key)
+	var service upspin.Service
+	if found {
+		service = s.(upspin.Service)
+		if service.Ping() {
+			return service, nil
+		}
+	}
+	// Not found or found but not reachable. Dial again and cache.
+	service, err := dialer.Dial(&key.context, key.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	if !service.Ping() {
+		return nil, errors.New("Ping failed")
+	}
+	cache.Add(key, service)
+	return service, nil
 }

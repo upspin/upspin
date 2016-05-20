@@ -70,6 +70,11 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.
 	return s, nil
 }
 
+// Ping implements Service.
+func (s *Store) Ping() bool {
+	return netutil.IsServerReachable(s.serverURL)
+}
+
 // ServerUserName implements Dialer.
 func (s *Store) ServerUserName() string {
 	return "GCP Store"
