@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f7ab26ee_cfec41db",
+        "filename": "cmd/dfuse/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-20T01:00:16Z",
+      "side": 1,
+      "message": "you need log.Connect(\"google.com:upspin\", \"dfuse\") here to reach GCP. If you don\u0027t, it will log to stderr. If you do, it logs to both places.",
+      "revId": "2ca7edb0ed655c3e975a21927e0762a3f3b08553",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
