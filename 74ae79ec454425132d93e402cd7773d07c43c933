@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f7ab26ee_4c017fa1",
+        "filename": "auth/e2e_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-20T00:42:44Z",
+      "side": 1,
+      "message": "Did you omit the newline intentionally?",
+      "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
