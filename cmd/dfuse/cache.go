@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha1"
 	"fmt"
-	"log"
 	"os"
 	filepath "path"
 	"strings"
@@ -14,6 +13,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/client"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/pack"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -139,7 +139,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			continue
 		}
 		if len(locs) > 0 {
-			log.Printf("%v redirects to %v", loc, locs)
+			log.Debug.Printf("%v redirects to %v", loc, locs)
 		outer:
 			for _, newLoc := range locs {
 				for _, oldLoc := range locations {
