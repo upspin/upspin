@@ -217,6 +217,9 @@ func (d *dummyUser) ServerUserName() string {
 func (d *dummyUser) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
+func (d *dummyUser) Ping() bool {
+	return true
+}
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	panic("unimplemented")
@@ -227,6 +230,9 @@ func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	store := &dummyStore{endpoint: e}
 	return store, nil
+}
+func (d *dummyStore) Ping() bool {
+	return true
 }
 func (d *dummyStore) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
@@ -256,6 +262,9 @@ func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
+}
+func (d *dummyDirectory) Ping() bool {
+	return true
 }
 func (d *dummyDirectory) ServerUserName() string {
 	panic("unimplemented")

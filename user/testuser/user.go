@@ -11,7 +11,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// service maps user names to potential machines holding root of the user's tree.
+// Service maps user names to potential machines holding root of the user's tree.
 // There is one for each Dial call, but they all share the underlying database.
 // It implements the upspin.User interface.
 type Service struct {
@@ -158,6 +158,11 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	this.context = *context
 	s.db.serviceCache[*context] = &this
 	return &this, nil
+}
+
+// Ping implements upspin.Service.
+func (s *Service) Ping() bool {
+	return true
 }
 
 func init() {

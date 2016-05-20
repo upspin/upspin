@@ -167,3 +167,7 @@ func (s *service) Endpoint() upspin.Endpoint {
 func (s *service) Configure(options ...string) error {
 	return nil
 }
+
+func (s *service) Ping() bool {
+	return true
+}

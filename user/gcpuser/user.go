@@ -25,12 +25,6 @@ type user struct {
 
 var _ upspin.User = (*user)(nil)
 
-// instanceKey is used to key into instanceCache.
-type instanceKey struct {
-	context  upspin.Context
-	endpoint upspin.Endpoint
-}
-
 // lookupEntry is the cached result of a Lookup call.
 type lookupEntry struct {
 	endpoints   []upspin.Endpoint
@@ -43,10 +37,7 @@ const (
 	lookupCacheDuration = time.Hour * 2
 )
 
-var (
-	instanceCache = cache.NewLRU(20)  // cache of instantiated user instances <instanceKey, *user>. Thread safe.
-	lookupCache   = cache.NewLRU(100) // <upspin.UserName, lookupEntry>
-)
+var lookupCache = cache.NewLRU(100) // <upspin.UserName, lookupEntry>
 
 func (u *user) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	if entry, found := lookupCache.Get(name); found {
@@ -119,22 +110,11 @@ func (u *user) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.S
 	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newUserError(fmt.Errorf("User server unreachable"), "")
 	}
-	// Re-use a bound instance if it's in the cache.
-	key := instanceKey{
-		context:  *context,
-		endpoint: endpoint,
-	}
-	if instance, found := instanceCache.Get(key); found {
-		return instance.(*user), nil
-	}
-	// Not in cache. Create a new instance now.
-
 	instance := &user{
 		serverURL:  serverURL.String(),
 		httpClient: &http.Client{},
 		endpoint:   endpoint,
 	}
-	instanceCache.Add(key, instance)
 	return instance, nil
 }
 
@@ -144,6 +124,11 @@ func (u *user) ServerUserName() string {
 
 func (u *user) Endpoint() upspin.Endpoint {
 	return u.endpoint
+}
+
+// Ping implements upspin.Service.
+func (u *user) Ping() bool {
+	return netutil.IsServerReachable(u.serverURL)
 }
 
 // Implements Error

@@ -329,3 +329,6 @@ func (d *dummyUser) Configure(options ...string) error {
 func (d *dummyUser) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
+func (d *dummyUser) Ping() bool {
+	return true
+}

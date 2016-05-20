@@ -86,6 +86,10 @@ func (c *userCache) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
 
+func (c *userCache) Ping() bool {
+	return true
+}
+
 // SetDuration sets the duration until entries expire.  Primarily
 // intended for testing.
 func (c *userCache) SetDuration(d time.Duration) {

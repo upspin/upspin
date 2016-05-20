@@ -15,7 +15,6 @@ import (
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/log"
@@ -39,16 +38,7 @@ type Directory struct {
 // Guarantee we implement the interface
 var _ upspin.Directory = (*Directory)(nil)
 
-// instanceKey is used to key into instanceCache.
-type instanceKey struct {
-	context  upspin.Context
-	endpoint upspin.Endpoint
-}
-
-var (
-	zeroLoc       upspin.Location
-	instanceCache = cache.NewLRU(20) // cache of instantiated Directory services <instanceKey, *Directory>. Thread safe.
-)
+var zeroLoc upspin.Location
 
 // newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
 func newDirectory(serverURL string, client netutil.HTTPClientInterface, timeFunc func() upspin.Time) *Directory {
@@ -287,24 +277,20 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 	if !netutil.IsServerReachable(serverURL.String()) {
 		return nil, newError(op, "", fmt.Errorf("Directory server unreachable"))
 	}
-	// Re-use a bound instance if it's in the cache.
-	key := instanceKey{
-		context:  *context,
-		endpoint: e,
-	}
-	if dir, found := instanceCache.Get(key); found {
-		return dir.(*Directory), nil
-	}
 	// Need to create a new instance.
-	log.Debug.Printf("Dial: Creating a new instance for key=%v", key)
+	log.Debug.Printf("Dial: Creating a new instance for endpoint %v and context %v", e, context)
 	dir := &Directory{
 		endpoint:  e,
 		serverURL: serverURL.String(),
 		timeNow:   d.timeNow,
 		client:    auth.NewClient(context.UserName, context.Factotum, &http.Client{}),
 	}
-	instanceCache.Add(key, dir)
 	return dir, nil
+}
+
+// Ping implements Service.
+func (d *Directory) Ping() bool {
+	return netutil.IsServerReachable(d.serverURL)
 }
 
 // Delete deletes the DirEntry for a name from the backend.
