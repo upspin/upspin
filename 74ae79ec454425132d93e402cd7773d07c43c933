@@ -16,6 +16,24 @@
       "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7ab26ee_af4d7565",
+        "filename": "auth/e2e_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-20T03:57:57Z",
+      "side": 1,
+      "message": "log.Printf already outputs a new line. I was using Println before because there was nothing to format and now there\u0027s the code.\n\nBTW: I actually accidentally wrote log.Println(\".... %d\", code) and go vet caught it. :-)",
+      "parentUuid": "f7ab26ee_4c017fa1",
+      "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
