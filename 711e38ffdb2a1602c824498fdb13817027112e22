@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f7ab26ee_f5574aef",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-20T17:40:54Z",
+      "side": 1,
+      "message": "Why are these LRUs?  If we are holding a connection and all its associated kilobytes of memory, why are we afraid to hold the little bit more that this represents until we forget about the binding.  Or is that the problem, that we don\u0027t know when the binding has been forgotten?",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 46
+      },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7ab26ee_d5a68e21",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-20T17:40:54Z",
+      "side": 1,
+      "message": "I\u0027m still a bit bothered about doubling the round trip time for each request, but I guess that can be addressed in the Ping code itself.  I guess anything not using a RESTful interface can just see if the connection hasn\u0027t been hung up.  Perhaps we can add something in net/http that does something similar...",
+      "range": {
+        "startLine": 132,
+        "startChar": 13,
+        "endLine": 132,
+        "endChar": 17
+      },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7ab26ee_75b6ba4e",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-20T17:40:54Z",
+      "side": 1,
+      "message": "Nor will this work with anything that isn\u0027t http.  Shouldn\u0027t it just be calling Ping of the service below it, i.e., the DIrectory client that it is calling.",
+      "range": {
+        "startLine": 167,
+        "startChar": 17,
+        "endLine": 167,
+        "endChar": 21
+      },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
