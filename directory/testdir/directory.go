@@ -842,6 +842,11 @@ func (s *Service) Endpoint() upspin.Endpoint {
 	return s.db.endpoint
 }
 
+// Ping implements upspin.Directory.Ping.
+func (s *Service) Ping() bool {
+	return true
+}
+
 const transport = upspin.InProcess
 
 func init() {

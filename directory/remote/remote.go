@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -181,6 +182,11 @@ func (r *remote) Configure(options ...string) error {
 	}
 	var resp proto.ConfigureResponse
 	return r.rpcClient.Call("Server.Configure", &req, &resp)
+}
+
+func (r *remote) Ping() bool {
+	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
+	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
 }
 
 const transport = upspin.Remote

@@ -118,6 +118,11 @@ func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	return &thisUser, nil
 }
 
+// Ping implements upspin.Service.
+func (s *service) Ping() bool {
+	return true
+}
+
 const transport = upspin.InProcess
 
 func init() {

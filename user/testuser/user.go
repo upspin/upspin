@@ -160,6 +160,11 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	return &this, nil
 }
 
+// Ping implements upspin.Service.
+func (s *Service) Ping() bool {
+	return true
+}
+
 func init() {
 	s := &Service{
 		db: &database{
