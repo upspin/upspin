@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 	"sync"
@@ -14,6 +13,7 @@ import (
 	xcontext "golang.org/x/net/context"
 
 	"upspin.googlesource.com/upspin.git/client"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/path"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -183,16 +183,16 @@ func (h *handle) freeNoLock() {
 
 // Attr implements fs.Node.Attr.
 func (n *node) Attr(addscontext xcontext.Context, attr *fuse.Attr) error {
-	log.Printf("Attr %s", n)
+	log.Debug.Printf("Attr %s", n)
 	*attr = n.attr
-	log.Printf("Attr %s returns %v", n, attr)
+	log.Debug.Printf("Attr %s returns %v", n, attr)
 	return nil
 }
 
 // Access implements fs.NodeAccesser.Access.
 func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 	// Allow all access.
-	log.Printf("Access %q %o", n, req.Mask)
+	log.Debug.Printf("Access %q %o", n, req.Mask)
 	return nil
 }
 
@@ -200,7 +200,7 @@ func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 // Every created file is initially backed by a clear text local file which is
 // Put in an upspin Directory on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
-	log.Printf("Create %q in %q", req.Name, n)
+	log.Debug.Printf("Create %q in %q", req.Name, n)
 	f := n.f
 	if n.t == rootNode {
 		// User directories are directly below the root.  We can't create
@@ -230,14 +230,14 @@ func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *f
 	resp.Node = nn.id
 	resp.Attr = nn.attr
 	//resp.EntryValid = time.Hour // TODO(p): figure out what would be right.
-	log.Printf("Create %q in %q returns %q", req.Name, n, h)
+	log.Debug.Printf("Create %q in %q returns %q", req.Name, n, h)
 	return nn, h, nil
 }
 
 // Mkdir implements fs.NodeMkdirer.Mkdir.
 // Creates a directory without opening it.
 func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node, error) {
-	log.Printf("Mkdir %q in %q", req.Name, n)
+	log.Debug.Printf("Mkdir %q in %q", req.Name, n)
 	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
@@ -252,7 +252,7 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 	if n.t == rootNode {
 		n.f.addUserDir(req.Name)
 	}
-	log.Printf("Mkdir %q in %q returns", req.Name, n, nn)
+	log.Debug.Printf("Mkdir %q in %q returns", req.Name, n, nn)
 	return nn, nil
 }
 
@@ -267,7 +267,7 @@ func (n *node) Open(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.
 
 // openDir opens the directory and reads its contents.
 func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	log.Printf("openDir %q", n)
+	log.Debug.Printf("openDir %q", n)
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, enotdir("%q", n.uname)
 	}
@@ -290,20 +290,20 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	}
 	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
-	log.Printf("Glob returned %s", err)
+	log.Debug.Printf("Glob returned %s", err)
 	if err != nil {
 		return nil, eio("%s globing %q", err, pattern)
 	}
 	h := allocHandle(n)
 	h.de = de
 	h.flags = req.Flags
-	log.Printf("openDir %q returns %q", n, h)
+	log.Debug.Printf("openDir %q returns %q", n, h)
 	return h, nil
 }
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
 func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	log.Printf("openFile %q %v", n, req.Flags)
+	log.Debug.Printf("openFile %q %v", n, req.Flags)
 	if n.attr.Mode&os.ModeDir != 0 {
 		return nil, eisdir("%q", n.uname)
 	}
@@ -314,7 +314,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	if err := n.f.cache.open(h, req.Flags); err != nil {
 		return nil, err
 	}
-	log.Printf("openFile %q %v returns %q", n, req.Flags, h)
+	log.Debug.Printf("openFile %q %v returns %q", n, req.Flags, h)
 	return h, nil
 }
 
@@ -353,7 +353,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 // Remove implements fs.Noderemover.  'n' is the directory in which the file
 // req.Name resides.  req.Dir flags this as an rmdir.
 func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
-	log.Printf("Remove %q from %q", req.Name, n)
+	log.Debug.Printf("Remove %q from %q", req.Name, n)
 	uname := path.Join(n.uname, req.Name)
 
 	// Find the node in question.
@@ -378,7 +378,7 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 	if err != nil {
 		return eperm("%q: %s", uname, err)
 	}
-	log.Printf("Remove %q from %q OK", req.Name, n)
+	log.Debug.Printf("Remove %q from %q OK", req.Name, n)
 	return nil
 }
 
@@ -404,7 +404,7 @@ func expectedError(err error, expected []string) bool {
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
-	log.Printf("Lookup %q in %q", name, n)
+	log.Debug.Printf("Lookup %q in %q", name, n)
 	uname := path.Join(n.uname, name)
 
 	// Ask the Directory.
@@ -427,7 +427,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	if n.t == rootNode {
 		n.f.addUserDir(name)
 	}
-	log.Printf("Lookup %q in %q returns %q", name, n, nn)
+	log.Debug.Printf("Lookup %q in %q returns %q", name, n, nn)
 	return nn, nil
 }
 
@@ -443,7 +443,7 @@ func (f *upspinFS) addUserDir(name string) {
 //
 // Files are only truncated by Setattr calls.
 func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
-	log.Printf("Setattr %q", n)
+	log.Debug.Printf("Setattr %q", n)
 	if req.Valid.Size() {
 		// Truncate.  Lots of cases:
 		// 1) we have it opened. Truncate the cached file and
@@ -490,7 +490,7 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 		// Set the modify time.
 		// TODO(p): should we actually set the modify time?
 	}
-	log.Printf("Setattr %q OK", n)
+	log.Debug.Printf("Setattr %q OK", n)
 	return nil
 }
 
@@ -498,13 +498,13 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 // really do anything here because if it takes any significant time something in
 // the kernel or git times out the flush and we get errors.
 func (h *handle) Flush(context xcontext.Context, req *fuse.FlushRequest) error {
-	log.Printf("Flush %q", h)
+	log.Debug.Printf("Flush %q", h)
 	return nil
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
 func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
-	log.Printf("ReadDirAll %q", h)
+	log.Debug.Printf("ReadDirAll %q", h)
 	var fde []fuse.Dirent
 	for _, de := range h.de {
 		parsed, _ := path.Parse(de.Name)
@@ -514,13 +514,13 @@ func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 		}
 		fde = append(fde, fuse.Dirent{Name: name})
 	}
-	log.Printf("ReadDirAll %q returns %v", h, fde)
+	log.Debug.Printf("ReadDirAll %q returns %v", h, fde)
 	return fde, nil
 }
 
 // Read implements fs.HandleReader.Read.
 func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
-	log.Printf("Read %q %d bytes at %d", h, cap(resp.Data), req.Offset)
+	log.Debug.Printf("Read %q %d bytes at %d", h, cap(resp.Data), req.Offset)
 	resp.Data = make([]byte, cap(resp.Data))
 	n, err := h.file.ReadAt(resp.Data, req.Offset)
 	if n != len(resp.Data) {
@@ -529,14 +529,14 @@ func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fus
 	if err == io.EOF {
 		err = nil
 	}
-	log.Printf("Read %q %d bytes at %d returns %s", h, cap(resp.Data), req.Offset, err)
+	log.Debug.Printf("Read %q %d bytes at %d returns %s", h, cap(resp.Data), req.Offset, err)
 	return err
 }
 
 // Write implements fs.HandleWriter.Write.  We lock the node for the extent of the write to serialize
 // changes to the node.
 func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
-	log.Printf("Write %q %d bytes at %d", h, len(req.Data), req.Offset)
+	log.Debug.Printf("Write %q %d bytes at %d", h, len(req.Data), req.Offset)
 	h.n.Lock()
 	defer h.n.Unlock()
 	h.n.cf.markDirty()
@@ -549,7 +549,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 	if newSize > h.n.attr.Size {
 		h.n.attr.Size = newSize
 	}
-	log.Printf("Write %q %d bytes at %d OK", h, len(req.Data), req.Offset)
+	log.Debug.Printf("Write %q %d bytes at %d OK", h, len(req.Data), req.Offset)
 	return nil
 }
 
@@ -557,7 +557,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 // it is written back to the store.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
 func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) error {
-	log.Printf("Release %q %v", h.n, h)
+	log.Debug.Printf("Release %q %v", h.n, h)
 
 	// Write back to upspin.
 	h.n.Lock()
@@ -571,14 +571,14 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 		}
 	}
 	h.n.Unlock()
-	log.Printf("Release %q -> %s", h, err)
+	log.Debug.Printf("Release %q -> %s", h, err)
 	h.free()
 	return err
 }
 
 // Fsync implements fs.NodeFsyncer.Fsync.
 func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
-	log.Printf("Fsync %q", n)
+	log.Debug.Printf("Fsync %q", n)
 	return nil
 }
 
@@ -587,7 +587,7 @@ func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
 func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	oldPath := old.(*node).uname
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Link %q to %q in %q", old.(*node), n, req.NewName)
+	log.Debug.Printf("Link %q to %q in %q", old.(*node), n, req.NewName)
 	de, err := n.f.client.Link(oldPath, newPath)
 	if err != nil {
 		return nil, err
@@ -600,7 +600,7 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
 	oldPath := path.Join(old.(*node).uname, req.OldName)
 	newPath := path.Join(n.uname, req.NewName)
-	log.Printf("Rename %q in %s to %q in %q", req.OldName, old.(*node), req.NewName, n)
+	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, old.(*node), req.NewName, n)
 	return n.f.client.Rename(oldPath, newPath)
 }
 
@@ -609,42 +609,42 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 
 // Getxattr implements fs.Getxattr.
 func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
-	log.Printf("Getxattr %q %v", n, req)
+	log.Debug.Printf("Getxattr %q %v", n, req)
 	return fuse.ErrNoXattr
 }
 
 // Listxattr implements fs.Listxattr.
 func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
-	log.Printf("Listxattr %q", n)
+	log.Debug.Printf("Listxattr %q", n)
 	return nil
 }
 
 // Setxattr implements fs.Setxattr.
 func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
-	log.Printf("Setxattr %q", n)
+	log.Debug.Printf("Setxattr %q", n)
 	return nil
 }
 
 // Removexattr implements fs.Removexattr.
 func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
-	log.Printf("Removexattr %q", n)
+	log.Debug.Printf("Removexattr %q", n)
 	return nil
 }
 
 // Symlink implements fs.Symlink.
 func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
-	log.Printf("Symlink %q/%q to %q", n, req.NewName, req.Target)
+	log.Debug.Printf("Symlink %q/%q to %q", n, req.NewName, req.Target)
 	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(req.Target)), time.Now())
 	if err := n.f.cache.putRedirect(nn, req.Target); err != nil {
 		return nil, err
 	}
-	log.Printf("Symlink %q/%q to %q returns %q", n, req.NewName, req.Target, nn)
+	log.Debug.Printf("Symlink %q/%q to %q returns %q", n, req.NewName, req.Target, nn)
 	return nn, nil
 }
 
 // Symlink implements fs.Readlink.
 func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string, error) {
-	log.Printf("Readlink %q", n)
+	log.Debug.Printf("Readlink %q", n)
 	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
 	if err != nil {
 		return "", err
@@ -659,6 +659,6 @@ func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string
 	if uint64(l) != n.attr.Size {
 		return "", eio("short read")
 	}
-	log.Printf("Readlink %q -> %q", n, string(buf))
+	log.Debug.Printf("Readlink %q -> %q", n, string(buf))
 	return string(buf), nil
 }

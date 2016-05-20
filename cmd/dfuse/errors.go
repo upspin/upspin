@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"syscall"
 
 	"github.com/presotto/fuse"
+
+	"upspin.googlesource.com/upspin.git/log"
 )
 
 // upspinError is an error string with a POSIX syscall error number.
@@ -24,7 +25,7 @@ func (u *upspinError) Errno() fuse.Errno {
 
 func mkError(errno syscall.Errno, format string, vars ...interface{}) *upspinError {
 	msg := fmt.Sprintf(format, vars...)
-	log.Println(msg)
+	log.Debug.Println(msg)
 	return &upspinError{errno, msg}
 }
 

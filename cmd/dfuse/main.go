@@ -4,13 +4,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/presotto/fuse"
 	"github.com/presotto/fuse/fs"
 
 	"upspin.googlesource.com/upspin.git/context"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/testuser"
 	"upspin.googlesource.com/upspin.git/user/usercache"
@@ -27,7 +27,8 @@ import (
 )
 
 var (
-	testFlag = flag.String("test", "", "set up test context with specified user")
+	testFlag  = flag.String("test", "", "set up test context with specified user")
+	debugFlag = flag.Bool("d", false, "turn on debugging")
 )
 
 func usage() {
@@ -40,6 +41,10 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
+	if *debugFlag {
+		log.SetLevel(log.Ldebug)
+	}
+
 	if flag.NArg() != 1 {
 		usage()
 	}
@@ -47,7 +52,7 @@ func main() {
 
 	context, err := context.InitContext(nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug.Fatal(err)
 	}
 
 	// Turn on caching for users.
@@ -57,11 +62,11 @@ func main() {
 	if *testFlag != "" {
 		testUser, ok := context.User.(*testuser.Service)
 		if !ok {
-			log.Fatal("Not a testuser Service")
+			log.Debug.Fatal("Not a testuser Service")
 		}
 
 		if err := testUser.Install(upspin.UserName(*testFlag), context.Directory); err != nil {
-			log.Print(err)
+			log.Debug.Print(err)
 		}
 	}
 
@@ -76,18 +81,18 @@ func main() {
 		fuse.DaemonTimeout("240"),
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug.Fatal(err)
 	}
 	defer c.Close()
 
 	err = fs.Serve(c, f)
 	if err != nil {
-		log.Fatal(err)
+		log.Debug.Fatal(err)
 	}
 
 	// check if the mount process has an error to report
 	<-c.Ready
 	if err := c.MountError; err != nil {
-		log.Fatal(err)
+		log.Debug.Fatal(err)
 	}
 }
