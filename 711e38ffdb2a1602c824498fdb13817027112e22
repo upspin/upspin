@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "f7ab26ee_40cdbe96",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-20T19:05:35Z",
+      "side": 1,
+      "message": "You are right.  If there\u0027s no way to know when the connections really go away, there\u0027s no way to maintain consistency between a map and what connections really exist so we can never clean up the map.   I guess an LRU is as good as we\u0027ll ever get.",
+      "parentUuid": "f7ab26ee_5568de78",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 46
+      },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7ab26ee_d5a68e21",
         "filename": "bind/bind.go",
         "patchSetId": 3
@@ -131,6 +155,30 @@
       "side": 1,
       "message": "Hmmm... you mean, creating a request and doing r.rpcClient.Call(\"Server.Ping\", \u0026req, \u0026resp)?\n\nI guess, we could. Maybe that\u0027s what the TODO will eventually be. I\u0027ll sync up with Rob on this one. For sure this shouldn\u0027t be an HTTP HEAD request.",
       "parentUuid": "f7ab26ee_75b6ba4e",
+      "range": {
+        "startLine": 167,
+        "startChar": 17,
+        "endLine": 167,
+        "endChar": 21
+      },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7ab26ee_1b9de764",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-20T19:05:35Z",
+      "side": 1,
+      "message": "It can\u0027t be just a TODO.  This will keep the test directory from working since it has no associated http port in the endpoint, just inprocess.",
+      "parentUuid": "f7ab26ee_b5b822f7",
       "range": {
         "startLine": 167,
         "startChar": 17,
