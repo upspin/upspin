@@ -37,11 +37,16 @@ func usage() {
 	os.Exit(2)
 }
 
+func debug(msg interface{}) {
+	log.Debug.Printf("FUSE %v", msg)
+}
+
 func main() {
 	flag.Usage = usage
 	flag.Parse()
 
 	if *debugFlag {
+		fuse.Debug = debug
 		log.SetLevel(log.Ldebug)
 	}
 
