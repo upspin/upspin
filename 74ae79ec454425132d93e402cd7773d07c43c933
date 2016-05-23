@@ -51,6 +51,24 @@
       "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_4644085f",
+        "filename": "auth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-23T19:41:34Z",
+      "side": 1,
+      "message": "The if is 4 lines above this comment. And it comes from a runtime flag (here, it\u0027s a configuration option, but it\u0027s ultimately coming from a flag in the various server\u0027s main function).",
+      "parentUuid": "fc922b13_e6fd144a",
+      "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
