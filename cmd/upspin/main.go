@@ -54,6 +54,8 @@ func main() {
 		put(args...)
 	case "get":
 		get(args...)
+	case "glob":
+		glob(args...)
 	case "ls":
 		ls(args...)
 	case "rm":
@@ -68,7 +70,7 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of upspin:\n")
-	fmt.Fprintf(os.Stderr, "\tupspin [flags] <mkdir|put|get|ls|rm|whichaccess> <path>\n")
+	fmt.Fprintf(os.Stderr, "\tupspin [flags] <mkdir|put|get|glob|ls|rm|whichaccess> <path>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -212,10 +214,10 @@ func get(args ...string) {
 	}
 }
 
-func ls(args ...string) {
-	fs := flag.NewFlagSet("ls", flag.ExitOnError)
+func glob(args ...string) {
+	fs := flag.NewFlagSet("glob", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
-	fs.Usage = subUsage(fs, "ls [-l] path...")
+	fs.Usage = subUsage(fs, "glob [-l] pattern...")
 	err := fs.Parse(args)
 	if err != nil {
 		log.Fatal(err)
@@ -238,9 +240,55 @@ func ls(args ...string) {
 	}
 }
 
+func ls(args ...string) {
+	fs := flag.NewFlagSet("ls", flag.ExitOnError)
+	longFormat := fs.Bool("l", false, "long format")
+	fs.Usage = subUsage(fs, "ls [-l] path...")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+		os.Exit(2)
+	}
+	for i := 0; i < fs.NArg(); i++ {
+		name := upspin.PathName(fs.Arg(i))
+		dir, err := c.Directory(name)
+		fmt.Println(name, err)
+		if err != nil {
+			log.Fatal(err)
+		}
+		entry, err := dir.Lookup(name)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var de []*upspin.DirEntry
+		if entry.IsDir() {
+			de, err = c.Glob(string(entry.Name) + "/*")
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			de = []*upspin.DirEntry{entry}
+		}
+
+		if *longFormat {
+			printLongDirEntries(de)
+		} else {
+			printShortDirEntries(de)
+		}
+	}
+}
+
+func hasFinalSlash(name upspin.PathName) bool {
+	return strings.HasSuffix(string(name), "/")
+}
+
 func printShortDirEntries(de []*upspin.DirEntry) {
 	for _, e := range de {
-		if e.IsDir() {
+		if e.IsDir() && !hasFinalSlash(e.Name) {
 			fmt.Printf("%s/\n", e.Name)
 		} else {
 			fmt.Printf("%s\n", e.Name)
@@ -265,9 +313,8 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 		isDirChar := '_'
 		if e.IsDir() {
 			isDirChar = 'd'
-			n := len(e.Name)
-			if e.Name[n-1:n] != "/" {
-				e.Name = e.Name + "/"
+			if !hasFinalSlash(e.Name) {
+				e.Name += "/"
 			}
 		}
 		endpt := endpoint.String(&e.Location.Endpoint)
