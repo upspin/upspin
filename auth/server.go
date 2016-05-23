@@ -23,7 +23,8 @@ import (
 	"net/http"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/cache"
+	"time"
+
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/log"
@@ -39,90 +40,21 @@ type Handler interface {
 	Handle(authHandlerFunc HandlerFunc) func(w http.ResponseWriter, r *http.Request)
 }
 
-// Config holds the configuration parameters for an instance of Handler.
-type Config struct {
-	// Lookup looks up user keys.
-	Lookup func(userName upspin.UserName) ([]upspin.PublicKey, error)
-
-	// AllowUnauthenticatedConnections allows unauthenticated connections, making it the caller's responsibility to check Handler.IsAuthenticated.
-	AllowUnauthenticatedConnections bool
-}
-
-// Session contains information about the connection and the authenticated user, if any.
-type Session interface {
-	// User returns the user name present in the session. It may be empty. Note: user might not be authenticated.
-	User() upspin.UserName
-
-	// IsAuthenticated reports whether the user in the session is authenticated.
-	IsAuthenticated() bool
-
-	// Err reports the status of the session.
-	Err() error
-}
-
-type sessionImpl struct {
-	user      upspin.UserName
-	isAuth    bool
-	tlsUnique string // This must represent a tls.ConnectionState.TLSUnique
-	err       error
-}
-
-var _ Session = (*sessionImpl)(nil)
-
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
-	config       *Config
-	sessionCache *cache.LRU // maps tlsUnique to AuthSession. Thread-safe.
+	config *Config
 }
 
 var _ Handler = (*authHandler)(nil)
 
-const (
-	// maxSessions defines the maximum number of connections to remember before we re-auth them.
-	// This also limits the number of parallel requests we can service, so do not set it to small numbers.
-	maxSessions = 1000
-)
-
 // NewHandler creates a new instance of a Handler according to the given config, which must not be changed subsequently by the caller.
 func NewHandler(config *Config) Handler {
 	return &authHandler{
-		config:       config,
-		sessionCache: cache.NewLRU(maxSessions),
+		config: config,
 	}
 }
 
-// User implements Session.
-func (s *sessionImpl) User() upspin.UserName {
-	return s.user
-}
-
-// IsAuthenticated implements Session.
-func (s *sessionImpl) IsAuthenticated() bool {
-	return s.isAuth
-}
-
-// Err implements Session.
-func (s *sessionImpl) Err() error {
-	return s.err
-}
-
-func (ah *authHandler) setTLSUnique(session *sessionImpl, tlsUnique string) {
-	if tlsUnique == "" {
-		log.Printf("Invalid tlsUnique for user %q", session.user)
-		return
-	}
-	ah.sessionCache.Add(tlsUnique, session)
-}
-
-func (ah *authHandler) getSessionByTLSUnique(tlsUnique string) *sessionImpl {
-	session, ok := ah.sessionCache.Get(tlsUnique)
-	if !ok {
-		return nil
-	}
-	return session.(*sessionImpl)
-}
-
-func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *http.Request) (*sessionImpl, error) {
+func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *http.Request) (Session, error) {
 	// Is this a TLS connection?
 	if r.TLS == nil {
 		// Not a TLS connection, so nothing else to do here.
@@ -130,10 +62,10 @@ func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *ht
 	}
 	// If we have a tlsUnique, let's use it.
 	if len(r.TLS.TLSUnique) > 0 { // 1 is the min size allowed by TLS.
-		session := ah.getSessionByTLSUnique(string(r.TLS.TLSUnique))
-		if session != nil && session.user == user {
+		session := GetSession(string(r.TLS.TLSUnique))
+		if session != nil && session.User() == user {
 			// We have a user and it's now authenticated. Done.
-			session.isAuth = true
+			session.(*sessionImpl).isAuth = true // TODO: peeking inside the type won't work when we move this package.
 			return session, nil
 		}
 	}
@@ -150,15 +82,15 @@ func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *ht
 		return nil, err
 	}
 	// Success! Create a new session and cache it if we have a TLSUnique.
-	session := &sessionImpl{
-		isAuth: true,
-		user:   user,
-	}
+
 	// Cache TLS unique to speed up the process in further requests.
+	var authToken string
 	if len(r.TLS.TLSUnique) > 0 {
-		// 1 is the min size allowed by TLS.
-		ah.setTLSUnique(session, string(r.TLS.TLSUnique))
+		authToken = string(r.TLS.TLSUnique)
 	}
+
+	// TODO: Expiration time is not currently used by HTTP servers. Will be used soon.
+	session := NewSession(user, true, time.Now().Add(time.Hour*100), authToken, nil)
 	return session, nil
 }
 
@@ -171,7 +103,7 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 			failAuth(w, errors.New("missing username in HTTP header"))
 			return
 		}
-		var session *sessionImpl
+		var session Session
 		session, err := ah.doAuth(user, w, r)
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
@@ -180,11 +112,8 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 			}
 			// Fall through if we allow unauthenticated requests.
 			log.Error.Printf("AuthHandler: authentication failed for user %q with error: %q. However, allowing unauthenticated connections.", user, err)
-			session = &sessionImpl{
-				user:   user,
-				isAuth: false,
-				err:    err,
-			}
+			// TODO: expiration not currently used.
+			session = NewSession(user, false, time.Now().Add(time.Hour*100), "", err)
 		}
 		// session is guaranteed non-nil here.
 		authHandlerFunc(session, w, r)

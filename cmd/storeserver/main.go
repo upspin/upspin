@@ -4,11 +4,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"net"
 
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
@@ -17,6 +14,11 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin/proto"
 
 	// Load required services
+
+	"fmt"
+	"net"
+
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/remote"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
@@ -29,6 +31,7 @@ var (
 
 type Server struct {
 	store upspin.Store
+	ss    grpcauth.SecureServer
 }
 
 func main() {
@@ -49,19 +52,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("binding to %q: %v", *endpoint, err)
 	}
-
+	// TODO...
+	ss, err := grpcauth.NewSecureServer(config, certFile, certKeyFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 	s := &Server{
 		store: store,
+		ss:    ss,
 	}
 
-	// TODO: FIGURE OUT HTTPS
+	proto.RegisterStoreServer(ss, s)
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
-	grpcServer := grpc.NewServer()
-	proto.RegisterStoreServer(grpcServer, s)
-	grpcServer.Serve(listener)
+	ss.Serve(listener)
 }
 
 func (s *Server) Get(ctx gContext.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
