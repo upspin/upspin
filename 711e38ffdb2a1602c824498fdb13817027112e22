@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "fc922b13_e6b2f457",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-23T20:00:42Z",
+      "side": 1,
+      "message": "// comment",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7ab26ee_f5574aef",
         "filename": "bind/bind.go",
         "patchSetId": 3
@@ -73,6 +90,23 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_c6b9f83a",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-23T20:00:42Z",
+      "side": 1,
+      "message": "in all three calls to reachableService you\u0027re creating a key first. it would be simpler to create it in reachable service, and to pass the context and endpoint as scalar arguments.",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7ab26ee_d5a68e21",
         "filename": "bind/bind.go",
         "patchSetId": 3
@@ -114,6 +148,24 @@
         "endLine": 132,
         "endChar": 17
       },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_e69994d9",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-23T20:00:42Z",
+      "side": 1,
+      "message": "i think it\u0027s worth considering a short timer here, so we don\u0027t ping it again milliseconds after we found out it was up. that could be a TODO for now.",
+      "parentUuid": "f7ab26ee_d5a68e21",
       "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -209,6 +261,23 @@
         "endLine": 167,
         "endChar": 21
       },
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_c6bed80a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-23T20:00:42Z",
+      "side": 1,
+      "message": "s/currently //\n\"is\" means \"currently\"",
       "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
