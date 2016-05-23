@@ -62,7 +62,24 @@ message ServerUserNameResponse {
 	string user_name = 1;
 }
 
+// Authenticate is not part of upspin.Directory. It is used only in the remote implementation.
+message AuthenticateRequest {
+	string user_name = 1;
+	string now = 2;
+	Signature signature = 3;
+}
+
+message Signature {
+    string r = 1;
+    string s = 2;
+}
+
+message AuthenticateResponse {
+	string token = 1;
+}
+
 service Store {
+    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
 	rpc Get (GetRequest) returns (GetResponse) {}
 	rpc Put (PutRequest) returns (PutResponse) {}
 	rpc Delete (DeleteRequest) returns (DeleteResponse) {}

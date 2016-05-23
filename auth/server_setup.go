@@ -17,8 +17,21 @@ const (
 	userServiceAddr = "https://upspin.io:8082"
 )
 
-// NewSecureServer returns an HTTP server setup with the certificate and key as provided by local file names, bound to the requested port.
-func NewSecureServer(port int, certFile string, certKeyFile string) (*http.Server, error) {
+// NewHTTPSecureServer returns an HTTP server setup with the certificate and key as provided by local file names, bound to the requested port.
+func NewHTTPSecureServer(port int, certFile string, certKeyFile string) (*http.Server, error) {
+	tlsConfig, err := NewDefaultTLSConfig(certFile, certKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	server := &http.Server{
+		Addr:      fmt.Sprintf(":%d", port),
+		TLSConfig: tlsConfig,
+	}
+	return server, nil
+}
+
+// NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
+func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {
 	certReadable, err := isReadableFile(certFile)
 	if err != nil {
 		return nil, fmt.Errorf("Problem with SSL certificate in %q: %q", certFile, err)
@@ -46,12 +59,7 @@ func NewSecureServer(port int, certFile string, certKeyFile string) (*http.Serve
 		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
 	}
 	tlsConfig.BuildNameToCertificate()
-
-	server := &http.Server{
-		Addr:      fmt.Sprintf(":%d", port),
-		TLSConfig: tlsConfig,
-	}
-	return server, nil
+	return tlsConfig, nil
 }
 
 // PublicUserKeyService returns a Lookup function that looks up users public keys.
