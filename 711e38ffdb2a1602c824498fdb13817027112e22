@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_4cb427f5",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-23T22:17:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_e6b2f457",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7ab26ee_f5574aef",
         "filename": "bind/bind.go",
         "patchSetId": 3
@@ -107,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_97b79ce3",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-23T22:17:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_c6b9f83a",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7ab26ee_d5a68e21",
         "filename": "bind/bind.go",
         "patchSetId": 3
@@ -166,6 +202,24 @@
       "side": 1,
       "message": "i think it\u0027s worth considering a short timer here, so we don\u0027t ping it again milliseconds after we found out it was up. that could be a TODO for now.",
       "parentUuid": "f7ab26ee_d5a68e21",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_ac792b1c",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-23T22:17:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_e69994d9",
       "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -278,6 +332,24 @@
       "writtenOn": "2016-05-23T20:00:42Z",
       "side": 1,
       "message": "s/currently //\n\"is\" means \"currently\"",
+      "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_2caf5ba3",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-23T22:17:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_c6bed80a",
       "revId": "711e38ffdb2a1602c824498fdb13817027112e22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
