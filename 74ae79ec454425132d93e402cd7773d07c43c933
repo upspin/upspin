@@ -34,6 +34,23 @@
       "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_e6fd144a",
+        "filename": "auth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-23T19:32:24Z",
+      "side": 1,
+      "message": "maybe this should be conditioned with a compile-time flag. there is an \u0027if\u0027 in the comment but not in the code.",
+      "revId": "74ae79ec454425132d93e402cd7773d07c43c933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
