@@ -482,7 +482,7 @@ func main() {
 	http.HandleFunc("/whichaccess/", ah.Handle(d.whichAccessHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := auth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}

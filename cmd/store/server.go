@@ -162,7 +162,7 @@ func main() {
 	http.HandleFunc("/delete", ah.Handle(ss.deleteHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := auth.NewSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := auth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			log.Error.Fatal(err)
 		}

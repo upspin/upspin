@@ -2,6 +2,8 @@
 package testauth
 
 import (
+	"time"
+
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -21,17 +23,22 @@ func NewSessionForTesting(user upspin.UserName, isAuth bool, err error) auth.Ses
 	}
 }
 
-// User implements auth.Handler.
+// User implements auth.Session.
 func (ds *dummySession) User() upspin.UserName {
 	return ds.user
 }
 
-// IsAuthenticated implements auth.Handler.
+// IsAuthenticated implements auth.Session.
 func (ds *dummySession) IsAuthenticated() bool {
 	return ds.isAuth
 }
 
-// Err implements auth.Handler.
+// Err implements auth.Session
 func (ds *dummySession) Err() error {
 	return ds.err
+}
+
+// Expires implements auth.Session.
+func (ds *dummySession) Expires() time.Time {
+	return time.Now().Add(100 * time.Hour) // TODO: not used yet.
 }

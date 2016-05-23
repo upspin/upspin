@@ -102,7 +102,7 @@ func TestServerHandler(t *testing.T) {
 	}
 	f := newFactotum(t, p256Key)
 	signReq(t, f, req)
-	makeTLSRequest(req, []byte("1234"))
+	makeTLSRequest(req, []byte("9999"))
 
 	// Now set up the server to receive this request.
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
@@ -166,7 +166,7 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	}
 	f := newFactotum(t, p256Key)
 	signReq(t, f, req)
-	makeTLSRequest(req, []byte("1234"))
+	makeTLSRequest(req, []byte("4321"))
 
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
@@ -189,7 +189,7 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	}
 	f := newFactotum(t, p256Key)
 	signReq(t, f, req)
-	makeTLSRequest(req, []byte("1234"))
+	makeTLSRequest(req, []byte("12345"))
 
 	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
