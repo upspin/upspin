@@ -1,5 +1,4 @@
-// Storeserver is a wrapper for a store implementation that presents it as a Go net/rpc interface.
-// TODO: Switch to grpc one day.
+// Storeserver is a wrapper for a store implementation that presents it as a grpc interface.
 package main
 
 import (
@@ -8,8 +7,9 @@ import (
 	"net"
 
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
 
+	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/endpoint"
 	"upspin.googlesource.com/upspin.git/log"
@@ -25,9 +25,15 @@ import (
 var (
 	port         = flag.Int("port", 8080, "TCP port number")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
+	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
+	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
+	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 )
 
+// Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
+	// Automatically handles authentication by implementing the Authenticate server method.
+	grpcauth.SecureServer
 	store upspin.Store
 }
 
@@ -49,19 +55,25 @@ func main() {
 	if err != nil {
 		log.Fatalf("binding to %q: %v", *endpoint, err)
 	}
-
+	config := auth.Config{
+		Lookup: auth.PublicUserKeyService(),
+		AllowUnauthenticatedConnections: *noAuth,
+	}
+	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 	s := &Server{
-		store: store,
+		SecureServer: grpcSecureServer,
+		store:        store,
 	}
 
-	// TODO: FIGURE OUT HTTPS
+	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
-	grpcServer := grpc.NewServer()
-	proto.RegisterStoreServer(grpcServer, s)
-	grpcServer.Serve(listener)
+	grpcSecureServer.Serve(listener)
 }
 
 func (s *Server) Get(ctx gContext.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
