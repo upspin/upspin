@@ -57,8 +57,11 @@ type node struct {
 	uname      upspin.PathName  // The complete upspin path name of the node.
 	user       upspin.UserName  // The upspin user whose directory tree contains this node.
 	attr       fuse.Attr        // Attributes of this node, e.g. POSIX mode bits.
-	cf         *cachedFile      // Local file system cached version of this node.
 	handles    map[*handle]bool // Handles (open instances) of this node.
+
+	// cached info.
+	cf *cachedFile        // Local file system contents of this node.
+	de []*upspin.DirEntry // Directory contents of this node.
 }
 
 func (n *node) String() string {
@@ -67,10 +70,8 @@ func (n *node) String() string {
 
 // handle represents an open file.
 type handle struct {
-	n     *node              // Associated node.
-	file  *os.File           // An open file of the in the clear cached contents.
-	de    []*upspin.DirEntry // If this is a directory, its contents.
-	flags fuse.OpenFlags     // flags used to  open the file.
+	n     *node          // Associated node.
+	flags fuse.OpenFlags // flags used to  open the file.
 	id    int
 }
 
@@ -148,19 +149,8 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 var handleId int
 var hl sync.Mutex
 
+// allocHandle is called with n locked.
 func allocHandle(n *node) *handle {
-	h := &handle{n: n}
-	n.Lock()
-	n.handles[h] = true
-	n.Unlock()
-	hl.Lock()
-	h.id = handleId
-	handleId++
-	hl.Unlock()
-	return h
-}
-
-func allocHandleNoLock(n *node) *handle {
 	h := &handle{n: n}
 	n.handles[h] = true
 	hl.Lock()
@@ -174,17 +164,19 @@ func (h *handle) free() {
 	n := h.n
 	n.Lock()
 	delete(n.handles, h)
-	n.Unlock()
-	if h.file != nil {
-		h.file.Close()
+	if len(n.handles) == 0 {
+		n.cf.close()
+		n.cf = nil
 	}
+	n.Unlock()
 }
 
 func (h *handle) freeNoLock() {
 	n := h.n
 	delete(n.handles, h)
-	if h.file != nil {
-		h.file.Close()
+	if len(n.handles) == 0 {
+		n.cf.close()
+		n.cf = nil
 	}
 }
 
@@ -225,16 +217,18 @@ func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *f
 	// Open it.
 	nn.Lock()
 	defer nn.Unlock()
-	h := allocHandleNoLock(nn)
+	h := allocHandle(nn)
 	if err := f.cache.create(h); err != nil {
 		return nil, nil, err
 	}
 
 	// Make sure we can actually create this node.
 	// TODO(p): this creates trash objects in a immutable store. Must be a better way.
-	if err := nn.cf.writeBack(nn); err != nil {
+	log.Debug.Printf("writing back %q", nn)
+	if err := nn.cf.writeBack(h); err != nil {
 		return nil, nil, err
 	}
+	log.Debug.Printf("done writing back %q", nn)
 
 	resp.Node = nn.id
 	resp.Attr = nn.attr
@@ -288,14 +282,16 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	if n.t == rootNode {
 		// The root is a special case since it is a local fiction.
 		n.f.Lock()
-		defer n.f.Unlock()
 		var de []*upspin.DirEntry
 		for u := range n.f.userDirs {
 			de = append(de, &upspin.DirEntry{Name: upspin.PathName(u), Metadata: upspin.Metadata{Attr: upspin.AttrDirectory}})
 		}
+		n.f.Unlock()
+		n.Lock()
+		defer n.Unlock()
 		h := allocHandle(n)
 		h.flags = req.Flags
-		h.de = de
+		n.de = de
 		return h, nil
 	}
 	dir, err := n.f.dc.lookup(n.user)
@@ -308,8 +304,10 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 	if err != nil {
 		return nil, eio("%s globing %q", err, pattern)
 	}
+	n.Lock()
+	defer n.Unlock()
 	h := allocHandle(n)
-	h.de = de
+	n.de = de
 	h.flags = req.Flags
 	log.Debug.Printf("openDir %q returns %q", n, h)
 	return h, nil
@@ -324,7 +322,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 		return nil, eisdir("%q", n.uname)
 	}
 
-	h := allocHandleNoLock(n)
+	h := allocHandle(n)
 	if err := n.f.cache.open(h, req.Flags); err != nil {
 		return nil, err
 	}
@@ -406,6 +404,13 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 	delete(f.nodeMap, uname)
 	f.enoentMap[uname] = time.Now().Add(defaultEnoentDuration)
 	f.Unlock()
+
+	// Forget the directory entry.
+	for i, de := range n.de {
+		if uname == de.Name {
+			n.de = append(n.de[0:i], n.de[i+1:]...)
+		}
+	}
 
 	log.Debug.Printf("Remove %q from %q OK", req.Name, n)
 	return nil
@@ -523,7 +528,7 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 			}
 			n.Unlock()
 		} else if req.Size == 0 {
-			h := allocHandleNoLock(n)
+			h := allocHandle(n)
 			if err := n.f.cache.create(h); err != nil {
 				h.freeNoLock()
 				n.Unlock()
@@ -532,7 +537,7 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 			n.Unlock()
 			h.Release(context, nil)
 		} else {
-			h := allocHandleNoLock(n)
+			h := allocHandle(n)
 			if err := n.f.cache.open(h, fuse.OpenReadWrite); err != nil {
 				h.freeNoLock()
 				n.Unlock()
@@ -566,8 +571,10 @@ func (h *handle) Flush(context xcontext.Context, req *fuse.FlushRequest) error {
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
 func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 	log.Debug.Printf("ReadDirAll %q", h)
+	h.n.Lock()
+	defer h.n.Unlock()
 	var fde []fuse.Dirent
-	for _, de := range h.de {
+	for _, de := range h.n.de {
 		parsed, _ := path.Parse(de.Name)
 		name := string(de.Name)
 		if !parsed.IsRoot() {
@@ -582,8 +589,10 @@ func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 // Read implements fs.HandleReader.Read.
 func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
 	log.Debug.Printf("Read %q %d bytes at %d", h, cap(resp.Data), req.Offset)
+	h.n.Lock()
+	defer h.n.Unlock()
 	resp.Data = make([]byte, cap(resp.Data))
-	n, err := h.file.ReadAt(resp.Data, req.Offset)
+	n, err := h.n.cf.readAt(resp.Data, req.Offset)
 	if n != len(resp.Data) {
 		resp.Data = resp.Data[:n]
 	}
@@ -600,8 +609,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 	log.Debug.Printf("Write %q %d bytes at %d", h, len(req.Data), req.Offset)
 	h.n.Lock()
 	defer h.n.Unlock()
-	h.n.cf.markDirty()
-	n, err := h.file.WriteAt(req.Data, req.Offset)
+	n, err := h.n.cf.writeAt(req.Data, req.Offset)
 	if err != nil {
 		return eio("writing to %q file %q: %s", err, h.n.uname, h.n.cf.fname, err)
 	}
@@ -622,18 +630,13 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 
 	// Write back to upspin.
 	h.n.Lock()
+	defer h.n.Unlock()
 	var err error
 	if h.n.cf != nil {
-		err = h.n.cf.writeBack(h.n)
-
-		// If this is the last handle, forget about the cached entry.
-		if len(h.n.handles) == 0 {
-			h.n.cf = nil
-		}
+		err = h.n.cf.writeBack(h)
 	}
-	h.n.Unlock()
+	h.freeNoLock()
 	log.Debug.Printf("Release %q -> %s", h, err)
-	h.free()
 	return err
 }
 
@@ -731,7 +734,7 @@ func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string
 	realh := h.(*handle)
 	defer realh.free()
 	buf := make([]byte, n.attr.Size)
-	l, err := realh.file.ReadAt(buf, 0)
+	l, err := n.cf.readAt(buf, 0)
 	if err != nil {
 		return "", err
 	}
@@ -776,4 +779,9 @@ func (n *node) exists() {
 	delete(f.enoentMap, n.uname)
 	f.nodeMap[n.uname] = n
 	f.Unlock()
+}
+
+// delay exists for testing.  We can insert a call to it anywhere we want to fake a delay.
+func delay() {
+	time.Sleep(200 * time.Millisecond)
 }
