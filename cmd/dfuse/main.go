@@ -23,6 +23,9 @@ import (
 	_ "upspin.io/store/gcpstore"
 	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
+	_ "upspin.io/user/gcpuser"
+	_ "upspin.io/user/inprocess"
+	_ "upspin.io/user/remote"
 )
 
 var (
@@ -83,6 +86,9 @@ func main() {
 		fuse.LocalVolume(),
 		fuse.VolumeName(string(f.context.UserName)),
 		fuse.DaemonTimeout("240"),
+		//fuse.OSXDebugFuseKernel(),
+		fuse.NoAppleDouble(),
+		fuse.NoAppleXattr(),
 	)
 	if err != nil {
 		log.Debug.Fatal(err)
