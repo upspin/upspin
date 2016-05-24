@@ -34,6 +34,24 @@
       "revId": "33aedd89c93533ca524267a869a8ac955c0b4561",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc15cb83_05deb224",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-24T16:59:23Z",
+      "side": 1,
+      "message": "I guess I\u0027m wondering where the Close happens.\nIt\u0027s not this package\u0027s fault; it just an unsettled problem.",
+      "parentUuid": "fc15cb83_c5a5baac",
+      "revId": "33aedd89c93533ca524267a869a8ac955c0b4561",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
