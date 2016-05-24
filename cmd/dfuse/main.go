@@ -80,6 +80,9 @@ func main() {
 		fuse.LocalVolume(),
 		fuse.VolumeName(string(f.context.UserName)),
 		fuse.DaemonTimeout("240"),
+		//fuse.OSXDebugFuseKernel(),
+		fuse.NoAppleDouble(),
+		fuse.NoAppleXattr(),
 	)
 	if err != nil {
 		log.Debug.Fatal(err)

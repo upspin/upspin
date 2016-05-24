@@ -35,6 +35,9 @@ type cachedFile struct {
 	fname   string // Filename in cache.
 	inStore bool   // True if this is a cached version of something in the store.
 	dirty   bool   // True if it needs to be written back on close.
+
+	file *os.File           // The in the clear cached file.
+	de   []*upspin.DirEntry // If this is a directory, its contents.
 }
 
 func newCache(context *upspin.Context, dir string) *cache {
@@ -67,7 +70,7 @@ func (c *cache) create(h *handle) error {
 	cf := &cachedFile{c: c, dirty: true}
 	cf.fname = c.mkTemp()
 	var err error
-	if h.file, err = os.Create(cf.fname); err != nil {
+	if cf.file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 		return eio("creating %q file %q: %s", h.n.uname, cf.fname, err)
 	}
 	h.n.cf = cf
@@ -79,12 +82,8 @@ func (c *cache) create(h *handle) error {
 func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	n := h.n
 	if n.cf != nil {
-		// Use precached version.
-		var err error
-		h.file, err = os.OpenFile(n.cf.fname, int(flags), 0700)
-		if err != nil {
-			return eio("opening %q file %q: %s", h.n.uname, n.cf.fname, err)
-		}
+		// We already have a cached version open.
+		h.flags = flags
 		return nil
 	}
 
@@ -122,10 +121,10 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		// be reused.
 		if de.Metadata.Packing() != upspin.PlainPack {
 			// Look for a dirty cached version.
-			h.file, err = os.OpenFile(cf.fname, int(flags), 0700)
+			cf.file, err = os.OpenFile(cf.fname, os.O_RDWR, 0700)
 			if err == nil {
 				h.flags = flags
-				if info, err := h.file.Stat(); err == nil {
+				if info, err := cf.file.Stat(); err == nil {
 					n.cf = cf
 					n.attr.Size = uint64(info.Size())
 					return nil
@@ -170,9 +169,9 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		cleartext = cleartext[:rlen]
 		// Save a copy of the cleartext in the local file system.
 		var file *os.File
-		if file, err = os.Create(cf.fname); err != nil {
+		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 			os.Mkdir(cdir, 0777)
-			if file, err = os.Create(cf.fname); err != nil {
+			if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 				return eio("%s creating %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
 			}
 		}
@@ -180,15 +179,21 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			file.Close()
 			return eio("%s writing %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
 		}
-		if h.file, err = os.OpenFile(cf.fname, int(flags), 0700); err != nil {
-			return eio("%s opening %q ref %q file %q", err, n.uname, loc.Reference, cf.fname)
-		}
+		cf.file = file
 		h.flags = flags
 		n.attr.Size = uint64(rlen)
 		n.cf = cf
 		return nil
 	}
 	return finalErr
+}
+
+// close is called when the last handle for a node has been closed.
+// Called with node locked.
+func (cf *cachedFile) close() {
+	if cf != nil && cf.file != nil {
+		cf.file.Close()
+	}
 }
 
 // makeDirty writes the cached file to the store if it is dirty. Called with node locked.
@@ -214,36 +219,47 @@ func (cf *cachedFile) markDirty() error {
 	return nil
 }
 
+// readAt reads from a cache file.
+func (cf *cachedFile) readAt(buf []byte, offset int64) (int, error) {
+	return cf.file.ReadAt(buf, offset)
+}
+
+// writeAt writes to a cache file.
+func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
+	cf.markDirty()
+	return cf.file.WriteAt(buf, offset)
+}
+
 // writeBack writes the cached file to the store if it is dirty. Called with node locked.
-func (cf *cachedFile) writeBack(n *node) error {
+func (cf *cachedFile) writeBack(h *handle) error {
+	n := h.n
+
 	// Nothing to do if the cache file isn't dirty.
 	if !cf.dirty {
 		return nil
 	}
 
 	// Read the whole file into memory. Hope it fits.
-	file, err := os.Open(cf.fname)
-	if err != nil {
-		return eio("opening %q (%q): %s", cf.fname, n.uname, err)
-	}
-	defer file.Close()
-	info, err := file.Stat()
+	log.Debug.Printf("writeBack %q, %s opened", n, cf.fname)
+	info, err := cf.file.Stat()
 	if err != nil {
 		return eio("stating %q (%q): %s", cf.fname, n.uname, err)
 	}
 	cleartext := make([]byte, info.Size())
 	var sofar int64
 	for sofar != info.Size() {
-		len, err := file.ReadAt(cleartext[sofar:], sofar)
+		len, err := cf.file.ReadAt(cleartext[sofar:], sofar)
 		if err != nil {
 			return eio("reading %q (%q): %s", cf.fname, n.uname, err)
 		}
 		sofar += int64(len)
 	}
+	log.Debug.Printf("writeBack %q, %s read", n, cf.fname)
 
 	// Use the client library to write it back.  Try multiple times on error.
 	var loc upspin.Location
 	for tries := 0; ; tries++ {
+		log.Debug.Printf("Put %q", n)
 		loc, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
 			break
@@ -253,6 +269,7 @@ func (cf *cachedFile) writeBack(n *node) error {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+	log.Debug.Printf("done Put %q", n)
 	cf.dirty = false
 
 	// Rename it to reflect the actual reference in the store so that new
