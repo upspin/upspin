@@ -116,6 +116,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	resp := &proto.StorePutResponse{
 		Reference: string(ref),
 	}
+	log.Printf("Done putting...")
 	return resp, err
 }
 

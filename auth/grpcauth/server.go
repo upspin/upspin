@@ -37,8 +37,8 @@ import (
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata"
 
+	"google.golang.org/grpc/metadata"
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/log"
@@ -58,7 +58,7 @@ var (
 
 const (
 	// authTokenKey is the key in the context's metadata for the auth token.
-	authTokenKey = "authToken"
+	authTokenKey = "upspinauthtoken" // must be all lower case.
 
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
@@ -161,7 +161,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Validate signature.
-	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), &rs, &ss)
+	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s", req.UserName)
 		return nil, ErrMissingSignature
@@ -198,18 +198,21 @@ func generateRandomToken() (string, error) {
 
 // GetSessionFromContext returns a session from the context if there is one.
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
+	log.Printf("=== Context: %v", ctx)
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.New("no metadata in context")
+		return nil, errors.New("invalid metadata")
 	}
-	values, ok := md[authTokenKey]
-	if !ok {
+	data, ok := md[authTokenKey]
+	log.Printf("ok=%d, data=%v", ok, data)
+	if !ok || len(data) != 1 {
 		return nil, errors.New("no auth token in metadata")
 	}
-	if len(values) != 1 {
-		return nil, errors.New("invalid length of values for auth token in metadata")
+	authToken := data[0]
+	if len(authToken) < authTokenEntropyLen {
+		return nil, errors.New("invalid auth token")
 	}
-	authToken := values[0]
+	log.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)

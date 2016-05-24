@@ -80,6 +80,17 @@ func (r *remote) Ping() bool {
 	return err == nil && resp.PingSequence == seq
 }
 
+// Shutdown implements upspin.Service.
+func (r *remote) Shutdown() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (r *remote) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
+}
+
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {

@@ -171,3 +171,10 @@ func (s *service) Configure(options ...string) error {
 func (s *service) Ping() bool {
 	return true
 }
+
+func (s *service) Shutdown() {
+}
+
+func (s *service) Authenticate(*upspin.Context) error {
+	return nil
+}

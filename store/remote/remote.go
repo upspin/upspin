@@ -5,10 +5,10 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"strings"
 
 	gContext "golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
@@ -27,43 +27,54 @@ type dialContext struct {
 
 // remote implements upspin.Store.
 type remote struct {
-	ctx         dialContext
-	storeClient proto.StoreClient
+	grpcauth.AuthClientService // For handling Authenticate, Ping and Shutdown.
+	ctx                        dialContext
+	storeClient                proto.StoreClient
 }
 
 var _ upspin.Store = (*remote)(nil)
 
 // Get implements upspin.Store.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	req := &proto.StoreGetRequest{
-		Reference: string(ref),
-	}
-	resp, err := r.storeClient.Get(gContext.Background(), req)
+	gCtx, err := r.SetAuthContext(r.Context)
 	if err != nil {
 		return nil, nil, err
 	}
-	return resp.Data, proto.UpspinLocations(resp.Locations), nil
+	req := &proto.StoreGetRequest{
+		Reference: string(ref),
+	}
+	resp, err := r.storeClient.Get(gCtx, req)
+	return resp.Data, proto.UpspinLocations(resp.Locations), err
 }
 
 // Put implements upspin.Store.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
+	var zeroRef upspin.Reference
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return zeroRef, err
+	}
 	req := &proto.StorePutRequest{
 		Data: data,
 	}
-	resp, err := r.storeClient.Put(gContext.Background(), req)
+	resp, err := r.storeClient.Put(gCtx, req)
 	if err != nil {
-		return "", err
+		return zeroRef, err
 	}
 	return upspin.Reference(resp.Reference), nil
 }
 
 // Delete implements upspin.Store.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return err
+	}
 	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
-	_, err := r.storeClient.Delete(gContext.Background(), req)
+	_, err = r.storeClient.Delete(gCtx, req)
 	return err
 }
 
@@ -72,7 +83,7 @@ func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
 }
 
-// Endpoint implements upspin.Service.
+// Endpoint implements upspin.Store.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
 }
@@ -86,44 +97,43 @@ func (r *remote) Configure(options ...string) error {
 	return err
 }
 
-// Ping implements upspin.Service.
-func (r *remote) Ping() bool {
-	seq := rand.Int31()
-	req := &proto.PingRequest{
-		PingSequence: seq,
-	}
-	resp, err := r.storeClient.Ping(gContext.Background(), req)
-	return err == nil && resp.PingSequence == seq
-}
-
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	r := &remote{
-		ctx: dialContext{
-			endpoint: e,
-			userName: context.UserName,
-		},
-	}
-
 	var err error
+	var storeClient proto.StoreClient
+	var conn *grpc.ClientConn
 	addr := string(e.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
-		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
+		conn, err = grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
 		if err != nil {
 			return nil, err
 		}
 		// TODO: When can we do conn.Close()?
-		r.storeClient = proto.NewStoreClient(conn)
+		storeClient = proto.NewStoreClient(conn)
 	default:
-		err = fmt.Errorf("unrecognized net address in store remote: %q", addr)
+		err = fmt.Errorf("unrecognized net address in remote: %q", addr)
 	}
 	if err != nil {
 		return nil, err
+	}
+
+	authClient := grpcauth.AuthClientService{
+		GRPCPartial: storeClient,
+		GRPCConn:    conn,
+		Context:     context,
+	}
+	r := &remote{
+		AuthClientService: authClient,
+		ctx: dialContext{
+			endpoint: e,
+			userName: context.UserName,
+		},
+		storeClient: storeClient,
 	}
 
 	return r, nil
