@@ -5,18 +5,19 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"log"
+	"math/rand"
 	"strings"
 
 	gContext "golang.org/x/net/context"
 
-	"google.golang.org/grpc"
-
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
+
+// requireAuthentication allows this client to connect to servers not using TLS.
+const requireAuthentication = true
 
 // dialContext contains the destination and authenticated user of the dial.
 type dialContext struct {
@@ -82,9 +83,9 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	addr := string(e.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
-		conn, err := grpc.Dial(addr[7:], grpc.WithInsecure()) // TODO: Enable TLS.
+		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
 		if err != nil {
-			log.Fatalf("remote store: gprc did not connect: %v", err)
+			return nil, err
 		}
 		// TODO: When can we do conn.Close()?
 		r.storeClient = proto.NewStoreClient(conn)
@@ -114,8 +115,12 @@ func (r *remote) Configure(options ...string) error {
 
 // Ping implements uspin.Service.
 func (r *remote) Ping() bool {
-	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
-	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
+	seq := rand.Int31()
+	req := &proto.PingRequest{
+		PingSequence: seq,
+	}
+	resp, err := r.storeClient.Ping(gContext.Background(), req)
+	return err == nil && resp.PingSequence == seq
 }
 
 const transport = upspin.Remote
