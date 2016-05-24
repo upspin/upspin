@@ -234,6 +234,17 @@ func (s *Store) Endpoint() upspin.Endpoint {
 	}
 }
 
+// Shutdown implements upspin.Service.
+func (s *Store) Shutdown() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (s *Store) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
+}
+
 type storeError struct {
 	op    string
 	error string
