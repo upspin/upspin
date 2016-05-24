@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc15cb83_f4e066a5",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-24T22:14:04Z",
+      "side": 1,
+      "message": "why not do it right away?",
+      "range": {
+        "startLine": 167,
+        "startChar": 18,
+        "endLine": 167,
+        "endChar": 22
+      },
+      "revId": "cf23dac1f93770f7c0687f7aca7d5e37f3aca52f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
