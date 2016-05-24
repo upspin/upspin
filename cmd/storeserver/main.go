@@ -76,32 +76,32 @@ func main() {
 	grpcSecureServer.Serve(listener)
 }
 
-func (s *Server) Get(ctx gContext.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
+func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get %q", req.Reference)
 	data, locs, err := s.store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
 	}
-	resp := &proto.GetResponse{
+	resp := &proto.StoreGetResponse{
 		Data:      data,
 		Locations: proto.Locations(locs),
 	}
 	return resp, err
 }
 
-func (s *Server) Put(ctx gContext.Context, req *proto.PutRequest) (*proto.PutResponse, error) {
+func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
 	ref, err := s.store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
 	}
-	resp := &proto.PutResponse{
+	resp := &proto.StorePutResponse{
 		Reference: string(ref),
 	}
 	return resp, err
 }
 
-func (s *Server) Delete(ctx gContext.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error) {
+func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
 	err := s.store.Delete(upspin.Reference(req.Reference))
 	if err != nil {

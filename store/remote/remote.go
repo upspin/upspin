@@ -34,7 +34,7 @@ var _ upspin.Store = (*remote)(nil)
 
 // Get implements upspin.Store.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	req := &proto.GetRequest{
+	req := &proto.StoreGetRequest{
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Get(gContext.Background(), req)
@@ -44,7 +44,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // Put implements upspin.Store.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
-	req := &proto.PutRequest{
+	req := &proto.StorePutRequest{
 		Data: data,
 	}
 	resp, err := r.storeClient.Put(gContext.Background(), req)
@@ -53,7 +53,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 
 // Delete implements upspin.Store.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
-	req := &proto.DeleteRequest{
+	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
 	_, err := r.storeClient.Delete(gContext.Background(), req)
