@@ -36,7 +36,7 @@ type upspinFS struct {
 	userDirs   map[string]bool               // Set of known user directories.
 	cache      *cache                        // A cache of files read from or to be written to dir/store.
 	nodeMap    map[upspin.PathName]*node     // All in use nodes.
-	enoentMap  map[upspin.PathName]time.Time // A map of non-existant names.
+	enoentMap  map[upspin.PathName]time.Time // A map of non-existent names.
 }
 
 type nodeType uint8
@@ -368,7 +368,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 	return dir, de, nil
 }
 
-// Remove implements fs.Noderemover.  'n' is the directory in which the file
+// Remove implements fs.NodeRemover.  'n' is the directory in which the file
 // req.Name resides.  req.Dir flags this as an rmdir.
 func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 	n.Lock()
@@ -489,11 +489,11 @@ func (n *node) Forget() {
 	defer f.Unlock()
 	nn, ok := f.nodeMap[n.uname]
 	if !ok {
-		log.Debug.Printf("@@@@@@@@@@@@@@@@ %q already forgotten", n)
+		log.Debug.Printf("Forget: %q already forgotten", n)
 		return
 	}
 	if nn != n {
-		log.Debug.Printf("@@@@@@@@@@@@@@@@ %q is not %q", nn, n)
+		log.Debug.Printf("Forget: %q is not %q", nn, n)
 		return
 	}
 	delete(f.nodeMap, n.uname)
@@ -643,7 +643,7 @@ func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
 	return nil
 }
 
-// Link implements fs.Link. It creates a new node in directory n that points to the same
+// Link implements fs.NodeLinker.Link. It creates a new node in directory n that points to the same
 // reference as old.
 func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	n.Lock()
@@ -661,7 +661,7 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	return nn, nil
 }
 
-// Rename implements fs.Rename. It renames the old node to r.NewName in directory n.
+// Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
 	n.Lock()
 	defer n.Unlock()
@@ -683,25 +683,25 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 // The following Xattr calls exist to short circuit any xattr calls.  Without them,
 // the MacOS kernel will constantly look for ._ files.
 
-// Getxattr implements fs.Getxattr.
+// Getxattr implements fs.NodeGetxattrer.Getxattr.
 func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
 	log.Debug.Printf("Getxattr %q %v", n, req)
 	return fuse.ErrNoXattr
 }
 
-// Listxattr implements fs.Listxattr.
+// Listxattr implements fs.NodeListxattrer.Listxattr.
 func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
 	log.Debug.Printf("Listxattr %q", n)
 	return nil
 }
 
-// Setxattr implements fs.Setxattr.
+// Setxattr implements fs.NodeSetxattrer.Setxattr.
 func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
 	log.Debug.Printf("Setxattr %q", n)
 	return nil
 }
 
-// Removexattr implements fs.Removexattr.
+// Removexattr implements fs.NodeRemovexattrer.Removexattr.
 func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
 	log.Debug.Printf("Removexattr %q", n)
 	return nil
@@ -721,7 +721,7 @@ func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	return nn, nil
 }
 
-// Symlink implements fs.Readlink.
+// Symlink implements fs.NodeReadlinker.Readlink.
 func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string, error) {
 	log.Debug.Printf("Readlink %q", n)
 	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
