@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -16,7 +17,16 @@ type dialKey struct {
 	endpoint upspin.Endpoint
 }
 
-const cacheSize = 20
+// dialedService holds a dialed service and its last ping time.
+type dialedService struct {
+	service  upspin.Service
+	lastPing time.Time
+}
+
+const (
+	cacheSize             = 20
+	pingFreshnessDuration = time.Minute * 15
+)
 
 var (
 	mu           sync.Mutex
@@ -24,7 +34,7 @@ var (
 	directoryMap = make(map[upspin.Transport]upspin.Directory)
 	storeMap     = make(map[upspin.Transport]upspin.Store)
 
-	// These caches hold <dialKey, upspin.Service> for each respective service type.
+	// These caches hold <dialKey, *dialedService> for each respective service type.
 	// They are thread safe.
 	userBoundCache      = cache.NewLRU(cacheSize)
 	directoryBoundCache = cache.NewLRU(cacheSize)
@@ -121,9 +131,16 @@ func reachableService(cc *upspin.Context, e upspin.Endpoint, cache *cache.LRU, d
 	s, found := cache.Get(key)
 	var service upspin.Service
 	if found {
-		service = s.(upspin.Service)
-		// TODO: don't re-ping if the last ping time was recent enough.
+		ds := s.(*dialedService)
+		service = ds.service
+		now := time.Now()
+		if ds.lastPing.Add(pingFreshnessDuration).After(now) {
+			// Last ping is fresh.
+			return service, nil
+		}
+		// Must re-ping and store the new ping time.
 		if service.Ping() {
+			ds.lastPing = now
 			return service, nil
 		}
 	}
@@ -135,6 +152,9 @@ func reachableService(cc *upspin.Context, e upspin.Endpoint, cache *cache.LRU, d
 	if !service.Ping() {
 		return nil, errors.New("Ping failed")
 	}
-	cache.Add(key, service)
+	cache.Add(key, &dialedService{
+		service:  service,
+		lastPing: time.Now(),
+	})
 	return service, nil
 }
