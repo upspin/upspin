@@ -293,6 +293,17 @@ func (d *Directory) Ping() bool {
 	return netutil.IsServerReachable(d.serverURL)
 }
 
+// Close implements upspin.Service.
+func (d *Directory) Close() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (d *Directory) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
+}
+
 // Delete deletes the DirEntry for a name from the backend.
 func (d *Directory) Delete(name upspin.PathName) error {
 	const op = "Delete"

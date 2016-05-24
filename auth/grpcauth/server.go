@@ -58,7 +58,7 @@ var (
 
 const (
 	// authTokenKey is the key in the context's metadata for the auth token.
-	authTokenKey = "authToken"
+	authTokenKey = "upspinauthtoken" // must be all lower case.
 
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
@@ -68,6 +68,9 @@ const (
 type SecureServer interface {
 	// Authenticate authenticates the calling user.
 	Authenticate(ctx gContext.Context, req *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error)
+
+	// Ping responds with the same.
+	Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
 
 	// GetSessionFromContext returns a session from the context if there is one.
 	GetSessionFromContext(ctx gContext.Context) (auth.Session, error)
@@ -161,7 +164,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Validate signature.
-	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), &rs, &ss)
+	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s", req.UserName)
 		return nil, ErrMissingSignature
@@ -184,6 +187,15 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	return resp, nil
 }
 
+// Ping responds with the same.
+func (s *secureServerImpl) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
+	log.Print("Ping")
+	resp := &proto.PingResponse{
+		PingSequence: req.PingSequence,
+	}
+	return resp, nil
+}
+
 func generateRandomToken() (string, error) {
 	var buf [authTokenEntropyLen]byte
 	n, err := rand.Read(buf[:])
@@ -200,16 +212,17 @@ func generateRandomToken() (string, error) {
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.New("no metadata in context")
+		return nil, errors.New("invalid metadata")
 	}
-	values, ok := md[authTokenKey]
-	if !ok {
+	data, ok := md[authTokenKey]
+	if !ok || len(data) != 1 {
 		return nil, errors.New("no auth token in metadata")
 	}
-	if len(values) != 1 {
-		return nil, errors.New("invalid length of values for auth token in metadata")
+	authToken := data[0]
+	if len(authToken) < authTokenEntropyLen {
+		return nil, errors.New("invalid auth token")
 	}
-	authToken := values[0]
+	log.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)
