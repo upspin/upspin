@@ -76,8 +76,16 @@ func main() {
 	grpcSecureServer.Serve(listener)
 }
 
+// Lookup implements upspin.User
 func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*proto.UserLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
+
+	// Validate that we have a session. If not, it's an auth error.
+	_, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
@@ -89,6 +97,7 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*pr
 	return resp, err
 }
 
+// Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 	err := s.user.Configure(req.Options...)
@@ -98,6 +107,7 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 	return nil, err
 }
 
+// Endpoint implements upspin.Service
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 	endpoint := s.user.Endpoint()
@@ -110,19 +120,12 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 	return resp, nil
 }
 
+// ServerUserName implements upspin.Service
 func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
 	userName := s.user.ServerUserName()
 	resp := &proto.ServerUserNameResponse{
 		UserName: string(userName),
-	}
-	return resp, nil
-}
-
-func (s *Server) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
-	log.Print("Ping")
-	resp := &proto.PingResponse{
-		PingSequence: req.PingSequence,
 	}
 	return resp, nil
 }

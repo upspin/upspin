@@ -152,3 +152,10 @@ func (d *dummyUser) Configure(options ...string) error {
 func (d *dummyUser) Ping() bool {
 	return true
 }
+
+func (d *dummyUser) Close() {
+}
+
+func (d *dummyUser) Authenticate(*upspin.Context) error {
+	return nil
+}

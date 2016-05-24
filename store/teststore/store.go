@@ -114,6 +114,17 @@ func (s *service) Ping() bool {
 	return true
 }
 
+// Close implements upspin.Service.
+func (s *service) Close() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (s *service) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
+}
+
 const transport = upspin.InProcess
 
 func init() {
