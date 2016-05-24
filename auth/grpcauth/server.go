@@ -161,7 +161,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Validate signature.
-	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), &rs, &ss)
+	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s", req.UserName)
 		return nil, ErrMissingSignature
@@ -210,6 +210,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 		return nil, errors.New("invalid length of values for auth token in metadata")
 	}
 	authToken := values[0]
+	log.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)
