@@ -80,6 +80,7 @@ func main() {
 	grpcSecureServer.Serve(listener)
 }
 
+// Get implements upspin.Store
 func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get %q", req.Reference)
 
@@ -100,6 +101,7 @@ func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 	return resp, err
 }
 
+// Put implements upspin.Store
 func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
 
@@ -119,6 +121,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	return resp, err
 }
 
+// Delete implements upspin.Store
 func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
 
@@ -135,6 +138,7 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 	return nil, err
 }
 
+// Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 	err := s.store.Configure(req.Options...)
@@ -144,6 +148,7 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 	return nil, err
 }
 
+// Endpoint implements upspin.Service
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 	endpoint := s.store.Endpoint()
@@ -156,19 +161,12 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 	return resp, nil
 }
 
+// ServerUserName implements upspin.Service
 func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
 	userName := s.store.ServerUserName()
 	resp := &proto.ServerUserNameResponse{
 		UserName: string(userName),
-	}
-	return resp, nil
-}
-
-func (s *Server) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
-	log.Print("Ping")
-	resp := &proto.PingResponse{
-		PingSequence: req.PingSequence,
 	}
 	return resp, nil
 }

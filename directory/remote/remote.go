@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/rpc"
 	"strings"
-	"time"
 
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/directory/proto"
@@ -95,22 +94,6 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return resp.Entry, err
 }
 
-// Authenticate tells the server which user this is.
-func (r *remote) Authenticate(userName upspin.UserName) (int, error) {
-	req := &proto.AuthenticateRequest{
-		UserName: userName,
-		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
-	}
-	sig, err := r.ctx.factotum.UserSign([]byte(string(req.UserName) + " DirectoryAuthenticate " + req.Now))
-	if err != nil {
-		return -1, err
-	}
-	req.Signature = sig
-	var resp proto.AuthenticateResponse
-	err = r.rpcClient.Call("Server.Authenticate", &req, &resp)
-	return resp.ID, err
-}
-
 // ServerUserName implements upspin.Service.
 func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
@@ -141,7 +124,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	if err != nil {
 		return nil, err
 	}
-	r.id, err = r.Authenticate(context.UserName)
+	// TODO: Authenticate
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +135,17 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 // Endpoint implements upspin.Directory.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
+}
+
+// Close implements upspin.Service.
+func (r *remote) Close() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (r *remote) Authenticate(ctx *upspin.Context) error {
+	// TODO
+	return nil
 }
 
 // Configure implements upspin.Service.
