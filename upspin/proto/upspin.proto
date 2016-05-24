@@ -14,28 +14,28 @@ message Location {
 	string reference = 2;
 }
 
-message GetRequest {
+message StoreGetRequest {
 	string reference = 1;
 }
 
-message GetResponse {
+message StoreGetResponse {
 	bytes data = 1;
 	repeated Location locations = 2;
 }
 
-message PutRequest {
+message StorePutRequest {
 	bytes data = 1;
 }
 
-message PutResponse {
+message StorePutResponse {
 	string reference = 1;
 }
 
-message DeleteRequest {
+message StoreDeleteRequest {
 	string reference = 1;
 }
 
-message DeleteResponse {
+message StoreDeleteResponse {
 }
 
 // Types for the methods of upspin.Service.
@@ -81,9 +81,9 @@ message AuthenticateResponse {
 
 service Store {
     rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
-	rpc Get (GetRequest) returns (GetResponse) {}
-	rpc Put (PutRequest) returns (PutResponse) {}
-	rpc Delete (DeleteRequest) returns (DeleteResponse) {}
+	rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
+	rpc Put (StorePutRequest) returns (StorePutResponse) {}
+	rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
 	rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
 	rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
 	rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
