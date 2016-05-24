@@ -62,6 +62,14 @@ message ServerUserNameResponse {
 	string user_name = 1;
 }
 
+message PingRequest {
+    int32 ping_sequence = 1;
+}
+
+message PingResponse {
+    int32 ping_sequence = 1;
+}
+
 // Authenticate is not part of the service definitions in upspin.
 // It is used only in the remote implementations.
 message AuthenticateRequest {
@@ -80,11 +88,12 @@ message AuthenticateResponse {
 }
 
 service Store {
-    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
 	rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
 	rpc Put (StorePutRequest) returns (StorePutResponse) {}
 	rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
 	rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
 	rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-	rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
+    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
+    rpc Ping (PingRequest) returns (PingResponse) {}
 }

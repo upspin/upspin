@@ -20,6 +20,7 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/remote"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
 var (
@@ -78,6 +79,13 @@ func main() {
 
 func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get %q", req.Reference)
+
+	// Validate that we have a session. If not, it's an auth error.
+	_, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	data, locs, err := s.store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
@@ -91,6 +99,13 @@ func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 
 func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
+
+	// Validate that we have a session. If not, it's an auth error.
+	_, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	ref, err := s.store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
@@ -103,7 +118,14 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 
 func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
-	err := s.store.Delete(upspin.Reference(req.Reference))
+
+	// Validate that we have a session. If not, it's an auth error.
+	_, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Reference, err)
 	}
@@ -136,6 +158,14 @@ func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameR
 	userName := s.store.ServerUserName()
 	resp := &proto.ServerUserNameResponse{
 		UserName: string(userName),
+	}
+	return resp, nil
+}
+
+func (s *Server) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
+	log.Print("Ping")
+	resp := &proto.PingResponse{
+		PingSequence: req.PingSequence,
 	}
 	return resp, nil
 }
