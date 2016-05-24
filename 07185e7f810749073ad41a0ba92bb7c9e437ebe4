@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc922b13_1c440c0c",
+        "filename": "auth/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "Handler was more useful term when this code was in context.  Here it looks a bit mysterious to the reader, especially as it no longer refers just to HTTP.  Maybe it will become more clear as the CL progresses.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_7c0190a8",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "s/lly/ly",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_bc15d8db",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "We\u0027re not yet confident we can keep clocks adequately in sync.  We\u0027ll deal with failures first as logs processing step.   Eventually, with luck, we\u0027ll be able to enforce failing here.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_fcea80e6",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "Nope, I literally meant 16 bytes from crypto/rand.Read().  All the other fields you mention would be in auth.Session.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_5cb4d4f4",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "I expected 16, not 1.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_bfa86a85",
+        "filename": "auth/server_setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "This is fine, but I wonder if we can get away with dropping RSA?  It would be interesting to me to find out, so maybe comment these out at the start and add back in when we find we have to.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_dfd3f613",
+        "filename": "auth/session.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-24T16:31:23Z",
+      "side": 1,
+      "message": "We\u0027re assuming 128-log2(sessionCacheSize) is large enough to defeat brute-force attacks.  This partly depends on monitoring logs.\n\nAnyway, remember there are security implications to making this a million, say.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
