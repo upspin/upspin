@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc15cb83_8bd3d1e6",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T19:38:33Z",
+      "side": 1,
+      "message": "I messed up this line. You may want to fix the tab here (Intellij is converting them to spaces for protos, I need to fix that). Thanks.",
+      "revId": "b9581761bea886cdcc4ca07b0aeb4707d8236aaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
