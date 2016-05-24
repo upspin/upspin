@@ -37,7 +37,6 @@ import (
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata"
 
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/factotum"
@@ -161,7 +160,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Validate signature.
-	err = verifySignature(keys, []byte(string(req.UserName)+" DirectoryAuthenticate "+req.Now), &rs, &ss)
+	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s", req.UserName)
 		return nil, ErrMissingSignature
@@ -198,18 +197,11 @@ func generateRandomToken() (string, error) {
 
 // GetSessionFromContext returns a session from the context if there is one.
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
-	md, ok := metadata.FromContext(ctx)
-	if !ok {
-		return nil, errors.New("no metadata in context")
+	var authToken = ctx.Value(authTokenKey).(string)
+	if len(authToken) < authTokenEntropyLen {
+		return nil, errors.New("invalid auth token")
 	}
-	values, ok := md[authTokenKey]
-	if !ok {
-		return nil, errors.New("no auth token in metadata")
-	}
-	if len(values) != 1 {
-		return nil, errors.New("invalid length of values for auth token in metadata")
-	}
-	authToken := values[0]
+	log.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)

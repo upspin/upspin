@@ -131,6 +131,17 @@ func (u *user) Ping() bool {
 	return netutil.IsServerReachable(u.serverURL)
 }
 
+// Shutdown implements upspin.Service.
+func (u *user) Shutdown() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (u *user) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
+}
+
 // Implements Error
 type userError struct {
 	error error
