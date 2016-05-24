@@ -16,6 +16,24 @@
       "revId": "33aedd89c93533ca524267a869a8ac955c0b4561",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc15cb83_c5a5baac",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:56:53Z",
+      "side": 1,
+      "message": "It\u0027s an LRU cache of size 20. It may keep old ones around after they expired, but they get recycled as new ones show up. Is that too bad?",
+      "parentUuid": "bcf6f39b_ebed31c6",
+      "revId": "33aedd89c93533ca524267a869a8ac955c0b4561",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
