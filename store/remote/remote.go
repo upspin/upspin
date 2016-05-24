@@ -12,8 +12,9 @@ import (
 
 	"google.golang.org/grpc"
 
+	"math/rand"
+
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
@@ -114,8 +115,12 @@ func (r *remote) Configure(options ...string) error {
 
 // Ping implements uspin.Service.
 func (r *remote) Ping() bool {
-	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
-	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
+	seq := rand.Int31()
+	req := &proto.PingRequest{
+		PingSequence: seq,
+	}
+	resp, err := r.storeClient.Ping(gContext.Background(), req)
+	return err == nil && resp.PingSequence == seq
 }
 
 const transport = upspin.Remote

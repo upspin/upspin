@@ -38,6 +38,8 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
+	"crypto/rand"
+
 	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/log"
@@ -55,7 +57,13 @@ var (
 	authTokenDuration = 20 * time.Hour // Max duration an auth token lasts.
 )
 
-const authTokenKey = "authToken"
+const (
+	// authTokenKey is the key in the context's metadata for the auth token.
+	authTokenKey = "authToken"
+
+	// authTokenEntropyLen is the size of random bytes in an auth token.
+	authTokenEntropyLen = 16
+)
 
 // A SecureServer is a grpc server that implements the Authenticate method as defined by the upspin proto.
 type SecureServer interface {
@@ -78,16 +86,25 @@ type SecureServer interface {
 // NewSecureServer returns a new grpc server with a TLS config as described by the certificate file and certificate
 // key file.
 func NewSecureServer(config auth.Config, certFile string, certKeyFile string) (SecureServer, error) {
-	tlsConfig, err := auth.NewDefaultTLSConfig(certFile, certKeyFile)
-	if err != nil {
-		return nil, err
-	}
-	creds := credentials.NewTLS(tlsConfig)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to generate credentials: %s", err)
+	var grpcServer *grpc.Server
+
+	if certFile != "" && certKeyFile != "" {
+		tlsConfig, err := auth.NewDefaultTLSConfig(certFile, certKeyFile)
+		if err != nil {
+			return nil, err
+		}
+		creds := credentials.NewTLS(tlsConfig)
+		grpcServer = grpc.NewServer(grpc.Creds(creds))
+	} else {
+		if config.AllowUnauthenticatedConnections {
+			log.Printf("Not using TLS encryption. Allowing unauthenticated users.")
+			grpcServer = grpc.NewServer()
+		} else {
+			return nil, errors.New("No certificate provided but not allowing unauthenticated users.")
+		}
 	}
 	return &secureServerImpl{
-		grpcServer: grpc.NewServer(grpc.Creds(creds)),
+		grpcServer: grpcServer,
 		config:     config,
 	}, nil
 }
@@ -153,15 +170,31 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 
 	// Generate an auth token and bind it to a session for the user.
 	expiration := now.Add(authTokenDuration)
-	// TODO: create a 128-bit random auth token.
-	authToken := "=== TODO auth token ==="
-	_ = auth.NewSession(parsed.User(), true, expiration, authToken, nil) // session is cached, ignore return value
+	authToken, err := generateRandomToken()
+	if err != nil {
+		log.Error.Printf("Can't create auth token.")
+		return nil, errors.New("can't create auth token")
+	}
+	isAuth := !s.config.AllowUnauthenticatedConnections
+	_ = auth.NewSession(parsed.User(), isAuth, expiration, authToken, nil) // session is cached, ignore return value
 
 	resp := &proto.AuthenticateResponse{
 		Token: authToken,
 	}
 
 	return resp, nil
+}
+
+func generateRandomToken() (string, error) {
+	var buf [authTokenEntropyLen]byte
+	n, err := rand.Read(buf[:])
+	if err != nil {
+		return "", err
+	}
+	if n != len(buf) {
+		return "", errors.New("random bytes too short.")
+	}
+	return fmt.Sprintf("%X", buf), nil
 }
 
 // GetSessionFromContext returns a session from the context if there is one.
