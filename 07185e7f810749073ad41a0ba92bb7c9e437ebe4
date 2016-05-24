@@ -118,6 +118,40 @@
       "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_5fd286e6",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-24T16:47:14Z",
+      "side": 1,
+      "message": "i preferred grpcServer here, for clarity about what it is. this is subtle code.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_3fe45ab3",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-24T16:47:14Z",
+      "side": 1,
+      "message": "this isn\u0027t about Directory. they\u0027ll all need it.\n\n// Authenticate is not part of the service definitions in upspin.\n// It is used only in the remote implementations.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
