@@ -86,8 +86,18 @@ func (c *userCache) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
 
+// Ping implements upspin.Service.
 func (c *userCache) Ping() bool {
 	return true
+}
+
+// Close implements upspin.Service.
+func (c *userCache) Close() {
+}
+
+// Authenticate implements upspin.Service.
+func (c *userCache) Authenticate(*upspin.Context) error {
+	return nil
 }
 
 // SetDuration sets the duration until entries expire.  Primarily

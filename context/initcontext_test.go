@@ -220,6 +220,11 @@ func (d *dummyUser) Endpoint() upspin.Endpoint {
 func (d *dummyUser) Ping() bool {
 	return true
 }
+func (d *dummyUser) Close() {
+}
+func (d *dummyUser) Authenticate(*upspin.Context) error {
+	return nil
+}
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	panic("unimplemented")
@@ -245,6 +250,11 @@ func (d *dummyStore) Configure(options ...string) error {
 }
 func (d *dummyStore) Delete(ref upspin.Reference) error {
 	panic("unimplemented")
+}
+func (d *dummyStore) Close() {
+}
+func (d *dummyStore) Authenticate(*upspin.Context) error {
+	return nil
 }
 
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
@@ -280,4 +290,9 @@ func (d *dummyDirectory) Endpoint() upspin.Endpoint {
 }
 func (d *dummyDirectory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
 	panic("unimplemented")
+}
+func (d *dummyDirectory) Close() {
+}
+func (d *dummyDirectory) Authenticate(*upspin.Context) error {
+	return nil
 }

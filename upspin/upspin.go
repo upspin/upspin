@@ -487,4 +487,11 @@ type Service interface {
 
 	// Ping reports whether the Service is reachable.
 	Ping() bool
+
+	// Authenticate authenticates the user in the context.
+	Authenticate(*Context) error
+
+	// Close closes the connection to the service and releases all resources used.
+	// A Service may not be re-used after close.
+	Close()
 }

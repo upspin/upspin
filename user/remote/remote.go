@@ -5,11 +5,11 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"strings"
 
 	gContext "golang.org/x/net/context"
 
+	"google.golang.org/grpc"
 	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -27,8 +27,9 @@ type dialContext struct {
 
 // remote implements upspin.User.
 type remote struct {
-	ctx        dialContext
-	userClient proto.UserClient
+	grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
+	ctx                        dialContext
+	userClient                 proto.UserClient
 }
 
 var _ upspin.User = (*remote)(nil)
@@ -70,30 +71,15 @@ func (r *remote) Configure(options ...string) error {
 	return err
 }
 
-// Ping implements upspin.Service.
-func (r *remote) Ping() bool {
-	seq := rand.Int31()
-	req := &proto.PingRequest{
-		PingSequence: seq,
-	}
-	resp, err := r.userClient.Ping(gContext.Background(), req)
-	return err == nil && resp.PingSequence == seq
-}
-
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
 		return nil, errors.New("remote user: unrecognized transport")
 	}
 
-	r := &remote{
-		ctx: dialContext{
-			endpoint: e,
-			userName: context.UserName,
-		},
-	}
-
 	var err error
+	var userClient proto.UserClient
+	var conn *grpc.ClientConn
 	addr := string(e.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
@@ -102,12 +88,26 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 			return nil, err
 		}
 		// TODO: When can we do conn.Close()?
-		r.userClient = proto.NewUserClient(conn)
+		userClient = proto.NewUserClient(conn)
 	default:
 		err = fmt.Errorf("unrecognized net address in user remote: %q", addr)
 	}
 	if err != nil {
 		return nil, err
+	}
+
+	authClient := grpcauth.AuthClientService{
+		GRPCCommon: userClient,
+		GRPCConn:   conn,
+		Context:    context,
+	}
+	r := &remote{
+		AuthClientService: authClient,
+		ctx: dialContext{
+			endpoint: e,
+			userName: context.UserName,
+		},
+		userClient: userClient,
 	}
 
 	return r, nil
