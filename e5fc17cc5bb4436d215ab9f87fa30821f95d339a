@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc15cb83_454d4a8b",
+        "filename": "cmd/dfuse/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T17:37:01Z",
+      "side": 1,
+      "message": "Gotta love code tongue twister. :-)",
+      "revId": "e5fc17cc5bb4436d215ab9f87fa30821f95d339a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
