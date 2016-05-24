@@ -83,12 +83,16 @@ func TestSwitch(t *testing.T) {
 	if du.dialed != 2 {
 		t.Errorf("Expected two dials. Got %d", du.dialed)
 	}
+	if u1.(*dummyUser).pingCount != 1 {
+		t.Errorf("Expected only one ping. Got %d", du.pingCount)
+	}
 }
 
 // Some dummy interfaces.
 type dummyUser struct {
-	endpoint upspin.Endpoint
-	dialed   int
+	endpoint  upspin.Endpoint
+	dialed    int
+	pingCount int
 }
 type dummyStore struct {
 	endpoint upspin.Endpoint
@@ -115,6 +119,7 @@ func (d *dummyUser) Configure(options ...string) error {
 	return nil
 }
 func (d *dummyUser) Ping() bool {
+	d.pingCount++
 	return true
 }
 
