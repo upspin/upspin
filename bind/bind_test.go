@@ -122,6 +122,11 @@ func (d *dummyUser) Ping() bool {
 	d.pingCount++
 	return true
 }
+func (d *dummyUser) Shutdown() {
+}
+func (d *dummyUser) Authenticate(*upspin.Context) error {
+	return nil
+}
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	return nil, nil, errors.New("dummyStore.Get not implemented")
@@ -147,6 +152,11 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 }
 func (d *dummyStore) Ping() bool {
 	return true
+}
+func (d *dummyStore) Shutdown() {
+}
+func (d *dummyStore) Authenticate(*upspin.Context) error {
+	return nil
 }
 
 func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
@@ -183,4 +193,9 @@ func (d *dummyDirectory) WhichAccess(name upspin.PathName) (upspin.PathName, err
 func (d *dummyDirectory) Ping() bool {
 	// This directory is broken and never reachable.
 	return false
+}
+func (d *dummyDirectory) Shutdown() {
+}
+func (d *dummyDirectory) Authenticate(*upspin.Context) error {
+	return nil
 }

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
 	"upspin.googlesource.com/upspin.git/user/proto"
 )
@@ -91,9 +90,21 @@ func (r *remote) Configure(options ...string) error {
 	return r.rpcClient.Call("Server.Configure", &req, &resp)
 }
 
+// Ping implements upspin.Service.
 func (r *remote) Ping() bool {
-	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
-	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
+	// TODO: do the right thing.
+	return true
+}
+
+// Shutdown implements upspin.Service.
+func (r *remote) Shutdown() {
+	// TODO
+}
+
+// Authenticate implements upspin.Service.
+func (r *remote) Authenticate(*upspin.Context) error {
+	// TODO
+	return nil
 }
 
 const transport = upspin.Remote
