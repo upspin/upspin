@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "fc15cb83_cbc8298a",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T20:23:13Z",
+      "side": 1,
+      "message": "I was typing a comment about this, not sure you got it (gerrit errored on me). I was writing this:\n\nThis should really be either 1) a flag (but this is a library, so maybe not) or 2) a parameter to Dial or 3) some user preference that gets loaded into the Context via rc file.\n\nWhat do you think?",
+      "parentUuid": "fc15cb83_cbfb09c9",
+      "revId": "513296bbdea4ef9b9861da9849210eae1075e9ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc15cb83_0b06c1c1",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 3
@@ -47,6 +65,24 @@
       "writtenOn": "2016-05-24T20:19:50Z",
       "side": 1,
       "message": "reindent please",
+      "revId": "513296bbdea4ef9b9861da9849210eae1075e9ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc15cb83_8b959155",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T20:23:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc15cb83_0b06c1c1",
       "revId": "513296bbdea4ef9b9861da9849210eae1075e9ee",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
