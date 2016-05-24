@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "fc15cb83_4eb1e7eb",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-24T20:28:29Z",
+      "side": 1,
+      "message": "let\u0027s talk about this today",
+      "parentUuid": "fc15cb83_cbc8298a",
+      "revId": "513296bbdea4ef9b9861da9849210eae1075e9ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc15cb83_0b06c1c1",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 3
