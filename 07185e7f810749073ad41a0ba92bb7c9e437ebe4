@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_5f8cc60f",
+        "filename": "auth/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "I\u0027ve clarified the comment. This will be shared between HTTP and gRPC.",
+      "parentUuid": "fc922b13_1c440c0c",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc922b13_7c0190a8",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-24T16:31:23Z",
       "side": 1,
       "message": "s/lly/ly",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_ff7032f9",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_7c0190a8",
       "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_7f642236",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Clarified TODO.",
+      "parentUuid": "fc922b13_bc15d8db",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc922b13_fcea80e6",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-05-24T16:31:23Z",
       "side": 1,
       "message": "Nope, I literally meant 16 bytes from crypto/rand.Read().  All the other fields you mention would be in auth.Session.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_bf514a57",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "I know. I meant this would be how we seed the random number generator. But as you mention, not necessary. Removed parenthetical.",
+      "parentUuid": "fc922b13_fcea80e6",
       "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_3fcd3a45",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Oh, this is because metadata returns a slice. It should be clear now that I renamed authToken to values and authToken is value[0] (which will still be a 16-byte string).",
+      "parentUuid": "fc922b13_5cb4d4f4",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc922b13_bfa86a85",
         "filename": "auth/server_setup.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-05-24T16:31:23Z",
       "side": 1,
       "message": "This is fine, but I wonder if we can get away with dropping RSA?  It would be interesting to me to find out, so maybe comment these out at the start and add back in when we find we have to.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc922b13_bff70a66",
+        "filename": "auth/server_setup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "This is in order of preference. We\u0027ll force the first one if the client can support it. And then go down the list.\n\nA while back I tried it with a slightly older version of curl and it could only handle RSA_WITH_AES_256 if I remember right.\n\nBut we can trim the list further if this is really insecure.",
+      "parentUuid": "fc922b13_bfa86a85",
       "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "fc922b13_bf8e2ae4",
+        "filename": "auth/session.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Thanks for the reminder. I added this to the comment. I suppose if we need 1 million we\u0027ll need to change the authToken size. \n\nHopefully, there are also other ways to mitigate brute-force attacks in our anti-DDoS arsenal.",
+      "parentUuid": "fc922b13_dfd3f613",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc922b13_5fd286e6",
         "filename": "cmd/storeserver/main.go",
         "patchSetId": 3
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "bc9c332b_a4aaa390",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc922b13_5fd286e6",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc922b13_3fe45ab3",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 3
@@ -149,6 +293,24 @@
       "writtenOn": "2016-05-24T16:47:14Z",
       "side": 1,
       "message": "this isn\u0027t about Directory. they\u0027ll all need it.\n\n// Authenticate is not part of the service definitions in upspin.\n// It is used only in the remote implementations.",
+      "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc9c332b_64b49bf5",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-24T16:54:42Z",
+      "side": 1,
+      "message": "Oh, my bad. I copied this from Directory.\n\nFixed.",
+      "parentUuid": "fc922b13_3fe45ab3",
       "revId": "07185e7f810749073ad41a0ba92bb7c9e437ebe4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
