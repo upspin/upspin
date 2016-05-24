@@ -118,11 +118,3 @@ func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameR
 	}
 	return resp, nil
 }
-
-func (s *Server) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
-	log.Print("Ping")
-	resp := &proto.PingResponse{
-		PingSequence: req.PingSequence,
-	}
-	return resp, nil
-}

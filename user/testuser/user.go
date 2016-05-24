@@ -165,6 +165,15 @@ func (s *Service) Ping() bool {
 	return true
 }
 
+// Close implements upspin.Service.
+func (s *Service) Close() {
+}
+
+// Authenticate implements upspin.Service.
+func (s *Service) Authenticate(*upspin.Context) error {
+	return nil
+}
+
 func init() {
 	s := &Service{
 		db: &database{

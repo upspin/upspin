@@ -332,3 +332,8 @@ func (d *dummyUser) Endpoint() upspin.Endpoint {
 func (d *dummyUser) Ping() bool {
 	return true
 }
+func (d *dummyUser) Close() {
+}
+func (d *dummyUser) Authenticate(*upspin.Context) error {
+	return nil
+}
