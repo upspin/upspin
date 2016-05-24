@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bcf6f39b_ebed31c6",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-24T16:51:30Z",
+      "side": 1,
+      "message": "i worry there is no deletion. these services just accumulate forever.\nit needs a TODO ASAP and a fix soon.",
+      "revId": "33aedd89c93533ca524267a869a8ac955c0b4561",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
