@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/auth/testauth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -617,7 +617,7 @@ func TestPutAccessFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
+	authClient := httpauth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	storeClient := newStoreClient(authClient)
 
 	ds := newDirServer(egcp, storeClient)
@@ -716,7 +716,7 @@ func TestGroupAccessFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	authClient := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
+	authClient := httpauth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	storeClient := newStoreClient(authClient)
 
 	// Create a session for broUserName
@@ -1133,7 +1133,7 @@ func newDummyStoreClient() *storeClient {
 	if err != nil {
 		panic(err)
 	}
-	authCli := auth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
+	authCli := httpauth.NewClient(upspin.UserName("this-server@upspin.io"), f, mock)
 	return newStoreClient(authCli)
 }
 

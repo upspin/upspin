@@ -1,4 +1,4 @@
-package auth
+package httpauth
 
 import (
 	"crypto/tls"
@@ -9,6 +9,7 @@ import (
 
 	"io/ioutil"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -105,7 +106,7 @@ func TestServerHandler(t *testing.T) {
 	makeTLSRequest(req, []byte("9999"))
 
 	// Now set up the server to receive this request.
-	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
 		called = true
 		if session.User() != user {
 			t.Errorf("Expected user %q, got %q", user, session.User())
@@ -117,7 +118,7 @@ func TestServerHandler(t *testing.T) {
 			t.Errorf("Expected no error, got %q", session.Err())
 		}
 	}
-	config := &Config{Lookup: lookup}
+	config := &auth.Config{Lookup: lookup}
 	ah := NewHandler(config)
 	ah.Handle(handler)(nil, req) // Invoke the handler.
 
@@ -135,7 +136,7 @@ func TestServerHandlerNotTLS(t *testing.T) {
 	f := newFactotum(t, p256Key)
 	signReq(t, f, req)
 
-	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
 		called = true
 		if session.IsAuthenticated() {
 			t.Error("Expected not IsAuthenticated")
@@ -144,7 +145,7 @@ func TestServerHandlerNotTLS(t *testing.T) {
 			t.Errorf("Expected user %q, got %q", user, session.User())
 		}
 	}
-	config := &Config{
+	config := &auth.Config{
 		Lookup: lookup,
 		AllowUnauthenticatedConnections: true,
 	}
@@ -168,11 +169,11 @@ func TestServerHandlerWritesResponseDirectly(t *testing.T) {
 	signReq(t, f, req)
 	makeTLSRequest(req, []byte("4321"))
 
-	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Do not define a Lookup function
-	var config Config
+	var config auth.Config
 	ah := NewHandler(&config)
 	ah.Handle(handler)(w, req) // Invoke the handler with an ExpectingResponseWriter
 
@@ -191,11 +192,11 @@ func TestServerHandlerSignaturesMismatch(t *testing.T) {
 	signReq(t, f, req)
 	makeTLSRequest(req, []byte("12345"))
 
-	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
 		t.Errorf("Inner handler function was called")
 	}
 	// Define a custom Lookup
-	config := &Config{
+	config := &auth.Config{
 		Lookup: func(upspin.UserName) ([]upspin.PublicKey, error) {
 			return nil, nil // No error, but no keys either.
 		},
@@ -217,7 +218,7 @@ func TestServerContinuesTLSSession(t *testing.T) {
 	makeTLSRequest(req, []byte("1234"))
 
 	// Now set up the server to receive this request.
-	handler := func(session Session, w http.ResponseWriter, r *http.Request) {
+	handler := func(session auth.Session, w http.ResponseWriter, r *http.Request) {
 		called++
 		if session.User() != user {
 			t.Errorf("Expected user %q, got %q", user, session.User())
@@ -229,7 +230,7 @@ func TestServerContinuesTLSSession(t *testing.T) {
 			t.Errorf("Expected no error, got %q", session.Err())
 		}
 	}
-	config := &Config{Lookup: lookup}
+	config := &auth.Config{Lookup: lookup}
 	ah := NewHandler(config)
 	ah.Handle(handler)(nil, req) // Invoke the handler.
 
