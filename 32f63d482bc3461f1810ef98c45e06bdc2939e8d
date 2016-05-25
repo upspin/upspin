@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_67d746d5",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:34:09Z",
+      "side": 1,
+      "message": "the idiom would be to call this GRPCCommon",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_e7c27616",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:34:09Z",
+      "side": 1,
+      "message": "s/same //",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_07c8ba34",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:34:09Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_e763562d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:34:09Z",
+      "side": 1,
+      "message": "s/service/Service/ just to be clear.",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_27529e5b",
+        "filename": "user/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:34:09Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be updated to be like store/remote?",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
