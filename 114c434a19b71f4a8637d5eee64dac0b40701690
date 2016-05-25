@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_d6992283",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T21:43:04Z",
+      "side": 1,
+      "message": "It\u0027s used elsewhere (another file in this package).",
+      "parentUuid": "5c17b7d8_587bfdad",
+      "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_b87579ba",
         "filename": "auth/common.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-25T21:36:28Z",
       "side": 1,
       "message": "Suggestion: put each of the map elements on its own line to make the elements easier to scan.",
+      "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_56a672b8",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T21:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_b87579ba",
       "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_769ff665",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T21:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_787841b0",
+      "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_188585af",
         "filename": "auth/common.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-05-25T21:36:28Z",
       "side": 1,
       "message": "sha is a writer, so let\u0027s take advantage of that:\n\nfmt.Fprintf(sha, \"%s:%s\", k, r.Header[k])",
+      "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_969cfa70",
+        "filename": "auth/common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T21:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_188585af",
       "revId": "114c434a19b71f4a8637d5eee64dac0b40701690",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
