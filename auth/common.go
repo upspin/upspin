@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -20,21 +21,32 @@ const (
 
 var (
 	errMissingSignature = errors.New("missing signature in header")
+	allowedHeaders      = map[string]bool{
+		"Date":              true,
+		userNameHeader:      true,
+		signatureTypeHeader: true,
+	}
 )
 
 func hashUserRequest(userName upspin.UserName, r *http.Request) []byte {
 	sha := sha256.New()
-	for k, v := range r.Header {
-		if k == signatureHeader {
-			// Do not hash the signature itself.
+	keys := make([]string, 0, len(allowedHeaders))
+	for k, _ := range r.Header {
+		if _, ok := allowedHeaders[k]; !ok {
+			// Do not use other custom headers, as they may be added by proxies along the way.
 			continue
 		}
-		sha.Sum([]byte(fmt.Sprintf("%s:%s", k, v)))
+		keys = append(keys, k)
 	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Fprintf(sha, "%s:%s", k, r.Header[k]) // r.Header[k] is known valid.
+	}
+
 	// Request method (GET, PUT, etc)
-	sha.Sum([]byte(r.Method))
+	sha.Write([]byte(r.Method))
 	// The fully-formatted URL
-	sha.Sum([]byte(r.URL.String()))
+	sha.Write([]byte(r.URL.Path))
 	// TODO: anything else?
 	return sha.Sum(nil)
 }
