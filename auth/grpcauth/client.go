@@ -1,6 +1,7 @@
 package grpcauth
 
 import (
+	"crypto/tls"
 	"math/rand"
 	"time"
 
@@ -50,7 +51,7 @@ func NewGRPCClient(netAddr upspin.NetAddr, allowUnauthenticatedConnections bool)
 	}
 	addr := string(netAddr)
 	conn, err := grpc.Dial(addr,
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")),
+		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowUnauthenticatedConnections})),
 		grpc.WithBlock(),
 		grpc.WithTimeout(timeOut),
 	)
