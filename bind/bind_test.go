@@ -76,7 +76,7 @@ func TestSwitch(t *testing.T) {
 	ctx2 := upspin.Context{
 		UserName: upspin.UserName("bob@foo.com"),
 	}
-	_, err = User(&ctx2, e) // Dials again,
+	u3, err := User(&ctx2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,13 +86,39 @@ func TestSwitch(t *testing.T) {
 	if u1.(*dummyUser).pingCount != 1 {
 		t.Errorf("Expected only one ping. Got %d", du.pingCount)
 	}
+
+	// Now check that Release works.
+	if len(userDialCache) != 2 {
+		t.Errorf("Expected two user services in the cache, got %d", len(userDialCache))
+	}
+
+	err = Release(u1) // u2 == u1
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Release(u3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(userDialCache) != 0 {
+		t.Errorf("Expected only no user service in the cache.")
+	}
+
+	if u1.(*dummyUser).closeCalled != 1 {
+		t.Errorf("Expected close to be called once on u1")
+	}
+	if u3.(*dummyUser).closeCalled != 1 {
+		t.Errorf("Expected close to be called once on u3")
+	}
 }
 
 // Some dummy interfaces.
 type dummyUser struct {
-	endpoint  upspin.Endpoint
-	dialed    int
-	pingCount int
+	endpoint    upspin.Endpoint
+	dialed      int
+	pingCount   int
+	closeCalled int
 }
 type dummyStore struct {
 	endpoint upspin.Endpoint
@@ -123,6 +149,7 @@ func (d *dummyUser) Ping() bool {
 	return true
 }
 func (d *dummyUser) Close() {
+	d.closeCalled++
 }
 func (d *dummyUser) Authenticate(*upspin.Context) error {
 	return nil
