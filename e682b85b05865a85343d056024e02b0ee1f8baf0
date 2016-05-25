@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_785fe134",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T23:14:32Z",
+      "side": 1,
+      "message": "I think this comment is out of date. cache.LRU might be thread safe, but raw maps are not. What are the concurrency implications here?\n\nAlso, do you run your tests with -race? If you do and the tests still passed here, we probably need to add some more concurrency to our tests at some point.",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_3859694e",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T23:14:32Z",
+      "side": 1,
+      "message": "s/server/service/",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_d834ede9",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T23:14:32Z",
+      "side": 1,
+      "message": "is there an error return value from Close?",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
