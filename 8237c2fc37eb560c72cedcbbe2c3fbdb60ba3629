@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_415b1217",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T05:41:10Z",
+      "side": 0,
+      "message": "I have many changes to this file too. I\u0027ll likely overwrite most of it.",
+      "revId": "8237c2fc37eb560c72cedcbbe2c3fbdb60ba3629",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
