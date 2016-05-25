@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_b84c9990",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T22:47:11Z",
+      "side": 1,
+      "message": "is grpcauth a thing already?",
+      "revId": "addc96e83b3b5f464e84a65d489296cf74af43c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
