@@ -16,7 +16,7 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
 
-// requireAuthentication allows this client to connect to servers not using TLS.
+// requireAuthentication specifies whether the connection demands TLS.
 const requireAuthentication = true
 
 // dialContext contains the destination and authenticated user of the dial.
@@ -39,7 +39,10 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Get(gContext.Background(), req)
-	return resp.Data, proto.UpspinLocations(resp.Locations), err
+	if err != nil {
+		return nil, nil, err
+	}
+	return resp.Data, proto.UpspinLocations(resp.Locations), nil
 }
 
 // Put implements upspin.Store.Put.
@@ -49,7 +52,10 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 		Data: data,
 	}
 	resp, err := r.storeClient.Put(gContext.Background(), req)
-	return upspin.Reference(resp.Reference), err
+	if err != nil {
+		return "", err
+	}
+	return upspin.Reference(resp.Reference), nil
 }
 
 // Delete implements upspin.Store.Delete.
@@ -64,6 +70,30 @@ func (r *remote) Delete(ref upspin.Reference) error {
 // ServerUserName implements upspin.Service.
 func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
+}
+
+// Endpoint implements upspin.Service.
+func (r *remote) Endpoint() upspin.Endpoint {
+	return r.ctx.endpoint
+}
+
+// Configure implements upspin.Service.
+func (r *remote) Configure(options ...string) error {
+	req := &proto.ConfigureRequest{
+		Options: options,
+	}
+	_, err := r.storeClient.Configure(gContext.Background(), req)
+	return err
+}
+
+// Ping implements upspin.Service.
+func (r *remote) Ping() bool {
+	seq := rand.Int31()
+	req := &proto.PingRequest{
+		PingSequence: seq,
+	}
+	resp, err := r.storeClient.Ping(gContext.Background(), req)
+	return err == nil && resp.PingSequence == seq
 }
 
 // Dial implements upspin.Service.
@@ -90,37 +120,13 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		// TODO: When can we do conn.Close()?
 		r.storeClient = proto.NewStoreClient(conn)
 	default:
-		err = fmt.Errorf("unrecognized net address in remote: %q", addr)
+		err = fmt.Errorf("unrecognized net address in store remote: %q", addr)
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	return r, nil
-}
-
-// Endpoint implements upspin.Store.Endpoint.
-func (r *remote) Endpoint() upspin.Endpoint {
-	return r.ctx.endpoint
-}
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
-	req := &proto.ConfigureRequest{
-		Options: options,
-	}
-	_, err := r.storeClient.Configure(gContext.Background(), req)
-	return err
-}
-
-// Ping implements uspin.Service.
-func (r *remote) Ping() bool {
-	seq := rand.Int31()
-	req := &proto.PingRequest{
-		PingSequence: seq,
-	}
-	resp, err := r.storeClient.Ping(gContext.Background(), req)
-	return err == nil && resp.PingSequence == seq
 }
 
 const transport = upspin.Remote

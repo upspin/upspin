@@ -1,108 +1,128 @@
-// Dirserver is a wrapper for a directory implementation that presents it as a Go net/rpc interface.
-// TODO: Switch to grpc one day.
+// Userserver is a wrapper for a user implementation that presents it as a Go net/rpc interface.
 package main
 
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net"
-	"net/http"
-	"net/rpc"
-	"os"
 
-	"upspin.googlesource.com/upspin.git/context"
+	gContext "golang.org/x/net/context"
+
+	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
+	"upspin.googlesource.com/upspin.git/bind"
+	"upspin.googlesource.com/upspin.git/endpoint"
+	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/proto"
+	"upspin.googlesource.com/upspin.git/upspin/proto"
 
-	// TODO: Other than the user implementations, most of these
-	// are only necessary because of InitContext.
-
-	// Load useful packers
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/pack/ee"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
-
-	// Load required gcp services
-	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
+	// Load required services
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
-
-	// Load required test services
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
-
-	// Load required remote services
-	_ "upspin.googlesource.com/upspin.git/directory/remote"
-	_ "upspin.googlesource.com/upspin.git/store/remote"
 	_ "upspin.googlesource.com/upspin.git/user/remote"
+	_ "upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 var (
-	port    = flag.Int("port", 8082, "TCP port number")
-	ctxfile = flag.String("context", os.Getenv("HOME")+"/upspin/rc.userserver", "context file to use to configure server")
+	port         = flag.Int("port", 8082, "TCP port number")
+	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
+	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
+	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
+	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 )
 
+// Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
-	context *upspin.Context
+	// Automatically handles authentication by implementing the Authenticate server method.
+	grpcauth.SecureServer
+	user upspin.User
 }
 
 func main() {
-	log.SetFlags(0)
-	log.SetPrefix("dirserver: ")
-
 	flag.Parse()
+	log.Connect("google.com:upspin", "userserver")
 
-	ctxfd, err := os.Open(*ctxfile)
+	endpoint, err := endpoint.Parse(*endpointFlag)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("endpoint parse error: %v", err)
 	}
-	defer ctxfd.Close()
-	ctx, err := context.InitContext(ctxfd)
+
+	// All we need in the context is some user name. It is unauthenticated. TODO?
+	context := &upspin.Context{
+		UserName: "userserver",
+	}
+
+	user, err := bind.User(context, *endpoint)
+	if err != nil {
+		log.Fatalf("binding to %q: %v", *endpoint, err)
+	}
+	config := auth.Config{
+		Lookup: auth.PublicUserKeyService(),
+		AllowUnauthenticatedConnections: *noAuth,
+	}
+	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := &Server{
-		context: ctx,
+		SecureServer: grpcSecureServer,
+		user:         user,
 	}
 
-	rpc.Register(s)
-	// TODO: FIGURE OUT HTTPS
-	rpc.HandleHTTP()
+	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
-	log.Fatal(http.Serve(listener, nil))
+	grpcSecureServer.Serve(listener)
 }
 
-func (s *Server) Lookup(req *proto.LookupRequest, resp *proto.LookupResponse) (err error) {
+func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*proto.UserLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
-	resp.Endpoints, resp.PublicKeys, err = s.context.User.Lookup(req.UserName)
+	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
 	}
-	return err
+	resp := &proto.UserLookupResponse{
+		Endpoints:  proto.Endpoints(endpoints),
+		PublicKeys: proto.PublicKeys(publicKeys),
+	}
+	return resp, err
 }
 
-func (s *Server) Configure(req *proto.ConfigureRequest, resp *proto.ConfigureResponse) error {
+func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
-	err := s.context.User.Configure(req.Options...)
+	err := s.user.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
-	return err
+	return nil, err
 }
 
-func (s *Server) Endpoint(req *proto.EndpointRequest, resp *proto.EndpointResponse) error {
+func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
-	resp.Endpoint = s.context.User.Endpoint()
-	return nil
+	endpoint := s.user.Endpoint()
+	resp := &proto.EndpointResponse{
+		Endpoint: &proto.Endpoint{
+			Transport: int32(endpoint.Transport),
+			NetAddr:   string(endpoint.NetAddr),
+		},
+	}
+	return resp, nil
 }
 
-func (s *Server) ServerUserName(req *proto.ServerUserNameRequest, resp *proto.ServerUserNameResponse) error {
+func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
-	resp.UserName = s.context.User.ServerUserName()
-	return nil
+	userName := s.user.ServerUserName()
+	resp := &proto.ServerUserNameResponse{
+		UserName: string(userName),
+	}
+	return resp, nil
+}
+
+func (s *Server) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
+	log.Print("Ping")
+	resp := &proto.PingResponse{
+		PingSequence: req.PingSequence,
+	}
+	return resp, nil
 }

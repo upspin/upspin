@@ -48,3 +48,63 @@ func Locations(ul []upspin.Location) []*Location {
 	}
 	return locs
 }
+
+// UpspinEndpoints converts from slices of proto's Endpoint struct to upspin's.
+// An unfortunate side-effect of not letting protobufs rule our types.
+func UpspinEndpoints(e []*Endpoint) []upspin.Endpoint {
+	if len(e) == 0 {
+		return nil
+	}
+	ueps := make([]upspin.Endpoint, len(e))
+	for i := range ueps {
+		ep := e[i]
+		ueps[i] = upspin.Endpoint{
+			Transport: upspin.Transport(ep.Transport),
+			NetAddr:   upspin.NetAddr(ep.NetAddr),
+		}
+	}
+	return ueps
+}
+
+// Endpoints converts from slices of upspin's Endpoint struct to proto's.
+// An unfortunate side-effect of not letting protobufs rule our types.
+func Endpoints(ue []upspin.Endpoint) []*Endpoint {
+	if len(ue) == 0 {
+		return nil
+	}
+	eps := make([]*Endpoint, len(ue))
+	for i := range eps {
+		ep := ue[i]
+		eps[i] = &Endpoint{
+			Transport: int32(ep.Transport),
+			NetAddr:   string(ep.NetAddr),
+		}
+	}
+	return eps
+}
+
+// UpspinPublicKeys converts from slices of strings to upspin's PublicKeys.
+// An unfortunate side-effect of not letting protobufs rule our types.
+func UpspinPublicKeys(s []string) []upspin.PublicKey {
+	if len(s) == 0 {
+		return nil
+	}
+	upk := make([]upspin.PublicKey, len(s))
+	for i := range upk {
+		upk[i] = upspin.PublicKey(s[i])
+	}
+	return upk
+}
+
+// PublicKeys converts from slices of upspin's PublicKey to string.
+// An unfortunate side-effect of not letting protobufs rule our types.
+func PublicKeys(upk []upspin.PublicKey) []string {
+	if len(upk) == 0 {
+		return nil
+	}
+	s := make([]string, len(upk))
+	for i := range s {
+		s[i] = string(upk[i])
+	}
+	return s
+}

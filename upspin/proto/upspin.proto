@@ -4,45 +4,35 @@ package proto;
 
 // Endpoint mirrors upspin.Endpoint.
 message Endpoint {
-	int32 transport = 1;
-	string net_addr = 2;
+    int32 transport = 1;
+    string net_addr = 2;
 }
 
 // Location mirrors upspin.Location.
 message Location {
-	Endpoint endpoint = 1;
-	string reference = 2;
+    Endpoint endpoint = 1;
+    string reference = 2;
 }
 
-message StoreGetRequest {
-	string reference = 1;
+// The Service interface.
+
+message AuthenticateRequest {
+    string user_name = 1;
+    string now = 2;
+    Signature signature = 3;
 }
 
-message StoreGetResponse {
-	bytes data = 1;
-	repeated Location locations = 2;
+message Signature {
+    string r = 1;
+    string s = 2;
 }
 
-message StorePutRequest {
-	bytes data = 1;
+message AuthenticateResponse {
+    string token = 1;
 }
-
-message StorePutResponse {
-	string reference = 1;
-}
-
-message StoreDeleteRequest {
-	string reference = 1;
-}
-
-message StoreDeleteResponse {
-}
-
-// Types for the methods of upspin.Service.
-// TODO: Put somewhere shared?
 
 message ConfigureRequest {
-	repeated string options = 1;
+    repeated string options = 1;
 }
 
 message ConfigureResponse {
@@ -52,14 +42,14 @@ message EndpointRequest {
 }
 
 message EndpointResponse {
-	Endpoint endpoint = 1;
+    Endpoint endpoint = 1;
 }
 
 message ServerUserNameRequest {
 }
 
 message ServerUserNameResponse {
-	string user_name = 1;
+    string user_name = 1;
 }
 
 message PingRequest {
@@ -70,30 +60,63 @@ message PingResponse {
     int32 ping_sequence = 1;
 }
 
-// Authenticate is not part of the service definitions in upspin.
-// It is used only in the remote implementations.
-message AuthenticateRequest {
-	string user_name = 1;
-	string now = 2;
-	Signature signature = 3;
+// The Store interface.
+
+message StoreGetRequest {
+    string reference = 1;
 }
 
-message Signature {
-    string r = 1;
-    string s = 2;
+message StoreGetResponse {
+    bytes data = 1;
+    repeated Location locations = 2;
 }
 
-message AuthenticateResponse {
-	string token = 1;
+message StorePutRequest {
+    bytes data = 1;
+}
+
+message StorePutResponse {
+    string reference = 1;
+}
+
+message StoreDeleteRequest {
+    string reference = 1;
+}
+
+message StoreDeleteResponse {
 }
 
 service Store {
+    // Service methods:
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
-    rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
-    rpc Put (StorePutRequest) returns (StorePutResponse) {}
-    rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
+
+    rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
+    rpc Put (StorePutRequest) returns (StorePutResponse) {}
+    rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
+}
+
+// The User interface.
+
+message UserLookupRequest {
+    string UserName = 1;
+}
+
+message UserLookupResponse {
+    repeated Endpoint Endpoints = 1;
+    repeated string PublicKeys = 2;
+}
+
+service User {
+    // Service methods:
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
+    rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
+    rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
+    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
+    rpc Ping (PingRequest) returns (PingResponse) {}
+
+    rpc Lookup (UserLookupRequest) returns (UserLookupResponse) {}
 }

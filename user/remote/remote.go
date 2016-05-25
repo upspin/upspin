@@ -5,14 +5,19 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"net/rpc"
+	"math/rand"
 	"strings"
 
+	gContext "golang.org/x/net/context"
+
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/proto"
+	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
+
+// requireAuthentication specifies whether the connection demands TLS.
+const requireAuthentication = true
 
 // dialContext contains the destination and authenticated user of the dial.
 type dialContext struct {
@@ -22,26 +27,28 @@ type dialContext struct {
 
 // remote implements upspin.User.
 type remote struct {
-	ctx       dialContext
-	rpcClient *rpc.Client
+	ctx        dialContext
+	userClient proto.UserClient
 }
 
 var _ upspin.User = (*remote)(nil)
 
 // Lookup implements upspin.User.Lookup.
 func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	req := &proto.LookupRequest{
-		UserName: name,
+	req := &proto.UserLookupRequest{
+		UserName: string(name),
 	}
-	var resp proto.LookupResponse
-	err := r.rpcClient.Call("Server.Lookup", &req, &resp)
+	resp, err := r.userClient.Lookup(gContext.Background(), req)
+	if err != nil {
+		return nil, nil, err
+	}
 	if len(resp.Endpoints) == 0 {
 		resp.Endpoints = nil
 	}
 	if len(resp.PublicKeys) == 0 {
 		resp.PublicKeys = nil
 	}
-	return resp.Endpoints, resp.PublicKeys, err
+	return proto.UpspinEndpoints(resp.Endpoints), proto.UpspinPublicKeys(resp.PublicKeys), err
 }
 
 // ServerUserName implements upspin.Service.
@@ -49,10 +56,34 @@ func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
 }
 
+// Endpoint implements upspin.Store.Endpoint.
+func (r *remote) Endpoint() upspin.Endpoint {
+	return r.ctx.endpoint
+}
+
+// Configure implements upspin.Service.
+func (r *remote) Configure(options ...string) error {
+	req := &proto.ConfigureRequest{
+		Options: options,
+	}
+	_, err := r.userClient.Configure(gContext.Background(), req)
+	return err
+}
+
+// Ping implements upspin.Service.
+func (r *remote) Ping() bool {
+	seq := rand.Int31()
+	req := &proto.PingRequest{
+		PingSequence: seq,
+	}
+	resp, err := r.userClient.Ping(gContext.Background(), req)
+	return err == nil && resp.PingSequence == seq
+}
+
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
-		return nil, errors.New("remote: unrecognized transport")
+		return nil, errors.New("remote user: unrecognized transport")
 	}
 
 	r := &remote{
@@ -65,35 +96,21 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	var err error
 	addr := string(e.NetAddr)
 	switch {
-	case strings.HasPrefix(addr, "http://"):
-		r.rpcClient, err = rpc.DialHTTP("tcp", addr[7:])
+	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
+		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: When can we do conn.Close()?
+		r.userClient = proto.NewUserClient(conn)
 	default:
-		err = fmt.Errorf("unrecognized net address in remote: %q", addr)
+		err = fmt.Errorf("unrecognized net address in user remote: %q", addr)
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	return r, nil
-}
-
-// Endpoint implements upspin.User.Endpoint.
-func (r *remote) Endpoint() upspin.Endpoint {
-	return r.ctx.endpoint
-}
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
-	req := &proto.ConfigureRequest{
-		Options: options,
-	}
-	var resp proto.ConfigureResponse
-	return r.rpcClient.Call("Server.Configure", &req, &resp)
-}
-
-func (r *remote) Ping() bool {
-	// TODO: possibly not the best way to find the server. WILL NOT work when we remove the "http://" prefix.
-	return netutil.IsServerReachable(string(r.ctx.endpoint.NetAddr))
 }
 
 const transport = upspin.Remote
