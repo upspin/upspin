@@ -2,8 +2,10 @@ package bind
 
 import (
 	"errors"
+	"math/rand"
 	"strings"
 	"testing"
+	"time"
 
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -76,7 +78,7 @@ func TestSwitch(t *testing.T) {
 	ctx2 := upspin.Context{
 		UserName: upspin.UserName("bob@foo.com"),
 	}
-	_, err = User(&ctx2, e) // Dials again,
+	u3, err := User(&ctx2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,13 +88,90 @@ func TestSwitch(t *testing.T) {
 	if u1.(*dummyUser).pingCount != 1 {
 		t.Errorf("Expected only one ping. Got %d", du.pingCount)
 	}
+
+	// Now check that Release works.
+	if len(userDialCache) != 2 {
+		t.Errorf("Expected two user services in the cache, got %d", len(userDialCache))
+	}
+
+	err = Release(u1) // u2 == u1
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Release(u3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(userDialCache) != 0 {
+		t.Errorf("Expected only no user service in the cache.")
+	}
+
+	if u1.(*dummyUser).closeCalled != 1 {
+		t.Errorf("Expected close to be called once on u1")
+	}
+	if u3.(*dummyUser).closeCalled != 1 {
+		t.Errorf("Expected close to be called once on u3")
+	}
+}
+
+func TestConcurrency(t *testing.T) {
+	const nRuns = 10
+	pingFreshnessDuration = 0 // Forces ping to always be invalid
+	defer func() { pingFreshnessDuration = 15 * time.Minute }()
+
+	start := make(chan bool)
+	done := make(chan bool)
+	var ctx upspin.Context
+	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr17"}
+	go func() {
+		<-start
+		for i := 0; i < nRuns; i++ {
+			_, err := Store(&ctx, e)
+			if err != nil {
+				if !strings.Contains(err.Error(), "concurrent bind") {
+					panic(err)
+				}
+				// Try again
+				continue
+			}
+			time.Sleep(time.Duration(rand.Int31n(10)) * time.Millisecond)
+			// Never call Release
+		}
+		done <- true
+	}()
+	go func() {
+		<-start
+		for i := 0; i < nRuns; i++ {
+			s, err := Store(&ctx, e)
+			if err != nil {
+				if !strings.Contains(err.Error(), "concurrent bind") {
+					panic(err)
+				}
+				// Try again
+				continue
+			}
+			time.Sleep(time.Duration(rand.Int31n(20)) * time.Millisecond)
+			// Release so that we can be sure it doesn't step on the toes of Bind.
+			err = Release(s)
+			if err != nil {
+				panic(err)
+			}
+		}
+		done <- true
+	}()
+	start <- true
+	start <- true
+	<-done
+	<-done
 }
 
 // Some dummy interfaces.
 type dummyUser struct {
-	endpoint  upspin.Endpoint
-	dialed    int
-	pingCount int
+	endpoint    upspin.Endpoint
+	dialed      int
+	pingCount   int
+	closeCalled int
 }
 type dummyStore struct {
 	endpoint upspin.Endpoint
@@ -123,6 +202,7 @@ func (d *dummyUser) Ping() bool {
 	return true
 }
 func (d *dummyUser) Close() {
+	d.closeCalled++
 }
 func (d *dummyUser) Authenticate(*upspin.Context) error {
 	return nil
@@ -151,6 +231,8 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 	return errors.New("dummyStore.Delete not implemented")
 }
 func (d *dummyStore) Ping() bool {
+	// Add some random delays.
+	time.Sleep(time.Duration(rand.Int31n(100)) * time.Millisecond)
 	return true
 }
 func (d *dummyStore) Close() {
