@@ -2,35 +2,56 @@
 // mirroring the interfaces and types in the upspin package itself.
 package proto
 
-import "upspin.googlesource.com/upspin.git/upspin"
+import (
+	"errors"
+
+	"upspin.googlesource.com/upspin.git/upspin"
+)
 
 // To regenerate the protocol buffer output for this package, run
 //	go generate
 
 //go:generate protoc upspin.proto --go_out=plugins=grpc:.
 
+// All these converters are an unfortunate side-effect of not letting protobufs rule our types.
+
+// UpspinLocation converts a proto Location struct to upspin.Location.
+func UpspinLocation(loc *Location) upspin.Location {
+	return upspin.Location{
+		Endpoint: upspin.Endpoint{
+			Transport: upspin.Transport(loc.Endpoint.Transport),
+			NetAddr:   upspin.NetAddr(loc.Endpoint.NetAddr),
+		},
+		Reference: upspin.Reference(loc.Reference),
+	}
+}
+
 // UpspinLocations converts from slices of proto's Location struct to upspin's.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func UpspinLocations(l []*Location) []upspin.Location {
 	if len(l) == 0 {
 		return nil
 	}
 	ulocs := make([]upspin.Location, len(l))
 	for i := range ulocs {
-		loc := l[i]
-		ulocs[i] = upspin.Location{
-			Endpoint: upspin.Endpoint{
-				Transport: upspin.Transport(loc.Endpoint.Transport),
-				NetAddr:   upspin.NetAddr(loc.Endpoint.NetAddr),
-			},
-			Reference: upspin.Reference(loc.Reference),
-		}
+		ulocs[i] = UpspinLocation(l[i])
 	}
 	return ulocs
 }
 
+// UpspinDirEntry converts a slice of bytes struct to *upspin.DirEntry.
+func UpspinDirEntry(b []byte) (*upspin.DirEntry, error) {
+	var d upspin.DirEntry
+	b, err := d.Unmarshal(b)
+	if err != nil {
+		return nil, err
+	}
+	if len(b) != 0 {
+		return nil, errors.New("proto.UpspinDirEntries: extra data")
+	}
+	return &d, nil
+}
+
 // Locations converts from slices of upspin's Location struct to proto's.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func Locations(ul []upspin.Location) []*Location {
 	if len(ul) == 0 {
 		return nil
@@ -50,7 +71,6 @@ func Locations(ul []upspin.Location) []*Location {
 }
 
 // UpspinEndpoints converts from slices of proto's Endpoint struct to upspin's.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func UpspinEndpoints(e []*Endpoint) []upspin.Endpoint {
 	if len(e) == 0 {
 		return nil
@@ -67,7 +87,6 @@ func UpspinEndpoints(e []*Endpoint) []upspin.Endpoint {
 }
 
 // Endpoints converts from slices of upspin's Endpoint struct to proto's.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func Endpoints(ue []upspin.Endpoint) []*Endpoint {
 	if len(ue) == 0 {
 		return nil
@@ -84,7 +103,6 @@ func Endpoints(ue []upspin.Endpoint) []*Endpoint {
 }
 
 // UpspinPublicKeys converts from slices of strings to upspin's PublicKeys.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func UpspinPublicKeys(s []string) []upspin.PublicKey {
 	if len(s) == 0 {
 		return nil
@@ -97,7 +115,6 @@ func UpspinPublicKeys(s []string) []upspin.PublicKey {
 }
 
 // PublicKeys converts from slices of upspin's PublicKey to string.
-// An unfortunate side-effect of not letting protobufs rule our types.
 func PublicKeys(upk []upspin.PublicKey) []string {
 	if len(upk) == 0 {
 		return nil
@@ -107,4 +124,36 @@ func PublicKeys(upk []upspin.PublicKey) []string {
 		s[i] = string(upk[i])
 	}
 	return s
+}
+
+// UpspinDirEntries converts from slices of bytes to upspin's *DirEntries.
+func UpspinDirEntries(b [][]byte) ([]*upspin.DirEntry, error) {
+	if len(b) == 0 {
+		return nil, nil
+	}
+	ude := make([]*upspin.DirEntry, len(b))
+	for i := range ude {
+		var err error
+		ude[i], err = UpspinDirEntry(b[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ude, nil
+}
+
+// DirEntryBytes converts from slices of upspin's *DirEntries to bytes.
+func DirEntryBytes(ude []*upspin.DirEntry) ([][]byte, error) {
+	if len(ude) == 0 {
+		return nil, nil
+	}
+	b := make([][]byte, len(ude))
+	for i := range b {
+		var err error
+		b[i], err = ude[i].Marshal()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return b, nil
 }
