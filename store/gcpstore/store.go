@@ -15,7 +15,6 @@ import (
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
@@ -57,10 +56,6 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.
 	s.serverURL = serverURL.String()
 	authClient, isSecure := s.httpClient.(*auth.HTTPClient)
 	if isSecure {
-		err := keyloader.Load(context)
-		if err != nil {
-			return nil, newStoreError(op, err.Error(), "")
-		}
 		authClient.SetUserName(context.UserName)
 		authClient.SetUserKeys(context.Factotum)
 	}
