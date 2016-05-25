@@ -84,6 +84,24 @@
       "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_c7b65295",
+        "filename": "user/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T16:48:14Z",
+      "side": 1,
+      "message": "Ah, Yes. I haven\u0027t done user or dir because they weren\u0027t on gRPC. Fixed now.",
+      "parentUuid": "7c371b6c_27529e5b",
+      "revId": "32f63d482bc3461f1810ef98c45e06bdc2939e8d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
