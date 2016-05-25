@@ -8,6 +8,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	"crypto/tls"
+
 	"google.golang.org/grpc/metadata"
 	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -50,7 +52,7 @@ func NewGRPCClient(netAddr upspin.NetAddr, allowUnauthenticatedConnections bool)
 	}
 	addr := string(netAddr)
 	conn, err := grpc.Dial(addr,
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")),
+		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowUnauthenticatedConnections})),
 		grpc.WithBlock(),
 		grpc.WithTimeout(timeOut),
 	)

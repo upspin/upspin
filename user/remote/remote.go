@@ -17,7 +17,7 @@ import (
 )
 
 // requireAuthentication specifies whether the connection demands TLS.
-const requireAuthentication = true
+const requireAuthentication = false
 
 // dialContext contains the destination and authenticated user of the dial.
 type dialContext struct {
@@ -83,7 +83,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	addr := string(e.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
-		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
+		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], !requireAuthentication)
 		if err != nil {
 			return nil, err
 		}
