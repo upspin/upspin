@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_7855a141",
+        "filename": "user/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T10:09:17Z",
+      "side": 1,
+      "message": "regardless, shouldn\u0027t it be https?",
+      "revId": "0f6e7b55309cdf44e91131ce40763e5d2efcb436",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
