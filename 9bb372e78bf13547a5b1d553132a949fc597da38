@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_a4aeaca3",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:06:25Z",
+      "side": 1,
+      "message": "it shuts down the connection to the service, not the service itself.\nmaybe shutdown isn\u0027t the right name. close is probably better.",
+      "revId": "9bb372e78bf13547a5b1d553132a949fc597da38",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
