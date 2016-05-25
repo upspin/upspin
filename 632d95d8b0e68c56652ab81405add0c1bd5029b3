@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_a71b0e63",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:55:03Z",
+      "side": 1,
+      "message": "you could use just \"\" here for zeroRef",
+      "revId": "632d95d8b0e68c56652ab81405add0c1bd5029b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
