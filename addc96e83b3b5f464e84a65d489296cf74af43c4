@@ -16,6 +16,24 @@
       "revId": "addc96e83b3b5f464e84a65d489296cf74af43c4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_ead2366d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T22:57:02Z",
+      "side": 1,
+      "message": "yeah, under auth too, in parallel with httpauth now.\n\nThanks.",
+      "parentUuid": "5c17b7d8_b84c9990",
+      "revId": "addc96e83b3b5f464e84a65d489296cf74af43c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
