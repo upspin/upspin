@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_c7fe5276",
+        "filename": "cmd/userserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-25T16:21:19Z",
+      "side": 1,
+      "message": "I agree, and plan to fix this in the next round, but had trouble debugging this so I wanted it to match the working storeserver code perfectly.",
+      "parentUuid": "7c371b6c_e7ffd673",
+      "revId": "0f6e7b55309cdf44e91131ce40763e5d2efcb436",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_7855a141",
         "filename": "user/remote/remote.go",
         "patchSetId": 2
