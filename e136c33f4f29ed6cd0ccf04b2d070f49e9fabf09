@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_b8433957",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T23:26:14Z",
+      "side": 1,
+      "message": "I\u0027d add a blank line above this one to make it clearer that mu guards all these fields",
+      "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_5829bd89",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-25T23:26:14Z",
+      "side": 1,
+      "message": "I\u0027m nervous about doing network stuff while holding mu.\nI think instead you should hold mu while accessing cache (line 158) and from line 181 onward.",
+      "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
