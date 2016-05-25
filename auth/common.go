@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 const (

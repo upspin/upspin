@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/log"
+	"upspin.io/upspin"
 )
 
 // NewGRPCClient returns new GRPC client connection connected securely (with TLS) to a GRPC server at the given address.

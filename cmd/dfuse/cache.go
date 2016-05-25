@@ -11,11 +11,11 @@ import (
 
 	"github.com/presotto/fuse"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/client"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/client"
+	"upspin.io/log"
+	"upspin.io/pack"
+	"upspin.io/upspin"
 )
 
 // Names of cache files are:

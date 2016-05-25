@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/directory/proto"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/directory/proto"
+	"upspin.io/upspin"
 )
 
 // dialContext contains the destination and authenticated user of the dial.

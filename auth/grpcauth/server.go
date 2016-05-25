@@ -39,12 +39,12 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/upspin/proto"
+	"upspin.io/auth"
+	"upspin.io/factotum"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 )
 
 // Errors returned in case of various authentication failure scenarios.

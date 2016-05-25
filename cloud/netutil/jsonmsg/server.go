@@ -3,8 +3,8 @@ package jsonmsg
 import (
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/netutil"
+	"upspin.io/upspin"
 )
 
 // This file supports the server side by marshaling special messages and sending them on the wire.

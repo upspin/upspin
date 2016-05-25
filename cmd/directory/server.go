@@ -9,18 +9,18 @@ import (
 	goPath "path"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/cache"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/auth"
+	"upspin.io/cache"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/factotum"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/user/gcpuser"
 )
 
 const (

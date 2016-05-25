@@ -5,9 +5,9 @@ import (
 	"errors"
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/key/sha256key"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/key/sha256key"
+	"upspin.io/upspin"
 )
 
 // service returns data and metadata referenced by the request.

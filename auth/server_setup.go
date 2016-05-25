@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"os"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/log"
+	"upspin.io/upspin"
 )
 
 const (

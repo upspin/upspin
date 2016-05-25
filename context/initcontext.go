@@ -9,12 +9,12 @@ import (
 	"path"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/endpoint"
+	"upspin.io/key/keyloader"
+	"upspin.io/log"
+	"upspin.io/pack"
+	"upspin.io/upspin"
 )
 
 // InitContext returns a context generated from configuration files and environment variables.

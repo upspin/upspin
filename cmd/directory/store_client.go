@@ -11,10 +11,10 @@ import (
 
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/upspin"
 )
 
 const (

@@ -12,7 +12,7 @@ import (
 
 	gopath "path"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 // Parsed represents a successfully parsed path name.

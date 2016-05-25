@@ -16,34 +16,34 @@ import (
 	"sync"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/context"
-	"upspin.googlesource.com/upspin.git/directory/proto"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/context"
+	"upspin.io/directory/proto"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 
 	// TODO: Other than the directory implementations, most of these
 	// are only necessary because of InitContext.
 
 	// Load useful packers
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/pack/ee"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
-	"upspin.googlesource.com/upspin.git/path"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
+	"upspin.io/path"
 
 	// Load required gcp services
-	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/directory/gcpdir"
+	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/user/gcpuser"
 
 	// Load required test services
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
+	_ "upspin.io/directory/testdir"
+	_ "upspin.io/store/teststore"
+	_ "upspin.io/user/testuser"
 
 	// Load required remote services
-	_ "upspin.googlesource.com/upspin.git/directory/remote"
-	_ "upspin.googlesource.com/upspin.git/store/remote"
-	_ "upspin.googlesource.com/upspin.git/user/remote"
+	_ "upspin.io/directory/remote"
+	_ "upspin.io/store/remote"
+	_ "upspin.io/user/remote"
 )
 
 var (

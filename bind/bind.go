@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/cache"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cache"
+	"upspin.io/upspin"
 )
 
 // dialKey is the key to the LRU caches that store dialed services.

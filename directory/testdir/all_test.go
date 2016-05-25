@@ -13,15 +13,15 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
+	"upspin.io/bind"
+	"upspin.io/pack"
+	"upspin.io/path"
+	"upspin.io/upspin"
+	"upspin.io/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/store/teststore"
 )
 
 var (

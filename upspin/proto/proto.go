@@ -2,7 +2,7 @@
 // mirroring the interfaces and types in the upspin package itself.
 package proto
 
-import "upspin.googlesource.com/upspin.git/upspin"
+import "upspin.io/upspin"
 
 // To regenerate the protocol buffer output for this package, run
 //	go generate

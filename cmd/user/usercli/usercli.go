@@ -12,13 +12,13 @@ import (
 	"os"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/endpoint"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/user/gcpuser"
 )
 
 var (

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.io/cloud/netutil"
 )
 
 func TestVerifyWildcardRequest(t *testing.T) {

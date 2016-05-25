@@ -7,16 +7,16 @@ import (
 	"net/http"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/cmd/store/cache"
-	"upspin.googlesource.com/upspin.git/key/sha256key"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/cmd/store/cache"
+	"upspin.io/key/sha256key"
+	"upspin.io/log"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/user/gcpuser"
 )
 
 const (

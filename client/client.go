@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/client/common/file"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/pack/ee"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/bind"
+	"upspin.io/client/common/file"
+	"upspin.io/pack"
+	"upspin.io/pack/ee"
+	"upspin.io/path"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/pack/plain" // Plain packer used when encoding an Access file.
+	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
 )
 
 // Client implements upspin.Client.

@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/directory/testdir"
+	_ "upspin.io/store/teststore"
 )
 
 type testEntry struct {

@@ -4,8 +4,8 @@ package testauth
 import (
 	"time"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/upspin"
 )
 
 type dummySession struct {

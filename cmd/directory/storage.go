@@ -11,9 +11,9 @@ import (
 	"errors"
 	"fmt"
 
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 var (

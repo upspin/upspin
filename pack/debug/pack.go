@@ -11,9 +11,9 @@ import (
 	"io"
 	"math/rand"
 
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/pack"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 type testPack struct{}

@@ -23,13 +23,13 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/path"
-	e "upspin.googlesource.com/upspin.git/test/testenv"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/path"
+	e "upspin.io/test/testenv"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/directory/gcpdir"
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
+	_ "upspin.io/directory/gcpdir"
+	_ "upspin.io/store/gcpstore"
 )
 
 const (

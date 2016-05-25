@@ -9,9 +9,9 @@ import (
 
 	"io/ioutil"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/netutil/nettest"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 )
 
 var (

@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/key/keyloader"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/bind"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/key/keyloader"
+	"upspin.io/upspin"
 )
 
 const (

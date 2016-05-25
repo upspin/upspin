@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 )
 
 const (

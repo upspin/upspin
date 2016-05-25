@@ -8,22 +8,22 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/grpcauth"
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/upspin/proto"
+	"upspin.io/auth"
+	"upspin.io/auth/grpcauth"
+	"upspin.io/bind"
+	"upspin.io/endpoint"
+	"upspin.io/log"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 
 	// Load required services
-	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
-	_ "upspin.googlesource.com/upspin.git/store/remote"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/store/remote"
+	_ "upspin.io/store/teststore"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
-	_ "upspin.googlesource.com/upspin.git/user/remote"
-	_ "upspin.googlesource.com/upspin.git/user/testuser"
+	_ "upspin.io/user/gcpuser"
+	_ "upspin.io/user/remote"
+	_ "upspin.io/user/testuser"
 )
 
 var (

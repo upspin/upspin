@@ -7,14 +7,14 @@ import (
 	"math/rand"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/test/testenv"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/test/testenv"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/pack/ee"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/directory/testdir"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
+	_ "upspin.io/store/teststore"
 )
 
 // These variables and consts are used by access_test and integration_test. Don't change them here without updating

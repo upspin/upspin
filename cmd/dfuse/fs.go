@@ -12,10 +12,10 @@ import (
 	"github.com/presotto/fuse/fs"
 	xcontext "golang.org/x/net/context"
 
-	"upspin.googlesource.com/upspin.git/client"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/client"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 const (

@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
+	"upspin.io/cloud/netutil"
 )
 
 var (

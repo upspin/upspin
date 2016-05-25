@@ -3,7 +3,7 @@
 // TODO: Maybe move to gprc?
 package proto
 
-import "upspin.googlesource.com/upspin.git/upspin"
+import "upspin.io/upspin"
 
 type LookupRequest struct {
 	UserName upspin.UserName

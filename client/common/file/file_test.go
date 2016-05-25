@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 var _ upspin.Client = (*dummyClient)(nil)

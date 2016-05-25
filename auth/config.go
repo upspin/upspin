@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 // Config holds the configuration parameters for instantiating a server (HTTP or gRPC).

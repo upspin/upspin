@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/testauth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/auth"
+	"upspin.io/auth/testauth"
+	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/nettest"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 )
 
 const (

@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/netutil"
+	"upspin.io/factotum"
+	"upspin.io/log"
+	"upspin.io/upspin"
 )
 
 // HandlerFunc is a type used by HTTP handler functions that want to use a Handler for authentication.
