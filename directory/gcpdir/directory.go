@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
@@ -283,7 +283,7 @@ func (d *Directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		endpoint:  e,
 		serverURL: serverURL.String(),
 		timeNow:   d.timeNow,
-		client:    auth.NewClient(context.UserName, context.Factotum, &http.Client{}),
+		client:    httpauth.NewClient(context.UserName, context.Factotum, &http.Client{}),
 	}
 	return dir, nil
 }
@@ -353,5 +353,5 @@ func newError(op string, path upspin.PathName, err error) *dirError {
 
 func init() {
 	// By default, set up only the HTTP client. Everything else gets bound at Dial time.
-	bind.RegisterDirectory(upspin.GCP, newDirectory("", auth.NewAnonymousClient(&http.Client{}), nil))
+	bind.RegisterDirectory(upspin.GCP, newDirectory("", httpauth.NewAnonymousClient(&http.Client{}), nil))
 }

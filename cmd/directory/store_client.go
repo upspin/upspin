@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/upspin"
@@ -32,10 +31,10 @@ var (
 
 // storeClient is an authenticating HTTP client that talks to an Upspin Store server.
 type storeClient struct {
-	http *auth.HTTPClient
+	http *httpauth.HTTPClient
 }
 
-func newStoreClient(http *auth.HTTPClient) *storeClient {
+func newStoreClient(http *httpauth.HTTPClient) *storeClient {
 	return &storeClient{
 		http: http,
 	}

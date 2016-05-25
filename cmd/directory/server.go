@@ -11,6 +11,7 @@ import (
 
 	"upspin.googlesource.com/upspin.git/access"
 	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/cache"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
@@ -465,7 +466,7 @@ func main() {
 	// Use the bucketname as the logging prefix so we can differentiate the main dir server and the test dir server.
 	log.Connect("google.com:"+*projectID, *bucketName)
 
-	ah := auth.NewHandler(&auth.Config{
+	ah := httpauth.NewHandler(&auth.Config{
 		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
 	})
@@ -474,7 +475,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := newStoreClient(auth.NewClient(dirServerName, factotum, &http.Client{}))
+	s := newStoreClient(httpauth.NewClient(dirServerName, factotum, &http.Client{}))
 	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), s)
 
 	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // dir handles GET, PUT/POST and DELETE.
@@ -482,7 +483,7 @@ func main() {
 	http.HandleFunc("/whichaccess/", ah.Handle(d.whichAccessHandler))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := auth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := httpauth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}

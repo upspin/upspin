@@ -1,5 +1,5 @@
 /*
-Package auth handles authentication of Upspin users.
+Package httpauth handles authentication of Upspin HTTP users.
 
 Sample usage:
 
@@ -13,7 +13,7 @@ Sample usage:
    // Configure TLS here if necessary ...
    ListenAndServeTLS(":443", nil)
 */
-package auth
+package httpauth
 
 import (
 	"crypto/ecdsa"
@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"upspin.googlesource.com/upspin.git/auth"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/log"
@@ -31,7 +32,7 @@ import (
 )
 
 // HandlerFunc is a type used by HTTP handler functions that want to use a Handler for authentication.
-type HandlerFunc func(session Session, w http.ResponseWriter, r *http.Request)
+type HandlerFunc func(session auth.Session, w http.ResponseWriter, r *http.Request)
 
 // Handler is used by HTTP servers to authenticate Upspin users.
 type Handler interface {
@@ -41,19 +42,32 @@ type Handler interface {
 
 // authHandler implements a Handler that ensures cryptography-grade authentication.
 type authHandler struct {
-	config *Config
+	config *auth.Config
 }
 
 var _ Handler = (*authHandler)(nil)
 
 // NewHandler creates a new instance of a Handler according to the given config, which must not be changed subsequently by the caller.
-func NewHandler(config *Config) Handler {
+func NewHandler(config *auth.Config) Handler {
 	return &authHandler{
 		config: config,
 	}
 }
 
-func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *http.Request) (Session, error) {
+// NewHTTPSecureServer returns an HTTP server setup with the certificate and key as provided by local file names, bound to the requested port.
+func NewHTTPSecureServer(port int, certFile string, certKeyFile string) (*http.Server, error) {
+	tlsConfig, err := auth.NewDefaultTLSConfig(certFile, certKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	server := &http.Server{
+		Addr:      fmt.Sprintf(":%d", port),
+		TLSConfig: tlsConfig,
+	}
+	return server, nil
+}
+
+func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *http.Request) (auth.Session, error) {
 	// Is this a TLS connection?
 	if r.TLS == nil {
 		// Not a TLS connection, so nothing else to do here.
@@ -61,10 +75,9 @@ func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *ht
 	}
 	// If we have a tlsUnique, let's use it.
 	if len(r.TLS.TLSUnique) > 0 { // 1 is the min size allowed by TLS.
-		session := GetSession(string(r.TLS.TLSUnique))
+		session := auth.GetSession(string(r.TLS.TLSUnique))
 		if session != nil && session.User() == user {
-			// We have a user and it's now authenticated. Done.
-			session.(*sessionImpl).isAuth = true // TODO: peeking inside the type won't work when we move this package.
+			// We have a user and a session. We're done, since all TLS sessions are authenticated.
 			return session, nil
 		}
 	}
@@ -89,7 +102,7 @@ func (ah *authHandler) doAuth(user upspin.UserName, w http.ResponseWriter, r *ht
 	}
 
 	// TODO: Expiration time is not currently used by HTTP servers. Will be used soon.
-	session := NewSession(user, true, time.Now().Add(time.Hour*100), authToken, nil)
+	session := auth.NewSession(user, true, time.Now().Add(time.Hour*100), authToken, nil)
 	return session, nil
 }
 
@@ -102,7 +115,7 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 			failAuth(w, errors.New("missing username in HTTP header"))
 			return
 		}
-		var session Session
+		var session auth.Session
 		session, err := ah.doAuth(user, w, r)
 		if err != nil {
 			if !ah.config.AllowUnauthenticatedConnections {
@@ -112,7 +125,7 @@ func (ah *authHandler) Handle(authHandlerFunc HandlerFunc) func(w http.ResponseW
 			// Fall through if we allow unauthenticated requests.
 			log.Error.Printf("AuthHandler: authentication failed for user %q with error: %q. However, allowing unauthenticated connections.", user, err)
 			// TODO: expiration not currently used.
-			session = NewSession(user, false, time.Now().Add(time.Hour*100), "", err)
+			session = auth.NewSession(user, false, time.Now().Add(time.Hour*100), "", err)
 		}
 		// session is guaranteed non-nil here.
 		authHandlerFunc(session, w, r)
