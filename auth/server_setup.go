@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 
 	"upspin.googlesource.com/upspin.git/bind"
@@ -16,19 +15,6 @@ import (
 const (
 	userServiceAddr = "https://upspin.io:8082"
 )
-
-// NewHTTPSecureServer returns an HTTP server setup with the certificate and key as provided by local file names, bound to the requested port.
-func NewHTTPSecureServer(port int, certFile string, certKeyFile string) (*http.Server, error) {
-	tlsConfig, err := NewDefaultTLSConfig(certFile, certKeyFile)
-	if err != nil {
-		return nil, err
-	}
-	server := &http.Server{
-		Addr:      fmt.Sprintf(":%d", port),
-		TLSConfig: tlsConfig,
-	}
-	return server, nil
-}
 
 // NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
 func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {

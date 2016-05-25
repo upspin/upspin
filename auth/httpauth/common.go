@@ -1,6 +1,6 @@
 // Package auth handles authentication of Upspin users.
 // This module implements common functionality between clients and server objects.
-package auth
+package httpauth
 
 import (
 	"crypto/sha256"

@@ -1,5 +1,5 @@
 // End to end tests using a test HTTP server instance with CA checking disabled, but otherwise functional TLS encryption.
-package auth_test
+package httpauth_test
 
 import (
 	"crypto/tls"
@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/factotum"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -52,7 +53,7 @@ func stopHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func startServer() *httptest.Server {
-	ah := auth.NewHandler(&auth.Config{
+	ah := httpauth.NewHandler(&auth.Config{
 		Lookup: lookup,
 	})
 	mux := http.NewServeMux()
@@ -85,7 +86,7 @@ func TestEndToEnd(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	authClient := auth.NewClient(user, f, client)
+	authClient := httpauth.NewClient(user, f, client)
 	resp, err := authClient.Do(req)
 	if err != nil {
 		t.Fatal(err)

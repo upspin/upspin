@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/bind"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
@@ -54,7 +55,7 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.
 		return nil, newStoreError(op, fmt.Sprintf("invalid HTTP address for endpoint: %v", err), "")
 	}
 	s.serverURL = serverURL.String()
-	authClient, isSecure := s.httpClient.(*auth.HTTPClient)
+	authClient, isSecure := s.httpClient.(*httpauth.HTTPClient)
 	if isSecure {
 		authClient.SetUserName(context.UserName)
 		authClient.SetUserKeys(context.Factotum)

@@ -1,5 +1,5 @@
 // Package auth handles authentication of Upspin users.
-package auth
+package httpauth
 
 import (
 	"fmt"

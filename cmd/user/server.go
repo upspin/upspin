@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/auth"
+	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
@@ -334,7 +334,7 @@ func main() {
 	expvar.Publish("user stats", expvar.Func(userStats.update))
 
 	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := auth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
+		server, err := httpauth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}
