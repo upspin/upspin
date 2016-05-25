@@ -120,3 +120,68 @@ service User {
 
     rpc Lookup (UserLookupRequest) returns (UserLookupResponse) {}
 }
+
+// The Directory interface.
+// DirEntry values are stored as bytes, for simple and fast marshaling.
+
+message DirectoryLookupRequest {
+	string Name = 1;
+}
+
+message DirectoryLookupResponse {
+	bytes Entry = 1;
+}
+
+message DirectoryPutRequest {
+	bytes Entry = 1;
+}
+
+message DirectoryPutResponse {
+}
+
+message DirectoryMakeDirectoryRequest {
+	string Name = 1;
+}
+
+message DirectoryMakeDirectoryResponse {
+	Location Location = 1;
+}
+
+message DirectoryGlobRequest {
+	string Pattern = 1;
+}
+
+message DirectoryGlobResponse {
+	repeated bytes Entries = 1;
+}
+
+message DirectoryDeleteRequest {
+	string Name = 1;
+}
+
+message DirectoryDeleteResponse {
+}
+
+message DirectoryWhichAccessRequest {
+	string Name = 1;
+}
+
+message DirectoryWhichAccessResponse {
+	string Name = 1;
+}
+
+service Directory {
+    // Service methods:
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
+    rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
+    rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
+    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
+    rpc Ping (PingRequest) returns (PingResponse) {}
+
+    rpc Lookup (DirectoryLookupRequest) returns (DirectoryLookupResponse) {}
+    rpc Put (DirectoryPutRequest) returns (DirectoryPutResponse) {}
+    rpc MakeDirectory (DirectoryMakeDirectoryRequest) returns (DirectoryMakeDirectoryResponse) {}
+    rpc Glob (DirectoryGlobRequest) returns (DirectoryGlobResponse) {}
+    rpc Delete (DirectoryDeleteRequest) returns (DirectoryDeleteResponse) {}
+    rpc WhichAccess (DirectoryWhichAccessRequest) returns (DirectoryWhichAccessResponse) {}
+}
