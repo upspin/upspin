@@ -4,6 +4,7 @@ package testdir
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	goPath "path"
 	"sort"
@@ -287,6 +288,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 
 // MakeDirectory implements upspin.Directory.MakeDirectory.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
+	log.Printf("testdir MakeDirectory %q", directoryName)
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
 	parsed, err := path.Parse(directoryName)

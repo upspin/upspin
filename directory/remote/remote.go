@@ -5,98 +5,151 @@ package remote
 import (
 	"errors"
 	"fmt"
-	"net/rpc"
 	"strings"
 
+	gContext "golang.org/x/net/context"
+	"google.golang.org/grpc"
+
+	"upspin.googlesource.com/upspin.git/auth/grpcauth"
 	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/directory/proto"
 	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.googlesource.com/upspin.git/upspin/proto"
 )
+
+// requireAuthentication specifies whether the connection demands TLS.
+const requireAuthentication = true
 
 // dialContext contains the destination and authenticated user of the dial.
 type dialContext struct {
 	endpoint upspin.Endpoint
 	userName upspin.UserName
-	factotum upspin.Factotum
 }
 
 // remote implements upspin.Directory.
 type remote struct {
 	upspin.NoConfiguration
-	ctx       dialContext
-	id        int
-	rpcClient *rpc.Client
+	grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
+	ctx                        dialContext
+	dirClient                  proto.DirectoryClient
 }
 
 var _ upspin.Directory = (*remote)(nil)
 
-// call calls the RPC method for the user associated with the remote.
-func (r *remote) call(method string, req, resp interface{}) error {
-	return r.rpcClient.Call(fmt.Sprintf("Server_%d.%s", r.id, method), req, resp)
-}
-
 // Glob implements upspin.Directory.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	req := &proto.GlobRequest{
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return nil, err
+	}
+	req := &proto.DirectoryGlobRequest{
 		Pattern: pattern,
 	}
-	var resp proto.GlobResponse
-	err := r.call("Glob", &req, &resp)
-	return resp.Entries, err
+	resp, err := r.dirClient.Glob(gCtx, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.Entries) == 0 {
+		return nil, err
+	}
+	return proto.UpspinDirEntries(resp.Entries)
 }
 
 // MakeDirectory implements upspin.Directory.MakeDirectory.
 func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
-	req := &proto.MakeDirectoryRequest{
-		Name: directoryName,
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return upspin.Location{}, err
 	}
-	var resp proto.MakeDirectoryResponse
-	err := r.call("MakeDirectory", &req, &resp)
-	return resp.Location, err
+	req := &proto.DirectoryMakeDirectoryRequest{
+		Name: string(directoryName),
+	}
+	resp, err := r.dirClient.MakeDirectory(gCtx, req)
+	if err != nil {
+		return upspin.Location{}, err
+	}
+	return proto.UpspinLocation(resp.Location), err
 }
 
 // Put implements upspin.Directory.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (r *remote) Put(entry *upspin.DirEntry) error {
-	req := &proto.PutRequest{
-		Entry: entry,
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return err
 	}
-	var resp proto.PutResponse
-	return r.call("Put", &req, &resp)
+	b, err := entry.Marshal()
+	if err != nil {
+		return err
+	}
+	req := &proto.DirectoryPutRequest{
+		Entry: b,
+	}
+	_, err = r.dirClient.Put(gCtx, req)
+	return err
 }
 
 // WhichAccess implements upspin.Directory.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
-	req := &proto.WhichAccessRequest{
-		Name: pathName,
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return "", err
 	}
-	var resp proto.WhichAccessResponse
-	err := r.call("WhichAccess", &req, &resp)
-	return resp.Name, err
+	req := &proto.DirectoryWhichAccessRequest{
+		Name: string(pathName),
+	}
+	resp, err := r.dirClient.WhichAccess(gCtx, req)
+	if err != nil {
+		return "", err
+	}
+	return upspin.PathName(resp.Name), err
 }
 
 // Delete implements upspin.Directory.Delete.
 func (r *remote) Delete(pathName upspin.PathName) error {
-	req := &proto.DeleteRequest{
-		Name: pathName,
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return err
 	}
-	var resp proto.DeleteResponse
-	return r.call("Delete", &req, &resp)
+	req := &proto.DirectoryDeleteRequest{
+		Name: string(pathName),
+	}
+	_, err = r.dirClient.Delete(gCtx, req)
+	return err
 }
 
 // Lookup implements upspin.Directory.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	req := &proto.LookupRequest{
-		Name: pathName,
+	gCtx, err := r.SetAuthContext(r.Context)
+	if err != nil {
+		return nil, err
 	}
-	var resp proto.LookupResponse
-	err := r.call("Lookup", &req, &resp)
-	return resp.Entry, err
+	req := &proto.DirectoryLookupRequest{
+		Name: string(pathName),
+	}
+	resp, err := r.dirClient.Lookup(gCtx, req)
+	if err != nil {
+		return nil, err
+	}
+	return proto.UpspinDirEntry(resp.Entry)
 }
 
 // ServerUserName implements upspin.Service.
 func (r *remote) ServerUserName() string {
 	return "" // No one is authenticated.
+}
+
+// Endpoint implements upspin.Store.Endpoint.
+func (r *remote) Endpoint() upspin.Endpoint {
+	return r.ctx.endpoint
+}
+
+// Configure implements upspin.Service.
+func (r *remote) Configure(options ...string) error {
+	req := &proto.ConfigureRequest{
+		Options: options,
+	}
+	_, err := r.dirClient.Configure(gContext.Background(), req)
+	return err
 }
 
 // Dial implements upspin.Service.
@@ -105,61 +158,40 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	r := &remote{
-		ctx: dialContext{
-			endpoint: e,
-			userName: context.UserName,
-			factotum: context.Factotum,
-		},
-	}
-
 	var err error
+	var dirClient proto.DirectoryClient
+	var conn *grpc.ClientConn
 	addr := string(e.NetAddr)
 	switch {
 	case strings.HasPrefix(addr, "http://"):
-		r.rpcClient, err = rpc.DialHTTP("tcp", addr[7:])
+		conn, err = grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: When can we do conn.Close()?
+		dirClient = proto.NewDirectoryClient(conn)
 	default:
-		err = fmt.Errorf("unrecognized net address in remote: %q", addr)
+		err = fmt.Errorf("unrecognized net address in dir remote: %q", addr)
 	}
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Authenticate
-	if err != nil {
-		return nil, err
+
+	authClient := grpcauth.AuthClientService{
+		GRPCCommon: dirClient,
+		GRPCConn:   conn,
+		Context:    context,
+	}
+	r := &remote{
+		AuthClientService: authClient,
+		ctx: dialContext{
+			endpoint: e,
+			userName: context.UserName,
+		},
+		dirClient: dirClient,
 	}
 
 	return r, nil
-}
-
-// Endpoint implements upspin.Directory.Endpoint.
-func (r *remote) Endpoint() upspin.Endpoint {
-	return r.ctx.endpoint
-}
-
-// Close implements upspin.Service.
-func (r *remote) Close() {
-	// TODO
-}
-
-// Authenticate implements upspin.Service.
-func (r *remote) Authenticate(ctx *upspin.Context) error {
-	// TODO
-	return nil
-}
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
-	req := &proto.ConfigureRequest{
-		Options: options,
-	}
-	var resp proto.ConfigureResponse
-	return r.rpcClient.Call("Server.Configure", &req, &resp)
-}
-
-func (r *remote) Ping() bool {
-	// TODO: use rpc.Ping here, like in storeserver.
-	return true
 }
 
 const transport = upspin.Remote
