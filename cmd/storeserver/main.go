@@ -20,7 +20,10 @@ import (
 	_ "upspin.googlesource.com/upspin.git/store/gcpstore"
 	_ "upspin.googlesource.com/upspin.git/store/remote"
 	_ "upspin.googlesource.com/upspin.git/store/teststore"
+
 	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.googlesource.com/upspin.git/user/remote"
+	_ "upspin.googlesource.com/upspin.git/user/testuser"
 )
 
 var (
