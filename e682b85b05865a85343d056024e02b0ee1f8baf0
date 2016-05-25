@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_ad552844",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T23:22:48Z",
+      "side": 1,
+      "message": "Ah, sloppy me. Good point.\n\nFixed the comment and added a call to mu.\n\nI don\u0027t normally run with -race, but I did it now and as expected, not enough parallelism to catch anything.",
+      "parentUuid": "5c17b7d8_785fe134",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_3859694e",
         "filename": "bind/bind.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_4d525c5c",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T23:22:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_3859694e",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_d834ede9",
         "filename": "bind/bind.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-05-25T23:14:32Z",
       "side": 1,
       "message": "is there an error return value from Close?",
+      "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_2dc83835",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-25T23:22:48Z",
+      "side": 1,
+      "message": "No. Mostly because there\u0027s nothing we can do. The grpc implementation actually could return something, but we just log it and drop it on the floor.",
+      "parentUuid": "5c17b7d8_d834ede9",
       "revId": "e682b85b05865a85343d056024e02b0ee1f8baf0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
