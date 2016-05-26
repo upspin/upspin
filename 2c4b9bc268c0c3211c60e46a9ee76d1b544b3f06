@@ -16,6 +16,24 @@
       "revId": "2c4b9bc268c0c3211c60e46a9ee76d1b544b3f06",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_6f470f41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-26T20:03:35Z",
+      "side": 1,
+      "message": "Yes, that\u0027s the one I want but it\u0027s not plumbed anywhere helpful.\nRemember this service multiplexes for different users. What I want is in effect a distinct Context for each authenticated user, but I don\u0027t see a clean way to do that beyond overriding Authenticate, which I could do but seems wrong.",
+      "parentUuid": "7c371b6c_af10b74c",
+      "revId": "2c4b9bc268c0c3211c60e46a9ee76d1b544b3f06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
