@@ -102,7 +102,7 @@ func NewSecureServer(config auth.Config, certFile string, certKeyFile string) (S
 			log.Printf("Not using TLS encryption. Allowing unauthenticated users.")
 			grpcServer = grpc.NewServer()
 		} else {
-			return nil, errors.New("No certificate provided but not allowing unauthenticated users.")
+			return nil, errors.New("No certificate provided but not allowing unauthenticated users")
 		}
 	}
 	return &secureServerImpl{
@@ -203,7 +203,7 @@ func generateRandomToken() (string, error) {
 		return "", err
 	}
 	if n != len(buf) {
-		return "", errors.New("random bytes too short.")
+		return "", errors.New("random bytes too short")
 	}
 	return fmt.Sprintf("%X", buf), nil
 }
