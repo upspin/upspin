@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_db8aa727",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "(l net.Listener, port int) {",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_fb8f6b34",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_bb99f383",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "for _, port \u003d range\n\nand what is the significance of this specific port range?\nWhy not just start at some value and increment?",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_9b942f4b",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "l, err \u003d",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_5b9f7765",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "s/\\.//",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_b88a592b",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "How about just \u0027ping\u0027 instead?\nThe demands/responses thing distracts from what this test is really about.",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_5880dd09",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "t.Log(\"...\")",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_787da106",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "t.Logf",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_187a6510",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem necessary.\nIf the requests are returning correctly, then the server is doing its thing.",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_38772927",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T19:46:30Z",
+      "side": 1,
+      "message": "code :\u003d m.Run()",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
