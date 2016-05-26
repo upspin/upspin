@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_b46b3172",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-26T17:39:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_b8433957",
+      "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_5829bd89",
         "filename": "bind/bind.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7c371b6c_5468a574",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-26T17:39:16Z",
+      "side": 1,
+      "message": "Unfortunately, that would open a window to a race condition.\n\nI\u0027ll have to think about this one some more. I\u0027ll ping my race condition guru, Dave, on this one.",
+      "parentUuid": "5c17b7d8_5829bd89",
+      "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_183345fc",
         "filename": "bind/bind_test.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-05-25T23:27:16Z",
       "side": 1,
       "message": "check these errors",
+      "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_b419f119",
+        "filename": "bind/bind_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-26T17:39:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c17b7d8_183345fc",
       "revId": "e136c33f4f29ed6cd0ccf04b2d070f49e9fabf09",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
