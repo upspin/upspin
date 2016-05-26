@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package prototest;
+
+import "upspin.googlesource.com/upspin.git/upspin/proto/upspin.proto";
+
+message HelloRequest {
+    string hello = 1;
+}
+
+message HelloResponse {
+    string hello = 1;
+}
+
+service TestService {
+	rpc Authenticate (proto.AuthenticateRequest) returns (proto.AuthenticateResponse) {}
+	rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
+	rpc Hello (HelloRequest) returns (HelloResponse) {}
+}
