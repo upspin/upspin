@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_af10b74c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-05-26T19:57:10Z",
+      "side": 1,
+      "message": "auth/grpcauth/client.go sends UserName in AuthenticateRequest.  That\u0027s not the one you want?",
+      "revId": "2c4b9bc268c0c3211c60e46a9ee76d1b544b3f06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
