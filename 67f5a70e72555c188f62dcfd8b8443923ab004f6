@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c17b7d8_dbb147f1",
+        "filename": "bind/bind.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T23:44:39Z",
+      "side": 1,
+      "message": "This can be a little clearer\n\nfresh :\u003d ds.lastPing.Add(pingFreshnessDuration).After(time.Now())\nds.mu.Unlock() // Order of unlocking is important here.\nmu.Unlock()\nif fresh { \n  return service, nil\n}",
+      "revId": "67f5a70e72555c188f62dcfd8b8443923ab004f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_9babcf7d",
+        "filename": "bind/bind.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T23:44:39Z",
+      "side": 1,
+      "message": "Is it OK to hold mu while dialling? Seems like it could lock out other callers for an unreasonably long time.",
+      "revId": "67f5a70e72555c188f62dcfd8b8443923ab004f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_fbb68be6",
+        "filename": "bind/bind.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T23:44:39Z",
+      "side": 1,
+      "message": "I thought that we would want concurrent binds to succeed, with both callers getting the same service. Do I misunderstand?",
+      "revId": "67f5a70e72555c188f62dcfd8b8443923ab004f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
