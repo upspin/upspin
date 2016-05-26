@@ -212,6 +212,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_1ba9ff88",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-26T22:51:16Z",
+      "side": 1,
+      "message": "I guess I\u0027m hesitant to enshrine the guy in our codebase. Just remembering that he exists gives a little pang of annoyed sadness. :-)",
+      "parentUuid": "7c371b6c_f55d326f",
+      "revId": "9f3dbfe56ab4e344f60ebfe0a48439a612f0c56d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c17b7d8_5880dd09",
         "filename": "auth/grpcauth/all_test.go",
         "patchSetId": 3
