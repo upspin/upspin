@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package prototest;
+
+import "upspin.googlesource.com/upspin.git/upspin/proto/upspin.proto";
+
+message DoATrumpRequest {
+    string people_demand = 1;
+}
+
+message DoATrumpResponse {
+    string trump_response = 1;
+}
+
+service TestService {
+	rpc Authenticate (proto.AuthenticateRequest) returns (proto.AuthenticateResponse) {}
+	rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
+	rpc DoATrump (DoATrumpRequest) returns (DoATrumpResponse) {}
+}
