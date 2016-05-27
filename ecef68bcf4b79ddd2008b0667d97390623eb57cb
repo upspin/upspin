@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_a471b6fd",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T14:54:21Z",
+      "side": 1,
+      "message": "does this update the live version (as in \"/etc/letsencrypt/live/upspin.io/\")? If not, we still need to figure out how to do that so the other servers can just load the certs automatically.\n\nDid you deploy this? The expiration date hasn\u0027t changed on the frontend.\n\nYou can try deploying it with cmd/admin/deploy-servers.sh frontend.\n\nThanks.",
+      "revId": "ecef68bcf4b79ddd2008b0667d97390623eb57cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
