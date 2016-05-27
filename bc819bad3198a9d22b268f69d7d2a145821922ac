@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_44822adf",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T14:51:04Z",
+      "side": 1,
+      "message": "Could this map grow unbounded? It\u0027s hard for me to prove the various returns in the middle of the loop below won\u0027t allow this map\u0027s entries to never be deleted. If you aren\u0027t 100% sure that could happen, my suggestion is to pre-allocate a fixed set of entries and then hash the bytes of dialKey to use one of the fixed waitgroups. In cmd/directory/pathlock there\u0027s an example you could re-use if you\u0027re concerned the entries could leak on errors or early returns.",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_842112e9",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T14:51:04Z",
+      "side": 1,
+      "message": "Is there any chance that the few returns above leave old entries in this map? If so, see above for suggestion above for keeping a fixed size, hashable slice.",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
