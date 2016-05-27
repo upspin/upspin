@@ -36,9 +36,10 @@ var (
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
+	context  *upspin.Context
+	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
-	store upspin.Store
 }
 
 func main() {
@@ -60,10 +61,6 @@ func main() {
 		UserName: "storeserver",
 	}
 
-	store, err := bind.Store(context, *endpoint)
-	if err != nil {
-		log.Fatalf("binding to %q: %v", *endpoint, err)
-	}
 	config := auth.Config{
 		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
@@ -73,8 +70,9 @@ func main() {
 		log.Fatal(err)
 	}
 	s := &Server{
+		context:      context,
+		endpoint:     *endpoint,
 		SecureServer: grpcSecureServer,
-		store:        store,
 	}
 
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
@@ -85,17 +83,34 @@ func main() {
 	grpcSecureServer.Serve(listener)
 }
 
+var (
+	// Empty structs we can allocate just once.
+	deleteResponse    proto.StoreDeleteResponse
+	configureResponse proto.ConfigureResponse
+)
+
+// storeFor returns a Store service bound to the user specified in the context.
+func (s *Server) storeFor(ctx gContext.Context) (upspin.Store, error) {
+	// Validate that we have a session. If not, it's an auth error.
+	session, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	context := *s.context
+	context.UserName = session.User()
+	return bind.Store(&context, s.endpoint)
+}
+
 // Get implements upspin.Store
 func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get %q", req.Reference)
 
-	// Validate that we have a session. If not, it's an auth error.
-	_, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	data, locs, err := s.store.Get(upspin.Reference(req.Reference))
+	data, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
 	}
@@ -110,13 +125,12 @@ func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
 
-	// Validate that we have a session. If not, it's an auth error.
-	_, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	ref, err := s.store.Put(req.Data)
+	ref, err := store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
 	}
@@ -130,33 +144,44 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
 
-	// Validate that we have a session. If not, it's an auth error.
-	_, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.store.Delete(upspin.Reference(req.Reference))
+	err = store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Reference, err)
 	}
-	return nil, err
+	return &deleteResponse, err
 }
 
 // Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
-	err := s.store.Configure(req.Options...)
+
+	store, err := s.storeFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = store.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
-	return nil, err
+	return &configureResponse, err
 }
 
 // Endpoint implements upspin.Service
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
-	endpoint := s.store.Endpoint()
+
+	store, err := s.storeFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := store.Endpoint()
 	resp := &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(endpoint.Transport),
@@ -169,7 +194,13 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 // ServerUserName implements upspin.Service
 func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
-	userName := s.store.ServerUserName()
+
+	store, err := s.storeFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	userName := store.ServerUserName()
 	resp := &proto.ServerUserNameResponse{
 		UserName: string(userName),
 	}
