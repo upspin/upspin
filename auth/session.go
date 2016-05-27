@@ -17,10 +17,6 @@ type Session interface {
 	// might not be authenticated.
 	User() upspin.UserName
 
-	// IsAuthenticated reports whether the user in the session is authenticated. When true, a user is guaranteed
-	// to be returned by the User method.
-	IsAuthenticated() bool
-
 	// Err reports the status of the session.
 	Err() error
 
@@ -35,10 +31,9 @@ const sessionCacheSize = 1000
 var sessionCache *cache.LRU // Caches <authToken, Session> Thread safe.
 
 // NewSession creates a new session with the given contents.
-func NewSession(user upspin.UserName, isAuth bool, expiration time.Time, authToken string, err error) Session {
+func NewSession(user upspin.UserName, expiration time.Time, authToken string, err error) Session {
 	session := &sessionImpl{
 		user:      user,
-		isAuth:    isAuth,
 		expires:   expiration,
 		authToken: authToken,
 		err:       err,
@@ -68,7 +63,6 @@ func resetSessions() {
 
 type sessionImpl struct {
 	user      upspin.UserName
-	isAuth    bool
 	authToken string
 	err       error
 	expires   time.Time
@@ -79,11 +73,6 @@ var _ Session = (*sessionImpl)(nil)
 // User implements Session.
 func (s *sessionImpl) User() upspin.UserName {
 	return s.user
-}
-
-// IsAuthenticated implements Session.
-func (s *sessionImpl) IsAuthenticated() bool {
-	return s.isAuth
 }
 
 // Err implements Session.

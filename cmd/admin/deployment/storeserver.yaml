@@ -1,0 +1,17 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: storeserver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: storeserver
+    spec:
+      containers:
+      - name: storeserver
+        image: gcr.io/PROJECT/storeserver
+        ports:
+        - containerPort: 80
+        - containerPort: 443
