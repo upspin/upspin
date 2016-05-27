@@ -7,8 +7,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +15,7 @@ import (
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
+	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/endpoint"
 	"upspin.io/errors"
@@ -40,12 +40,8 @@ import (
 )
 
 var (
-	port         = flag.Int("port", 5581, "TCP port number")
 	ctxfile      = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.dirserver"), "context file to use to configure server")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	selfSigned   = flag.Bool("selfsigned", false, "Start server with a self-signed TLS certificate")
-	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to TLS certificate file")
-	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to TLS certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
 	logFile      = flag.String("logfile", "dirserver", "Name of the log file on GCP or empty for no GCP logging")
 )
@@ -65,11 +61,6 @@ func main() {
 
 	if *logFile != "" {
 		log.Connect(upspinProject, *logFile)
-	}
-
-	if *selfSigned {
-		*certFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem")
-		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
 	svr, err := metric.NewGCPSaver(upspinProject)
@@ -117,11 +108,8 @@ func main() {
 		}
 	}
 
-	config := auth.Config{
-		Lookup: auth.PublicUserKeyService(),
-		AllowUnauthenticatedConnections: *selfSigned,
-	}
-	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
+	config := auth.Config{Lookup: auth.PublicUserKeyService()}
+	grpcSecureServer, err := grpcauth.NewSecureServer(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -130,13 +118,10 @@ func main() {
 		SecureServer: grpcSecureServer,
 		endpoint:     *endpoint,
 	}
-
 	proto.RegisterDirectoryServer(grpcSecureServer.GRPCServer(), s)
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-	if err != nil {
-		log.Fatal("listen error:", err)
-	}
-	grpcSecureServer.Serve(listener)
+
+	http.Handle("/", grpcSecureServer.GRPCServer())
+	https.ListenAndServe("dirserver")
 }
 
 var (
