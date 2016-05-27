@@ -16,6 +16,24 @@
       "revId": "ecef68bcf4b79ddd2008b0667d97390623eb57cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c65afc6_7aa6b9b8",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T22:07:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand what you mean, regarding the \"live version\". This code will write and read a file at that location.",
+      "parentUuid": "7c371b6c_a471b6fd",
+      "revId": "ecef68bcf4b79ddd2008b0667d97390623eb57cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
