@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc9cebd9_3371f0fc",
+        "filename": "cmd/store/grpcstore/grpcstore.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T22:14:16Z",
+      "side": 1,
+      "message": "need package comment.",
+      "revId": "0608dfa0285da6ff2a2f85eb8f4683b7c100e2e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_b34de090",
+        "filename": "cmd/store/httpstore/httpstore.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T22:14:16Z",
+      "side": 1,
+      "message": "needs package comment",
+      "revId": "0608dfa0285da6ff2a2f85eb8f4683b7c100e2e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_336290f7",
+        "filename": "cmd/store/httpstore/httpstore.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T22:14:16Z",
+      "side": 1,
+      "message": "why does this one have a comment but the other handlers do not? be consistent.",
+      "revId": "0608dfa0285da6ff2a2f85eb8f4683b7c100e2e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_53591c4d",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T22:14:16Z",
+      "side": 1,
+      "message": "s/rest/REST/\nit is an acronym",
+      "revId": "0608dfa0285da6ff2a2f85eb8f4683b7c100e2e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_9339c4e2",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T22:14:16Z",
+      "side": 1,
+      "message": "prefixed isn\u0027t quite the right term. maybe just \"passed a user name\"",
+      "revId": "0608dfa0285da6ff2a2f85eb8f4683b7c100e2e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
