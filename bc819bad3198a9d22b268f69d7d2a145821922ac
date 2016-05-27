@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "fc9cebd9_53d47cfc",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T21:53:02Z",
+      "side": 1,
+      "message": "15 * time.Minute\n\nmore english-like",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_73d7f802",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-27T21:53:02Z",
+      "side": 1,
+      "message": "dialed",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_44822adf",
         "filename": "bind/bind.go",
         "patchSetId": 9
