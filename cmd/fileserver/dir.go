@@ -5,7 +5,6 @@
 package main
 
 import (
-	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,10 +41,6 @@ func NewDirServer(context *upspin.Context, endpoint upspin.Endpoint, server grpc
 		SecureServer: server,
 	}
 	return s
-}
-
-func (s *DirServer) Run(listener net.Listener, errChan chan error) {
-	errChan <- s.SecureServer.Serve(listener)
 }
 
 // Lookup implements upspin.Directory.

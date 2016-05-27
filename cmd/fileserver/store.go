@@ -6,7 +6,6 @@ package main
 
 import (
 	"io/ioutil"
-	"net"
 	"os"
 
 	"upspin.io/auth/grpcauth"
@@ -35,10 +34,6 @@ func NewStoreServer(context *upspin.Context, endpoint upspin.Endpoint, server gr
 		SecureServer: server,
 	}
 	return s
-}
-
-func (s *StoreServer) Run(listener net.Listener, errChan chan error) {
-	errChan <- s.SecureServer.Serve(listener)
 }
 
 // Get implements upspin.Store.
