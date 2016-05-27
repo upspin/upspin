@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9c65afc6_da94254c",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T22:03:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc9cebd9_53d47cfc",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc9cebd9_73d7f802",
         "filename": "bind/bind.go",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-27T21:53:02Z",
       "side": 1,
       "message": "dialed",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c65afc6_fa99e982",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T22:03:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc9cebd9_73d7f802",
       "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9c65afc6_9a8aad26",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T22:03:49Z",
+      "side": 1,
+      "message": "I am 100% sure that they can\u0027t leak, barring some major flaw in my reasoning. I will add a check to the concurrency test to help ensure this.",
+      "parentUuid": "7c371b6c_44822adf",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_842112e9",
         "filename": "bind/bind.go",
         "patchSetId": 9
@@ -64,6 +118,24 @@
       "writtenOn": "2016-05-27T14:51:04Z",
       "side": 1,
       "message": "Is there any chance that the few returns above leave old entries in this map? If so, see above for suggestion above for keeping a fixed size, hashable slice.",
+      "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c65afc6_ba8f7135",
+        "filename": "bind/bind.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T22:03:49Z",
+      "side": 1,
+      "message": "None of the returns above can be reached if there is an entry in this map.",
+      "parentUuid": "7c371b6c_842112e9",
       "revId": "bc819bad3198a9d22b268f69d7d2a145821922ac",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
