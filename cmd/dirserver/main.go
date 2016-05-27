@@ -50,6 +50,7 @@ var (
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 )
 
+// Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
 type Server struct {
 	context  *upspin.Context
 	endpoint upspin.Endpoint
@@ -110,7 +111,7 @@ var (
 	configureResponse proto.ConfigureResponse
 )
 
-// dirFor returns a directory service bound to the user specified in the context.
+// dirFor returns a Directory service bound to the user specified in the context.
 func (s *Server) dirFor(ctx gContext.Context) (upspin.Directory, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)

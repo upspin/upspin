@@ -30,11 +30,12 @@ var (
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 )
 
-// Server is a SecureServer that talks to a Store interface and serves gRPC requests.
+// Server is a SecureServer that talks to a User interface and serves gRPC requests.
 type Server struct {
+	context  *upspin.Context
+	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
-	user upspin.User
 }
 
 func main() {
@@ -56,10 +57,6 @@ func main() {
 		UserName: "userserver",
 	}
 
-	user, err := bind.User(context, *endpoint)
-	if err != nil {
-		log.Fatalf("binding to %q: %v", *endpoint, err)
-	}
 	config := auth.Config{
 		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
@@ -69,8 +66,9 @@ func main() {
 		log.Fatal(err)
 	}
 	s := &Server{
+		context:      context,
+		endpoint:     *endpoint,
 		SecureServer: grpcSecureServer,
-		user:         user,
 	}
 
 	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
@@ -81,17 +79,28 @@ func main() {
 	grpcSecureServer.Serve(listener)
 }
 
+// userFor returns a User service bound to the user specified in the context.
+func (s *Server) userFor(ctx gContext.Context) (upspin.User, error) {
+	// Validate that we have a session. If not, it's an auth error.
+	session, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	context := *s.context
+	context.UserName = session.User()
+	return bind.User(&context, s.endpoint)
+}
+
 // Lookup implements upspin.User
 func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*proto.UserLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
 
-	// Validate that we have a session. If not, it's an auth error.
-	_, err := s.GetSessionFromContext(ctx)
+	user, err := s.userFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
+	endpoints, publicKeys, err := user.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
 	}
@@ -105,7 +114,12 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*pr
 // Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
-	err := s.user.Configure(req.Options...)
+
+	user, err := s.userFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = user.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
@@ -115,7 +129,12 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 // Endpoint implements upspin.Service
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
-	endpoint := s.user.Endpoint()
+
+	user, err := s.userFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+	endpoint := user.Endpoint()
 	resp := &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(endpoint.Transport),
@@ -128,7 +147,11 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 // ServerUserName implements upspin.Service
 func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
 	log.Print("ServerUserName")
-	userName := s.user.ServerUserName()
+	user, err := s.userFor(ctx)
+	if err != nil {
+		return nil, err
+	}
+	userName := user.ServerUserName()
 	resp := &proto.ServerUserNameResponse{
 		UserName: string(userName),
 	}
