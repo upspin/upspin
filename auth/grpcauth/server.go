@@ -39,7 +39,6 @@ import (
 
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
 	"upspin.io/auth"
@@ -89,28 +88,10 @@ type SecureServer interface {
 	GRPCServer() *grpc.Server
 }
 
-// NewSecureServer returns a new grpc server with a TLS config as described by the certificate file and certificate
-// key file.
-func NewSecureServer(config auth.Config, certFile string, certKeyFile string) (SecureServer, error) {
-	var grpcServer *grpc.Server
-
-	if certFile != "" && certKeyFile != "" {
-		tlsConfig, err := auth.NewDefaultTLSConfig(certFile, certKeyFile)
-		if err != nil {
-			return nil, errors.E("NewSecurServer", err)
-		}
-		creds := credentials.NewTLS(tlsConfig)
-		grpcServer = grpc.NewServer(grpc.Creds(creds))
-	} else {
-		if config.AllowUnauthenticatedConnections {
-			log.Printf("Not using TLS encryption. Allowing unauthenticated users.")
-			grpcServer = grpc.NewServer()
-		} else {
-			return nil, errors.E("NewSecureServer", errors.Invalid, "no certificate provided but not allowing unauthenticated users")
-		}
-	}
+// NewSecureServer returns a new SecureServer that serves GRPC.
+func NewSecureServer(config auth.Config) (SecureServer, error) {
 	return &secureServerImpl{
-		grpcServer: grpcServer,
+		grpcServer: grpc.NewServer(),
 		config:     config,
 	}, nil
 }
@@ -184,8 +165,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 		log.Error.Printf("Can't create auth token.")
 		return nil, errors.E(Authenticate, err)
 	}
-	isAuth := !s.config.AllowUnauthenticatedConnections
-	_ = auth.NewSession(parsed.User(), isAuth, expiration, authToken, nil) // session is cached, ignore return value
+	_ = auth.NewSession(parsed.User(), expiration, authToken, nil) // session is cached, ignore return value
 
 	resp := &proto.AuthenticateResponse{
 		Token: authToken,

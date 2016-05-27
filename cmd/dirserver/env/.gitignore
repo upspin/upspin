@@ -1,0 +1,4 @@
+# never check these in
+public.upspinkey
+secret.upspinkey
+serviceaccountkey.json
