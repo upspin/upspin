@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_1be1ffa7",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T05:54:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c371b6c_69e147a7",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_a9fe6f43",
         "filename": "bind/bind.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-27T05:34:50Z",
       "side": 1,
       "message": "You probably want a limit here so we don\u0027t keep attempting forever.",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_3bde43ef",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T05:54:47Z",
+      "side": 1,
+      "message": "This should only loop as long as there is an entry for key in cache, and that should only happen once unless there are a lot of concurrent callers all trying to set up the same service. I don\u0027t think it\u0027ll ever loop more than a few times in practice, but I will add a check just in case some programming error gets us here.",
+      "parentUuid": "7c371b6c_a9fe6f43",
       "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_dbe94790",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T05:54:47Z",
+      "side": 1,
+      "message": "The ping function (see line 28) observes the pingFreshnessDuration.\n\nIf there is a ds cached then wait is irrelevant; there cannot be any inflight dials so long as there is a cached ds for that key. With this code as-written, cache[key] and inflightDial[key] cannot be both set while mu is released.",
+      "parentUuid": "7c371b6c_69f86757",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_c9fbb353",
         "filename": "bind/bind.go",
         "patchSetId": 6
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_9be3cfac",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T05:54:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c371b6c_c9fbb353",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_89f5ab5e",
         "filename": "bind/bind.go",
         "patchSetId": 6
@@ -81,6 +153,24 @@
       "writtenOn": "2016-05-27T05:34:50Z",
       "side": 1,
       "message": "I think dial can be uninitialized at this point, no?",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_bbe81389",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T05:54:47Z",
+      "side": 1,
+      "message": "No. The only way the loop exits is if !cached, and at line 211 we set dial if !cached.",
+      "parentUuid": "7c371b6c_89f5ab5e",
       "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
