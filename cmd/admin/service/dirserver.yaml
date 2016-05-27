@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: "dirserver"
+spec:
+  selector:
+    app: "dirserver"
+  ports:
+  - name: "http"
+    port: 80
+    targetPort: 80
+  - name: "https"
+    port: 443
+    targetPort: 443
+    protocol: "TCP"
+  type: LoadBalancer
+  loadBalancerIP: 130.211.200.47 # upspin-test
