@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c371b6c_69e147a7",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "s/signel/single/",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_a9fe6f43",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "You probably want a limit here so we don\u0027t keep attempting forever.",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_69f86757",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "At this point, what prevents multiple pings from happening in parallel (and thus possibly overloading the server)?\n\nAt this point, there\u0027s a ds cached, but wait is possibly uninitialized (false) and hence two calls will wait not for each other, right? (Not 100% sure, but it looks like it\u0027s possible since you don\u0027t check if there\u0027s something inflight if it was already in cache.).",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_c9fbb353",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "Release may fail.",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_89f5ab5e",
+        "filename": "bind/bind.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "I think dial can be uninitialized at this point, no?",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c371b6c_2991ff0b",
+        "filename": "bind/bind_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-27T05:34:50Z",
+      "side": 1,
+      "message": "I\u0027d bring back that concurrency test I wrote. It found some initial issues with -race.",
+      "revId": "3471181b94951846ebd4121c5eafe1a1efa93acf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
