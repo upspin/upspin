@@ -1,176 +1,126 @@
-package main
+package store
 
 import (
+	"bytes"
 	"errors"
-	"flag"
 	"fmt"
-	"net/http"
+	"io"
+	"io/ioutil"
+	"os"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/httpauth"
 	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/key/sha256key"
 	"upspin.googlesource.com/upspin.git/log"
 	"upspin.googlesource.com/upspin.git/upspin"
-
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
 )
 
-const (
-	multiPartMemoryBuffer int64 = 10 << 20 // 10MB buffer for file transfers
-)
-
+// Common variables uses by all implementations of store.Server.
 var (
-	projectID             = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName            = flag.String("bucket", "g-upspin-store", "The name of an existing bucket within the project.")
-	tempDir               = flag.String("tempdir", "", "Location of local directory to be our cache. Empty for system default.")
-	port                  = flag.Int("port", 8080, "TCP port to serve.")
-	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
-	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
-	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
-	context               = "StoreService: "
-	errInvalidRef         = errors.New("invalid reference")
+	ServerName    = "StoreService: "
+	ErrInvalidRef = errors.New("invalid reference")
 )
 
-type storeServer struct {
-	cloudClient gcp.GCP
-	fileCache   *cache.FileCache
+// Server implements methods from upspin.Store that are relevant on the server side for both GRPC and HTTP servers.
+// All methods from upspin.Store are prefixed with the user name. A context could be used for completion,
+// but we only care about the user name, so use that for simplicity.
+type Server struct {
+	CloudClient gcp.GCP
+	FileCache   *cache.FileCache
 }
 
-// Handler for receiving file put requests (i.e. storing new blobs).
-// Requests must contain a 'file' form entry.
-func (s *storeServer) putHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" && r.Method != "PUT" {
-		netutil.SendJSONErrorString(w, "post or put request expected")
-		return
-	}
-	r.ParseMultipartForm(multiPartMemoryBuffer)
-	file, _, err := r.FormFile("file")
+// Put implements upspin.Store for a given UserName.
+func (s *Server) Put(userName upspin.UserName, data []byte) (upspin.Reference, error) {
+	return s.InnerPut(userName, bytes.NewBuffer(data))
+}
+
+// InnerPut implements upspin.Store for a given UserName using an io.Reader.
+func (s *Server) InnerPut(userName upspin.UserName, reader io.Reader) (upspin.Reference, error) {
+	// TODO: check that userName has permission to write to this store server.
+	sha := sha256key.NewShaReader(reader)
+	initialRef := s.FileCache.RandomRef()
+	err := s.FileCache.Put(initialRef, sha)
 	if err != nil {
-		netutil.SendJSONError(w, context, fmt.Errorf("Put: %s", err))
-		return
-	}
-	defer file.Close()
-	sha := sha256key.NewShaReader(file)
-	initialRef := s.fileCache.RandomRef()
-	err = s.fileCache.Put(initialRef, sha)
-	if err != nil {
-		netutil.SendJSONError(w, context, fmt.Errorf("Put: %s", err))
-		return
+		return "", fmt.Errorf("%sPut: %s", ServerName, err)
 	}
 	// Figure out the appropriate reference for this blob
 	ref := sha.EncodedSum()
 
 	// Rename it in the cache
-	s.fileCache.Rename(ref, initialRef)
+	s.FileCache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
 	go func() {
-		if _, err := s.cloudClient.PutLocalFile(s.fileCache.GetFileLocation(ref), ref); err == nil {
+		if _, err := s.CloudClient.PutLocalFile(s.FileCache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
 			// compared with our much better-provisioned
 			// storage backend.  This is safe to do
 			// because FileCache is thread safe.
-			s.fileCache.Purge(ref)
+			s.FileCache.Purge(ref)
 		}
 	}()
-
-	// Answer something sensible to the client.
-	log.Printf("Put: %s: %s", sess.User(), ref)
-	jsonmsg.SendReferenceResponse(upspin.Reference(ref), w)
+	return upspin.Reference(ref), nil
 }
 
-func (s *storeServer) getHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	ref := r.FormValue("ref")
-	if ref == "" {
-		netutil.SendJSONError(w, context, errInvalidRef)
-		return
+// Get implements upspin.Store for a UserName
+func (s *Server) Get(userName upspin.UserName, ref upspin.Reference) ([]byte, []upspin.Location, error) {
+	file, loc, err := s.InnerGet(userName, ref)
+	if err != nil {
+		return nil, nil, err
 	}
-	log.Printf("Looking up ref %s in cache for user %s", ref, sess.User())
+	if file != nil {
+		defer file.Close()
+		bytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			err = fmt.Errorf("%sGet: %s", ServerName, err)
+		}
+		return bytes, nil, err
+	}
+	return nil, []upspin.Location{loc}, nil
+}
 
-	file, err := s.fileCache.OpenRefForRead(ref)
+// InnerGet is the version of Store.Get that supports both the HTTP interface and the higher level Store.Get
+// (which matches one-to-one with the GRPC interface). It returns only one of the two return values or an error.
+// file is non-nil when the ref is found locally. If non-nil, the file is open for read and the caller should close it
+// (after which it may disappear). If location is non-zero it means ref is in the backend at that location.
+func (s *Server) InnerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+	file, err = s.FileCache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
 		log.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
-		defer file.Close()
-		http.ServeFile(w, r, file.Name())
 		return
 	}
 
 	// File is not local, try to get it from our storage.
-	link, err := s.cloudClient.Get(ref)
+	var link string
+	link, err = s.CloudClient.Get(string(ref))
 	if err != nil {
-		netutil.SendJSONError(w, context, fmt.Errorf("get: %s", err))
+		err = fmt.Errorf("%sGet: %s", ServerName, err)
 		return
 	}
 	// GCP should return an http link
 	if !strings.HasPrefix(link, "http") {
-		errMsg := fmt.Sprintf("get: invalid link returned from GCP: %s", link)
-		netutil.SendJSONError(w, context, errors.New(errMsg))
+		errMsg := fmt.Sprintf("%sGet: invalid link returned from GCP: %s", ServerName, link)
 		log.Error.Println(errMsg)
+		err = errors.New(errMsg)
 		return
 	}
 
-	location := upspin.Location{}
 	location.Reference = upspin.Reference(link)
 	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
 	log.Printf("Ref %s returned as link: %s", ref, link)
-	netutil.SendJSONReply(w, location)
+	return
 }
 
-func (s *storeServer) deleteHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	ref := r.FormValue("ref")
-	if ref == "" {
-		netutil.SendJSONError(w, context, errInvalidRef)
-		return
-	}
-	if r.Method != "POST" {
-		netutil.SendJSONErrorString(w, context+"Delete only accepts POST HTTP requests")
-		return
-	}
+// Delete implements upspin.Store for a UserName. It's common between HTTP and GRPC.
+func (s *Server) Delete(userName upspin.UserName, ref upspin.Reference) error {
 	// TODO: verify ownership and proper ACLs to delete blob
-	err := s.cloudClient.Delete(ref)
+	err := s.CloudClient.Delete(string(ref))
 	if err != nil {
-		netutil.SendJSONError(w, context, fmt.Errorf("delete: %s: %s", ref, err))
-		return
+		return fmt.Errorf("%sDelete: %s: %s", ServerName, ref, err)
 	}
 	log.Printf("Delete: %s: Success", ref)
-	netutil.SendJSONErrorString(w, "success")
-}
-
-func main() {
-	flag.Parse()
-
-	log.Connect("google.com:"+*projectID, *bucketName)
-
-	ss := &storeServer{
-		cloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
-		fileCache:   cache.NewFileCache(*tempDir),
-	}
-
-	ah := httpauth.NewHandler(&auth.Config{
-		Lookup: auth.PublicUserKeyService(),
-		AllowUnauthenticatedConnections: *noAuth,
-	})
-
-	http.HandleFunc("/put", ah.Handle(ss.putHandler))
-	http.HandleFunc("/get", ah.Handle(ss.getHandler))
-	http.HandleFunc("/delete", ah.Handle(ss.deleteHandler))
-
-	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := httpauth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
-		if err != nil {
-			log.Error.Fatal(err)
-		}
-		log.Println("Starting HTTPS server with SSL.")
-		log.Error.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
-	} else {
-		log.Println("Not using SSL certificate. Starting regular HTTP server.")
-		log.Error.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
-	}
+	return nil
 }
