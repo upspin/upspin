@@ -1,0 +1,17 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: gcr.io/PROJECT/frontend
+        ports:
+        - containerPort: 80
+        - containerPort: 443
