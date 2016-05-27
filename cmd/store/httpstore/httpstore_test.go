@@ -14,6 +14,7 @@ import (
 	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
 	"upspin.googlesource.com/upspin.git/cloud/netutil"
 	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
+	"upspin.googlesource.com/upspin.git/cmd/store"
 	"upspin.googlesource.com/upspin.git/cmd/store/cache"
 	"upspin.googlesource.com/upspin.git/upspin"
 )
@@ -56,22 +57,22 @@ func TestDeleteInvalidRequestType(t *testing.T) {
 }
 
 func TestGetInvalidReference(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"StoreService: get: not found"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"StoreService: Get: not found"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?ref=foofoo", nil)
 
 	ss := newStoreServer()
-	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: "does not match", Link: ""}
+	ss.store.CloudClient = &gcptest.ExpectGetGCP{Ref: "does not match", Link: ""}
 
 	ss.getHandler(session, resp, req)
 	resp.Verify(t)
 }
 
 func TestGetCrazyGCP(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"StoreService: get: invalid link returned from GCP: bad-url"}`)
+	resp := nettest.NewExpectingResponseWriter(`{"error":"StoreService: Get: invalid link returned from GCP: bad-url"}`)
 	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/get?ref=foofoo", nil)
 
 	ss := newStoreServer()
-	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: "foofoo", Link: "bad-url"}
+	ss.store.CloudClient = &gcptest.ExpectGetGCP{Ref: "foofoo", Link: "bad-url"}
 
 	ss.getHandler(session, resp, req)
 	resp.Verify(t)
@@ -100,7 +101,7 @@ func TestGetRemoteFile(t *testing.T) {
 	req := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8080/get?ref=%v", Ref), nil)
 
 	ss := newStoreServer()
-	ss.cloudClient = &gcptest.ExpectGetGCP{Ref: Ref, Link: RetLink}
+	ss.store.CloudClient = &gcptest.ExpectGetGCP{Ref: Ref, Link: RetLink}
 
 	ss.getHandler(session, resp, req)
 	resp.Verify(t)
@@ -169,9 +170,12 @@ func TestMain(m *testing.M) {
 	fileCache.Delete()
 }
 
-func newStoreServer() *storeServer {
-	return &storeServer{
-		cloudClient: &gcptest.DummyGCP{},
-		fileCache:   fileCache,
+func newStoreServer() *httpStoreServer {
+	storeServer := &store.Server{
+		CloudClient: &gcptest.DummyGCP{},
+		FileCache:   fileCache,
+	}
+	return &httpStoreServer{
+		store: storeServer,
 	}
 }
