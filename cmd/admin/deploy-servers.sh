@@ -180,6 +180,7 @@ function main {
     echo "Going to work the following servers: ${serverlist[@]}"
 
     gcloud config set project "$project"
+    gcloud config set compute/zone us-central1-c
     gcloud container clusters get-credentials cluster-1
 
     for server in "${serverlist[@]}"; do
