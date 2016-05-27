@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # Copyright 2016 The Upspin Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -14,61 +14,50 @@
 # -d deploy only -- does not rebuild servers.
 # -b build only -- does not deploy servers.
 # -r restarts only -- does not build nor deploy servers.
-# -t when deploying, deploy testing instances only.
-#    Only storeserver and dirserver available as testing.
-#    Does not affect the build command.
+# -p use production cluster (default is testing).
+
+# TODO(adg): requires cdbuild command right now
 
 errors=()
 root=""
 deployonly=0
 buildonly=0
 restartonly=0
-testing=""
+project="upspin-test"
 default_serverlist=(userserver dirserver storeserver frontend)
 
 # Builds the named binary statically.
 function build {
     server=$1
     pushd "$root/cmd/$server" >/dev/null
-    echo "=== Building $server ..."
-    runsafely env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "/tmp/$server"
+    echo "=== Building $server and pushing image to $project ..."
+    dir=$TMPDIR/$USER-upspin-frontend
+    mkdir $dir
+    sed 's/PROJECT/'$project'/' Dockerfile > $dir/Dockerfile
+    runsafely env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "$dir/$server"
+    (
+        set -e
+        cd $dir
+        cdbuild -project $project -name $server
+    )
+    rm -r $dir
     popd >/dev/null
 }
 
-# Deploys the named binary to GCE and restarts it.
+# Deploys the named service to the cluster and restart it.
 function deploy {
     server=$1
-    echo "=== Deploying $server$testing ..."
-    # Copy binary to GCE
-    runsafely scp "/tmp/$server" upspin.io:/tmp
-    # Stop service and move binary
-    stop "$server"
-    runsafely ssh upspin.io "sudo mv /tmp/$server /var/www/$server$testing; sudo chown www-data /var/www/$server$testing"
-    if [ "$server" == "frontend" ]; then
-        runsafely ssh upspin.io "cd /var/www; sudo setcap CAP_NET_BIND_SERVICE=+eip /var/www/frontend"
-    fi
-    start "$server"
+    echo "=== Deploying $server to $project ..."
+    sed 's/PROJECT/'$project'/' $root/cmd/admin/deployment/${server}.yaml | kubectl apply -f -
+    sed 's/PROJECT/'$project'/' $root/cmd/admin/service/${server}.yaml | kubectl apply -f -
+    restart $1
 }
 
-# Restarts a service on upspin.io
+# Restarts a service in the cluster.
 function restart {
     server=$1
-    stop "$server"
-    start "$server"
-}
-
-# Stops a service on upspin.io
-function stop {
-    server=$1
-     echo "Stopping service $server$testing"
-    runsafely ssh upspin.io "sudo supervisorctl stop upspin-$server$testing"
-}
-
-# Starts a stopped service on upspin.io
-function start {
-    server=$1
-     echo "Starting service $server$testing"
-    runsafely ssh upspin.io "sudo supervisorctl start upspin-$server$testing"
+    echo "=== Restarting $server in $project ..."
+    kubectl delete pods -l app=$server
 }
 
 # Finds the root of project upspin by looking in the current directory and in $GOPATH and puts it in $root
@@ -112,8 +101,8 @@ function main {
             -r|--restart-only)
             restartonly=1
             ;;
-            -t|--testing)
-            testing="-test"
+            -p|--prod)
+	    project="upspin-prod"
             ;;
             storeserver)
             serverlist[${#serverlist[*]}]="storeserver"
@@ -155,10 +144,6 @@ function main {
     echo "Going to work the following servers: ${serverlist[@]}"
 
     for server in "${serverlist[@]}"; do
-        if [[ $testing && ($server != "storeserver" && $server != "dirserver") ]]; then
-            echo "There is no testing instance for $server"
-            exit  # this could be a continue, but it's probably not what the user intended. Be safe.
-        fi
         if [ $restartonly == 1 ]; then
             restart $server
             continue
