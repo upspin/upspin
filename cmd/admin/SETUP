@@ -1,0 +1,94 @@
+This document describes how to set up an Upspin cluster on the Google Cloud Platform.
+
+- Create a Google Cloud Project: https://cloud.google.com/iam-admin/projects
+  - Make sure it has an associated Billing Account.
+
+- Enable the relevant APIs:
+  - Compute: https://cloud.google.com/apis/api/compute_component/overview
+  - Container: https://cloud.google.com/apis/api/container/overview
+  - Container Builder: https://cloud.google.com/apis/api/cloudbuild.googleapis.com/overview
+
+- Install the Google Cloud SDK: https://cloud.google.com/sdk/
+
+- Configure your the SDK tools to use your project:
+
+    $ gcloud config set project $PROJECT
+    $ gcloud auth login
+
+- Create Cloud Storage buckets: https://console.cloud.google.com/storage/browser
+
+    $PROJECT-directory
+    $PROJECT-letsencrypt
+    $PROJECT-store
+    $PROJECT-user
+
+- Create service account for accessing letsencrypt bucket.
+  - Visit: https://console.cloud.google.com/permissions/serviceaccounts
+  - Click 'Create service account'.
+  - Give it a name (eg "$PROJECT-letsencrypt").
+  - Check 'Furnish a new private key' (and leave 'Key type' as 'JSON').
+  - Click 'Create'.
+  - Put the downloaded private key somewhere safe and note its ID.
+
+- Configure the letsencrypt bucket to be owned by that service account.
+  - Visit https://console.cloud.google.com/storage/browser
+  - Click the icon to the right of the letsencrypt bucket, and click 'Edit bucket permissions'.
+  - Click 'Add item' and add a 'User' with the Service Account ID and 'Owner' permissions.
+  - Click 'Save'.
+
+- Create signed URLs for accessing letsencrypt credentials for each service,
+  where SERVICE is each of frontend, userserver, dirserver, storeserver.
+
+    $ gsutil signurl -m PUT -d 3650d <path-to-jsonkey> gs://$PROJECT-letsencrypt/$SERVICE.cache
+    $ gsutil signurl -m GET -d 3650d <path-to-jsonkey> gs://$PROJECT-letsencrypt/$SERVICE.cache
+
+  and store them in the global compute metadata,
+  
+    https://cloud.google.com/compute/metadata
+
+  under these keys:
+
+    letscloud-put-url-$SERVICE
+    letscloud-get-url-$SERVICE
+
+- Create a service account for accessing the directory and store buckets.
+  - Visit: https://console.cloud.google.com/permissions/serviceaccounts
+  - Click 'Create service account'.
+  - Give it a name (eg "$PROJECT-admin").
+  - Check 'Furnish a new private key' (and leave 'Key type' as 'JSON').
+  - Click 'Create'.
+  - Put the JSON key file in $HOME/upspin/deploy/$PROJECT/serviceaccountkey.json
+
+- Obtain and place the directory public and private keys in 
+    $HOME/upspin/deploy/$PROJECT/dirserver/
+  as public.upspinkey and secret.upspinkey.
+
+    TODO(adg): location of these keys? or create new ones?
+
+- Put an rc.dirserver in $HOME/upspin/deploy/$PROJECT/dirserver/
+
+    TODO(adg): this should relate to key generation in the previous step
+    TODO(adg): mention user= line once issue #1 is fixed
+
+- Create a Google Container Engine Cluster:
+
+    $ gcloud container clusters create <cluster-name>
+
+- Create static IP addresses for the services:
+
+    $ gcloud compute addresses create dirserver
+    $ gcloud compute addresses create frontend
+    $ gcloud compute addresses create storeserver
+    $ gcloud compute addresses create userserver
+
+  and put them in files in $HOME/upspin/deploy/$PROJECT/ip
+  named the same as the address name (and the service), eg:
+
+    $ echo a.b.c.d > $HOME/upspin/deploy/$PROJECT/ip/dirserver
+
+- Deploy the servers to the cluster:
+
+    $ ./deploy-servers.sh
+
+TODO:
+ generalize IP addresses
