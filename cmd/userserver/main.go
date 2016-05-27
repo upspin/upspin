@@ -7,10 +7,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"net"
-	"os"
-	"path/filepath"
+	"net/http"
 	"strings"
 
 	gContext "golang.org/x/net/context"
@@ -18,6 +15,7 @@ import (
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
+	"upspin.io/cloud/https"
 	"upspin.io/endpoint"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -28,11 +26,7 @@ import (
 )
 
 var (
-	port         = flag.Int("port", 5582, "TCP port number")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	selfSigned   = flag.Bool("selfsigned", false, "Start server with a self-signed TLS certificate")
-	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to TLS certificate file")
-	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to TLS certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options (key=value) for this server")
 	logFile      = flag.String("logfile", "userserver", "Name of the log file on GCP or empty for no GCP logging")
 )
@@ -54,11 +48,6 @@ func main() {
 
 	if *logFile != "" {
 		log.Connect("google.com:upspin", *logFile)
-	}
-
-	if *selfSigned {
-		*certFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem")
-		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
 	endpoint, err := endpoint.Parse(*endpointFlag)
@@ -98,21 +87,16 @@ func main() {
 		endpoint: *endpoint,
 		user:     user,
 	}
-	authConfig := auth.Config{
-		Lookup: s.internalLookup,
-		AllowUnauthenticatedConnections: *selfSigned,
-	}
-	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig, *certFile, *certKeyFile)
+	authConfig := auth.Config{Lookup: s.internalLookup}
+	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.SecureServer = grpcSecureServer
 	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-	if err != nil {
-		log.Fatal("listen error:", err)
-	}
-	grpcSecureServer.Serve(listener)
+
+	http.Handle("/", grpcSecureServer.GRPCServer())
+	https.ListenAndServe("userserver")
 }
 
 func (s *Server) internalLookup(userName upspin.UserName) ([]upspin.PublicKey, error) {

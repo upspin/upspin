@@ -1,0 +1,19 @@
+
+- Create a Google Cloud Project
+
+- Create a Google Container Engine Cluster
+
+- Create buckets
+
+    $PROJECT-user
+    $PROJECT-directory
+    $PROJECT-store
+    $PROJECT-letsencrypt
+
+- Create service account for accessing letsencrypt bucket
+
+- Create signed URLs for accessing letsencrypt credentials
+  and store them in the global compute metadata
+
+    gsutil signurl -m PUT -d 3650d <path-to-pubkey> gs://$PROJECT-letsencrypt/$SERVICE.cache
+    gsutil signurl -m GET -d 3650d <path-to-pubkey> gs://$PROJECT-letsencrypt/$SERVICE.cache
