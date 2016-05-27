@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_9b38af2c",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T03:00:31Z",
+      "side": 1,
+      "message": "Added a comment; they\u0027re the return values of reachableService.",
+      "parentUuid": "7c371b6c_7ef57f5b",
+      "revId": "824968c5be2caa8175a3e3e74c12e11db5e28372",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_9efe4344",
         "filename": "bind/bind.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_db2e27e7",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T03:00:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c371b6c_9efe4344",
+      "revId": "824968c5be2caa8175a3e3e74c12e11db5e28372",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_1e91d30b",
         "filename": "bind/bind.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-05-27T02:47:27Z",
       "side": 1,
       "message": "if ping failed, you\u0027ll leave a dial hanging that others might find and retry on, which seems wrong. ditt of err !\u003d nil. this is close but i think it leaves the system in a bad state if the dial fails with concurrent callers.\n\nif that\u0027s not true, this is still too complicated for me to understand.",
+      "revId": "824968c5be2caa8175a3e3e74c12e11db5e28372",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_5b43f7a6",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T03:00:31Z",
+      "side": 1,
+      "message": "See below. If err !\u003d nil (because either dial or ping failed), the bad service will never be added to the cache. I added some more comments.",
+      "parentUuid": "7c371b6c_1e91d30b",
       "revId": "824968c5be2caa8175a3e3e74c12e11db5e28372",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
