@@ -41,6 +41,11 @@ func main() {
 	flag.Parse()
 	log.Connect("google.com:upspin", "userserver")
 
+	if *noAuth {
+		*certFile = ""
+		*certKeyFile = ""
+	}
+
 	endpoint, err := endpoint.Parse(*endpointFlag)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)

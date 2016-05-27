@@ -1,5 +1,4 @@
 // Dirserver is a wrapper for a directory implementation that presents it as a Go net/rpc interface.
-// TODO: Switch to grpc one day.
 package main
 
 import (
@@ -61,6 +60,11 @@ type Server struct {
 func main() {
 	flag.Parse()
 	log.Connect("google.com:upspin", "storeserver")
+
+	if *noAuth {
+		*certFile = ""
+		*certKeyFile = ""
+	}
 
 	ctxfd, err := os.Open(*ctxfile)
 	if err != nil {
