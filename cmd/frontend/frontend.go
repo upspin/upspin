@@ -8,23 +8,15 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"log"
 	"net/http"
-)
 
-var (
-	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
-	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	"upspin.io/cloud/https"
 )
 
 func main() {
-	go func() {
-		log.Fatal(http.ListenAndServe(":80", http.RedirectHandler("https://upspin.io", http.StatusMovedPermanently)))
-	}()
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServeTLS(":443", *sslCertificateFile, *sslCertificateKeyFile, nil))
+	https.ListenAndServe("frontend")
 }
 
 const (
@@ -37,5 +29,5 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
 		return
 	}
-	http.FileServer(http.Dir("/var/www/public_root")).ServeHTTP(w, r)
+	w.Write([]byte("Hello, upspin"))
 }
