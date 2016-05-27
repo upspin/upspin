@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5c17b7d8_fb81abd9",
+        "filename": "bind/bind.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T03:38:48Z",
+      "side": 1,
+      "message": "I think I\u0027ve clarified it.",
+      "parentUuid": "7c371b6c_7e449f3a",
+      "revId": "e36e07cb35bb8b43f803799bc68036957bc16264",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c371b6c_fe6e6fb3",
         "filename": "bind/bind.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-27T03:32:16Z",
       "side": 1,
       "message": "this could and probably should go inside the loop. the structure will be simpler then.",
+      "revId": "e36e07cb35bb8b43f803799bc68036957bc16264",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c17b7d8_3b2163e7",
+        "filename": "bind/bind.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-27T03:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c371b6c_fe6e6fb3",
       "revId": "e36e07cb35bb8b43f803799bc68036957bc16264",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
