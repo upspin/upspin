@@ -7,14 +7,14 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
+	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -29,12 +29,9 @@ import (
 )
 
 var (
-	port        = flag.Int("port", 8080, "TCP port number for services")
-	ctxfile     = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.fileserver"), "context file to use to configure server")
-	selfSigned  = flag.Bool("selfsigned", false, "start server with a self-signed TLS certificate")
-	certFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "TLS certificate file")
-	certKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "TLS certificate key file")
-	root        = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
+	httpsAddr = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
+	ctxfile   = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.fileserver"), "context file to use to configure server")
+	root      = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
 )
 
 func main() {
@@ -45,11 +42,6 @@ func main() {
 	}
 	if !strings.HasSuffix(*root, "/") {
 		*root += "/"
-	}
-
-	if *selfSigned {
-		*certFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem")
-		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
@@ -63,35 +55,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	config := auth.Config{
-		Lookup: auth.PublicUserKeyService(),
-		AllowUnauthenticatedConnections: *selfSigned,
-	}
+	config := auth.Config{Lookup: auth.PublicUserKeyService()}
 
 	endpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(fmt.Sprintf("localhost:%d", *port)), // TODO: Should be domain name.
+		NetAddr:   upspin.NetAddr(*httpsAddr),
 	}
 
-	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
+	grpcSecureServer, err := grpcauth.NewSecureServer(config)
 	if err != nil {
 		log.Fatal(err)
 	}
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-	if err != nil {
-		log.Fatal(err)
-	}
+	grpcServer := grpcSecureServer.GRPCServer()
+	http.Handle("/", grpcServer)
 
 	storeServer := NewStoreServer(context, endpoint, grpcSecureServer)
-	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), storeServer)
+	proto.RegisterStoreServer(grpcServer, storeServer)
 
 	dirServer := NewDirServer(context, endpoint, grpcSecureServer)
-	proto.RegisterDirectoryServer(grpcSecureServer.GRPCServer(), dirServer)
+	proto.RegisterDirectoryServer(grpcServer, dirServer)
 
-	errChan := make(chan error)
-
-	go storeServer.Run(listener, errChan)
-	go dirServer.Run(listener, errChan)
-
-	log.Fatal(<-errChan)
+	https.ListenAndServe("fileserver", *httpsAddr, nil)
 }

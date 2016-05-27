@@ -5,8 +5,10 @@
 package grpcauth
 
 import (
+	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"testing"
 
@@ -14,6 +16,7 @@ import (
 
 	"upspin.io/auth"
 	prototest "upspin.io/auth/grpcauth/testdata"
+	"upspin.io/cloud/https"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
@@ -44,9 +47,8 @@ func lookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	return nil, errors.Str("No user here")
 }
 
-func pickPort() (listener net.Listener, port string) {
-	var err error
-	listener, err = net.Listen("tcp", "localhost:0")
+func pickPort() (port string) {
+	listener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
@@ -54,7 +56,8 @@ func pickPort() (listener net.Listener, port string) {
 	if err != nil {
 		log.Fatalf("Failed to parse listener address: %v", err)
 	}
-	return listener, port
+	listener.Close()
+	return port
 }
 
 func startServer() (port string) {
@@ -62,18 +65,18 @@ func startServer() (port string) {
 		Lookup: lookup,
 	}
 	var err error
-	grpcServer, err = NewSecureServer(config, "testdata/cert.pem", "testdata/key.pem")
+	grpcServer, err = NewSecureServer(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 	srv = &server{
 		SecureServer: grpcServer,
 	}
-	var listener net.Listener
-	listener, port = pickPort()
+	port = pickPort()
 	prototest.RegisterTestServiceServer(grpcServer.GRPCServer(), srv)
 	log.Printf("Starting e2e server on port %s", port)
-	go grpcServer.Serve(listener)
+	http.Handle("/", grpcServer.GRPCServer())
+	go https.ListenAndServe("test", fmt.Sprintf("localhost:%s", port), nil)
 	return port
 }
 
@@ -85,9 +88,6 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 	}
 	if session.User() != user {
 		s.t.Fatalf("Expected user %q, got %q", user, session.User())
-	}
-	if !session.IsAuthenticated() {
-		s.t.Fatalf("Expected authenticated session.")
 	}
 	if req.PeopleDemand == demands[s.iteration] {
 		resp := &prototest.DoATrumpResponse{
