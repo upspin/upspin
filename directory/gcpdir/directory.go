@@ -31,7 +31,7 @@ type Directory struct {
 	upspin.NoConfiguration
 	endpoint  upspin.Endpoint
 	serverURL string
-	client    netutil.HTTPClientInterface
+	client    netutil.HTTPClient
 	timeNow   func() upspin.Time
 }
 
@@ -41,7 +41,7 @@ var _ upspin.Directory = (*Directory)(nil)
 var zeroLoc upspin.Location
 
 // newDirectory returns a concrete implementation of Directory, pointing to a server at a given URL and port.
-func newDirectory(serverURL string, client netutil.HTTPClientInterface, timeFunc func() upspin.Time) *Directory {
+func newDirectory(serverURL string, client netutil.HTTPClient, timeFunc func() upspin.Time) *Directory {
 	if timeFunc == nil {
 		timeFunc = upspin.Now
 	}

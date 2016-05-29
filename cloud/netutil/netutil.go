@@ -9,43 +9,27 @@ import (
 	"net/http"
 )
 
+// HTTP header keys.
 const (
-	// Constants that may appear in HTTP headers:
-
-	// ContentType is the content type.
-	ContentType = "Content-Type"
-
-	// ContentLength is the content length.
+	ContentType   = "Content-Type"
 	ContentLength = "Content-Length"
+)
 
-	// HTTP Methods:
-
-	// Get is the GET method.
-	Get = "GET"
-
-	// Post is the POST method.
-	Post = "POST"
-
-	// Patch is the PATCH method.
-	Patch = "PATCH"
-
-	// Put is the PUT method.
-	Put = "PUT"
-
-	// Delete is the DELETE method.
+// HTTP methods.
+const (
+	Get    = "GET"
+	Post   = "POST"
+	Patch  = "PATCH"
+	Put    = "PUT"
 	Delete = "DELETE"
 )
 
-var (
-	// ErrTooLong is returned when a BufferResponse would not fit in the buffer budget.
-	ErrTooLong = errors.New("response body too long")
-)
+// ErrTooLong is returned when a BufferResponse would not fit in the buffer budget.
+var ErrTooLong = errors.New("response body too long")
 
-// TODO(edpin): Rename this to get rid of 'Interface'.
-
-// HTTPClientInterface is a minimal HTTP client interface. An instance of
+// HTTPClient is a minimal HTTP client interface. An instance of
 // http.Client implements this interface.
-type HTTPClientInterface interface {
+type HTTPClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 

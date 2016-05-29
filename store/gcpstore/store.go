@@ -27,7 +27,7 @@ const (
 type Store struct {
 	upspin.NoConfiguration
 	serverURL  string
-	httpClient netutil.HTTPClientInterface
+	httpClient netutil.HTTPClient
 }
 
 // Guarantee we implement the interface
@@ -36,7 +36,7 @@ var _ upspin.Store = (*Store)(nil)
 // New returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
 // Put requests on blocks of data. Use this only for testing.
-func New(serverURL string, httpClient netutil.HTTPClientInterface) *Store {
+func New(serverURL string, httpClient netutil.HTTPClient) *Store {
 	return &Store{
 		serverURL:  serverURL,
 		httpClient: httpClient,
