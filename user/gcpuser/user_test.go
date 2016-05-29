@@ -68,7 +68,7 @@ func TestLookup(t *testing.T) {
 	mock.Verify(t)
 }
 
-func getUserForTesting(mock netutil.HTTPClientInterface) *user {
+func getUserForTesting(mock netutil.HTTPClient) *user {
 	return &user{
 		serverURL:  location,
 		httpClient: mock,
