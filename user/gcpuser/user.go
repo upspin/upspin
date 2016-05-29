@@ -20,7 +20,7 @@ type user struct {
 	upspin.NoConfiguration
 	endpoint   upspin.Endpoint
 	serverURL  string
-	httpClient netutil.HTTPClientInterface
+	httpClient netutil.HTTPClient
 }
 
 var _ upspin.User = (*user)(nil)

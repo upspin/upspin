@@ -18,7 +18,7 @@ import (
 // decrease its performance.
 type HTTPClient struct {
 	// The underlying HTTP client
-	client netutil.HTTPClientInterface
+	client netutil.HTTPClient
 
 	// Protects all fields below from concurrent access (client does not need locking).
 	sync.Mutex
@@ -39,7 +39,7 @@ type HTTPClient struct {
 	factotum upspin.Factotum
 }
 
-var _ netutil.HTTPClientInterface = (*HTTPClient)(nil)
+var _ netutil.HTTPClient = (*HTTPClient)(nil)
 
 const (
 	// AuthIntervalSec is the maximum allowed time between unauthenticated requests to the same server.
@@ -52,7 +52,7 @@ var (
 )
 
 // NewClient returns a new HTTPClient that handles auth for the named user and underlying HTTP client.
-func NewClient(user upspin.UserName, factotum upspin.Factotum, httClient netutil.HTTPClientInterface) *HTTPClient {
+func NewClient(user upspin.UserName, factotum upspin.Factotum, httClient netutil.HTTPClient) *HTTPClient {
 	return &HTTPClient{
 		user:     user,
 		factotum: factotum,
@@ -62,7 +62,7 @@ func NewClient(user upspin.UserName, factotum upspin.Factotum, httClient netutil
 
 // NewAnonymousClient returns a new HTTPClient that does not yet know about the user name.
 // To complete setup, use SetUserName and SetUserKeys.
-func NewAnonymousClient(httClient netutil.HTTPClientInterface) *HTTPClient {
+func NewAnonymousClient(httClient netutil.HTTPClient) *HTTPClient {
 	return &HTTPClient{
 		client: httClient,
 	}
