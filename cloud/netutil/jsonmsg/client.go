@@ -1,7 +1,7 @@
-// Package jsonmsg handles marshaling and unmarshaling Upspin data structures to and from JSON.
-// The goal of this package is two-fold:
-// 1) hide types that only exist on the wire and
-// 2) make so that JSON replies from the server can be as "strongly typed" as JSON can be.
+// Package jsonmsg handles marshaling and unmarshaling Upspin data structures
+// to and from JSON. The goal of this package is to hide types that only exist
+// on the wire and to make it so that JSON replies from the server can be as
+// "strongly typed" as JSON can be.
 package jsonmsg
 
 import (
