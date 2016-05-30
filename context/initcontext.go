@@ -1,4 +1,4 @@
-//Package context creates a client context from various sources.
+// Package context creates a client context from various sources.
 package context
 
 import (
@@ -17,8 +17,19 @@ import (
 	"upspin.googlesource.com/upspin.git/upspin"
 )
 
-// InitContext returns a context generated from configuration files and environment variables.
-// If passed a non-nil io.Reader, that is used instead of the default files.
+// InitContext returns a context generated from a configuration file and/or
+// environment variables.
+//
+// The default configuration file location is $HOME/upspin/rc.
+// If passed a non-nil io.Reader, that is used instead of the default file.
+// The upspinuser, upspindirectory, upspinstore, and upspinpacking environment
+// variables specify the user, directory, store, and packing, and will override
+// values in the provided reader or default rc file.
+//
+// A configuration file should be of the format
+//   # lines that begin with a hash are ignored
+//   key = value
+// where key may be one of user, directory, store, or packing.
 func InitContext(r io.Reader) (*upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{"name": "noone@nowhere.org",
