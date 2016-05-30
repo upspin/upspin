@@ -169,7 +169,7 @@ func TestAll(t *testing.T) {
 		t.Fatalf("Programmer error. Make at least one demand!")
 	}
 	for i := range demands {
-		t.Log("Calling Trump: %d", i)
+		t.Logf("Calling Trump: %d", i)
 		response := cli.TellTrump(t, demands[i])
 		if expectedResponses[i] != response {
 			t.Errorf("Demand %d: Expected response %q, got %q", i, expectedResponses[i], response)
