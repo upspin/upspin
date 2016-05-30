@@ -22,6 +22,24 @@
       "revId": "6f42888ebfab6c11feac480bfa34ea0f29e55f28",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c65afc6_5a4d75cf",
+        "filename": "cloud/netutil/jsonmsg/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-30T01:33:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc9cebd9_e74cbe91",
+      "revId": "6f42888ebfab6c11feac480bfa34ea0f29e55f28",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
