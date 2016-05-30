@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc9cebd9_e74cbe91",
+        "filename": "cloud/netutil/jsonmsg/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-05-30T01:27:08Z",
+      "side": 1,
+      "message": "how about \"to strongly type JSON server replies to the extent possible.\"",
+      "range": {
+        "startLine": 3,
+        "startChar": 19,
+        "endLine": 5,
+        "endChar": 15
+      },
+      "revId": "6f42888ebfab6c11feac480bfa34ea0f29e55f28",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
