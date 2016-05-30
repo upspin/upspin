@@ -34,6 +34,24 @@
       "revId": "ecef68bcf4b79ddd2008b0667d97390623eb57cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc9cebd9_270d2632",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-05-30T03:42:05Z",
+      "side": 1,
+      "message": "Okay, so I see what you mean about the other servers sharing the certs.\nWe\u0027ll need to devise a better plan for sharing the certs with the other services.\nThe rsc.io/letsencrypt package in its current form does not expect to share\nthat data with others, so a bit of custom work will be involved.",
+      "parentUuid": "7c371b6c_a471b6fd",
+      "revId": "ecef68bcf4b79ddd2008b0667d97390623eb57cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
