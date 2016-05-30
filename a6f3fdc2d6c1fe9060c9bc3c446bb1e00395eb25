@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc9cebd9_e7bcbee7",
+        "filename": "cloud/netutil/netutil.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-30T16:58:25Z",
+      "side": 1,
+      "message": "This comment should start with \"HTTPClient ...\"",
+      "revId": "a6f3fdc2d6c1fe9060c9bc3c446bb1e00395eb25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
