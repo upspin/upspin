@@ -266,7 +266,7 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 		n.f.addUserDir(req.Name)
 	}
 	nn.exists()
-	log.Debug.Printf("Mkdir %q in %q returns", req.Name, n, nn)
+	log.Debug.Printf("Mkdir %q in %q returns %q", req.Name, n, nn)
 	return nn, nil
 }
 

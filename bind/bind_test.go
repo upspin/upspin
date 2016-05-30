@@ -148,7 +148,7 @@ func TestConcurrency(t *testing.T) {
 	wg.Wait()
 
 	if n := len(inflightDials); n != 0 {
-		t.Error("len(inflightDials) == %v, want 0", n)
+		t.Errorf("len(inflightDials) == %v, want 0", n)
 	}
 }
 
