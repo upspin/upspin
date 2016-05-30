@@ -3,8 +3,8 @@ package main
 import (
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/client"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/client"
+	"upspin.io/upspin"
 )
 
 type directoryCache struct {

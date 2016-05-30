@@ -6,13 +6,13 @@ import (
 	"math/rand"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
+	"upspin.io/bind"
+	"upspin.io/upspin"
+	"upspin.io/user/testuser"
 
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/pack/debug"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/directory/testdir"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/store/teststore"
 )
 
 // TODO: Copied from testdirectory/all_test.go. Make this publicly available.

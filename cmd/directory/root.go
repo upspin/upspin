@@ -5,11 +5,11 @@ package main
 import (
 	"encoding/json"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/auth"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 // root is the user's directory root. It contains server annotations for performance and correctness.

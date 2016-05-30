@@ -13,10 +13,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"upspin.googlesource.com/upspin.git/cmd/keygen/proquint"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/pack/ee"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cmd/keygen/proquint"
+	"upspin.io/pack"
+	"upspin.io/pack/ee"
+	"upspin.io/upspin"
 )
 
 var (

@@ -3,10 +3,10 @@ package testenv
 import (
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/directory/testdir"
-	_ "upspin.googlesource.com/upspin.git/store/teststore"
+	_ "upspin.io/directory/testdir"
+	_ "upspin.io/store/teststore"
 )
 
 func TestInProcess(t *testing.T) {

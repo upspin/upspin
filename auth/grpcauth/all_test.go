@@ -10,11 +10,11 @@ import (
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/grpcauth"
-	prototest "upspin.googlesource.com/upspin.git/auth/grpcauth/testdata"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/auth/grpcauth"
+	prototest "upspin.io/auth/grpcauth/testdata"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 )
 
 var (

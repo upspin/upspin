@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/auth/httpauth"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth/httpauth"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/upspin"
 )
 
 const (

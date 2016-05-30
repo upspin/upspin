@@ -3,8 +3,8 @@ package debugpack
 import (
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/pack"
+	"upspin.io/upspin"
 )
 
 var (

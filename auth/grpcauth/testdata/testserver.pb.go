@@ -17,7 +17,7 @@ package prototest
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import proto1 "upspin.googlesource.com/upspin.git/upspin/proto"
+import proto1 "upspin.io/upspin/proto"
 
 import (
 	context "golang.org/x/net/context"

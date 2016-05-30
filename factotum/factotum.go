@@ -11,9 +11,9 @@ import (
 	"math/big"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/log"
+	"upspin.io/pack"
+	"upspin.io/upspin"
 )
 
 var sig0 upspin.Signature // for returning nil

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/nettest"
 )
 
 func TestSendJSONErrorString(t *testing.T) {

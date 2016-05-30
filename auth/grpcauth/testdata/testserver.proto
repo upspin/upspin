@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prototest;
 
-import "upspin.googlesource.com/upspin.git/upspin/proto/upspin.proto";
+import "upspin.io/upspin/proto/upspin.proto";
 
 message DoATrumpRequest {
     string people_demand = 1;

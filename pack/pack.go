@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 var (

@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cache"
+	"upspin.io/cache"
 )
 
 func TestLRU(t *testing.T) {

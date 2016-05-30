@@ -7,13 +7,13 @@ import (
 	"log"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/client"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/pack/ee"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/user/testuser"
+	"upspin.io/bind"
+	"upspin.io/client"
+	"upspin.io/factotum"
+	"upspin.io/pack/ee"
+	"upspin.io/path"
+	"upspin.io/upspin"
+	"upspin.io/user/testuser"
 )
 
 // Entry is an entry in the Upspin namespace.

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 // Service maps user names to potential machines holding root of the user's tree.

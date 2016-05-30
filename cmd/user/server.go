@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/auth/httpauth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth/httpauth"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 // userServer is the implementation of the User Service on GCP.

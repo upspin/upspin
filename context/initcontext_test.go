@@ -8,12 +8,12 @@ import (
 	"sync"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/pack"
-	_ "upspin.googlesource.com/upspin.git/pack/ee"
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/endpoint"
+	"upspin.io/pack"
+	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
+	"upspin.io/upspin"
 )
 
 var once sync.Once
