@@ -28,7 +28,7 @@ function build {
     server=$1
     pushd "$root/cmd/$server" >/dev/null
     echo "=== Building $server ..."
-    runsafely env CGO_ENABLED=0 go build -v -o "/tmp/$server"
+    runsafely env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "/tmp/$server"
     popd >/dev/null
 }
 
@@ -40,7 +40,7 @@ function deploy {
     runsafely scp "/tmp/$server" upspin.io:/tmp
     # Stop service and move binary
     stop "$server"
-    runsafely ssh upspin.io "sudo cp /tmp/$server /var/www/$server$testing"
+    runsafely ssh upspin.io "sudo mv /tmp/$server /var/www/$server$testing"
     if [ "$server" == "frontend" ]; then
         runsafely ssh upspin.io "cd /var/www; sudo setcap CAP_NET_BIND_SERVICE=+eip /var/www/frontend"
     fi
