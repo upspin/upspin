@@ -124,7 +124,7 @@ func (d *Directory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
 }
 
 // storeDirEntry stores the given dirEntry in the server by applying an HTTP method (POST or PATCH accepted by server).
-func (d *Directory) storeDirEntry(op string, HTTPMethod string, dirEntry *upspin.DirEntry) error {
+func (d *Directory) storeDirEntry(op string, httpMethod string, dirEntry *upspin.DirEntry) error {
 	name := dirEntry.Name
 	// Encode dirEntry as JSON
 	dirEntryJSON, err := json.Marshal(dirEntry)
@@ -133,7 +133,7 @@ func (d *Directory) storeDirEntry(op string, HTTPMethod string, dirEntry *upspin
 	}
 
 	// Prepare a put request to the server
-	req, err := http.NewRequest(HTTPMethod, fmt.Sprintf("%s/dir/%s", d.serverURL, dirEntry.Name), bytes.NewBuffer(dirEntryJSON))
+	req, err := http.NewRequest(httpMethod, fmt.Sprintf("%s/dir/%s", d.serverURL, dirEntry.Name), bytes.NewBuffer(dirEntryJSON))
 	if err != nil {
 		return newError(op, name, err)
 	}
