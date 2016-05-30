@@ -198,7 +198,7 @@ const (
 	// EEp521Pack uses AES-256, SHA-512, and curve P521; strength 256.
 	EEp521Pack Packing = 17
 	// Ed25519Pack is a TODO packer
-	Ed25519Pack Packing = 19 // TODO(ehg) x/crytpo/curve25519, github.com/agl/ed25519
+	Ed25519Pack Packing = 19 // TODO(ehg) x/crypto/curve25519, github.com/agl/ed25519
 )
 
 // User service.
