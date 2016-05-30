@@ -3,7 +3,7 @@ package path
 import (
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 type parseTest struct {

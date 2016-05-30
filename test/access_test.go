@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/test/testenv"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/pack"
+	"upspin.io/test/testenv"
+	"upspin.io/upspin"
 )
 
 // p256 keys

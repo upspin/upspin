@@ -9,16 +9,16 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/grpcauth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cmd/store"
-	"upspin.googlesource.com/upspin.git/cmd/store/cache"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/upspin/proto"
+	"upspin.io/auth"
+	"upspin.io/auth/grpcauth"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cmd/store"
+	"upspin.io/cmd/store/cache"
+	"upspin.io/log"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/user/gcpuser"
 )
 
 var (

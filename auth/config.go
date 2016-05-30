@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/bind"
+	"upspin.io/upspin"
 )
 
 // Config holds the configuration parameters for instantiating a server (HTTP or gRPC).

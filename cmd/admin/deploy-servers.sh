@@ -70,7 +70,7 @@ function start {
 
 # Finds the root of project upspin by looking in the current directory and in $GOPATH and puts it in $root
 function find_root {
-    local test_dir="$GOPATH/src/upspin.googlesource.com/upspin.git"
+    local test_dir="$GOPATH/src/upspin.io"
     if [ -f "$test_dir/upspin/upspin.go" ]; then
         root=$test_dir
     elif [ -f "../../upspin/upspin.go" ]; then

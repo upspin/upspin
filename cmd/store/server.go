@@ -10,11 +10,11 @@ import (
 	"os"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cmd/store/cache"
-	"upspin.googlesource.com/upspin.git/key/sha256key"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cmd/store/cache"
+	"upspin.io/key/sha256key"
+	"upspin.io/log"
+	"upspin.io/upspin"
 )
 
 // Common variables uses by all implementations of store.Server.

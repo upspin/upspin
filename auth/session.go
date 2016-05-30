@@ -3,8 +3,8 @@ package auth
 import (
 	"time"
 
-	"upspin.googlesource.com/upspin.git/cache"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cache"
+	"upspin.io/upspin"
 )
 
 // Session contains information about the connection and the authenticated user, if any.

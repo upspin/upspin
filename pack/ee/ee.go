@@ -24,11 +24,11 @@ import (
 
 	"golang.org/x/crypto/hkdf"
 
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/factotum"
+	"upspin.io/log"
+	"upspin.io/pack"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 // wrappedKey encodes a key that will decrypt and verify the ciphertext.

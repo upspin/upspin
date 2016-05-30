@@ -5,10 +5,10 @@ package main
 import (
 	"errors"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
 )
 
 // updateAccess handles fetching and parsing a new or updated Access file and caches its parsed representation in root.accessFiles.

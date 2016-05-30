@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 // maxInt is the int64 representation of the maximum value of an int.

@@ -3,7 +3,7 @@ package main
 import (
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 const (

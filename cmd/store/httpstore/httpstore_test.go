@@ -10,13 +10,13 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth/testauth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	"upspin.googlesource.com/upspin.git/cmd/store"
-	"upspin.googlesource.com/upspin.git/cmd/store/cache"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth/testauth"
+	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/nettest"
+	"upspin.io/cmd/store"
+	"upspin.io/cmd/store/cache"
+	"upspin.io/upspin"
 )
 
 const (

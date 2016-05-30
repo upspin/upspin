@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cloud/gcp/gcptest"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
+	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/nettest"
 )
 
 const (

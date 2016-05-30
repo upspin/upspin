@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/netutil"
+	"upspin.io/upspin"
 )
 
 // HTTPClient is a thin wrapper around a standard HTTP Client that implements authentication transparently. It caches state

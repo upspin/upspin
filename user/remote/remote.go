@@ -10,10 +10,10 @@ import (
 	gContext "golang.org/x/net/context"
 
 	"google.golang.org/grpc"
-	"upspin.googlesource.com/upspin.git/auth/grpcauth"
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/upspin/proto"
+	"upspin.io/auth/grpcauth"
+	"upspin.io/bind"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 )
 
 // requireAuthentication specifies whether the connection demands TLS.

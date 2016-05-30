@@ -9,8 +9,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/pack"
+	"upspin.io/upspin"
 )
 
 // drng is an io.Reader returning deterministic random bits seeded from aesKey.

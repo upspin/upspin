@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	"google.golang.org/grpc/metadata"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
-	"upspin.googlesource.com/upspin.git/upspin/proto"
+	"upspin.io/log"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 )
 
 // GRPCCommon is an interface that all GRPC services implement for authentication and ping as part of upspin.Service.

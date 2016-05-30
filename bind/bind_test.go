@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 func TestSwitch(t *testing.T) {

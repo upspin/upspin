@@ -12,10 +12,10 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/httpauth"
-	"upspin.googlesource.com/upspin.git/factotum"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/auth/httpauth"
+	"upspin.io/factotum"
+	"upspin.io/upspin"
 )
 
 var (

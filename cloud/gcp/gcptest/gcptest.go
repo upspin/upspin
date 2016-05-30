@@ -4,7 +4,7 @@ package gcptest
 import (
 	"errors"
 
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
+	"upspin.io/cloud/gcp"
 )
 
 // DummyGCP is a dummy version of gcp.GCP that does nothing.

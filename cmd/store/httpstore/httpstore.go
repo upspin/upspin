@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"upspin.googlesource.com/upspin.git/auth"
-	"upspin.googlesource.com/upspin.git/auth/httpauth"
-	"upspin.googlesource.com/upspin.git/cloud/gcp"
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/jsonmsg"
-	"upspin.googlesource.com/upspin.git/cmd/store"
-	"upspin.googlesource.com/upspin.git/cmd/store/cache"
-	"upspin.googlesource.com/upspin.git/log"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/auth"
+	"upspin.io/auth/httpauth"
+	"upspin.io/cloud/gcp"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/jsonmsg"
+	"upspin.io/cmd/store"
+	"upspin.io/cmd/store/cache"
+	"upspin.io/log"
+	"upspin.io/upspin"
 
-	_ "upspin.googlesource.com/upspin.git/user/gcpuser"
+	_ "upspin.io/user/gcpuser"
 )
 
 const (

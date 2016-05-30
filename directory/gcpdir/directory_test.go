@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/cloud/netutil"
-	"upspin.googlesource.com/upspin.git/cloud/netutil/nettest"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/cloud/netutil"
+	"upspin.io/cloud/netutil/nettest"
+	"upspin.io/upspin"
 )
 
 const (

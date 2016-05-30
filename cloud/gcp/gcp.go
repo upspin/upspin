@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
 
-	"upspin.googlesource.com/upspin.git/log"
+	"upspin.io/log"
 )
 
 const (

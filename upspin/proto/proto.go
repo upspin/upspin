@@ -5,7 +5,7 @@ package proto
 import (
 	"errors"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 // To regenerate the protocol buffer output for this package, run

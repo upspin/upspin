@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 // Parse a string representation into an endpoint.

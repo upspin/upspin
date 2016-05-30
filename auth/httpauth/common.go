@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"sort"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 const (

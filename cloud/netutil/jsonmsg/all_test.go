@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.googlesource.com/upspin.git/endpoint"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/endpoint"
+	"upspin.io/upspin"
 )
 
 const (

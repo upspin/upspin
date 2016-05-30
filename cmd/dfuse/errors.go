@@ -6,7 +6,7 @@ import (
 
 	"github.com/presotto/fuse"
 
-	"upspin.googlesource.com/upspin.git/log"
+	"upspin.io/log"
 )
 
 // upspinError is an error string with a POSIX syscall error number.

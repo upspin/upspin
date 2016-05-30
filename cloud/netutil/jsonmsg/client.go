@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/upspin"
 )
 
 var (

@@ -11,14 +11,14 @@ import (
 	"strings"
 	"sync"
 
-	"upspin.googlesource.com/upspin.git/access"
-	"upspin.googlesource.com/upspin.git/bind"
-	"upspin.googlesource.com/upspin.git/pack"
-	"upspin.googlesource.com/upspin.git/path"
-	"upspin.googlesource.com/upspin.git/upspin"
+	"upspin.io/access"
+	"upspin.io/bind"
+	"upspin.io/pack"
+	"upspin.io/path"
+	"upspin.io/upspin"
 
 	// Imported because it's used to pack dir entries.
-	_ "upspin.googlesource.com/upspin.git/pack/plain"
+	_ "upspin.io/pack/plain"
 )
 
 // Used to store directory entries.
