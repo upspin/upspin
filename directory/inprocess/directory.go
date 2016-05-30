@@ -1,5 +1,5 @@
-// Package testdir implements a simple, non-persistent, in-memory directory service.
-package testdir
+// Package inprocess implements a simple, non-persistent, in-memory directory service.
+package inprocess
 
 import (
 	"errors"
@@ -288,7 +288,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 
 // MakeDirectory implements upspin.Directory.MakeDirectory.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
-	log.Printf("testdir MakeDirectory %q", directoryName)
+	log.Printf("directory/inprocess MakeDirectory %q", directoryName)
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
 	parsed, err := path.Parse(directoryName)
@@ -811,13 +811,13 @@ func (s *Service) ServerUserName() string {
 // requires that the transport be InProcess.
 func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
-		return nil, errors.New("testdir: unrecognized transport")
+		return nil, errors.New("directory/inprocess: unrecognized transport")
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
 	if s.db.serviceOwner == "" {
 		if context.UserName == "" {
-			return nil, errors.New("testdir: no user name set in Dial")
+			return nil, errors.New("directory/inprocess: no user name set in Dial")
 		}
 		// This is the first call; set the owner and endpoint.
 		s.db.endpoint = e

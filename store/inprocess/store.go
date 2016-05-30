@@ -1,5 +1,5 @@
-// Package teststore implements a simple non-persistent in-memory store service.
-package teststore
+// Package inprocess implements a simple non-persistent in-memory store service.
+package inprocess
 
 import (
 	"errors"
@@ -86,7 +86,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 
 // ServerUserName implements upspin.service.
 func (s *service) ServerUserName() string {
-	return "testuser"
+	return "inprocess"
 }
 
 // Dial always returns an authenticated instance to the underlying service.
@@ -95,7 +95,7 @@ func (s *service) ServerUserName() string {
 // TODO: Authenticate the caller.
 func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
-		return nil, errors.New("teststore: unrecognized transport")
+		return nil, errors.New("store/inprocess: unrecognized transport")
 	}
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()

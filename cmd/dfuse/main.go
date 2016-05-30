@@ -12,18 +12,17 @@ import (
 	"upspin.io/context"
 	"upspin.io/log"
 	"upspin.io/upspin"
-	"upspin.io/user/testuser"
+	"upspin.io/user/inprocess"
 	"upspin.io/user/usercache"
 
 	_ "upspin.io/directory/gcpdir"
+	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/directory/remote"
-	_ "upspin.io/directory/testdir"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
-	_ "upspin.io/store/teststore"
-	_ "upspin.io/user/gcpuser"
 )
 
 var (
@@ -65,9 +64,9 @@ func main() {
 
 	// Hack for testing
 	if *testFlag != "" {
-		testUser, ok := context.User.(*testuser.Service)
+		testUser, ok := context.User.(*inprocess.Service)
 		if !ok {
-			log.Debug.Fatal("Not a testuser Service")
+			log.Debug.Fatal("Not a inprocess.Service")
 		}
 
 		if err := testUser.Install(upspin.UserName(*testFlag), context.Directory); err != nil {

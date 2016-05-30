@@ -1,4 +1,4 @@
-package testuser
+package inprocess
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	"upspin.io/bind"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/testdir"
+	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/pack/debug"
-	_ "upspin.io/store/teststore"
+	_ "upspin.io/store/inprocess"
 )
 
 var (
@@ -44,7 +44,7 @@ func TestInstallAndLookup(t *testing.T) {
 	u, ctxt := setup(t)
 	testUser, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not a testuser Service")
+		t.Fatal("Not an inprocess User Service")
 	}
 
 	err := testUser.Install(userName, ctxt.Directory)
@@ -70,7 +70,7 @@ func TestPublicKeysAndUsers(t *testing.T) {
 	u, _ := setup(t)
 	testUser, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not a testuser Service")
+		t.Fatal("Not an inprocess User Service")
 	}
 	const testKey = "pub key1"
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{
@@ -110,7 +110,7 @@ func TestSafety(t *testing.T) {
 	u, _ := setup(t)
 	testUser, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not a testuser Service")
+		t.Fatal("Not an inprocess User Service")
 	}
 	const testKey = "pub key2"
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{

@@ -10,11 +10,11 @@ import (
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/testdir"
+	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/teststore"
+	_ "upspin.io/store/inprocess"
 )
 
 // These variables and consts are used by access_test and integration_test. Don't change them here without updating

@@ -31,9 +31,9 @@ import (
 	_ "upspin.io/user/gcpuser"
 
 	// Load required test services
-	_ "upspin.io/directory/testdir"
-	_ "upspin.io/store/teststore"
-	_ "upspin.io/user/testuser"
+	_ "upspin.io/directory/inprocess"
+	_ "upspin.io/store/inprocess"
+	_ "upspin.io/user/inprocess"
 
 	// Load required remote services
 	_ "upspin.io/directory/remote"
