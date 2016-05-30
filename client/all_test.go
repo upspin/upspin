@@ -8,14 +8,14 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/upspin"
-	"upspin.io/user/testuser"
+	"upspin.io/user/inprocess"
 
-	_ "upspin.io/directory/testdir"
+	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/pack/debug"
-	_ "upspin.io/store/teststore"
+	_ "upspin.io/store/inprocess"
 )
 
-// TODO: Copied from testdirectory/all_test.go. Make this publicly available.
+// TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.
 
 func newContext(name upspin.UserName) *upspin.Context {
 	endpoint := upspin.Endpoint{
@@ -46,12 +46,12 @@ func newContext(name upspin.UserName) *upspin.Context {
 
 func setup(userName upspin.UserName) *upspin.Context {
 	context := newContext(userName)
-	err := context.User.(*testuser.Service).Install(userName, context.Directory)
+	err := context.User.(*inprocess.Service).Install(userName, context.Directory)
 	if err != nil {
 		panic(err)
 	}
 	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
-	context.User.(*testuser.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
+	context.User.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 	return context
 }
 

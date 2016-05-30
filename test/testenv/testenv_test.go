@@ -5,8 +5,8 @@ import (
 
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/testdir"
-	_ "upspin.io/store/teststore"
+	_ "upspin.io/directory/inprocess"
+	_ "upspin.io/store/inprocess"
 )
 
 func TestInProcess(t *testing.T) {

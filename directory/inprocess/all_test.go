@@ -1,4 +1,4 @@
-package testdir
+package inprocess
 
 // This test uses an in-process Store service for the underlying
 // storage. To run this test against a GCP Store, start a GCP store
@@ -17,11 +17,11 @@ import (
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
-	"upspin.io/user/testuser"
+	"upspin.io/user/inprocess"
 
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/gcpstore"
-	_ "upspin.io/store/teststore"
+	_ "upspin.io/store/inprocess"
 )
 
 var (
@@ -71,12 +71,12 @@ func newContext(name upspin.UserName) *upspin.Context {
 
 func setup(userName upspin.UserName) *upspin.Context {
 	context := newContext(userName)
-	err := context.User.(*testuser.Service).Install(userName, context.Directory)
+	err := context.User.(*inprocess.Service).Install(userName, context.Directory)
 	if err != nil {
 		panic(err)
 	}
 	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
-	context.User.(*testuser.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
+	context.User.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 	return context
 }
 

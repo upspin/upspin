@@ -18,8 +18,8 @@ import (
 
 	// Load required services
 	_ "upspin.io/user/gcpuser"
+	_ "upspin.io/user/inprocess"
 	_ "upspin.io/user/remote"
-	_ "upspin.io/user/testuser"
 )
 
 var (

@@ -13,7 +13,7 @@ import (
 	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
-	"upspin.io/user/testuser"
+	"upspin.io/user/inprocess"
 )
 
 // Entry is an entry in the Upspin namespace.
@@ -236,7 +236,7 @@ func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the testuser service, creates a new key for the user based on
+// newContextForUser adds a new user to the inprocess user service, creates a new key for the user based on
 // the chosen packing type and returns a partially filled Context.
 func newContextForUser(userName upspin.UserName, packing upspin.Packing) (*upspin.Context, error) {
 	entropy := make([]byte, 32) // Enough for p521
@@ -256,7 +256,7 @@ func newContextForUser(userName upspin.UserName, packing upspin.Packing) (*upspi
 	return newContextForUserWithKey(userName, keyPair, packing)
 }
 
-// newContextForUserWithKey adds a new user to the testuser service and returns a Context partially filled with user,
+// newContextForUserWithKey adds a new user to the inprocess user service and returns a Context partially filled with user,
 // key and packing type as given.
 func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing) (*upspin.Context, error) {
 	context := &upspin.Context{
@@ -272,7 +272,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 	if err != nil {
 		return nil, err
 	}
-	testUser, ok := user.(*testuser.Service)
+	testUser, ok := user.(*inprocess.Service)
 	if !ok {
 		return nil, errors.New("user service must be the in-process instance")
 	}
@@ -287,7 +287,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 
 // installUserRoot installs a root dir for the user in the context, but does not create the root dir.
 func installUserRoot(context *upspin.Context) error {
-	testUser, ok := context.User.(*testuser.Service)
+	testUser, ok := context.User.(*inprocess.Service)
 	if !ok {
 		return errors.New("installUserRoot: user service must be the in-process instance")
 	}

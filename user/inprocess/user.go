@@ -1,5 +1,5 @@
-// Package testuser implements a non-persistent, memory-resident user service.
-package testuser
+// Package inprocess implements a non-persistent, memory-resident user service.
+package inprocess
 
 import (
 	"errors"
@@ -85,7 +85,7 @@ func validateUserName(name upspin.UserName) (*path.Parsed, error) {
 		return nil, err
 	}
 	if !parsed.IsRoot() {
-		return nil, fmt.Errorf("testuser: %q not a user name", name)
+		return nil, fmt.Errorf("inprocess-user: %q not a user name", name)
 	}
 	return &parsed, nil
 }
@@ -134,14 +134,14 @@ func (s *Service) Endpoint() upspin.Endpoint {
 
 // ServerUserName implements upspin.service.
 func (s *Service) ServerUserName() string {
-	return "testuser"
+	return "inprocess"
 }
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
 func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
-		return nil, errors.New("testuser: unrecognized transport")
+		return nil, errors.New("user/inprocess: unrecognized transport")
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
