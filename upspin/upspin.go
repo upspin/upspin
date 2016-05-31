@@ -30,6 +30,10 @@ const (
 	// Remote indicates a connection to a remote server through RPC.
 	// The Endpoint's NetAddr contains the HTTP address of the remote server.
 	Remote
+
+	// HTTPS indicates that contents are stored at regular web services that
+	// speak the HTTPS protocol.
+	HTTPS
 )
 
 // A Location identifies where a piece of data is stored and how to retrieve it.
