@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59b509ab_cbf48997",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T23:41:53Z",
+      "side": 1,
+      "message": "needs a comment. also see naming issue in other server file.",
+      "revId": "56e05e430e0502e4b966bc35df4170e26476d00f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_ebc86d62",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T23:41:53Z",
+      "side": 1,
+      "message": "when you build this package, it will be called server because that\u0027s what the directory name is. that\u0027s the rule for mains.\n\nbut you will have store and directory and user servers. you need a naming convention, like gcpstore, gcpdir, etc.",
+      "revId": "56e05e430e0502e4b966bc35df4170e26476d00f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
