@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/factotum"
 	"upspin.io/pack"
+	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 )
 
@@ -300,6 +301,7 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 
 // dummyUser is a User service that returns a key for a given user.
 type dummyUser struct {
+	testfixtures.DummyUser
 	// The two slices go together
 	userToMatch  []upspin.UserName
 	keyToReturn  []upspin.PublicKey
@@ -319,21 +321,4 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 }
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
-}
-func (d *dummyUser) ServerUserName() string {
-	return "dummyUser"
-}
-func (d *dummyUser) Configure(options ...string) error {
-	panic("unimplemented")
-}
-func (d *dummyUser) Endpoint() upspin.Endpoint {
-	panic("unimplemented")
-}
-func (d *dummyUser) Ping() bool {
-	return true
-}
-func (d *dummyUser) Close() {
-}
-func (d *dummyUser) Authenticate(*upspin.Context) error {
-	return nil
 }

@@ -1,13 +1,13 @@
 package bind
 
 import (
-	"errors"
 	"math/rand"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 )
 
@@ -154,35 +154,21 @@ func TestConcurrency(t *testing.T) {
 
 // Some dummy interfaces.
 type dummyUser struct {
+	testfixtures.DummyUser
 	endpoint    upspin.Endpoint
 	dialed      int
 	pingCount   int
 	closeCalled int
 }
 type dummyStore struct {
+	testfixtures.DummyStore
 	endpoint upspin.Endpoint
 }
 type dummyDirectory struct {
+	testfixtures.DummyDirectory
 	endpoint upspin.Endpoint
 }
 
-func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	return nil, nil, errors.New("dummyUser.Lookup not implemented")
-}
-func (d *dummyUser) Endpoint() upspin.Endpoint {
-	return d.endpoint
-}
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	user := &dummyUser{endpoint: e}
-	d.dialed++
-	return user, nil
-}
-func (d *dummyUser) ServerUserName() string {
-	return "userUser"
-}
-func (d *dummyUser) Configure(options ...string) error {
-	return nil
-}
 func (d *dummyUser) Ping() bool {
 	d.pingCount++
 	return true
@@ -190,80 +176,40 @@ func (d *dummyUser) Ping() bool {
 func (d *dummyUser) Close() {
 	d.closeCalled++
 }
-func (d *dummyUser) Authenticate(*upspin.Context) error {
-	return nil
+
+func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	user := &dummyUser{endpoint: e}
+	d.dialed++
+	return user, nil
 }
 
-func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	return nil, nil, errors.New("dummyStore.Get not implemented")
-}
-func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
-	return "", errors.New("dummyStore.Put not implemented")
-}
-func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	store := &dummyStore{endpoint: e}
-	return store, nil
-}
-func (d *dummyStore) Endpoint() upspin.Endpoint {
+func (d *dummyUser) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
-func (d *dummyStore) ServerUserName() string {
-	return "userStore"
-}
-func (d *dummyStore) Configure(options ...string) error {
-	return nil
-}
-func (d *dummyStore) Delete(ref upspin.Reference) error {
-	return errors.New("dummyStore.Delete not implemented")
-}
+
 func (d *dummyStore) Ping() bool {
 	// Add some random delays.
 	time.Sleep(time.Duration(rand.Int31n(100)) * time.Millisecond)
 	return true
 }
-func (d *dummyStore) Close() {
-}
-func (d *dummyStore) Authenticate(*upspin.Context) error {
-	return nil
+
+func (d *dummyStore) Endpoint() upspin.Endpoint {
+	return d.endpoint
 }
 
-func (d *dummyDirectory) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.New("dummyDirectory.Lookup not implemented")
+func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	store := &dummyStore{endpoint: e}
+	return store, nil
 }
-func (d *dummyDirectory) Put(entry *upspin.DirEntry) error {
-	return errors.New("dummyDirectory.Put not implemented")
-}
-func (d *dummyDirectory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return upspin.Location{}, errors.New("dummyDirectory.MakeDirectory not implemented")
-}
-func (d *dummyDirectory) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	return nil, errors.New("dummyDirectory.GLob not implemented")
-}
+
 func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }
-func (d *dummyDirectory) ServerUserName() string {
-	return "userDirectory"
-}
-func (d *dummyDirectory) Configure(options ...string) error {
-	return nil
-}
-func (d *dummyDirectory) Delete(name upspin.PathName) error {
-	return nil
-}
 func (d *dummyDirectory) Endpoint() upspin.Endpoint {
 	return d.endpoint
-}
-func (d *dummyDirectory) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
-	return "", errors.New("dummyDirectory.WhichAccess not implemented")
 }
 func (d *dummyDirectory) Ping() bool {
 	// This directory is broken and never reachable.
 	return false
-}
-func (d *dummyDirectory) Close() {
-}
-func (d *dummyDirectory) Authenticate(*upspin.Context) error {
-	return nil
 }
