@@ -1,4 +1,4 @@
-// Package main implements the grpcstore server, a Store service that speaks the GRPC transport.
+// Store implements upspin.Store on Google Cloud Platform (GCP).
 package main
 
 import (
@@ -12,7 +12,6 @@ import (
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/gcp"
-	"upspin.io/cmd/store"
 	"upspin.io/cmd/store/cache"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -40,7 +39,7 @@ var (
 // grpcStoreServer wraps a storeServer with methods for serving GRPC requests.
 type grpcStoreServer struct {
 	grpcauth.SecureServer
-	store *store.Server
+	store *server
 }
 
 // Configure implements the GRPC interface of upspin.Service.
@@ -138,9 +137,9 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	}
 
-	store := &store.Server{
-		CloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
-		FileCache:   cache.NewFileCache(*tempDir),
+	store := &server{
+		cloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
+		fileCache:   cache.NewFileCache(*tempDir),
 	}
 
 	grpcSecureServer, err := grpcauth.NewSecureServer(config, *sslCertificateFile, *sslCertificateKeyFile)
