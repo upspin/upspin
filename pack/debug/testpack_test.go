@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"upspin.io/pack"
+	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 )
 
@@ -118,14 +119,17 @@ func TestPack(t *testing.T) {
 // Dummy interface for User, so we can look up a user and get a key.
 
 type dummyUser struct {
+	testfixtures.DummyUser
 	endpoint upspin.Endpoint
 }
 
 type dummyStore struct {
+	testfixtures.DummyStore
 	endpoint upspin.Endpoint
 }
 
 type dummyDirectory struct {
+	testfixtures.DummyDirectory
 	endpoint upspin.Endpoint
 }
 
@@ -135,27 +139,4 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
-}
-
-func (d *dummyUser) ServerUserName() string {
-	return "dummyUser"
-}
-
-func (d *dummyUser) Endpoint() upspin.Endpoint {
-	panic("unimplemented")
-}
-
-func (d *dummyUser) Configure(options ...string) error {
-	panic("unimplemented")
-}
-
-func (d *dummyUser) Ping() bool {
-	return true
-}
-
-func (d *dummyUser) Close() {
-}
-
-func (d *dummyUser) Authenticate(*upspin.Context) error {
-	return nil
 }
