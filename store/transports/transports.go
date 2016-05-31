@@ -5,6 +5,7 @@ package transports
 
 import (
 	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/store/https"
 	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
 )
