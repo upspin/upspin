@@ -1,5 +1,5 @@
-// Package store implements the GCP Store server's common functionality between GRPC and HTTP REST interfaces.
-package store
+// Package main implements the GCP Store server.
+package main
 
 import (
 	"bytes"
@@ -26,22 +26,22 @@ var (
 // Server implements methods from upspin.Store that are relevant on the server side for both GRPC and HTTP servers.
 // All methods from upspin.Store are given the user name making the call. A context could be used for completion,
 // but we only care about the user name, so we use that for simplicity.
-type Server struct {
-	CloudClient gcp.GCP
-	FileCache   *cache.FileCache
+type server struct {
+	cloudClient gcp.GCP
+	fileCache   *cache.FileCache
 }
 
 // Put implements upspin.Store for a given UserName.
-func (s *Server) Put(userName upspin.UserName, data []byte) (upspin.Reference, error) {
-	return s.InnerPut(userName, bytes.NewBuffer(data))
+func (s *server) Put(userName upspin.UserName, data []byte) (upspin.Reference, error) {
+	return s.innerPut(userName, bytes.NewBuffer(data))
 }
 
 // InnerPut implements upspin.Store for a given UserName using an io.Reader.
-func (s *Server) InnerPut(userName upspin.UserName, reader io.Reader) (upspin.Reference, error) {
+func (s *server) innerPut(userName upspin.UserName, reader io.Reader) (upspin.Reference, error) {
 	// TODO: check that userName has permission to write to this store server.
 	sha := sha256key.NewShaReader(reader)
-	initialRef := s.FileCache.RandomRef()
-	err := s.FileCache.Put(initialRef, sha)
+	initialRef := s.fileCache.RandomRef()
+	err := s.fileCache.Put(initialRef, sha)
 	if err != nil {
 		return "", fmt.Errorf("%sPut: %s", ServerName, err)
 	}
@@ -49,25 +49,25 @@ func (s *Server) InnerPut(userName upspin.UserName, reader io.Reader) (upspin.Re
 	ref := sha.EncodedSum()
 
 	// Rename it in the cache
-	s.FileCache.Rename(ref, initialRef)
+	s.fileCache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
 	go func() {
-		if _, err := s.CloudClient.PutLocalFile(s.FileCache.GetFileLocation(ref), ref); err == nil {
+		if _, err := s.cloudClient.PutLocalFile(s.fileCache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
 			// compared with our much better-provisioned
 			// storage backend.  This is safe to do
 			// because FileCache is thread safe.
-			s.FileCache.Purge(ref)
+			s.fileCache.Purge(ref)
 		}
 	}()
 	return upspin.Reference(ref), nil
 }
 
 // Get implements upspin.Store for a UserName.
-func (s *Server) Get(userName upspin.UserName, ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	file, loc, err := s.InnerGet(userName, ref)
+func (s *server) Get(userName upspin.UserName, ref upspin.Reference) ([]byte, []upspin.Location, error) {
+	file, loc, err := s.innerGet(userName, ref)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -86,8 +86,8 @@ func (s *Server) Get(userName upspin.UserName, ref upspin.Reference) ([]byte, []
 // (which matches one-to-one with the GRPC interface). It returns only one of the two return values or an error.
 // file is non-nil when the ref is found locally. If non-nil, the file is open for read and the caller should close it
 // (after which it may disappear). If location is non-zero it means ref is in the backend at that location.
-func (s *Server) InnerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
-	file, err = s.FileCache.OpenRefForRead(string(ref))
+func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+	file, err = s.fileCache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
 		log.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
@@ -96,7 +96,7 @@ func (s *Server) InnerGet(userName upspin.UserName, ref upspin.Reference) (file 
 
 	// File is not local, try to get it from our storage.
 	var link string
-	link, err = s.CloudClient.Get(string(ref))
+	link, err = s.cloudClient.Get(string(ref))
 	if err != nil {
 		err = fmt.Errorf("%sGet: %s", ServerName, err)
 		return
@@ -110,15 +110,17 @@ func (s *Server) InnerGet(userName upspin.UserName, ref upspin.Reference) (file 
 	}
 
 	location.Reference = upspin.Reference(link)
+	// TODO: change this to upspin.HTTP and deprecate store/gcpstore.
 	location.Endpoint.Transport = upspin.GCP // Go fetch using the provided link.
+	location.Endpoint.NetAddr = upspin.NetAddr(link)
 	log.Printf("Ref %s returned as link: %s", ref, link)
 	return
 }
 
 // Delete implements upspin.Store for a UserName. It's common between HTTP and GRPC.
-func (s *Server) Delete(userName upspin.UserName, ref upspin.Reference) error {
+func (s *server) Delete(userName upspin.UserName, ref upspin.Reference) error {
 	// TODO: verify ownership and proper ACLs to delete blob
-	err := s.CloudClient.Delete(string(ref))
+	err := s.cloudClient.Delete(string(ref))
 	if err != nil {
 		return fmt.Errorf("%sDelete: %s: %s", ServerName, ref, err)
 	}

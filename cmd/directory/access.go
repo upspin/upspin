@@ -13,7 +13,7 @@ import (
 
 // updateAccess handles fetching and parsing a new or updated Access file and caches its parsed representation in root.accessFiles.
 func (d *dirServer) updateAccess(accessPath *path.Parsed, location *upspin.Location) error {
-	buf, err := d.storeClient.Get(location)
+	buf, err := d.storeGet(location)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (d *dirServer) addGroup(pathName upspin.PathName, acc *access.Access) error
 	if err != nil {
 		return err
 	}
-	buf, err := d.storeClient.Get(&dirEntry.Location)
+	buf, err := d.storeGet(&dirEntry.Location)
 	if err != nil {
 		// This will happen if we're not the Endpoint for the Location.
 		// TODO: figure out our location -- this is subtle given our IP address may not match our
