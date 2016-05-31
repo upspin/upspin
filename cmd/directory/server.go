@@ -21,6 +21,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"upspin.io/bind"
 	_ "upspin.io/user/gcpuser"
 )
 
@@ -36,14 +37,21 @@ var (
 	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+
+	dirServerName = upspin.UserName("upspin-dir@upspin.io")
+	// TODO(ehg): reach for the heart attack medication now.
+	dirServerKeys = upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n12753464240987498461983148972112771989345466331613802629415048914390179140074\n113057636188867924404487991022758917365734968737512850580456009882603240653118"),
+		Private: upspin.PrivateKey("68857421579026555549183754996095119843468813533440727584492238901752627939653"),
+	}
 )
 
 type dirServer struct {
-	cloudClient gcp.GCP // handle for GCP bucket g-upspin-directory
-	storeClient *storeClient
-	dirCache    *cache.LRU // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
-	rootCache   *cache.LRU // caches <upspin.UserName, root>. It is thread safe.
-	dirNegCache *cache.LRU // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
+	cloudClient gcp.GCP         // handle for GCP bucket g-upspin-directory
+	factotum    upspin.Factotum // this server's factotum with its keys.
+	dirCache    *cache.LRU      // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
+	rootCache   *cache.LRU      // caches <upspin.UserName, root>. It is thread safe.
+	dirNegCache *cache.LRU      // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
 }
 
 type dirError struct {
@@ -448,15 +456,47 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	return nil
 }
 
-func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
+func newDirServer(cloudClient gcp.GCP, f upspin.Factotum) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
-		storeClient: store,
+		factotum:    f,
 		dirCache:    cache.NewLRU(1000), // TODO: adjust numbers
 		rootCache:   cache.NewLRU(1000), // TODO: adjust numbers
 		dirNegCache: cache.NewLRU(1000), // TODO: adjust numbers
 	}
 	return d
+}
+
+// newStoreClient creates a Store object connected to the Store endpoint given and loads a context for
+// this server (using a factotum for keys)
+func newStoreClient(factotum upspin.Factotum, e upspin.Endpoint) (upspin.Store, error) {
+	serverContext := upspin.Context{
+		UserName: dirServerName,
+		Factotum: factotum,
+	}
+
+	return bind.Store(&serverContext, e)
+}
+
+// storeGet binds to the endpoint in the location, calls the store client and resolves up to one indirection,
+// returning the contents of the file.
+func (d *dirServer) storeGet(loc *upspin.Location) ([]byte, error) {
+	store, err := newStoreClient(d.factotum, loc.Endpoint)
+	if err != nil {
+		return nil, newDirError("storeGet", upspin.PathName(loc.Reference), fmt.Errorf("can't create new store client: %s", err).Error())
+	}
+	data, locs, err := store.Get(loc.Reference)
+	if err != nil {
+		return nil, err
+	}
+	if data != nil {
+		return data, nil
+	}
+	if len(locs) > 0 {
+		data, _, err := store.Get(locs[0].Reference)
+		return data, err
+	}
+	return data, err
 }
 
 func main() {
@@ -475,8 +515,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := newStoreClient(httpauth.NewClient(dirServerName, factotum, &http.Client{}))
-	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), s)
+	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), factotum)
 
 	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // dir handles GET, PUT/POST and DELETE.
 	http.HandleFunc("/glob/", ah.Handle(d.globHandler))
