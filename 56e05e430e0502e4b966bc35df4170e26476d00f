@@ -33,6 +33,24 @@
       "revId": "56e05e430e0502e4b966bc35df4170e26476d00f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_4bebb986",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:57:00Z",
+      "side": 1,
+      "message": "It will be named store not server, like it is now. User will be user and Directory will be directory. Isn\u0027t the current convention good enough?",
+      "parentUuid": "59b509ab_ebc86d62",
+      "revId": "56e05e430e0502e4b966bc35df4170e26476d00f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
