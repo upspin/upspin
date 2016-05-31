@@ -15,14 +15,11 @@ import (
 	"upspin.io/user/inprocess"
 	"upspin.io/user/usercache"
 
-	_ "upspin.io/directory/gcpdir"
-	_ "upspin.io/directory/inprocess"
-	_ "upspin.io/directory/remote"
+	_ "upspin.io/directory/transports"
+	_ "upspin.io/store/transports"
+
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/gcpstore"
-	_ "upspin.io/store/inprocess"
-	_ "upspin.io/store/remote"
 )
 
 var (
