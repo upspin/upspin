@@ -21,6 +21,8 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"upspin.io/bind"
+	"upspin.io/endpoint"
 	_ "upspin.io/user/gcpuser"
 )
 
@@ -33,14 +35,22 @@ var (
 	projectID             = flag.String("project", "upspin", "Our cloud project ID.")
 	bucketName            = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
 	port                  = flag.Int("port", 8081, "TCP port to serve.")
+	storeEndpoint         = flag.String("store", "remote,http://upspin.io:8080", "Endpoint of this server's main store")
 	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
 	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+
+	dirServerName = upspin.UserName("upspin-dir@upspin.io")
+	// TODO(ehg): reach for the heart attack medication now.
+	dirServerKeys = upspin.KeyPair{
+		Public:  upspin.PublicKey("p256\n12753464240987498461983148972112771989345466331613802629415048914390179140074\n113057636188867924404487991022758917365734968737512850580456009882603240653118"),
+		Private: upspin.PrivateKey("68857421579026555549183754996095119843468813533440727584492238901752627939653"),
+	}
 )
 
 type dirServer struct {
 	cloudClient gcp.GCP // handle for GCP bucket g-upspin-directory
-	storeClient *storeClient
+	storeClient upspin.Store
 	dirCache    *cache.LRU // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
 	rootCache   *cache.LRU // caches <upspin.UserName, root>. It is thread safe.
 	dirNegCache *cache.LRU // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
@@ -448,7 +458,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	return nil
 }
 
-func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
+func newDirServer(cloudClient gcp.GCP, store upspin.Store) *dirServer {
 	d := &dirServer{
 		cloudClient: cloudClient,
 		storeClient: store,
@@ -457,6 +467,17 @@ func newDirServer(cloudClient gcp.GCP, store *storeClient) *dirServer {
 		dirNegCache: cache.NewLRU(1000), // TODO: adjust numbers
 	}
 	return d
+}
+
+// newStoreClient creates a Store object connected to the Store endpoint given and loads a context for
+// this server (using a factotum for keys)
+func newStoreClient(factotum factotum.Factotum, e upspin.Endpoint) upspin.Store {
+	serverContext := upspin.Context{
+		UserName: dirServerName,
+		Factotum: factotum,
+	}
+
+	return bind.Store(&serverContext, e), nil
 }
 
 func main() {
@@ -475,7 +496,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := newStoreClient(httpauth.NewClient(dirServerName, factotum, &http.Client{}))
+	e, err := endpoint.Parse(*storeEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	s := newStoreClient(factotum, e)
 	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), s)
 
 	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // dir handles GET, PUT/POST and DELETE.
