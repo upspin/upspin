@@ -16,14 +16,9 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
-	// Load required services
-	_ "upspin.io/store/gcpstore"
-	_ "upspin.io/store/inprocess"
-	_ "upspin.io/store/remote"
-
-	_ "upspin.io/user/gcpuser"
-	_ "upspin.io/user/inprocess"
-	_ "upspin.io/user/remote"
+	// Load required transports
+	_ "upspin.io/store/transports"
+	_ "upspin.io/user/transports"
 )
 
 var (

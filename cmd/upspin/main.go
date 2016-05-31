@@ -18,20 +18,10 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
-	// Load required gcp services
-	_ "upspin.io/directory/gcpdir"
-	_ "upspin.io/store/gcpstore"
-	_ "upspin.io/user/gcpuser"
-
-	// Load required test services
-	_ "upspin.io/directory/inprocess"
-	_ "upspin.io/store/inprocess"
-	_ "upspin.io/user/inprocess"
-
-	// Load required remote services
-	_ "upspin.io/directory/remote"
-	_ "upspin.io/store/remote"
-	_ "upspin.io/user/remote"
+	// Load required transports
+	_ "upspin.io/directory/transports"
+	_ "upspin.io/store/transports"
+	_ "upspin.io/user/transports"
 )
 
 var (
