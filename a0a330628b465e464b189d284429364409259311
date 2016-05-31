@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_686b23de",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_c86faf15",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_085f0768",
         "filename": "cmd/directory/server.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-31T22:56:26Z",
       "side": 1,
       "message": "s/given //",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_c879efb4",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_085f0768",
       "revId": "a0a330628b465e464b189d284429364409259311",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_8883f7ac",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_a84fdbae",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_e8c87362",
         "filename": "cmd/store/all_test.go",
         "patchSetId": 6
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_6839e3dd",
+        "filename": "cmd/store/all_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_e8c87362",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_2800cb5a",
         "filename": "cmd/store/server.go",
         "patchSetId": 6
@@ -81,6 +153,24 @@
       "writtenOn": "2016-05-31T22:56:26Z",
       "side": 1,
       "message": "this isn\u0027t the usual style for commands, since it\u0027s not really a package. Here\u0027s what my unicode program looks like; i think it shows a friendlier style as the first sentence uses the command name as the subject and the rest contains usage information so go doc is helpful.\n\n\n/*\nUnicode is a command-line tool for studying Unicode characters.\n\nusage: unicode [-c] [-d] [-n] [-t]\n-c: args are hex; output characters (xyz)\n-n: args are characters; output hex (23 or 23-44)\n-g: args are regular expressions for matching names\n-d: output textual description\n-t: output plain text, not one char per line\n-U: output full Unicode description\n\nDefault behavior sniffs the arguments to select -c vs. -n.\n\nFor some options you will need UnicodeData.txt installed.\nUse curl or wget or your favorite webirific tool to copy\n\tftp://ftp.unicode.org/Public/UNIDATA/UnicodeData.txt\nto\n\t$GOPATH/src/robpike.io/cmd/unicode\n*/\npackage main // import \"robpike.io/cmd/unicode\"",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_e80dd331",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T23:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_2800cb5a",
       "revId": "a0a330628b465e464b189d284429364409259311",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
