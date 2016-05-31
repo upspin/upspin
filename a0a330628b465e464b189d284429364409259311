@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59b509ab_c86faf15",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T22:56:26Z",
+      "side": 1,
+      "message": "factory is a java word. use \u0027new\u0027 with the appropriate indication. maybe newStoreClient?",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_085f0768",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T22:56:26Z",
+      "side": 1,
+      "message": "s/given //",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_a84fdbae",
+        "filename": "cmd/directory/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T22:56:26Z",
+      "side": 1,
+      "message": "\u0027satisfies\u0027 usually refers to interface types. maybe\n\n//newStoreClient is a storeClientFactory function (but use the new name here) that creates...",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_e8c87362",
+        "filename": "cmd/store/all_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T22:56:26Z",
+      "side": 1,
+      "message": "this really threw me. maybe newStoreServer should wrap the server type, so this line could be\n  \u003c-s.ch\nand the declaration above goes away.",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_2800cb5a",
+        "filename": "cmd/store/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-05-31T22:56:26Z",
+      "side": 1,
+      "message": "this isn\u0027t the usual style for commands, since it\u0027s not really a package. Here\u0027s what my unicode program looks like; i think it shows a friendlier style as the first sentence uses the command name as the subject and the rest contains usage information so go doc is helpful.\n\n\n/*\nUnicode is a command-line tool for studying Unicode characters.\n\nusage: unicode [-c] [-d] [-n] [-t]\n-c: args are hex; output characters (xyz)\n-n: args are characters; output hex (23 or 23-44)\n-g: args are regular expressions for matching names\n-d: output textual description\n-t: output plain text, not one char per line\n-U: output full Unicode description\n\nDefault behavior sniffs the arguments to select -c vs. -n.\n\nFor some options you will need UnicodeData.txt installed.\nUse curl or wget or your favorite webirific tool to copy\n\tftp://ftp.unicode.org/Public/UNIDATA/UnicodeData.txt\nto\n\t$GOPATH/src/robpike.io/cmd/unicode\n*/\npackage main // import \"robpike.io/cmd/unicode\"",
+      "revId": "a0a330628b465e464b189d284429364409259311",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
