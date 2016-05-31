@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9923d13_bd071f10",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-05-31T17:11:56Z",
+      "side": 1,
+      "message": "This breaks things because mv changes the owner, but cp does not. And it needs to be owned by www-data for security reasons. I\u0027ll use cp + rm instead or chown.",
+      "revId": "6881b4758f599718821e50a78f000dbdf98943b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
