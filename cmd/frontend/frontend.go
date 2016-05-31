@@ -8,22 +8,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"rsc.io/letsencrypt"
 )
 
-var letsCache = flag.String("letsencrypt_cache", "/etc/letsencrypt/live/upspin.io/letsencrypt.cache", "Path to letsencrypt cache file")
+var (
+	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
+	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+)
 
 func main() {
-	flag.Parse()
-
+	go func() {
+		log.Fatal(http.ListenAndServe(":80", http.RedirectHandler("https://upspin.io", http.StatusMovedPermanently)))
+	}()
 	http.HandleFunc("/", handler)
-
-	var m letsencrypt.Manager
-	if err := m.CacheFile(*letsCache); err != nil {
-		log.Fatal(err)
-	}
-	log.Fatal(m.Serve())
+	log.Fatal(http.ListenAndServeTLS(":443", *sslCertificateFile, *sslCertificateKeyFile, nil))
 }
 
 const (
