@@ -40,7 +40,7 @@ function deploy {
     runsafely scp "/tmp/$server" upspin.io:/tmp
     # Stop service and move binary
     stop "$server"
-    runsafely ssh upspin.io "sudo mv /tmp/$server /var/www/$server$testing"
+    runsafely ssh upspin.io "sudo mv /tmp/$server /var/www/$server$testing; sudo chown www-data /var/www/$server$testing"
     if [ "$server" == "frontend" ]; then
         runsafely ssh upspin.io "cd /var/www; sudo setcap CAP_NET_BIND_SERVICE=+eip /var/www/frontend"
     fi

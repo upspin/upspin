@@ -14,6 +14,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"upspin.io/log"
 	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
 )
 
@@ -198,10 +199,12 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	where := []upspin.Location{entry.Location}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
+		log.Printf("== Client: doing bind on %v", loc.Endpoint)
 		store, err := bind.Store(c.context, loc.Endpoint)
 		if isError(err) {
 			continue
 		}
+		log.Printf("== Client: doing get on %v", loc.Reference)
 		cipher, locs, err := store.Get(loc.Reference)
 		if isError(err) {
 			continue // locs guaranteed to be nil.
