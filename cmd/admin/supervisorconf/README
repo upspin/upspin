@@ -1,0 +1,10 @@
+This directory contains supervisord job configuration files for deploying on upspin.io.
+
+There are 4 types of servers:
+- Frontend: for serving HTTPS requests
+- Store: the upspin.Store implementation
+- Directory: the upspin.Directory implementation
+- User: the keyserver that implements upspin.User
+
+There are also two variations of Store and Directory:
+- Production and testing.
