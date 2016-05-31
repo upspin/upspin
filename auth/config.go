@@ -47,6 +47,9 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 	}
 
 	cert, err := tls.LoadX509KeyPair(certFile, certKeyFile)
+	if err != nil {
+		return nil, err
+	}
 
 	tlsConfig := &tls.Config{
 		CipherSuites: []uint16{
