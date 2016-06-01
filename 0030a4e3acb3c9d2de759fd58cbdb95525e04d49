@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3943f551_de2429b4",
+        "filename": "CONTRIBUTORS",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T22:24:25Z",
+      "side": 1,
+      "message": "Can I be left without email?\n\nIf not, how about edpin@edpin.com?",
+      "revId": "0030a4e3acb3c9d2de759fd58cbdb95525e04d49",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
