@@ -20,7 +20,6 @@ import (
 	"upspin.io/user/inprocess"
 
 	_ "upspin.io/pack/debug"
-	_ "upspin.io/store/gcpstore"
 	_ "upspin.io/store/inprocess"
 )
 
