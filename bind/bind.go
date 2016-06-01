@@ -85,12 +85,23 @@ var (
 	inflightDials = make(map[dialKey]*inflightDial)
 )
 
+const allowOverwrite = true // for documentation purposes
+
 // RegisterUser registers a User interface for the transport.
 func RegisterUser(transport upspin.Transport, user upspin.User) error {
+	return registerUser(transport, user, !allowOverwrite)
+}
+
+// ReregisterUser re-registers a User interface for the transport.
+func ReregisterUser(transport upspin.Transport, user upspin.User) error {
+	return registerUser(transport, user, allowOverwrite)
+}
+
+func registerUser(transport upspin.Transport, user upspin.User, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := userMap[transport]
-	if ok {
+	if ok && !allowOverwrite {
 		return fmt.Errorf("cannot override User interface: %v", transport)
 	}
 	userMap[transport] = user
@@ -99,10 +110,19 @@ func RegisterUser(transport upspin.Transport, user upspin.User) error {
 
 // RegisterDirectory registers a Directory interface for the transport.
 func RegisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
+	return registerDirectory(transport, dir, !allowOverwrite)
+}
+
+// ReregisterDirectory re-registers a Directory interface for the transport.
+func ReregisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
+	return registerDirectory(transport, dir, allowOverwrite)
+}
+
+func registerDirectory(transport upspin.Transport, dir upspin.Directory, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := directoryMap[transport]
-	if ok {
+	if ok && !allowOverwrite {
 		return fmt.Errorf("cannot override Directory interface: %v", transport)
 	}
 	directoryMap[transport] = dir
@@ -111,10 +131,19 @@ func RegisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
 
 // RegisterStore registers a Store interface for the transport.
 func RegisterStore(transport upspin.Transport, store upspin.Store) error {
+	return registerStore(transport, store, !allowOverwrite)
+}
+
+// ReregisterStore re-registers a Store interface for the transport.
+func ReregisterStore(transport upspin.Transport, store upspin.Store) error {
+	return registerStore(transport, store, allowOverwrite)
+}
+
+func registerStore(transport upspin.Transport, store upspin.Store, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := storeMap[transport]
-	if ok {
+	if ok && !allowOverwrite {
 		return fmt.Errorf("cannot override Store interface: %v", transport)
 	}
 	storeMap[transport] = store
