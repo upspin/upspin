@@ -160,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "19c9d179_16fa7c1c",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T23:08:15Z",
+      "side": 1,
+      "message": "Ok, fixed.",
+      "parentUuid": "b9a3657f_239f8a17",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_6ef1eb0e",
         "filename": "store/https/https.go",
         "patchSetId": 2
