@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"strings"
 
 	gContext "golang.org/x/net/context"
 
@@ -27,6 +28,7 @@ var (
 	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
 )
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
@@ -51,9 +53,27 @@ func main() {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
 
-	// All we need in the context is some user name. It is unauthenticated. TODO?
+	// All we need in the context is some user name. It is unauthenticated.
 	context := &upspin.Context{
 		UserName: "storeserver",
+	}
+	// Instantiate
+	store, err := bind.Store(context, endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// If there are configuration options, set them now
+	if *config != "" {
+		opts := strings.Split(config, ",")
+		// Configure it appropriately.
+		err = store.Configure(opts...)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err := bind.ReregisterStore(endpoint.Transport, store)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	config := auth.Config{

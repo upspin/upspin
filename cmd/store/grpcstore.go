@@ -11,9 +11,9 @@ import (
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
-	"upspin.io/cloud/gcp"
-	"upspin.io/cmd/store/cache"
+	"upspin.io/bind"
 	"upspin.io/log"
+	"upspin.io/store/gcp"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -39,7 +39,9 @@ var (
 // grpcStoreServer wraps a storeServer with methods for serving GRPC requests.
 type grpcStoreServer struct {
 	grpcauth.SecureServer
-	store *server
+	store    upspin.Store
+	context  *upspin.Context
+	endpoint upspin.Endpoint
 }
 
 // Configure implements the GRPC interface of upspin.Service.
@@ -75,12 +77,12 @@ func (s *grpcStoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) 
 	log.Printf("Get %q", req.Reference)
 
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	data, locs, err := s.store.Get(session.User(), upspin.Reference(req.Reference))
+	data, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
 	}
@@ -96,12 +98,12 @@ func (s *grpcStoreServer) Put(ctx gContext.Context, req *proto.StorePutRequest) 
 	log.Printf("Put %.30x...", req.Data)
 
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	ref, err := s.store.Put(session.User(), req.Data)
+	ref, err := store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
 	}
@@ -116,16 +118,28 @@ func (s *grpcStoreServer) Delete(ctx gContext.Context, req *proto.StoreDeleteReq
 	log.Printf("Delete %q", req.Reference)
 
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	store, err := s.storeFor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.store.Delete(session.User(), upspin.Reference(req.Reference))
+	err = store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Reference, err)
 	}
 	return nil, err
+}
+
+// storeFor returns a Store service bound to the user specified in the context.
+func (s *grpcStoreServer) storeFor(ctx gContext.Context) (upspin.Store, error) {
+	// Validate that we have a session. If not, it's an auth error.
+	session, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	context := *s.context
+	context.UserName = session.User()
+	return bind.Store(&context, s.endpoint)
 }
 
 func main() {
@@ -137,9 +151,27 @@ func main() {
 		AllowUnauthenticatedConnections: *noAuth,
 	}
 
-	store := &server{
-		cloudClient: gcp.New(*projectID, *bucketName, gcp.PublicRead),
-		fileCache:   cache.NewFileCache(*tempDir),
+	// Get an instance of GCP store.
+	context := &upspin.Context{
+		UserName: "will be overriden",
+	}
+	endpoint := upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   "", // it's local.
+	}
+	store, err := bind.Store(context, endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Configure it appropriately.
+	err = store.Configure(
+		gcp.ConfigBucketName, *bucketName,
+		gcp.ConfigProjectID, *projectID,
+		gcp.ConfigTemporaryDir, *tempDir,
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	grpcSecureServer, err := grpcauth.NewSecureServer(config, *sslCertificateFile, *sslCertificateKeyFile)
@@ -149,6 +181,8 @@ func main() {
 	s := &grpcStoreServer{
 		SecureServer: grpcSecureServer,
 		store:        store,
+		context:      context,
+		endpoint:     endpoint,
 	}
 
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)

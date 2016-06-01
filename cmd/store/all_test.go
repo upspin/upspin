@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"upspin.io/cloud/gcp/gcptest"
-	"upspin.io/cmd/store/cache"
+	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 )
 
