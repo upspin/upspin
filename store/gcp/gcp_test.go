@@ -1,28 +1,29 @@
-package main
+package gcp
 
 import (
 	"bytes"
 	"strings"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/cloud/gcp/gcptest"
-	"upspin.io/cmd/store/cache"
+	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 )
 
 const (
-	expectedRef = "978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"
-	linkForRef  = "http://go-download-from-gcp/ref/978F...4F"
-	contents    = "contents of our file"
-	userName    = "dude@foo.com"
+	expectedRef   = "978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"
+	serverBaseURL = "http://go-download-from-gcp.goog.com"
+	linkForRef    = serverBaseURL + "/ref/978F...4F"
+	contents      = "contents of our file"
+	userName      = "dude@foo.com"
 )
-
-var fileCache = cache.NewFileCache("")
 
 func TestPutAndGet(t *testing.T) {
 	s := newStoreServer()
+	defer s.server.Close()
 
-	ref, err := s.server.Put(userName, []byte(contents))
+	ref, err := s.server.Put([]byte(contents))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +33,7 @@ func TestPutAndGet(t *testing.T) {
 
 	<-s.ch // Wait for the server thread to put to GCP safely.
 
-	data, locs, err := s.server.Get(userName, ref)
+	data, locs, err := s.server.Get(ref)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,8 +45,8 @@ func TestPutAndGet(t *testing.T) {
 	}
 	expectedLoc := upspin.Location{
 		Endpoint: upspin.Endpoint{
-			Transport: upspin.GCP,
-			NetAddr:   linkForRef,
+			Transport: upspin.HTTPS,
+			NetAddr:   serverBaseURL,
 		},
 		Reference: linkForRef,
 	}
@@ -55,14 +56,16 @@ func TestPutAndGet(t *testing.T) {
 }
 
 func TestGetFromLocalCache(t *testing.T) {
-	// File is still locally on the server, get the bytes instead of a new location.
-	err := fileCache.Put(expectedRef, bytes.NewReader([]byte(contents)))
+	s := newStoreServer()
+	defer s.server.Close()
+
+	// Simulate file still being locally on the server. Get the bytes instead of a new location.
+	err := s.server.fileCache.Put(expectedRef, bytes.NewReader([]byte(contents)))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s := newStoreServer()
-	data, locs, err := s.server.Get(userName, expectedRef)
+	data, locs, err := s.server.Get(expectedRef)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,8 +82,9 @@ func TestGetFromLocalCache(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	s := newStoreServer()
+	defer s.server.Close()
 
-	err := s.server.Delete(userName, expectedRef)
+	err := s.server.Delete(expectedRef)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,8 +98,9 @@ func TestDelete(t *testing.T) {
 
 func TestGetInvalidRef(t *testing.T) {
 	s := newStoreServer()
+	defer s.server.Close()
 
-	_, _, err := s.server.Get(userName, "bla bla bla")
+	_, _, err := s.server.Get("bla bla bla")
 	if err == nil {
 		t.Fatal("Expected error")
 	}
@@ -107,12 +112,14 @@ func TestGetInvalidRef(t *testing.T) {
 
 func TestGCPErrorsOut(t *testing.T) {
 	s := newStoreServer()
+	defer s.server.Close()
+
 	s.server.cloudClient = &gcptest.ExpectGetGCP{
 		Ref:  "123",
 		Link: "very poorly-formated url",
 	}
 
-	_, _, err := s.server.Get(userName, "123")
+	_, _, err := s.server.Get("123")
 	if err == nil {
 		t.Fatal("Expected error")
 	}
@@ -122,9 +129,39 @@ func TestGCPErrorsOut(t *testing.T) {
 	}
 }
 
-func TestMain(m *testing.M) {
-	m.Run()
-	fileCache.Delete()
+func TestMissingConfiguration(t *testing.T) {
+	store, err := bind.Store(&upspin.Context{}, upspin.Endpoint{Transport: upspin.GCP})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, err = store.Get("bla bla bla")
+	if err == nil {
+		t.Fatalf("Expected error")
+	}
+	if !strings.HasPrefix(err.Error(), "not configured") {
+		t.Fatalf("Expected not configured error, got %q", err)
+	}
+	store.Close()
+}
+
+func TestConfigure(t *testing.T) {
+	store, err := bind.Store(&upspin.Context{}, upspin.Endpoint{Transport: upspin.GCP})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.Configure("dance", "the macarena")
+	if err == nil {
+		t.Fatalf("Expected error")
+	}
+	if !strings.HasPrefix(err.Error(), "invalid configuration") {
+		t.Errorf("Expected invalid configuration error, got %q", err)
+	}
+	// now configure it correctly
+	err = store.Configure(ConfigProjectID, "some project id", ConfigBucketName, "zee bucket", ConfigTemporaryDir, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	store.Close()
 }
 
 func newStoreServer() *storeTestServer {
@@ -138,7 +175,7 @@ func newStoreServer() *storeTestServer {
 				},
 				ch: ch,
 			},
-			fileCache: fileCache,
+			fileCache: cache.NewFileCache(""),
 		},
 		ch: ch,
 	}
