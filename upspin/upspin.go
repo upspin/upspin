@@ -66,7 +66,6 @@ type Signature struct {
 }
 
 // Factotum implements an agent, potentially remote, to handle private key operations.
-// Think of this as a replacement for *PrivateKey, or as an ssh-agent.
 // Implementations typically provide NewFactotum() to set the key.
 type Factotum interface {
 	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.

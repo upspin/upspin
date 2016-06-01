@@ -7,3 +7,6 @@ implementations that can be used to join things like file systems
 and other storage services to the name space.
 
 Performance is not a primary goal. Uniformity and security are.
+
+
+This is not an official Google product.

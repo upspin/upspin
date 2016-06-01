@@ -21,9 +21,7 @@ There are three fundamental services defined in Upspin.
 
 * The Store is the ultimate location for user-provided data.  Every
 piece of user data stored in the system is identified by a Location,
-which identifies where it is stored and how to address it, and a
-Packing, which identifies how the data is represented, including
-details such as encryption and compression.
+which identifies where it is stored and how to address it.
 
 * The Directory service implements the name space, binding hierarchical,
 Unix-like names to Locations of data stored in Store servers.
