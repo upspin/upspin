@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"strings"
 
 	gContext "golang.org/x/net/context"
 
@@ -27,6 +28,7 @@ var (
 	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
 )
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
@@ -51,16 +53,39 @@ func main() {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
 
-	// All we need in the context is some user name. It is unauthenticated. TODO?
+	// All we need in the context is some user name. It is unauthenticated.
 	context := &upspin.Context{
 		UserName: "storeserver",
 	}
+	// If there are configuration options, set them now
+	if *config != "" {
+		// Get an instance so we can configure it.
+		store, err := bind.Store(context, *endpoint)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := strings.Split(*config, ",")
+		if len(opts)%2 != 0 {
+			log.Fatal("Configuration options must have format optKey,optVal,...")
+		}
+		// Configure it appropriately.
+		log.Printf("Configuring server with options: %v", opts)
+		err = store.Configure(opts...)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Now this pre-configured store is the one that will generate new instances for this server.
+		err = bind.ReregisterStore(endpoint.Transport, store)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
-	config := auth.Config{
+	authConfig := auth.Config{
 		Lookup: auth.PublicUserKeyService(),
 		AllowUnauthenticatedConnections: *noAuth,
 	}
-	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
+	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig, *certFile, *certKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
