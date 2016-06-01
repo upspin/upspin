@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_7733fa50",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T16:28:27Z",
+      "side": 1,
+      "message": "Despite Intellij, I copy and paste a lot. :-)\nDone.",
+      "parentUuid": "59b509ab_4ed50758",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_ee971ba3",
         "filename": "store/https/https.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-01T01:25:29Z",
       "side": 1,
       "message": "\"https: Put not implemented\"\n\nthis is the conventional way to express errors in go",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_373d8219",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T16:28:27Z",
+      "side": 1,
+      "message": "Done. See below for https vs HTTPS.",
+      "parentUuid": "59b509ab_ee971ba3",
       "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_d741869f",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T16:28:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59b509ab_8e945fa0",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_0ef62f08",
         "filename": "store/https/https.go",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "59b509ab_378b42f9",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T16:28:27Z",
+      "side": 1,
+      "message": "Ok, but HTTPS is an acronym and I believe it should be capitalized even in error messages. Same above.",
+      "parentUuid": "59b509ab_0ef62f08",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_6ef1eb0e",
         "filename": "store/https/https.go",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2016-06-01T01:25:29Z",
       "side": 1,
       "message": "I don\u0027t think there\u0027s any reason to have this function.\njust replace newStoreError(foo, bar, baz) with storeError{foo, bar, baz}",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59b509ab_d72ae6c5",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-01T16:28:27Z",
+      "side": 1,
+      "message": "It doesn\u0027t hurt either and I like it\u0027s more English \"new store\" as opposed to \"\u0026 store\". I used that in all other transports, so it\u0027s also here for consistency.",
+      "parentUuid": "59b509ab_6ef1eb0e",
       "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
