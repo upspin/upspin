@@ -17,6 +17,7 @@ import (
 
 	_ "upspin.io/directory/transports"
 	_ "upspin.io/store/transports"
+	_ "upspin.io/user/transports"
 
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
