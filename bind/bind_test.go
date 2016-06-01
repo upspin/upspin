@@ -37,6 +37,17 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("registerDirectory should have failed")
 	}
 
+	// These should all work.
+	if err := ReregisterUser(upspin.InProcess, du); err != nil {
+		t.Error(err)
+	}
+	if err := ReregisterStore(upspin.InProcess, &dummyStore{}); err != nil {
+		t.Error(err)
+	}
+	if err := ReregisterDirectory(upspin.InProcess, &dummyDirectory{}); err != nil {
+		t.Error(err)
+	}
+
 	// These should return different NetAddrs
 	s1, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
 	s2, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
