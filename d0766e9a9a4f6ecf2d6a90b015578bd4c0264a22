@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "b9a3657f_239f8a17",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-01T22:44:55Z",
+      "side": 1,
+      "message": "The Go convention is to use the package name as the prefix, and the package name is \u0027https\u0027.",
+      "parentUuid": "59b509ab_378b42f9",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59b509ab_6ef1eb0e",
         "filename": "store/https/https.go",
         "patchSetId": 2
@@ -171,6 +189,24 @@
       "side": 1,
       "message": "It doesn\u0027t hurt either and I like it\u0027s more English \"new store\" as opposed to \"\u0026 store\". I used that in all other transports, so it\u0027s also here for consistency.",
       "parentUuid": "59b509ab_6ef1eb0e",
+      "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b9a3657f_c38316be",
+        "filename": "store/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-01T22:44:55Z",
+      "side": 1,
+      "message": "OK sure",
+      "parentUuid": "59b509ab_d72ae6c5",
       "revId": "d0766e9a9a4f6ecf2d6a90b015578bd4c0264a22",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
