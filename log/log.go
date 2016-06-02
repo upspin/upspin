@@ -50,7 +50,7 @@ var (
 
 	currentLevel  Level = Linfo
 	defaultClient *logging.Client
-	defaultLogger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
+	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
 
 type logger struct {
