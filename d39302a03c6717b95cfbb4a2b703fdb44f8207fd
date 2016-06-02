@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d947393d_32c628af",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Sort of, to disambiguate. Because remote can take configuration for inprocess, aws, etc. I wanted to make sure an AWS projectId would not accidentally be configured with a GCP one. Maybe it doesn\u0027t matter. Just being cautious to avoid misconfigurations.",
+      "parentUuid": "d947393d_f21bc06f",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d947393d_12112c51",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-02T21:52:42Z",
       "side": 1,
       "message": "odd comment",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_52c3b49d",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Removed. These are all internal now, so no need for a comment.",
+      "parentUuid": "d947393d_12112c51",
       "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "d947393d_12468c17",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d947393d_722fd08b",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d947393d_5232d4f8",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-02T21:52:42Z",
       "side": 1,
       "message": "s/$/./",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_32438808",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d947393d_5232d4f8",
       "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "d947393d_724d102e",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Ah yeah. Updated.",
+      "parentUuid": "d947393d_f208201d",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d947393d_f242e053",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-06-02T21:52:42Z",
       "side": 1,
       "message": "this is fine, but maybe would read better and be less error-prone if the call was like\nConfigure(\"a\u003db\", \"c\u003dd\")",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_d2224441",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-02T22:16:57Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "d947393d_f242e053",
       "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
