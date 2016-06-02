@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
 // which contain the private and public parts of a keypair.
 
