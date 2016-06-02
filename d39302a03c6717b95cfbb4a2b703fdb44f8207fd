@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d947393d_f21bc06f",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "are these \"gcp\" prefixes necessary?",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_12112c51",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "odd comment",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_722fd08b",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "innerPut",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_5232d4f8",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_f208201d",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "i think this comment is out of date",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_f242e053",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "this is fine, but maybe would read better and be less error-prone if the call was like\nConfigure(\"a\u003db\", \"c\u003dd\")",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d947393d_d248847e",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:52:42Z",
+      "side": 1,
+      "message": "isConfigured returns ...\n\nbut really it sounds like a boolean function, so does it make sense to have it just be a predicate at the call site, and return the error there?",
+      "revId": "d39302a03c6717b95cfbb4a2b703fdb44f8207fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
