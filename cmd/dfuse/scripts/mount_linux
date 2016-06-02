@@ -1,26 +1,113 @@
 #!/bin/bash
 
-# mp is the mount point of the upspin root.
-mp=/upspin
+name=`who am i|sed 's/ .*//'`@google.com
 
-# create an fstab entry that lets a user mount/unmount.
-if ! grep -q upspin /etc/fstab
-then
-	echo 'echo upspin $mp fuse.fs user,noauto 0 0 >> /etc/fstab' | sudo bash
-fi
+# startdfuse mounts the server onto /upspin.
+# If /upspin doesn't exist create it.
+# If fstab doesn't include a line for this file system, add one.
+function startdfuse() {
+	killall -9 dfuse >/dev/null 2>&1
+	
+	# mp is the mount point of the upspin root.
+	mp=/upspin
+	
+	# create an fstab entry that lets a user mount/unmount.
+	if ! grep -q upspin /etc/fstab
+	then
+		echo 'echo upspin $mp fuse.fs user,noauto 0 0 >> /etc/fstab' | sudo bash
+	fi
+	
+	# Unmount any previous mount.
+	umount $mp 2>/dev/null
+	
+	# Create the mount point if it doesn't exist.
+	if ! test -d $mp 
+	then
+		sudo mkdir $mp
+		sudo chown $USER $mp
+		sudo chmod 755 $mp
+	fi
+	
+	# Uncomment the following line if you want to start every run with a clean cache.
+	#rm -fr $HOME/upspin/cache
 
-# Unmount any previous mount.
-umount $mp 2>/dev/null
+	# Change the false to true if you want the script to create a config script for you.
+	if false then
+		cat > ~/upspin/rc <<EOF
+name=$name
+packing=p256
+user=gcp,https://upspin.io:8082
+#directory=gcp,https://upspin.io:8081
+#store=remote,http://uspin.io:5580
+#directory=inprocess
+#store=inprocess
+directory=remote,http://localhost:8081
+store=remote,http://localhost:8080
+EOF
+	fi
 
-# Create the mount point if it doesn't exist.
-if ! test -d $mp 
-then
-	sudo mkdir $mp
-	sudo chown $USER $mp
-fi
+	# Start the service. Add -d flag for debugging.
+	$GOPATH/bin/dfuse $mp > /tmp/dfuse.log 2>&1 &
+	
+	# Wait for the server to appear in the namespace.
+	for i in `seq 10`
+	do
+		if df -a|grep -q upspin
+		then
+			break
+		fi
+		sleep 2
+	done
 
-# Uncomment the following line if you want to start every run with a clean cache.
-rm -fr $HOME/upspin/cache
+	if ! df -a|grep -q upspin
+	then
+		echo cannot start dfuse server 1>&2
+		tail /tmp/dfuse.log 1>&2
+		exit 1
+	fi
+}
 
-# Start the service.
-$GOPATH/bin/dfuse $mp
+# start local storeserver
+function startstore() {
+	killall -9 storeserver >/dev/null 2>&1
+	cat > ~/upspin/rc.storeserver <<EOF
+name=$name
+packing=p256
+user=gcp,https://upspin.io:8082
+#directory=gcp,https://upspin.io:8081
+#store=gcp,https://upspin.io:8080
+directory=inprocess
+store=inprocess
+#directory=remote,http://localhost:8081
+#store=remote,http://localhost:8080
+EOF
+	storeserver -noauth -cert= -key= 2>/tmp/storeserver.log &
+	
+}
+
+# start local dirserver
+function startdir() {
+	killall -9 dirserver >/dev/null 2>&1
+	cat > ~/upspin/rc.dirserver <<EOF
+name=$name
+packing=p256
+user=gcp,https://upspin.io:8082
+#directory=gcp,https://upspin.io:8081
+#store=gcp,https://upspin.io:8080
+directory=inprocess
+store=inprocess
+#directory=remote,http://localhost:8081
+#store=remote,http://localhost:8080
+EOF
+	dirserver -noauth -cert= -key= 2>/tmp/dirserver.log &
+}
+
+#startstore
+#startdir
+startdfuse
+
+echo -n hit return when done
+read x
+killall -9 storeserver
+killall -9 dirserver
+killall -9 dfuse
