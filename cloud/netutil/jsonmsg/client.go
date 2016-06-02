@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package jsonmsg handles marshaling and unmarshaling Upspin data structures
 // to and from JSON. The goal of this package is to hide types that only exist
 // on the wire and to strongly type JSON server replies to the extent possible.

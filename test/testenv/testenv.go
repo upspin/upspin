@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package testenv provides a declarative environment for creating a complete Upspin test tree.
 // See testenv_test.go for an example on how to use it.
 package testenv
