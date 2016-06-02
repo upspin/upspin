@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package cache_test
 
 // This copied and minimally adapted from: https://github.com/golang/build/blob/master/internal/lru/cache_test.go

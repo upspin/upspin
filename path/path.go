@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package path provides tools for parsing and printing file names.
 // File names always start with a user name in mail-address form,
 // followed by a slash and a possibly empty path name that follows. Thus the root of

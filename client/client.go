@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package client implements a simple client service talking to services
 // running anywhere (GCP, InProcess, etc).
 package client

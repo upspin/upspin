@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package test contains an integration test for all of Upspin.
 // This particular integration test runs on GCP and as such we disable it
 // from normal 'go test ./...' runs since it's too

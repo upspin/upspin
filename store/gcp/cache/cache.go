@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package cache stores blobs that are either 1) not yet stored in the cloud or
 // 2) that should stay local for performance concerns.
 // This cache interface allows some "peeking" inside for performance optimizations (i.e. renaming a ref)
