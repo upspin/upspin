@@ -312,6 +312,7 @@ type DirEntry struct {
 // FileAttributes define the attributes for a DirEntry.
 type FileAttributes byte
 
+// Supported FileAttributes.
 const (
 	AttrNone      = FileAttributes(0)
 	AttrDirectory = FileAttributes(1 << 0)
