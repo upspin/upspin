@@ -3,13 +3,14 @@ package grpcauth
 import (
 	"crypto/tls"
 	"math/rand"
+	"strings"
 	"time"
 
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-
 	"google.golang.org/grpc/metadata"
+
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -37,36 +38,28 @@ type AuthClientService struct {
 var tokenFreshnessDuration = authTokenDuration - time.Hour
 
 // NewGRPCClient returns new GRPC client connection connected securely (with TLS) to a GRPC server at the given address.
-// If allowUnauthenticatedConnections is true, the connection may not be secure.
-func NewGRPCClient(netAddr upspin.NetAddr, allowUnauthenticatedConnections bool) (*grpc.ClientConn, error) {
-	// TODO: These timeouts are arbitrary.
-	const (
-		longTimeout  = 7 * time.Second
-		shortTimeout = 3 * time.Second
-	)
-	// By default, wait until we get a connection. But if we're expecting TLS to fail, wait a little less.
-	timeOut := longTimeout
-	if allowUnauthenticatedConnections {
-		timeOut = shortTimeout
-	}
+// The address is expected to be a raw network address with port number, as in domain.com:5580. However, for convenience,
+// it is optionally accepted for the time being to use one of the following prefixes:
+// https://, http://, grpc://. This may change in the future.
+// If allowSelfSignedCertificates is true, the client will connect with a server with a self-signed certificate.
+// Otherwise it will reject it. Mostly only useful for testing a local server.
+func NewGRPCClient(netAddr upspin.NetAddr, allowSelfSignedCertificates bool) (*grpc.ClientConn, error) {
 	addr := string(netAddr)
-	conn, err := grpc.Dial(addr,
-		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowUnauthenticatedConnections})),
-		grpc.WithBlock(),
-		grpc.WithTimeout(timeOut),
-	)
-	if err != nil && allowUnauthenticatedConnections {
-		conn, err = grpc.Dial(addr,
-			grpc.WithInsecure(),
-			grpc.WithBlock(),
-			grpc.WithTimeout(longTimeout),
-		)
-		if err != nil {
-			log.Debug.Printf("grpcauth: did not connect even insecurely: %v", err)
-			return nil, err
-		}
-		log.Printf("grpcauth: connected insecurely.")
+	isHTTP := strings.HasPrefix(addr, "http://")
+	isHTTPS := strings.HasPrefix(addr, "https://")
+	isGRPC := strings.HasPrefix(addr, "grpc://")
+	skip := 0
+	switch {
+	case isHTTP, isGRPC:
+		skip = 7
+	case isHTTPS:
+		skip = 8
 	}
+	conn, err := grpc.Dial(addr[skip:],
+		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificates})),
+		grpc.WithBlock(),
+		grpc.WithTimeout(5*time.Second), // TODO: This timeout is arbitrary.
+	)
 	return conn, err
 }
 

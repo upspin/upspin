@@ -4,11 +4,8 @@ package remote
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
@@ -158,25 +155,13 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	var err error
-	var dirClient proto.DirectoryClient
-	var conn *grpc.ClientConn
-	addr := string(e.NetAddr)
-	switch {
-	case strings.HasPrefix(addr, "http://"):
-		conn, err = grpcauth.NewGRPCClient(e.NetAddr[7:], requireAuthentication)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: When can we do conn.Close()?
-		dirClient = proto.NewDirectoryClient(conn)
-	default:
-		err = fmt.Errorf("unrecognized net address in dir remote: %q", addr)
-	}
+	const allowSelfSignedCertificate = true // for documenting the parameter
+	conn, err := grpcauth.NewGRPCClient(e.NetAddr, allowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
-
+	// TODO: When can we do conn.Close()?
+	dirClient := proto.NewDirectoryClient(conn)
 	authClient := grpcauth.AuthClientService{
 		GRPCCommon: dirClient,
 		GRPCConn:   conn,

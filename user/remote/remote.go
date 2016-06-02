@@ -4,20 +4,14 @@ package remote
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 
 	gContext "golang.org/x/net/context"
 
-	"google.golang.org/grpc"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
-
-// requireAuthentication specifies whether the connection demands TLS.
-const requireAuthentication = false
 
 // dialContext contains the destination and authenticated user of the dial.
 type dialContext struct {
@@ -77,25 +71,16 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote user: unrecognized transport")
 	}
 
-	var err error
-	var userClient proto.UserClient
-	var conn *grpc.ClientConn
-	addr := string(e.NetAddr)
-	switch {
-	case strings.HasPrefix(addr, "http://"): // TODO: Should this be, say "grpc:"?
-		conn, err := grpcauth.NewGRPCClient(e.NetAddr[7:], !requireAuthentication)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: When can we do conn.Close()?
-		userClient = proto.NewUserClient(conn)
-	default:
-		err = fmt.Errorf("unrecognized net address in user remote: %q", addr)
-	}
+	const allowSelfSignedCertificate = true // for documenting the parameter
+	conn, err := grpcauth.NewGRPCClient(e.NetAddr, allowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
-
+	// TODO: When can we do conn.Close()?
+	userClient := proto.NewUserClient(conn)
+	if err != nil {
+		return nil, err
+	}
 	authClient := grpcauth.AuthClientService{
 		GRPCCommon: userClient,
 		GRPCConn:   conn,
