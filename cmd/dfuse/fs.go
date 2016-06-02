@@ -32,7 +32,7 @@ type upspinFS struct {
 	root       *node                         // The root of the upspin file system.
 	uid        int                           // OS user id of this process' owner.
 	gid        int                           // OS group id of this process' owner.
-	lastId     fuse.NodeID                   // The last node ID created and assigned to a file.
+	lastID     fuse.NodeID                   // The last node ID created and assigned to a file.
 	userDirs   map[string]bool               // Set of known user directories.
 	cache      *cache                        // A cache of files read from or to be written to dir/store.
 	nodeMap    map[upspin.PathName]*node     // All in use nodes.
@@ -139,14 +139,14 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 	}
 	n.handles = make(map[*handle]bool)
 	f.Lock()
-	f.lastId++
-	n.id = f.lastId
+	f.lastID++
+	n.id = f.lastID
 	f.Unlock()
 	n.attr.Inode = uint64(n.id)
 	return n
 }
 
-var handleId int
+var handleID int
 var hl sync.Mutex
 
 // allocHandle is called with n locked.
@@ -154,8 +154,8 @@ func allocHandle(n *node) *handle {
 	h := &handle{n: n}
 	n.handles[h] = true
 	hl.Lock()
-	h.id = handleId
-	handleId++
+	h.id = handleID
+	handleID++
 	hl.Unlock()
 	return h
 }
@@ -599,7 +599,7 @@ func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fus
 	if err == io.EOF {
 		err = nil
 	}
-	log.Debug.Printf("Read %q %d bytes at %d returns %s", h, cap(resp.Data), req.Offset, err)
+	log.Debug.Printf("Read %q %d bytes at %d returns %d, %s", h, cap(resp.Data), req.Offset, n, err)
 	return err
 }
 
@@ -669,14 +669,26 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 	n.Lock()
 	defer n.Unlock()
 	oldPath := path.Join(old.(*node).uname, req.OldName)
+	// If we still have the old node, lock it for the duration.
+	f := n.f
+	f.Lock()
+	oldn, ok := f.nodeMap[oldPath]
+	if ok {
+		oldn.Lock()
+		defer oldn.Unlock()
+	}
+	f.Unlock()
 	newPath := path.Join(n.uname, req.NewName)
 	err := n.f.client.Rename(oldPath, newPath)
 	if err == nil {
-		f := n.f
 		f.Lock()
 		delete(f.nodeMap, oldPath)
 		delete(f.nodeMap, newPath)
 		delete(f.enoentMap, newPath)
+		if oldn != nil {
+			f.nodeMap[newPath] = oldn
+			oldn.uname = newPath
+		}
 		f.Unlock()
 	}
 	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, old.(*node), req.NewName, n)
