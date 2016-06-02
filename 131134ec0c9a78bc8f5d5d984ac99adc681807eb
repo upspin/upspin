@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d947393d_127a0ca9",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:47:24Z",
+      "side": 1,
+      "message": "you could document the parameter for real if you made it an exported constant of this package. that would read really well in client packages.",
+      "revId": "131134ec0c9a78bc8f5d5d984ac99adc681807eb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
