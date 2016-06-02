@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d947393d_92b8bc85",
+        "filename": "cmd/dfuse/scripts/mount_linux",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-02T21:45:32Z",
+      "side": 1,
+      "message": "for this and other errors, please do\n\necho 1\u003e\u00262 message ...\n\nto print to stderr",
+      "revId": "f9a2060bf439d8aa9d2157cea6469c8d8ed3a565",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
