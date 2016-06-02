@@ -17,6 +17,7 @@ var ErrNoConfiguration = errors.New("service does not accept configuration optio
 // configuration options for the service.
 type NoConfiguration struct{}
 
+// Configure implements Service.
 func (NoConfiguration) Configure(options ...string) error {
 	return ErrNoConfiguration
 }

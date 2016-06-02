@@ -126,13 +126,12 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 	return nil
 }
 
-// Methods to implement upspin.Service
-
+// Endpoint implements upspin.Service.
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.db.endpoint
 }
 
-// ServerUserName implements upspin.service.
+// ServerUserName implements upspin.Service.
 func (s *Service) ServerUserName() string {
 	return "inprocess"
 }

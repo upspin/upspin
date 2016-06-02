@@ -113,6 +113,7 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.Directory, error) {
 	return bind.Directory(&context, s.endpoint)
 }
 
+// Lookup implements upspin.Directory.
 func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest) (*proto.DirectoryLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
 
@@ -136,6 +137,7 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest)
 	return resp, err
 }
 
+// Put implements upspin.Directory.
 func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*proto.DirectoryPutResponse, error) {
 	log.Printf("Put")
 
@@ -155,6 +157,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*pro
 	return &putResponse, err
 }
 
+// MakeDirectory implements upspin.Directory.
 func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDirectoryRequest) (*proto.DirectoryMakeDirectoryResponse, error) {
 	log.Printf("MakeDirectory %q", req.Name)
 
@@ -174,6 +177,7 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDir
 	return resp, err
 }
 
+// Glob implements upspin.Directory.
 func (s *Server) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*proto.DirectoryGlobResponse, error) {
 	log.Printf("Glob %q", req.Pattern)
 
@@ -193,6 +197,7 @@ func (s *Server) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*p
 	return resp, err
 }
 
+// Delete implements upspin.Directory.
 func (s *Server) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest) (*proto.DirectoryDeleteResponse, error) {
 	log.Printf("Delete %q", req.Name)
 
@@ -207,6 +212,7 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest)
 	return &deleteResponse, err
 }
 
+// WhichAccess implements upspin.Directory.
 func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirectoryWhichAccessRequest) (*proto.DirectoryWhichAccessResponse, error) {
 	log.Printf("WhichAccess %q", req.Name)
 

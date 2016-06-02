@@ -31,7 +31,7 @@ var (
 func hashUserRequest(userName upspin.UserName, r *http.Request) []byte {
 	sha := sha256.New()
 	keys := make([]string, 0, len(allowedHeaders))
-	for k, _ := range r.Header {
+	for k := range r.Header {
 		if _, ok := allowedHeaders[k]; !ok {
 			// Do not use other custom headers, as they may be added by proxies along the way.
 			continue
