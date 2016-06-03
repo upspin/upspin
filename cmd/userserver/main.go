@@ -34,17 +34,21 @@ var (
 	config       = flag.String("config", "", "Comma-separated list of configuration options (key=value) for this server")
 )
 
+// The upspin username for this server.
+const serverName = "userserver"
+
 // Server is a SecureServer that talks to a User interface and serves gRPC requests.
 type Server struct {
 	context  *upspin.Context
 	endpoint upspin.Endpoint
+	user     upspin.User // default user service for looking up keys for unauthenticated users.
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", "userserver")
+	log.Connect("google.com:upspin", serverName)
 
 	if *noAuth {
 		*certFile = ""
@@ -56,52 +60,58 @@ func main() {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
 
-	// All we need in the context is some user name. It is unauthenticated. TODO?
+	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	context := &upspin.Context{
-		UserName: "userserver",
+		UserName: serverName,
+	}
+
+	// Get an instance so we can configure it and use it for authenticated connections.
+	user, err := bind.User(context, *endpoint)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// If there are configuration options, set them now
 	if *config != "" {
-		// Get an instance so we can configure it.
-		store, err := bind.Store(context, *endpoint)
-		if err != nil {
-			log.Fatal(err)
-		}
 		opts := strings.Split(*config, ",")
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
-		err = store.Configure(opts...)
+		err = user.Configure(opts...)
 		if err != nil {
 			log.Fatal(err)
 		}
 		// Now this pre-configured store is the one that will generate new instances for this server.
-		err = bind.ReregisterStore(endpoint.Transport, store)
+		err = bind.ReregisterUser(endpoint.Transport, user)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	s := &Server{
+		context:  context,
+		endpoint: *endpoint,
+		user:     user,
+	}
 	authConfig := auth.Config{
-		Lookup: auth.PublicUserKeyService(),
+		Lookup: s.internalLookup,
 		AllowUnauthenticatedConnections: *noAuth,
 	}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig, *certFile, *certKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := &Server{
-		context:      context,
-		endpoint:     *endpoint,
-		SecureServer: grpcSecureServer,
-	}
-
+	s.SecureServer = grpcSecureServer
 	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
 	grpcSecureServer.Serve(listener)
+}
+
+func (s *Server) internalLookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
+	_, keys, err := s.user.Lookup(userName)
+	return keys, err
 }
 
 // userFor returns a User service bound to the user specified in the context.
@@ -116,16 +126,11 @@ func (s *Server) userFor(ctx gContext.Context) (upspin.User, error) {
 	return bind.User(&context, s.endpoint)
 }
 
-// Lookup implements upspin.User
+// Lookup implements upspin.User, and does not do any authentication.
 func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*proto.UserLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
 
-	user, err := s.userFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	endpoints, publicKeys, err := user.Lookup(upspin.UserName(req.UserName))
+	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
 	}

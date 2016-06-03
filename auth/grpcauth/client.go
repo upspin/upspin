@@ -38,7 +38,7 @@ type AuthClientService struct {
 	lastTokenRefresh time.Time
 }
 
-// AllowSelfSignedCertificates is used for documenting the parameter with same name in NewGRPCClient.
+// AllowSelfSignedCertificate is used for documenting the parameter with same name in NewGRPCClient.
 const AllowSelfSignedCertificate = true
 
 // To be safe, we refresh the token 1 hour ahead of time.
