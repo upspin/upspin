@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46b8c6a6_fb6277c6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-03T17:16:50Z",
+      "side": 1,
+      "message": "style point: please don\u0027t use gerunds in the subject lines, for consistency with other CLs.\nuser/gcp: move server into a package and integrate it with userserver\n\nalso no final period.\n\nbradfitz\u0027s rule is something like the text should read well if put in the blank for \"This CL wil l ___\".",
+      "revId": "b68fe67b8bc0c8a138830c44cb5227c00ce45036",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
