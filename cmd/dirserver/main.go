@@ -44,6 +44,9 @@ var (
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 )
 
+// The upspin username for this server.
+const serverName = "dirserver"
+
 // Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
 type Server struct {
 	context  *upspin.Context
@@ -54,13 +57,14 @@ type Server struct {
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", "storeserver")
+	log.Connect("google.com:upspin", serverName)
 
 	if *noAuth {
 		*certFile = ""
 		*certKeyFile = ""
 	}
 
+	// Load context and keys for this server. It needs a real upspin username and keys.
 	ctxfd, err := os.Open(*ctxfile)
 	if err != nil {
 		log.Fatal(err)

@@ -171,7 +171,7 @@ func (u *user) fetchUserEntry(userName upspin.UserName) (*userEntry, error) {
 	// Get the user entry from GCP
 	buf, err := u.cloudClient.Download(string(userName))
 	if err != nil {
-		log.Printf("Error downloading: %s", err)
+		log.Printf("Error downloading user entry for %q: %q", userName, err)
 		return nil, err
 	}
 	// Now convert it to a userEntry

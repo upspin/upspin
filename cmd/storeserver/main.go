@@ -35,6 +35,9 @@ var (
 	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
 )
 
+// The upspin username for this server.
+const serverName = "storeserver"
+
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
 	context  *upspin.Context
@@ -45,7 +48,7 @@ type Server struct {
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", "storeserver")
+	log.Connect("google.com:upspin", serverName)
 
 	if *noAuth {
 		*certFile = ""
@@ -57,9 +60,9 @@ func main() {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
 
-	// All we need in the context is some user name. It is unauthenticated.
+	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	context := &upspin.Context{
-		UserName: "storeserver",
+		UserName: serverName,
 	}
 	// If there are configuration options, set them now
 	if *config != "" {
