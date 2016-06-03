@@ -21,7 +21,7 @@ deployonly=0
 buildonly=0
 restartonly=0
 testing=""
-default_serverlist=(user directory storeserver frontend)
+default_serverlist=(userserver directory storeserver frontend)
 
 # Builds the named binary statically.
 function build {
@@ -118,8 +118,8 @@ function main {
             directory)
             serverlist[${#serverlist[*]}]="directory"
             ;;
-            user)
-            serverlist[${#serverlist[*]}]="user"
+            userserver)
+            serverlist[${#serverlist[*]}]="userserver"
             ;;
             frontend)
             serverlist[${#serverlist[*]}]="frontend"
