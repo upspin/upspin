@@ -30,7 +30,7 @@ type Config struct {
 }
 
 const (
-	userServiceAddr = "https://upspin.io:8082"
+	userServiceAddr = "upspin.io:5582"
 )
 
 // NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
@@ -76,7 +76,7 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	context := &upspin.Context{}
 	e := upspin.Endpoint{
-		Transport: upspin.GCP,
+		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(userServiceAddr),
 	}
 	u, err := bind.User(context, e)
