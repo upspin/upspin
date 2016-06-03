@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06efae33_4634a8c9",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-03T23:01:38Z",
+      "side": 1,
+      "message": "Also true for Mkdir no?",
+      "revId": "2b1b50cbc6cbed51d58a075eeb1ab04783273baa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
