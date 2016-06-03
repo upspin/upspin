@@ -264,10 +264,11 @@ type Directory interface {
 	// but is included in the packing signature and so should usually
 	// be set to a non-zero value.
 	// Sequence represents a sequence number that is incremented
-	// after each Put. If it is non-zero, the Directory service will
+	// after each Put. If it is neither 0 nor -1, the Directory service will
 	// reject the Put operation unless Sequence is the same as that
 	// stored in the metadata for the existing item with the same
-	// path name.
+	// path name. If it is -1, Put will fail if there is already an item
+	// with that name.
 	//
 	// All but the last element of the path name must already exist
 	// and be directories. The final element, if it exists, must not
@@ -318,9 +319,17 @@ type FileAttributes byte
 
 // Supported FileAttributes.
 const (
-	AttrNone      = FileAttributes(0)
+	// AttrNone is the default attribute, identifying a plain data object.
+	AttrNone = FileAttributes(0)
+	// AttrDirectory identifies a directory. It must be the only attribute.
 	AttrDirectory = FileAttributes(1 << 0)
-	AttrRedirect  = FileAttributes(1 << 1)
+	// AttrLink identifies a link. It must be the only attribute.
+	// A link is a path name whose content identifies another
+	// "target" item in the tree, similar to a Unix symbolic link.
+	// The target of a link may be another link.
+	// The associated Location identifies an item, packed with PlainPack,
+	// containing the full Upspin path name of the target.
+	AttrLink = FileAttributes(1 << 1)
 )
 
 // Metadata stores (among other things) the keys that enable the
@@ -332,6 +341,12 @@ type Metadata struct {
 	Time     Time           // Time associated with file; might be when it was last written.
 	Packdata []byte         // Packing-specific metadata stored in directory.
 }
+
+// Special Sequence numbers.
+const (
+	SeqNotExist = -1 // Put will fail if item exists.
+	SeqIgnore   = 0  // Put will not check sequence number, but will update it.
+)
 
 // Store service.
 
@@ -365,7 +380,10 @@ type Store interface {
 // Client API.
 
 // The Client interface provides a higher-level API suitable for applications
-// that wish to access Upspin's name space.
+// that wish to access Upspin's name space. When Client evaluates a path
+// name and encounters a link, it evaluates the link, iteratively if necessary,
+// until it reaches an item that is not a link.
+// (The Directory interface does no special processing for links.)
 type Client interface {
 	// Get returns the clear, decrypted data stored under the given name.
 	// It is intended only for special purposes, since it will allocate memory
@@ -406,7 +424,9 @@ type Client interface {
 	// PublicKeys returns an error or a slice of public keys for the user.
 	PublicKeys(name PathName) ([]PublicKey, error)
 
-	// Link creates a new name for the reference referred to by the old name.
+	// Link creates a new name for the reference referred to by the old name,
+	// thereby defining the new name as a link to the old.
+	// There must be no existing item with the new name.
 	// The old name is still a valid name for the reference.
 	Link(oldName, newName PathName) (*DirEntry, error)
 

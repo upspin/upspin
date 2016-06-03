@@ -226,16 +226,15 @@ func Now() Time {
 	return TimeFromGo(time.Now())
 }
 
-// IsDir returns true if the entry is for a directory.
+// IsDir reports whether the entry is a directory.
 func (d *DirEntry) IsDir() bool {
 	return d.Metadata.Attr == AttrDirectory
 }
 
-// IsRedirect returns true if the entry is a redirection to
-// something perhaps outside of Upspin. It is currently only
-// used by FUSE to represent a symlink.
-func (d *DirEntry) IsRedirect() bool {
-	return d.Metadata.Attr == AttrRedirect
+// IsLink reports whether the entry is a link to
+// something perhaps outside of Upspin.
+func (d *DirEntry) IsLink() bool {
+	return d.Metadata.Attr == AttrLink
 }
 
 // ErrIncompatible is returned by SetDir and SetRedirect to indicate the
@@ -252,12 +251,12 @@ func (d *DirEntry) SetDir() error {
 	return nil
 }
 
-// SetRedirect marks this entry as a redirection. If any other bits are set,
+// SetLink marks this entry as a link. If any other bits are set,
 // it is an error.
-func (d *DirEntry) SetRedirect() error {
-	if d.Metadata.Attr|AttrRedirect != AttrRedirect {
+func (d *DirEntry) SetLink() error {
+	if d.Metadata.Attr|AttrLink != AttrLink {
 		return ErrIncompatible
 	}
-	d.Metadata.Attr = AttrRedirect
+	d.Metadata.Attr = AttrLink
 	return nil
 }

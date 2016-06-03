@@ -466,7 +466,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	if de.IsDir() {
 		mode |= os.ModeDir
 	}
-	if de.IsRedirect() {
+	if de.IsLink() {
 		mode |= os.ModeSymlink
 	}
 	nn := n.f.allocNode(n, name, mode, de.Metadata.Size, de.Metadata.Time.Go())
