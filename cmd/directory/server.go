@@ -27,7 +27,7 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/store/remote"
-	_ "upspin.io/user/gcpuser"
+	_ "upspin.io/user/remote"
 )
 
 const (

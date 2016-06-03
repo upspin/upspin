@@ -69,9 +69,6 @@ func main() {
 			log.Fatal(err)
 		}
 		opts := strings.Split(*config, ",")
-		if len(opts)%2 != 0 {
-			log.Fatal("Configuration options must have format optKey,optVal,...")
-		}
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
 		err = store.Configure(opts...)
