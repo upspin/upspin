@@ -151,7 +151,9 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Get user's public keys.
+	log.Printf("Authenticate: Looking up keys for user %q", parsed.User())
 	keys, err := s.config.Lookup(parsed.User())
+	log.Printf("Authenticate: Done looking for keys. Error: %v", err)
 	if err != nil {
 		return nil, err
 	}

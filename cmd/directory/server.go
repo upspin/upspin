@@ -115,6 +115,7 @@ func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http
 	}
 	switch r.Method {
 	case netutil.Get:
+		log.Printf("Get: user %q looking up %q", sess.User(), parsed.Path())
 		dirEntry, err := d.getHandler(sess, parsed, r)
 		if err != nil {
 			netutil.SendJSONError(w, context, err)
@@ -125,6 +126,7 @@ func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http
 	case netutil.Delete:
 		err = d.deleteDirEntry(sess, parsed, r)
 	case netutil.Post, netutil.Put:
+		log.Printf("Put: user %q putting %q", sess.User(), parsed.Path())
 		buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
 		if buf == nil {
 			// Request was invalid and was closed. Nothing else to do.
