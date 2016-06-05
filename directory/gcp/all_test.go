@@ -2,21 +2,19 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package gcp
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"strings"
 	"testing"
 
+	"reflect"
 	"upspin.io/access"
-	"upspin.io/auth/testauth"
 	"upspin.io/cloud/gcp"
 	"upspin.io/cloud/gcp/gcptest"
-	"upspin.io/cloud/netutil"
-	"upspin.io/cloud/netutil/nettest"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
 )
@@ -30,8 +28,8 @@ const (
 )
 
 var (
-	dummySess = testauth.NewSessionForTesting(userName, false, nil)
-	dir       = upspin.DirEntry{
+	timeFunc = func() upspin.Time { return upspin.Time(17) }
+	dir      = upspin.DirEntry{
 		Name: upspin.PathName(pathName),
 		Location: upspin.Location{
 			Reference: upspin.Reference("1234"),
@@ -47,6 +45,10 @@ var (
 			Packdata: []byte("12345"),
 		},
 	}
+	serviceEndpoint = upspin.Endpoint{
+		Transport: upspin.GCP,
+		NetAddr:   upspin.NetAddr("This service's location"),
+	}
 	dirParent = upspin.DirEntry{
 		Name: upspin.PathName(parentPathName),
 		Metadata: upspin.Metadata{
@@ -59,18 +61,15 @@ var (
 			Name: rootPath,
 			Location: upspin.Location{
 				// Reference is empty for the root.
-				Endpoint: upspin.Endpoint{
-					Transport: upspin.GCP,
-					NetAddr:   "https://directory-server.com",
-				},
+				Endpoint: serviceEndpoint,
 			},
 			Metadata: upspin.Metadata{
 				Attr: upspin.AttrDirectory,
+				Time: 1234,
 			},
 		},
 		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
-	dirVal = fmt.Sprintf("%d", upspin.AttrDirectory)
 	// These are not real keys. Just *valid* keys so authClient does not complain.
 	serverKeys = upspin.KeyPair{
 		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
@@ -78,24 +77,57 @@ var (
 	}
 )
 
-func Put(t *testing.T, ds *dirServer, dirEntry upspin.DirEntry, errorExpected string) {
-	resp := nettest.NewExpectingResponseWriter(errorExpected)
-	jsonDir := toJSON(t, dirEntry)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", dirEntry.Name), jsonDir)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+func assertError(t *testing.T, expectedError string, err error) {
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if !strings.Contains(err.Error(), expectedError) {
+		t.Errorf("Expected error %q, got %q", expectedError, err)
+	}
+}
+
+func assertLocation(t *testing.T, expectedLocation upspin.Location, loc upspin.Location, err error) {
+	if err != nil {
+		t.Fatal(err)
+	}
+	if loc != expectedLocation {
+		t.Errorf("Expected location %v, got %v", expectedLocation, loc)
+	}
+}
+
+func assertDirEntries(t *testing.T, exectedDirEntries []*upspin.DirEntry, de []*upspin.DirEntry, err error) {
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(exectedDirEntries) != len(de) {
+		t.Errorf("Expected %d dir entries, got %d: (%v vs %v)", len(exectedDirEntries), len(de), exectedDirEntries, de)
+	}
+	for i, dir := range exectedDirEntries {
+		if !reflect.DeepEqual(*dir, *de[i]) {
+			t.Errorf("Expected entry %d: %v, got %v", i, dir, de[i])
+		}
+	}
+}
+
+func assertDirEntry(t *testing.T, exectedDirEntry *upspin.DirEntry, de *upspin.DirEntry, err error) {
+	assertDirEntries(t, []*upspin.DirEntry{exectedDirEntry}, []*upspin.DirEntry{de}, err)
+}
+
+func Put(t *testing.T, ds *directory, dirEntry *upspin.DirEntry, expectedError string) {
+	err := ds.Put(dirEntry)
+	assertError(t, expectedError, err)
 }
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), upspin.DirEntry{}, `{"error":"DirService: POST: invalid pathname"}`)
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &upspin.DirEntry{}, "Put: no user name in path")
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), dir, `{"error":"DirService: POST: a@x/myroot/myfile: no user name in path"}`)
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "Put: a@x/myroot/myfile: no user name in path")
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -112,34 +144,28 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), dir, `{"error":"DirService: verifyMeta: fred@bob.com/myroot/myfile: invalid sequence number"}`)
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "verifyMeta: fred@bob.com/myroot/myfile: invalid sequence number")
 }
 
 func TestLookupPathError(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: GET: invalid pathname"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir", nil)
-
+	expectedError := "Lookup: no user name in path"
 	ds := newTestDirServer(t, &gcptest.DummyGCP{})
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	_, err := ds.Lookup("")
+	assertError(t, expectedError, err)
 }
 
 func TestGlobMissingPattern(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Glob: invalid pathname"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/glob/", nil)
-
+	expectedError := "Glob: no user name in path"
 	ds := newTestDirServer(t, &gcptest.DummyGCP{})
-	ds.globHandler(dummySess, resp, req)
-	resp.Verify(t)
+	_, err := ds.Glob("")
+	assertError(t, expectedError, err)
 }
 
 func TestGlobBadPath(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Glob: missing/email/dir/file: bad user name in path"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/glob/missing/email/dir/file", nil)
-
+	expectedError := "Glob: missing/email/dir/file: bad user name in path"
 	ds := newTestDirServer(t, &gcptest.DummyGCP{})
-	ds.globHandler(dummySess, resp, req)
-	resp.Verify(t)
+	_, err := ds.Glob("missing/email/dir/file")
+	assertError(t, expectedError, err)
 }
 
 func TestPutErrorFileNoParentDir(t *testing.T) {
@@ -154,21 +180,20 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	Put(t, ds, dir, `{"error":"DirService: Put: test@foo.com/myroot/myfile: parent path not found"}`)
+	Put(t, ds, &dir, "Put: test@foo.com/myroot/myfile: parent path not found")
 }
 
 func TestLookupPathNotFound(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: get: test@foo.com/invalid/invalid/invalid: path not found"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/test@foo.com/invalid/invalid/invalid", nil)
+	expectedError := "Lookup: test@foo.com/invalid/invalid/invalid: path not found"
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, "something that does not match"},
 		Data: [][]byte{rootJSON, []byte("")},
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	_, err := ds.Lookup("test@foo.com/invalid/invalid/invalid")
+	assertError(t, expectedError, err)
 }
 
 // Regression test to catch that we don't panic (by going past the root).
@@ -176,36 +201,27 @@ func TestLookupRoot(t *testing.T) {
 	// The root converted to JSON.
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
-
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
-
+	expectedDirEntry := upspin.DirEntry{
+		Name: upspin.PathName("test@foo.com/"),
+		Location: upspin.Location{
+			Endpoint:  serviceEndpoint,
+			Reference: "",
+		},
+		Metadata: upspin.Metadata{
+			Attr:     upspin.AttrDirectory,
+			Sequence: 0,
+			Size:     0,
+			Time:     1234,
+		},
+	}
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
-}
-
-func TestLookup(t *testing.T) {
-	// The root converted to JSON.
-	rootJSON := toRootJSON(t, &userRoot)
-
-	// Non-default Location
-	resp := nettest.NewExpectingResponseWriter(`{"Name":"test@foo.com/","Location":{"Endpoint":{"Transport":1,"NetAddr":"https://directory-server.com"},"Reference":""},"Metadata":{"Attr":` + dirVal + `,"Sequence":0,"Size":0,"Time":0,"Packdata":null}}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+userName+"/", nil)
-
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{userName},
-		Data: [][]byte{rootJSON},
-	}
-
-	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	de, err := ds.Lookup(upspin.PathName(userName + "/"))
+	assertDirEntry(t, &expectedDirEntry, de, err)
 }
 
 func TestLookupWithoutReadRights(t *testing.T) {
@@ -217,14 +233,11 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	rootJSON := toRootJSON(t, &newRoot)
 
 	dirJSON := toJSON(t, dir)
-	dirAnswer := dir // make a copy.
-	dirAnswer.Metadata.Packdata = nil
-	dirAnswer.Location = upspin.Location{}
-	dirAnswerJSON := toJSON(t, dirAnswer)
 
-	// Default, zero Location.
-	resp := nettest.NewExpectingResponseWriter(string(dirAnswerJSON))
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
+	// Default, zero Location is the expected answer.
+	expectedDirEntry := dir                       // copy
+	expectedDirEntry.Location = upspin.Location{} // Zero location
+	expectedDirEntry.Metadata.Packdata = nil      // No pack data either
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, pathName},
@@ -232,9 +245,9 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	session := testauth.NewSessionForTesting("lister-dude@me.com", false, nil)
-	ds.dirHandler(session, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = "lister-dude@me.com"
+	de, err := ds.Lookup(pathName)
+	assertDirEntry(t, &expectedDirEntry, de, err)
 }
 
 func TestGlobComplex(t *testing.T) {
@@ -281,13 +294,10 @@ func TestGlobComplex(t *testing.T) {
 			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
 	}
 
-	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2}) // dir3 is NOT returned to user (no access)
-	resp := nettest.NewExpectingResponseWriter(string(respBody))
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/glob/f@b.co/sub*/*.pdf", nil)
-
+	expectedDirEntries := []*upspin.DirEntry{&dir1, &dir2} // dir3 is NOT returned to user (no access)
 	ds := newTestDirServer(t, lgcp)
-	ds.globHandler(dummySess, resp, req)
-	resp.Verify(t)
+	de, err := ds.Glob("f@b.co/sub*/*.pdf")
+	assertDirEntries(t, expectedDirEntries, de, err)
 
 	if lgcp.listDirCalled {
 		t.Error("Call to ListDir unexpected")
@@ -344,13 +354,11 @@ func TestGlobSimple(t *testing.T) {
 			userName + "/subdir/notpdf", userName + "/subdir/b.pdf"},
 	}
 
-	respBody := toJSON(t, []upspin.DirEntry{dir1, dir2})
-	resp := nettest.NewExpectingResponseWriter(string(respBody))
-	req := nettest.NewRequest(t, netutil.Get, fmt.Sprintf("http://localhost:8081/glob/%s/subdir/*.pdf", userName), nil)
+	expectedDirEntries := []*upspin.DirEntry{&dir1, &dir2}
 
 	ds := newTestDirServer(t, lgcp)
-	ds.globHandler(dummySess, resp, req)
-	resp.Verify(t)
+	de, err := ds.Glob(userName + "/subdir/*.pdf")
+	assertDirEntries(t, expectedDirEntries, de, err)
 
 	if !lgcp.listDirCalled {
 		t.Error("Expected call to ListDir")
@@ -361,22 +369,19 @@ func TestGlobSimple(t *testing.T) {
 
 	// Now check that another user who doesn't have read permission, but does have list permission would get the
 	// same list, but without the location in them.
-	session := testauth.NewSessionForTesting(upspin.UserName("listerdude@me.com"), false, nil)
+	ds.context.UserName = "listerdude@me.com"
 	// Location and Packdata are anonymized.
 	dir1.Location = upspin.Location{}
 	dir2.Location = upspin.Location{}
 	dir1.Metadata.Packdata = nil
 	dir2.Metadata.Packdata = nil
-	respBody = toJSON(t, []upspin.DirEntry{dir1, dir2}) // new expected response does not have Location.
-	resp = nettest.NewExpectingResponseWriter(string(respBody))
+	expectedDirEntries = []*upspin.DirEntry{&dir1, &dir2} // new expected response does not have Location.
 
-	ds.globHandler(session, resp, req) // using session for listerdude@me.com.
-	resp.Verify(t)
+	de, err = ds.Glob(userName + "/subdir/*.pdf")
+	assertDirEntries(t, expectedDirEntries, de, err)
 }
 
 func TestPutParentNotDir(t *testing.T) {
-	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON := toJSON(t, dir)
 	// The DirEntry of the parent, converted to JSON.
 	notDirParent := dirParent
 	notDirParent.Metadata.Attr = upspin.AttrNone // Parent is not dir!
@@ -384,8 +389,7 @@ func TestPutParentNotDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: parent is not a directory"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", dir.Name), dirEntryJSON)
+	expectedError := "Put: test@foo.com/mydir/myfile.txt: parent is not a directory"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, parentPathName},
@@ -393,13 +397,11 @@ func TestPutParentNotDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Put(&dir)
+	assertError(t, expectedError, err)
 }
 
 func TestPutFileOverwritesDir(t *testing.T) {
-	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON := toJSON(t, dir)
 	// The DirEntry of the parent, converted to JSON.
 	dirParentJSON := toJSON(t, dirParent)
 
@@ -410,8 +412,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: directory already exists"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", dir.Name), dirEntryJSON)
+	expectedError := "Put: test@foo.com/mydir/myfile.txt: directory already exists"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, parentPathName, pathName},
@@ -419,16 +420,11 @@ func TestPutFileOverwritesDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Put(&dir)
+	assertError(t, expectedError, err)
 }
 
 func TestPutDirOverwritesFile(t *testing.T) {
-	// The DirEntry we're trying to Put, converted to JSON.
-	newDir := dir
-	newDir.SetDir()
-	dirEntryJSON := toJSON(t, newDir)
-
 	// The DirEntry of the parent, converted to JSON.
 	dirParentJSON := toJSON(t, dirParent)
 
@@ -438,8 +434,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: overwriting file with directory"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", newDir.Name), dirEntryJSON)
+	expectedError := "MakeDirectory: test@foo.com/mydir/myfile.txt: overwriting file with directory"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, parentPathName, pathName},
@@ -447,21 +442,17 @@ func TestPutDirOverwritesFile(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	_, err := ds.MakeDirectory(dir.Name)
+	assertError(t, expectedError, err)
 }
 
 func TestPutPermissionDenied(t *testing.T) {
-	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON := toJSON(t, dir)
-
 	newRoot := userRoot
 	newRoot.accessFiles = make(accessFileDB)
 	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "") // No one can write, including owner.
 	rootJSON := toRootJSON(t, &newRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/mydir/myfile.txt: permission denied"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", dir.Name), dirEntryJSON)
+	expectedError := "Put: test@foo.com/mydir/myfile.txt: permission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName},
@@ -469,21 +460,15 @@ func TestPutPermissionDenied(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Put(&dir)
+	assertError(t, expectedError, err)
 }
 
 func TestPut(t *testing.T) {
-	// The DirEntry we're trying to Put, converted to JSON.
-	dirEntryJSON := toJSON(t, dir)
-
 	// The DirEntry of the parent, converted to JSON.
 	dirParentJSON := toJSON(t, dirParent)
 
 	rootJSON := toRootJSON(t, &userRoot)
-
-	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", dir.Name), dirEntryJSON)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, "test@foo.com/mydir"},
@@ -491,15 +476,16 @@ func TestPut(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Put(&dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Check that the parent Sequence number was updated...
 	updatedParent := dirParent
 	updatedParent.Metadata.Sequence++
 	updatedParentJSON := toJSON(t, updatedParent)
 
-	// And that the file's Readers were updated
 	updatedDir := dir
 	updatedDirJSON := toJSON(t, updatedDir)
 
@@ -521,22 +507,23 @@ func TestPut(t *testing.T) {
 	}
 }
 
-func TestPutRoot(t *testing.T) {
-	// rootDirJSON is what the client requests...
-	rootDirJSON := toJSON(t, userRoot.dirEntry)
-	// ... rootJSON is what the server puts to GCP.
-	rootJSON := toRootJSON(t, &userRoot)
-
-	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", userRoot.dirEntry.Name), rootDirJSON)
+func TestMakeRoot(t *testing.T) {
+	// rootJSON is what the server puts to GCP.
+	userRootSavedNow := userRoot                         // copy
+	userRootSavedNow.dirEntry.Metadata.Time = timeFunc() // time of creation is now.
+	rootJSON := toRootJSON(t, &userRootSavedNow)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: []string{"does not exist"},
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	loc, err := ds.MakeDirectory(userRoot.dirEntry.Name)
+	expectedLocation := upspin.Location{
+		Reference: "",
+		Endpoint:  serviceEndpoint,
+	}
+	assertLocation(t, expectedLocation, loc, err)
 
 	if len(egcp.PutContents) != 1 {
 		t.Fatalf("Expected put to write 1 dir entry, got %d", len(egcp.PutContents))
@@ -549,12 +536,8 @@ func TestPutRoot(t *testing.T) {
 	}
 }
 
-func TestPutRootPermissionDenied(t *testing.T) {
-	// rootDirJSON is what the client requests.
-	rootDirJSON := toJSON(t, userRoot.dirEntry)
-
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: test@foo.com/: permission denied"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8080/dir/", userRoot.dirEntry.Name), rootDirJSON)
+func TestMakeRootPermissionDenied(t *testing.T) {
+	expectedError := "Put: test@foo.com/: permission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: []string{"does not exist"},
@@ -563,9 +546,9 @@ func TestPutRootPermissionDenied(t *testing.T) {
 	ds := newTestDirServer(t, egcp)
 
 	// The session is for a user other than the expected root owner.
-	session := testauth.NewSessionForTesting(upspin.UserName("bozo@theclown.org"), false, nil)
-	ds.dirHandler(session, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = "bozo@theclown.org"
+	_, err := ds.MakeDirectory(userRoot.dirEntry.Name)
+	assertError(t, expectedError, err)
 
 	if len(egcp.PutContents) != 0 {
 		t.Fatalf("Expected put to write 0 dir entries, got %d", len(egcp.PutContents))
@@ -590,7 +573,6 @@ func TestPutAccessFile(t *testing.T) {
 			},
 		},
 	}
-	dirEntryJSON := toJSON(t, dir)
 
 	// The DirEntry of the root.
 	rootJSON := toRootJSON(t, &userRoot)
@@ -604,9 +586,6 @@ func TestPutAccessFile(t *testing.T) {
 	}
 	dirParentJSON := toJSON(t, dirParent)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req := nettest.NewRequest(t, netutil.Post, u("http://localhost:8081/dir/", dir.Name), dirEntryJSON)
-
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, parentDir},
 		Data: [][]byte{rootJSON, dirParentJSON},
@@ -618,15 +597,19 @@ func TestPutAccessFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ds := newDirServer(egcp, f,
+	ds := newDirectory(egcp, f,
 		func(e upspin.Endpoint) (upspin.Store, error) {
 			return &dummyStore{
 				ref:      upspin.Reference("1234"),
 				contents: []byte(accessContents),
 			}, nil
-		})
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+		}, timeFunc)
+	ds.context.UserName = userName // the default user for the default session.
+	ds.endpoint = serviceEndpoint
+	err = ds.Put(&dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// And the server Put a new root to GCP, the Access file and incremented the parent's sequence.
 	if len(egcp.PutRef) != 3 {
@@ -697,10 +680,6 @@ func TestGroupAccessFile(t *testing.T) {
 	// We'll now attempt to have broUserName read a file under userName's tree.
 	dirJSON := toJSON(t, dir) // dir is the dirEntry of the file that broUserName will attempt to read
 
-	// Expected success (that is, dir.Get returns the dirJSON entry)
-	resp := nettest.NewExpectingResponseWriter(string(dirJSON))
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8081/dir/"+pathName, nil)
-
 	// Internally, we look up the root, the Group file and finally the pathName requested. Later, a new group file is
 	// put so we lookup its parent and finally we retrieve the new group entry.
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -721,11 +700,9 @@ func TestGroupAccessFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Create a session for broUserName
-	session := testauth.NewSessionForTesting(broUserName, false, nil)
 	// Create a store factory that returns d1 then d2.
 	count := 0
-	ds := newDirServer(egcp, f, func(e upspin.Endpoint) (upspin.Store, error) {
+	ds := newDirectory(egcp, f, func(e upspin.Endpoint) (upspin.Store, error) {
 		count++
 		switch count {
 		case 1:
@@ -734,23 +711,27 @@ func TestGroupAccessFile(t *testing.T) {
 			return d2, nil
 		}
 		return nil, errors.New("invalid")
-	})
-	ds.dirHandler(session, resp, req)
+	}, timeFunc)
+	// Create a session for broUserName
+	ds.context.UserName = broUserName
+	de, err := ds.Lookup(pathName)
+	assertDirEntry(t, &dir, de, err)
 
 	// Now Put a new Group with new contents that does not include broUserName and check that if we fetch the file
 	// again with access will be denied, because the new definition got picked up (after first being invalidated).
 
-	groupReq := nettest.NewRequest(t, netutil.Post, u("http://localhost:8081/dir/", newGroupDir.Name), newGroupDirJSON)
-	resp = nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	ds.dirHandler(dummySess, resp, groupReq) // This is the owner of the file putting the new group file.
-	resp.Verify(t)
+	ds.context.UserName = userName
+	err = ds.Put(&newGroupDir) // This is the owner of the file putting the new group file.
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	// Go back to bro accessing.
+	ds.context.UserName = broUserName
 	// Expected permission denied this time.
-	resp = nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: test@foo.com/mydir/myfile.txt: permission denied"}`)
-	req = nettest.NewRequest(t, netutil.Get, "http://localhost:8081/dir/"+pathName, nil)
-
-	ds.dirHandler(session, resp, req) // same session: for broUserName
-	resp.Verify(t)
+	expectedError := "Lookup: test@foo.com/mydir/myfile.txt: permission denied"
+	_, err = ds.Lookup(pathName)
+	assertError(t, expectedError, err)
 }
 
 func TestMarshalRoot(t *testing.T) {
@@ -802,17 +783,7 @@ func TestMarshalRoot(t *testing.T) {
 	}
 }
 
-func TestClientSendsBadDirEntry(t *testing.T) {
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Put: unmarshal: invalid character 'c' looking for beginning of value"}`)
-	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/dir/hello@foo.com/bla.txt", []byte("crap data"))
-
-	ds := newTestDirServer(t, &gcptest.DummyGCP{})
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
-}
-
 func TestGCPCorruptsData(t *testing.T) {
-	dirEntryJSON := toJSON(t, dir)
 	rootJSON := toRootJSON(t, &userRoot)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -820,15 +791,14 @@ func TestGCPCorruptsData(t *testing.T) {
 		Data: [][]byte{rootJSON, []byte("really bad JSON structure that does not parse")},
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: getmeta: test@foo.com/mydir: json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"}`)
-	req := nettest.NewRequest(t, netutil.Post, "http://localhost:8080/dir/"+pathName, dirEntryJSON)
+	expectedError := "getmeta: test@foo.com/mydir: json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"
 
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Put(&dir)
+	assertError(t, expectedError, err)
 }
 
-func TestGet(t *testing.T) {
+func TestLookup(t *testing.T) {
 	dirEntryJSON := toJSON(t, dir)
 	rootJSON := toRootJSON(t, &userRoot)
 
@@ -837,15 +807,12 @@ func TestGet(t *testing.T) {
 		Data: [][]byte{rootJSON, dirEntryJSON},
 	}
 
-	resp := nettest.NewExpectingResponseWriter(string(dirEntryJSON))
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
-
 	ds := newTestDirServer(t, egcp)
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	de, err := ds.Lookup(pathName)
+	assertDirEntry(t, &dir, de, err)
 }
 
-func TestGetPermissionDenied(t *testing.T) {
+func TestLookupPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -853,14 +820,12 @@ func TestGetPermissionDenied(t *testing.T) {
 		Data: [][]byte{rootJSON},
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: test@foo.com/mydir/myfile.txt: permission denied"}`)
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
-
+	expectedError := "Lookup: test@foo.com/mydir/myfile.txt: permission denied"
 	ds := newTestDirServer(t, egcp)
 
-	sess := testauth.NewSessionForTesting("sloppyjoe@unauthorized.com", false, nil)
-	ds.dirHandler(sess, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = "sloppyjoe@unauthorized.com"
+	_, err := ds.Lookup(pathName)
+	assertError(t, expectedError, err)
 }
 
 func TestDelete(t *testing.T) {
@@ -875,13 +840,12 @@ func TestDelete(t *testing.T) {
 		deletePathExpected: pathName,
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+pathName, nil)
-
 	ds := newTestDirServer(t, lgcp)
 
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Delete(pathName)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lgcp.listDirCalled {
 		t.Errorf("ListDir should not have been called as pathName is not a directory")
@@ -904,13 +868,12 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 		fileNames: []string{pathName}, // pathName is inside parentPathName.
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Delete: test@foo.com/mydir: directory not empty"}`)
-	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+parentPathName, nil)
+	expectedError := "Delete: test@foo.com/mydir: directory not empty"
 
 	ds := newTestDirServer(t, lgcp)
 
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Delete(parentPathName)
+	assertError(t, expectedError, err)
 
 	if !lgcp.listDirCalled {
 		t.Errorf("ListDir should have been called as pathName is a directory")
@@ -930,14 +893,13 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 		},
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: Delete: test@foo.com/mydir/myfile.txt: permission denied"}`)
-	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+pathName, nil)
+	expectedError := "Delete: test@foo.com/mydir/myfile.txt: permission denied"
 
 	ds := newTestDirServer(t, lgcp)
 
-	session := testauth.NewSessionForTesting(upspin.UserName("some-random-dude@bozo.com"), false, nil)
-	ds.dirHandler(session, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = "some-random-dude@bozo.com"
+	err := ds.Delete(pathName)
+	assertError(t, expectedError, err)
 
 	if lgcp.listDirCalled {
 		t.Errorf("ListDir should not have been called as pathName is not a directory")
@@ -970,13 +932,12 @@ func TestDeleteAccessFile(t *testing.T) {
 		deletePathExpected: rootAccessFile,
 	}
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req := nettest.NewRequest(t, netutil.Delete, "http://localhost:8080/dir/"+rootAccessFile, nil)
-
 	ds := newTestDirServer(t, lgcp)
 
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	err := ds.Delete(rootAccessFile)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Verify we put a new root with a plain vanilla Access file.
 	if len(lgcp.PutRef) != 1 {
@@ -1028,40 +989,34 @@ func TestDeleteGroupFile(t *testing.T) {
 	}
 
 	// Verify that bro@family.com has access.
-	resp := nettest.NewExpectingResponseWriter(string(dirJSON))
-	req := nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
-
 	ds := newTestDirServer(t, lgcp)
 
-	broSess := testauth.NewSessionForTesting(upspin.UserName(broUserName), false, nil)
-	ds.dirHandler(broSess, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = broUserName
+	de, err := ds.Lookup(pathName)
+	assertDirEntry(t, &dir, de, err)
 
 	// Now the owner deletes the group file.
-	resp = nettest.NewExpectingResponseWriter(`{"error":"success"}`)
-	req = nettest.NewRequest(t, netutil.Delete, u("http://localhost:8080/dir/", groupPathName), nil)
-
-	ds.dirHandler(dummySess, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = userName
+	err = ds.Delete(groupPathName)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if !lgcp.deleteCalled {
 		t.Errorf("Expected delete to be called on %s", groupPathName)
 	}
 
-	// And now the session for bro (broSess) can no longer read it.
+	// And now the session for bro can no longer read it.
 	// TODO: this error message is not helpful. It should contain permission denied plus the path
 	// to the missing Group file.
-	resp = nettest.NewExpectingResponseWriter(`{"error":"DirService: Get: download: pathname not found"}`)
-	req = nettest.NewRequest(t, netutil.Get, "http://localhost:8080/dir/"+pathName, nil)
-	ds.dirHandler(broSess, resp, req)
-	resp.Verify(t)
+	expectedError := "Lookup: download: pathname not found"
+	ds.context.UserName = broUserName
+	_, err = ds.Lookup(pathName)
+	assertError(t, expectedError, err)
 }
 
 func TestWhichAccessImplicitAtRoot(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
-
-	resp := nettest.NewExpectingResponseWriter(`{"Access":""}`)
-	req := nettest.NewRequest(t, netutil.Get, u("http://localhost:8080/whichaccess/", pathName), nil)
 
 	// The Access file at the root really exists.
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
@@ -1070,8 +1025,13 @@ func TestWhichAccessImplicitAtRoot(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.whichAccessHandler(dummySess, resp, req)
-	resp.Verify(t)
+	accessPath, err := ds.WhichAccess(pathName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessPath != "" {
+		t.Errorf("Expected implicit path, got %q", accessPath)
+	}
 }
 
 func TestWhichAccess(t *testing.T) {
@@ -1080,9 +1040,6 @@ func TestWhichAccess(t *testing.T) {
 		Name: rootAccessFile,
 	})
 
-	resp := nettest.NewExpectingResponseWriter(fmt.Sprintf(`{"Access":"%s"}`, rootAccessFile))
-	req := nettest.NewRequest(t, netutil.Get, u("http://localhost:8080/whichaccess/", pathName), nil)
-
 	// The Access file at the root really exists.
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, rootAccessFile},
@@ -1090,15 +1047,19 @@ func TestWhichAccess(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.whichAccessHandler(dummySess, resp, req)
-	resp.Verify(t)
+	accessPath, err := ds.WhichAccess(pathName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessPath != rootAccessFile {
+		t.Errorf("Expected %q, got %q", rootAccessFile, accessPath)
+	}
 }
 
 func TestWhichAccessPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	resp := nettest.NewExpectingResponseWriter(`{"error":"DirService: WhichAccess: test@foo.com/mydir/myfile.txt: permission denied"}`)
-	req := nettest.NewRequest(t, netutil.Get, u("http://localhost:8080/whichaccess/", pathName), nil)
+	expectedError := "WhichAccess: test@foo.com/mydir/myfile.txt: permission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName},
@@ -1106,9 +1067,9 @@ func TestWhichAccessPermissionDenied(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	session := testauth.NewSessionForTesting(upspin.UserName("somerandomguy@a.co"), false, nil)
-	ds.whichAccessHandler(session, resp, req)
-	resp.Verify(t)
+	ds.context.UserName = "somerandomguy@a.co"
+	_, err := ds.WhichAccess(pathName)
+	assertError(t, expectedError, err)
 }
 
 func toJSON(t *testing.T, data interface{}) []byte {
@@ -1135,17 +1096,15 @@ func makeAccess(t *testing.T, path upspin.PathName, accessFileContents string) *
 	return acc
 }
 
-func newTestDirServer(t *testing.T, gcp gcp.GCP) *dirServer {
+func newTestDirServer(t *testing.T, gcp gcp.GCP) *directory {
 	f, err := factotum.New(serverKeys)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return newDirServer(gcp, f, nil)
-}
-
-// u (short for URL) is a helper function to join the pieces of a request URL.
-func u(baseURL string, pathName upspin.PathName) string {
-	return baseURL + string(pathName)
+	ds := newDirectory(gcp, f, nil, timeFunc)
+	ds.context.UserName = userName // the default user for the default session.
+	ds.endpoint = serviceEndpoint
+	return ds
 }
 
 // listGCP is an ExpectDownloadCapturePutGCP that returns a slice of fileNames
