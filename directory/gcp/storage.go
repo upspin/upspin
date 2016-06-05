@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package gcp
 
 // This file deals with low-level storage of dir entries on GCP, their mashaling and unmarshaling and caching.
 
