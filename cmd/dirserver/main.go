@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -36,12 +37,13 @@ import (
 )
 
 var (
-	port         = flag.Int("port", 8081, "TCP port number")
+	port         = flag.Int("port", 5581, "TCP port number")
 	ctxfile      = flag.String("context", os.Getenv("HOME")+"/upspin/rc.dirserver", "context file to use to configure server")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
 	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
 )
 
 // The upspin username for this server.
@@ -78,6 +80,28 @@ func main() {
 	endpoint, err := endpoint.Parse(*endpointFlag)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
+	}
+
+	// Get an instance so we can configure it and use it for authenticated connections.
+	dir, err := bind.Directory(context, *endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// If there are configuration options, set them now.
+	if *config != "" {
+		opts := strings.Split(*config, ",")
+		// Configure it appropriately.
+		log.Printf("Configuring server with options: %v", opts)
+		err = dir.Configure(opts...)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Now this pre-configured Directory is the one that will generate new instances.
+		err = bind.ReregisterDirectory(endpoint.Transport, dir)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	config := auth.Config{
