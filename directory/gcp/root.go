@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package gcp
 
 // This file deals with encoding and decoding the user's root and caching it.
 
@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 
 	"upspin.io/access"
-	"upspin.io/auth"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -26,7 +25,7 @@ type root struct {
 type accessFileDB map[upspin.PathName]*access.Access
 
 // getRoot retrieves the user's root, possibly by fetching it from storage.
-func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
+func (d *directory) getRoot(user upspin.UserName) (*root, error) {
 	const op = "getRoot"
 	userRootPath := upspin.PathName(user)
 
@@ -55,7 +54,7 @@ func (d *dirServer) getRoot(user upspin.UserName) (*root, error) {
 }
 
 // putRoot stores the user's root to stable storage, updating the cache.
-func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
+func (d *directory) putRoot(user upspin.UserName, root *root) error {
 	const op = "putRoot"
 
 	// Put it in the root cache.
@@ -76,10 +75,10 @@ func (d *dirServer) putRoot(user upspin.UserName, root *root) error {
 	return nil
 }
 
-func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
+func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
-	if sess.User() != parsed.User() {
+	if user != parsed.User() {
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
 	_, err := d.getRoot(parsed.User())
@@ -112,7 +111,7 @@ func (d *dirServer) handleRootCreation(sess auth.Session, parsed *path.Parsed, d
 	if err != nil {
 		return err
 	}
-	log.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	log.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 
