@@ -2,58 +2,55 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+// Package gcp implements upspin.Directory for talking to the Google Cloud Platofrm (GCP).
+package gcp
 
 import (
 	"bytes"
-	"encoding/json"
-	"flag"
+	"errors"
 	"fmt"
-	"net/http"
 	goPath "path"
 	"strings"
+	"sync"
 
 	"upspin.io/access"
-	"upspin.io/auth"
-	"upspin.io/auth/httpauth"
 	"upspin.io/bind"
 	"upspin.io/cache"
-	"upspin.io/cloud/gcp"
-	"upspin.io/cloud/netutil"
-	"upspin.io/cloud/netutil/jsonmsg"
-	"upspin.io/key/keyloader"
+	gcpCloud "upspin.io/cloud/gcp"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
-
-	_ "upspin.io/store/remote"
-	_ "upspin.io/user/remote"
 )
 
+// Configuration options for this package.
 const (
-	maxBuffSizePerReq = 1 << 20 // 1MB max buff size per request
-	context           = "DirService: "
+	// ConfigProjectID specifies which GCP project to use for talking to GCP.
+	// If not specified, "upspin" is used.
+	ConfigProjectID = "gcpProjectId"
+
+	// ConfigBucketName specifies which GCS bucket to store data in.
+	// If not specified, "g-upspin-directory" is used.
+	ConfigBucketName = "gcpBucketName"
 )
 
-var (
-	projectID             = flag.String("project", "upspin", "Our cloud project ID.")
-	bucketName            = flag.String("bucket", "g-upspin-directory", "The name of an existing bucket within the project.")
-	port                  = flag.Int("port", 8081, "TCP port to serve.")
-	noAuth                = flag.Bool("noauth", false, "Disable authentication.")
-	sslCertificateFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
-	sslCertificateKeyFile = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+type directory struct {
+	context  upspin.Context
+	endpoint upspin.Endpoint
 
-	dirServerName = upspin.UserName("upspin-dir@upspin.io")
-)
-
-type dirServer struct {
-	cloudClient    gcp.GCP         // handle for GCP bucket g-upspin-directory
-	factotum       upspin.Factotum // this server's factotum with its keys.
-	newStoreClient newStoreClient  // how to create a Store client.
-	dirCache       *cache.LRU      // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
-	rootCache      *cache.LRU      // caches <upspin.UserName, root>. It is thread safe.
-	dirNegCache    *cache.LRU      // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
+	// TODO: could all or some of the fields below be singletons?
+	timeNow        func() upspin.Time // returns the current time.
+	cloudClient    gcpCloud.GCP       // handle for GCP bucket g-upspin-directory.
+	serverName     upspin.UserName    // this server's user name (for talking to Store, etc).
+	factotum       upspin.Factotum    // this server's factotum with its keys.
+	newStoreClient newStoreClient     // how to create a Store client.
+	dirCache       *cache.LRU         // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
+	rootCache      *cache.LRU         // caches <upspin.UserName, root>. It is thread safe.
+	dirNegCache    *cache.LRU         // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
 }
+
+var _ upspin.Directory = (*directory)(nil)
+
+var zeroLoc upspin.Location
 
 type dirError struct {
 	op    string
@@ -91,93 +88,66 @@ func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
 	return nil
 }
 
-func (d *dirServer) getPathFromRequest(op string, handlerPrefix string, r *http.Request) (*path.Parsed, error) {
-	prefixLen := len(handlerPrefix)    // how many characters to skip from the URL path
-	if len(r.URL.Path) < prefixLen+7 { // 7 is the magic minLen for a root "a@b.co/"
-		return nil, newDirError(op, "", "invalid pathname")
-	}
-	pathName := upspin.PathName(r.URL.Path[prefixLen:]) // skip this handler's prefix.
-	parsed, err := path.Parse(pathName)
+// MakeDirectory implements upspin.Directory.
+func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
+	const op = "MakeDirectory"
+
+	parsed, err := path.Parse(dirName)
 	if err != nil {
-		return nil, newDirError(op, pathName, err.Error())
+		return zeroLoc, newDirError(op, dirName, err.Error())
 	}
-	return &parsed, nil
+	// Prepares a dir entry for storage.
+	dirEntry := upspin.DirEntry{
+		Name: parsed.Path(),
+		Location: upspin.Location{
+			// Reference is ignored.
+			// Endpoint for dir entries is where the Directory server is.
+			Endpoint: d.endpoint,
+		},
+		Metadata: upspin.Metadata{
+			Attr:     upspin.AttrDirectory,
+			Sequence: 0, // don't care?
+			Size:     0, // Being explicit that dir entries have zero size.
+			Time:     d.timeNow(),
+			Packdata: nil,
+		},
+	}
+	err = d.put(op, &dirEntry)
+	if err != nil {
+		return zeroLoc, err
+	}
+	return dirEntry.Location, nil
 }
 
-// dirHandler handles directory requests. It supports GET, POST/PUT, and DELETE which implement Directory.Get,
-// Directory.Put and Directory.Delete respectively.
-func (d *dirServer) dirHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
-	// First step is verifying the path name
-	parsed, err := d.getPathFromRequest(r.Method, "/dir/", r)
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	switch r.Method {
-	case netutil.Get:
-		log.Printf("Get: user %q looking up %q", sess.User(), parsed.Path())
-		dirEntry, err := d.getHandler(sess, parsed, r)
-		if err != nil {
-			netutil.SendJSONError(w, context, err)
-			return
-		}
-		netutil.SendJSONReply(w, dirEntry)
-		return
-	case netutil.Delete:
-		err = d.deleteDirEntry(sess, parsed, r)
-	case netutil.Post, netutil.Put:
-		log.Printf("Put: user %q putting %q", sess.User(), parsed.Path())
-		buf := netutil.BufferRequest(w, r, maxBuffSizePerReq) // closes r.Body
-		if buf == nil {
-			// Request was invalid and was closed. Nothing else to do.
-			return
-		}
-		dirEntry := new(upspin.DirEntry)
-		err = json.Unmarshal(buf, dirEntry)
-		if err != nil {
-			retErr := newDirError("Put", dirEntry.Name, fmt.Sprintf("unmarshal: %s", err))
-			netutil.SendJSONError(w, context, retErr)
-			log.Println(retErr)
-			return
-		}
-		err = d.putDir(sess, parsed, dirEntry)
-	default:
-		netutil.SendJSONErrorString(w, "Only POST, PUT, GET and DELETE requests are accepted")
-		return
-	}
-	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
-	}
-	netutil.SendJSONErrorString(w, "success")
-}
-
-// putDir writes or overwrites a complete dirEntry to the back
-// end, provided several checks have passed first.
-func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
+// Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.
+// It implements upspin.Directory.
+func (d *directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
-	parsedAgain, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
+	return d.put(op, dirEntry)
+}
+
+// put is the common implementation between MakeDirectory and Put.
+func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
+	parsed, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
 	if err != nil {
-		return err
+		return newDirError(op, dirEntry.Name, err.Error())
 	}
-	if !parsed.Equal(parsedAgain) {
-		return newDirError(op, parsed.Path(), "inconsistent DirEntry.Name")
-	}
+	user := d.context.UserName
 	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
 		return err
 	}
 	// If we're creating the root, handle it elsewhere.
 	if parsed.IsRoot() {
 		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
-		return d.handleRootCreation(sess, parsed, dirEntry)
+		return d.handleRootCreation(user, &parsed, dirEntry)
 	}
 
 	// Check ACLs before we go any further, so we don't leak information about the existence of files and directories.
-	canCreate, err := d.hasRight(op, sess.User(), access.Create, &parsedAgain)
+	canCreate, err := d.hasRight(op, user, access.Create, &parsed)
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
-	canWrite, err := d.hasRight(op, sess.User(), access.Write, &parsedAgain)
+	canWrite, err := d.hasRight(op, user, access.Write, &parsed)
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
@@ -234,7 +204,7 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 
 	// If this is an Access file or Group file, we have some extra work to do.
 	if access.IsAccessFile(canonicalPath) {
-		err = d.updateAccess(parsed, &dirEntry.Location)
+		err = d.updateAccess(&parsed, &dirEntry.Location)
 		if err != nil {
 			return err
 		}
@@ -246,20 +216,26 @@ func (d *dirServer) putDir(sess auth.Session, parsed *path.Parsed, dirEntry *ups
 		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group was not there, no harm done.
 	}
 
-	log.Printf("%s: %q %q", op, sess.User(), dirEntry.Name)
+	log.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 
-func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.Request) (*upspin.DirEntry, error) {
-	const op = "Get"
+// Lookup implements upspin.Directory.
+func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "Lookup"
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return nil, newDirError(op, pathName, err.Error())
+	}
+
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
-	canRead, err := d.hasRight(op, sess.User(), access.Read, parsed)
+	canRead, err := d.hasRight(op, d.context.UserName, access.Read, &parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error Read: %s", err)
 		return nil, err
 	}
-	canList, err := d.hasRight(op, sess.User(), access.List, parsed)
+	canList, err := d.hasRight(op, d.context.UserName, access.List, &parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error List: %s", err)
@@ -281,67 +257,65 @@ func (d *dirServer) getHandler(sess auth.Session, parsed *path.Parsed, r *http.R
 	}
 	if err != nil {
 		if err == errEntryNotFound {
-			err = newDirError("get", parsed.Path(), "path not found")
+			err = newDirError(op, parsed.Path(), "path not found")
 		}
 		return nil, err
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		log.Printf("Zeroing out location information in Get for user %s on path %s", sess.User(), parsed)
+		log.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName, parsed)
 		dirEntry.Location = upspin.Location{}
 		dirEntry.Metadata.Packdata = nil
 	}
-	log.Printf("Got dir entry for user %s: path %s: %v", sess.User(), parsed.Path(), dirEntry)
+	log.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName, parsed.Path(), dirEntry)
 	return dirEntry, nil
 }
 
-func (d *dirServer) whichAccessHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	const op = "WhichAccess"
 
-	parsedPath, err := d.getPathFromRequest(op, "/whichaccess/", r)
+	parsed, err := path.Parse(pathName)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return "", newDirError(op, pathName, err.Error())
 	}
-	accessPath, acc, err := d.whichAccess(op, parsedPath)
+
+	accessPath, acc, err := d.whichAccess(op, &parsed)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return "", err
 	}
+
+	user := d.context.UserName
+
 	// Must check whether the user has sufficient rights to List the requested path.
-	canRead, err := d.checkRights(sess.User(), access.Read, parsedPath.Path(), acc)
+	canRead, err := d.checkRights(user, access.Read, parsed.Path(), acc)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("WhichAccess error Read: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
+		return "", err
 	}
-	canList, err := d.checkRights(sess.User(), access.List, parsedPath.Path(), acc)
+	canList, err := d.checkRights(user, access.List, parsed.Path(), acc)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("WhichAccess error List: %s", err)
-		netutil.SendJSONError(w, context, err)
-		return
+		return "", err
 	}
 	if !canRead && !canList {
-		netutil.SendJSONError(w, context, newDirError(op, parsedPath.Path(), access.ErrPermissionDenied.Error()))
-		return
+		return "", newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
-	jsonmsg.SendWhichAccessResponse(accessPath, w)
+	return accessPath, nil
 }
 
-func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *http.Request) {
+func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "Glob"
-	parsed, err := d.getPathFromRequest(op, "/glob/", r)
+	pathName := upspin.PathName(pattern)
+	parsed, err := path.Parse(pathName)
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return nil, newDirError(op, pathName, err.Error())
 	}
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
 	if err != nil {
-		netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), err.Error()))
-		return
+		return nil, newDirError(op, parsed.Path(), err.Error())
 	}
 
 	// As an optimization, we look for the longest prefix that
@@ -368,10 +342,10 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
 	}
 	if err != nil {
-		netutil.SendJSONError(w, context, err)
-		return
+		return nil, err
 	}
 
+	user := d.context.UserName
 	dirEntries := make([]*upspin.DirEntry, 0, len(names))
 	// Now do the actual globbing.
 	for _, lookupPath := range names {
@@ -381,7 +355,7 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			log.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
 			de, err := d.getNonRoot(upspin.PathName(lookupPath))
 			if err != nil {
-				netutil.SendJSONError(w, context, newDirError(op, parsed.Path(), err.Error()))
+				return nil, newDirError(op, parsed.Path(), err.Error())
 			}
 			// Verify if user has proper list ACL.
 			parsedDirName, err := path.Parse(de.Name)
@@ -389,18 +363,18 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 				log.Error.Printf("Internal inconsistency: dir entry name does not parse: %s", err)
 				continue
 			}
-			canList, err := d.hasRight(op, sess.User(), access.List, &parsedDirName)
+			canList, err := d.hasRight(op, user, access.List, &parsedDirName)
 			if err != nil {
-				log.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
+				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
-			canRead, err := d.hasRight(op, sess.User(), access.Read, &parsedDirName)
+			canRead, err := d.hasRight(op, user, access.Read, &parsedDirName)
 			if err != nil {
-				log.Printf("Error checking access for user: %s on %s: %s", sess.User(), de.Name, err)
+				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
 			if !canRead && !canList {
-				log.Printf("User %s can't Glob %s", sess.User(), de.Name)
+				log.Printf("User %s can't Glob %s", user, de.Name)
 				continue
 			}
 			// If the user can't read a path, clear out its Location.
@@ -411,15 +385,21 @@ func (d *dirServer) globHandler(sess auth.Session, w http.ResponseWriter, r *htt
 			dirEntries = append(dirEntries, de)
 		}
 	}
-	netutil.SendJSONReply(w, dirEntries)
+	return dirEntries, nil
 }
 
 // deleteDirEntry handles deleting names and their associated DirEntry.
-func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *http.Request) error {
+func (d *directory) Delete(pathName upspin.PathName) error {
 	const op = "Delete"
 
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return newDirError(op, pathName, err.Error())
+	}
+
+	user := d.context.UserName
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
-	canDelete, err := d.hasRight(op, sess.User(), access.Delete, parsed)
+	canDelete, err := d.hasRight(op, user, access.Delete, &parsed)
 	if err != nil {
 		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error for Delete: %s", err)
@@ -429,7 +409,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
 	// Otherwise, locate the entry first.
-	dirEntry, err := d.getDirEntry(parsed)
+	dirEntry, err := d.getDirEntry(&parsed)
 	if err != nil {
 		return err
 	}
@@ -447,7 +427,7 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 	}
 	// If this was an Access file, we need to delete it from the root as well.
 	if access.IsAccessFile(parsedPath) {
-		err = d.deleteAccess(parsed)
+		err = d.deleteAccess(&parsed)
 		if err != nil {
 			return err
 		}
@@ -462,11 +442,12 @@ func (d *dirServer) deleteDirEntry(sess auth.Session, parsed *path.Parsed, r *ht
 // newStoreClient is a function that creates a store client for an endpoint.
 type newStoreClient func(e upspin.Endpoint) (upspin.Store, error)
 
-func newDirServer(cloudClient gcp.GCP, f upspin.Factotum, newStoreClient newStoreClient) *dirServer {
-	d := &dirServer{
+func newDirectory(cloudClient gcpCloud.GCP, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
+	d := &directory{
 		cloudClient:    cloudClient,
 		factotum:       f,
 		newStoreClient: newStoreClient,
+		timeNow:        timeFunc,
 		dirCache:       cache.NewLRU(1000), // TODO: adjust numbers
 		rootCache:      cache.NewLRU(1000), // TODO: adjust numbers
 		dirNegCache:    cache.NewLRU(1000), // TODO: adjust numbers
@@ -475,14 +456,19 @@ func newDirServer(cloudClient gcp.GCP, f upspin.Factotum, newStoreClient newStor
 	if d.newStoreClient == nil {
 		d.newStoreClient = d.newDefaultStoreClient
 	}
+	// Use the default time function if not given one.
+	if d.timeNow == nil {
+		d.timeNow = upspin.Now
+	}
+
 	return d
 }
 
 // newStoreClient is newStoreCllient function that creates a Store object connected to the Store endpoint and loads
 // a context for this server (using its factotum for keys).
-func (d *dirServer) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, error) {
+func (d *directory) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, error) {
 	serverContext := upspin.Context{
-		UserName: dirServerName,
+		UserName: d.serverName,
 		Factotum: d.factotum,
 	}
 
@@ -491,7 +477,7 @@ func (d *dirServer) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, erro
 
 // storeGet binds to the endpoint in the location, calls the store client and resolves up to one indirection,
 // returning the contents of the file.
-func (d *dirServer) storeGet(loc *upspin.Location) ([]byte, error) {
+func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 	store, err := d.newStoreClient(loc.Endpoint)
 	if err != nil {
 		return nil, newDirError("storeGet", upspin.PathName(loc.Reference), fmt.Errorf("can't create new store client: %s", err).Error())
@@ -510,41 +496,114 @@ func (d *dirServer) storeGet(loc *upspin.Location) ([]byte, error) {
 	return data, err
 }
 
-func main() {
-	flag.Parse()
+var (
+	mu       sync.Mutex // protects fields below
+	refCount uint64
+)
 
-	// Somehow the Logging API requires a 'google.com:' prefix, but the GCS buckets do not.
-	// Use the bucketname as the logging prefix so we can differentiate the main dir server and the test dir server.
-	log.Connect("google.com:"+*projectID, *bucketName)
-
-	ah := httpauth.NewHandler(&auth.Config{
-		Lookup: auth.PublicUserKeyService(),
-		AllowUnauthenticatedConnections: *noAuth,
-	})
-
-	ctx := upspin.Context{
-		UserName: dirServerName,
+// Dial implements upspin.Service.
+func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	if e.Transport != upspin.GCP {
+		return nil, errors.New("directory gcp: unrecognized transport")
 	}
-	err := keyloader.Load(&ctx) // Keys are now in the server's home dir on upspin.io.
-	if err != nil {
-		log.Fatal(err)
+	mu.Lock()
+	defer mu.Unlock()
+
+	refCount++
+	if refCount == 0 {
+		// This is virtually impossible to happen. One will run out of memory before this happens.
+		// It means the ref count wrapped around and thus we can't handle another instance. Fail.
+		refCount--
+		return nil, errors.New("directory gcp: internal error: refCount wrapped around")
 	}
-	d := newDirServer(gcp.New(*projectID, *bucketName, gcp.ProjectPrivate), ctx.Factotum, nil)
 
-	http.HandleFunc("/dir/", ah.Handle(d.dirHandler)) // dir handles GET, PUT/POST and DELETE.
-	http.HandleFunc("/glob/", ah.Handle(d.globHandler))
-	http.HandleFunc("/whichaccess/", ah.Handle(d.whichAccessHandler))
+	// Have we keys for this service already?
+	if d.factotum == nil {
+		d.factotum = context.Factotum
+	}
+	// Have we a server name already?
+	if d.serverName == "" {
+		d.serverName = context.UserName
+	}
 
-	if *sslCertificateFile != "" && *sslCertificateKeyFile != "" {
-		server, err := httpauth.NewHTTPSecureServer(*port, *sslCertificateFile, *sslCertificateKeyFile)
-		if err != nil {
-			log.Fatal(err)
+	this := *d              // Clone ourselves.
+	this.context = *context // Make a copy of the context, to prevent changes.
+	this.endpoint = e
+	return &this, nil
+}
+
+// Configure configures the connection to the backing store (namely, GCP) once the service
+// has been dialed. The details of the configuration are explained at the package comments.
+func (d *directory) Configure(options ...string) error {
+	// These are defaults that only make sense for those running upspin.io.
+	bucketName := "g-upspin-directory"
+	projectID := "upspin"
+	for _, option := range options {
+		opts := strings.Split(option, "=")
+		if len(opts) != 2 {
+			return fmt.Errorf("invalid option format: %q", option)
 		}
-		log.Println("Starting HTTPS server with SSL.")
-		log.Fatal(server.ListenAndServeTLS(*sslCertificateFile, *sslCertificateKeyFile))
-	} else {
-		log.Println("Not using SSL certificate. Starting regular HTTP server.")
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+		switch opts[0] {
+		case ConfigBucketName:
+			bucketName = opts[1]
+		case ConfigProjectID:
+			projectID = opts[1]
+		default:
+			return fmt.Errorf("invalid configuration option: %q", opts[0])
+		}
 	}
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
+	mu.Lock()
+	defer mu.Unlock()
+
+	d.cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.ProjectPrivate)
+	log.Debug.Printf("Configured GCP directory: %v", options)
+	return nil
+}
+
+// isConfigured returns whether this server is configured properly.
+func (d *directory) isConfigured() bool {
+	return d.cloudClient != nil && d.context.UserName != ""
+}
+
+// Ping implements upspin.Service.
+func (d *directory) Ping() bool {
+	return true
+}
+
+// Close implements upspin.Service.
+func (d *directory) Close() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Clean up this instance
+	d.context.UserName = "" // ensure we get an error in subsequent calls.
+
+	refCount--
+	if refCount == 0 {
+		d.cloudClient = nil
+		d.dirCache = nil
+		d.dirNegCache = nil
+		d.rootCache = nil
+		// Do any other global clean ups here.
+	}
+}
+
+// Authenticate implements upspin.Service.
+func (d *directory) Authenticate(*upspin.Context) error {
+	// Authentication is not dealt here. It happens at other layers.
+	return nil
+}
+
+// ServerUserName implements upspin.Service.
+func (d *directory) ServerUserName() string {
+	return string(d.context.UserName)
+}
+
+// Endpoint implements upspin.Service.
+func (d *directory) Endpoint() upspin.Endpoint {
+	return d.endpoint
+}
+
+func init() {
+	bind.RegisterDirectory(upspin.GCP, newDirectory(nil, nil, nil, nil))
 }
