@@ -21,7 +21,7 @@ deployonly=0
 buildonly=0
 restartonly=0
 testing=""
-default_serverlist=(userserver directory storeserver frontend)
+default_serverlist=(userserver dirserver storeserver frontend)
 
 # Builds the named binary statically.
 function build {
@@ -115,8 +115,8 @@ function main {
             storeserver)
             serverlist[${#serverlist[*]}]="storeserver"
             ;;
-            directory)
-            serverlist[${#serverlist[*]}]="directory"
+            dirserver)
+            serverlist[${#serverlist[*]}]="dirserver"
             ;;
             userserver)
             serverlist[${#serverlist[*]}]="userserver"
@@ -152,7 +152,7 @@ function main {
     echo "Going to work the following servers: ${serverlist[@]}"
 
     for server in "${serverlist[@]}"; do
-        if [[ $testing && ($server != "storeserver" && $server != "directory") ]]; then
+        if [[ $testing && ($server != "storeserver" && $server != "dirserver") ]]; then
             echo "There is no testing instance for $server"
             exit  # this could be a continue, but it's probably not what the user intended. Be safe.
         fi
