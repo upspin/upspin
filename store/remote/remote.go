@@ -42,6 +42,9 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Get(gCtx, req)
+	if err != nil {
+		return nil, nil, err
+	}
 	return resp.Data, proto.UpspinLocations(resp.Locations), err
 }
 

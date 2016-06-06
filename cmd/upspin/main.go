@@ -16,9 +16,11 @@ import (
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/endpoint"
+	"upspin.io/path"
 	"upspin.io/upspin"
 
 	// Load useful packers
+
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
@@ -42,16 +44,18 @@ func main() {
 
 	args := flag.Args()[1:]
 	switch strings.ToLower(flag.Arg(0)) {
-	case "mkdir":
-		mkdir(args...)
-	case "put":
-		put(args...)
 	case "get":
 		get(args...)
 	case "glob":
 		glob(args...)
+	case "link":
+		link(args...)
 	case "ls":
 		ls(args...)
+	case "mkdir":
+		mkdir(args...)
+	case "put":
+		put(args...)
 	case "rm":
 		rm(args...)
 	case "whichaccess":
@@ -82,95 +86,6 @@ func subUsage(fs *flag.FlagSet, msg string) func() {
 		}
 		os.Exit(2)
 	}
-}
-
-func whichAccess(args ...string) {
-	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "whichaccess path...")
-	err := fs.Parse(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for i := 0; i < fs.NArg(); i++ {
-		acc, err := ctx.Directory.WhichAccess(upspin.PathName(fs.Arg(i)))
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(acc)
-	}
-}
-
-func rm(args ...string) {
-	fs := flag.NewFlagSet("rm", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "rm path...")
-	err := fs.Parse(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for i := 0; i < fs.NArg(); i++ {
-		err := ctx.Directory.Delete(upspin.PathName(fs.Arg(i)))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-}
-
-func mkdir(args ...string) {
-	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "mkdir directory...")
-	err := fs.Parse(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for i := 0; i < fs.NArg(); i++ {
-		loc, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("%s: %+v", fs.Arg(i), loc)
-	}
-}
-
-func put(args ...string) {
-	fs := flag.NewFlagSet("put", flag.ExitOnError)
-	inFile := fs.String("in", "", "input file (default standard input)")
-	fs.Usage = subUsage(fs, "put [-in=inputfile] path")
-	err := fs.Parse(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if fs.NArg() != 1 {
-		fs.Usage()
-		os.Exit(2)
-	}
-	var input *os.File
-	if *inFile == "" {
-		input = os.Stdin
-	} else {
-		input, err = os.Open(*inFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer input.Close()
-	}
-	data, err := ioutil.ReadAll(input)
-	if err != nil {
-		log.Fatal(err)
-	}
-	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("%s: %+v", fs.Arg(0), loc)
 }
 
 func get(args ...string) {
@@ -234,6 +149,38 @@ func glob(args ...string) {
 	}
 }
 
+func link(args ...string) {
+	fs := flag.NewFlagSet("link", flag.ExitOnError)
+	force := fs.Bool("f", false, "create link even if original path does not exist")
+	// This is the same order as in the Unix ln command. It sorta feels
+	// backwards, but it's also the same as in cp, with the new name second.
+	fs.Usage = subUsage(fs, "link original_path new_path")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() != 2 {
+		fs.Usage()
+		os.Exit(2)
+	}
+	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
+	newPath := path.Clean(upspin.PathName(fs.Arg(1)))
+	// We require the original to exist unless explicitly requested otherwise.
+	if !*force {
+		dir, err := c.Directory(originalPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if _, err := dir.Lookup(originalPath); err != nil {
+			log.Fatal(err)
+		}
+	}
+	_, err = c.Link(originalPath, newPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func ls(args ...string) {
 	fs := flag.NewFlagSet("ls", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
@@ -249,7 +196,6 @@ func ls(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
 		dir, err := c.Directory(name)
-		fmt.Println(name, err)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -273,6 +219,95 @@ func ls(args ...string) {
 		} else {
 			printShortDirEntries(de)
 		}
+	}
+}
+
+func mkdir(args ...string) {
+	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "mkdir directory...")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for i := 0; i < fs.NArg(); i++ {
+		loc, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%s: %+v", fs.Arg(i), loc)
+	}
+}
+
+func put(args ...string) {
+	fs := flag.NewFlagSet("put", flag.ExitOnError)
+	inFile := fs.String("in", "", "input file (default standard input)")
+	fs.Usage = subUsage(fs, "put [-in=inputfile] path")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() != 1 {
+		fs.Usage()
+		os.Exit(2)
+	}
+	var input *os.File
+	if *inFile == "" {
+		input = os.Stdin
+	} else {
+		input, err = os.Open(*inFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer input.Close()
+	}
+	data, err := ioutil.ReadAll(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("%s: %+v", fs.Arg(0), loc)
+}
+
+func rm(args ...string) {
+	fs := flag.NewFlagSet("rm", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "rm path...")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for i := 0; i < fs.NArg(); i++ {
+		err := ctx.Directory.Delete(upspin.PathName(fs.Arg(i)))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func whichAccess(args ...string) {
+	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "whichaccess path...")
+	err := fs.Parse(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for i := 0; i < fs.NArg(); i++ {
+		acc, err := ctx.Directory.WhichAccess(upspin.PathName(fs.Arg(i)))
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(acc)
 	}
 }
 
@@ -304,85 +339,37 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 		}
 	}
 	for _, e := range de {
-		isDirChar := '_'
+		redirect := ""
+		attrChar := '_'
 		if e.IsDir() {
-			isDirChar = 'd'
+			attrChar = 'd'
 			if !hasFinalSlash(e.Name) {
 				e.Name += "/"
 			}
 		}
+		if e.IsLink() {
+			attrChar = '>'
+			data, err := c.Get(e.Name)
+			if err == nil {
+				redirect = " -> " + string(data)
+			} else {
+				log.Printf("Error fetching redirect for %q: %s", e.Name, err)
+				redirect = " (error fetching redirect)"
+			}
+
+		}
 		endpt := endpoint.String(&e.Location.Endpoint)
 		// TODO: print readers when we have them again.
-		fmt.Printf("%c %*d %*d %s [%s]\t%s\n",
-			isDirChar,
+		fmt.Printf("%c %*d %*d %s [%s]\t%s%s\n",
+			attrChar,
 			seqWidth, e.Metadata.Sequence,
 			sizeWidth, e.Metadata.Size,
 			e.Metadata.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
 			endpt,
-			e.Name)
+			e.Name,
+			redirect)
 	}
 }
-
-/*
-type domains map[string][]string // map[domain][]user
-
-// addUser parses and adds a new user to the map of users and domains.
-func (d domains) addUser(userName upspin.UserName) {
-	user, domain, err := path.UserAndDomain(userName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	users, found := d[domain]
-	if !found {
-		d[domain] = make([]string, 1, 5)
-	}
-	d[domain] = append(users, user)
-}
-
-// getUsersByDomain writes a list of users grouped by domain. If more than one user exists for given domain,
-// the usernames are appended together separated by a comma, as in p,r,edpin@google.com bar,baz@foo.com.
-func (d domains) writeUsersByDomain(buf *bytes.Buffer) {
-	var doms []string
-	for dom := range d {
-		doms = append(doms, dom)
-	}
-	for j, dom := range doms {
-		users := d[dom]
-		for i, u := range users {
-			buf.WriteString(u)
-			if i < len(users)-1 {
-				buf.WriteByte(',')
-			}
-		}
-		buf.WriteByte('@')
-		buf.WriteString(dom)
-		if j < len(doms)-1 {
-			buf.WriteByte(' ')
-		}
-	}
-}
-
-func formatReaders(readers []upspin.UserName) string {
-	const (
-		maxLen = 44
-	)
-	if len(readers) == 0 {
-		return ""
-	}
-	domainMap := domains{}
-	for _, r := range readers {
-		domainMap.addUser(r)
-	}
-	var formatted bytes.Buffer
-	domainMap.writeUsersByDomain(&formatted)
-
-	if formatted.Len() >= maxLen-3 {
-		formatted.Truncate(maxLen)
-		formatted.WriteString("...")
-	}
-	return formatted.String()
-}
-*/
 
 func newClient() (upspin.Client, *upspin.Context) {
 	ctx, err := context.InitContext(nil)

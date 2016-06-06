@@ -753,9 +753,15 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		}
 		// We found the item with that name.
 		found = true
-		// If it's already there and is not expected to be a directory, this is an error.
-		if !deleting && nextEntry.IsDir() && !dirOverwriteOK {
-			return "", mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
+		if !deleting {
+			// If it's already there and the sequence number is SeqNotExist, this is an error.
+			if newEntry.Metadata.Sequence == upspin.SeqNotExist {
+				return "", mkStrError(op, newEntry.Name, "already exists")
+			}
+			// If it's already there and is not expected to be a directory, this is an error.
+			if nextEntry.IsDir() && !dirOverwriteOK {
+				return "", mkStrError(op, upspin.PathName(dirName), "cannot overwrite directory")
+			}
 		}
 		// Drop this entry so we can append the updated one (or skip it, if we're deleting).
 		// It may have changed length because of the metadata being unpredictable,
@@ -764,7 +770,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		dirData = dirData[:len(dirData)-length]
 		if !deleting {
 			// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
-			if newEntry.Metadata.Sequence != 0 {
+			if newEntry.Metadata.Sequence != upspin.SeqIgnore {
 				if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
 					return "", mkError(op, newEntry.Name, errSeq)
 				}
