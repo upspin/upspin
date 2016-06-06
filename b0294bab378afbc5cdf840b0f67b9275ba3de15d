@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06efae33_46cdc39a",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-06T16:52:54Z",
+      "side": 1,
+      "message": "this is exactly os.PathError except for not being exported. why not use it?",
+      "revId": "b0294bab378afbc5cdf840b0f67b9275ba3de15d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
