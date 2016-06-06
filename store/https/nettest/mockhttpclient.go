@@ -11,8 +11,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"upspin.io/cloud/netutil"
 )
 
 var (
@@ -37,6 +35,11 @@ type MockHTTPResponse struct {
 	Error    error
 	Response *http.Response
 }
+
+const (
+	contentType   = "Content-Type"
+	contentLength = "Content-Length"
+)
 
 // NewMockHTTPClient creates an instance pre-loaded with the responses
 // that will be returned when Do is invoked on the HTTP client, in
@@ -64,8 +67,8 @@ func NewMockHTTPClient(responsesToSend []MockHTTPResponse, requestsExpected []*h
 // necessary to fine-tune it.
 func NewMockHTTPResponse(statusCode int, bodyType string, data []byte) MockHTTPResponse {
 	header := http.Header{}
-	header.Add(netutil.ContentType, bodyType)
-	header.Add(netutil.ContentLength, fmt.Sprint(len(data)))
+	header.Add(contentType, bodyType)
+	header.Add(contentLength, fmt.Sprint(len(data)))
 	status := fmt.Sprint(statusCode)
 	resp := &http.Response{
 		Status:     status,
@@ -140,8 +143,8 @@ func (m *MockHTTPClient) Verify(t TestingInterface) {
 		}
 		isWildCard := contentsEquivalent(t, e.Body, r.Body)
 		if !isWildCard {
-			if e.Header.Get(netutil.ContentType) != r.Header.Get(netutil.ContentType) {
-				t.Errorf("Content type mismatch. Expected %v, got %v", e.Header.Get(netutil.ContentType), r.Header.Get(netutil.ContentType))
+			if e.Header.Get(contentType) != r.Header.Get(contentType) {
+				t.Errorf("Content type mismatch. Expected %v, got %v", e.Header.Get(contentType), r.Header.Get(contentType))
 			}
 			// This is probably unnecessary as
 			// compareBytes has already compared lengths

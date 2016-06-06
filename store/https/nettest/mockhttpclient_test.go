@@ -8,28 +8,31 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+)
 
-	"upspin.io/cloud/netutil"
+const (
+	Post = "POST"
+	Get  = "GET"
 )
 
 func TestVerifyWildcardRequest(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com/url", []byte("content")),
+		NewRequest(t, Post, "http://foo.com/url", []byte("content")),
 		AnyRequest,
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp(), newResp()}, expected)
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/url", []byte("content")))
-	mock.Do(NewRequest(t, netutil.Get, "http://anothersite.com", []byte("something else")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/url", []byte("content")))
+	mock.Do(NewRequest(t, Get, "http://anothersite.com", []byte("something else")))
 	mock.Verify(t)
 }
 
 func TestVerifyBodyComparison(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com", []byte("1234")),
+		NewRequest(t, Post, "http://foo.com", []byte("1234")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	differentPayload := NewRequest(t, netutil.Post, "http://foo.com", []byte("1230"))
+	differentPayload := NewRequest(t, Post, "http://foo.com", []byte("1230"))
 	mock.Do(differentPayload)
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.
@@ -49,12 +52,12 @@ func TestVerifyBodyComparison(t *testing.T) {
 
 func TestVerifyIncorrectNumberOfRequests(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com", []byte("1234")),
-		NewRequest(t, netutil.Post, "http://foo.com/get", nil),
+		NewRequest(t, Post, "http://foo.com", []byte("1234")),
+		NewRequest(t, Post, "http://foo.com/get", nil),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", nil))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get", nil))
 
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.
@@ -73,22 +76,22 @@ func TestVerifyIncorrectNumberOfRequests(t *testing.T) {
 
 func TestVerifyMatchesWildcardURL(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "*", []byte("1234")),
+		NewRequest(t, Post, "*", []byte("1234")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get", []byte("1234")))
 
 	mock.Verify(t)
 }
 
 func TestVerifyCatchesMismatchedURLQuery(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com/get?bar=soap", []byte("1234")),
+		NewRequest(t, Post, "http://foo.com/get?bar=soap", []byte("1234")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get?bar=whiskey", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get?bar=whiskey", []byte("1234")))
 
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.
@@ -104,11 +107,11 @@ func TestVerifyCatchesMismatchedURLQuery(t *testing.T) {
 
 func TestVerifyCatchesMismatchedURLScheme(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")),
+		NewRequest(t, Post, "http://foo.com/get", []byte("1234")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "https://foo.com/get", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "https://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.
@@ -124,11 +127,11 @@ func TestVerifyCatchesMismatchedURLScheme(t *testing.T) {
 
 func TestVerifyCatchesMismatchedRequestType(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Get, "http://foo.com/get", []byte("1234")),
+		NewRequest(t, Get, "http://foo.com/get", []byte("1234")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.
@@ -148,37 +151,37 @@ func TestVerifyWildcardRequestType(t *testing.T) {
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get", []byte("1234")))
 	mock.Verify(t)
 }
 
 func TestVerifyNilBody(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com", nil),
+		NewRequest(t, Post, "http://foo.com", nil),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com", nil))
+	mock.Do(NewRequest(t, Post, "http://foo.com", nil))
 	mock.Verify(t)
 }
 
 func TestVerifyNilBodyMatchesWildcard(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com", []byte("*")),
+		NewRequest(t, Post, "http://foo.com", []byte("*")),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com", nil))
+	mock.Do(NewRequest(t, Post, "http://foo.com", nil))
 	mock.Verify(t)
 }
 
 func TestVerifyCachesNonNilBody(t *testing.T) {
 	expected := []*http.Request{
-		NewRequest(t, netutil.Post, "http://foo.com/get", nil),
+		NewRequest(t, Post, "http://foo.com/get", nil),
 	}
 	mock := NewMockHTTPClient([]MockHTTPResponse{newResp()}, expected)
 
-	mock.Do(NewRequest(t, netutil.Post, "http://foo.com/get", []byte("1234")))
+	mock.Do(NewRequest(t, Post, "http://foo.com/get", []byte("1234")))
 
 	newT := newMockTesting(t)
 	mock.Verify(newT) // will fail.

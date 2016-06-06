@@ -12,8 +12,9 @@ import (
 	"net/url"
 	"strings"
 
+	"io"
+
 	"upspin.io/bind"
-	"upspin.io/cloud/netutil"
 	"upspin.io/upspin"
 )
 
@@ -22,7 +23,7 @@ import (
 type Store struct {
 	upspin.NoConfiguration
 	serverURL  string
-	httpClient netutil.HTTPClient
+	httpClient HTTPClient
 }
 
 // Guarantee we implement the interface
@@ -36,16 +37,30 @@ const (
 	invalidRefError = "invalid reference"
 	notHTTPError    = "not an HTTP(S) reference"
 	httpClientError = "HTTP client error: %v"
+
+	Get = "GET" // HTTP Get method
 )
+
+// HTTPClient is a minimal HTTP client interface. An instance of
+// http.Client implements this interface.
+type HTTPClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+}
 
 // New returns a concrete implementation of Store, pointing to a
 // server at a given URL (including the port), for performing Get and
 // Put requests on blocks of data. Use this only for testing.
-func New(serverURL string, httpClient netutil.HTTPClient) *Store {
+func New(serverURL string, httpClient HTTPClient) *Store {
 	return &Store{
 		serverURL:  serverURL,
 		httpClient: httpClient,
 	}
+}
+
+// IsServerReachable reports whether the server at an URL can be reached.
+func IsServerReachable(serverURL string) bool {
+	_, err := http.Head(serverURL)
+	return err == nil
 }
 
 // Dial implements Dialer.
@@ -59,15 +74,15 @@ func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.
 		return nil, newStoreError(op, fmt.Sprintf("invalid HTTP address for endpoint: %v", err), "")
 	}
 	s.serverURL = serverURL.String()
-	if !netutil.IsServerReachable(s.serverURL) {
-		return nil, newStoreError(op, "Store server unreachable", "")
+	if !IsServerReachable(s.serverURL) {
+		return nil, newStoreError(op, "HTTPS store server unreachable", "")
 	}
 	return s, nil
 }
 
 // Ping implements Service.
 func (s *Store) Ping() bool {
-	return netutil.IsServerReachable(s.serverURL)
+	return IsServerReachable(s.serverURL)
 }
 
 // ServerUserName implements Service.
@@ -85,7 +100,7 @@ func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	if !strings.HasPrefix(string(ref), "http://") && !strings.HasPrefix(string(ref), "https://") {
 		return nil, nil, newStoreError(op, notHTTPError, ref)
 	}
-	httpReq, err := http.NewRequest(netutil.Get, url, nil)
+	httpReq, err := http.NewRequest(Get, url, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -123,7 +138,7 @@ func (s *Store) requestAndReadResponseBody(op string, ref upspin.Reference, req 
 
 	// Read the body of the response
 	defer resp.Body.Close()
-	respBody, err := netutil.BufferResponse(resp, maxBytesLimit)
+	respBody, err := BufferResponse(resp, maxBytesLimit)
 	if err != nil {
 		return nil, newStoreError(op, err.Error(), ref)
 	}
@@ -168,6 +183,34 @@ func newStoreError(op string, error string, ref upspin.Reference) *storeError {
 		error: error,
 		ref:   ref,
 	}
+}
+
+// errTooLong is returned when a BufferResponse would not fit in the buffer budget.
+var errTooLong = errors.New("response body too long")
+
+// BufferResponse reads the body of an HTTP response up to maxBufLen bytes. It closes the response body.
+// If the response is larger than maxBufLen, it returns ErrTooLong.
+func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
+	var buf []byte
+	defer resp.Body.Close()
+	if resp.ContentLength > 0 {
+		if resp.ContentLength <= maxBufLen {
+			buf = make([]byte, resp.ContentLength)
+		} else {
+			// Return an error
+			return nil, errTooLong
+		}
+	} else {
+		buf = make([]byte, maxBufLen)
+	}
+	n, err := resp.Body.Read(buf)
+	if err != nil && err != io.EOF {
+		if err == io.ErrShortBuffer {
+			return nil, errTooLong
+		}
+		return nil, err
+	}
+	return buf[:n], nil
 }
 
 func init() {

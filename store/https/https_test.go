@@ -8,11 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
-	"strings"
-
-	"upspin.io/cloud/netutil/nettest"
+	"upspin.io/store/https/nettest"
 )
 
 const (
