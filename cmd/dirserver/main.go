@@ -44,10 +44,8 @@ var (
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
+	logFile      = flag.String("logfile", "dirserver", "Name of the log file on GCP or empty for no GCP logging")
 )
-
-// The upspin username for this server.
-const serverName = "dirserver"
 
 // Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
 type Server struct {
@@ -59,7 +57,10 @@ type Server struct {
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", serverName)
+
+	if *logFile != "" {
+		log.Connect("google.com:upspin", *logFile)
+	}
 
 	if *noAuth {
 		*certFile = ""
