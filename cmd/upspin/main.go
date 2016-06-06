@@ -30,10 +30,6 @@ import (
 	_ "upspin.io/user/transports"
 )
 
-var (
-	c, ctx = newClient()
-)
-
 func main() {
 	flag.Usage = usage
 	flag.Parse()
@@ -101,6 +97,7 @@ func get(args ...string) {
 		os.Exit(2)
 	}
 
+	c, _ := newClient()
 	data, err := c.Get(upspin.PathName(fs.Arg(0)))
 	if err != nil {
 		log.Fatal(err)
@@ -135,6 +132,7 @@ func glob(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
+	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		de, err := c.Glob(fs.Arg(i))
 		if err != nil {
@@ -142,7 +140,7 @@ func glob(args ...string) {
 		}
 
 		if *longFormat {
-			printLongDirEntries(de)
+			printLongDirEntries(c, de)
 		} else {
 			printShortDirEntries(de)
 		}
@@ -165,6 +163,7 @@ func link(args ...string) {
 	}
 	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
 	newPath := path.Clean(upspin.PathName(fs.Arg(1)))
+	c, _ := newClient()
 	// We require the original to exist unless explicitly requested otherwise.
 	if !*force {
 		dir, err := c.Directory(originalPath)
@@ -193,6 +192,7 @@ func ls(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
+	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
 		dir, err := c.Directory(name)
@@ -215,7 +215,7 @@ func ls(args ...string) {
 		}
 
 		if *longFormat {
-			printLongDirEntries(de)
+			printLongDirEntries(c, de)
 		} else {
 			printShortDirEntries(de)
 		}
@@ -232,6 +232,7 @@ func mkdir(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
+	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		loc, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
 		if err != nil {
@@ -253,6 +254,7 @@ func put(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
+	c, _ := newClient()
 	var input *os.File
 	if *inFile == "" {
 		input = os.Stdin
@@ -284,6 +286,7 @@ func rm(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
+	_, ctx := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		err := ctx.Directory.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
@@ -302,6 +305,7 @@ func whichAccess(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
+	_, ctx := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		acc, err := ctx.Directory.WhichAccess(upspin.PathName(fs.Arg(i)))
 		if err != nil {
@@ -325,7 +329,7 @@ func printShortDirEntries(de []*upspin.DirEntry) {
 	}
 }
 
-func printLongDirEntries(de []*upspin.DirEntry) {
+func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 	seqWidth := 2
 	sizeWidth := 2
 	for _, e := range de {
