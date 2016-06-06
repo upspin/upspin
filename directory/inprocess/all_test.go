@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"upspin.io/bind"
@@ -30,6 +31,15 @@ import (
 var (
 	useGCPStore = "" // leave empty for in-process. see init below
 )
+
+var (
+	userNumber int32 // Updated atomically
+)
+
+func nextUser() upspin.UserName {
+	userNumber = atomic.AddInt32(&userNumber, 1)
+	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
+}
 
 func init() {
 	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
@@ -72,14 +82,14 @@ func newContext(name upspin.UserName) *upspin.Context {
 	return context
 }
 
-func setup(userName upspin.UserName) *upspin.Context {
-	context := newContext(userName)
-	err := context.User.(*inprocess.Service).Install(userName, context.Directory)
+func setup() *upspin.Context {
+	context := newContext(nextUser())
+	err := context.User.(*inprocess.Service).Install(context.UserName, context.Directory)
 	if err != nil {
 		panic(err)
 	}
-	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
-	context.User.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
+	key := upspin.PublicKey(fmt.Sprintf("key for %s", context.UserName))
+	context.User.(*inprocess.Service).SetPublicKeys(context.UserName, []upspin.PublicKey{key})
 	return context
 }
 
@@ -137,15 +147,11 @@ func storeDataHelper(t *testing.T, context *upspin.Context, data []byte, name up
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
-	const (
-		user = "user1@google.com"
-		root = user + "/"
-	)
-	context := setup(user)
-	const (
-		fileName = root + "file"
-		text     = "hello sailor"
-	)
+	context := setup()
+	user := context.UserName
+	root := upspin.PathName(user + "/")
+	fileName := root + "file"
+	const text = "hello sailor"
 
 	entry1 := storeData(t, context, []byte(text), fileName)
 	err := context.Directory.Put(entry1)
@@ -186,11 +192,8 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	const (
-		user = "user2@google.com"
-		root = user + "/"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
 	// Create a hundred files.
 	locs := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
@@ -235,11 +238,8 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	const (
-		user = "user3@google.com"
-		root = user + "/"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
 	// Create a hundred files.
 	href := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
@@ -288,11 +288,8 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	const (
-		user = "user4@google.com"
-		root = user + "/"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
 	_, err := context.Directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/", user)))
 	if err != nil {
 		t.Fatal(err)
@@ -403,11 +400,8 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
-	const (
-		user = "user5@google.com"
-		root = user + "/"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
 	// Build the tree.
 	dirs := []string{
 		"ten",
@@ -469,11 +463,9 @@ func TestGlob(t *testing.T) {
 }
 
 func TestSequencing(t *testing.T) {
-	const (
-		user     = "user6@google.com"
-		fileName = user + "/file"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
+	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
 	seq := int64(-1)
 	for i := 0; i < 10; i++ {
@@ -521,11 +513,9 @@ func TestSequencing(t *testing.T) {
 }
 
 func TestRootDirectorySequencing(t *testing.T) {
-	const (
-		user     = "user7@google.com"
-		fileName = user + "/file"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
+	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
 	seq := int64(-1)
 	for i := 0; i < 10; i++ {
@@ -547,12 +537,31 @@ func TestRootDirectorySequencing(t *testing.T) {
 	}
 }
 
+func TestSeqNotExist(t *testing.T) {
+	context := setup()
+	user := context.UserName
+	fileName := upspin.PathName(user + "/file")
+	entry := storeData(t, context, []byte("hello"), fileName)
+	// First write with SeqNotExist should succeed.
+	entry.Metadata.Sequence = upspin.SeqNotExist
+	err := context.Directory.Put(entry)
+	if err != nil {
+		t.Fatalf("put file: %v", err)
+	}
+	// Second should fail.
+	err = context.Directory.Put(entry)
+	if err == nil {
+		t.Fatalf("put file succeeded; should have failed")
+	}
+	if !strings.Contains(err.Error(), "already exists") {
+		t.Fatalf("put file expected 'already exists' error; got %v", err)
+	}
+}
+
 func TestDelete(t *testing.T) {
-	const (
-		user     = "user8@google.com"
-		fileName = user + "/file"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
+	fileName := upspin.PathName(user + "/file")
 	dir := context.Directory
 	entry := storeData(t, context, []byte("hello"), fileName)
 	err := dir.Put(entry)
@@ -583,12 +592,10 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteDirectory(t *testing.T) {
-	const (
-		user     = "user9@google.com"
-		dirName  = user + "/dir"
-		fileName = dirName + "/file"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
+	dirName := upspin.PathName(user + "/dir")
+	fileName := dirName + "/file"
 	dir := context.Directory
 	_, err := dir.MakeDirectory(dirName)
 	if err != nil {
@@ -632,14 +639,12 @@ func TestDeleteDirectory(t *testing.T) {
 }
 
 func TestWhichAccess(t *testing.T) {
-	const (
-		user           = "user10@google.com"
-		dir1Name       = user + "/dir1"
-		dir2Name       = dir1Name + "/dir2"
-		fileName       = dir2Name + "/file"
-		accessFileName = dir1Name + "/Access"
-	)
-	context := setup(user)
+	context := setup()
+	user := context.UserName
+	dir1Name := upspin.PathName(user + "/dir1")
+	dir2Name := dir1Name + "/dir2"
+	fileName := dir2Name + "/file"
+	accessFileName := dir1Name + "/Access"
 	dir := context.Directory
 	_, err := dir.MakeDirectory(dir1Name)
 	if err != nil {

@@ -374,7 +374,13 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 	}
 
 	// Update the directory entry with the new name and sequence.
-	entry.Metadata.Sequence = 0
+	// If we are linking, the new file must not exist.
+	// TODO: Should it also not exist on a rename?
+	if rename {
+		entry.Metadata.Sequence = upspin.SeqIgnore
+	} else {
+		entry.Metadata.Sequence = upspin.SeqNotExist
+	}
 	if err := packer.Name(c.context, entry, newName); err != nil {
 		return nil, err
 	}
