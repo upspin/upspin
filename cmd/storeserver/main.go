@@ -33,10 +33,8 @@ var (
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
+	logFile      = flag.String("logfile", "storeserver", "Name of the log file on GCP or empty for no GCP logging")
 )
-
-// The upspin username for this server.
-const serverName = "storeserver"
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
@@ -48,7 +46,10 @@ type Server struct {
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", serverName)
+
+	if *logFile != "" {
+		log.Connect("google.com:upspin", *logFile)
+	}
 
 	if *noAuth {
 		*certFile = ""
@@ -62,7 +63,7 @@ func main() {
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	context := &upspin.Context{
-		UserName: serverName,
+		UserName: "storeserver",
 	}
 	// If there are configuration options, set them now
 	if *config != "" {

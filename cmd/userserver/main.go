@@ -32,6 +32,7 @@ var (
 	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
 	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options (key=value) for this server")
+	logFile      = flag.String("logfile", "userserver", "Name of the log file on GCP or empty for no GCP logging")
 )
 
 // The upspin username for this server.
@@ -48,7 +49,10 @@ type Server struct {
 
 func main() {
 	flag.Parse()
-	log.Connect("google.com:upspin", serverName)
+
+	if *logFile != "" {
+		log.Connect("google.com:upspin", *logFile)
+	}
 
 	if *noAuth {
 		*certFile = ""
