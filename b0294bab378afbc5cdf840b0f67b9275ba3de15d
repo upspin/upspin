@@ -16,6 +16,24 @@
       "revId": "b0294bab378afbc5cdf840b0f67b9275ba3de15d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "06efae33_692890d1",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-06T17:23:47Z",
+      "side": 1,
+      "message": "(Just a parens: This is not new code. It\u0027s moved code that git didn\u0027t recognize due to too many changes.)\n\nWe talked about PathError when this code was first introduced. I can use it if it\u0027s important, but my Error() function does not include the path if it\u0027s not present. os.PathError does and if it\u0027s empty it looks like two  spaces between the messages.\n\nThis is what it does:\n\nfunc (e *PathError) Error() string { return e.Op + \" \" + e.Path + \": \" + e.Err.Error() }\n\nI changed it so I\u0027m wrapping os.PathError and using my own Error() function. Let me know if it\u0027s sufficient or if you prefer I just use os.PathError as-is anyway.",
+      "parentUuid": "06efae33_46cdc39a",
+      "revId": "b0294bab378afbc5cdf840b0f67b9275ba3de15d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
