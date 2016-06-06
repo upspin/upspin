@@ -8,10 +8,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 
-	"reflect"
 	"upspin.io/access"
 	"upspin.io/cloud/gcp"
 	"upspin.io/cloud/gcp/gcptest"

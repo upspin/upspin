@@ -480,10 +480,6 @@ func newDirectory(cloudClient gcpCloud.GCP, f upspin.Factotum, newStoreClient ne
 		rootCache:      cache.NewLRU(1000), // TODO: adjust numbers
 		dirNegCache:    cache.NewLRU(1000), // TODO: adjust numbers
 	}
-	// Use our default if not given one.
-	if d.newStoreClient == nil {
-		d.newStoreClient = d.newDefaultStoreClient
-	}
 	// Use the default time function if not given one.
 	if d.timeNow == nil {
 		d.timeNow = upspin.Now
@@ -506,10 +502,18 @@ func (d *directory) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, erro
 // storeGet binds to the endpoint in the location, calls the store client and resolves up to one indirection,
 // returning the contents of the file.
 func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
-	store, err := d.newStoreClient(loc.Endpoint)
+	var store upspin.Store
+	var err error
+	// Use our default if not given one.
+	if d.newStoreClient == nil {
+		store, err = d.newDefaultStoreClient(loc.Endpoint)
+	} else {
+		store, err = d.newStoreClient(loc.Endpoint)
+	}
 	if err != nil {
 		return nil, newDirError("storeGet", upspin.PathName(loc.Reference), fmt.Errorf("can't create new store client: %s", err).Error())
 	}
+	log.Debug.Printf("storeGet: going to get loc: %v", loc)
 	data, locs, err := store.Get(loc.Reference)
 	if err != nil {
 		return nil, err
@@ -518,8 +522,8 @@ func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 		return data, nil
 	}
 	if len(locs) > 0 {
-		data, _, err := store.Get(locs[0].Reference)
-		return data, err
+		// TODO: this only does one redirection. It also might recurse forever if the redirections refer to each other.
+		return d.storeGet(&locs[0])
 	}
 	return data, err
 }
