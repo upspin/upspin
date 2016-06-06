@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06efae33_89c7dc78",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-06T18:09:15Z",
+      "side": 1,
+      "message": "I would say yes, it shouldn\u0027t exist in both cases.",
+      "range": {
+        "startLine": 378,
+        "startChar": 4,
+        "endLine": 378,
+        "endChar": 47
+      },
+      "revId": "c75ec6054627d60ab7d86521e7797c4a5fe74100",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
