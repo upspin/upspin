@@ -9,7 +9,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -30,6 +29,8 @@ import (
 	_ "upspin.io/user/transports"
 )
 
+var op string // The subcommand we are running.
+
 func main() {
 	flag.Usage = usage
 	flag.Parse()
@@ -39,7 +40,8 @@ func main() {
 	}
 
 	args := flag.Args()[1:]
-	switch strings.ToLower(flag.Arg(0)) {
+	op = flag.Arg(0)
+	switch strings.ToLower(op) {
 	case "get":
 		get(args...)
 	case "glob":
@@ -54,6 +56,8 @@ func main() {
 		put(args...)
 	case "rm":
 		rm(args...)
+	case "share":
+		share(args...)
 	case "whichaccess":
 		whichAccess(args...)
 	default:
@@ -68,6 +72,20 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+// exitf prints the error and exits the program.
+// We don't use log (although the packages we call do) because the errors
+// are for users.
+func exitf(format string, args ...interface{}) {
+	format = fmt.Sprintf("upspin: %s: %s\n", op, format)
+	fmt.Fprintf(os.Stderr, format, args...)
+	os.Exit(1)
+}
+
+// exit calls exitf with the error.
+func exit(err error) {
+	exitf("%s", err)
 }
 
 func subUsage(fs *flag.FlagSet, msg string) func() {
@@ -90,7 +108,7 @@ func get(args ...string) {
 	fs.Usage = subUsage(fs, "get [-out=outputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
@@ -100,9 +118,8 @@ func get(args ...string) {
 	c, _ := newClient()
 	data, err := c.Get(upspin.PathName(fs.Arg(0)))
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
-	log.Printf("Success reading file. Len: %d", len(data))
 	// Write to outfile or to stdout if none set
 	var output *os.File
 	if *outFile == "" {
@@ -110,13 +127,13 @@ func get(args ...string) {
 	} else {
 		output, err = os.Create(*outFile)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 		defer output.Close()
 	}
 	_, err = output.Write(data)
 	if err != nil {
-		log.Fatalf("Copying to output failed: %v", err)
+		exitf("Copying to output failed: %v", err)
 	}
 }
 
@@ -126,7 +143,7 @@ func glob(args ...string) {
 	fs.Usage = subUsage(fs, "glob [-l] pattern...")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -136,7 +153,7 @@ func glob(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		de, err := c.Glob(fs.Arg(i))
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		if *longFormat {
@@ -155,7 +172,7 @@ func link(args ...string) {
 	fs.Usage = subUsage(fs, "link original_path new_path")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() != 2 {
 		fs.Usage()
@@ -168,15 +185,15 @@ func link(args ...string) {
 	if !*force {
 		dir, err := c.Directory(originalPath)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
-		if _, err := dir.Lookup(originalPath); err != nil {
-			log.Fatal(err)
+		if _, err = dir.Lookup(originalPath); err != nil {
+			exit(err)
 		}
 	}
 	_, err = c.Link(originalPath, newPath)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 }
 
@@ -186,7 +203,7 @@ func ls(args ...string) {
 	fs.Usage = subUsage(fs, "ls [-l] path...")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -197,18 +214,18 @@ func ls(args ...string) {
 		name := upspin.PathName(fs.Arg(i))
 		dir, err := c.Directory(name)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 		entry, err := dir.Lookup(name)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 
 		var de []*upspin.DirEntry
 		if entry.IsDir() {
 			de, err = c.Glob(string(entry.Name) + "/*")
 			if err != nil {
-				log.Fatal(err)
+				exit(err)
 			}
 		} else {
 			de = []*upspin.DirEntry{entry}
@@ -227,7 +244,7 @@ func mkdir(args ...string) {
 	fs.Usage = subUsage(fs, "mkdir directory...")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -236,9 +253,9 @@ func mkdir(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		loc, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
-		log.Printf("%s: %+v", fs.Arg(i), loc)
+		fmt.Fprintf(os.Stderr, "%s: %+v\n", fs.Arg(0), loc)
 	}
 }
 
@@ -248,7 +265,7 @@ func put(args ...string) {
 	fs.Usage = subUsage(fs, "put [-in=inputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
@@ -261,19 +278,19 @@ func put(args ...string) {
 	} else {
 		input, err = os.Open(*inFile)
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 		defer input.Close()
 	}
 	data, err := ioutil.ReadAll(input)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
-	log.Printf("%s: %+v", fs.Arg(0), loc)
+	fmt.Fprintf(os.Stderr, "%s: %+v\n", fs.Arg(0), loc)
 }
 
 func rm(args ...string) {
@@ -281,7 +298,7 @@ func rm(args ...string) {
 	fs.Usage = subUsage(fs, "rm path...")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -290,9 +307,33 @@ func rm(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		err := ctx.Directory.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 	}
+}
+
+func share(args ...string) {
+	fs := flag.NewFlagSet("share", flag.ExitOnError)
+	fix := fs.Bool("fix", false, "repair incorrect share settings")
+	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
+	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
+	quiet := fs.Bool("q", false, "suppress output. Default is to show state for every file")
+	fs.Usage = subUsage(fs, "share path...")
+	err := fs.Parse(args)
+	if err != nil {
+		exit(err)
+	}
+	if fs.NArg() != 1 {
+		usage()
+	}
+	s := &sharer{
+		fs:    fs,
+		fix:   *fix,
+		isDir: *isDir,
+		recur: *recur,
+		quiet: *quiet,
+	}
+	s.do()
 }
 
 func whichAccess(args ...string) {
@@ -300,7 +341,7 @@ func whichAccess(args ...string) {
 	fs.Usage = subUsage(fs, "whichaccess path...")
 	err := fs.Parse(args)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -309,7 +350,7 @@ func whichAccess(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		acc, err := ctx.Directory.WhichAccess(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 		fmt.Println(acc)
 	}
@@ -357,7 +398,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 			if err == nil {
 				redirect = " -> " + string(data)
 			} else {
-				log.Printf("Error fetching redirect for %q: %s", e.Name, err)
+				fmt.Fprintf(os.Stderr, "fetching redirect for %q: %s\n", e.Name, err)
 				redirect = " (error fetching redirect)"
 			}
 
@@ -378,7 +419,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 func newClient() (upspin.Client, *upspin.Context) {
 	ctx, err := context.InitContext(nil)
 	if err != nil {
-		log.Fatal(err)
+		exit(err)
 	}
 	return client.New(ctx), ctx
 }
