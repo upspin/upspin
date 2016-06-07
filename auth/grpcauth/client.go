@@ -87,7 +87,7 @@ func (ac *AuthClientService) Authenticate(ctx *upspin.Context) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Authenticate: got authtoken for user %s: %s", req.UserName, resp.Token)
+	log.Debug.Printf("Authenticate: got authtoken for user %s: %s", req.UserName, resp.Token)
 	ac.authToken = resp.Token
 	ac.lastTokenRefresh = time.Now()
 	return nil
@@ -117,7 +117,7 @@ func (ac *AuthClientService) SetAuthContext(ctx *upspin.Context) (gContext.Conte
 			return nil, err
 		}
 	}
-	log.Printf("SetAuthContext: set auth token: %s", ac.authToken)
+	log.Debug.Printf("SetAuthContext: set auth token: %s", ac.authToken)
 	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
 }
 
