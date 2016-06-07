@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a3989490_3fc2809b",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-07T23:08:57Z",
+      "side": 1,
+      "message": "Instead of this, you could install the usercache too. But this is fine.",
+      "revId": "15c8497631416b9ea5af1a247a82522b0441bcf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
