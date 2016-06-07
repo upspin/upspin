@@ -169,6 +169,7 @@ func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.Pub
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
 func (u *user) fetchUserEntry(userName upspin.UserName) (*userEntry, error) {
 	// Get the user entry from GCP
+	log.Printf("Going to get user entry on GCP for user %s", userName)
 	buf, err := u.cloudClient.Download(string(userName))
 	if err != nil {
 		log.Printf("Error downloading user entry for %q: %q", userName, err)
