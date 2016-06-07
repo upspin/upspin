@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/presotto/fuse"
-	"github.com/presotto/fuse/fs"
+	"bazil.org/fuse"
+	"bazil.org/fuse/fs"
 	xcontext "golang.org/x/net/context"
 
 	"upspin.io/client"

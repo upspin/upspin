@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/presotto/fuse"
+	"bazil.org/fuse"
 
 	"upspin.io/log"
 )

@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/presotto/fuse"
+	"bazil.org/fuse"
 
 	"upspin.io/bind"
 	"upspin.io/client"
