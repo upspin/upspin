@@ -11,9 +11,9 @@
 //
 // Example:
 //
-// Read: email@domain,com, email2@domain.com
-// Write: writer@domain.com, writer2@domain.com, writer3@exmaple,com
-// Append,Write: appender@example.com # This is a comment
+//	Read: email@domain,com, email2@domain.com
+//	Write: writer@domain.com, writer2@domain.com, writer3@example,com
+//	Append,Write: appender@example.com # This is a comment
 package access
 
 import (
@@ -521,7 +521,6 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 	var missingGroups []upspin.PathName
 	// This is not a range loop because the groups list may grow.
 	for i := 0; i < len(groupsToCheck); i++ {
-		// TODO: The call to Path allocates. Would be nice to avoid.
 		group := groupsToCheck[i]
 		groupPath := group.Path()
 		mu.RLock()
