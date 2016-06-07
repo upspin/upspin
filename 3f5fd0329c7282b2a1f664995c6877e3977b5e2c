@@ -16,6 +16,24 @@
       "revId": "3f5fd0329c7282b2a1f664995c6877e3977b5e2c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3258844_73c2a04e",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-07T23:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83c4707e_edbfcd67",
+      "revId": "3f5fd0329c7282b2a1f664995c6877e3977b5e2c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
