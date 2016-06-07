@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -115,7 +114,7 @@ type client struct {
 }
 
 func (c *client) TellTrump(t *testing.T, demand string) (response string) {
-	gCtx, err := c.SetAuthContext(c.Context)
+	gCtx, err := c.NewAuthContext()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,11 +132,7 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 
 func startClient(port string) {
 	const allowSelfSignedCert = true
-	conn, err := grpcauth.NewGRPCClient(upspin.NetAddr("localhost:"+port), allowSelfSignedCert)
-	if err != nil {
-		log.Fatal(err)
-	}
-	grpcClient := prototest.NewTestServiceClient(conn)
+
 	f, err := factotum.New(p256Key)
 	if err != nil {
 		log.Fatal(err)
@@ -146,21 +141,17 @@ func startClient(port string) {
 		UserName: user,
 		Factotum: f,
 	}
-	authClient := grpcauth.AuthClientService{
-		GRPCCommon: grpcClient,
-		GRPCConn:   conn,
-		Context:    ctx,
-	}
-	cli = &client{
-		AuthClientService: authClient,
-		grpcClient:        grpcClient,
-	}
-	// Wait for the connection to get established with the server.
-	cc, err := grpc.NewConn(conn)
+
+	authClient, err := grpcauth.NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), allowSelfSignedCert)
 	if err != nil {
 		log.Fatal(err)
 	}
-	cc.Wait(gContext.Background())
+	grpcClient := prototest.NewTestServiceClient(authClient.GRPCConn())
+	authClient.SetService(grpcClient)
+	cli = &client{
+		AuthClientService: *authClient,
+		grpcClient:        grpcClient,
+	}
 }
 
 func TestAll(t *testing.T) {

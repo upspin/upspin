@@ -38,7 +38,7 @@ var _ upspin.Directory = (*remote)(nil)
 
 // Glob implements upspin.Directory.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 
 // MakeDirectory implements upspin.Directory.MakeDirectory.
 func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return upspin.Location{}, err
 	}
@@ -74,7 +74,7 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, 
 // Put implements upspin.Directory.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (r *remote) Put(entry *upspin.DirEntry) error {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 
 // WhichAccess implements upspin.Directory.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return "", err
 	}
@@ -107,7 +107,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) 
 
 // Delete implements upspin.Directory.Delete.
 func (r *remote) Delete(pathName upspin.PathName) error {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (r *remote) Delete(pathName upspin.PathName) error {
 
 // Lookup implements upspin.Directory.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, err
 	}
@@ -159,19 +159,15 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	conn, err := grpcauth.NewGRPCClient(e.NetAddr, grpcauth.AllowSelfSignedCertificate)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.AllowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
 	// TODO: When can we do conn.Close()?
-	dirClient := proto.NewDirectoryClient(conn)
-	authClient := grpcauth.AuthClientService{
-		GRPCCommon: dirClient,
-		GRPCConn:   conn,
-		Context:    context,
-	}
+	dirClient := proto.NewDirectoryClient(authClient.GRPCConn())
+	authClient.SetService(dirClient)
 	r := &remote{
-		AuthClientService: authClient,
+		AuthClientService: *authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,
