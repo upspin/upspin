@@ -74,17 +74,19 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 // PublicUserKeyService returns a Lookup function that looks up users public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, error) {
-	context := &upspin.Context{}
-	e := upspin.Endpoint{
-		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(userServiceAddr),
-	}
-	u, err := bind.User(context, e)
-	if err != nil {
-		log.Fatalf("Can't bind to User service: %v", err)
-	}
 	return func(userName upspin.UserName) ([]upspin.PublicKey, error) {
+		context := &upspin.Context{}
+		e := upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   upspin.NetAddr(userServiceAddr),
+		}
+		u, err := bind.User(context, e)
+		if err != nil {
+			log.Fatalf("Can't bind to User service: %v", err)
+		}
+		log.Printf("Calling User.Lookup for user %s", userName)
 		_, keys, err := u.Lookup(userName)
+		log.Printf("Lookup answered: %v, %v", keys, err)
 		return keys, err
 	}
 }
