@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/presotto/fuse"
-	"github.com/presotto/fuse/fs"
+	"bazil.org/fuse"
+	"bazil.org/fuse/fs"
 
 	"upspin.io/context"
 	"upspin.io/log"
