@@ -11,9 +11,9 @@
 //
 // Example:
 //
-// Read: email@domain,com, email2@domain.com
-// Write: writer@domain.com, writer2@domain.com, writer3@exmaple,com
-// Append,Write: appender@example.com # This is a comment
+//	Read: email@domain,com, email2@domain.com
+//	Write: writer@domain.com, writer2@domain.com, writer3@example,com
+//	Append,Write: appender@example.com # This is a comment
 package access
 
 import (
