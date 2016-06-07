@@ -34,7 +34,7 @@ var _ upspin.Store = (*remote)(nil)
 
 // Get implements upspin.Store.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,7 +51,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // Put implements upspin.Store.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return "", err
 	}
@@ -67,7 +67,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 
 // Delete implements upspin.Store.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
-	gCtx, err := r.SetAuthContext(r.Context)
+	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
 	}
@@ -103,19 +103,15 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	conn, err := grpcauth.NewGRPCClient(e.NetAddr, grpcauth.AllowSelfSignedCertificate)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.AllowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
 	// TODO: When can we do conn.Close()?
-	storeClient := proto.NewStoreClient(conn)
-	authClient := grpcauth.AuthClientService{
-		GRPCCommon: storeClient,
-		GRPCConn:   conn,
-		Context:    context,
-	}
+	storeClient := proto.NewStoreClient(authClient.GRPCConn())
+	authClient.SetService(storeClient)
 	r := &remote{
-		AuthClientService: authClient,
+		AuthClientService: *authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,
