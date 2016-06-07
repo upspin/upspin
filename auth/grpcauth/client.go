@@ -99,7 +99,11 @@ func (ac *AuthClientService) Ping() bool {
 	req := &proto.PingRequest{
 		PingSequence: seq,
 	}
-	resp, err := ac.GRPCCommon.Ping(gContext.Background(), req)
+	gctx, _ := gContext.WithTimeout(gContext.Background(), 3*time.Second) // ignore the cancel function.
+	resp, err := ac.GRPCCommon.Ping(gctx, req)
+	if err != nil {
+		log.Printf("Ping error: %s", err)
+	}
 	return err == nil && resp.PingSequence == seq
 }
 
