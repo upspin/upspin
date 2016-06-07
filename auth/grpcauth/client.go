@@ -65,7 +65,6 @@ func NewGRPCClient(netAddr upspin.NetAddr, allowSelfSignedCertificate bool) (*gr
 	conn, err := grpc.Dial(addr[skip:],
 		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
 		grpc.WithBlock(),
-		grpc.WithTimeout(5*time.Second), // TODO: This timeout is arbitrary.
 	)
 	return conn, err
 }
