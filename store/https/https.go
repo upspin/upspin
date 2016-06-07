@@ -203,14 +203,14 @@ func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 	} else {
 		buf = make([]byte, maxBufLen)
 	}
-	n, err := resp.Body.Read(buf)
-	if err != nil && err != io.EOF {
-		if err == io.ErrShortBuffer {
-			return nil, errTooLong
+	n, err := io.ReadFull(resp.Body, buf)
+	if err != nil {
+		if err == io.ErrUnexpectedEOF {
+			return buf[:n], nil
 		}
 		return nil, err
 	}
-	return buf[:n], nil
+	return buf, nil
 }
 
 func init() {
