@@ -30,10 +30,9 @@ type GRPCCommon interface {
 
 // AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.
 type AuthClientService struct {
-	GRPCCommon GRPCCommon
-	GRPCConn   *grpc.ClientConn
-	Context    *upspin.Context
-
+	grpcCommon       GRPCCommon
+	grpcConn         *grpc.ClientConn
+	context          *upspin.Context
 	authToken        string
 	lastTokenRefresh time.Time
 }
@@ -44,13 +43,13 @@ const AllowSelfSignedCertificate = true
 // To be safe, we refresh the token 1 hour ahead of time.
 var tokenFreshnessDuration = authTokenDuration - time.Hour
 
-// NewGRPCClient returns new GRPC client connection connected securely (with TLS) to a GRPC server at the given address.
+// NewGRPCClient returns new GRPC client connected securely (with TLS) to a GRPC server at a net address.
 // The address is expected to be a raw network address with port number, as in domain.com:5580. However, for convenience,
 // it is optionally accepted for the time being to use one of the following prefixes:
 // https://, http://, grpc://. This may change in the future.
 // If allowSelfSignedCertificates is true, the client will connect with a server with a self-signed certificate.
 // Otherwise it will reject it. Mostly only useful for testing a local server.
-func NewGRPCClient(netAddr upspin.NetAddr, allowSelfSignedCertificate bool) (*grpc.ClientConn, error) {
+func NewGRPCClient(context *upspin.Context, netAddr upspin.NetAddr, allowSelfSignedCertificate bool) (*AuthClientService, error) {
 	addr := string(netAddr)
 	isHTTP := strings.HasPrefix(addr, "http://")
 	isHTTPS := strings.HasPrefix(addr, "https://")
@@ -66,7 +65,25 @@ func NewGRPCClient(netAddr upspin.NetAddr, allowSelfSignedCertificate bool) (*gr
 		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
 		grpc.WithBlock(),
 	)
-	return conn, err
+	if err != nil {
+		return nil, err
+	}
+	ac := &AuthClientService{
+		grpcConn: conn,
+		context:  context,
+	}
+	return ac, nil
+}
+
+// SetService sets the underlying RPC service which was obtained with proto.NewSERVICENAMEClient, where SERVICENAME is
+// the RPC service definition from the proto file.
+func (ac *AuthClientService) SetService(common GRPCCommon) {
+	ac.grpcCommon = common
+}
+
+// GRPCConn returns the grpc client connection used to dial the server.
+func (ac *AuthClientService) GRPCConn() *grpc.ClientConn {
+	return ac.grpcConn
 }
 
 // Authenticate implements upspin.Service.
@@ -83,7 +100,7 @@ func (ac *AuthClientService) Authenticate(ctx *upspin.Context) error {
 		R: sig.R.String(),
 		S: sig.S.String(),
 	}
-	resp, err := ac.GRPCCommon.Authenticate(gContext.Background(), req)
+	resp, err := ac.grpcCommon.Authenticate(gContext.Background(), req)
 	if err != nil {
 		return err
 	}
@@ -100,7 +117,7 @@ func (ac *AuthClientService) Ping() bool {
 		PingSequence: seq,
 	}
 	gctx, _ := gContext.WithTimeout(gContext.Background(), 3*time.Second) // ignore the cancel function.
-	resp, err := ac.GRPCCommon.Ping(gctx, req)
+	resp, err := ac.grpcCommon.Ping(gctx, req)
 	if err != nil {
 		log.Printf("Ping error: %s", err)
 	}
@@ -111,12 +128,12 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
 }
 
-// SetAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
+// NewAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
 // is done if necessary.
-func (ac *AuthClientService) SetAuthContext(ctx *upspin.Context) (gContext.Context, error) {
+func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 	var err error
 	if ac.isAuthTokenExpired() {
-		err = ac.Authenticate(ctx)
+		err = ac.Authenticate(ac.context)
 		if err != nil {
 			return nil, err
 		}
@@ -128,5 +145,5 @@ func (ac *AuthClientService) SetAuthContext(ctx *upspin.Context) (gContext.Conte
 // Close implements upspin.Service.
 func (ac *AuthClientService) Close() {
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
-	_ = ac.GRPCConn.Close() // explicitly ignore the error as there's nothing we can do.
+	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
 }

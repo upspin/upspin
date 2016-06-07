@@ -75,22 +75,18 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote user: unrecognized transport")
 	}
 
-	conn, err := grpcauth.NewGRPCClient(e.NetAddr, grpcauth.AllowSelfSignedCertificate)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.AllowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
 	// TODO: When can we do conn.Close()?
-	userClient := proto.NewUserClient(conn)
+	userClient := proto.NewUserClient(authClient.GRPCConn())
+	authClient.SetService(userClient)
 	if err != nil {
 		return nil, err
 	}
-	authClient := grpcauth.AuthClientService{
-		GRPCCommon: userClient,
-		GRPCConn:   conn,
-		Context:    context,
-	}
 	r := &remote{
-		AuthClientService: authClient,
+		AuthClientService: *authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,
