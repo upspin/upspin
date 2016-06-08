@@ -7,6 +7,7 @@ package grpcauth
 import (
 	"crypto/tls"
 	"math/rand"
+	"net"
 	"strings"
 	"time"
 
@@ -63,10 +64,23 @@ func NewGRPCClient(netAddr upspin.NetAddr, allowSelfSignedCertificate bool) (*gr
 		skip = 8
 	}
 	conn, err := grpc.Dial(addr[skip:],
-		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
 		grpc.WithBlock(),
+		grpc.WithDialer(dialWithKeepAlive),
+		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
 	)
 	return conn, err
+}
+
+func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
+	c, err := net.DialTimeout("tcp", target, timeout)
+	if err != nil {
+		return nil, err
+	}
+	if tc, ok := c.(*net.TCPConn); ok {
+		tc.SetKeepAlive(true)
+		tc.SetKeepAlivePeriod(2 * time.Minute)
+	}
+	return c, nil
 }
 
 // Authenticate implements upspin.Service.
