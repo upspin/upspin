@@ -11,6 +11,8 @@ import (
 
 	gContext "golang.org/x/net/context"
 
+	"time"
+
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/upspin"
@@ -103,7 +105,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.New("remote: unrecognized transport")
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.AllowSelfSignedCertificate)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, 3*time.Minute, grpcauth.AllowSelfSignedCertificate)
 	if err != nil {
 		return nil, err
 	}
