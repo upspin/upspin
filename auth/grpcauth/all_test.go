@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package grpcauth_test
+package grpcauth
 
 import (
 	"errors"
@@ -14,7 +14,6 @@ import (
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth"
-	"upspin.io/auth/grpcauth"
 	prototest "upspin.io/auth/grpcauth/testdata"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
@@ -31,14 +30,14 @@ var (
 	}
 
 	user       = upspin.UserName("joe@blow.com")
-	grpcServer grpcauth.SecureServer
+	grpcServer SecureServer
 	srv        *server
 	cli        *client
 )
 
 type server struct {
 	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
+	SecureServer
 	t         *testing.T
 	iteration int
 }
@@ -68,7 +67,7 @@ func startServer() (port string) {
 		Lookup: lookup,
 	}
 	var err error
-	grpcServer, err = grpcauth.NewSecureServer(config, "testdata/cert.pem", "testdata/key.pem")
+	grpcServer, err = NewSecureServer(config, "testdata/cert.pem", "testdata/key.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -108,9 +107,9 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 }
 
 type client struct {
-	grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
-	grpcClient                 prototest.TestServiceClient
-	demandCount                int
+	AuthClientService // For handling Authenticate, Ping and Close.
+	grpcClient        prototest.TestServiceClient
+	demandCount       int
 }
 
 func (c *client) TellTrump(t *testing.T, demand string) (response string) {
@@ -131,8 +130,6 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 }
 
 func startClient(port string) {
-	const allowSelfSignedCert = true
-
 	f, err := factotum.New(p256Key)
 	if err != nil {
 		log.Fatal(err)
@@ -142,7 +139,7 @@ func startClient(port string) {
 		Factotum: f,
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), allowSelfSignedCert)
+	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, AllowSelfSignedCertificate)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,6 +175,10 @@ func TestAll(t *testing.T) {
 	if cli.demandCount != srv.iteration {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.demandCount)
 	}
+
+	if cli.keepAliveRound > 0 {
+		t.Errorf("Expected keep alive go routine to be alive.")
+	}
 }
 
 var (
@@ -204,6 +205,12 @@ func TestMain(m *testing.M) {
 	log.Printf("Finishing...")
 	cli.Close()
 	srv.Stop()
+
+	// Verify keep alive routine has exited
+	if cli.keepAliveRound != 0 {
+		log.Printf("Keep-alive go routine has not exited")
+		code = -1
+	}
 
 	// Report test results.
 	log.Printf("Finishing e2e tests: %d", code)
