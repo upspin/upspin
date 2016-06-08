@@ -129,7 +129,7 @@ func (s *sharer) do() {
 		for _, e := range entries {
 			name := e.Name
 			if !e.IsDir() {
-				s.fixShare(name, s.users[name])
+				s.fixShare(name, s.users[path.DropPath(name, 1)])
 			}
 		}
 	}
@@ -279,9 +279,14 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	}
 	packdatas := []*[]byte{&entry.Metadata.Packdata}
 	packer.Share(s.context, keys, packdatas)
+	if packdatas[0] == nil {
+		fmt.Fprintf(os.Stderr, "packing skipped for %q\n", entry.Name)
+		s.exitCode = 1
+		return
+	}
 	err = s.context.Directory.Put(entry)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s", name, err)
+		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", name, err)
 		s.exitCode = 1
 	}
 }
@@ -302,6 +307,11 @@ func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 		s.exitCode = 1
 	}
 	// Remember the lookup, failed or otherwise.
+	// TODO: We need to deal with multiple key types, and finding the right one.
+	// TODO: This may be different for each file type, but for now we're only using
+	// one encryption protocol so it will serve for now.
+	// TODO: See ee.IsValidKeyForPacker and make it general.
+	fmt.Println(user, len(keys))
 	s.userKeys[user] = keys[0]
 	return keys[0]
 }

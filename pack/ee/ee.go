@@ -329,6 +329,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 			continue
 		}
 		*packdata[i] = dst
+		skipped[i] = false
 	}
 	for i := range packdata {
 		if skipped[i] {
