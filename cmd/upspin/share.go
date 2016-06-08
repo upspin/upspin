@@ -57,7 +57,8 @@ type sharer struct {
 
 // do is the main function for the share subcommand.
 func (s *sharer) do() {
-	// Validate names quickly before grabbing a context.
+	// Validate names quickly before grabbing a context. Avoids
+	// a slow start if there's a simple typo.
 	for i := 0; i < s.fs.NArg(); i++ {
 		name := upspin.PathName(s.fs.Arg(i))
 		_, err := path.Parse(name)
@@ -72,6 +73,18 @@ func (s *sharer) do() {
 	}
 	s.context = context
 	s.client = client.New(context)
+
+	// To change things, User must be the owner of every file.
+	// (We just parsed them all, but that was before we had a context.)
+	if s.fix {
+		for i := 0; i < s.fs.NArg(); i++ {
+			name := upspin.PathName(s.fs.Arg(i))
+			parsed, _ := path.Parse(name)
+			if parsed.User() != s.context.UserName {
+				exitf("%q: %q is not owner", name, s.context.UserName)
+			}
+		}
+	}
 
 	// Files parse. Get the list of all directory entries we care about.
 	entries := s.allEntries()
@@ -138,7 +151,7 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 		if err != nil {
 			exitf("lookup %q: %s", name, err)
 		}
-		if !entry.IsDir() {
+		if !entry.IsDir() && !entry.IsLink() {
 			entries = append(entries, entry)
 			continue
 		}
@@ -160,7 +173,7 @@ func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	entries := make([]*upspin.DirEntry, 0, len(thisDir))
 	// Add plain files.
 	for _, e := range thisDir {
-		if !e.IsDir() {
+		if !e.IsDir() && !e.IsLink() {
 			entries = append(entries, e)
 		}
 	}
