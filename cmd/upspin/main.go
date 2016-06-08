@@ -20,6 +20,7 @@ import (
 
 	// Load useful packers
 
+	"upspin.io/pack"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
@@ -385,7 +386,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 	}
 	for _, e := range de {
 		redirect := ""
-		attrChar := '_'
+		attrChar := ' '
 		if e.IsDir() {
 			attrChar = 'd'
 			if !hasFinalSlash(e.Name) {
@@ -404,9 +405,15 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 
 		}
 		endpt := endpoint.String(&e.Location.Endpoint)
+		packStr := "?"
+		packer := pack.Lookup(upspin.Packing(e.Metadata.Packdata[0]))
+		if packer != nil {
+			packStr = packer.String()
+		}
 		// TODO: print readers when we have them again.
-		fmt.Printf("%c %*d %*d %s [%s]\t%s%s\n",
+		fmt.Printf("%c %.6s %*d %*d %s [%s]\t%s%s\n",
 			attrChar,
+			packStr,
 			seqWidth, e.Metadata.Sequence,
 			sizeWidth, e.Metadata.Size,
 			e.Metadata.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
