@@ -14,6 +14,8 @@ import (
 	"upspin.io/bind"
 	"upspin.io/upspin"
 
+	"strings"
+
 	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/store/inprocess"
 )
@@ -26,15 +28,13 @@ type testEntry struct {
 type service struct {
 	lookups int
 	entries map[string]testEntry
+
+	context  upspin.Context
+	endpoint upspin.Endpoint
+	dialed   int
 }
 
 func setup(t *testing.T) (*service, *upspin.Context) {
-	s := &service{entries: make(map[string]testEntry)}
-	s.add("a@a.com")
-	s.add("b@b.com")
-	s.add("c@c.com")
-	s.add("d@d.com")
-
 	c := &upspin.Context{
 		UserName: "unused@unused.com",
 		Packing:  upspin.DebugPack,
@@ -43,9 +43,28 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
+
+	s := &service{
+		entries:  make(map[string]testEntry),
+		endpoint: e,
+		context:  *c,
+	}
+	s.add("a@a.com")
+	s.add("b@b.com")
+	s.add("c@c.com")
+	s.add("d@d.com")
+
+	err := bind.RegisterUser(e.Transport, s)
+	if err != nil {
+		if strings.Contains(err.Error(), "cannot override") {
+			err = bind.ReregisterUser(e.Transport, s)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
 	c.User = s
 
-	var err error
 	c.Store, err = bind.Store(c, e)
 	if err != nil {
 		t.Fatal(err)
@@ -70,6 +89,10 @@ func TestCache(t *testing.T) {
 	try(t, s, c, "c@c.com")
 	try(t, s, c, "d@d.com")
 
+	if s.dialed != 4 {
+		t.Errorf("Expected 4 dials; one for each cache miss. Got %d", s.dialed)
+	}
+
 	sofar := s.lookups
 
 	// Check for consistency between cached and uncached.
@@ -79,6 +102,11 @@ func TestCache(t *testing.T) {
 		try(t, s, c, "b@b.com")
 		try(t, s, c, "c@c.com")
 		try(t, s, c, "d@d.com")
+	}
+
+	// No new cache misses, so no new dials.
+	if s.dialed != 4 {
+		t.Errorf("Expected no new dials, just the original 4. Got %d", s.dialed)
 	}
 
 	// If the cache worked, we should only have 1 uncached access per try() in the loop.
@@ -112,6 +140,10 @@ func TestExpiration(t *testing.T) {
 	try(t, s, c, "d@d.com")
 	if s.lookups != sofar+2*4 {
 		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+2*4)
+	}
+
+	if s.dialed != 8 {
+		t.Errorf("Expected 8 dials, got %d", s.dialed)
 	}
 }
 
@@ -157,15 +189,18 @@ func (s *service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 }
 
 func (s *service) ServerUserName() string {
-	return "?"
+	return string(s.context.UserName)
 }
 
 func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	s.dialed++
+	s.context = *context
+	s.endpoint = e
 	return s, nil
 }
 
 func (s *service) Endpoint() upspin.Endpoint {
-	return upspin.Endpoint{}
+	return s.endpoint
 }
 
 func (s *service) Configure(options ...string) error {
