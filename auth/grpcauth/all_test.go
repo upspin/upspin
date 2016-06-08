@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -155,12 +154,6 @@ func startClient(port string) {
 		AuthClientService: authClient,
 		grpcClient:        grpcClient,
 	}
-	// Wait for the connection to get established with the server.
-	cc, err := grpc.NewConn(conn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cc.Wait(gContext.Background())
 }
 
 func TestAll(t *testing.T) {
