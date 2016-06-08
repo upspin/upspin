@@ -8,6 +8,9 @@ package usercache
 import (
 	"time"
 
+	"fmt"
+
+	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/upspin"
 )
@@ -19,9 +22,10 @@ type entry struct {
 }
 
 type userCache struct {
-	uncached upspin.User
-	entries  *cache.LRU
-	duration time.Duration
+	userEndpoint upspin.Endpoint
+	context      upspin.Context
+	entries      *cache.LRU
+	duration     time.Duration
 }
 
 // Install a cache onto the User service.  After this all User service requests will
@@ -29,16 +33,17 @@ type userCache struct {
 //
 // TODO(p): Install is not concurrency safe since context is assumed to be immutable
 // everywhere else.  Not sure this needs to be fixed but should at least be noted.
-func Install(context *upspin.Context) {
-	// Avpoid installing more than once.
+func Install(context *upspin.Context, endpoint upspin.Endpoint) {
+	// Avoid installing more than once.
 	if _, ok := context.User.(*userCache); ok {
 		return
 	}
 
 	c := &userCache{
-		uncached: context.User,
-		entries:  cache.NewLRU(256),
-		duration: time.Minute * 15,
+		context:      *context,
+		userEndpoint: endpoint,
+		entries:      cache.NewLRU(256),
+		duration:     time.Minute * 15,
 	}
 	context.User = c
 }
@@ -53,11 +58,17 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 			e := v.(*entry)
 			return e.eps, e.pub, nil
 		}
-		// TODO(p): change the LRU stuff to have a Remove method.
+		c.entries.Remove(name)
 	}
 
 	// Not found, look it up.
-	eps, pub, err := c.uncached.Lookup(name)
+	user, err := bind.User(c.context, c.userEndpoint)
+	if err != nil {
+		return nil, nil, fmt.Errorf("usercache: error binding to User service on %v for user %q: %s",
+			c.userEndpoint, c.context.UserName, err.Error())
+	}
+	defer bind.Release(user)
+	eps, pub, err := user.Lookup(name)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,7 +88,7 @@ func (c *userCache) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 
 // ServerUserName implements upspin.User.ServerUserName.
 func (c *userCache) ServerUserName() string {
-	return c.uncached.ServerUserName()
+	return c.context.UserName
 }
 
 // Configure implements upspin.Service.
@@ -97,6 +108,7 @@ func (c *userCache) Ping() bool {
 
 // Close implements upspin.Service.
 func (c *userCache) Close() {
+	c.entries = nil
 }
 
 // Authenticate implements upspin.Service.
