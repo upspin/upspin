@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eff6f04a_0065a831",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-08T23:41:59Z",
+      "side": 1,
+      "message": "move up?",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 23,
+        "endChar": 8
+      },
+      "revId": "d29550267d3a78f1dbb8d00082d30f233276722e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_20578443",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-08T23:41:59Z",
+      "side": 1,
+      "message": "TODO(ehg): make sure this is correct and add a test for multiple readers?",
+      "revId": "d29550267d3a78f1dbb8d00082d30f233276722e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
