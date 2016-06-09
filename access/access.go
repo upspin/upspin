@@ -462,29 +462,11 @@ func preallocSize(n int) int {
 	}
 }
 
-// ErrNeedGroup is returned by Access.Can when a group file must be provided.
-var ErrNeedGroup = errors.New("need group")
-
-// Can reports whether the requesting user can access the file
+// canNoGroupLoad reports whether the requesting user can access the file
 // using the specified right according to the rules of the Access
-// file.
-//
-// The rights are applied to the path itself. For instance, for Create
-// the question is whether the user can create the named file, not
-// whether the user has Create rights in the directory with that name.
-// Similarly, for List the question is whether the user can list the
-// status of this file, or if it is a directory, list the contents
-// of that directory. It is the caller's responsibility to apply the
-// correct Access file to the question, and separately to verify
-// issues such as attempts to write to a directory rather than a file.
-//
-// If the Access file does not know the members of a group that it
-// needs to resolve the answer, it return false, sets the error to
-// ErrNeedGroup, and returns a list of the group files it needs to
-// have read for it. The caller should fetch these and report them
-// with the AddGroup method, then retry.
-//
-func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName) (bool, []upspin.PathName, error) {
+// file. If it needs to read some group files before the decision can be made,
+// it returns a non-nil slice of their names.
+func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName upspin.PathName) (bool, []upspin.PathName, error) {
 	parsedRequester, err := path.Parse(upspin.PathName(requester + "/"))
 	if err != nil {
 		return false, nil, err
@@ -539,19 +521,52 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 			return true, nil, nil
 		}
 	}
-	if missingGroups != nil {
-		return false, missingGroups, ErrNeedGroup
+	return false, missingGroups, nil
+}
+
+// Can reports whether the requesting user can access the file
+// using the specified right according to the rules of the Access
+// file.
+//
+// The rights are applied to the path itself. For instance, for Create
+// the question is whether the user can create the named file, not
+// whether the user has Create rights in the directory with that name.
+// Similarly, for List the question is whether the user can list the
+// status of this file, or if it is a directory, list the contents
+// of that directory. It is the caller's responsibility to apply the
+// correct Access file to the question, and separately to verify
+// issues such as attempts to write to a directory rather than a file.
+//
+// The method loads group files as needed by
+// calling the provided function to read each file's contents.
+func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName, load func(upspin.PathName) ([]byte, error)) (bool, error) {
+	for {
+		granted, missing, err := a.canNoGroupLoad(requester, right, pathName)
+		if err != nil {
+			return false, err
+		}
+		if missing == nil {
+			return granted, nil
+		}
+		for _, group := range missing {
+			data, err := load(group)
+			if err != nil {
+				return false, err
+			}
+			err = AddGroup(group, data)
+			if err != nil {
+				return false, err
+			}
+		}
 	}
-	return false, nil, nil
 }
 
 // expandGroups expands a list of groups to the user names they represent.
 // If the Access file does not know the members of a group that it
-// needs to resolve the answer, it sets the error to ErrNeedGroup, and
-// returns a list of the group files it needs to have read for it.
+// needs to resolve the answer, it returns a list of the group files it needs to have read for it.
 // The caller should fetch these and report them with the AddGroup method, then retry.
 // TODO: use this in Can.
-func (a *Access) expandGroups(toExpand []upspin.PathName) ([]upspin.UserName, []upspin.PathName, error) {
+func (a *Access) expandGroups(toExpand []upspin.PathName) ([]upspin.UserName, []upspin.PathName) {
 	var missingGroups []upspin.PathName
 	var userNames []upspin.UserName
 Outer:
@@ -587,9 +602,9 @@ Outer:
 		}
 	}
 	if len(missingGroups) > 0 {
-		return userNames, missingGroups, ErrNeedGroup
+		return userNames, missingGroups
 	}
-	return userNames, nil, nil
+	return userNames, nil
 }
 
 func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
@@ -601,15 +616,14 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 	}
 }
 
-// usersStep returns the user names granted a given right according to the rules
+// usersNoGroupLoad returns the user names granted a given right according to the rules
 // of the Access file.
 //
 // If the Access file does not know the members of a group that it
-// needs to resolve the answer, it sets the error to
-// ErrNeedGroup, and returns a list of the group files it needs to
+// needs to resolve the answer, it returns a list of the group files it needs to
 // have read for it. The caller should fetch these and report them
 // with the AddGroup method, then retry.
-func (a *Access) usersStep(right Right) ([]upspin.UserName, []upspin.PathName, error) {
+func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.PathName, error) {
 	list, err := a.getListFor(right)
 	if err != nil {
 		return nil, nil, err
@@ -626,9 +640,9 @@ func (a *Access) usersStep(right Right) ([]upspin.UserName, []upspin.PathName, e
 		}
 	}
 	if len(groups) > 0 {
-		users, missingGroups, err := a.expandGroups(groups)
+		users, missingGroups := a.expandGroups(groups)
 		userNames = mergeUsers(userNames, users)
-		if err != nil {
+		if missingGroups != nil {
 			return userNames, missingGroups, err
 		}
 	}
@@ -636,16 +650,16 @@ func (a *Access) usersStep(right Right) ([]upspin.UserName, []upspin.PathName, e
 }
 
 // AllUsers returns the user names granted a given right according to the rules
-// of the Access file. The method loads group files as needed by
+// of the Access file. AllUsers loads group files as needed by
 // calling the provided function to read each file's contents.
 func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
 	for {
-		readers, neededGroups, err := a.usersStep(right)
-		if err == nil {
-			return readers, nil
-		}
-		if err != ErrNeedGroup {
+		readers, neededGroups, err := a.usersNoGroupLoad(right)
+		if err != nil {
 			return nil, err
+		}
+		if neededGroups == nil {
+			return readers, nil
 		}
 		for _, group := range neededGroups {
 			groupData, err := load(group)

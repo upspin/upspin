@@ -5,7 +5,6 @@
 package access
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -161,7 +160,7 @@ func TestHasAccessNoGroups(t *testing.T) {
 	}
 
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, groups, err := a.Can(user, right, file)
+		ok, groups, err := a.canNoGroupLoad(user, right, file)
 		if groups != nil {
 			t.Fatalf("non-empty groups %q", groups)
 		}
@@ -245,38 +244,25 @@ func TestHasAccessWithGroups(t *testing.T) {
 		groupName = upspin.PathName("me@here.com/Group/family")
 		groupText = "# My family\n sister@me.com, brother@me.com\n"
 	)
+
+	loaded := false
+	loadTest := func(name upspin.PathName) ([]byte, error) {
+		loaded = true
+		switch name {
+		case "me@here.com/Group/family":
+			return []byte("# My family\n sister@me.com, brother@me.com\n"), nil
+		default:
+			return nil, fmt.Errorf("%s not found", name)
+		}
+	}
+
 	a, err := Parse(testFile, []byte(accessText))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	loadedGroup := false
-
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, missingGroups, err := a.Can(user, right, file)
-		if missingGroups != nil {
-			// This is a simple test. There's only one group.
-			if len(missingGroups) != 1 {
-				t.Fatalf("expected one missing group, got %v", missingGroups)
-			}
-			pathName := missingGroups[0]
-			if pathName != groupName {
-				t.Fatalf("expected %q for group name, got %q", groupName, pathName)
-			}
-			if loadedGroup {
-				t.Fatal("group already loaded")
-			}
-			err = AddGroup(groupName, []byte(groupText))
-			if err != nil {
-				t.Fatal(err)
-			}
-			loadedGroup = true
-			// It must work now.
-			ok, missingGroups, err = a.Can(user, right, file)
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
+		ok, err := a.Can(user, right, file, loadTest)
 		if ok == truth {
 			return
 		}
@@ -307,7 +293,7 @@ func TestHasAccessWithGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Sister can't read anymore and family group is needed.
-	ok, missingGroups, err := a.Can("sister@me.com", Read, "me@here.com/foo/bar")
+	ok, missingGroups, err := a.canNoGroupLoad("sister@me.com", Read, "me@here.com/foo/bar")
 	if ok {
 		t.Errorf("Expected no permission")
 	}
@@ -509,13 +495,13 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestUsersIteration(t *testing.T) {
+func TestUsersNoGroupLoad(t *testing.T) {
 	acc, err := Parse("bob@foo.com/Access",
 		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, groupsNeeded, err := acc.usersStep(Read)
+	readersList, groupsNeeded, err := acc.usersNoGroupLoad(Read)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}
@@ -524,9 +510,12 @@ func TestUsersIteration(t *testing.T) {
 	}
 	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
 	expectEqual(t, expectedReaders, listFromUserName(readersList))
-	writersList, groupsNeeded, err := acc.usersStep(Write)
-	if err != ErrNeedGroup {
-		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	writersList, groupsNeeded, err := acc.usersNoGroupLoad(Write)
+	if err != nil {
+		t.Fatalf("Expected no error; got %s", err)
+	}
+	if groupsNeeded == nil {
+		t.Fatalf("Expected groups to be needed")
 	}
 	expectedWriters := []string{"bob@foo.com"}
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
@@ -538,9 +527,12 @@ func TestUsersIteration(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Try again.
-	writersList, groupsNeeded, err = acc.usersStep(Write)
-	if err != ErrNeedGroup {
-		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
+	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
+	if err != nil {
+		t.Fatalf("Round 2: Expected no error %s", err)
+	}
+	if groupsNeeded == nil {
+		t.Fatalf("Round 2: Expected groups to be needed")
 	}
 	groupsExpected = []string{"bob@foo.com/Group/grandparents"}
 	expectEqual(t, groupsExpected, listFromPathName(groupsNeeded))
@@ -549,7 +541,7 @@ func TestUsersIteration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writersList, groupsNeeded, err = acc.usersStep(Write)
+	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -565,7 +557,7 @@ func TestAllUsers(t *testing.T) {
 		case "bob@foo.com/Group/friends":
 			return []byte("nancy@foo.com, anna@foo.com"), nil
 		default:
-			return nil, errors.New("not found")
+			return nil, fmt.Errorf("%s not found", name)
 		}
 	}
 
