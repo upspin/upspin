@@ -56,7 +56,7 @@ func (f Factotum) PackingString() string {
 
 // FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.
 func (f Factotum) FileSign(p upspin.Packing, n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
-	log.Printf("factotum.fileSign %s %s %d %x\n", pack.Lookup(p).String(), n, t, hash)
+	log.Debug.Printf("factotum.fileSign %s %s %d %x\n", pack.Lookup(p).String(), n, t, hash)
 	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, VerHash(p, n, t, dkey, hash))
 	if err != nil {
 		return sig0, err
@@ -66,7 +66,7 @@ func (f Factotum) FileSign(p upspin.Packing, n upspin.PathName, t upspin.Time, d
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
 func (f Factotum) ScalarMult(curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int) {
-	log.Printf("factotum.scalarMult %d %d\n", x, y)
+	log.Debug.Printf("factotum.scalarMult %d %d\n", x, y)
 	return curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
 }
 
