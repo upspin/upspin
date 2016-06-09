@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eff6f04a_89c9dc17",
+        "filename": "directory/gcp/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T20:53:53Z",
+      "side": 0,
+      "message": "Wow, this is old. Equal was implemented a while back...",
+      "revId": "0b31dfc58b1a16d6498dc39526ed055b43718795",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
