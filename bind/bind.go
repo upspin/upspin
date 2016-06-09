@@ -31,7 +31,7 @@ type dialedService struct {
 }
 
 // A variable, so that it can be tweaked during tests.
-var pingFreshnessDuration = 15 * time.Minute
+var pingFreshnessDuration = 5 * time.Minute
 
 // ping will issue a Ping through the dialed service, but only if it is not
 // dead and its last ping time is more than pingFreshnessDuration ago.
