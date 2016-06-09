@@ -129,12 +129,25 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		if err != nil {
 			return err
 		}
-		readers, _, err = acc.Users(access.Read)
-		if err == access.ErrNeedGroup {
-			return fmt.Errorf("Groups not implemented yet for Client.Put sharing")
-		}
-		if err != nil {
-			return err
+		for {
+			var neededGroups []upspin.PathName
+			readers, neededGroups, err = acc.Users(access.Read)
+			if err == nil {
+				break
+			}
+			if err != access.ErrNeedGroup {
+				return err
+			}
+			for _, group := range neededGroups {
+				groupData, err := c.Get(group)
+				if err != nil {
+					return err
+				}
+				err = access.AddGroup(group, groupData)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
