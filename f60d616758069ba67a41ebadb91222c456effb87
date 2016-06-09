@@ -19,6 +19,58 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_52d942fd",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-09T18:35:40Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "eff6f04a_129bba7e",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_d2ec329f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-09T18:35:40Z",
+      "side": 1,
+      "message": "what is a keyHash? this is a public comment mentioning an internal data structure.\n\nReaderHashes returns the XXX hashes (please explain) of the readers whose keys are present in the packdata.",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_b2e9a68d",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-09T18:35:40Z",
+      "side": 1,
+      "message": "ctx is unused. do we need it in the signature at all?",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eff6f04a_52a8228c",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -64,6 +116,41 @@
       "writtenOn": "2016-06-09T18:23:40Z",
       "side": 1,
       "message": "nil, nil?",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_72d43ec7",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-09T18:35:40Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "eff6f04a_32e476e6",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_b242c679",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-09T18:35:40Z",
+      "side": 1,
+      "message": "if it\u0027s hashes, it\u0027s not readers. i\u0027d call this\nReaderHashes",
       "revId": "f60d616758069ba67a41ebadb91222c456effb87",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
