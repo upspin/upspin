@@ -236,7 +236,7 @@ func read(c upspin.Client, file upspin.PathName) []byte {
 func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	entry, err := s.context.Directory.Lookup(name)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "looking up %q:", name, err)
+		fmt.Fprintf(os.Stderr, "looking up %q: %s", name, err)
 		s.exitCode = 1
 		return
 	}
@@ -296,7 +296,7 @@ func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 		s.exitCode = 1
 	}
 	if len(keys) == 0 {
-		fmt.Fprintf(os.Stderr, "no key for %q: %s\n", user)
+		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
 		s.exitCode = 1
 	}
 	// Remember the lookup, failed or otherwise.

@@ -37,7 +37,7 @@ var (
 )
 
 func nextUser() upspin.UserName {
-	userNumber = atomic.AddInt32(&userNumber, 1)
+	atomic.AddInt32(&userNumber, 1)
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
