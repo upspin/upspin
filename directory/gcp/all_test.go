@@ -760,13 +760,14 @@ func TestMarshalRoot(t *testing.T) {
 	if len(root2.accessFiles) != 2 {
 		t.Fatalf("Expected two Access files, got %d", len(root2.accessFiles))
 	}
-	// Make a few assertions about who can access what.
-	// What I really want here is acc1.Equal(acc1saved), but Equal is not publicly implemented. :-(
 	acc1saved, ok := root2.accessFiles[accessRoot]
 	if !ok {
 		t.Fatalf("Expected %s to exist in DB.", accessRoot)
 	}
-	can, _, err := acc1saved.Can(upspin.UserName("bob@foo.com"), access.Read, fileInRoot)
+	if !acc1.Equal(acc1saved) {
+		t.Fatalf("files differ; want %q got %q\n", acc1, acc1saved)
+	}
+	can, err := acc1saved.Can(upspin.UserName("bob@foo.com"), access.Read, fileInRoot, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -774,7 +775,7 @@ func TestMarshalRoot(t *testing.T) {
 		t.Errorf("Expected bob@foo.com to have Read access to %s", fileInRoot)
 	}
 	acc2saved, ok := root2.accessFiles[accessRestricted]
-	can, _, err = acc2saved.Can(upspin.UserName("gandhi@peace.in"), access.List, dirRestricted)
+	can, err = acc2saved.Can(upspin.UserName("gandhi@peace.in"), access.List, dirRestricted, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

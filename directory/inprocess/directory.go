@@ -628,34 +628,20 @@ func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
 	if accessFile == nil {
 		accessFile = s.rootAccessFile(parsed)
 	}
-	for attempt := 0; attempt < 10; attempt++ {
-		granted, missing, err := accessFile.Can(s.context.UserName, right, parsed.Path())
-		if err == nil {
-			return granted, nil
-		}
-		if err != access.ErrNeedGroup {
-			return false, err
-		}
-		for _, group := range missing {
-			gParsed, err := path.Parse(group)
-			if err != nil {
-				return false, err
-			}
-			entry, err := s.lookup(gParsed)
-			if err != nil {
-				return false, err
-			}
-			data, err := s.getData(entry)
-			if err != nil {
-				return false, err
-			}
-			err = access.AddGroup(group, data)
-			if err != nil {
-				return false, err
-			}
-		}
+	return accessFile.Can(s.context.UserName, right, parsed.Path(), s.load)
+}
+
+// load is a helper for Access.Can that gets the entire contents of the named item.
+func (s *Service) load(name upspin.PathName) ([]byte, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
 	}
-	return false, errors.New("group retry loop")
+	entry, err := s.lookup(parsed)
+	if err != nil {
+		return nil, err
+	}
+	return s.getData(entry)
 }
 
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.

@@ -106,43 +106,16 @@ func (d *directory) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 
 // checkRights is a convenience function that applies the Can method of the access entry given using the user, right and path provided.
 func (d *directory) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access) (bool, error) {
-	var groupErr error
-	for {
-		can, morePaths, err := acc.Can(user, right, pathName)
-		if err == access.ErrNeedGroup {
-			for _, g := range morePaths {
-				err = d.addGroup(g, acc)
-				if err != nil {
-					if groupErr == nil {
-						groupErr = err
-					}
-				}
-			}
-			if groupErr != nil {
-				log.Printf("Error checking access: %s", groupErr)
-				return false, groupErr
-			}
-			continue // Try acc.Can again
-		}
-		log.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
-		return can, err
-	}
+	can, err := acc.Can(user, right, pathName, d.load)
+	log.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
+	return can, err
 }
 
-// addGroup looks up a Group name, fetches its contents if found and calls access.AddGroup with the contents.
-// It is currently limited to group files that belong to this directory service (that is, it does not attempt to dial
-// another directory service to find it).
-func (d *directory) addGroup(pathName upspin.PathName, acc *access.Access) error {
+// load is a helper for Access.Can that gets the entire contents of the named item.
+func (d *directory) load(pathName upspin.PathName) ([]byte, error) {
 	dirEntry, err := d.getNonRoot(pathName)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	buf, err := d.storeGet(&dirEntry.Location)
-	if err != nil {
-		// This will happen if we're not the Endpoint for the Location.
-		// TODO: figure out our location -- this is subtle given our IP address may not match our
-		// public DNS record and there might be multiple addresses bound to this server.
-		return err
-	}
-	return access.AddGroup(pathName, buf)
+	return d.storeGet(&dirEntry.Location)
 }
