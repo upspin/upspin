@@ -635,6 +635,31 @@ func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error
 	return userNames, nil, nil
 }
 
+// AllUsers returns the user names granted a given right according to the rules
+// of the Access file. Unlike Users, this method loads group files as needed by
+// calling the provided function to read each file's contents as needed.
+func (a *Access) AllUsers(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
+	for {
+		readers, neededGroups, err := a.Users(right)
+		if err == nil {
+			return readers, nil
+		}
+		if err != ErrNeedGroup {
+			return nil, err
+		}
+		for _, group := range neededGroups {
+			groupData, err := load(group)
+			if err != nil {
+				return nil, err
+			}
+			err = AddGroup(group, groupData)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+}
+
 // mergeUsers merges src into dst skipping duplicates and returns the updated dst.
 func mergeUsers(dst []upspin.UserName, src []upspin.UserName) []upspin.UserName {
 	known := make(map[upspin.UserName]bool)
