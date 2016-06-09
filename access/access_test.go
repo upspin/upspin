@@ -509,13 +509,13 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestUsers(t *testing.T) {
+func TestUsersIteration(t *testing.T) {
 	acc, err := Parse("bob@foo.com/Access",
 		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, groupsNeeded, err := acc.Users(Read)
+	readersList, groupsNeeded, err := acc.usersStep(Read)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}
@@ -524,7 +524,7 @@ func TestUsers(t *testing.T) {
 	}
 	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
 	expectEqual(t, expectedReaders, listFromUserName(readersList))
-	writersList, groupsNeeded, err := acc.Users(Write)
+	writersList, groupsNeeded, err := acc.usersStep(Write)
 	if err != ErrNeedGroup {
 		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
 	}
@@ -538,7 +538,7 @@ func TestUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Try again.
-	writersList, groupsNeeded, err = acc.Users(Write)
+	writersList, groupsNeeded, err = acc.usersStep(Write)
 	if err != ErrNeedGroup {
 		t.Fatalf("Expected error %s, got %s", ErrNeedGroup, err)
 	}
@@ -549,7 +549,7 @@ func TestUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writersList, groupsNeeded, err = acc.Users(Write)
+	writersList, groupsNeeded, err = acc.usersStep(Write)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -574,7 +574,7 @@ func TestAllUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, err := acc.AllUsers(Read, loadTest)
+	readersList, err := acc.Users(Read, loadTest)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}

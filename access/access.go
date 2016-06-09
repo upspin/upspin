@@ -601,7 +601,7 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 	}
 }
 
-// Users returns the user names granted a given right according to the rules
+// usersStep returns the user names granted a given right according to the rules
 // of the Access file.
 //
 // If the Access file does not know the members of a group that it
@@ -609,7 +609,7 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 // ErrNeedGroup, and returns a list of the group files it needs to
 // have read for it. The caller should fetch these and report them
 // with the AddGroup method, then retry.
-func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error) {
+func (a *Access) usersStep(right Right) ([]upspin.UserName, []upspin.PathName, error) {
 	list, err := a.getListFor(right)
 	if err != nil {
 		return nil, nil, err
@@ -638,9 +638,9 @@ func (a *Access) Users(right Right) ([]upspin.UserName, []upspin.PathName, error
 // AllUsers returns the user names granted a given right according to the rules
 // of the Access file. Unlike Users, this method loads group files as needed by
 // calling the provided function to read each file's contents as needed.
-func (a *Access) AllUsers(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
+func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
 	for {
-		readers, neededGroups, err := a.Users(right)
+		readers, neededGroups, err := a.usersStep(right)
 		if err == nil {
 			return readers, nil
 		}
