@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eff6f04a_129bba7e",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T18:23:40Z",
+      "side": 1,
+      "message": "why not return nil, nil?",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_52a8228c",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T18:23:40Z",
+      "side": 1,
+      "message": "I\u0027d prefix it with eePack: so we know where this is coming from. Also, lower case should be fine...",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_b2b886da",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T18:23:40Z",
+      "side": 1,
+      "message": "You need to check that they match the expected ones or this is not really testing.",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_32e476e6",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T18:23:40Z",
+      "side": 1,
+      "message": "nil, nil?",
+      "revId": "f60d616758069ba67a41ebadb91222c456effb87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
