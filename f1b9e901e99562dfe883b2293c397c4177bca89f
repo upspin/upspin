@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eff6f04a_37c7c8a1",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-09T18:05:20Z",
+      "side": 1,
+      "message": "This is changing semantics.  The old one returned the username of the server whereas this one returns the user name of the client.  Is this what you intended?",
+      "range": {
+        "startLine": 96,
+        "startChar": 17,
+        "endLine": 96,
+        "endChar": 24
+      },
+      "revId": "f1b9e901e99562dfe883b2293c397c4177bca89f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
