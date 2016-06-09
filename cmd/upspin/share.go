@@ -211,7 +211,7 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 
 // usersWithReadAccess returns the list of user names granted read access by this access file.
 func (s *sharer) usersWithReadAccess(a *access.Access) []upspin.UserName {
-	userList, err := a.AllUsers(access.Read, s.client.Get)
+	userList, err := a.Users(access.Read, s.client.Get)
 	if err != nil {
 		exitf("getting user list: %s", err)
 	}

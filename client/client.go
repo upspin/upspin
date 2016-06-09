@@ -129,7 +129,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		if err != nil {
 			return err
 		}
-		readers, err = acc.AllUsers(access.Read, c.Get)
+		readers, err = acc.Users(access.Read, c.Get)
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
 	readersPublicKey[0] = c.context.Factotum.PublicKey()
