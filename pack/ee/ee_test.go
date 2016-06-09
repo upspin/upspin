@@ -200,7 +200,28 @@ func TestSharing(t *testing.T) {
 	}
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob
-	shareBlob(t, ctx, packer, []upspin.PublicKey{bobsKeyPair.Public}, &d.Metadata.Packdata)
+	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesKeyPair.Public, bobsKeyPair.Public}, &d.Metadata.Packdata)
+
+	readers, err := packer.ReaderHashes(d.Metadata.Packdata)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(readers) != 2 {
+		t.Errorf("Expected 2 readerhashes, got %d", len(readers))
+	}
+	dudesKey, err := parsePublicKey(dudesKeyPair.Public, packer.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	bobsKey, err := parsePublicKey(bobsKeyPair.Public, packer.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash0 := keyHash(dudesKey)
+	hash1 := keyHash(bobsKey)
+	if !bytes.Equal(readers[0], hash0) || !bytes.Equal(readers[1], hash1) {
+		t.Errorf("text: expected %q; got %q", [][]byte{hash0, hash1}, readers)
+	}
 
 	// Now load Bob as the current user.
 	ctx.UserName = bobsUserName
