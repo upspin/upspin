@@ -213,8 +213,11 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 func (s *sharer) usersWithReadAccess(a *access.Access) []upspin.UserName {
 	for {
 		userList, neededGroups, err := a.Users(access.Read)
-		if err != access.ErrNeedGroup {
+		if err == nil {
 			return userList
+		}
+		if err != access.ErrNeedGroup {
+			exitf("getting user list: %s", err)
 		}
 		for _, group := range neededGroups {
 			err := access.AddGroup(group, read(s.client, group))
