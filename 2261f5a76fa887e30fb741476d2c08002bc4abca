@@ -16,6 +16,24 @@
       "revId": "2261f5a76fa887e30fb741476d2c08002bc4abca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_4cbc07f3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T17:24:45Z",
+      "side": 1,
+      "message": "Another thing we could try is expiring dead sockets sooner. \n\nIf we get a fd, we can call Setsockopt on it to set the tcp_retries2 value to a small number (maybe 2?).\n\nhttps://drupal.star.bnl.gov/STAR/blog-entry/jeromel/2009/feb/18/tcp-parameters-linux-kernel\n\nSadly, I don\u0027t see how to go from a net.Conn to an fd in go with the current libraries. It\u0027s not exported.\n\nThis thread has a workaround, but it\u0027s awful: https://groups.google.com/forum/#!topic/golang-nuts/fJyW1GCx_6s",
+      "parentUuid": "837f104c_eaf75bff",
+      "revId": "2261f5a76fa887e30fb741476d2c08002bc4abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
