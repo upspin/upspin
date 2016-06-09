@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"time"
 	"upspin.io/bind"
 	"upspin.io/cloud/gcp/gcptest"
 	"upspin.io/store/gcp/cache"
@@ -20,12 +21,11 @@ const (
 	serverBaseURL = "http://go-download-from-gcp.goog.com"
 	linkForRef    = serverBaseURL + "/ref/978F...4F"
 	contents      = "contents of our file"
-	userName      = "dude@foo.com"
 )
 
 func TestPutAndGet(t *testing.T) {
 	s := newStoreServer()
-	defer s.server.Close()
+	defer s.server.fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	ref, err := s.server.Put([]byte(contents))
 	if err != nil {
@@ -61,7 +61,7 @@ func TestPutAndGet(t *testing.T) {
 
 func TestGetFromLocalCache(t *testing.T) {
 	s := newStoreServer()
-	defer s.server.Close()
+	defer s.server.fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	// Simulate file still being locally on the server. Get the bytes instead of a new location.
 	err := s.server.fileCache.Put(expectedRef, bytes.NewReader([]byte(contents)))
@@ -86,7 +86,7 @@ func TestGetFromLocalCache(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	s := newStoreServer()
-	defer s.server.Close()
+	defer s.server.fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	err := s.server.Delete(expectedRef)
 	if err != nil {
@@ -102,7 +102,7 @@ func TestDelete(t *testing.T) {
 
 func TestGetInvalidRef(t *testing.T) {
 	s := newStoreServer()
-	defer s.server.Close()
+	defer s.server.fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	_, _, err := s.server.Get("bla bla bla")
 	if err == nil {
@@ -116,7 +116,7 @@ func TestGetInvalidRef(t *testing.T) {
 
 func TestGCPErrorsOut(t *testing.T) {
 	s := newStoreServer()
-	defer s.server.Close()
+	defer s.server.fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	s.server.cloudClient = &gcptest.ExpectGetGCP{
 		Ref:  "123",
@@ -145,7 +145,7 @@ func TestMissingConfiguration(t *testing.T) {
 	if !strings.HasPrefix(err.Error(), "not configured") {
 		t.Fatalf("Expected not configured error, got %q", err)
 	}
-	store.Close()
+	bind.Release(store)
 }
 
 func TestConfigure(t *testing.T) {
@@ -165,7 +165,26 @@ func TestConfigure(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	store.Close()
+	bind.Release(store)
+}
+
+func TestRefCount(t *testing.T) {
+	s1, err := bind.Store(&upspin.Context{UserName: "a"}, upspin.Endpoint{Transport: upspin.GCP})
+	if err != nil {
+		t.Fatal(err)
+	}
+	s2, err := bind.Store(&upspin.Context{UserName: "b"}, upspin.Endpoint{Transport: upspin.GCP})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if refCount != 2 {
+		t.Fatalf("Expected 2 instances, got %d", refCount)
+	}
+	bind.Release(s1)
+	bind.Release(s2)
+	if refCount != 0 {
+		t.Fatalf("Expected 0 instances, got %d", refCount)
+	}
 }
 
 func newStoreServer() *storeTestServer {
@@ -198,7 +217,11 @@ type testGCP struct {
 
 // PutLocalFile implements GCP.
 func (t *testGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	t.ch <- true // Inform we've been called.
+	go func() {
+		time.Sleep(50 * time.Millisecond) // Allow time for the cache purge to happen.
+		t.ch <- true                      // Inform we've been called.
+	}()
+
 	return "", nil
 }
 
