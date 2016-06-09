@@ -43,6 +43,10 @@ func (testPack) String() string {
 	return "debug"
 }
 
+func (testPack) ReaderHashes(packdata []byte) ([][]byte, error) {
+	return nil, nil
+}
+
 func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }
