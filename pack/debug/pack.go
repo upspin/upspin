@@ -43,6 +43,11 @@ func (testPack) String() string {
 	return "debug"
 }
 
+func (testPack) Readers(context *upspin.Context, packdata []byte) ([][]byte, error) {
+	r := make([][]byte, 0)
+	return r, nil
+}
+
 func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }

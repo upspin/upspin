@@ -32,6 +32,11 @@ func (plainPack) String() string {
 	return "plain"
 }
 
+func (plainPack) Readers(context *upspin.Context, packdata []byte) ([][]byte, error) {
+	r := make([][]byte, 0)
+	return r, nil
+}
+
 func (plainPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }

@@ -202,6 +202,14 @@ func TestSharing(t *testing.T) {
 	// Share with Bob
 	shareBlob(t, ctx, packer, []upspin.PublicKey{bobsKeyPair.Public}, &d.Metadata.Packdata)
 
+	readers, err := packer.Readers(ctx, d.Metadata.Packdata)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < len(readers); i++ {
+		fmt.Printf("reader %d = %x\n", i, readers[i])
+	}
+
 	// Now load Bob as the current user.
 	ctx.UserName = bobsUserName
 	f, err = factotum.New(bobsKeyPair)

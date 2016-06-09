@@ -160,6 +160,10 @@ type Packer interface {
 	// UnpackLen eturns -1 if there is an error.
 	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
 
+	// Readers returns hashes of the public keys able to decrypt the
+	// associated ciphertext.
+	Readers(context *Context, packdata []byte) ([][]byte, error)
+
 	// Share updates each packdata element to enable all the readers,
 	// and only those readers, to be able to decrypt the associated ciphertext,
 	// which is held separate from this call. It is invoked in response to

@@ -250,6 +250,19 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	return 0, errNoWrappedKey
 }
 
+// Readers returns a slice of keyHash of all readers listed in this packdata.
+func (c common) Readers(ctx *upspin.Context, packdata []byte) (readers [][]byte, err error) {
+	_, wrap, _, err := c.pdUnmarshal(packdata)
+	if err != nil {
+		return nil, err
+	}
+	readers = make([][]byte, len(wrap))
+	for i := 0; i < len(wrap); i++ {
+		readers[i] = wrap[i].keyHash
+	}
+	return readers, nil
+}
+
 // Share extracts dkey from the packdata, wraps for readers, and updates packdata.
 func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 
@@ -282,6 +295,10 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
 		sig, wrap, cipherSum, err := c.pdUnmarshal(*d)
+		if err != nil {
+			log.Printf("CAN'T HAPPEN: pdUnmarshal failed in Share: %q", err)
+			return
+		}
 		for i, w := range wrap {
 			var h keyHashArray
 			copy(h[:], w.keyHash)
