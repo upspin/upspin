@@ -22,6 +22,30 @@
       "revId": "f1b9e901e99562dfe883b2293c397c4177bca89f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_7739d082",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-09T18:11:50Z",
+      "side": 1,
+      "message": "Honestly, I don\u0027t think it matters much as no one uses this consistently. I want to delete this method too. Sometimes we return a server name \"StoreServer\", sometimes the user that created it \"foo@google.com\".\n\nI\u0027ve \"fixed\" it by returning the last bound server.",
+      "parentUuid": "eff6f04a_37c7c8a1",
+      "range": {
+        "startLine": 96,
+        "startChar": 17,
+        "endLine": 96,
+        "endChar": 24
+      },
+      "revId": "f1b9e901e99562dfe883b2293c397c4177bca89f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
