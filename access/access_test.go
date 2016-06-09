@@ -5,6 +5,7 @@
 package access
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -556,9 +557,36 @@ func TestUsers(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
-// This is unusual, but to be safe we are asserting equal correctly we test that our comparator is good.
-// (Is worth making Equal a method in Access? Not needed outside of this test yet.)
-func TestAssertEqual(t *testing.T) {
+func TestAllUsers(t *testing.T) {
+	loaded := false
+	loadTest := func(name upspin.PathName) ([]byte, error) {
+		loaded = true
+		switch name {
+		case "bob@foo.com/Group/friends":
+			return []byte("nancy@foo.com, anna@foo.com"), nil
+		default:
+			return nil, errors.New("not found")
+		}
+	}
+
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com, friends"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, err := acc.AllUsers(Read, loadTest)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if !loaded {
+		t.Fatalf("group file was not loaded")
+	}
+	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+}
+
+// We test the differenceString function used in assertEqual.
+func TestDifferenceString(t *testing.T) {
 	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)

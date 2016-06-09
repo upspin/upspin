@@ -211,21 +211,11 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 
 // usersWithReadAccess returns the list of user names granted read access by this access file.
 func (s *sharer) usersWithReadAccess(a *access.Access) []upspin.UserName {
-	for {
-		userList, neededGroups, err := a.Users(access.Read)
-		if err == nil {
-			return userList
-		}
-		if err != access.ErrNeedGroup {
-			exitf("getting user list: %s", err)
-		}
-		for _, group := range neededGroups {
-			err := access.AddGroup(group, read(s.client, group))
-			if err != nil {
-				exitf("loading group file %q: %s", group, err)
-			}
-		}
+	userList, err := a.AllUsers(access.Read, s.client.Get)
+	if err != nil {
+		exitf("getting user list: %s", err)
 	}
+	return userList
 }
 
 // read returns the contents of the file. It exits if the file cannot be read.
