@@ -129,26 +129,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		if err != nil {
 			return err
 		}
-		for {
-			var neededGroups []upspin.PathName
-			readers, neededGroups, err = acc.Users(access.Read)
-			if err == nil {
-				break
-			}
-			if err != access.ErrNeedGroup {
-				return err
-			}
-			for _, group := range neededGroups {
-				groupData, err := c.Get(group)
-				if err != nil {
-					return err
-				}
-				err = access.AddGroup(group, groupData)
-				if err != nil {
-					return err
-				}
-			}
-		}
+		readers, err = acc.AllUsers(access.Read, c.Get)
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
 	readersPublicKey[0] = c.context.Factotum.PublicKey()
