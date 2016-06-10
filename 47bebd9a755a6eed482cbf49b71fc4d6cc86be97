@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f3a9cf7_e0b8c2db",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "I don\u0027t see the purpose in exporting this and forcing callers to NewGRPCClient to specify it. Why not just leave it an internal implementation detail and make our call sites simpler? I imagine if we change policies on keepalives, we\u0027ll do it for everyone.",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
