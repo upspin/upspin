@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f3a9cf7_e0cf225b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "I see this touched by Authenticate and Ping.\nHow else is lastNetActivity updated?\nThe comment seems wrong.",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_40d52ef3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "why do we care? seems fussy",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_20daaa24",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "seems noisy, suggest delete",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_80df3613",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "idle :\u003d time.Since(ac.lastNetActivity)",
+      "range": {
+        "startLine": 107,
+        "startChar": 3,
+        "endLine": 107,
+        "endChar": 15
+      },
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_60e4b2e7",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "also noisy; now that this is tested this should go",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_c0c81e59",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "suggested log wording \"grpcauth: keepAlive: ping failed\" ?",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_a0c51a3f",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_00d3260b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:54:05Z",
+      "side": 1,
+      "message": "I don\u0027t see this channel used anywhere. Delete?",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
