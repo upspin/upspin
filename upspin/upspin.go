@@ -467,7 +467,7 @@ type File interface {
 }
 
 // Context contains client information such as the user's keys and
-// preferred User, Directory, and Store servers.
+// preferred User, Directory, and Store servers endpoints.
 type Context struct {
 	// The name of the user requesting access.
 	UserName UserName
@@ -480,15 +480,15 @@ type Context struct {
 	// to the directory.
 	Packing Packing
 
-	// User is the User service to contact when evaluating names.
-	User User
+	// User is the endpoint of the User service to connect to for evaluating names.
+	User Endpoint
 
-	// Directory is the Directory in which to place new data items,
+	// Directory is the endpoint of the Directory in which to place new data items,
 	// usually the location of the user's root.
-	Directory Directory
+	Directory Endpoint
 
-	// Store is the Store in which to place new data items.
-	Store Store
+	// Store is the endpoint of the Store in which to place new data items.
+	Store Endpoint
 }
 
 // Dialer defines how to connect and authenticate to a server. Each

@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/crypto/hkdf"
 
+	"upspin.io/bind"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -709,7 +710,11 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (
 	if string(user) == string(ctx.UserName) {
 		return ctx.Factotum.PublicKey(), nil
 	}
-	_, keys, err := ctx.User.Lookup(user)
+	userService, err := bind.User(ctx, ctx.User)
+	if err != nil {
+		return "", err
+	}
+	_, keys, err := userService.Lookup(user)
 	if err != nil {
 		return "", err
 	}

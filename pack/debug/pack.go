@@ -15,6 +15,7 @@ import (
 	"io"
 	"math/rand"
 
+	"upspin.io/bind"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -239,7 +240,11 @@ func getKey(ctx *upspin.Context, name upspin.PathName) (upspin.PublicKey, error)
 	if err != nil {
 		return "", err
 	}
-	_, keys, err := ctx.User.Lookup(parsed.User())
+	user, err := bind.User(ctx, ctx.User)
+	if err != nil {
+		return "", err
+	}
+	_, keys, err := user.Lookup(parsed.User())
 	if err != nil {
 		return "", err
 	}

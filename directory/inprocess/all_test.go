@@ -11,7 +11,6 @@ package inprocess
 // to run.
 
 import (
-	"flag"
 	"fmt"
 	"sort"
 	"strings"
@@ -29,10 +28,6 @@ import (
 )
 
 var (
-	useGCPStore = "" // leave empty for in-process. see init below
-)
-
-var (
 	userNumber int32 // Updated atomically
 )
 
@@ -41,56 +36,45 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func init() {
-	flag.StringVar(&useGCPStore, "use_gcp_store", "", "leave empty to use an in-process Store, or set to the URL of the GCP store (e.g. 'http://localhost:8080')")
-}
-
-func newContext(name upspin.UserName) *upspin.Context {
-	storeEndpoint := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "", // ignored
-	}
-
-	if strings.HasPrefix(useGCPStore, "http") {
-		storeEndpoint.Transport = upspin.GCP
-		storeEndpoint.NetAddr = upspin.NetAddr(useGCPStore)
-	}
-
+func newContextAndServices(name upspin.UserName) (context *upspin.Context, user upspin.User, dir upspin.Directory, store upspin.Store) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	context := &upspin.Context{
-		UserName: name,
-		Packing:  upspin.DebugPack,
+	context = &upspin.Context{
+		UserName:  name,
+		Packing:   upspin.DebugPack,
+		User:      endpoint,
+		Directory: endpoint,
+		Store:     endpoint,
 	}
 	var err error
-	context.User, err = bind.User(context, endpoint)
+	user, err = bind.User(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Store, err = bind.Store(context, storeEndpoint)
+	store, err = bind.Store(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
-	context.Directory, err = bind.Directory(context, endpoint)
+	dir, err = bind.Directory(context, endpoint)
 	if err != nil {
 		panic(err)
 	}
-	return context
+	return
 }
 
-func setup() *upspin.Context {
-	context := newContext(nextUser())
-	err := context.User.(*inprocess.Service).Install(context.UserName, context.Directory)
+func setup() (*upspin.Context, upspin.User, upspin.Directory, upspin.Store) {
+	context, user, dir, store := newContextAndServices(nextUser())
+	err := user.(*inprocess.Service).Install(context.UserName, dir)
 	if err != nil {
 		panic(err)
 	}
 	key := upspin.PublicKey(fmt.Sprintf("key for %s", context.UserName))
-	context.User.(*inprocess.Service).SetPublicKeys(context.UserName, []upspin.PublicKey{key})
-	return context
+	user.(*inprocess.Service).SetPublicKeys(context.UserName, []upspin.PublicKey{key})
+	return context, user, dir, store
 }
 
 func packData(t *testing.T, context *upspin.Context, data []byte, entry *upspin.DirEntry, packing upspin.Packing) ([]byte, upspin.Packdata) {
@@ -134,12 +118,16 @@ func storeDataHelper(t *testing.T, context *upspin.Context, data []byte, name up
 		},
 	}
 	cipher, packdata := packData(t, context, data, entry, packing)
-	ref, err := context.Store.Put(cipher)
+	store, err := bind.Store(context, context.Store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ref, err := store.Put(cipher)
 	if err != nil {
 		t.Fatal(err)
 	}
 	entry.Location = upspin.Location{
-		Endpoint:  context.Store.Endpoint(),
+		Endpoint:  context.Store,
 		Reference: ref,
 	}
 	entry.Metadata.Packdata = packdata
@@ -147,20 +135,20 @@ func storeDataHelper(t *testing.T, context *upspin.Context, data []byte, name up
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
-	context := setup()
+	context, _, directory, store := setup()
 	user := context.UserName
 	root := upspin.PathName(user + "/")
 	fileName := root + "file"
 	const text = "hello sailor"
 
 	entry1 := storeData(t, context, []byte(text), fileName)
-	err := context.Directory.Put(entry1)
+	err := directory.Put(entry1)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
 
 	// Test that Lookup returns the same location.
-	entry2, err := context.Directory.Lookup(fileName)
+	entry2, err := directory.Lookup(fileName)
 	if err != nil {
 		t.Fatalf("lookup %s: %s", fileName, err)
 	}
@@ -169,12 +157,12 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	}
 
 	// Fetch the data back and inspect it.
-	ciphertext, locs, err := context.Store.Get(entry1.Location.Reference)
+	ciphertext, locs, err := store.Get(entry1.Location.Reference)
 	if err != nil {
 		t.Fatal("get blob:", err)
 	}
 	if locs != nil {
-		ciphertext, _, err = context.Store.Get(locs[0].Reference)
+		ciphertext, _, err = store.Get(locs[0].Reference)
 		if err != nil {
 			t.Fatal("get redirected blob:", err)
 		}
@@ -192,7 +180,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	context := setup()
+	context, _, directory, store := setup()
 	user := context.UserName
 	// Create a hundred files.
 	locs := make([]upspin.Location, nFile)
@@ -200,7 +188,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -212,17 +200,17 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		ciphertext, newLocs, err := context.Store.Get(locs[j].Reference)
+		ciphertext, newLocs, err := store.Get(locs[j].Reference)
 		if err != nil {
 			t.Fatalf("%q: get blob: %v, ref: %v", fileName, err, locs[j].Reference)
 		}
 		if newLocs != nil {
-			ciphertext, _, err = context.Store.Get(newLocs[0].Reference)
+			ciphertext, _, err = store.Get(newLocs[0].Reference)
 			if err != nil {
 				t.Fatalf("%q: get redirected blob: %v", fileName, err)
 			}
 		}
-		entry, err := context.Directory.Lookup(fileName)
+		entry, err := directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
@@ -238,7 +226,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	context := setup()
+	context, _, directory, store := setup()
 	user := context.UserName
 	// Create a hundred files.
 	href := make([]upspin.Location, nFile)
@@ -246,7 +234,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -258,21 +246,21 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
-		entry, err := context.Directory.Lookup(fileName)
+		entry, err := directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("#%d: %q: lookup file: %v", i, fileName, err)
 		}
-		cipher, locs, err := context.Store.Get(entry.Location.Reference)
+		cipher, locs, err := store.Get(entry.Location.Reference)
 		if err != nil {
 			t.Fatalf("%q: get file: %v", fileName, err)
 		}
 		if locs != nil {
-			cipher, _, err = context.Store.Get(locs[0].Reference)
+			cipher, _, err = store.Get(locs[0].Reference)
 			if err != nil {
 				t.Fatalf("%q: get redirected file: %v", fileName, err)
 			}
 		}
-		entry, err = context.Directory.Lookup(fileName)
+		entry, err = directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
@@ -288,42 +276,42 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	context := setup()
+	context, _, directory, store := setup()
 	user := context.UserName
-	_, err := context.Directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/", user)))
+	_, err := directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = context.Directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
+	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = context.Directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf", user)))
+	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = context.Directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
+	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
 	entry := storeData(t, context, []byte(text), fileName)
-	err = context.Directory.Put(entry)
+	err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Read it back.
-	entry, err = context.Directory.Lookup(fileName)
+	entry, err = directory.Lookup(fileName)
 	if err != nil {
 		t.Fatalf("%q: lookup file: %v", fileName, err)
 	}
-	cipher, locs, err := context.Store.Get(entry.Location.Reference)
+	cipher, locs, err := store.Get(entry.Location.Reference)
 	if err != nil {
 		t.Fatalf("%q: get file: %v", fileName, err)
 	}
 	if locs != nil {
-		cipher, _, err = context.Store.Get(locs[0].Reference)
+		cipher, _, err = store.Get(locs[0].Reference)
 		if err != nil {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
@@ -339,21 +327,21 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	// Now overwrite it.
 	text = "goodnight mother"
 	entry = storeData(t, context, []byte(text), fileName)
-	err = context.Directory.Put(entry)
+	err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Read it back.
-	entry, err = context.Directory.Lookup(fileName)
+	entry, err = directory.Lookup(fileName)
 	if err != nil {
 		t.Fatalf("%q: second lookup file: %v", fileName, err)
 	}
-	cipher, locs, err = context.Store.Get(entry.Location.Reference)
+	cipher, locs, err = store.Get(entry.Location.Reference)
 	if err != nil {
 		t.Fatalf("%q: second get file: %v", fileName, err)
 	}
 	if locs != nil {
-		cipher, _, err = context.Store.Get(locs[0].Reference)
+		cipher, _, err = store.Get(locs[0].Reference)
 		if err != nil {
 			t.Fatalf("%q: second get redirected file: %v", fileName, err)
 		}
@@ -400,7 +388,7 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
-	context := setup()
+	context, _, directory, _ := setup()
 	user := context.UserName
 	// Build the tree.
 	dirs := []string{
@@ -418,7 +406,7 @@ func TestGlob(t *testing.T) {
 	for _, dir := range dirs {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, dir))
 		t.Log(name)
-		_, err := context.Directory.MakeDirectory(name)
+		_, err := directory.MakeDirectory(name)
 		if err != nil {
 			t.Fatalf("make directory: %s: %v", name, err)
 		}
@@ -426,7 +414,7 @@ func TestGlob(t *testing.T) {
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
 		entry := storeData(t, context, []byte(name), name)
-		err := context.Directory.Put(entry)
+		err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
@@ -434,7 +422,7 @@ func TestGlob(t *testing.T) {
 	// Now do the test proper.
 	for _, test := range globTests {
 		name := fmt.Sprintf("%s/%s", user, test.pattern)
-		entries, err := context.Directory.Glob(name)
+		entries, err := directory.Glob(name)
 		if err != nil {
 			t.Errorf("%s: %v\n", test.pattern, err)
 			continue
@@ -463,7 +451,7 @@ func TestGlob(t *testing.T) {
 }
 
 func TestSequencing(t *testing.T) {
-	context := setup()
+	context, _, directory, _ := setup()
 	user := context.UserName
 	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
@@ -472,11 +460,11 @@ func TestSequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, context, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
-		entry, err = context.Directory.Lookup(fileName)
+		entry, err = directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("lookup file %d: %v", i, err)
 		}
@@ -488,11 +476,11 @@ func TestSequencing(t *testing.T) {
 	// Now check it updates if we set the sequence correctly.
 	entry := storeData(t, context, []byte("first seq version"), fileName)
 	entry.Metadata.Sequence = seq
-	err := context.Directory.Put(entry)
+	err := directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
-	entry, err = context.Directory.Lookup(fileName)
+	entry, err = directory.Lookup(fileName)
 	if err != nil {
 		t.Fatalf("lookup file: %v", err)
 	}
@@ -502,7 +490,7 @@ func TestSequencing(t *testing.T) {
 	// Now check it fails if we don't.
 	entry = storeData(t, context, []byte("second seq version"), fileName)
 	entry.Metadata.Sequence = seq
-	err = context.Directory.Put(entry)
+	err = directory.Put(entry)
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
@@ -513,7 +501,7 @@ func TestSequencing(t *testing.T) {
 }
 
 func TestRootDirectorySequencing(t *testing.T) {
-	context := setup()
+	context, _, directory, _ := setup()
 	user := context.UserName
 	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
@@ -522,11 +510,11 @@ func TestRootDirectorySequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, context, []byte(text), fileName)
-		err := context.Directory.Put(entry)
+		err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
-		entry, err = context.Directory.Lookup(fileName)
+		entry, err = directory.Lookup(fileName)
 		if err != nil {
 			t.Fatalf("lookup dir %d: %v", i, err)
 		}
@@ -538,18 +526,18 @@ func TestRootDirectorySequencing(t *testing.T) {
 }
 
 func TestSeqNotExist(t *testing.T) {
-	context := setup()
+	context, _, directory, _ := setup()
 	user := context.UserName
 	fileName := upspin.PathName(user + "/file")
 	entry := storeData(t, context, []byte("hello"), fileName)
 	// First write with SeqNotExist should succeed.
 	entry.Metadata.Sequence = upspin.SeqNotExist
-	err := context.Directory.Put(entry)
+	err := directory.Put(entry)
 	if err != nil {
 		t.Fatalf("put file: %v", err)
 	}
 	// Second should fail.
-	err = context.Directory.Put(entry)
+	err = directory.Put(entry)
 	if err == nil {
 		t.Fatalf("put file succeeded; should have failed")
 	}
@@ -559,10 +547,9 @@ func TestSeqNotExist(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	context := setup()
+	context, _, dir, _ := setup()
 	user := context.UserName
 	fileName := upspin.PathName(user + "/file")
-	dir := context.Directory
 	entry := storeData(t, context, []byte("hello"), fileName)
 	err := dir.Put(entry)
 	if err != nil {
@@ -592,11 +579,10 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteDirectory(t *testing.T) {
-	context := setup()
+	context, _, dir, _ := setup()
 	user := context.UserName
 	dirName := upspin.PathName(user + "/dir")
 	fileName := dirName + "/file"
-	dir := context.Directory
 	_, err := dir.MakeDirectory(dirName)
 	if err != nil {
 		t.Fatal(err)
@@ -619,7 +605,7 @@ func TestDeleteDirectory(t *testing.T) {
 		t.Fatalf("deleting non-empty directory succeeded with wrong error: %v", err)
 	}
 	// Now delete the file.
-	err = context.Directory.Delete(fileName)
+	err = dir.Delete(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -639,13 +625,12 @@ func TestDeleteDirectory(t *testing.T) {
 }
 
 func TestWhichAccess(t *testing.T) {
-	context := setup()
+	context, _, dir, _ := setup()
 	user := context.UserName
 	dir1Name := upspin.PathName(user + "/dir1")
 	dir2Name := dir1Name + "/dir2"
 	fileName := dir2Name + "/file"
 	accessFileName := dir1Name + "/Access"
-	dir := context.Directory
 	_, err := dir.MakeDirectory(dir1Name)
 	if err != nil {
 		t.Fatal(err)

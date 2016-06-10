@@ -13,18 +13,17 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/user/inprocess"
-	"upspin.io/user/usercache"
 
 	_ "upspin.io/directory/transports"
-	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
-
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
+	_ "upspin.io/store/transports"
+	_ "upspin.io/user/transports"
 )
 
 var (
@@ -61,17 +60,24 @@ func main() {
 		log.Debug.Fatal(err)
 	}
 
-	// Turn on caching for users.
-	usercache.Install(context)
+	// dfuse does not do user lookups, so it does not need a usercache (other layers will use it).
 
 	// Hack for testing
 	if *testFlag != "" {
-		testUser, ok := context.User.(*inprocess.Service)
+		user, err := bind.User(context, context.User)
+		if err != nil {
+			log.Debug.Fatal(err)
+		}
+		testUser, ok := user.(*inprocess.Service)
 		if !ok {
 			log.Debug.Fatal("Not a inprocess.Service")
 		}
 
-		if err := testUser.Install(upspin.UserName(*testFlag), context.Directory); err != nil {
+		dir, err := bind.Directory(context, context.Directory)
+		if err != nil {
+			log.Debug.Fatal(err)
+		}
+		if err := testUser.Install(upspin.UserName(*testFlag), dir); err != nil {
 			log.Debug.Print(err)
 		}
 	}

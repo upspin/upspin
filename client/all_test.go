@@ -29,33 +29,31 @@ func newContext(name upspin.UserName) *upspin.Context {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context := &upspin.Context{
-		UserName: name,
-		Packing:  upspin.DebugPack, // TODO.
-	}
-	var err error
-	context.User, err = bind.User(context, endpoint)
-	if err != nil {
-		panic(err)
-	}
-	context.Store, err = bind.Store(context, endpoint)
-	if err != nil {
-		panic(err)
-	}
-	context.Directory, err = bind.Directory(context, endpoint)
-	if err != nil {
-		panic(err)
+		UserName:  name,
+		Packing:   upspin.DebugPack, // TODO.
+		User:      endpoint,
+		Directory: endpoint,
+		Store:     endpoint,
 	}
 	return context
 }
 
 func setup(userName upspin.UserName) *upspin.Context {
 	context := newContext(userName)
-	err := context.User.(*inprocess.Service).Install(userName, context.Directory)
+	user, err := bind.User(context, context.User)
+	if err != nil {
+		panic(err)
+	}
+	dir, err := bind.Directory(context, context.Directory)
+	if err != nil {
+		panic(err)
+	}
+	err = user.(*inprocess.Service).Install(userName, dir)
 	if err != nil {
 		panic(err)
 	}
 	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
-	context.User.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
+	user.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 	return context
 }
 
@@ -254,7 +252,6 @@ func TestFileRandomAccess(t *testing.T) {
 func TestFileZeroFill(t *testing.T) {
 	const (
 		user     = "zerofill@google.com"
-		root     = user + "/"
 		fileName = user + "/" + "file"
 	)
 	client, f, _ := setupFileIO(user, fileName, 0, t)

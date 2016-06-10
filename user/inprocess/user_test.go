@@ -32,15 +32,9 @@ func setup(t *testing.T) (upspin.User, *upspin.Context) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.Store, err = bind.Store(c, e)
-	if err != nil {
-		t.Fatal(err)
-	}
-	c.Directory, err = bind.Directory(c, e)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	c.User = e
+	c.Store = e
+	c.Directory = e
 	return u, c
 }
 
@@ -51,7 +45,11 @@ func TestInstallAndLookup(t *testing.T) {
 		t.Fatal("Not an inprocess User Service")
 	}
 
-	err := testUser.Install(userName, ctxt.Directory)
+	dir, err := bind.Directory(ctxt, ctxt.Directory)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = testUser.Install(userName, dir)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
