@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_b0c4f9fe",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:56:35Z",
+      "side": 1,
+      "message": "why? mu is consistent with the rest of the code base and with the same functionality in dir/gcp.",
+      "parentUuid": "4f3a9cf7_4087ee22",
+      "revId": "4ca4cb2b6e8b8b9a0ec8ab15b40c4ff5076b3c42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_a0bebac6",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_90c9fd17",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:56:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3a9cf7_a0bebac6",
+      "revId": "4ca4cb2b6e8b8b9a0ec8ab15b40c4ff5076b3c42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_c0c13e3b",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-06-10T00:42:37Z",
       "side": 1,
       "message": "why are you taking the lock here?",
+      "revId": "4ca4cb2b6e8b8b9a0ec8ab15b40c4ff5076b3c42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_508015d6",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:56:35Z",
+      "side": 1,
+      "message": "Bug. Fixed.",
+      "parentUuid": "4f3a9cf7_c0c13e3b",
       "revId": "4ca4cb2b6e8b8b9a0ec8ab15b40c4ff5076b3c42",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
