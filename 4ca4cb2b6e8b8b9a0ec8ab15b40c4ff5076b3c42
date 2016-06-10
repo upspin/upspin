@@ -60,6 +60,24 @@
     },
     {
       "key": {
+        "uuid": "aff6b89b_8bbe2dc7",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T17:29:08Z",
+      "side": 1,
+      "message": "The pointer ones that belong inside the server. They are really static package vars, so I moved them here to make that clear. See CL description for why.",
+      "parentUuid": "0fc6e430_f107020c",
+      "revId": "4ca4cb2b6e8b8b9a0ec8ab15b40c4ff5076b3c42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_a0bebac6",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
