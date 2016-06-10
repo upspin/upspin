@@ -7,15 +7,10 @@ package debugpack
 import (
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/pack"
-	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
-)
-
-var (
-	meta = &upspin.Metadata{
-		Packdata: []byte{byte(upspin.DebugPack)},
-	}
+	testUser "upspin.io/user/inprocess"
 )
 
 func TestRegister(t *testing.T) {
@@ -36,7 +31,6 @@ const (
 
 var (
 	context = &upspin.Context{
-		User:     &dummyUser{},
 		UserName: userName,
 	}
 )
@@ -120,27 +114,14 @@ func TestPack(t *testing.T) {
 	}
 }
 
-// Dummy interface for User, so we can look up a user and get a key.
-
-type dummyUser struct {
-	testfixtures.DummyUser
-	endpoint upspin.Endpoint
-}
-
-type dummyStore struct {
-	testfixtures.DummyStore
-	endpoint upspin.Endpoint
-}
-
-type dummyDirectory struct {
-	testfixtures.DummyDirectory
-	endpoint upspin.Endpoint
-}
-
-func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	return nil, []upspin.PublicKey{"a key"}, nil
-}
-
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	return d, nil
+func TestMain(m *testing.M) {
+	user, err := bind.User(&upspin.Context{}, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""})
+	if err != nil {
+		panic(err)
+	}
+	testuser, ok := user.(*testUser.Service)
+	if !ok {
+		panic("not a testuser")
+	}
+	testuser.SetPublicKeys(userName, []upspin.PublicKey{"a key"})
 }

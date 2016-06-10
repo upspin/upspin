@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"upspin.io/upspin"
+	"upspin.io/bind"
 
 	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/store/inprocess"
@@ -36,7 +37,11 @@ func TestInProcess(t *testing.T) {
 	}
 
 	// Now check the tree was setup correctly
-	de, err := env.Context.Directory.Glob(userName + "/*")
+	dir, err := bind.Directory(env.Context, env.Context.Directory)
+	if err != nil {
+		t.Fatal(err)
+	}
+	de, err := dir.Glob(userName + "/*")
 	if err != nil {
 		t.Fatal(err)
 	}

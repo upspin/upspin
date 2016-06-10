@@ -28,30 +28,18 @@ type userCache struct {
 	duration       time.Duration
 }
 
-// Install a cache onto the User service.  After this all User service requests will
+// New creates a cache onto the User service.  After this all User service requests will
 // be filtered through the cache.
 //
-// TODO(p): Install is not concurrency safe since context is assumed to be immutable
+// TODO(p): New is not concurrency safe since context is assumed to be immutable
 // everywhere else.  Not sure this needs to be fixed but should at least be noted.
-func Install(context *upspin.Context) {
-	// Avoid installing more than once.
-	if _, ok := context.User.(*userCache); ok {
-		return
-	}
-
-	c := &userCache{
+func New(context *upspin.Context) upspin.User {
+	return &userCache{
 		context:      *context, // make a copy.
-		userEndpoint: context.User.Endpoint(),
+		userEndpoint: context.User,
 		entries:      cache.NewLRU(256),
 		duration:     time.Minute * 15,
 	}
-	// Don't hold a reference to these.
-	c.context.User = nil
-	c.context.Store = nil
-	c.context.Directory = nil
-
-	// Install the new User service (this userCache).
-	context.User = c
 }
 
 // Lookup implements upspin.User.Lookup.

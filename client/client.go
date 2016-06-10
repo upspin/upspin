@@ -92,12 +92,16 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	// Store contents.
-	ref, err := c.context.Store.Put(cipher)
+	store, err := bind.Store(c.context, c.context.Store)
+	if err != nil {
+		return zeroLoc, err
+	}
+	ref, err := store.Put(cipher)
 	if err != nil {
 		return zeroLoc, err
 	}
 	de.Location = upspin.Location{
-		Endpoint:  c.context.Store.Endpoint(),
+		Endpoint:  c.context.Store,
 		Reference: ref,
 	}
 
@@ -112,10 +116,18 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	if packerString[0] != 'p' || strings.IndexByte("235", packerString[1]) < 0 { // TODO generalize for more packers when some exist
 		return nil
 	}
+	directory, err := bind.Directory(c.context, c.context.Directory)
+	if err != nil {
+		return err
+	}
+	user, err := bind.User(c.context, c.context.User)
+	if err != nil {
+		return err
+	}
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
-	accessName, err := c.context.Directory.WhichAccess(name)
+	accessName, err := directory.WhichAccess(name)
 	if err != nil {
 		return err
 	}
@@ -135,7 +147,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	readersPublicKey[0] = c.context.Factotum.PublicKey()
 	n := 1
 	for _, r := range readers {
-		_, pubkeys, err := c.context.User.Lookup(r)
+		_, pubkeys, err := user.Lookup(r)
 		if err != nil || len(pubkeys) < 1 {
 			// TODO warn that we can't process one of the readers?
 			continue
@@ -273,9 +285,13 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var endpoints []upspin.Endpoint
 	if parsed.User() == c.context.UserName {
-		endpoints = append(endpoints, c.context.Directory.Endpoint())
+		endpoints = append(endpoints, c.context.Directory)
 	}
-	if eps, _, err := c.context.User.Lookup(parsed.User()); err == nil {
+	user, err := bind.User(c.context, c.context.User)
+	if err != nil {
+		return nil, err
+	}
+	if eps, _, err := user.Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	var dir upspin.Directory
@@ -301,7 +317,11 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 	if parsed.User() == c.context.UserName {
 		pubKeys = append(pubKeys, c.context.Factotum.PublicKey())
 	}
-	if _, pks, err := c.context.User.Lookup(parsed.User()); err == nil {
+	user, err := bind.User(c.context, c.context.User)
+	if err != nil {
+		return nil, err
+	}
+	if _, pks, err := user.Lookup(parsed.User()); err == nil {
 		pubKeys = append(pubKeys, pks...)
 	}
 	if len(pubKeys) == 0 {

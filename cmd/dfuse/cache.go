@@ -108,14 +108,10 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	locations := []upspin.Location{de.Location}
 	for i := 0; i < len(locations); i++ {
 		loc := locations[i]
-		store := n.f.context.Store
-		if loc.Endpoint != store.Endpoint() {
-			var err error
-			store, err = bind.Store(n.f.context, loc.Endpoint)
-			if err != nil {
-				finalErr = eio("%s bind.Store %v", err, loc)
-				continue
-			}
+		store, err := bind.Store(n.f.context, loc.Endpoint)
+		if err != nil {
+			finalErr = eio("%s bind.Store %v", err, loc)
+			continue
 		}
 		var cdir string
 		cdir, cf.fname = c.cacheName(loc, n.uname)
