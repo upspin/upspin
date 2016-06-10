@@ -91,7 +91,7 @@ func newDirError(op string, path upspin.PathName, err string) *dirError {
 
 // verifyMetadata checks that the metadata is minimally valid.
 func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
-	if meta.Sequence < 0 {
+	if meta.Sequence < upspin.SeqNotExist {
 		return newDirError("verifyMeta", path, "invalid sequence number")
 	}
 	return nil
@@ -191,6 +191,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 		return newDirError(op, canonicalPath, err.Error())
 
 	}
+	seq := dirEntry.Metadata.Sequence
 	if err == nil {
 		if existingDirEntry.IsDir() {
 			return newDirError(op, canonicalPath, "directory already exists")
@@ -198,6 +199,15 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 		if dirEntry.IsDir() {
 			return newDirError(op, canonicalPath, "overwriting file with directory")
 		}
+		if seq == upspin.SeqNotExist {
+			return newDirError(op, canonicalPath, "file already exists")
+		}
+		if seq > upspin.SeqIgnore && seq != existingDirEntry.Metadata.Sequence {
+			return newDirError(op, canonicalPath, "sequence mismatch")
+		}
+	}
+	if seq < upspin.SeqBase {
+		dirEntry.Metadata.Sequence = upspin.SeqBase
 	}
 
 	// Canonicalize path.
