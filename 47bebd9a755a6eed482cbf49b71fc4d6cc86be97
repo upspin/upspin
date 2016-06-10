@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_d03d4523",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "If we depend on a specific parameter for correctness, we\u0027re doing something wrong. This should be configurable by different sites/users according to their networking conditions. I debated whether to put this in Service.Configure so that it is truly customizable without having to edit the code and recompile, but sadly it\u0027s too late to configure that then and the wrong place for it.\n\nI prefer to leave it as is. We can hide it if it becomes a nuisance.",
+      "parentUuid": "4f3a9cf7_e0b8c2db",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_20010a65",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_b00ab971",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3a9cf7_20010a65",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_80f61699",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-06-10T00:56:24Z",
       "side": 1,
       "message": "select {\ncase ac.closeKeepAlive \u003c- true:\ndefault:\n}\n\nSo that the Close method doesn\u0027t block if it is called twice.",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_900fbd82",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Done. But it\u0027s probably an error to call Close more than once.",
+      "parentUuid": "4f3a9cf7_80f61699",
       "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
