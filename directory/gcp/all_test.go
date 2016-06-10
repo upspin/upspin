@@ -139,7 +139,7 @@ func makeValidMeta() upspin.Metadata {
 
 func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 	meta := makeValidMeta()
-	meta.Sequence = -1
+	meta.Sequence = upspin.SeqNotExist - 1
 	dir := upspin.DirEntry{
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
@@ -504,6 +504,17 @@ func TestPut(t *testing.T) {
 	}
 	if !bytes.Equal(updatedParentJSON, egcp.PutContents[1]) {
 		t.Errorf("Expected put to write %s, wrote %s", updatedParentJSON, egcp.PutContents[1])
+	}
+
+	// Check that a second put with SeqNotExist fails.
+	ndir := dir
+	ndir.Metadata.Sequence = upspin.SeqNotExist
+	err = ds.Put(&ndir)
+	if err == nil {
+		t.Fatal("Put with SeqNotExist should have failed")
+	}
+	if !strings.Contains(err.Error(), "file already exists") {
+		t.Errorf("Put with SeqNotExist failed with %s", err)
 	}
 }
 
