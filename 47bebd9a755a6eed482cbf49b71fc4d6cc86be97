@@ -16,6 +16,40 @@
       "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_20010a65",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:56:24Z",
+      "side": 1,
+      "message": "make it a buffered channel with length 1",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f3a9cf7_80f61699",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-10T00:56:24Z",
+      "side": 1,
+      "message": "select {\ncase ac.closeKeepAlive \u003c- true:\ndefault:\n}\n\nSo that the Close method doesn\u0027t block if it is called twice.",
+      "revId": "47bebd9a755a6eed482cbf49b71fc4d6cc86be97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
