@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_50e495e6",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "I debated whether to add a SetLastActivity() function that other methods could call. It doesn\u0027t seem necessary, but we could add it. Updated the comment.",
+      "parentUuid": "4f3a9cf7_e0cf225b",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_40d52ef3",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_30c9095b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "To prevent mistakes. I\u0027d hate to be the server on the other end of a 10ms ping interval.",
+      "parentUuid": "4f3a9cf7_40d52ef3",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_20daaa24",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -47,6 +83,42 @@
       "writtenOn": "2016-06-10T00:54:05Z",
       "side": 1,
       "message": "seems noisy, suggest delete",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_9001fd66",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Moved to Debug.",
+      "parentUuid": "4f3a9cf7_20daaa24",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_b0fcf97d",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3a9cf7_20daaa24",
       "revId": "66840301720faa3215915a47729644cd4e030178",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -76,6 +148,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_70f6719c",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3a9cf7_80df3613",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_60e4b2e7",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -87,6 +177,24 @@
       "writtenOn": "2016-06-10T00:54:05Z",
       "side": 1,
       "message": "also noisy; now that this is tested this should go",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_10ededc1",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Moved to Debug.",
+      "parentUuid": "4f3a9cf7_60e4b2e7",
       "revId": "66840301720faa3215915a47729644cd4e030178",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -110,6 +218,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_f0e961b5",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3a9cf7_c0c81e59",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_a0c51a3f",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -127,6 +253,24 @@
     },
     {
       "key": {
+        "uuid": "eff6f04a_d0e665e3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "Moved to debug.",
+      "parentUuid": "4f3a9cf7_a0c51a3f",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f3a9cf7_00d3260b",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -138,6 +282,24 @@
       "writtenOn": "2016-06-10T00:54:05Z",
       "side": 1,
       "message": "I don\u0027t see this channel used anywhere. Delete?",
+      "revId": "66840301720faa3215915a47729644cd4e030178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eff6f04a_b023d909",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-10T15:37:50Z",
+      "side": 1,
+      "message": "It\u0027s used.",
+      "parentUuid": "4f3a9cf7_00d3260b",
       "revId": "66840301720faa3215915a47729644cd4e030178",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
