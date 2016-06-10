@@ -12,19 +12,21 @@ import (
 	"os"
 	"strings"
 
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/endpoint"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
 	// Load useful packers
 
-	"upspin.io/pack"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
+
 	_ "upspin.io/directory/transports"
 	_ "upspin.io/store/transports"
 	_ "upspin.io/user/transports"
@@ -305,8 +307,12 @@ func rm(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
+	dir, err := bind.Directory(ctx, ctx.Directory)
+	if err != nil {
+		exit(err)
+	}
 	for i := 0; i < fs.NArg(); i++ {
-		err := ctx.Directory.Delete(upspin.PathName(fs.Arg(i)))
+		err := dir.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
 		}
@@ -348,8 +354,12 @@ func whichAccess(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
+	dir, err := bind.Directory(ctx, ctx.Directory)
+	if err != nil {
+		exit(err)
+	}
 	for i := 0; i < fs.NArg(); i++ {
-		acc, err := ctx.Directory.WhichAccess(upspin.PathName(fs.Arg(i)))
+		acc, err := dir.WhichAccess(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
 		}

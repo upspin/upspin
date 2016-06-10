@@ -63,16 +63,9 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 			t.Fatal(err)
 		}
 	}
-	c.User = s
-
-	c.Store, err = bind.Store(c, e)
-	if err != nil {
-		t.Fatal(err)
-	}
-	c.Directory, err = bind.Directory(c, e)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c.User = e
+	c.Store = e
+	c.Directory = e
 
 	return s, c
 }
@@ -81,13 +74,14 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 // for efficacy of the cached version.
 func TestCache(t *testing.T) {
 	s, c := setup(t)
-	Install(c)
+	user := New(c)
+	u := user.(*userCache)
 
 	// Cache the 4 names.
-	try(t, s, c, "a@a.com")
-	try(t, s, c, "b@b.com")
-	try(t, s, c, "c@c.com")
-	try(t, s, c, "d@d.com")
+	try(t, s, u, "a@a.com")
+	try(t, s, u, "b@b.com")
+	try(t, s, u, "c@c.com")
+	try(t, s, u, "d@d.com")
 
 	if s.dialed != 4 {
 		t.Errorf("Expected 4 dials; one for each cache miss. Got %d", s.dialed)
@@ -98,10 +92,10 @@ func TestCache(t *testing.T) {
 	// Check for consistency between cached and uncached.
 	loops := 200
 	for i := 0; i < loops; i++ {
-		try(t, s, c, "a@a.com")
-		try(t, s, c, "b@b.com")
-		try(t, s, c, "c@c.com")
-		try(t, s, c, "d@d.com")
+		try(t, s, u, "a@a.com")
+		try(t, s, u, "b@b.com")
+		try(t, s, u, "c@c.com")
+		try(t, s, u, "d@d.com")
 	}
 
 	// No new cache misses, so no new dials.
@@ -121,23 +115,24 @@ func TestExpiration(t *testing.T) {
 		t.Skip("Expiration tests skipped in short mode")
 	}
 	s, c := setup(t)
-	Install(c)
-	c.User.(*userCache).SetDuration(time.Second)
+	user := New(c)
+	u := user.(*userCache)
+	u.SetDuration(time.Second)
 
 	// Cache the 4 names.
-	try(t, s, c, "a@a.com")
-	try(t, s, c, "b@b.com")
-	try(t, s, c, "c@c.com")
-	try(t, s, c, "d@d.com")
+	try(t, s, u, "a@a.com")
+	try(t, s, u, "b@b.com")
+	try(t, s, u, "c@c.com")
+	try(t, s, u, "d@d.com")
 	sofar := s.lookups
 
 	time.Sleep(2 * time.Second)
 
 	// After a few seconds all entries should expire.
-	try(t, s, c, "a@a.com")
-	try(t, s, c, "b@b.com")
-	try(t, s, c, "c@c.com")
-	try(t, s, c, "d@d.com")
+	try(t, s, u, "a@a.com")
+	try(t, s, u, "b@b.com")
+	try(t, s, u, "c@c.com")
+	try(t, s, u, "d@d.com")
 	if s.lookups != sofar+2*4 {
 		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+2*4)
 	}
@@ -149,9 +144,9 @@ func TestExpiration(t *testing.T) {
 
 // try looks up a name through the cached and uncached User services and
 // compares the results.
-func try(t *testing.T, s *service, c *upspin.Context, name string) {
+func try(t *testing.T, s *service, u *userCache, name string) {
 	seps, spks, serr := s.Lookup(upspin.UserName(name))
-	ceps, cpks, cerr := c.User.Lookup(upspin.UserName(name))
+	ceps, cpks, cerr := u.Lookup(upspin.UserName(name))
 	if !reflect.DeepEqual(seps, ceps) {
 		t.Errorf("for %s got %v expect %v", name, ceps, seps)
 	}

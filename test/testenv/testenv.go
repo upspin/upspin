@@ -206,10 +206,7 @@ func gcpClient(context *upspin.Context) (upspin.Client, error) {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored.
 	}
-	err := bindEndpoints(context, endpointStore, endpointDir, endpointUser)
-	if err != nil {
-		return nil, err
-	}
+	setContextEndpoints(context, endpointStore, endpointDir, endpointUser)
 	client := client.New(context)
 	return client, nil
 }
@@ -232,10 +229,7 @@ func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	err := bindEndpoints(context, endpointStore, endpointDir, endpointUser)
-	if err != nil {
-		return nil, err
-	}
+	setContextEndpoints(context, endpointStore, endpointDir, endpointUser)
 	client := client.New(context)
 	return client, nil
 }
@@ -291,36 +285,30 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 
 // installUserRoot installs a root dir for the user in the context, but does not create the root dir.
 func installUserRoot(context *upspin.Context) error {
-	testUser, ok := context.User.(*inprocess.Service)
+	user, err := bind.User(context, context.User)
+	if err != nil {
+		return err
+	}
+	testUser, ok := user.(*inprocess.Service)
 	if !ok {
 		return errors.New("installUserRoot: user service must be the in-process instance")
 	}
-	testUser.AddRoot(context.UserName, context.Directory.Endpoint())
+	testUser.AddRoot(context.UserName, context.Directory)
 	return nil
 }
 
 func makeRoot(context *upspin.Context) error {
 	// Make the root to be sure it's there.
-	_, err := context.Directory.MakeDirectory(upspin.PathName(context.UserName + "/"))
+	directory, err := bind.Directory(context, context.Directory)
+	_, err = directory.MakeDirectory(upspin.PathName(context.UserName + "/"))
 	if err != nil && !strings.Contains(err.Error(), "already ") {
 		return err
 	}
 	return nil
 }
 
-func bindEndpoints(context *upspin.Context, store, dir, user upspin.Endpoint) error {
-	var err error
-	context.Store, err = bind.Store(context, store)
-	if err != nil {
-		return err
-	}
-	context.Directory, err = bind.Directory(context, dir)
-	if err != nil {
-		return err
-	}
-	context.User, err = bind.User(context, user)
-	if err != nil {
-		return err
-	}
-	return nil
+func setContextEndpoints(context *upspin.Context, store, dir, user upspin.Endpoint) {
+	context.Store = store
+	context.Directory = dir
+	context.User = user
 }

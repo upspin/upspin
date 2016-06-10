@@ -14,6 +14,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/test/testfixtures"
@@ -193,7 +194,10 @@ func TestSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx.Factotum = f // Override setup to prevent reading keys from .ssh/
-	ctx.User = mockUser
+	bind.ReregisterUser(upspin.InProcess, mockUser)
+	ctx.User = upspin.Endpoint{
+		Transport: upspin.InProcess,
+	}
 
 	d := &upspin.DirEntry{
 		Name: pathName,
@@ -270,7 +274,10 @@ func TestBadSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx.Factotum = f
-	ctx.User = mockUser
+	bind.ReregisterUser(upspin.InProcess, mockUser)
+	ctx.User = upspin.Endpoint{
+		Transport: upspin.InProcess,
+	}
 
 	d := &upspin.DirEntry{
 		Name: pathName,

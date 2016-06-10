@@ -13,6 +13,7 @@ import (
 	"sort"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/pack"
@@ -145,9 +146,13 @@ func userListToString(userList []upspin.UserName) string {
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
 func (s *sharer) allEntries() []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
+	directory, err := bind.Directory(s.context, s.context.Directory)
+	if err != nil {
+		exit(err)
+	}
 	for i := 0; i < s.fs.NArg(); i++ {
 		name := upspin.PathName(s.fs.Arg(i))
-		entry, err := s.context.Directory.Lookup(name)
+		entry, err := directory.Lookup(name)
 		if err != nil {
 			exitf("lookup %q: %s", name, err)
 		}
@@ -166,7 +171,11 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	thisDir, err := s.context.Directory.Glob(string(dir) + "/*")
+	directory, err := bind.Directory(s.context, s.context.Directory)
+	if err != nil {
+		exit(err)
+	}
+	thisDir, err := directory.Glob(string(dir) + "/*")
 	if err != nil {
 		exitf("globbing %q: %s", dir, err)
 	}
@@ -197,7 +206,11 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 	if _, ok := s.accessFiles[name]; ok {
 		return
 	}
-	which, err := s.context.Directory.WhichAccess(name)
+	directory, err := bind.Directory(s.context, s.context.Directory)
+	if err != nil {
+		exit(err)
+	}
+	which, err := directory.WhichAccess(name)
 	if err != nil {
 		exitf("looking up access file %q: %s", name, err)
 	}
@@ -234,7 +247,11 @@ func read(c upspin.Client, file upspin.PathName) []byte {
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
 func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
-	entry, err := s.context.Directory.Lookup(name)
+	directory, err := bind.Directory(s.context, s.context.Directory)
+	if err != nil {
+		exit(err)
+	}
+	entry, err := directory.Lookup(name)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "looking up %q: %s", name, err)
 		s.exitCode = 1
@@ -277,7 +294,7 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		s.exitCode = 1
 		return
 	}
-	err = s.context.Directory.Put(entry)
+	err = directory.Put(entry)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", name, err)
 		s.exitCode = 1
@@ -290,7 +307,11 @@ func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	if ok {
 		return key
 	}
-	_, keys, err := s.context.User.Lookup(user)
+	userService, err := bind.User(s.context, s.context.User)
+	if err != nil {
+		exit(err)
+	}
+	_, keys, err := userService.Lookup(user)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
 		s.exitCode = 1

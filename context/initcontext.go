@@ -13,7 +13,6 @@ import (
 	"path"
 	"strings"
 
-	"upspin.io/bind"
 	"upspin.io/endpoint"
 	"upspin.io/key/keyloader"
 	"upspin.io/log"
@@ -109,25 +108,16 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		log.Error.Printf("%s: cannot parse User service: %s", op, err)
 		return nil, err
 	}
-	if context.User, err = bind.User(context, *ep); err != nil {
-		log.Error.Printf("%s: cannot bind to User service: %s", op, err)
-		return nil, err
-	}
+	context.User = *ep
 	if ep, err = endpoint.Parse(vals["store"]); err != nil {
 		log.Error.Printf("%s: cannot parse Store service: %s", op, err)
 		return nil, err
 	}
-	if context.Store, err = bind.Store(context, *ep); err != nil {
-		log.Error.Printf("%s: cannot bind to Store service: %s", op, err)
-		return nil, err
-	}
+	context.Store = *ep
 	if ep, err = endpoint.Parse(vals["directory"]); err != nil {
 		log.Error.Printf("%s: cannot parse Directory service: %s", op, err)
 		return nil, err
 	}
-	if context.Directory, err = bind.Directory(context, *ep); err != nil {
-		log.Error.Printf("%s: cannot bind to Directory service: %s", op, err)
-		return nil, err
-	}
+	context.Directory = *ep
 	return context, nil
 }
