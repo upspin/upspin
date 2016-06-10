@@ -91,7 +91,7 @@ func newDirError(op string, path upspin.PathName, err string) *dirError {
 
 // verifyMetadata checks that the metadata is minimally valid.
 func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
-	if meta.Sequence < 0 {
+	if meta.Sequence < upspin.SeqNotExist {
 		return newDirError("verifyMeta", path, "invalid sequence number")
 	}
 	return nil
@@ -198,6 +198,18 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 		if dirEntry.IsDir() {
 			return newDirError(op, canonicalPath, "overwriting file with directory")
 		}
+		if dirEntry.Metadata.Sequence == upspin.SeqNotExist {
+			return newDirError(op, canonicalPath, "file already exists")
+		}
+		// TODO(p): This check needs a lock.  Perhaps we should lock the directory's path
+		// during this whole operation?
+		if dirEntry.Metadata.Sequence > upspin.SeqIgnore && dirEntry.Metadata.Sequence != existingDirEntry.Metadata.Sequence {
+			return newDirError(op, canonicalPath, "sequence mismatch")
+		}
+		dirEntry.Metadata.Sequence = existingDirEntry.Metadata.Sequence + 1
+	}
+	if dirEntry.Metadata.Sequence < upspin.SeqBase {
+		dirEntry.Metadata.Sequence = upspin.SeqBase
 	}
 
 	// Canonicalize path.
@@ -210,6 +222,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	}
 
 	// Patch the parent: bump sequence number.
+	// TODO(p): this incrementing needs a lock. See TODO above.
 	parentDirEntry.Metadata.Sequence++
 	err = d.putDirEntry(&parentParsedPath, parentDirEntry)
 	if err != nil {

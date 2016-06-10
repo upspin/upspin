@@ -350,6 +350,7 @@ type Metadata struct {
 const (
 	SeqNotExist = -1 // Put will fail if item exists.
 	SeqIgnore   = 0  // Put will not check sequence number, but will update it.
+	SeqBase     = 1  // Base at which valid sequence numbers start.
 )
 
 // Store service.
