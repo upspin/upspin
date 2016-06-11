@@ -90,7 +90,7 @@ type Factotum interface {
 	// PackingString returns the Packing.String() value associated with the key.
 	PackingString() string
 
-	// PublicKey returns the user's public key as loaded by the Factotum.
+	// PublicKey returns the user's public key in canonical string format.
 	PublicKey() PublicKey
 }
 
