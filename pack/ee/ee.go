@@ -5,7 +5,7 @@
 // Package ee implements elliptic-curve end-to-end-encrypted packers.
 package ee
 
-// Upspin crypto summary:
+// Upspin ee crypto summary:
 // Alice shares a file with Bob by picking a new random symmetric key, encrypting the file,
 // wrapping the symmetric encryption key with Bob's public key, signing the file using
 // her own elliptic curve private key, and sending the ciphertext and metadata to a
@@ -37,8 +37,8 @@ import (
 
 // wrappedKey encodes a key that will decrypt and verify the ciphertext.
 type wrappedKey struct {
-	keyHash   []byte // sha256(recipient PublicKey)
-	dkey      []byte // ciphertext symmetric decryption key, encrypted for recipient PublicKey
+	keyHash   []byte // sha256(recipient stringPublicKey)
+	dkey      []byte // ciphertext symmetric decryption key
 	nonce     []byte
 	ephemeral ecdsa.PublicKey
 }
@@ -67,7 +67,7 @@ type eep521 struct {
 }
 
 const (
-	aesKeyLen          = 32 // AES-256 because public cloud should withstand multifile multikey attack.
+	aesKeyLen          = 32 // AES-256,random-key because public cloud should withstand multifile multikey attack.
 	p256               = "p256"
 	p384               = "p384"
 	p521               = "p521"
@@ -263,8 +263,12 @@ func (c common) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 	return readers, nil
 }
 
-// Share extracts dkey from the packdata, wraps for readers, and updates packdata.
+// Share extracts the file decryption key from the packdata, wraps for a revised list of readers, and updates packdata.
 func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+
+	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
+	// Share updates the wrapped keys, leaving the other two fields unchanged.
+	// For efficiency, reuse the wrapped key for readers in both old and new list.
 
 	// Fetch all the public keys we'll need.
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
@@ -278,25 +282,17 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		}
 		copy(hash[i][:], keyHash(pubkey[i]))
 	}
-
-	// Get my own key.
-	mypub, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
-	if err != nil {
-		log.Printf("cannot parse my own key: %v", err)
-		return // can't happen
-	}
-	myhash := keyHash(mypub)
+	myhash := stringKeyHash([]byte(ctx.Factotum.PublicKey()))
 
 	// For each packdata, wrap for new readers.
-	skipped := make([]bool, len(packdata))
-	for i, d := range packdata {
+	for j, d := range packdata {
 
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
 		sig, wrap, cipherSum, err := c.pdUnmarshal(*d)
 		if err != nil {
-			log.Printf("eePack: can't happen: pdUnmarshal failed in Share: %q", err)
+			log.Printf("eePack: can't happen: pdUnmarshal failed in Share: %v", err)
 			return
 		}
 		for i, w := range wrap {
@@ -304,6 +300,7 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 			copy(h[:], w.keyHash)
 			alreadyWrapped[h] = &wrap[i]
 			if !bytes.Equal(myhash, w.keyHash) {
+				// to unwrap dkey, we can only use our own private key
 				continue
 			}
 			dkey, err = c.aesUnwrap(ctx.Factotum, w)
@@ -312,9 +309,9 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 				break // give up;  might mean that owner has changed keys
 			}
 		}
-		skipped[i] = true
-		if len(dkey) == 0 {
-			continue // failed to get dkey
+		if len(dkey) == 0 { // failed to get a valid decryption key
+			packdata[j] = nil // tell caller this packdata was skipped
+			continue
 		}
 
 		// Create new list of wrapped keys.
@@ -332,25 +329,21 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 				}
 				v := w.ephemeral
 				log.Printf("Wrap for %x [%d %d]", hash[i], v.X, v.Y)
+				// TODO(ehg) save to a separate log and provide post-analysis
 				pw = &w
-			} // else reuse the existing wrapped key
+			} // else reuse the existing wrapped dkey
 			wrap[nwrap] = *pw
 			nwrap++
 		}
 		wrap = wrap[:nwrap]
 
-		// Rebuild packdata[i] from existing sig and new wrapped keys.
+		// Rebuild packdata[j] from existing sig and new wrapped keys.
 		dst := make([]byte, c.packdataLen(nwrap))
 		err = c.pdMarshal(&dst, sig, wrap, cipherSum)
 		if err != nil {
-			continue
-		}
-		*packdata[i] = dst
-		skipped[i] = false
-	}
-	for i := range packdata {
-		if skipped[i] {
-			packdata[i] = nil
+			packdata[j] = nil // tell caller this packdata was skipped
+		} else {
+			*packdata[j] = dst
 		}
 	}
 }
@@ -468,10 +461,16 @@ func packname(curve elliptic.Curve) string {
 	}
 }
 
+// keyHash returns the hash of a key given in ECDSA format
 func keyHash(p *ecdsa.PublicKey) []byte {
 	keyBytes := []byte(fmt.Sprintf("%s\n%s\n%s\n", packname(p.Curve), p.X.String(), p.Y.String()))
 	// this string should be the same as the file contents ~/.ssh/public.upspinkey
-	keyHash := sha256.Sum256(keyBytes)
+	return stringKeyHash(keyBytes)
+}
+
+// stringKeyHash returns the hash of a key given in string format
+func stringKeyHash(p []byte) []byte {
+	keyHash := sha256.Sum256(p)
 	return keyHash[:]
 }
 
@@ -614,12 +613,8 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 		w.ephemeral.Y.SetBytes(buf)
 		wrap[i] = w
 	}
-	// TODO(p): eventually make hash mandatory.  Currently not for backward compatability.
-	// The +1 is for the varint size preceding the hash.
-	if len(pd)-n == sha256.Size+1 {
-		hash = make([]byte, sha256.Size)
-		n += pdGetBytes(&hash, pd[n:])
-	}
+	hash = make([]byte, sha256.Size)
+	n += pdGetBytes(&hash, pd[n:])
 	if n != len(pd) { // sanity check, not a thorough parser test
 		return sig0, nil, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
 	}
