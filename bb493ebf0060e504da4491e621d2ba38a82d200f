@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f0648d0_97fa644f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/wraps/wraps it/ ?",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_f7ef608b",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "change of subject.\nFor efficiency, it reuses...in both THE old and new listS.",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_d7f4dc62",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "this error return needs to set all elements of packdata to nil",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_b79cc829",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/f/F/ s/$/./",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_97a1c463",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/te/Te/ s/$/./",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_7704f03f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/s/S/ s/$/./",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_5701ec2d",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_370a7850",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "you don\u0027t use err after this, so you could write\nif c.pdMarshal() !\u003d nil {\nalthough that may not be clearer. your call.",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_17077446",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "s/t/T/ s/$/./",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_b7f5e861",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:36:21Z",
+      "side": 1,
+      "message": "which is?",
+      "revId": "bb493ebf0060e504da4491e621d2ba38a82d200f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
