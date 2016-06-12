@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f0648d0_d7ab3c3f",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:42:11Z",
+      "side": 1,
+      "message": "s/servers/server/\nyay english",
+      "revId": "6c402035278271fc3ba2b8228cd634b930d657c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_3791d80c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-12T02:42:11Z",
+      "side": 1,
+      "message": "// User is the endpoint of the User service to contact to evaluate names.",
+      "revId": "6c402035278271fc3ba2b8228cd634b930d657c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
