@@ -90,9 +90,9 @@ func newDirError(op string, path upspin.PathName, err string) *dirError {
 }
 
 // verifyMetadata checks that the metadata is minimally valid.
-func verifyMetadata(path upspin.PathName, meta upspin.Metadata) error {
+func verifyMetadata(op string, path upspin.PathName, meta upspin.Metadata) error {
 	if meta.Sequence < upspin.SeqNotExist {
-		return newDirError("verifyMeta", path, "invalid sequence number")
+		return newDirError(op, path, "invalid sequence number")
 	}
 	return nil
 }
@@ -146,10 +146,11 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
-	user := d.context.UserName
-	if err := verifyMetadata(parsed.Path(), dirEntry.Metadata); err != nil {
+	if err := verifyMetadata(op, dirEntry.Name, dirEntry.Metadata); err != nil {
 		return err
 	}
+
+	user := d.context.UserName
 	// If we're creating the root, handle it elsewhere.
 	if parsed.IsRoot() {
 		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
@@ -168,24 +169,20 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	if dirEntry.IsDir() && !canCreate || !dirEntry.IsDir() && !canWrite {
 		return newDirError(op, dirEntry.Name, access.ErrPermissionDenied.Error())
 	}
-	// Find parent.
-	parentParsedPath := parsed.Drop(1) // Can't fail as this is not called for roots.
-	parentDirEntry, err := d.getDirEntry(&parentParsedPath)
-	if err != nil {
-		if err == errEntryNotFound {
-			// Give a more descriptive error
-			err = newDirError(op, parsed.Path(), "parent path not found")
-		}
-		return err
+
+	canonicalPath := parsed.Path()
+	parentParsedPath := parsed.Drop(1) // Can't fail as parsed is NOT root.
+
+	var mu *sync.Mutex
+	if parentParsedPath.IsRoot() {
+		mu = userLock(parsed.User())
+	} else {
+		mu = pathLock(parentParsedPath.Path())
 	}
-	// Verify parent IsDir (redundant, but just to be safe).
-	if !parentDirEntry.IsDir() {
-		log.Error.Printf("Bad inconsistency. Parent of path is not a directory: %s", parentDirEntry.Name)
-		return newDirError(op, parsed.Path(), "parent is not a directory")
-	}
+	mu.Lock()
+	defer mu.Unlock()
 
 	// Verify whether there's a directory with same name.
-	canonicalPath := parsed.Path()
 	existingDirEntry, err := d.getNonRoot(canonicalPath)
 	if err != nil && err != errEntryNotFound {
 		return newDirError(op, canonicalPath, err.Error())
@@ -201,8 +198,6 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 		if dirEntry.Metadata.Sequence == upspin.SeqNotExist {
 			return newDirError(op, canonicalPath, "file already exists")
 		}
-		// TODO(p): This check needs a lock.  Perhaps we should lock the directory's path
-		// during this whole operation?
 		if dirEntry.Metadata.Sequence > upspin.SeqIgnore && dirEntry.Metadata.Sequence != existingDirEntry.Metadata.Sequence {
 			return newDirError(op, canonicalPath, "sequence mismatch")
 		}
@@ -222,11 +217,24 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	}
 
 	// Patch the parent: bump sequence number.
-	// TODO(p): this incrementing needs a lock. See TODO above.
-	parentDirEntry.Metadata.Sequence++
-	err = d.putDirEntry(&parentParsedPath, parentDirEntry)
+	parentDirEntry, root, err := d.getDirEntry(&parentParsedPath)
 	if err != nil {
+		if err == errEntryNotFound {
+			return newDirError(op, canonicalPath, "parent path not found")
+		}
 		return err
+	}
+	// For self-consistency, verify parent really is a directory
+	if !parentDirEntry.IsDir() {
+		err = newDirError(op, canonicalPath, "parent is not a directory")
+		log.Error.Printf("Bad inconsistency: %s", err)
+		return err
+	}
+	parentDirEntry.Metadata.Sequence++
+	if parentParsedPath.IsRoot() {
+		err = d.putRoot(parentParsedPath.User(), root)
+	} else {
+		err = d.putNonRoot(parentParsedPath.Path(), parentDirEntry)
 	}
 
 	// If this is an Access file or Group file, we have some extra work to do.
@@ -449,11 +457,23 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	if !canDelete {
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
-	// Otherwise, locate the entry first.
-	dirEntry, err := d.getDirEntry(&parsed)
+
+	var mu *sync.Mutex
+	if parsed.IsRoot() {
+		mu = userLock(parsed.User())
+	} else {
+		parentPath := path.DropPath(parsed.Path(), 1)
+		mu = pathLock(parentPath)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Locate the entry first.
+	dirEntry, _, err := d.getDirEntry(&parsed)
 	if err != nil {
 		return err
 	}
+
 	parsedPath := parsed.Path()
 	// Only empty directories can be removed.
 	if dirEntry.IsDir() {
@@ -468,6 +488,11 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	}
 	// If this was an Access file, we need to delete it from the root as well.
 	if access.IsAccessFile(parsedPath) {
+		// We know mu is not the user lock, because parsedPath is an Access file so it's safe to grab the user lock.
+		uLock := userLock(parsed.User())
+		uLock.Lock()
+		defer uLock.Unlock()
+
 		err = d.deleteAccess(&parsed)
 		if err != nil {
 			return err

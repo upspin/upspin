@@ -24,32 +24,23 @@ var (
 	errEntryNotFound = newDirError("download", "", "pathname not found")
 )
 
-func (d *directory) getDirEntry(parsedPath *path.Parsed) (*upspin.DirEntry, error) {
-	if parsedPath.IsRoot() {
-		root, err := d.getRoot(parsedPath.User())
+// getDirEntry is a convenience function that returns a directory entry for the path, regardless whether it's a root
+// or a regular path. If it's a root, it also returns the root entry. The appropriate lock (userlock or pathlock)
+// must be held by the caller.
+func (d *directory) getDirEntry(path *path.Parsed) (*upspin.DirEntry, *root, error) {
+	if path.IsRoot() {
+		root, err := d.getRoot(path.User())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return &root.dirEntry, nil
+		return &root.dirEntry, root, nil
 	}
-	return d.getNonRoot(parsedPath.Path())
-}
-
-// putDirEntry writes to the backend at the given path a dir entry that could be a root or a regular dir entry.
-// If it's a root dir entry, it first attempts to read an expected-to-exist root in order to update it.
-func (d *directory) putDirEntry(parsedPath *path.Parsed, dirEntry *upspin.DirEntry) error {
-	if parsedPath.IsRoot() {
-		root, err := d.getRoot(parsedPath.User())
-		if err != nil {
-			return err
-		}
-		root.dirEntry = *dirEntry
-		return d.putRoot(parsedPath.User(), root)
-	}
-	return d.putNonRoot(parsedPath.Path(), dirEntry)
+	de, err := d.getNonRoot(path.Path())
+	return de, nil, err
 }
 
 // getNonRoot returns the dir entry for the given path, possibly going to stable storage to find it.
+// It must be called with pathLock(path) held.
 func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 	log.Printf("Looking up dir entry %q", path)
 
@@ -65,11 +56,6 @@ func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errEntryNotFound
 	}
 	var savedDirEntry upspin.DirEntry
-
-	// Lock the dir entry
-	dirEntryLock := pathLock(path)
-	dirEntryLock.Lock()
-	defer dirEntryLock.Unlock()
 
 	buf, err := d.getCloudBytes(path)
 	if err != nil {
@@ -89,14 +75,10 @@ func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 
 // putNonRoot forcibly writes to stable storage the given dir entry at the canonical path on the
 // backend without checking anything but the marshaling.
+// It must be called with pathLock(path) held.
 func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) error {
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
-
-	// Lock the dir entry
-	dirEntryLock := pathLock(path)
-	dirEntryLock.Lock()
-	defer dirEntryLock.Unlock()
 
 	d.dirCache.Add(path, *dirEntry)
 	d.dirNegCache.Remove(path) // remove from the negative cache in case it was there.
@@ -113,6 +95,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 }
 
 // isDirEmpty reports whether the directory path is empty.
+// It must be called with pathLock(path) held.
 func (d *directory) isDirEmpty(path upspin.PathName) error {
 	dirPrefix := string(path) + "/"
 	files, err := d.cloudClient.ListDir(dirPrefix)
@@ -137,12 +120,8 @@ func (d *directory) getCloudBytes(path upspin.PathName) ([]byte, error) {
 }
 
 // deletePath deletes the path from the storage backend and if successful also deletes it from all caches.
+// It must be called with pathLock(path) held.
 func (d *directory) deletePath(path upspin.PathName) error {
-	// Lock the dir entry
-	dirEntryLock := pathLock(path)
-	dirEntryLock.Lock()
-	defer dirEntryLock.Unlock()
-
 	if err := d.cloudClient.Delete(string(path)); err != nil {
 		return err
 	}

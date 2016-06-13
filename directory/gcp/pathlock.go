@@ -11,15 +11,25 @@ import (
 )
 
 const (
-	numLocks = 100
+	numPathLocks = 100
+	numUserLocks = 10
 )
 
-var locks []*sync.Mutex
+var (
+	pathLocks []*sync.Mutex
+	userLocks []*sync.Mutex
+)
 
 // pathLock returns a mutex associated with a given path.
 func pathLock(path upspin.PathName) *sync.Mutex {
 	lockNum := hashCode(string(path))
-	return locks[lockNum%numLocks]
+	return pathLocks[lockNum%numPathLocks]
+}
+
+// userLock returns a mutex associated with a given username.
+func userLock(userName upspin.UserName) *sync.Mutex {
+	lockNum := hashCode(string(userName))
+	return userLocks[lockNum%numUserLocks]
 }
 
 func hashCode(s string) uint64 {
@@ -31,8 +41,12 @@ func hashCode(s string) uint64 {
 }
 
 func init() {
-	locks = make([]*sync.Mutex, numLocks)
-	for i := range locks {
-		locks[i] = new(sync.Mutex)
+	pathLocks = make([]*sync.Mutex, numPathLocks)
+	for i := range pathLocks {
+		pathLocks[i] = new(sync.Mutex)
+	}
+	userLocks = make([]*sync.Mutex, numUserLocks)
+	for i := range userLocks {
+		userLocks[i] = new(sync.Mutex)
 	}
 }
