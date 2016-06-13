@@ -25,6 +25,7 @@ type root struct {
 type accessFileDB map[upspin.PathName]*access.Access
 
 // getRoot retrieves the user's root, possibly by fetching it from storage.
+// It must be called with userLock(user) held.
 func (d *directory) getRoot(user upspin.UserName) (*root, error) {
 	const op = "getRoot"
 	userRootPath := upspin.PathName(user)
@@ -54,6 +55,7 @@ func (d *directory) getRoot(user upspin.UserName) (*root, error) {
 }
 
 // putRoot stores the user's root to stable storage, updating the cache.
+// It must be called with userLock(user) held.
 func (d *directory) putRoot(user upspin.UserName, root *root) error {
 	const op = "putRoot"
 
@@ -75,12 +77,18 @@ func (d *directory) putRoot(user upspin.UserName, root *root) error {
 	return nil
 }
 
+// handleRootCreation creates a root for a user.
+// It must NOT be called with userLock(user) held.
 func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
 	if user != parsed.User() {
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
+	// Hold the user lock.
+	mu := userLock(user)
+	mu.Lock()
+	defer mu.Unlock()
 	_, err := d.getRoot(parsed.User())
 	if err != nil && err != errEntryNotFound {
 		return newDirError(op, parsed.Path(), err.Error())
