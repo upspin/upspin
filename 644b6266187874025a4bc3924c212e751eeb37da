@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f0648d0_ebc2d9ee",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-13T19:42:33Z",
+      "side": 1,
+      "message": "This just prevents one possible deadlock but not all, e.g.,\n\nproc A locks a/b and then a/b/c which both resolve to differnt locks\nproc b locks q/r and then q/r/s which also both resolve to different locks.\n\nIf a/b is the same lock and q/r/s and a/b/c is the same lock as q/r then you have the possibility of deadlock.\n\nOf course, if you just lock the parent, you are still synchronized, have an easier bit of code, and no possibility of deadlock.",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 34
+      },
+      "revId": "644b6266187874025a4bc3924c212e751eeb37da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_eb7939b3",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-13T19:42:33Z",
+      "side": 1,
+      "message": "If you always just lock the parent across both operations (i.e. the parent sequence inc and putting this dirEntry, you are still a happy camper.\n\nThe only time this wouldn\u0027t work is if you actually implement sequence numbers like a real merkle tree and have to increment the sequence numbers all the way up the tree.   Then you would indeed need a different strategy.",
+      "range": {
+        "startLine": 503,
+        "startChar": 13,
+        "endLine": 503,
+        "endChar": 18
+      },
+      "revId": "644b6266187874025a4bc3924c212e751eeb37da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
