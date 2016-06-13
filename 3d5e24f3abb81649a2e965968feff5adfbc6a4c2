@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f0648d0_5deaab81",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-13T17:04:12Z",
+      "side": 0,
+      "message": "Please delete line 26 as well. It was added just for this. Thanks.",
+      "revId": "3d5e24f3abb81649a2e965968feff5adfbc6a4c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
