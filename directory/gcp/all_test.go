@@ -144,7 +144,7 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "verifyMeta: fred@bob.com/myroot/myfile: invalid sequence number")
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "Put: fred@bob.com/myroot/myfile: invalid sequence number")
 }
 
 func TestLookupPathError(t *testing.T) {
@@ -415,8 +415,8 @@ func TestPutFileOverwritesDir(t *testing.T) {
 	expectedError := "Put: test@foo.com/mydir/myfile.txt: directory already exists"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{userName, parentPathName, pathName},
-		Data: [][]byte{rootJSON, dirParentJSON, existingDirEntryJSON},
+		Ref:  []string{userName, pathName, parentPathName},
+		Data: [][]byte{rootJSON, existingDirEntryJSON, dirParentJSON},
 	}
 
 	ds := newTestDirServer(t, egcp)
@@ -437,8 +437,8 @@ func TestPutDirOverwritesFile(t *testing.T) {
 	expectedError := "MakeDirectory: test@foo.com/mydir/myfile.txt: overwriting file with directory"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
-		Ref:  []string{userName, parentPathName, pathName},
-		Data: [][]byte{rootJSON, dirParentJSON, existingDirEntryJSON},
+		Ref:  []string{userName, pathName, parentPathName},
+		Data: [][]byte{rootJSON, existingDirEntryJSON, dirParentJSON},
 	}
 
 	ds := newTestDirServer(t, egcp)
