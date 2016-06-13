@@ -45,6 +45,24 @@
       "revId": "644b6266187874025a4bc3924c212e751eeb37da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0648d0_cb9275c4",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-13T20:12:48Z",
+      "side": 1,
+      "message": "Hmmm, yeah, but if I\u0027m operating on a/b/c I will lock a/b only. If another concurrent delete operation comes for a/b/c/d I will lock a/b/c only, which is not protected by the grand parent lock. But maybe that\u0027s not a problem we want to prevent... I\u0027ll go with your suggestion for Put/Mkdir.\n\nThanks!",
+      "parentUuid": "2f0648d0_eb7939b3",
+      "revId": "644b6266187874025a4bc3924c212e751eeb37da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
