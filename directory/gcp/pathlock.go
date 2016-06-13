@@ -10,16 +10,20 @@ import (
 	"upspin.io/upspin"
 )
 
-const (
-	numLocks = 100
-)
+// A pathLock is a lock on a given path. There are numPathLocks in this pool of locks and the
+// string hash of a path selects which lock to use. This fixed pool ensures we don't have a growing
+// number of locks and that we also don't have a race creating new locks when we first touch a path.
 
-var locks []*sync.Mutex
+// All methods in storage.go are protected by a pathLock, which must be held upon calling them.
+
+const numPathLocks = 100
+
+var pathLocks []*sync.Mutex
 
 // pathLock returns a mutex associated with a given path.
 func pathLock(path upspin.PathName) *sync.Mutex {
 	lockNum := hashCode(string(path))
-	return locks[lockNum%numLocks]
+	return pathLocks[lockNum%numPathLocks]
 }
 
 func hashCode(s string) uint64 {
@@ -31,8 +35,8 @@ func hashCode(s string) uint64 {
 }
 
 func init() {
-	locks = make([]*sync.Mutex, numLocks)
-	for i := range locks {
-		locks[i] = new(sync.Mutex)
+	pathLocks = make([]*sync.Mutex, numPathLocks)
+	for i := range pathLocks {
+		pathLocks[i] = new(sync.Mutex)
 	}
 }
