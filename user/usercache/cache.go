@@ -21,11 +21,10 @@ type entry struct {
 }
 
 type userCache struct {
-	userEndpoint   upspin.Endpoint
-	context        upspin.Context
-	serverUserName string
-	entries        *cache.LRU
-	duration       time.Duration
+	userEndpoint upspin.Endpoint
+	context      upspin.Context
+	entries      *cache.LRU
+	duration     time.Duration
 }
 
 // New creates a cache onto the User service.  After this all User service requests will
@@ -57,7 +56,6 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 
 	// Not found, look it up.
 	user, err := bind.User(&c.context, c.userEndpoint)
-	c.serverUserName = user.ServerUserName()
 	if err != nil {
 		return nil, nil, fmt.Errorf("usercache: error binding to User service on %v for user %q: %s",
 			c.userEndpoint, c.context.UserName, err.Error())
@@ -79,11 +77,6 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 // Dial implements upspin.User.Dial.
 func (c *userCache) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return c, nil
-}
-
-// ServerUserName implements upspin.User.ServerUserName.
-func (c *userCache) ServerUserName() string {
-	return c.serverUserName
 }
 
 // Configure implements upspin.Service.

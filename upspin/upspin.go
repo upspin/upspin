@@ -512,12 +512,6 @@ type Service interface {
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint
 
-	// ServerUserName returns the authenticated user name of the server.
-	// If there is no authenticated name an empty string is returned.
-	// TODO(p): Should I distinguish a server which didn't pass authentication
-	// from one which has no user name?
-	ServerUserName() string
-
 	// Ping reports whether the Service is reachable.
 	Ping() bool
 

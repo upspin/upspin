@@ -88,11 +88,6 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 	return copyOf(data), nil, nil
 }
 
-// ServerUserName implements upspin.service.
-func (s *service) ServerUserName() string {
-	return "inprocess"
-}
-
 // Dial always returns an authenticated instance to the underlying service.
 // There is only one data set in the address space.
 // Dial ignores the address within the endpoint but requires that the transport be InProcess.

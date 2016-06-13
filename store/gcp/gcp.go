@@ -280,11 +280,6 @@ func (s *server) Authenticate(*upspin.Context) error {
 	return nil
 }
 
-// ServerUserName implements upspin.Service.
-func (s *server) ServerUserName() string {
-	return string(s.context.UserName)
-}
-
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
 	return s.endpoint

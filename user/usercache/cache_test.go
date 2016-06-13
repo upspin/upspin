@@ -183,10 +183,6 @@ func (s *service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 	return nil, nil, errors.New("not found")
 }
 
-func (s *service) ServerUserName() string {
-	return string(s.context.UserName)
-}
-
 func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	s.dialed++
 	s.context = *context

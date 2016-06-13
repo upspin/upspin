@@ -85,11 +85,6 @@ func (s *Store) Ping() bool {
 	return IsServerReachable(s.serverURL)
 }
 
-// ServerUserName implements Service.
-func (s *Store) ServerUserName() string {
-	return ""
-}
-
 // Get implements Store.
 func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	const op = "Get"
