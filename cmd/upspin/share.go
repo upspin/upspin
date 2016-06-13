@@ -6,6 +6,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -54,12 +55,14 @@ type sharer struct {
 	// userKeys holds the keys we've looked up for each user. We remember
 	// only the zeroth element of each key returned by User.Lookup.
 	userKeys map[upspin.UserName]upspin.PublicKey
+
+	// userByHash maps the SHA-256 hashes of each user's key to the user name.
+	userByHash map[[sha256.Size]byte]upspin.UserName
 }
 
 // do is the main function for the share subcommand.
 func (s *sharer) do() {
-	// Validate names quickly before grabbing a context. Avoids
-	// a slow start if there's a simple typo.
+	// Validate names quickly before grabbing a context.
 	for i := 0; i < s.fs.NArg(); i++ {
 		name := upspin.PathName(s.fs.Arg(i))
 		_, err := path.Parse(name)
@@ -97,10 +100,13 @@ func (s *sharer) do() {
 		s.addAccess(e)
 	}
 
+	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
+	s.userByHash = make(map[[sha256.Size]byte]upspin.UserName)
+	var entriesToFix []*upspin.DirEntry
+
 	// Now we're ready. First show the state if asked.
 	if !s.quiet {
 		// TODO: Show state of wrapped readers.
-		// Compute the strings for all the user lists. This will de-dup the user lists.
 		uNames := make(map[string][]string)
 		for _, u := range s.users {
 			uNames[userListToString(u)] = nil
@@ -115,7 +121,7 @@ func (s *sharer) do() {
 		}
 		fmt.Println("Read permissions defined by Access files:")
 		for users, names := range uNames {
-			fmt.Printf("\nfiles readable by: %s:\n", users)
+			fmt.Printf("\nfiles readable by:\n%s:\n", users)
 			sort.Strings(names)
 			for _, name := range names {
 				fmt.Printf("\t%s\n", name)
@@ -123,11 +129,63 @@ func (s *sharer) do() {
 		}
 	}
 
-	// Repair the wrapped keys if requested.
+	// Find any discrepancies.
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		users := s.users[path.DropPath(entry.Name, 1)]
+		for _, user := range users {
+			s.lookupKey(user)
+		}
+		packer := lookupPacker(entry)
+		if packer.Packing() == upspin.PlainPack {
+			continue
+		}
+		hashes, err := packer.ReaderHashes(entry.Metadata.Packdata)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
+			continue
+		}
+		var hashUsers string
+		for _, hash := range hashes {
+			var thisUser upspin.UserName
+			switch packer.Packing() {
+			case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack, upspin.Ed25519Pack:
+				if len(hash) != sha256.Size {
+					fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
+					continue
+				}
+				var h [sha256.Size]byte
+				copy(h[:], hash)
+				thisUser = s.userByHash[h]
+			default:
+				fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
+				continue
+			}
+			if hashUsers != "" {
+				hashUsers += " "
+			}
+			hashUsers += string(thisUser)
+		}
+		userList := userListToString(users)
+		if userList != hashUsers {
+			if !s.quiet {
+				if len(entriesToFix) == 0 {
+					fmt.Println("\nAccess discrepancies:\n")
+				}
+				fmt.Printf("%s:\n", entry.Name)
+				fmt.Printf("\tAccess: %s\n", userList)
+				fmt.Printf("\tKeys:   %s\n", hashUsers)
+			}
+			entriesToFix = append(entriesToFix, entry)
+		}
+	}
+
+	// Repair the wrapped keys if necessary and requested.
 	if s.fix {
-		s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
 		// Now repair them. TODO: Don't repair if the wrapped keys are already correct.
-		for _, e := range entries {
+		for _, e := range entriesToFix {
 			name := e.Name
 			if !e.IsDir() {
 				s.fixShare(name, s.users[path.DropPath(name, 1)])
@@ -163,7 +221,10 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 		if !s.isDir && !s.recur {
 			exitf("%q is a directory; use -r or -d", name)
 		}
-		entries = append(entries, s.entriesFromDirectory(entry.Name)...)
+		if entry.IsDir() || lookupPacker(entry) != nil {
+			// Only work on entries we can pack. Those we can't will be logged.
+			entries = append(entries, s.entriesFromDirectory(entry.Name)...)
+		}
 	}
 	return entries
 }
@@ -183,7 +244,10 @@ func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Add plain files.
 	for _, e := range thisDir {
 		if !e.IsDir() && !e.IsLink() {
-			entries = append(entries, e)
+			if lookupPacker(e) != nil {
+				// Only work on entries we can pack. Those we can't will be logged.
+				entries = append(entries, e)
+			}
 		}
 	}
 	if s.recur {
@@ -195,6 +259,24 @@ func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 		}
 	}
 	return entries
+}
+
+// lookupPacker returns the Packer implementation for the entry, or
+// nil if none is available.
+func lookupPacker(entry *upspin.DirEntry) upspin.Packer {
+	if entry.IsDir() {
+		// Directories are not packed.
+		return nil
+	}
+	if len(entry.Metadata.Packdata) == 0 {
+		fmt.Fprintf(os.Stderr, "%q has no packdata\n", entry.Name)
+	}
+	packing := upspin.Packing(entry.Metadata.Packdata[0])
+	packer := pack.Lookup(packing)
+	if packer == nil {
+		fmt.Fprintf(os.Stderr, "%q has no registered packer for %d; ignoring\n", entry.Name, packing)
+	}
+	return packer
 }
 
 // addAccess loads an access file.
@@ -264,13 +346,8 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		fmt.Fprintf(os.Stderr, "%q has no packdata; ignoring\n", name)
 		return
 	}
-	packing := upspin.Packing(entry.Metadata.Packdata[0])
-	packer := pack.Lookup(packing)
-	if packer == nil {
-		fmt.Fprintf(os.Stderr, "%q has no registered packer for %d; ignoring\n", name, packing)
-		return
-	}
-	switch packing {
+	packer := lookupPacker(entry) // Won't be nil.
+	switch packer.Packing() {
 	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack, upspin.Ed25519Pack:
 		// Will repack below.
 	default:
@@ -325,7 +402,7 @@ func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	// TODO: This may be different for each file type, but for now we're only using
 	// one encryption protocol so it will serve for now.
 	// TODO: See ee.IsValidKeyForPacker and make it general.
-	fmt.Println(user, len(keys))
 	s.userKeys[user] = keys[0]
+	s.userByHash[sha256.Sum256([]byte(keys[0]))] = user
 	return keys[0]
 }

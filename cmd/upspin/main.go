@@ -16,7 +16,6 @@ import (
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/endpoint"
-	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -416,12 +415,11 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 		}
 		endpt := endpoint.String(&e.Location.Endpoint)
 		packStr := "?"
-		packer := pack.Lookup(upspin.Packing(e.Metadata.Packdata[0]))
+		packer := lookupPacker(e)
 		if packer != nil {
 			packStr = packer.String()
 		}
-		// TODO: print readers when we have them again.
-		fmt.Printf("%c %.6s %*d %*d %s [%s]\t%s%s\n",
+		fmt.Printf("%c %-6s %*d %*d %s [%s]\t%s%s\n",
 			attrChar,
 			packStr,
 			seqWidth, e.Metadata.Sequence,
