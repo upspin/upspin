@@ -810,11 +810,6 @@ func (s *Service) DeleteAll() {
 
 // Methods to implement upspin.Dialer.
 
-// ServerUserName implements upspin.Dialer.
-func (s *Service) ServerUserName() string {
-	return "" // No one is authenticated.
-}
-
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
