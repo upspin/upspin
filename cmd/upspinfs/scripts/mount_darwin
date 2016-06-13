@@ -16,4 +16,4 @@ mkdir $mp 2>/dev/null
 #rm -fr $HOME/upspin/cache
 
 # Start the service.
-dfuse $mp
+upspinfs $mp

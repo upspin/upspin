@@ -26,4 +26,4 @@ fi
 rm -fr $HOME/upspin/cache
 
 # Start the service.
-$GOPATH/bin/dfuse $mp
+upspinfs $mp
