@@ -49,13 +49,6 @@ message EndpointResponse {
     Endpoint endpoint = 1;
 }
 
-message ServerUserNameRequest {
-}
-
-message ServerUserNameResponse {
-    string user_name = 1;
-}
-
 message PingRequest {
     int32 ping_sequence = 1;
 }
@@ -95,7 +88,6 @@ service Store {
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
@@ -119,7 +111,6 @@ service User {
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Lookup (UserLookupRequest) returns (UserLookupResponse) {}
@@ -179,7 +170,6 @@ service Directory {
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc ServerUserName (ServerUserNameRequest) returns (ServerUserNameResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Lookup (DirectoryLookupRequest) returns (DirectoryLookupResponse) {}

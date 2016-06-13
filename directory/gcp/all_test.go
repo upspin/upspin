@@ -1180,9 +1180,6 @@ func (d *dummyStore) Ping() bool {
 func (d *dummyStore) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
-func (d *dummyStore) ServerUserName() string {
-	panic("unimplemented")
-}
 func (d *dummyStore) Configure(options ...string) error {
 	panic("unimplemented")
 }

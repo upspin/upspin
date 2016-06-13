@@ -135,11 +135,6 @@ func (s *Service) Endpoint() upspin.Endpoint {
 	return s.db.endpoint
 }
 
-// ServerUserName implements upspin.Service.
-func (s *Service) ServerUserName() string {
-	return "inprocess"
-}
-
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
 func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {

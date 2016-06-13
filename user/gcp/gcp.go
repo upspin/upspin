@@ -277,11 +277,6 @@ func (u *user) Authenticate(*upspin.Context) error {
 	return nil
 }
 
-// ServerUserName implements upspin.Service.
-func (u *user) ServerUserName() string {
-	return string(u.context.UserName)
-}
-
 // Endpoint implements upspin.Service.
 func (u *user) Endpoint() upspin.Endpoint {
 	return u.endpoint

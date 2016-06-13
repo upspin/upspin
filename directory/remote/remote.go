@@ -134,11 +134,6 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return proto.UpspinDirEntry(resp.Entry)
 }
 
-// ServerUserName implements upspin.Service.
-func (r *remote) ServerUserName() string {
-	return "" // No one is authenticated.
-}
-
 // Endpoint implements upspin.Store.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint

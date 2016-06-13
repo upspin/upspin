@@ -78,11 +78,6 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	return err
 }
 
-// ServerUserName implements upspin.Service.
-func (r *remote) ServerUserName() string {
-	return "" // No one is authenticated.
-}
-
 // Endpoint implements upspin.Store.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint

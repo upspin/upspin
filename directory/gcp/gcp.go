@@ -643,11 +643,6 @@ func (d *directory) Authenticate(*upspin.Context) error {
 	return nil
 }
 
-// ServerUserName implements upspin.Service.
-func (d *directory) ServerUserName() string {
-	return string(d.context.UserName)
-}
-
 // Endpoint implements upspin.Service.
 func (d *directory) Endpoint() upspin.Endpoint {
 	return d.endpoint

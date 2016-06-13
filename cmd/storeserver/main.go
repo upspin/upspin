@@ -215,19 +215,3 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 	}
 	return resp, nil
 }
-
-// ServerUserName implements upspin.Service
-func (s *Server) ServerUserName(ctx gContext.Context, req *proto.ServerUserNameRequest) (*proto.ServerUserNameResponse, error) {
-	log.Print("ServerUserName")
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	userName := store.ServerUserName()
-	resp := &proto.ServerUserNameResponse{
-		UserName: string(userName),
-	}
-	return resp, nil
-}
