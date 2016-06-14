@@ -7,8 +7,8 @@ package testenv
 import (
 	"testing"
 
-	"upspin.io/upspin"
 	"upspin.io/bind"
+	"upspin.io/upspin"
 
 	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/store/inprocess"

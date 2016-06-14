@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"strings"
 	"testing"
-
 	"time"
+
 	"upspin.io/bind"
 	"upspin.io/cloud/gcp/gcptest"
 	"upspin.io/store/gcp/cache"
