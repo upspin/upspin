@@ -52,6 +52,24 @@
       "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f43ec9eb_2672bc98",
+        "filename": "directory/gcp/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T05:41:52Z",
+      "side": 1,
+      "message": "In general, I agree. I originally started out that way and then realized that half of the methods would end up having Locked for suffix, which is kind of noisy, specially because there are two sets of locks, User and Path. getDirEntry for example, requires one or the other. Should it end with UserOrPathLocked? How about the others? Which lock is it? Should they all specify UserLocked or PathLocked?\n\nI see Dave posted a comment about a third option: NoLock suffix. \n\nWe should document our naming standards so that these reviews go a bit more smoothly in the future.\n\nAnyway, I\u0027m usually in favor of not arguing too much about small potatoes, but I also wanted to point out this decision was deliberate, not an oversight.\n\nLet\u0027s all vote tomorrow and code by consensus -- because consensus is the fastest and most correct way to code, yay :-)",
+      "parentUuid": "d47aa5a9_34fc9078",
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
