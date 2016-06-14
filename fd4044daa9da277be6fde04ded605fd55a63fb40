@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f43ec9eb_31a15862",
+        "filename": "store/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-14T16:24:39Z",
+      "side": 1,
+      "message": "delete this blank line",
+      "revId": "fd4044daa9da277be6fde04ded605fd55a63fb40",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
