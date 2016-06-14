@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f43ec9eb_914dcc82",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-14T16:33:46Z",
+      "side": 1,
+      "message": "use path.Join for this.",
+      "revId": "efb32c9c48705693209f8fd63de67d3e7c1485d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
