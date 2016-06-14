@@ -9,6 +9,8 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"os"
+	"path/filepath"
 	"strings"
 
 	gContext "golang.org/x/net/context"
@@ -28,9 +30,9 @@ import (
 var (
 	port         = flag.Int("port", 5582, "TCP port number")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	noAuth       = flag.Bool("noauth", false, "Disable authentication.")
-	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to SSL certificate file")
-	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to SSL certificate key file")
+	selfSigned   = flag.Bool("selfsigned", false, "Start server with a self-signed TLS certificate")
+	certFile     = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "Path to TLS certificate file")
+	certKeyFile  = flag.String("key", "/etc/letsencrypt/live/upspin.io/privkey.pem", "Path to TLS certificate key file")
 	config       = flag.String("config", "", "Comma-separated list of configuration options (key=value) for this server")
 	logFile      = flag.String("logfile", "userserver", "Name of the log file on GCP or empty for no GCP logging")
 )
@@ -54,9 +56,9 @@ func main() {
 		log.Connect("google.com:upspin", *logFile)
 	}
 
-	if *noAuth {
-		*certFile = ""
-		*certKeyFile = ""
+	if *selfSigned {
+		*certFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem")
+		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
 	endpoint, err := endpoint.Parse(*endpointFlag)
@@ -98,7 +100,7 @@ func main() {
 	}
 	authConfig := auth.Config{
 		Lookup: s.internalLookup,
-		AllowUnauthenticatedConnections: *noAuth,
+		AllowUnauthenticatedConnections: *selfSigned,
 	}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig, *certFile, *certKeyFile)
 	if err != nil {
