@@ -16,6 +16,24 @@
       "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f43ec9eb_2372ae98",
+        "filename": "directory/gcp/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T01:58:34Z",
+      "side": 1,
+      "message": "I know. But I usually see that when there\u0027s a version without the lock as well. Like, getDir and getDirLocked. Since there are many methods here that require a lock, I thought it was kind of a bit detrimental to the readability...",
+      "parentUuid": "f43ec9eb_a0819413",
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
