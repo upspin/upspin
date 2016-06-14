@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "f42b2915_b594a04e",
+        "filename": "directory/gcp/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-14T23:01:20Z",
+      "side": 1,
+      "message": "there is no user lock anymore",
+      "revId": "17001f8e3dffafca98ff4b5b508a43a874c205b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f42b2915_958f2438",
+        "filename": "directory/gcp/pathlock.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-14T23:01:20Z",
+      "side": 1,
+      "message": "you don\u0027t actually need all of this\n\nit could just be\n\nvar pathLocks [numPathLocks]sync.Mutex",
+      "revId": "17001f8e3dffafca98ff4b5b508a43a874c205b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b46b7130_ac06c710",
         "filename": "directory/gcp/root.go",
         "patchSetId": 3
