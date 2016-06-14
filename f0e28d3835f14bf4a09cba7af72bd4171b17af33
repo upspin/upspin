@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f43ec9eb_711e4057",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-14T16:46:46Z",
+      "side": 1,
+      "message": "no need for this local name. just import \"filepath\" and use filepath.Join",
+      "revId": "f0e28d3835f14bf4a09cba7af72bd4171b17af33",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
