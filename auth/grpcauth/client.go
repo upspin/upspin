@@ -82,6 +82,7 @@ func NewGRPCClient(context *upspin.Context, netAddr upspin.NetAddr, keepAliveInt
 	conn, err := grpc.Dial(addr[skip:],
 		grpc.WithBlock(),
 		grpc.WithDialer(dialWithKeepAlive),
+		grpc.WithTimeout(3*time.Second),
 		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
 	)
 	if err != nil {

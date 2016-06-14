@@ -283,7 +283,11 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		}
 		copy(hash[i][:], keyHash(pubkey[i]))
 	}
-	myhash := stringKeyHash([]byte(ctx.Factotum.PublicKey()))
+	mypub, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
+	if err != nil {
+		log.Printf("Error parsing my public key: %s", err)
+	}
+	myhash := keyHash(mypub)
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdata {
