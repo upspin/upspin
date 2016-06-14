@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b46b7130_63c4e2fc",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-14T20:08:30Z",
+      "side": 1,
+      "message": "I\u0027m not sure we want to \u0027fix\u0027 this.  It basically means that we removed someone from Access.  Seems kind of like a very belated \"are you sure?\".  Seems like we would want to do warn when we actually change access since, as you pointed out, we may be running share in background to fix up what we changed.",
+      "range": {
+        "startLine": 168,
+        "startChar": 8,
+        "endLine": 168,
+        "endChar": 12
+      },
+      "revId": "e6cbebbad9a28ae59b0672e7f5064e03c1840eaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
