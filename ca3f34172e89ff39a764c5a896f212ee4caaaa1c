@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f43ec9eb_a04994a2",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T00:08:13Z",
+      "side": 1,
+      "message": "A comment here would go well. I\u0027m not sure why hashUsers is a space-delimited string...?",
+      "revId": "ca3f34172e89ff39a764c5a896f212ee4caaaa1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
