@@ -147,7 +147,11 @@ func (s *sharer) do() {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
+		// hashUsers is the pretty-printed string of user names recovered from
+		// looking at the list of hashed keys in the packdata. It makes for an
+		// easy comparison with the return value from userListToString.
 		var hashUsers string
+		unknownUser := false
 		for _, hash := range hashes {
 			var thisUser upspin.UserName
 			switch packer.Packing() {
@@ -158,7 +162,15 @@ func (s *sharer) do() {
 				}
 				var h [sha256.Size]byte
 				copy(h[:], hash)
-				thisUser = s.userByHash[h]
+				var ok bool
+				thisUser, ok = s.userByHash[h]
+				if !ok && !unknownUser {
+					// TODO: We have a key but no way yet to look up a user by key in the User service.
+					// When that is fixed, we can take care of this.
+					// For now, all the users we know by name are mentioned in Access files.
+					unknownUser = true
+					fmt.Fprintf(os.Stderr, "%q: TODO: cannot find user for key(s)\n", entry.Name)
+				}
 			default:
 				fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
 				continue
@@ -296,7 +308,12 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 	if err != nil {
 		exitf("looking up access file %q: %s", name, err)
 	}
-	a, err := access.Parse(which, read(s.client, which))
+	var a *access.Access
+	if which == "" {
+		a, err = access.New(name)
+	} else {
+		a, err = access.Parse(which, read(s.client, which))
+	}
 	if err != nil {
 		exitf("parsing access file %q: %s", name, err)
 	}
