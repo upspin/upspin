@@ -193,18 +193,18 @@ func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin
 func gcpClient(context *upspin.Context) (upspin.Client, error) {
 	// Use a test GCP Store...
 	endpointStore := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   "https://upspin.io:9980", // Test store server.
+		Transport: upspin.Remote,
+		NetAddr:   "upspin.io:9980", // Test store server.
 	}
 	// ... and a test GCP directory ...
 	endpointDir := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   "https://upspin.io:9981", // Test dir server.
+		Transport: upspin.Remote,
+		NetAddr:   "upspin.io:9981", // Test dir server.
 	}
 	// and an in-process test user.
 	endpointUser := upspin.Endpoint{
 		Transport: upspin.InProcess,
-		NetAddr:   "", // ignored.
+		NetAddr:   "", // ignored
 	}
 	setContextEndpoints(context, endpointStore, endpointDir, endpointUser)
 	client := client.New(context)
@@ -300,6 +300,9 @@ func installUserRoot(context *upspin.Context) error {
 func makeRoot(context *upspin.Context) error {
 	// Make the root to be sure it's there.
 	directory, err := bind.Directory(context, context.Directory)
+	if err != nil {
+		return err
+	}
 	_, err = directory.MakeDirectory(upspin.PathName(context.UserName + "/"))
 	if err != nil && !strings.Contains(err.Error(), "already ") {
 		return err

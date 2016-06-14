@@ -28,12 +28,17 @@ import (
 	"testing"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/path"
 	e "upspin.io/test/testenv"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/gcpdir"
-	_ "upspin.io/store/gcpstore"
+	_ "upspin.io/directory/transports"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
+	_ "upspin.io/store/transports"
+	_ "upspin.io/user/transports"
 )
 
 const (
@@ -223,10 +228,11 @@ func testGlobWithPattern(t *testing.T, env *e.Env) {
 func testDelete(t *testing.T, env *e.Env) {
 	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
 	log.Printf("Context: Username: %s", env.Context.UserName)
-	err := env.Context.Directory.Delete(pathName)
+	dir, err := bind.Directory(env.Context, env.Context.Directory)
 	if err != nil {
 		t.Fatal(err)
 	}
+	err = dir.Delete(pathName)
 	// Check it really deleted it (and is not being cached in memory).
 	_, err = env.Client.Get(pathName)
 	if err == nil {
@@ -237,7 +243,7 @@ func testDelete(t *testing.T, env *e.Env) {
 	}
 	// But I can't delete files in dir1, since I lack permission.
 	pathName = upspin.PathName(ownersName + "/dir1/file1.txt")
-	err = env.Context.Directory.Delete(pathName)
+	err = dir.Delete(pathName)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -246,12 +252,12 @@ func testDelete(t *testing.T, env *e.Env) {
 	}
 	// But we can always remove the Access file.
 	accessPathName := upspin.PathName(ownersName + "/dir1/Access")
-	err = env.Context.Directory.Delete(accessPathName)
+	err = dir.Delete(accessPathName)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Now delete file1.txt
-	err = env.Context.Directory.Delete(pathName)
+	err = dir.Delete(pathName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -385,10 +391,14 @@ func deleteGCPEnv(env *e.Env) error {
 	if err != nil {
 		return err
 	}
+	dir, err := bind.Directory(env.Context, env.Context.Directory)
+	if err != nil {
+		return err
+	}
 	entries := append(fileSet1, fileSet2...)
 	var firstErr error
 	deleteNow := func(name upspin.PathName) {
-		err = env.Context.Directory.Delete(name)
+		err = dir.Delete(name)
 		if err != nil {
 			if firstErr == nil {
 				firstErr = err
