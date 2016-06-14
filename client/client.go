@@ -17,6 +17,7 @@ import (
 	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user/usercache"
 
 	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
 )
@@ -24,6 +25,7 @@ import (
 // Client implements upspin.Client.
 type Client struct {
 	context *upspin.Context
+	user    upspin.User
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -36,6 +38,7 @@ var (
 func New(context *upspin.Context) upspin.Client {
 	return &Client{
 		context: context,
+		user:    usercache.New(context),
 	}
 }
 
@@ -120,10 +123,6 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	if err != nil {
 		return err
 	}
-	user, err := bind.User(c.context, c.context.User)
-	if err != nil {
-		return err
-	}
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
@@ -147,7 +146,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	readersPublicKey[0] = c.context.Factotum.PublicKey()
 	n := 1
 	for _, r := range readers {
-		_, pubkeys, err := user.Lookup(r)
+		_, pubkeys, err := c.user.Lookup(r)
 		if err != nil || len(pubkeys) < 1 {
 			// TODO warn that we can't process one of the readers?
 			continue
@@ -287,11 +286,7 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 	if parsed.User() == c.context.UserName {
 		endpoints = append(endpoints, c.context.Directory)
 	}
-	user, err := bind.User(c.context, c.context.User)
-	if err != nil {
-		return nil, err
-	}
-	if eps, _, err := user.Lookup(parsed.User()); err == nil {
+	if eps, _, err := c.user.Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	var dir upspin.Directory
@@ -317,11 +312,7 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 	if parsed.User() == c.context.UserName {
 		pubKeys = append(pubKeys, c.context.Factotum.PublicKey())
 	}
-	user, err := bind.User(c.context, c.context.User)
-	if err != nil {
-		return nil, err
-	}
-	if _, pks, err := user.Lookup(parsed.User()); err == nil {
+	if _, pks, err := c.user.Lookup(parsed.User()); err == nil {
 		pubKeys = append(pubKeys, pks...)
 	}
 	if len(pubKeys) == 0 {
