@@ -34,6 +34,24 @@
       "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d47aa5a9_34fc9078",
+        "filename": "directory/gcp/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-14T02:55:35Z",
+      "side": 1,
+      "message": "I\u0027d prefer to see the word Locked around a bit than to have more trouble tracking down racy code. I\u0027ve seen it used generally when the method expects some lock to be held. Considering the number of names in this package already, I think it makes sense to put this flag in the name.",
+      "parentUuid": "f43ec9eb_2372ae98",
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
