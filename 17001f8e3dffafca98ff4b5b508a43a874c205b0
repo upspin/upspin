@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "74c4997d_395bcf0c",
+        "filename": "directory/gcp/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T23:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f42b2915_b594a04e",
+      "revId": "17001f8e3dffafca98ff4b5b508a43a874c205b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f42b2915_958f2438",
         "filename": "directory/gcp/pathlock.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "74c4997d_19adabfe",
+        "filename": "directory/gcp/pathlock.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T23:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f42b2915_958f2438",
+      "revId": "17001f8e3dffafca98ff4b5b508a43a874c205b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b46b7130_ac06c710",
         "filename": "directory/gcp/root.go",
         "patchSetId": 3
@@ -47,6 +83,30 @@
       "writtenOn": "2016-06-14T22:36:07Z",
       "side": 1,
       "message": "What is the \u0027/\u0027 about?",
+      "range": {
+        "startLine": 88,
+        "startChar": 18,
+        "endLine": 88,
+        "endChar": 22
+      },
+      "revId": "17001f8e3dffafca98ff4b5b508a43a874c205b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "74c4997d_d948534b",
+        "filename": "directory/gcp/root.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T23:47:36Z",
+      "side": 1,
+      "message": "Every path ends with \"/\". If I don\u0027t put it, then on the other file where I have a if path.IsRoot() { pathLock(path.Path()) }, that will add a \"/\" and if this line doesn\u0027t, the two locks won\u0027t match.",
+      "parentUuid": "b46b7130_ac06c710",
       "range": {
         "startLine": 88,
         "startChar": 18,
