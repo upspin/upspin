@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "b46b7130_e3a0d2a9",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-14T19:48:07Z",
+      "side": 1,
+      "message": "But you are not always locking the user.   You are only doing it when the parent is the root, i.e., if you are putting a file like \u0027p@google.com/x\u0027.  You are then locking \u0027p@google.com\u0027 which is what you would be doing if you did your userLock anyways.  All this code does is a round about way of getting to the same result that you would get if you just locked the parent path name.",
+      "parentUuid": "d4e9c5d0_5cbfbd76",
+      "range": {
+        "startLine": 177,
+        "startChar": 4,
+        "endLine": 177,
+        "endChar": 20
+      },
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f43ec9eb_4caf2797",
         "filename": "directory/gcp/pathlock.go",
         "patchSetId": 2
