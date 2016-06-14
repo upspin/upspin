@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "d4e9c5d0_dc182dc8",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-14T19:31:23Z",
+      "side": 1,
+      "message": "I don\u0027t understand why you make a distinction here.  This lock is only based on the path name and the user root is a perfectly fine path name to lock on.",
+      "range": {
+        "startLine": 177,
+        "startChar": 4,
+        "endLine": 177,
+        "endChar": 20
+      },
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f43ec9eb_4caf2797",
         "filename": "directory/gcp/pathlock.go",
         "patchSetId": 2
