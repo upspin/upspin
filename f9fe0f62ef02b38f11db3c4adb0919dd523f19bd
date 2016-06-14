@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "b46b7130_83f0fe9d",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T19:56:30Z",
+      "side": 1,
+      "message": "If I PathLock(p@google.com) instead of UserLock(p@google.com), things would not be locked, since these are two separate lock pools. \n\nI agree parent path would work in most cases, but not p@google.com/Groups/family.\n\nI\u0027ll come over to chat so we sync up. No pun intended :-)",
+      "parentUuid": "b46b7130_e3a0d2a9",
+      "range": {
+        "startLine": 177,
+        "startChar": 4,
+        "endLine": 177,
+        "endChar": 20
+      },
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f43ec9eb_4caf2797",
         "filename": "directory/gcp/pathlock.go",
         "patchSetId": 2
