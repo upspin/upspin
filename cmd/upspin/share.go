@@ -158,6 +158,7 @@ func (s *sharer) do() {
 			case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack, upspin.Ed25519Pack:
 				if len(hash) != sha256.Size {
 					fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
+					s.exitCode = 1
 					continue
 				}
 				var h [sha256.Size]byte
@@ -165,11 +166,14 @@ func (s *sharer) do() {
 				var ok bool
 				thisUser, ok = s.userByHash[h]
 				if !ok && !unknownUser {
-					// TODO: We have a key but no way yet to look up a user by key in the User service.
-					// When that is fixed, we can take care of this.
-					// For now, all the users we know by name are mentioned in Access files.
+					// We have a key but no user with that key is known to us.
+					// This means an access change has removed permissions for some user
+					// but if that user still has the reference, the user could read the file.
+					// Someone should run upspin share -fix soon to repair the packing.
 					unknownUser = true
-					fmt.Fprintf(os.Stderr, "%q: TODO: cannot find user for key(s)\n", entry.Name)
+					fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
+					s.exitCode = 1
+					continue
 				}
 			default:
 				fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
