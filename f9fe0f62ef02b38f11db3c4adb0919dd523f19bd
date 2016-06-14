@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d4e9c5d0_5cbfbd76",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-14T19:38:54Z",
+      "side": 1,
+      "message": "My assumption is that I would go with fine-grain locking: use the deepest path possible. Locking the whole user is only necessary when we are:\n1) Working at the root level, obviously.\n2) Updating Group or Access files.\n\nFor all else, as we talked offline, I wanted to go with a hybrid solution that would use another lock, dependent only on the path name, so that accessing a/b/c and a/d/e would not cause any contention (other than random collisions in the pool).\n\nMaybe I should just always lock the user and be done. That was option 1) in an email I sent yesterday, but I wasn\u0027t too happy with it.\n\nIt think this is not that much more complex, but it does make the code harder to follow and, as pointed out, it\u0027s not very clear when to lock what or when.\n\nWe have not yet solved the issue of how to document this better.",
+      "parentUuid": "d4e9c5d0_dc182dc8",
+      "range": {
+        "startLine": 177,
+        "startChar": 4,
+        "endLine": 177,
+        "endChar": 20
+      },
+      "revId": "f9fe0f62ef02b38f11db3c4adb0919dd523f19bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f43ec9eb_4caf2797",
         "filename": "directory/gcp/pathlock.go",
         "patchSetId": 2
