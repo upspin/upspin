@@ -14,6 +14,7 @@ import (
 	"upspin.io/pack"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
+	"upspin.io/path"
 )
 
 // p256 keys
@@ -36,7 +37,7 @@ type runner struct {
 }
 
 func (r *runner) read(user upspin.UserName, file upspin.PathName, shouldSucceed bool) {
-	file = upspin.PathName(r.owner) + "/" + file
+	file = path.Join(upspin.PathName(r.owner), string(file))
 	var err error
 	client := r.env.Client
 	if user != r.owner {
@@ -71,6 +72,17 @@ func (r *runner) Errorf(format string, args ...interface{}) {
 	r.t.Errorf(format, args...)
 }
 
+func (r *runner) write(user upspin.UserName, file upspin.PathName, contents string, shouldSucceed bool) {
+	file = path.Join(upspin.PathName(r.owner), string(file))
+	var err error
+	client := r.env.Client
+	if user != r.owner {
+		client = r.userClient
+	}
+	_, err = client.Put(file, []byte(contents))
+	r.check("Put", user, file, err, shouldSucceed)
+}
+
 func testReadAccess(t *testing.T, packing upspin.Packing) {
 	var (
 		user  = newUserName()
@@ -82,6 +94,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		privateDir  = "private"
 		publicFile  = publicDir + "/public.txt"
 		privateFile = privateDir + "/private.txt"
+		contentsOfPublic = "public file"
 	)
 	key := ownersKey
 	if packing == upspin.EEp521Pack {
@@ -95,7 +108,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		Tree: testenv.Tree{
 			testenv.E(groupDir+"/", ""),
 			testenv.E(publicDir+"/", ""),
-			testenv.E(publicFile, "public"),
+			testenv.E(publicFile, contentsOfPublic),
 			testenv.E(privateDir+"/", ""),
 			testenv.E(privateFile, "private"),
 		},
@@ -133,16 +146,13 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, publicDir, false)
 	r.read(user, publicFile, false)
 
-	// Add /private/Access, granting Read to user.
+	// Add /public/Access, granting Read to user and write to owner.
+	const accessFile = "/public/Access"
 	var (
-		accessFile = upspin.PathName(owner + "/public/Access")
-		accessText = fmt.Sprintf("r:%s\n", user)
+		accessText = fmt.Sprintf("r:%s\nw:%s", user, owner)
 	)
-	_, err = env.Client.Put(accessFile, []byte(accessText))
-	if err != nil {
-		t.Fatal(err)
-	}
 	r.state = "With Access file"
+	r.write(owner, accessFile, accessText, true)
 
 	// With Access file, every item is still readable by owner.
 	r.read(owner, "", true)
@@ -156,55 +166,50 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, privateDir, false)
 	r.read(user, privateDir, false)
 	r.read(user, publicDir, true)
-	//r.read(user, publicFile, true) TODO: this does not work yet because the file must be Put again until Update() exists.
+
+	// The only way to update the keys for the file using the Client interface is to use Put,
+	// which will call packer.Share. That also stores the file again, which is unnecessary. TODO.
+	r.write(owner, publicFile, contentsOfPublic, true)
+	r.read(user, publicFile, true)
 
 	// Change Access file to disable again.
 	const (
 		noUserAccessText = "r: someoneElse@test.com\n"
 	)
-	_, err = env.Client.Put(accessFile, []byte(noUserAccessText))
-	if err != nil {
-		t.Fatal(err)
-	}
 	r.state = "With no user in Access file"
+	r.write(owner, accessFile, noUserAccessText, true)
 
 	r.read(user, "", false)
 	r.read(user, privateDir, false)
 	r.read(user, privateDir, false)
 	r.read(user, publicDir, false)
 	r.read(user, publicFile, false)
+	r.write(user, publicFile, "will not succeed", false)
 
-	// Now create a group and put user in it.
-	const groupAccessText = "r: mygroup\n"
+	// Now create a group and put user in it and make owner a writer.
+	const groupFile = "/Group/mygroup"
 	var (
-		groupFile = upspin.PathName(owner + "/Group/mygroup")
+		groupAccessText = string("r: mygroup\nw:" + owner)
 		groupText = fmt.Sprintf("%s\n", user)
 	)
-	_, err = env.Client.Put(groupFile, []byte(groupText))
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = env.Client.Put(accessFile, []byte(groupAccessText))
-	if err != nil {
-		t.Fatal(err)
-	}
 	r.state = "With user in Group file"
+	r.write(owner, accessFile, groupAccessText, true)
+	r.write(owner, groupFile, groupText, true)
 
 	r.read(user, "", false)
 	r.read(user, privateDir, false)
 	r.read(user, privateDir, false)
 	r.read(user, publicDir, true)
-	// r.read(user, publicFile, true) TODO: Cannot work until sharing is implemented.
+
+	r.write(owner, publicFile, contentsOfPublic, true)  // Put file again to trigger sharing.
+	r.read(user, publicFile, true)
 
 	// Take user out of the group.
 	const (
 		noUserGroupText = "someoneElse@test.com\n"
 	)
-	_, err = env.Client.Put(groupFile, []byte(noUserGroupText))
-	if err != nil {
-		t.Fatal(err)
-	}
 	r.state = "With no user in Group file"
+	r.write(owner, groupFile, noUserGroupText, true)
 
 	r.read(user, "", false)
 	r.read(user, privateDir, false)
