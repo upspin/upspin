@@ -193,9 +193,9 @@ func (s *sharer) do() {
 		if userList != hashUsers {
 			if !s.quiet {
 				if len(entriesToFix) == 0 {
-					fmt.Println("\nAccess discrepancies:\n")
+					fmt.Println("\nAccess discrepancies:")
 				}
-				fmt.Printf("%s:\n", entry.Name)
+				fmt.Printf("\n%s:\n", entry.Name)
 				fmt.Printf("\tAccess: %s\n", userList)
 				fmt.Printf("\tKeys:   %s\n", hashUsers)
 			}
@@ -395,6 +395,8 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 				}
 			}
 		}
+		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
+		s.exitCode = 1
 	}
 	packdatas := []*[]byte{&entry.Metadata.Packdata}
 	packer.Share(s.context, keys, packdatas)
