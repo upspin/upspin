@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_44e2e4ac",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T19:28:53Z",
+      "side": 1,
+      "message": "not really, or at least not in this order. the true order is lookup, share, put.",
+      "revId": "1569840aada237b66dfaceedfcc28d7b06c4a800",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
