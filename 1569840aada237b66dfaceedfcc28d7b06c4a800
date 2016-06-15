@@ -16,6 +16,24 @@
       "revId": "1569840aada237b66dfaceedfcc28d7b06c4a800",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_04bf3c77",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T19:33:52Z",
+      "side": 1,
+      "message": "Not sure I understand this.\n\nWe need to do Client.Put again because in this test we don\u0027t want to do what Client.Put does under the covers (i.e. lookup Access files, call Packer.Share).\n\nShould I change this comment? It looks okay to me...\n\nThanks.",
+      "parentUuid": "b4f8d1fb_44e2e4ac",
+      "revId": "1569840aada237b66dfaceedfcc28d7b06c4a800",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
