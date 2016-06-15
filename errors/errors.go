@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"runtime"
+	"strings"
 
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -101,6 +102,18 @@ func E(args ...interface{}) error {
 		case upspin.UserName:
 			e.User = arg
 		case string:
+			// Someone might accidentally call us with a user or path name
+			// that is not of the right type. Take care of that and log it.
+			if strings.Contains(arg, "@") {
+				_, file, line, _ := runtime.Caller(1)
+				log.Printf("errors.E: unqualified type for %q from %s:%d: %v", arg, file, line)
+				if strings.Contains(arg, "/") {
+					e.Path = upspin.PathName(arg)
+				} else {
+					e.User = upspin.UserName(arg)
+				}
+				continue
+			}
 			e.Op = arg
 		case Kind:
 			e.Kind = arg
