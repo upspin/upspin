@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "b4f8d1fb_5e5e312a",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T17:24:38Z",
+      "side": 1,
+      "message": "I realized that the name \u0027class\u0027 may work badly with protobufs. Yay protobufs. Yay C++.\n\nSo Kind it is, grudgingly.",
+      "parentUuid": "94d74d7e_2a0b3f54",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_6dd27509",
         "filename": "errors/errors.go",
         "patchSetId": 2
