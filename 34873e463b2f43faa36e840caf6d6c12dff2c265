@@ -1,0 +1,163 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f49c09da_8dd8812c",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "Copyright?",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_edddc51a",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "Error",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_2dc86d55",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "Kind is a shorter, more common (in Go), and less overloaded term than Class. But I don\u0027t have strong feelings.",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_6dd27509",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "What\u0027s the use case for NoError? For sentinel error values? I\u0027m wary of using this new Error type for sentinels, but maybe I\u0027m being paranoid.\n\nReading further, it seems that NoError is the class that Errors get when no Class is provided to the constructor. That seems wrong: if no class is provided it\u0027s still an error, it\u0027s just not one of these specific classes.\n\nIf there\u0027s no strong argument for NoError, I feel like Class(0) should be \"Unknown\", \"General\", or \"Other\", so that the zero value is meaningful.",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_4dcfb95b",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "I/O",
+      "range": {
+        "startLine": 34,
+        "startChar": 37,
+        "endLine": 34,
+        "endChar": 39
+      },
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_0dee51bd",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "var b bytes.Buffer\nI think this might save an alloc?",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_ed2b05df",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "move this comment down (see my next comment)",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_8d26c118",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "err :\u003d fmt.Errorf(\"network unreachable\")\n\n// Single error.\ne1 :\u003d errors.E(path, \"Get\", errors.IO, err)",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_4de859af",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T03:55:23Z",
+      "side": 1,
+      "message": "I don\u0027t think you don\u0027t need the leading \\n. I think all spaces are trimmed at the beginning and end of examples",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
