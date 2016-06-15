@@ -19,7 +19,7 @@ import (
 func createReadAndDelete(t *testing.T, wgStart *sync.WaitGroup, wgEnd *sync.WaitGroup, d *directory, path upspin.PathName, loopCount int, maxIdleMS int32) {
 	wgEnd.Add(1)
 	wgStart.Done()
-	t.Log("Started Go routine for operating on %s", path)
+	t.Logf("Started Go routine for operating on %s", path)
 	wgStart.Wait()
 
 	var err error

@@ -193,9 +193,9 @@ func (s *sharer) do() {
 		if userList != hashUsers {
 			if !s.quiet {
 				if len(entriesToFix) == 0 {
-					fmt.Println("\nAccess discrepancies:\n")
+					fmt.Println("\nAccess discrepancies:")
 				}
-				fmt.Printf("%s:\n", entry.Name)
+				fmt.Printf("\n%s:\n", entry.Name)
 				fmt.Printf("\tAccess: %s\n", userList)
 				fmt.Printf("\tKeys:   %s\n", hashUsers)
 			}
