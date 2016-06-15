@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_5e33d106",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T17:27:35Z",
+      "side": 1,
+      "message": "copyright",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_7e0fad2c",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T17:27:35Z",
+      "side": 1,
+      "message": "gcp",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_de1fe15f",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T17:27:35Z",
+      "side": 1,
+      "message": "gcp",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_3e152541",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T17:27:35Z",
+      "side": 1,
+      "message": "gcp",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
