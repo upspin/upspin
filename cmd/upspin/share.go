@@ -22,7 +22,7 @@ import (
 	"upspin.io/upspin"
 
 	// Load useful packers
-	_ "upspin.io/pack/ee"
+	"upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
@@ -37,6 +37,7 @@ type sharer struct {
 	// Flags.
 	fs    *flag.FlagSet
 	fix   bool
+	force bool
 	isDir bool
 	recur bool
 	quiet bool
@@ -54,7 +55,7 @@ type sharer struct {
 
 	// userKeys holds the keys we've looked up for each user. We remember
 	// only the zeroth element of each key returned by User.Lookup.
-	userKeys map[upspin.UserName]upspin.PublicKey
+	userKeys map[upspin.UserName][]upspin.PublicKey
 
 	// userByHash maps the SHA-256 hashes of each user's key to the user name.
 	userByHash map[[sha256.Size]byte]upspin.UserName
@@ -100,13 +101,11 @@ func (s *sharer) do() {
 		s.addAccess(e)
 	}
 
-	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
+	s.userKeys = make(map[upspin.UserName][]upspin.PublicKey)
 	s.userByHash = make(map[[sha256.Size]byte]upspin.UserName)
-	var entriesToFix []*upspin.DirEntry
 
 	// Now we're ready. First show the state if asked.
 	if !s.quiet {
-		// TODO: Show state of wrapped readers.
 		uNames := make(map[string][]string)
 		for _, u := range s.users {
 			uNames[userListToString(u)] = nil
@@ -129,9 +128,15 @@ func (s *sharer) do() {
 		}
 	}
 
-	// Find any discrepancies.
+	var entriesToFix []*upspin.DirEntry
+
+	// Identify the entries we need to update.
 	for _, entry := range entries {
 		if entry.IsDir() {
+			continue
+		}
+		if s.force {
+			entriesToFix = append(entriesToFix, entry)
 			continue
 		}
 		users := s.users[path.DropPath(entry.Name, 1)]
@@ -200,7 +205,7 @@ func (s *sharer) do() {
 
 	// Repair the wrapped keys if necessary and requested.
 	if s.fix {
-		// Now repair them. TODO: Don't repair if the wrapped keys are already correct.
+		// Now repair them.
 		for _, e := range entriesToFix {
 			name := e.Name
 			if !e.IsDir() {
@@ -234,7 +239,7 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 			entries = append(entries, entry)
 			continue
 		}
-		if !s.isDir && !s.recur {
+		if !s.isDir {
 			exitf("%q is a directory; use -r or -d", name)
 		}
 		if entry.IsDir() || lookupPacker(entry) != nil {
@@ -377,12 +382,18 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		}
 		return
 	}
-	// TODO: Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
+	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
 	for _, user := range users {
-		key := s.lookupKey(user)
-		if len(key) > 0 {
-			keys = append(keys, key)
+		userKeys := s.lookupKey(user)
+		for _, key := range userKeys {
+			if len(key) > 0 {
+				// TODO: Make this general. This works now only because we are always using ee.
+				if ee.IsValidKeyForPacker(key, packer.String()) {
+					keys = append(keys, key)
+					break
+				}
+			}
 		}
 	}
 	packdatas := []*[]byte{&entry.Metadata.Packdata}
@@ -400,30 +411,35 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 }
 
 // lookupKey returns the public key for the user.
-func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
-	key, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
+func (s *sharer) lookupKey(user upspin.UserName) []upspin.PublicKey {
+	keys, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
 	if ok {
-		return key
+		return keys
 	}
 	userService, err := bind.User(s.context, s.context.User)
 	if err != nil {
 		exit(err)
 	}
-	_, keys, err := userService.Lookup(user)
+	_, keys, err = userService.Lookup(user)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
 		s.exitCode = 1
+		s.userKeys[user] = nil
+		return nil
 	}
 	if len(keys) == 0 {
 		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
 		s.exitCode = 1
+		s.userKeys[user] = nil
+		return nil
 	}
 	// Remember the lookup, failed or otherwise.
 	// TODO: We need to deal with multiple key types, and finding the right one.
 	// TODO: This may be different for each file type, but for now we're only using
 	// one encryption protocol so it will serve for now.
-	// TODO: See ee.IsValidKeyForPacker and make it general.
-	s.userKeys[user] = keys[0]
-	s.userByHash[sha256.Sum256([]byte(keys[0]))] = user
-	return keys[0]
+	s.userKeys[user] = keys
+	for _, key := range keys {
+		s.userByHash[sha256.Sum256([]byte(key))] = user
+	}
+	return keys
 }

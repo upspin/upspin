@@ -321,6 +321,7 @@ func rm(args ...string) {
 func share(args ...string) {
 	fs := flag.NewFlagSet("share", flag.ExitOnError)
 	fix := fs.Bool("fix", false, "repair incorrect share settings")
+	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
 	quiet := fs.Bool("q", false, "suppress output. Default is to show state for every file")
@@ -332,9 +333,16 @@ func share(args ...string) {
 	if fs.NArg() != 1 {
 		usage()
 	}
+	if *recur {
+		*isDir = true
+	}
+	if *force {
+		*fix = true
+	}
 	s := &sharer{
 		fs:    fs,
 		fix:   *fix,
+		force: *force,
 		isDir: *isDir,
 		recur: *recur,
 		quiet: *quiet,
