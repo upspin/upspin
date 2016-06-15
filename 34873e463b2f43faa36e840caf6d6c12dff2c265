@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_0a4abb95",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_8dd8812c",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_edddc51a",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-15T03:55:23Z",
       "side": 1,
       "message": "Error",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_cadc23ef",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_edddc51a",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_6a9a5728",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_3e0b6554",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_1e082954",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-15T04:35:09Z",
       "side": 1,
       "message": "We\u0027ve been using Op in some places, even though Method is more generic (you also mention operation below).",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_0a08fb53",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_1e082954",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_2a0b3f54",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "I agree that we use Kind a lot, but really this is a class of error. It\u0027s not a big deal but really I don\u0027t feel I should avoid a word just because it\u0027s a keyword in another language.",
+      "parentUuid": "f49c09da_2dc86d55",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_6dd27509",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-06-15T03:55:23Z",
       "side": 1,
       "message": "What\u0027s the use case for NoError? For sentinel error values? I\u0027m wary of using this new Error type for sentinels, but maybe I\u0027m being paranoid.\n\nReading further, it seems that NoError is the class that Errors get when no Class is provided to the constructor. That seems wrong: if no class is provided it\u0027s still an error, it\u0027s just not one of these specific classes.\n\nIf there\u0027s no strong argument for NoError, I feel like Class(0) should be \"Unknown\", \"General\", or \"Other\", so that the zero value is meaningful.",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_eaf00771",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_6dd27509",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -127,6 +235,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_0adf5be0",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_4dcfb95b",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_1e8dc9ec",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -144,6 +270,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_aaf60f6b",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Instead of using bytes.Buffer? I could, but like byte buffers, and if you try it you\u0027ll see the code is shorter this way.",
+      "parentUuid": "b4f8d1fb_1e8dc9ec",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_0dee51bd",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -155,6 +299,24 @@
       "writtenOn": "2016-06-15T03:55:23Z",
       "side": 1,
       "message": "var b bytes.Buffer\nI think this might save an alloc?",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_4ae9538a",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "The compiler treats these the same (it decides what allocates, I don\u0027t), and this way I avoid an \u0026 at all the call sites.",
+      "parentUuid": "f49c09da_0dee51bd",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -196,6 +358,42 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_4a44b387",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94d74d7e_4abaf3d2",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_6a47f78d",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_7eb32db0",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_ed2b05df",
         "filename": "errors/errors_test.go",
         "patchSetId": 2
@@ -207,6 +405,24 @@
       "writtenOn": "2016-06-15T03:55:23Z",
       "side": 1,
       "message": "move this comment down (see my next comment)",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_aacd6f3b",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_ed2b05df",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -230,6 +446,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_8ad22bdb",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_8d26c118",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_4de859af",
         "filename": "errors/errors_test.go",
         "patchSetId": 2
@@ -241,6 +475,24 @@
       "writtenOn": "2016-06-15T03:55:23Z",
       "side": 1,
       "message": "I don\u0027t think you don\u0027t need the leading \\n. I think all spaces are trimmed at the beginning and end of examples",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94d74d7e_ead767c9",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T05:43:47Z",
+      "side": 1,
+      "message": "I thought so too, but I need it.",
+      "parentUuid": "f49c09da_4de859af",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
