@@ -178,6 +178,24 @@
     },
     {
       "key": {
+        "uuid": "94d74d7e_4abaf3d2",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T04:39:56Z",
+      "side": 1,
+      "message": "Yeah, because an example is executed as part of the test suite, it\u0027s a kind of test.",
+      "parentUuid": "b4f8d1fb_7eb32db0",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_ed2b05df",
         "filename": "errors/errors_test.go",
         "patchSetId": 2
