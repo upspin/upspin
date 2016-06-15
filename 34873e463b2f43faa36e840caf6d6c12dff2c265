@@ -496,6 +496,24 @@
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f49c09da_8d7401ed",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-15T05:47:30Z",
+      "side": 1,
+      "message": "I am surprised. That is disappointing. I\u0027ll investigate.",
+      "parentUuid": "94d74d7e_ead767c9",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
