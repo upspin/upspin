@@ -34,6 +34,24 @@
       "revId": "1569840aada237b66dfaceedfcc28d7b06c4a800",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_a43c88db",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-15T19:40:55Z",
+      "side": 1,
+      "message": "i was speaking of the underlying mechanism. you\u0027re right that for the client, this is all we can do. here\u0027s a rewrite that clarifies:\n\n// The only way to update the keys for the file using the Client interface is to use Put,\n// which will call Share. That also stores the file again, which should be unnecessary. TODO.",
+      "parentUuid": "b4f8d1fb_04bf3c77",
+      "revId": "1569840aada237b66dfaceedfcc28d7b06c4a800",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
