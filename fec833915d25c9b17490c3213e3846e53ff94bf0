@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b4f8d1fb_9e48b94a",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T17:31:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_5e33d106",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_7e0fad2c",
         "filename": "directory/gcp/race_test.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-15T17:27:35Z",
       "side": 1,
       "message": "gcp",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_de5241fa",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T17:31:35Z",
+      "side": 1,
+      "message": "Doh!\n\nDone.",
+      "parentUuid": "b4f8d1fb_7e0fad2c",
       "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "b4f8d1fb_3e3885c3",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T17:31:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_de1fe15f",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_3e152541",
         "filename": "directory/gcp/race_test.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-15T17:27:35Z",
       "side": 1,
       "message": "gcp",
+      "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_1e35c9cb",
+        "filename": "directory/gcp/race_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T17:31:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4f8d1fb_3e152541",
       "revId": "fec833915d25c9b17490c3213e3846e53ff94bf0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
