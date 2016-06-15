@@ -36,6 +36,40 @@
     },
     {
       "key": {
+        "uuid": "b4f8d1fb_3e0b6554",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T04:35:09Z",
+      "side": 1,
+      "message": "These will all need documentation in the final version.",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_1e082954",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T04:35:09Z",
+      "side": 1,
+      "message": "We\u0027ve been using Op in some places, even though Method is more generic (you also mention operation below).",
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_2dc86d55",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -87,6 +121,23 @@
         "endLine": 34,
         "endChar": 39
       },
+      "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_1e8dc9ec",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-15T04:35:09Z",
+      "side": 1,
+      "message": "Call append instead?",
       "revId": "34873e463b2f43faa36e840caf6d6c12dff2c265",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
