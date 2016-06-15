@@ -427,16 +427,13 @@ func (s *sharer) lookupKey(user upspin.UserName) []upspin.PublicKey {
 		s.userKeys[user] = nil
 		return nil
 	}
+	// Remember the lookup, failed or otherwise.
 	if len(keys) == 0 {
 		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
 		s.exitCode = 1
 		s.userKeys[user] = nil
 		return nil
 	}
-	// Remember the lookup, failed or otherwise.
-	// TODO: We need to deal with multiple key types, and finding the right one.
-	// TODO: This may be different for each file type, but for now we're only using
-	// one encryption protocol so it will serve for now.
 	s.userKeys[user] = keys
 	for _, key := range keys {
 		s.userByHash[sha256.Sum256([]byte(key))] = user
