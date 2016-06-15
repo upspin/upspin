@@ -106,7 +106,7 @@ func E(args ...interface{}) error {
 			// that is not of the right type. Take care of that and log it.
 			if strings.Contains(arg, "@") {
 				_, file, line, _ := runtime.Caller(1)
-				log.Printf("errors.E: unqualified type for %q from %s:%d: %v", arg, file, line)
+				log.Printf("errors.E: unqualified type for %q from %s:%d", arg, file, line)
 				if strings.Contains(arg, "/") {
 					e.Path = upspin.PathName(arg)
 				} else {
