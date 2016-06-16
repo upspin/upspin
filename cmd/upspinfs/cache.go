@@ -15,6 +15,7 @@ import (
 
 	"bazil.org/fuse"
 
+	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/log"
@@ -253,6 +254,12 @@ func (cf *cachedFile) writeBack(h *handle) error {
 			return eio("reading %q (%q): %s", cf.fname, n.uname, err)
 		}
 		sofar += int64(len)
+	}
+
+	// Hack because zero length access files don't work.
+	// TODO(p): fix when 0 length access files are allowed.
+	if len(cleartext) == 0 && access.IsAccessFile(n.uname) {
+		cleartext = []byte("\n")
 	}
 	log.Debug.Printf("writeBack %q, %s read", n, cf.fname)
 
