@@ -7,12 +7,11 @@
 package remote
 
 import (
-	"errors"
-
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -39,7 +38,10 @@ func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publi
 	}
 	resp, err := r.userClient.Lookup(gContext.Background(), req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.E("Lookup", errors.IO, err)
+	}
+	if len(resp.Error) != 0 {
+		return nil, nil, errors.UnmarshalError(resp.Error)
 	}
 	if len(resp.Endpoints) == 0 {
 		resp.Endpoints = nil
@@ -47,7 +49,7 @@ func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publi
 	if len(resp.PublicKeys) == 0 {
 		resp.PublicKeys = nil
 	}
-	return proto.UpspinEndpoints(resp.Endpoints), proto.UpspinPublicKeys(resp.PublicKeys), err
+	return proto.UpspinEndpoints(resp.Endpoints), proto.UpspinPublicKeys(resp.PublicKeys), nil
 }
 
 // Endpoint implements upspin.Store.Endpoint.
@@ -60,14 +62,17 @@ func (r *remote) Configure(options ...string) error {
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
-	_, err := r.userClient.Configure(gContext.Background(), req)
-	return err
+	resp, err := r.userClient.Configure(gContext.Background(), req)
+	if err != nil {
+		return errors.E("Configure", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
-		return nil, errors.New("remote user: unrecognized transport")
+		return nil, errors.E("User.Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.AllowSelfSignedCertificate)

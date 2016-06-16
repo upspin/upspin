@@ -7,12 +7,11 @@
 package remote
 
 import (
-	"errors"
-
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -47,10 +46,13 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	resp, err := r.dirClient.Glob(gCtx, req)
 	if err != nil {
-		return nil, err
+		return nil, errors.E("Glob", errors.IO, err)
+	}
+	if len(resp.Error) != 0 {
+		return nil, errors.UnmarshalError(resp.Error)
 	}
 	if len(resp.Entries) == 0 {
-		return nil, err
+		return nil, nil
 	}
 	return proto.UpspinDirEntries(resp.Entries)
 }
@@ -66,9 +68,9 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, 
 	}
 	resp, err := r.dirClient.MakeDirectory(gCtx, req)
 	if err != nil {
-		return upspin.Location{}, err
+		return upspin.Location{}, errors.E("MakeDirectory", errors.IO, err)
 	}
-	return proto.UpspinLocation(resp.Location), err
+	return proto.UpspinLocation(resp.Location), errors.UnmarshalError(resp.Error)
 }
 
 // Put implements upspin.Directory.Put.
@@ -85,8 +87,11 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 	req := &proto.DirectoryPutRequest{
 		Entry: b,
 	}
-	_, err = r.dirClient.Put(gCtx, req)
-	return err
+	resp, err := r.dirClient.Put(gCtx, req)
+	if err != nil {
+		return errors.E("Put", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // WhichAccess implements upspin.Directory.WhichAccess.
@@ -100,9 +105,9 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) 
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req)
 	if err != nil {
-		return "", err
+		return "", errors.E("WhichAccess", errors.IO, err)
 	}
-	return upspin.PathName(resp.Name), err
+	return upspin.PathName(resp.Name), errors.UnmarshalError(resp.Error)
 }
 
 // Delete implements upspin.Directory.Delete.
@@ -114,8 +119,11 @@ func (r *remote) Delete(pathName upspin.PathName) error {
 	req := &proto.DirectoryDeleteRequest{
 		Name: string(pathName),
 	}
-	_, err = r.dirClient.Delete(gCtx, req)
-	return err
+	resp, err := r.dirClient.Delete(gCtx, req)
+	if err != nil {
+		return errors.E("Delete", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // Lookup implements upspin.Directory.Lookup.
@@ -129,7 +137,10 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	resp, err := r.dirClient.Lookup(gCtx, req)
 	if err != nil {
-		return nil, err
+		return nil, errors.E("Lookup", errors.IO, err)
+	}
+	if len(resp.Error) != 0 {
+		return nil, errors.UnmarshalError(resp.Error)
 	}
 	return proto.UpspinDirEntry(resp.Entry)
 }
@@ -144,14 +155,17 @@ func (r *remote) Configure(options ...string) error {
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
-	_, err := r.dirClient.Configure(gContext.Background(), req)
-	return err
+	resp, err := r.dirClient.Configure(gContext.Background(), req)
+	if err != nil {
+		return errors.E("Configure", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
-		return nil, errors.New("remote: unrecognized transport")
+		return nil, errors.E("Directory.Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.AllowSelfSignedCertificate)
