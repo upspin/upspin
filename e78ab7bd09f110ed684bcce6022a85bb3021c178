@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_04fc5777",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T00:31:03Z",
+      "side": 1,
+      "message": "should we document that method strings must not include @ symbols?",
+      "revId": "e78ab7bd09f110ed684bcce6022a85bb3021c178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_e4216b04",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T00:31:03Z",
+      "side": 1,
+      "message": "I feel like this should just explode rather than log and set the field. \nOr we should at least check e.Path !\u003d nil before setting it",
+      "revId": "e78ab7bd09f110ed684bcce6022a85bb3021c178",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
