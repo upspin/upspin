@@ -351,6 +351,9 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 	if err != nil {
 		return nil, err
 	}
+	if entry.IsDir() {
+		return nil, fmt.Errorf("cannot link or rename directories")
+	}
 
 	packer := pack.Lookup(entry.Metadata.Packing())
 	if packer == nil {
