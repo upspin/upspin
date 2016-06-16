@@ -7,12 +7,11 @@
 package remote
 
 import (
-	"errors"
-
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -43,9 +42,12 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := r.storeClient.Get(gCtx, req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.E("Get", errors.IO, err)
 	}
-	return resp.Data, proto.UpspinLocations(resp.Locations), err
+	if len(resp.Error) != 0 {
+		return nil, nil, errors.UnmarshalError(resp.Error)
+	}
+	return resp.Data, proto.UpspinLocations(resp.Locations), nil
 }
 
 // Put implements upspin.Store.Put.
@@ -60,9 +62,9 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	}
 	resp, err := r.storeClient.Put(gCtx, req)
 	if err != nil {
-		return "", err
+		return "", errors.E("Put", errors.IO, err)
 	}
-	return upspin.Reference(resp.Reference), nil
+	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
 }
 
 // Delete implements upspin.Store.Delete.
@@ -74,8 +76,11 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
-	_, err = r.storeClient.Delete(gCtx, req)
-	return err
+	resp, err := r.storeClient.Delete(gCtx, req)
+	if err != nil {
+		return errors.E("Delete", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // Endpoint implements upspin.Store.Endpoint.
@@ -88,14 +93,17 @@ func (r *remote) Configure(options ...string) error {
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
-	_, err := r.storeClient.Configure(gContext.Background(), req)
-	return err
+	resp, err := r.storeClient.Configure(gContext.Background(), req)
+	if err != nil {
+		return errors.E("Configure", errors.IO, err)
+	}
+	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
-		return nil, errors.New("remote: unrecognized transport")
+		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.AllowSelfSignedCertificate)
