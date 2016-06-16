@@ -58,6 +58,25 @@ func TestParse(t *testing.T) {
 	match(t, a.list[Delete], []string{"admin@c.com"})
 }
 
+func TestParseEmpty(t *testing.T) {
+	a, err := Parse(testFile, []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := Read; i < numRights; i++ {
+		match(t, a.list[i], nil)
+	}
+
+	// Nil should be OK too.
+	a, err = Parse(testFile, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := Read; i < numRights; i++ {
+		match(t, a.list[i], nil)
+	}
+}
+
 type accessEqualTest struct {
 	path1   upspin.PathName
 	access1 string
