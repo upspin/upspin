@@ -69,7 +69,6 @@ func New(context *upspin.Context) upspin.Store {
 
 // Put implements upspin.Store.
 func (s *server) Put(data []byte) (upspin.Reference, error) {
-	log.Printf("Put")
 	return s.innerPut(s.context.UserName, bytes.NewBuffer(data))
 }
 
@@ -129,16 +128,15 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+	if !s.isConfigured() {
+		return nil, upspin.Location{}, errNotConfigured
+	}
 	mu.RLock()
 	defer mu.RUnlock()
-	var zeroLoc upspin.Location
-	if !s.isConfigured() {
-		return nil, zeroLoc, errNotConfigured
-	}
 	file, err = fileCache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
-		log.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
+		log.Debug.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
 		return
 	}
 
@@ -169,23 +167,22 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 	// HTTPS transport client efficiently.
 	location.Endpoint.Transport = upspin.HTTPS
 	location.Endpoint.NetAddr = upspin.NetAddr(fmt.Sprintf("%s://%s", url.Scheme, url.Host))
-	log.Printf("Ref %s returned as link: %s", ref, link)
+	log.Debug.Printf("Ref %s returned as link: %s", ref, link)
 	return
 }
 
 // Delete implements upspin.Store.
 func (s *server) Delete(ref upspin.Reference) error {
-	mu.RLock()
-	defer mu.RUnlock()
 	if !s.isConfigured() {
 		return errNotConfigured
 	}
+	mu.RLock()
+	defer mu.RUnlock()
 	// TODO: verify ownership and proper ACLs to delete blob
 	err := cloudClient.Delete(string(ref))
 	if err != nil {
 		return fmt.Errorf("%sDelete: %s: %s", errorPrefix, ref, err)
 	}
-	log.Printf("Delete: %s: Success", ref)
 	return nil
 }
 
