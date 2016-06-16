@@ -27,7 +27,7 @@ var (
 
 // getDirEntry is a convenience function that returns a directory entry for the path, regardless whether it's a root
 // or a regular path. If it's a root, it also returns the root entry.
-// It must be called with pathLock(path) held.
+// It must be called with userlock held.
 func (d *directory) getDirEntry(path *path.Parsed) (*upspin.DirEntry, *root, error) {
 	if path.IsRoot() {
 		root, err := d.getRoot(path.User())
@@ -41,7 +41,7 @@ func (d *directory) getDirEntry(path *path.Parsed) (*upspin.DirEntry, *root, err
 }
 
 // getNonRoot returns the dir entry for the given path, possibly going to stable storage to find it.
-// It must be called with pathLock(path) held.
+// It must be called with userlock held.
 func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 	log.Printf("Looking up dir entry %q", path)
 
@@ -76,7 +76,7 @@ func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 
 // putNonRoot forcibly writes to stable storage the given dir entry at the canonical path on the
 // backend without checking anything but the marshaling.
-// It must be called with pathLock(path) held.
+// It must be called with userlock held.
 func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) error {
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
@@ -96,7 +96,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 }
 
 // isDirEmpty reports whether the directory path is empty.
-// It must be called with pathLock(path) held.
+// It must be called with userlock held.
 func (d *directory) isDirEmpty(path upspin.PathName) error {
 	dirPrefix := string(path) + "/"
 	files, err := d.cloudClient.ListDir(dirPrefix)
@@ -121,7 +121,7 @@ func (d *directory) getCloudBytes(path upspin.PathName) ([]byte, error) {
 }
 
 // deletePath deletes the path from the storage backend and if successful also deletes it from all caches.
-// It must be called with pathLock(path) held.
+// It must be called with userlock held.
 func (d *directory) deletePath(path upspin.PathName) error {
 	if err := d.cloudClient.Delete(string(path)); err != nil {
 		return err

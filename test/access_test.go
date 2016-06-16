@@ -12,9 +12,9 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/pack"
+	"upspin.io/path"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
-	"upspin.io/path"
 )
 
 // p256 keys
@@ -89,11 +89,11 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		owner = newUserName()
 	)
 	const (
-		groupDir    = "Group"
-		publicDir   = "public"
-		privateDir  = "private"
-		publicFile  = publicDir + "/public.txt"
-		privateFile = privateDir + "/private.txt"
+		groupDir         = "Group"
+		publicDir        = "public"
+		privateDir       = "private"
+		publicFile       = publicDir + "/public.txt"
+		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
 	key := ownersKey
@@ -190,7 +190,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	const groupFile = "/Group/mygroup"
 	var (
 		groupAccessText = string("r: mygroup\nw:" + owner)
-		groupText = fmt.Sprintf("%s\n", user)
+		groupText       = fmt.Sprintf("%s\n", user)
 	)
 	r.state = "With user in Group file"
 	r.write(owner, accessFile, groupAccessText, true)
@@ -201,7 +201,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, privateDir, false)
 	r.read(user, publicDir, true)
 
-	r.write(owner, publicFile, contentsOfPublic, true)  // Put file again to trigger sharing.
+	r.write(owner, publicFile, contentsOfPublic, true) // Put file again to trigger sharing.
 	r.read(user, publicFile, true)
 
 	// Take user out of the group.
