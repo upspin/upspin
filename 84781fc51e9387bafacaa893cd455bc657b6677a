@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_9d2d568a",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-16T15:13:12Z",
+      "side": 1,
+      "message": "I just realized this is now wrong. If you grab the lock, test, release the lock and then grab it again assuming nothing changed, there\u0027s a tiny window of vulnerability. The lock must be held the whole time. \n\nThe original code was correct, though maybe not efficient. I will have a fix shortly.",
+      "revId": "84781fc51e9387bafacaa893cd455bc657b6677a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
