@@ -7,6 +7,7 @@ package errors
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"runtime"
 	"strings"
@@ -171,4 +172,154 @@ func (e *Error) Error() string {
 		return "no error"
 	}
 	return b.String()
+}
+
+// Recreate the errors.New functionality of the standard Go errors package
+// so we can create simple text errors when needed.
+
+// Str returns an error that formats as the given text. It is intended to
+// be used as the error-typed argument to the E function.
+func Str(text string) error {
+	return &errorString{text}
+}
+
+// errorString is a trivial implementation of error.
+type errorString struct {
+	s string
+}
+
+func (e *errorString) Error() string {
+	return e.s
+}
+
+// MarshalAppend marshals err into a byte slice. The result is appended to b,
+// which may be nil.
+// It returns the argument slice unchanged if the error is nil.
+func (err *Error) MarshalAppend(b []byte) []byte {
+	if err == nil {
+		return b
+	}
+	b = appendString(b, string(err.Path))
+	b = appendString(b, string(err.User))
+	b = appendString(b, err.Op)
+	var tmp [16]byte // For use by PutVarint.
+	N := binary.PutVarint(tmp[:], int64(err.Kind))
+	b = append(b, tmp[:N]...)
+	b = MarshalErrorAppend(err.Err, b)
+	return b
+}
+
+// Marshal marshals its receiver into a byte slice, which it returns.
+// It returns nil if the error is nil.
+func (err *Error) Marshal() []byte {
+	return err.MarshalAppend(nil)
+}
+
+// MarshalErrorAppend marshals an arbitrary error into a byte slice.
+// The result is appended to b, which may be nil.
+// It returns the argument slice unchanged if the error is nil.
+// If the error is not an *Error, it just records the result of err.Error().
+// Otherwise it encodes the full Error struct.
+func MarshalErrorAppend(err error, b []byte) []byte {
+	if err == nil {
+		return b
+	}
+	if e, ok := err.(*Error); ok {
+		// This is an errors.Error. Mark it as such.
+		b = append(b, 'E')
+		return e.MarshalAppend(b)
+	}
+	// Ordinary error.
+	b = append(b, 'e')
+	b = appendString(b, err.Error())
+	return b
+
+}
+
+// MarshalError marshals an arbitrary error and returns the byte slice.
+// If the error is nil, it returns nil.
+// It returns the argument slice unchanged if the error is nil.
+// If the error is not an *Error, it just records the result of err.Error().
+// Otherwise it encodes the full Error struct.
+func MarshalError(err error) []byte {
+	return MarshalErrorAppend(err, nil)
+}
+
+// Unmarshal unmarshals the byte slice into the receiver, which must be non-nil.
+func (err *Error) Unmarshal(b []byte) {
+	if len(b) == 0 {
+		return
+	}
+	data, b := getBytes(b)
+	if data != nil {
+		err.Path = upspin.PathName(data)
+	}
+	data, b = getBytes(b)
+	if data != nil {
+		err.User = upspin.UserName(data)
+	}
+	data, b = getBytes(b)
+	if data != nil {
+		err.Op = string(data)
+	}
+	k, N := binary.Varint(b)
+	err.Kind = Kind(k)
+	b = b[N:]
+	err.Err = UnmarshalError(b)
+}
+
+// UnmarshalError unmarshals the byte slice into an error value.
+// The byte slice must have been created by MarshalError or
+// MarshalErrorAppend.
+// If the encoded error was of type *Error, the returned error value
+// will have that underlying type. Otherwise it will be just a simple
+// value that implements the error interface.
+func UnmarshalError(b []byte) error {
+	if len(b) == 0 {
+		return nil
+	}
+	code := b[0]
+	b = b[1:]
+	switch code {
+	case 'e':
+		// Plain error.
+		var data []byte
+		data, b = getBytes(b)
+		if len(b) != 0 {
+			log.Printf("Unmarshal error: trailing bytes")
+		}
+		return Str(string(data))
+	case 'E':
+		// Error value.
+		var err Error
+		err.Unmarshal(b)
+		return &err
+	default:
+		log.Printf("Unmarshal error: corrup data %q", b)
+		return Str(string(b))
+	}
+}
+
+func appendString(b []byte, str string) []byte {
+	var tmp [16]byte // For use by PutUvarint.
+	N := binary.PutUvarint(tmp[:], uint64(len(str)))
+	b = append(b, tmp[:N]...)
+	b = append(b, str...)
+	return b
+}
+
+// getBytes unmarshals the byte slice at b (uvarint count followed by bytes)
+// and returns the slice followed by the remaining bytes.
+// If there is insufficient data, both return values will be nil.
+func getBytes(b []byte) (data, remaining []byte) {
+	u, N := binary.Uvarint(b)
+	if len(b) < N+int(u) {
+		log.Printf("Unmarshal error: bad encoding")
+		return nil, nil
+	}
+	if N == 0 {
+		log.Printf("Unmarshal error: bad encoding")
+		return nil, b
+	}
+	return b[N : N+int(u)], b[N+int(u):]
 }
