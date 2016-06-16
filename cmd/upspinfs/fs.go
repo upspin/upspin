@@ -352,6 +352,22 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 	}
 	de, err := dir.Lookup(uname)
 	if err != nil {
+		if expectedError(err, permErrors) {
+			// We act like a permission error didn't happen in the hopes that
+			// a later longer path will succeed.
+			de = &upspin.DirEntry{Name: uname, Metadata: upspin.Metadata{Attr: upspin.AttrDirectory}}
+			found := false
+			for _, e := range n.de {
+				if e.Name == uname {
+					found = true
+					break
+				}
+			}
+			if !found {
+				n.de = append(n.de, de)
+			}
+			return dir, de, nil
+		}
 		if expectedError(err, dirErrors) {
 			return nil, nil, f.enoent(uname, "lookup %s", err)
 		}
@@ -425,6 +441,11 @@ var dirErrors = []string{
 	"not a directory",
 	"no such directory entry",
 	"no such user",
+	"permission",
+}
+
+var permErrors = []string{
+	"permission",
 }
 
 // expectedError returns true if the error is one from the given list.
@@ -669,10 +690,10 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 }
 
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
-func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node) error {
+func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
 	n.Lock()
 	defer n.Unlock()
-	oldPath := path.Join(old.(*node).uname, req.OldName)
+	oldPath := path.Join(n.uname, req.OldName)
 	// If we still have the old node, lock it for the duration.
 	f := n.f
 	f.Lock()
@@ -682,7 +703,7 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 		defer oldn.Unlock()
 	}
 	f.Unlock()
-	newPath := path.Join(n.uname, req.NewName)
+	newPath := path.Join(newDir.(*node).uname, req.NewName)
 	err := n.f.client.Rename(oldPath, newPath)
 	if err == nil {
 		f.Lock()
@@ -695,7 +716,7 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, old fs.Node
 		}
 		f.Unlock()
 	}
-	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, old.(*node), req.NewName, n)
+	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, n, req.NewName, newDir.(*node))
 	return err
 }
 
