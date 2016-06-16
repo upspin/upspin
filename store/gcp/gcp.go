@@ -129,12 +129,11 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+	if !s.isConfigured() {
+		return nil, upspin.Location{}, errNotConfigured
+	}
 	mu.RLock()
 	defer mu.RUnlock()
-	var zeroLoc upspin.Location
-	if !s.isConfigured() {
-		return nil, zeroLoc, errNotConfigured
-	}
 	file, err = fileCache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
