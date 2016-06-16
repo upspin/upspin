@@ -684,6 +684,7 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, newDir fs.N
 	n.Lock()
 	defer n.Unlock()
 	oldPath := path.Join(n.uname, req.OldName)
+	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, n, req.NewName, newDir.(*node))
 	// If we still have the old node, lock it for the duration.
 	f := n.f
 	f.Lock()
@@ -705,8 +706,11 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, newDir fs.N
 			oldn.uname = newPath
 		}
 		f.Unlock()
+	} else {
+		if strings.Contains(err.Error(), "director") {
+			err = eisdir("%s", err.Error())
+		}
 	}
-	log.Debug.Printf("Rename %q in %s to %q in %q", req.OldName, n, req.NewName, newDir.(*node))
 	return err
 }
 

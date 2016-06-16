@@ -49,7 +49,7 @@ func enotsup(format string, vars ...interface{}) *upspinError {
 	return mkError(syscall.ENOTSUP, "Operation not supported: "+format, vars...)
 }
 func enotdir(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.ENOTSUP, "Not a directory: "+format, vars...)
+	return mkError(syscall.ENOTDIR, "Not a directory: "+format, vars...)
 }
 func eisdir(format string, vars ...interface{}) *upspinError {
 	return mkError(syscall.EISDIR, "Is a directory: "+format, vars...)
