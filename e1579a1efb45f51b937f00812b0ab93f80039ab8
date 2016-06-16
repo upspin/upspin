@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_044d7726",
+        "filename": "client/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T01:11:29Z",
+      "side": 1,
+      "message": "This seems like an unrelated change. It also doesn\u0027t seem to do anything. Part of some other work?",
+      "revId": "e1579a1efb45f51b937f00812b0ab93f80039ab8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_845987eb",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T01:11:29Z",
+      "side": 1,
+      "message": "I like this trick:\n  const doUnpack, noUnpack \u003d true, false\nthen:\n  func BenchmarkPack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, noUnpack) }\n  func BenchmarkPackUnpack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, doUnpack) }",
+      "revId": "e1579a1efb45f51b937f00812b0ab93f80039ab8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f8d1fb_046617a8",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T01:11:29Z",
+      "side": 1,
+      "message": "make these 1-liners like in the other file?",
+      "revId": "e1579a1efb45f51b937f00812b0ab93f80039ab8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
