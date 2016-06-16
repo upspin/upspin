@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4f8d1fb_5d610ebe",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-16T15:18:31Z",
+      "side": 1,
+      "message": "I will have a fix today.",
+      "revId": "7321a33f1ebe69ed15e6b461b06e0fda326e5d26",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
