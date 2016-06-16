@@ -7,6 +7,7 @@ package errors
 
 import (
 	"bytes"
+	"encoding"
 	"encoding/binary"
 	"fmt"
 	"runtime"
@@ -34,7 +35,11 @@ type Error struct {
 	Err error
 }
 
-var _ error = (*Error)(nil)
+var (
+	_ error                      = (*Error)(nil)
+	_ encoding.BinaryUnmarshaler = (*Error)(nil)
+	_ encoding.BinaryMarshaler   = (*Error)(nil)
+)
 
 // Kind defines the kind of error this is, mostly for use by systems
 // such as FUSE that must act differently depending on the error.
@@ -210,9 +215,9 @@ func (err *Error) MarshalAppend(b []byte) []byte {
 }
 
 // Marshal marshals its receiver into a byte slice, which it returns.
-// It returns nil if the error is nil.
-func (err *Error) Marshal() []byte {
-	return err.MarshalAppend(nil)
+// It returns nil if the error is nil. The returned error is always nil.
+func (err *Error) MarshalBinary() ([]byte, error) {
+	return err.MarshalAppend(nil), nil
 }
 
 // MarshalErrorAppend marshals an arbitrary error into a byte slice.
@@ -245,10 +250,11 @@ func MarshalError(err error) []byte {
 	return MarshalErrorAppend(err, nil)
 }
 
-// Unmarshal unmarshals the byte slice into the receiver, which must be non-nil.
-func (err *Error) Unmarshal(b []byte) {
+// UnmarshalBinary unmarshals the byte slice into the receiver, which must be non-nil.
+// The returned error is always nil.
+func (err *Error) UnmarshalBinary(b []byte) error {
 	if len(b) == 0 {
-		return
+		return nil
 	}
 	data, b := getBytes(b)
 	if data != nil {
@@ -266,6 +272,7 @@ func (err *Error) Unmarshal(b []byte) {
 	err.Kind = Kind(k)
 	b = b[N:]
 	err.Err = UnmarshalError(b)
+	return nil
 }
 
 // UnmarshalError unmarshals the byte slice into an error value.
@@ -292,7 +299,7 @@ func UnmarshalError(b []byte) error {
 	case 'E':
 		// Error value.
 		var err Error
-		err.Unmarshal(b)
+		err.UnmarshalBinary(b)
 		return &err
 	default:
 		log.Printf("Unmarshal error: corrup data %q", b)
