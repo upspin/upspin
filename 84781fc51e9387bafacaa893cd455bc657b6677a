@@ -16,6 +16,24 @@
       "revId": "84781fc51e9387bafacaa893cd455bc657b6677a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54b8753d_16c5bc3d",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-16T21:39:59Z",
+      "side": 1,
+      "message": "Oops.\nBut the original code was not correct. It could deadlock in some situations. I recently amended the docs for sync.RWMutex:\n\n\"If a goroutine holds a RWMutex for reading, it must not expect this or any other goroutine to be able to also take the read lock until the first read lock is released. In particular, this prohibits recursive read locking. This is to ensure that the lock eventually becomes available; a blocked Lock call excludes new readers from acquiring the lock.\"\n\nhttps://tip.golang.org/pkg/sync/#RWMutex",
+      "parentUuid": "b4f8d1fb_9d2d568a",
+      "revId": "84781fc51e9387bafacaa893cd455bc657b6677a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
