@@ -19,6 +19,42 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_2e68b3a5",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:27:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_8d952156",
+      "revId": "f4f77f9196c37a5822d03dc577cf699ffa5c9730",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_0e6defb5",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:27:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_8d952156",
+      "revId": "f4f77f9196c37a5822d03dc577cf699ffa5c9730",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f49c09da_ed8ae52f",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -30,6 +66,24 @@
       "writtenOn": "2016-06-16T21:36:12Z",
       "side": 1,
       "message": "Should this be and encoding.BinaryMarshaler?\nFeels like it should be. (and the same wrt unmarshal)\nhttps://golang.org/pkg/encoding/#BinaryMarshaler",
+      "revId": "f4f77f9196c37a5822d03dc577cf699ffa5c9730",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_ee617bc0",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:27:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f49c09da_ed8ae52f",
       "revId": "f4f77f9196c37a5822d03dc577cf699ffa5c9730",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
