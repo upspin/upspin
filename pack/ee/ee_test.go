@@ -140,19 +140,31 @@ func TestName521(t *testing.T) {
 	testPackNameAndUnpack(t, ctx, packer, name, name2, []byte(text))
 }
 
-func benchmarkPack(b *testing.B, packing upspin.Packing) {
-	const (
-		user upspin.UserName = "user@google.com"
-		text                 = "this is some text"
-	)
+func benchmarkPack(b *testing.B, packing upspin.Packing, fileSize int, unpack bool) {
+	const user upspin.UserName = "user@google.com"
+	data := make([]byte, fileSize)
+	n, err := rand.Read(data)
+	if err != nil {
+		b.Fatal(err)
+	}
+	if n != fileSize {
+		b.Fatalf("Not enough random bytes read: %d", n)
+	}
+	data = data[:n]
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
 	ctx, packer := setup(user, packing)
 	for i := 0; i < b.N; i++ {
-		d := &upspin.DirEntry{}
-		d.Name = name
-		data := []byte(text)
+		d := &upspin.DirEntry{
+			Name: name,
+		}
 		cipher := make([]byte, packer.PackLen(ctx, data, d))
-		m, _ := packer.Pack(ctx, cipher, data, d)
+		m, err := packer.Pack(ctx, cipher, data, d)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !unpack {
+			continue
+		}
 		cipher = cipher[:m]
 		clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
 		m, _ = packer.Unpack(ctx, clear, cipher, d)
@@ -160,9 +172,16 @@ func benchmarkPack(b *testing.B, packing upspin.Packing) {
 	}
 }
 
-func BenchmarkPack256(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack) }
-func BenchmarkPack384(b *testing.B) { benchmarkPack(b, upspin.EEp384Pack) }
-func BenchmarkPack521(b *testing.B) { benchmarkPack(b, upspin.EEp521Pack) }
+func BenchmarkPack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, false) }
+func BenchmarkPack256_1kbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024, false) }
+func BenchmarkPack256_1Mbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024*1024, false) }
+
+func BenchmarkPack384_1byte(b *testing.B) { benchmarkPack(b, upspin.EEp384Pack, 1, false) }
+func BenchmarkPack521_1byte(b *testing.B) { benchmarkPack(b, upspin.EEp521Pack, 1, false) }
+
+func BenchmarkPackUnpack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, true) }
+func BenchmarkPackUnpack256_1kbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024, true) }
+func BenchmarkPackUnpack256_1Mbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024*1024, true) }
 
 func TestSharing(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.

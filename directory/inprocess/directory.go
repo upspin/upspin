@@ -8,7 +8,6 @@ package inprocess
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	goPath "path"
 	"sort"
@@ -17,6 +16,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
