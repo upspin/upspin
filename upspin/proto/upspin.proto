@@ -33,6 +33,7 @@ message Signature {
 
 message AuthenticateResponse {
     string token = 1;
+    bytes Error = 2;
 }
 
 message ConfigureRequest {
@@ -40,6 +41,7 @@ message ConfigureRequest {
 }
 
 message ConfigureResponse {
+    bytes Error = 1;
 }
 
 message EndpointRequest {
@@ -66,6 +68,7 @@ message StoreGetRequest {
 message StoreGetResponse {
     bytes data = 1;
     repeated Location locations = 2;
+    bytes Error = 3;
 }
 
 message StorePutRequest {
@@ -74,6 +77,7 @@ message StorePutRequest {
 
 message StorePutResponse {
     string reference = 1;
+    bytes Error = 2;
 }
 
 message StoreDeleteRequest {
@@ -81,6 +85,7 @@ message StoreDeleteRequest {
 }
 
 message StoreDeleteResponse {
+    bytes Error = 1;
 }
 
 service Store {
@@ -104,6 +109,7 @@ message UserLookupRequest {
 message UserLookupResponse {
     repeated Endpoint Endpoints = 1;
     repeated string PublicKeys = 2;
+    bytes Error = 3;
 }
 
 service User {
@@ -120,49 +126,55 @@ service User {
 // DirEntry values are stored as bytes, for simple and fast marshaling.
 
 message DirectoryLookupRequest {
-	string Name = 1;
+    string Name = 1;
 }
 
 message DirectoryLookupResponse {
-	bytes Entry = 1;
+    bytes Entry = 1;
+    bytes Error = 2;
 }
 
 message DirectoryPutRequest {
-	bytes Entry = 1;
+    bytes Entry = 1;
 }
 
 message DirectoryPutResponse {
+    bytes Error = 1;
 }
 
 message DirectoryMakeDirectoryRequest {
-	string Name = 1;
+    string Name = 1;
 }
 
 message DirectoryMakeDirectoryResponse {
-	Location Location = 1;
+    Location Location = 1;
+    bytes Error = 2;
 }
 
 message DirectoryGlobRequest {
-	string Pattern = 1;
+    string Pattern = 1;
 }
 
 message DirectoryGlobResponse {
-	repeated bytes Entries = 1;
+    repeated bytes Entries = 1;
+    bytes Error = 2;
 }
 
 message DirectoryDeleteRequest {
-	string Name = 1;
+    string Name = 1;
 }
 
 message DirectoryDeleteResponse {
+    bytes Error = 1;
 }
 
 message DirectoryWhichAccessRequest {
-	string Name = 1;
+    string Name = 1;
 }
 
 message DirectoryWhichAccessResponse {
-	string Name = 1;
+    string Name = 1;
+    bytes Error = 2;
 }
 
 service Directory {
