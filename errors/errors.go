@@ -23,8 +23,8 @@ type Error struct {
 	Path upspin.PathName
 	// User is the Upspin name of the user attempting the operation.
 	User upspin.UserName
-	// Op is the operation being performed, usually the method
-	// being invoked (Get, Put, etc.)
+	// Op is the operation being performed, usually the name of the method
+	// being invoked (Get, Put, etc.). It should not contain an at sign @.
 	Op string
 	// Kind is the class of error, such as permission failure,
 	// or "Other" if its class is unknown or irrelevant.
@@ -108,9 +108,13 @@ func E(args ...interface{}) error {
 				_, file, line, _ := runtime.Caller(1)
 				log.Printf("errors.E: unqualified type for %q from %s:%d", arg, file, line)
 				if strings.Contains(arg, "/") {
-					e.Path = upspin.PathName(arg)
+					if e.Path != "" { // Don't overwrite a valid path.
+						e.Path = upspin.PathName(arg)
+					}
 				} else {
-					e.User = upspin.UserName(arg)
+					if e.User != "" { // Don't overwrite a valid user.
+						e.User = upspin.UserName(arg)
+					}
 				}
 				continue
 			}
