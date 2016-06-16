@@ -6,6 +6,7 @@
 package nettest
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 )
@@ -23,6 +24,7 @@ type ExpectingResponseWriter struct {
 // Write implements io.Writer.
 func (e *ExpectingResponseWriter) Write(response []byte) (n int, err error) {
 	e.response = string(response)
+	e.header["Content-Length"] = []string{fmt.Sprintf("%d", len(response))}
 	return len(response), nil
 }
 

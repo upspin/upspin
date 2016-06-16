@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"upspin.io/cloud/gcp"
+	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 )
 
@@ -29,15 +31,15 @@ func createReadAndDelete(t *testing.T, wgStart *sync.WaitGroup, wgEnd *sync.Wait
 		}
 		err = d.Put(de)
 		if err != nil {
-			t.Fatal(err)
+			panic(err)
 		}
 		_, err = d.Lookup(path)
 		if err != nil {
-			t.Fatal(err)
+			panic(err)
 		}
 		err = d.Delete(path)
 		if err != nil {
-			t.Fatal(err)
+			panic(err)
 		}
 		time.Sleep(time.Duration(rand.Int31n(maxIdleMS)) * time.Millisecond)
 	}
@@ -86,9 +88,44 @@ func TestParallelOperationsOnCommonPath(t *testing.T) {
 	wgEnd.Wait()
 }
 
+func TestParallelOperationsOnAccessAndRoot(t *testing.T) {
+	wgStart := new(sync.WaitGroup)
+	wgEnd := new(sync.WaitGroup)
+
+	d := startDir(t)
+
+	_, err := d.MakeDirectory(upspin.PathName(userName + "/dir"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	wgStart.Add(3)
+
+	go createReadAndDelete(t, wgStart, wgEnd, d, upspin.PathName(userName+"/Access"), 100, 10)
+	go createReadAndDelete(t, wgStart, wgEnd, d, upspin.PathName(userName+"/dir/foo.txt"), 100, 10)
+	go createReadAndDelete(t, wgStart, wgEnd, d, upspin.PathName(userName+"/dir/Access"), 100, 10)
+
+	wgStart.Wait()
+	wgEnd.Wait()
+}
+
+func newDirServerWithDummyStore(t *testing.T, gcp gcp.GCP) *directory {
+	f, err := factotum.New(serverKeys)
+	if err != nil {
+		t.Fatal(err)
+	}
+	storeFunc := func(e upspin.Endpoint) (upspin.Store, error) {
+		return new(dummyAccessStore), nil
+	}
+	ds := newDirectory(gcp, f, storeFunc, timeFunc)
+	ds.context.UserName = userName // the default user for the default session.
+	ds.endpoint = serviceEndpoint
+	return ds
+}
+
 func startDir(t *testing.T) *directory {
 	log.SetLevel(log.Lerror) // silence most messages
-	d := newTestDirServer(t, &gcpMock{storage: make(map[string][]byte)})
+	d := newDirServerWithDummyStore(t, &gcpMock{storage: make(map[string][]byte)})
 
 	root := &upspin.DirEntry{
 		Name: userName,
@@ -101,6 +138,15 @@ func startDir(t *testing.T) *directory {
 		t.Fatal(err)
 	}
 	return d
+}
+
+type dummyAccessStore struct {
+	testfixtures.DummyStore
+}
+
+func (d *dummyAccessStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+	// Always return an Access that will work for the test, so we never get permission denied.
+	return []byte("*:" + userName), nil, nil
 }
 
 type gcpMock struct {

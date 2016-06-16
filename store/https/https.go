@@ -8,11 +8,10 @@ package https
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"io"
 
 	"upspin.io/bind"
 	"upspin.io/upspin"
@@ -188,7 +187,7 @@ var errTooLong = errors.New("response body too long")
 func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 	var buf []byte
 	defer resp.Body.Close()
-	if resp.ContentLength > 0 {
+	if resp.ContentLength >= 0 {
 		if resp.ContentLength <= maxBufLen {
 			buf = make([]byte, resp.ContentLength)
 		} else {
