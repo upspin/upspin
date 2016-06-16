@@ -5,57 +5,65 @@
 package main
 
 import (
-	"fmt"
+	"strings"
 	"syscall"
 
 	"bazil.org/fuse"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 )
 
-// upspinError is an error string with a POSIX syscall error number.
-type upspinError struct {
+// errnoError is a go string with a POSIX syscall error number.
+type errnoError struct {
 	errno syscall.Errno
-	err   string
+	err   error
 }
 
-func (u *upspinError) Error() string {
-	return u.err
+func (u *errnoError) Error() string {
+	return u.err.Error()
 }
 
-func (u *upspinError) Errno() fuse.Errno {
+func (u *errnoError) Errno() fuse.Errno {
 	return fuse.Errno(u.errno)
 }
 
-func mkError(errno syscall.Errno, format string, vars ...interface{}) *upspinError {
-	msg := fmt.Sprintf(format, vars...)
-	log.Debug.Println(msg)
-	return &upspinError{errno, msg}
+var errs = []struct {
+	str   string
+	errno syscall.Errno
+}{
+	{"not found", syscall.ENOENT},
+	{"not a directory", syscall.ENOTDIR},
+	{"no such", syscall.ENOENT},
+	{"permission", syscall.EPERM},
 }
 
-func enoent(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.ENOENT, "No such file or directory: "+format, vars...)
-}
-func eio(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.EIO, format, vars...)
-}
-func eperm(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.EPERM, "Operation not permitted: "+format, vars...)
-}
-func eexist(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.EEXIST, "File exists: "+format, vars...)
-}
-func enotsup(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.ENOTSUP, "Operation not supported: "+format, vars...)
-}
-func enotdir(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.ENOTDIR, "Not a directory: "+format, vars...)
-}
-func eisdir(format string, vars ...interface{}) *upspinError {
-	return mkError(syscall.EISDIR, "Is a directory: "+format, vars...)
-}
-
-// TODO(p): make this mac specific or remove it when we're done debugging.
-func edotunderscore() *upspinError {
-	return &upspinError{syscall.ENOENT, ""}
+// e2e converts an upspin error into a fuse one.
+func e2e(err error) *errnoError {
+	errno := syscall.EIO
+	if ue, ok := err.(*errors.Error); ok {
+		switch ue.Kind {
+		case errors.Permission:
+			errno = syscall.EPERM
+		case errors.Exist:
+			errno = syscall.EEXIST
+		case errors.NotExist:
+			errno = syscall.ENOENT
+		case errors.Syntax:
+			errno = syscall.ENOENT
+		case errors.IsDir:
+			errno = syscall.EISDIR
+		case errors.NotDir:
+			errno = syscall.ENOTDIR
+		}
+	} else {
+		for _, e := range errs {
+			if strings.Contains(err.Error(), e.str) {
+				errno = e.errno
+				break
+			}
+		}
+	}
+	log.Debug.Println(err.Error())
+	return &errnoError{errno, err}
 }
