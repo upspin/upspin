@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "4959bc44_0e04cf0b",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:15:24Z",
+      "side": 1,
+      "message": "Upspin",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_ce059708",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:15:24Z",
+      "side": 1,
+      "message": "s/defined/configured/\ns/their //",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_5da62e28",
         "filename": "cmd/webspin/main.go",
         "patchSetId": 1
@@ -105,6 +139,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_ae294380",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:15:24Z",
+      "side": 1,
+      "message": "marginally, but it\u0027s longer and harder to read. i prefer the original",
+      "parentUuid": "b4f8d1fb_9d89d68a",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_5d8f4e8e",
         "filename": "cmd/webspin/main.go",
         "patchSetId": 1
@@ -116,6 +168,24 @@
       "writtenOn": "2016-06-16T15:34:13Z",
       "side": 1,
       "message": "Is this the recommended way of doing templates, embedding in the code, or is this just temporary as this grows and graduates to a separate loadable file. Is it possible to link it in the binary, like in C++?",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_2e51d3f3",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-16T23:15:24Z",
+      "side": 1,
+      "message": "Yes, this is idiomatic for simple templates.",
+      "parentUuid": "b4f8d1fb_5d8f4e8e",
       "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
