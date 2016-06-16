@@ -5,6 +5,7 @@
 package plain
 
 import (
+	"crypto/rand"
 	"testing"
 
 	"upspin.io/pack"
@@ -33,11 +34,18 @@ func TestPack(t *testing.T) {
 		name upspin.PathName = "user@google.com/file/of/user"
 		text                 = "this is some text"
 	)
-	packer := plainPack{}
 
-	// First pack.
-	data := []byte(text)
-	cipher := make([]byte, 1024)
+	cipher, de := doPack(t, name, []byte(text))
+	clear := doUnpack(t, cipher, de)
+
+	if string(clear) != text {
+		t.Errorf("text: expected %q; got %q", text, clear)
+	}
+}
+
+// doPack packs the contents of data for name and returns the cipher and the dir entry.
+func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.DirEntry) {
+	packer := plainPack{}
 	de := &upspin.DirEntry{
 		Name: name,
 	}
@@ -45,21 +53,44 @@ func TestPack(t *testing.T) {
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
+	cipher := make([]byte, n)
 	m, err := packer.Pack(context, cipher, data, de)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
-	cipher = cipher[:m]
+	return cipher[:m], de
+}
 
-	// Now unpack.
-	clear := make([]byte, 1024)
-	m, err = packer.Unpack(context, clear, cipher, de)
+// doUnpack unpacks cipher for a dir entry and returns the clear text.
+func doUnpack(t testing.TB, cipher []byte, de *upspin.DirEntry) []byte {
+	packer := plainPack{}
+	n := packer.UnpackLen(context, cipher, de)
+	if n < 1 {
+		t.Fatalf("UnpackLen failed with size %d", n)
+	}
+	clear := make([]byte, n)
+	m, err := packer.Unpack(context, clear, cipher, de)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
-	clear = clear[:m]
-	str := string(clear[:m])
-	if str != text {
-		t.Errorf("text: expected %q; got %q", text, str)
+	return clear[:m]
+}
+
+func benchmarkPlainPack(b *testing.B, fileSize int) {
+	data := make([]byte, fileSize)
+	n, err := rand.Read(data)
+	if err != nil {
+		b.Fatal(err)
+	}
+	if n != fileSize {
+		b.Fatalf("Not enough random bytes: got %d, expected %d", n, fileSize)
+	}
+	data = data[:n]
+	for i := 0; i < b.N; i++ {
+		doPack(b, upspin.PathName("bench@upspin.io/foo.txt"), data)
 	}
 }
+
+func BenchmarkPlainPack_1byte(b *testing.B)  { benchmarkPlainPack(b, 1) }
+func BenchmarkPlainPack_1kbyte(b *testing.B) { benchmarkPlainPack(b, 1024) }
+func BenchmarkPlainPack_1Mbyte(b *testing.B) { benchmarkPlainPack(b, 1024*1024) }
