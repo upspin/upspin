@@ -38,7 +38,7 @@ func newContext(name upspin.UserName) *upspin.Context {
 	return context
 }
 
-func setup(userName upspin.UserName) *upspin.Context {
+func setup(userName upspin.UserName, key upspin.PublicKey) *upspin.Context {
 	context := newContext(userName)
 	user, err := bind.User(context, context.User)
 	if err != nil {
@@ -52,7 +52,9 @@ func setup(userName upspin.UserName) *upspin.Context {
 	if err != nil {
 		panic(err)
 	}
-	key := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	if key == "" {
+		key = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	}
 	user.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 	return context
 }
@@ -64,7 +66,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	client := New(setup(user))
+	client := New(setup(user, ""))
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -87,7 +89,7 @@ const (
 )
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
-	client := New(setup(user))
+	client := New(setup(user, ""))
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -306,7 +308,7 @@ func TestFileZeroFill(t *testing.T) {
 
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
-	client := New(setup(user))
+	client := New(setup(user, ""))
 	var err error
 	var paths []*upspin.DirEntry
 	checkPaths := func(expPaths ...string) {
@@ -344,7 +346,7 @@ func TestGlob(t *testing.T) {
 
 func TestLinkAndRename(t *testing.T) {
 	const user = "link@a.com"
-	client := New(setup(user))
+	client := New(setup(user, ""))
 	original := upspin.PathName(fmt.Sprintf("%s/original", user))
 	text := "the rain in spain"
 	if _, err := client.Put(original, []byte(text)); err != nil {
