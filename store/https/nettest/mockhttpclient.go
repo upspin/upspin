@@ -71,10 +71,11 @@ func NewMockHTTPResponse(statusCode int, bodyType string, data []byte) MockHTTPR
 	header.Add(contentLength, fmt.Sprint(len(data)))
 	status := fmt.Sprint(statusCode)
 	resp := &http.Response{
-		Status:     status,
-		StatusCode: statusCode,
-		Header:     header,
-		Body:       &readCloser{bytes.NewReader(data)},
+		Status:        status,
+		StatusCode:    statusCode,
+		Header:        header,
+		Body:          &readCloser{bytes.NewReader(data)},
+		ContentLength: int64(len(data)),
 	}
 	return MockHTTPResponse{Error: nil, Response: resp}
 }

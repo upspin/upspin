@@ -146,6 +146,12 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
+
+	// Lock the user root
+	mu := userLock(parsed.User())
+	mu.Lock()
+	defer mu.Unlock()
+
 	if err := verifyMetadata(op, dirEntry.Name, dirEntry.Metadata); err != nil {
 		return err
 	}
@@ -172,10 +178,6 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 
 	canonicalPath := parsed.Path()
 	parentParsedPath := parsed.Drop(1) // Can't fail as parsed is NOT root.
-
-	mu := pathLock(parentParsedPath.Path())
-	mu.Lock()
-	defer mu.Unlock()
 
 	// Verify whether there's a directory with same name.
 	existingDirEntry, err := d.getNonRoot(canonicalPath)
@@ -262,6 +264,10 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, newDirError(op, pathName, err.Error())
 	}
 
+	mu := userLock(parsed.User())
+	mu.Lock()
+	defer mu.Unlock()
+
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
 	canRead, err := d.hasRight(op, d.context.UserName, access.Read, &parsed)
 	if err != nil {
@@ -316,6 +322,10 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 		return "", newDirError(op, pathName, err.Error())
 	}
 
+	mu := userLock(parsed.User())
+	mu.Lock()
+	defer mu.Unlock()
+
 	accessPath, acc, err := d.whichAccess(op, &parsed)
 	if err != nil {
 		return "", err
@@ -353,6 +363,11 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, newDirError(op, pathName, err.Error())
 	}
+
+	mu := userLock(parsed.User())
+	mu.Lock()
+	defer mu.Unlock()
+
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
 	if err != nil {
@@ -441,6 +456,10 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 		return newDirError(op, pathName, err.Error())
 	}
 
+	mu := userLock(parsed.User())
+	mu.Lock()
+	defer mu.Unlock()
+
 	user := d.context.UserName
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
 	canDelete, err := d.hasRight(op, user, access.Delete, &parsed)
@@ -452,16 +471,6 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	if !canDelete {
 		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
 	}
-
-	var mu *sync.Mutex
-	if parsed.IsRoot() {
-		mu = pathLock(parsed.Path())
-	} else {
-		parentPath := path.DropPath(parsed.Path(), 1)
-		mu = pathLock(parentPath)
-	}
-	mu.Lock()
-	defer mu.Unlock()
 
 	// Locate the entry first.
 	dirEntry, _, err := d.getDirEntry(&parsed)
