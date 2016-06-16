@@ -53,6 +53,9 @@ const (
 	IO                     // External I/O error such as network failure.
 	Exist                  // Item already exists.
 	NotExist               // Item does not exist.
+	NotFile                // File operation on a directory.
+	NotDir                 // Directory operation on a File.
+	NotEmpty               // Directory not empty.
 )
 
 func (k Kind) String() string {
@@ -71,6 +74,12 @@ func (k Kind) String() string {
 		return "item does not exist"
 	case Other:
 		return "other error"
+	case NotFile:
+		return "file operation on a directory"
+	case NotDir:
+		return "directory operation on a file"
+	case NotEmpty:
+		return "directory not empty"
 	}
 	return "unknown error kind"
 }
@@ -95,6 +104,9 @@ func (k Kind) String() string {
 //
 // If the error is printed, only those items that have been
 // set to non-zero values will appear in the result.
+//
+// If Kind is not specified or Other, we set it to the Kind of
+// the underlying error.
 //
 func E(args ...interface{}) error {
 	if len(args) == 0 {
@@ -134,6 +146,12 @@ func E(args ...interface{}) error {
 			log.Printf("errors.E: bad call from %s:%d: %v", file, line, args)
 			return Errorf("unknown type %T, value %v in error call", arg, arg)
 		}
+	}
+	if e.Kind != Other || e.Err == nil {
+		return e
+	}
+	if prev, ok := e.Err.(*Error); ok {
+		e.Kind = prev.Kind
 	}
 	return e
 }

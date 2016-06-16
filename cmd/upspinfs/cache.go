@@ -18,6 +18,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
@@ -70,13 +71,13 @@ func (c *cache) mkTemp() string {
 // The corresponding node should be locked.
 func (c *cache) create(h *handle) error {
 	if h.n.cf != nil {
-		return eio("unexpected create of an open file")
+		return errors.E(errors.IO, errors.Str("create of an open file"))
 	}
 	cf := &cachedFile{c: c, dirty: true}
 	cf.fname = c.mkTemp()
 	var err error
 	if cf.file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-		return eio("creating %q file %q: %s", h.n.uname, cf.fname, err)
+		return err
 	}
 	h.n.cf = cf
 	return nil
@@ -97,11 +98,11 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	cf := &cachedFile{c: c, inStore: true}
 	dir, err := n.f.dc.lookup(n.user)
 	if err != nil {
-		return enoent("%q", n.user)
+		return err
 	}
 	de, err := dir.Lookup(n.uname)
 	if err != nil {
-		return enoent("%q", n.uname)
+		return err
 	}
 
 	// Loop following redirects from the store.
@@ -111,7 +112,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		loc := locations[i]
 		store, err := bind.Store(n.f.context, loc.Endpoint)
 		if err != nil {
-			finalErr = eio("%s bind.Store %v", err, loc)
+			finalErr = err
 			continue
 		}
 		var cdir string
@@ -135,7 +136,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		var data []byte
 		var locs []upspin.Location
 		if data, locs, err = store.Get(loc.Reference); err != nil {
-			finalErr = eio("%s Get %q ref %q file %q", err, n.uname, loc.Reference, cf.fname)
+			finalErr = err
 			continue
 		}
 		if len(locs) > 0 {
@@ -153,18 +154,18 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		}
 		packer := pack.Lookup(de.Metadata.Packing())
 		if packer == nil {
-			finalErr = eio("couldn't lookup %q ref %q file %q", n.uname, loc.Reference, cf.fname)
+			finalErr = errors.E(errors.IO, errors.Str("no packer found"))
 			continue
 		}
 		clearLen := packer.UnpackLen(n.f.context, data, de)
 		if clearLen < 0 {
-			finalErr = eio("couldn't unpack %q ref %q file %q", h.n.uname, loc.Reference, cf.fname)
+			finalErr = errors.E(errors.IO, errors.Str("unpack len < 0"))
 			continue
 		}
 		cleartext := make([]byte, clearLen)
 		rlen, err := packer.Unpack(n.f.context, cleartext, data, de)
 		if err != nil {
-			finalErr = eio("%s unpacking %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
+			finalErr = err
 			continue
 		}
 		cleartext = cleartext[:rlen]
@@ -173,12 +174,12 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 			os.Mkdir(cdir, 0777)
 			if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-				return eio("%s creating %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
+				return err
 			}
 		}
 		if wlen, err := file.Write(cleartext); err != nil || rlen != wlen {
 			file.Close()
-			return eio("%s writing %q ref %q file %q", err, h.n.uname, loc.Reference, cf.fname)
+			return err
 		}
 		cf.file = file
 		h.flags = flags
@@ -214,7 +215,7 @@ func (cf *cachedFile) markDirty() error {
 	fname := cf.c.mkTemp()
 	err := os.Rename(cf.fname, fname)
 	if err != nil {
-		return eio("renaming %q to %q: %s", cf.fname, fname, err)
+		return err
 	}
 	cf.fname = fname
 	return nil
@@ -244,14 +245,14 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	log.Debug.Printf("writeBack %q, %s opened", n, cf.fname)
 	info, err := cf.file.Stat()
 	if err != nil {
-		return eio("stating %q (%q): %s", cf.fname, n.uname, err)
+		return err
 	}
 	cleartext := make([]byte, info.Size())
 	var sofar int64
 	for sofar != info.Size() {
 		len, err := cf.file.ReadAt(cleartext[sofar:], sofar)
 		if err != nil {
-			return eio("reading %q (%q): %s", cf.fname, n.uname, err)
+			return err
 		}
 		sofar += int64(len)
 	}
@@ -272,7 +273,7 @@ func (cf *cachedFile) writeBack(h *handle) error {
 			break
 		}
 		if tries > 5 || !strings.Contains(err.Error(), "unreachable") {
-			return eio("writing back %s (%q): %s", cf.fname, n.uname, err)
+			return err
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -285,7 +286,7 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	if err := os.Rename(cf.fname, fname); err != nil {
 		os.Mkdir(cdir, 0700)
 		if err := os.Rename(cf.fname, fname); err != nil {
-			return eio("renaming %s to %s: %s", cf.fname, fname, err)
+			return err
 		}
 	}
 	cf.fname = fname
@@ -303,7 +304,7 @@ func (c *cache) putRedirect(n *node, target string) error {
 	// Use the client library to write it.
 	loc, err := c.client.Put(n.uname, []byte(target))
 	if err != nil {
-		return eio("writing symlink %s: %s", n.uname, err)
+		return err
 	}
 
 	// Save it in the cache. If we can't, that's fine.
