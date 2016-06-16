@@ -7,8 +7,7 @@
 package proto
 
 import (
-	"errors"
-
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -50,7 +49,7 @@ func UpspinDirEntry(b []byte) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	if len(b) != 0 {
-		return nil, errors.New("proto.UpspinDirEntries: extra data")
+		return nil, errors.E("proto.UpspinDirEntry", errors.Syntax, errors.Str("extra data"))
 	}
 	return &d, nil
 }

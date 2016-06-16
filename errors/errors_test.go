@@ -2,36 +2,45 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package errors_test
+package errors
 
 import (
-	"fmt"
+	"testing"
 
-	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
-func ExampleError() {
+func TestMarshal(t *testing.T) {
 	path := upspin.PathName("jane@doe.com/file")
 	user := upspin.UserName("joe@blow.com")
-	err := fmt.Errorf("network unreachable")
+	err := Str("network unreachable")
 
-	// Single error.
-	e1 := errors.E(path, "Get", errors.IO, err)
-	fmt.Println("\nSimple error:")
-	fmt.Println(e1)
+	// Single error. No user is set, so we will have a zero-length field inside.
+	e1 := E(path, "Get", IO, err)
 
 	// Nested error.
-	fmt.Println("\nNested error:")
-	e2 := errors.E(path, user, "Read", errors.Other, e1)
-	fmt.Println(e2)
+	e2 := E(path, user, "Read", Other, e1)
 
-	// Output:
-	//
-	// Simple error:
-	// jane@doe.com/file: Get: I/O error: network unreachable
-	//
-	// Nested error:
-	// jane@doe.com/file, for joe@blow.com: Read:
-	//	jane@doe.com/file: Get: I/O error: network unreachable
+	b := MarshalError(e2)
+	e3 := UnmarshalError(b)
+
+	in := e2.(*Error)
+	out := e3.(*Error)
+	// Compare elementwise.
+	if in.Path != out.Path {
+		t.Errorf("expected Path %q; got %q", in.Path, out.Path)
+	}
+	if in.User != out.User {
+		t.Errorf("expected User %q; got %q", in.User, out.User)
+	}
+	if in.Op != out.Op {
+		t.Errorf("expected Op %q; got %q", in.Op, out.Op)
+	}
+	if in.Kind != out.Kind {
+		t.Errorf("expected kind %d; got %d", in.Kind, out.Kind)
+	}
+	// Note that error will have lost type information, so just check its Error string.
+	if in.Err.Error() != out.Err.Error() {
+		t.Errorf("expected Err %q; got %q", in.Err, out.Err)
+	}
 }
