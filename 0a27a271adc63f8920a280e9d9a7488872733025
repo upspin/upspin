@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_71856a1b",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:04:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4959bc44_0e04cf0b",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4959bc44_ce059708",
         "filename": "cmd/webspin/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-16T23:15:24Z",
       "side": 1,
       "message": "s/defined/configured/\ns/their //",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_8e7c3f05",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:04:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4959bc44_ce059708",
       "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_2e9b13df",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:04:59Z",
+      "side": 1,
+      "message": "Ack. I expect whatever environment this runs in will provide an -http argument.",
+      "parentUuid": "b4f8d1fb_9db0b65c",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_9ddef670",
         "filename": "cmd/webspin/main.go",
         "patchSetId": 1
@@ -81,6 +135,24 @@
       "writtenOn": "2016-06-16T15:34:13Z",
       "side": 1,
       "message": "Does this need to exported? And if so, godoc comment?",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_0ea04f0b",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:04:59Z",
+      "side": 1,
+      "message": "No it doesn\u0027t. Unexported.",
+      "parentUuid": "b4f8d1fb_9ddef670",
       "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -116,6 +188,24 @@
       "side": 1,
       "message": "I\u0027d do cli.Glob(path) first to see what you get. Maybe the URL contained something like a@b.com/*.txt. Then, based on that, you either do a get or display the DirEntry(ies) returned. It\u0027s still two lookups, but it handles the glob operation in one go.",
       "parentUuid": "b4f8d1fb_ba713896",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_71fe8a75",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:04:59Z",
+      "side": 1,
+      "message": "Thats\u0027 a much better approach. I\u0027ve adopted it. Thanks.",
+      "parentUuid": "b4f8d1fb_3dd1a264",
       "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
