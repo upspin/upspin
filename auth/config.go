@@ -6,12 +6,13 @@ package auth
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"upspin.io/access"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/user/usercache"
 )
@@ -35,24 +36,25 @@ const (
 
 // NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
 func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {
+	const NewDefaultTLSConfig = "NewDefaultTLSConfig"
 	certReadable, err := isReadableFile(certFile)
 	if err != nil {
-		return nil, fmt.Errorf("Problem with SSL certificate in %q: %q", certFile, err)
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("SSL certificate in %q: %q", certFile, err))
 	}
 	if !certReadable {
-		return nil, fmt.Errorf("Certificate %q not readable", certFile)
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("certificate file %q not readable", certFile))
 	}
 	keyReadable, err := isReadableFile(certKeyFile)
 	if err != nil {
-		return nil, fmt.Errorf("Problem with SSL key %q: %v", certKeyFile, err)
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("SSL key in %q: %v", certKeyFile, err))
 	}
 	if !keyReadable {
-		return nil, fmt.Errorf("Certificate key %q not readable", certKeyFile)
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("certificate key file %q not readable", certKeyFile))
 	}
 
 	cert, err := tls.LoadX509KeyPair(certFile, certKeyFile)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(NewDefaultTLSConfig, err)
 	}
 
 	tlsConfig := &tls.Config{
@@ -86,7 +88,7 @@ func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, 
 		log.Printf("Calling User.Lookup for user %s", userName)
 		_, keys, err := user.Lookup(userName)
 		log.Printf("Lookup answered: %v, %v", keys, err)
-		return keys, err
+		return keys, errors.E("PublicUserKeyService", err)
 	}
 }
 
@@ -103,12 +105,12 @@ func isReadableFile(path string) (bool, error) {
 		return false, err // Item is problematic.
 	}
 	if info.IsDir() {
-		return false, errors.New("is directory")
+		return false, errors.Str("is directory")
 	}
 	// Is it readable?
 	fd, err := os.Open(path)
 	if err != nil {
-		return false, errors.New("permission denied")
+		return false, access.ErrPermissionDenied
 	}
 	fd.Close()
 	return true, nil // Item exists and is readable.

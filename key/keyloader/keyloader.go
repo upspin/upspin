@@ -6,34 +6,34 @@
 package keyloader
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
 )
 
 const (
-	noKeysFound  = "no keys found"
 	keyloaderErr = "keyloader: %v"
 )
 
 var (
-	errNilContext = errors.New("nil context")
-	zeroPrivKey   upspin.KeyPair
-	zeroPubKey    upspin.PublicKey
+	errNoKeysFound = errors.Str("no keys found")
+	errNilContext  = errors.Str("nil context")
+	zeroPrivKey    upspin.KeyPair
+	zeroPubKey     upspin.PublicKey
 )
 
 // Load reads a key pair from the user's .ssh directory and loads
 // them into the context.
 func Load(context *upspin.Context) error {
 	if context == nil {
-		return errNilContext
+		return errors.E(Load, errors.Invalid, errors.Str("nil context"))
 	}
-	k, err := privateKey()
+	k, err := privateKey("Load")
 	if err != nil {
 		return err
 	}
@@ -42,10 +42,10 @@ func Load(context *upspin.Context) error {
 }
 
 // publicKey returns the public key of the current user by reading from $HOME/.ssh/.
-func publicKey() (upspin.PublicKey, error) {
+func publicKey(op string) (upspin.PublicKey, error) {
 	f, err := os.Open(filepath.Join(sshdir(), "public.upspinkey"))
 	if err != nil {
-		return zeroPubKey, fmt.Errorf(noKeysFound)
+		return zeroPubKey, errors.E(op, errors.NotExist, errNoKeysFound)
 	}
 	defer f.Close()
 	buf := make([]byte, 400) // enough for p521
@@ -57,10 +57,10 @@ func publicKey() (upspin.PublicKey, error) {
 }
 
 // privateKey returns the private key of the current user by reading from $HOME/.ssh/.
-func privateKey() (upspin.KeyPair, error) {
+func privateKey(op string) (upspin.KeyPair, error) {
 	f, err := os.Open(filepath.Join(sshdir(), "secret.upspinkey"))
 	if err != nil {
-		return zeroPrivKey, fmt.Errorf(noKeysFound)
+		return zeroPrivKey, errors.E(op, errors.NotExist, errNoKeysFound)
 	}
 	defer f.Close()
 	buf := make([]byte, 200) // enough for p521
@@ -70,7 +70,7 @@ func privateKey() (upspin.KeyPair, error) {
 	}
 	buf = buf[:n]
 	buf = []byte(strings.TrimSpace(string(buf)))
-	pubkey, err := publicKey()
+	pubkey, err := publicKey(op)
 	if err != nil {
 		return zeroPrivKey, err
 	}

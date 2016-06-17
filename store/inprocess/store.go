@@ -6,10 +6,10 @@
 package inprocess
 
 import (
-	"errors"
 	"sync"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/upspin"
 )
@@ -59,8 +59,15 @@ func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 }
 
 // Delete implements upspin.Store
-func (s *service) Delete(upspin.Reference) error {
-	return errors.New("Not implemented yet")
+func (s *service) Delete(ref upspin.Reference) error {
+	s.data.mu.Lock()
+	defer s.data.mu.Unlock()
+	_, ok := s.data.blob[ref]
+	if !ok {
+		return errors.E("Delete", errors.NotExist, "no such blob")
+	}
+	delete(s.data.blob, ref)
+	return nil
 }
 
 // DeleteAll deletes all data from memory.
@@ -73,17 +80,18 @@ func (s *service) DeleteAll() {
 // Get implements upspin.Store
 // TODO: Get should provide alternate location if missing.
 func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
+	const Get = "Get"
 	if ref == "" {
-		return nil, nil, errors.New("empty reference")
+		return nil, nil, errors.E(Get, errors.Invalid, errors.Str("empty reference"))
 	}
 	s.data.mu.Lock()
 	data, ok := s.data.blob[ref]
 	s.data.mu.Unlock()
 	if !ok {
-		return nil, nil, errors.New("no such blob")
+		return nil, nil, errors.E(Get, errors.NotExist, "no such blob")
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
-		return nil, nil, errors.New("internal hash mismatch in Store.Get")
+		return nil, nil, errors.E(Get, errors.Invalid, "internal hash mismatch in Store.Get")
 	}
 	return copyOf(data), nil, nil
 }
@@ -94,7 +102,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 // TODO: Authenticate the caller.
 func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
-		return nil, errors.New("store/inprocess: unrecognized transport")
+		return nil, errors.E("Store", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
