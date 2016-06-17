@@ -8,14 +8,14 @@
 #
 # Usage:
 #
-# ./deploy-servers.sh [user|directory|store|frontend] [-d] [-b] [-t]
+# ./deploy-servers.sh [userserver|dirserver|storeserver|frontend] [-d] [-b] [-t]
 #
 # If a server name is not given, all are rebuilt and redeployed.
 # -d deploy only -- does not rebuild servers.
 # -b build only -- does not deploy servers.
 # -r restarts only -- does not build nor deploy servers.
 # -t when deploying, deploy testing instances only.
-#    Only store and directory available as testing.
+#    Only storeserver and dirserver available as testing.
 #    Does not affect the build command.
 
 errors=()
