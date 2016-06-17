@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9a9905f_25e6aef2",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:46:30Z",
+      "side": 1,
+      "message": "Consider adding an example_test.go file with an example of how the api should be used. Besides the obvious documentation benefit, it\u0027ll help guide the design discussion.",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9a9905f_45d72afb",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:46:30Z",
+      "side": 1,
+      "message": "Name this Start? That way it\u0027s obvious that the span\u0027s start time is now.\n\nm :\u003d metric.New(\"foo\")\ndefer m.Done()\n\nspan :\u003d m.Start(\"op\")\n// op\nspan.End()\n\ndefer m.Start(\"last op\").End()",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9a9905f_05e132d9",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:46:30Z",
+      "side": 1,
+      "message": "How does storage get configured?\nI think that will become an important piece of this.",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9a9905f_65dca61e",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-17T00:46:30Z",
+      "side": 1,
+      "message": "Why is it convenient to return a *Metric? Where would that be used?",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
