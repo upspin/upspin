@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_7c69c1e3",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T01:29:38Z",
+      "side": 1,
+      "message": "How about StartSpan? It\u0027s weird to start a metric several times.",
+      "parentUuid": "e9a9905f_45d72afb",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9a9905f_05e132d9",
         "filename": "metrics/metrics.go",
         "patchSetId": 2
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_bcb3b9ab",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T01:29:38Z",
+      "side": 1,
+      "message": "I was thinking about adding a Connect() method like cloud.GCP and log, but I it\u0027s probably cleaner and more testable to pass an interface to New and that interface would only have the following method:\n\ntype StoreLogs interface {\n    Store(m *Metric) err\n}\n\nthen each implementation can initialize it anyway it wants to. \n\nSomething like that.",
+      "parentUuid": "e9a9905f_05e132d9",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9a9905f_65dca61e",
         "filename": "metrics/metrics.go",
         "patchSetId": 2
@@ -64,6 +100,24 @@
       "writtenOn": "2016-06-17T00:46:30Z",
       "side": 1,
       "message": "Why is it convenient to return a *Metric? Where would that be used?",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_9c991532",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T01:29:38Z",
+      "side": 1,
+      "message": "See the test for an example. Just a quick way to end a metric:\n\ns :\u003d m.AddSpan(\"begin\")\n// ...\ns \u003d m.AddSpan(\"last thing\")\n// ...\ns.End().Done()\n\nOr, to begin a new span:\n\ns \u003d s.End().AddSpan(\"next span\")\n\nThe defer option you suggested is okay too, but does not allow this short notation above.\n\nI originally had it returning the Span itself, but there\u0027s no reason to daisy-chain it, so maybe returning the metric is not so bad? I will add an example test to clarify.\n\nThoughts?",
+      "parentUuid": "e9a9905f_65dca61e",
       "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
