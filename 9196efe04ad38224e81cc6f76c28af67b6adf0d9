@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_c563e42d",
+        "filename": "auth/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T23:28:11Z",
+      "side": 1,
+      "message": "Since you\u0027re here, you can change s/SSL/TLS/",
+      "revId": "9196efe04ad38224e81cc6f76c28af67b6adf0d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_e570e0f1",
+        "filename": "auth/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T23:28:11Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "9196efe04ad38224e81cc6f76c28af67b6adf0d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
