@@ -7,12 +7,13 @@ package sha256key
 
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
+
+	"upspin.io/errors"
 )
 
 var (
-	errHashFormat = errors.New("bad hash format")
+	errHashFormat = errors.Str("bad hash format")
 )
 
 // Size is the number of bytes in a hash.
