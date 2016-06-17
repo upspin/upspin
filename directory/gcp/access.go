@@ -17,7 +17,7 @@ import (
 
 // updateAccess handles fetching and parsing a new or updated Access file and caches its parsed representation in root.accessFiles.
 // It must be called with userlock held.
-func (d *directory) updateAccess(accessPath *path.Parsed, location *upspin.Location) error {
+func (d *directory) updateAccess(accessPath *path.Parsed, location *upspin.Location, opts ...options) error {
 	buf, err := d.storeGet(location)
 	if err != nil {
 		return err
@@ -29,12 +29,12 @@ func (d *directory) updateAccess(accessPath *path.Parsed, location *upspin.Locat
 	}
 
 	user := accessPath.User()
-	root, err := d.getRoot(user)
+	root, err := d.getRoot(user, opts...)
 	if err != nil {
 		return err
 	}
 	root.accessFiles[accessPath.Path()] = acc
-	err = d.putRoot(user, root)
+	err = d.putRoot(user, root, opts...)
 	if err != nil {
 		return err
 	}
@@ -64,20 +64,20 @@ func (d *directory) deleteAccess(accessPath *path.Parsed) error {
 // hasRight reports whether the user has the right on the path. It's assumed that all prior verifications have taken
 // place, such as verifying whether the user is writing to a file that existed as a directory or vice-versa, etc.
 // It must be called with userlock held.
-func (d *directory) hasRight(op string, user upspin.UserName, right access.Right, parsedPath *path.Parsed) (bool, error) {
-	_, acc, err := d.whichAccess(op, parsedPath)
+func (d *directory) hasRight(op string, user upspin.UserName, right access.Right, parsedPath *path.Parsed, opts ...options) (bool, error) {
+	_, acc, err := d.whichAccess(op, parsedPath, opts...)
 	if err != nil {
 		return false, err
 	}
-	return d.checkRights(user, right, parsedPath.Path(), acc)
+	return d.checkRights(user, right, parsedPath.Path(), acc, opts...)
 }
 
 // whichAccess returns the path name and the parsed contents of the ruling Access file for a given path name.
 // It must be called with userlock held.
 // TODO: we should cache this computation as it requires parsing paths, traversing them, doing drop, joins, etc.
-func (d *directory) whichAccess(op string, parsedPath *path.Parsed) (upspin.PathName, *access.Access, error) {
+func (d *directory) whichAccess(op string, parsedPath *path.Parsed, opts ...options) (upspin.PathName, *access.Access, error) {
 	user := parsedPath.User()
-	root, err := d.getRoot(user)
+	root, err := d.getRoot(user, opts...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -91,7 +91,7 @@ func (d *directory) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 			if accessDir.IsRoot() {
 				// Not locking the path here as this is just to check existence of it and it's
 				// racy by nature (i.e. the lock wouldn't prevent races as soon as it's released).
-				_, err := d.getNonRoot(accessPath)
+				_, err := d.getNonRoot(accessPath, opts...)
 				if err == errEntryNotFound {
 					return "", acc, nil // The Access file does not exist.
 				}
@@ -116,7 +116,7 @@ func (d *directory) whichAccess(op string, parsedPath *path.Parsed) (upspin.Path
 
 // checkRights is a convenience function that applies the Can method of the access entry given using the user, right and path provided.
 // It must be called with userlock held.
-func (d *directory) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access) (bool, error) {
+func (d *directory) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access, opts ...options) (bool, error) {
 	can, err := acc.Can(user, right, pathName, d.load)
 	log.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
 	return can, err

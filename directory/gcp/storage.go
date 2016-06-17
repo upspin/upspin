@@ -28,21 +28,27 @@ var (
 // getDirEntry is a convenience function that returns a directory entry for the path, regardless whether it's a root
 // or a regular path. If it's a root, it also returns the root entry.
 // It must be called with userlock held.
-func (d *directory) getDirEntry(path *path.Parsed) (*upspin.DirEntry, *root, error) {
+func (d *directory) getDirEntry(path *path.Parsed, opts ...options) (*upspin.DirEntry, *root, error) {
+	ss := getSpan(opts...).StartSubSpan("getDirEntry")
+	defer ss.End()
+
 	if path.IsRoot() {
-		root, err := d.getRoot(path.User())
+		root, err := d.getRoot(path.User(), opts...)
 		if err != nil {
 			return nil, nil, err
 		}
 		return &root.dirEntry, root, nil
 	}
-	de, err := d.getNonRoot(path.Path())
+	de, err := d.getNonRoot(path.Path(), opts...)
 	return de, nil, err
 }
 
 // getNonRoot returns the dir entry for the given path, possibly going to stable storage to find it.
 // It must be called with userlock held.
-func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
+func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
+	ss := getSpan(opts...).StartSubSpan("getNonRoot")
+	defer ss.End()
+
 	log.Printf("Looking up dir entry %q", path)
 
 	// Check cache first.
@@ -58,7 +64,7 @@ func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	var savedDirEntry upspin.DirEntry
 
-	buf, err := d.getCloudBytes(path)
+	buf, err := d.getCloudBytes(path, opts...)
 	if err != nil {
 		if err == errEntryNotFound {
 			// Add to the negative cache
@@ -77,9 +83,12 @@ func (d *directory) getNonRoot(path upspin.PathName) (*upspin.DirEntry, error) {
 // putNonRoot forcibly writes to stable storage the given dir entry at the canonical path on the
 // backend without checking anything but the marshaling.
 // It must be called with userlock held.
-func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) error {
+func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, opts ...options) error {
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
+
+	ss := getSpan(opts...).StartSubSpan("putNonRoot")
+	defer ss.End()
 
 	d.dirCache.Add(path, *dirEntry)
 	d.dirNegCache.Remove(path) // remove from the negative cache in case it was there.
@@ -91,7 +100,9 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry) 
 		return newDirError("putmeta", path, errMsg)
 	}
 	log.Printf("Storing dir entry at %q", path)
+	ss2 := ss.StartSubSpan("putCloudBytes")
 	_, err = d.cloudClient.Put(string(path), jsonBuf)
+	ss2.End()
 	return err
 }
 
@@ -110,8 +121,11 @@ func (d *directory) isDirEmpty(path upspin.PathName) error {
 }
 
 // getCloudBytes fetches the path from the storage backend.
-func (d *directory) getCloudBytes(path upspin.PathName) ([]byte, error) {
+func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte, error) {
 	log.Printf("Downloading DirEntry from GCP: %s", path)
+	ss := getSpan(opts...).StartSubSpan("getCloudBytes")
+	defer ss.End()
+
 	data, err := d.cloudClient.Download(string(path))
 	if err != nil {
 		// TODO: differentiate FILE NOT FOUND from other errors.
