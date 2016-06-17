@@ -5,13 +5,13 @@
 package usercache
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 	"time"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 
 	"strings"
@@ -180,7 +180,7 @@ func (s *service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 	if e, ok := s.entries[string(name)]; ok {
 		return e.eps, e.pks, nil
 	}
-	return nil, nil, errors.New("not found")
+	return nil, nil, errors.E("Lookup", name, errors.NotExist)
 }
 
 func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {

@@ -6,7 +6,7 @@ package upspin
 
 import (
 	"encoding/binary"
-	"errors"
+	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
 	"time"
 )
 
