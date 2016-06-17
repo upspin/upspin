@@ -11,11 +11,11 @@ package debugpack
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"io"
 	"math/rand"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -30,10 +30,8 @@ func init() {
 }
 
 var (
-	errTooShort     = errors.New("TestPack: destination slice too short")
-	errBadMetadata  = errors.New("bad metadata")
-	errBadSignature = errors.New("signature validation failed")
-	errNoKey        = errors.New("no key for signature")
+	errTooShort    = errors.Str("destination slice too short")
+	errBadMetadata = errors.Str("bad metadata")
 )
 
 func (testPack) Packing() upspin.Packing {
@@ -98,24 +96,25 @@ func addSignature(meta *upspin.Metadata, signature byte) error {
 }
 
 func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	const Pack = "Pack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
-		return 0, err
+		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, err)
 	}
 	name := dirEntry.Name
 	if len(name) > 64*1024 {
-		return 0, errors.New("name too long")
+		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errors.Str("name too long"))
 	}
 	if len(cleartext) > 1024*1024*1024 {
-		return 0, errors.New("cleartext too long")
+		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errors.Str("cleartext too long"))
 	}
 	if len(ciphertext) < len(cleartext) {
-		return 0, errTooShort
+		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errTooShort)
 	}
 	ciphertext = ciphertext[:len(cleartext)]
 	cb, err := cryptByte(meta, true)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, err)
 	}
 	addSignature(meta, sign(context, cleartext, dirEntry.Name))
 	putPath(meta, dirEntry.Name)
@@ -126,16 +125,17 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 }
 
 func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+	const Unpack = "Unpack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
 	}
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
-		return 0, errors.New("testPack.Unpack: crazy length")
+		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, errors.Str("ciphertext too long"))
 	}
 	cb, err := cryptByte(meta, false)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
 	}
 	br := bytes.NewReader(ciphertext)
 	cr := cryptByteReader{cb, br}
@@ -146,13 +146,13 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 			break
 		}
 		if i >= len(cleartext) {
-			return 0, errTooShort
+			return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, errTooShort)
 		}
 		cleartext[i] = c
 	}
 	signature := sign(context, cleartext[:i], dirEntry.Name)
 	if len(meta.Packdata) < 3 || signature != meta.Packdata[2] {
-		return 0, errBadSignature
+		return 0, errors.E("Unpack", dirEntry.Name, errors.Invalid, errors.Str("signature validation failed"))
 	}
 	return i, nil
 }
@@ -198,12 +198,13 @@ func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
 
 // Name implements upspin.Pack.Name.
 func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+	const Name = "Name"
 	if dirEntry.IsDir() {
-		return errors.New("Name: cannot rename directory")
+		return errors.E(Name, errors.Invalid, dirEntry.Name, "cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
 	if err != nil {
-		return err
+		return errors.E(Name, err)
 	}
 	meta := &dirEntry.Metadata
 
@@ -212,13 +213,16 @@ func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName ups
 	dirEntry.Name = name
 	oldName, err := getPath(meta)
 	if err != nil {
-		return err
+		return errors.E(Name, errors.Invalid, dirEntry.Name, err)
 	}
 	putPath(meta, name)
 
 	// Remove old name from signature.
 	signature := meta.Packdata[2]
 	key, err := getKey(ctx, oldName)
+	if err != nil {
+		panic(err)
+	}
 	for i, c := range []byte(oldName) {
 		signature ^= c ^ key[i%len(key)]
 	}
@@ -249,7 +253,7 @@ func getKey(ctx *upspin.Context, name upspin.PathName) (upspin.PublicKey, error)
 		return "", err
 	}
 	if len(keys) == 0 {
-		return "", errors.New("no keys for signing in DebugPack")
+		return "", errors.Str("no keys for signing")
 	}
 	return keys[0], nil
 }

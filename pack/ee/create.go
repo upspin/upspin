@@ -13,6 +13,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
+	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
@@ -51,9 +52,10 @@ func (d *drng) Read(p []byte) (n int, err error) {
 
 // CreateKeys creates a key pair based on the chosen packing and a slice of entropy.
 func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error) {
+	const CreateKeys = "CreateKeys"
 	packer := pack.Lookup(packing)
 	if packer == nil {
-		return nil, fmt.Errorf("packing %v not registered", packing)
+		return nil, errors.E(CreateKeys, errors.Invalid, fmt.Errorf("packing %v not registered", packing))
 	}
 	var keyType string
 	var curve elliptic.Curve
@@ -68,12 +70,12 @@ func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error)
 		keyType = (packer.(eep521)).packerString
 		curve = (packer.(eep521)).curve
 	default:
-		return nil, fmt.Errorf("invalid packing %d", packing)
+		return nil, errors.E(CreateKeys, errors.Invalid, fmt.Errorf("packing %d", packing))
 	}
 
 	priv, err := createKeysFromEntropy(curve, entropy)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(CreateKeys, errors.Invalid, err)
 	}
 	keypair := encodeKeys(priv, keyType)
 	return keypair, nil
@@ -109,7 +111,7 @@ func createKeysFromEntropy(curve elliptic.Curve, entropy []byte) (*ecdsa.Private
 	// Generate random key-pair.
 	priv, err := ecdsa.GenerateKey(curve, d)
 	if err != nil {
-		return nil, fmt.Errorf("key not generated: %s", err)
+		return nil, err
 	}
 	return priv, nil
 }

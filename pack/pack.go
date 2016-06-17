@@ -6,10 +6,10 @@
 package pack
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -56,10 +56,10 @@ func LookupByName(name string) upspin.Packer {
 
 var (
 	// ErrNilMetadata indicates that the metadata is nil.
-	ErrNilMetadata = errors.New("nil metadata")
+	ErrNilMetadata = errors.Str("nil metadata")
 
 	// ErrBadPacking indicates that the packing code is invalid.
-	ErrBadPacking = errors.New("metadata has incorrect or missing Packing value")
+	ErrBadPacking = errors.Str("metadata has incorrect or missing Packing value")
 )
 
 // CheckPackMeta verifies that the metadata satisfies the invariant for Pack and Packlen.

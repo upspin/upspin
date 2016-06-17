@@ -20,7 +20,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -29,6 +28,7 @@ import (
 	"golang.org/x/crypto/hkdf"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -68,11 +68,10 @@ type eep521 struct {
 }
 
 const (
-	aesKeyLen          = 32 // AES-256,random-key because public cloud should withstand multifile multikey attack.
-	p256               = "p256"
-	p384               = "p384"
-	p521               = "p521"
-	noKnownKeysForUser = "no known keys for user %s"
+	aesKeyLen = 32 // AES-256,random-key because public cloud should withstand multifile multikey attack.
+	p256      = "p256"
+	p384      = "p384"
+	p521      = "p521"
 )
 
 func init() {
@@ -106,11 +105,12 @@ const (
 )
 
 var (
-	errTooShort     = errors.New("destination slice too short")
-	errVerify       = errors.New("does not verify")
-	errNoWrappedKey = errors.New("no wrapped key for me")
-	errKeyLength    = errors.New("wrong key length")
-	sig0            upspin.Signature // for returning nil of correct type
+	errTooShort           = errors.Str("destination slice too short")
+	errVerify             = errors.Str("does not verify")
+	errNoWrappedKey       = errors.Str("no wrapped key for me")
+	errKeyLength          = errors.Str("wrong key length")
+	errNoKnownKeysForUser = errors.Str("no known keys for user")
+	sig0                  upspin.Signature // for returning nil of correct type
 )
 
 func (c common) Packing() upspin.Packing {
@@ -136,11 +136,12 @@ func (c common) String() string {
 }
 
 func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
+	const Pack = "Pack"
 	if err := pack.CheckPackMeta(c, &d.Metadata); err != nil {
-		return 0, err
+		return 0, errors.E(Pack, errors.Invalid, d.Name, err)
 	}
 	if len(ciphertext) < len(cleartext) {
-		return 0, errTooShort
+		return 0, errors.E(Pack, errors.Invalid, d.Name, errTooShort)
 	}
 	ciphertext = ciphertext[:len(cleartext)]
 
@@ -148,11 +149,11 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 	cipherLen, err := c.encrypt(ciphertext, cleartext, dkey)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 	b := sha256.Sum256(ciphertext)
 	cipherSum := b[:]
@@ -160,7 +161,7 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	// Sign ciphertext.
 	sig, err := ctx.Factotum.FileSign(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 
 	// Wrap for myself.
@@ -168,27 +169,28 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	wrap := make([]wrappedKey, 1)
 	p, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 	wrap[0], err = c.aesWrap(p, dkey)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 
 	// Serialize packer metadata.
 	err = c.pdMarshal(&d.Metadata.Packdata, sig, wrap, cipherSum)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Pack, d.Name, err)
 	}
 	return cipherLen, err
 }
 
 func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
+	const Unpack = "Unpack"
 	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
 	if len(cleartext) < len(ciphertext) {
-		return 0, errTooShort
+		return 0, errors.E(Unpack, errors.Invalid, d.Name, errTooShort)
 	}
 	cleartext = cleartext[:len(ciphertext)]
 
@@ -196,34 +198,34 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	dkey := make([]byte, aesKeyLen)
 	sig, wrap, _, err := c.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, d.Name, err)
 	}
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
-	owner := parsed.User()
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, err)
 	}
+	owner := parsed.User()
 	// The owner has a well-known public key
 	ownerRawPubKey, err := publicKey(ctx, owner, c.packerString)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, d.Name, err)
 	}
 	ownerPubKey, err := parsePublicKey(ownerRawPubKey, c.packerString)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, d.Name, err)
 	}
 
 	// Now get my own keys
 	me := ctx.UserName // Recipient of the file is me (the user in the context)
 	rawPublicKey, err := publicKey(ctx, me, c.packerString)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, d.Name, err)
 	}
 	pubkey, err := parsePublicKey(rawPublicKey, c.packerString)
 	if err != nil {
-		return 0, err
+		return 0, errors.E(Unpack, d.Name, err)
 	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
@@ -238,24 +240,24 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 		dkey, err = c.aesUnwrap(ctx.Factotum, w)
 		if err != nil {
 			log.Printf("unwrap failed: %v", err)
-			return 0, err
+			return 0, errors.E(Unpack, d.Name, err)
 		}
 		// Verify that the owner signed this with his/her public key.
 		if !ecdsa.Verify(ownerPubKey, factotum.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 			log.Println("verify failed")
-			return 0, errVerify
+			return 0, errors.E(Unpack, d.Name, errVerify)
 		}
 		// dkey is safe, so we decrypt the whole blob.
 		return c.decrypt(cleartext, ciphertext, dkey)
 	}
-	return 0, errNoWrappedKey
+	return 0, errors.E(Unpack, d.Name, errNoWrappedKey)
 }
 
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
 func (c common) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 	_, wrap, _, err := c.pdUnmarshal(packdata)
 	if err != nil {
-		return nil, err
+		return nil, errors.E("ReaderHashes", errors.Invalid, err)
 	}
 	readers = make([][]byte, len(wrap))
 	for i := 0; i < len(wrap); i++ {
@@ -286,6 +288,10 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 	mypub, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
 	if err != nil {
 		log.Printf("Error parsing my public key: %s", err)
+		for i := range packdata {
+			packdata[i] = nil
+		}
+		return
 	}
 	myhash := keyHash(mypub)
 
@@ -357,48 +363,49 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 
 // Name implements upspin.Name.
 func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+	const Name = "Name"
 	if d.IsDir() {
-		return errors.New("Name: cannot rename directory")
+		return errors.E(Name, d.Name, errors.Invalid, "cannot rename directory")
 	}
 	if err := pack.CheckUnpackMeta(c, &d.Metadata); err != nil {
-		return err
+		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
 
 	dkey := make([]byte, aesKeyLen)
 	sig, wrap, cipherSum, err := c.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
-		return err
+		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
 	// TODO(p): take this out when the sum is mandatory since the check will happen in pdUnmarshal
 	if cipherSum == nil {
-		return errTooShort
+		return errors.E(Name, errors.Invalid, d.Name, errTooShort)
 	}
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
 	if err != nil {
-		return err
+		return errors.E(Name, err)
 	}
 	owner := parsed.User()
 	// The owner has a well-known public key
 	ownerRawPubKey, err := publicKey(ctx, owner, c.packerString)
 	if err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 	ownerPubKey, err := parsePublicKey(ownerRawPubKey, c.packerString)
 	if err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 
 	// Now get my own keys
 	me := ctx.UserName // Recipient of the file is me (the user in the context)
 	rawPublicKey, err := publicKey(ctx, me, c.packerString)
 	if err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 	pubkey, err := parsePublicKey(rawPublicKey, c.packerString)
 	if err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
@@ -413,26 +420,26 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 	if !wrapFound {
 		log.Printf("unwrap failed: %s", errNoWrappedKey)
-		return errNoWrappedKey
+		return errors.E(Name, d.Name, errNoWrappedKey)
 	}
 
 	// Decode my wrapped key using my private key
 	dkey, err = c.aesUnwrap(ctx.Factotum, w)
 	if err != nil {
 		log.Printf("unwrap failed: %s", err)
-		return err
+		return errors.E(Name, d.Name, errors.Str("unwrap failed"))
 	}
 
 	// Verify that the owner signed this with his/her public key.
 	if !ecdsa.Verify(ownerPubKey, factotum.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum), sig.R, sig.S) {
 		log.Println("verify failed")
-		return errVerify
+		return errors.E(Name, d.Name, errVerify)
 	}
 
 	// If we are changing directories, remove all wrapped keys except my own.
 	parsedNew, err := path.Parse(newName)
 	if err != nil {
-		return err
+		return errors.E(Name, err)
 	}
 	newName = parsedNew.Path()
 	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
@@ -442,13 +449,13 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	// Compute new signature.
 	sig, err = ctx.Factotum.FileSign(ctx.Packing, newName, d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
 	if err := c.pdMarshal(&d.Metadata.Packdata, sig, wrap, cipherSum); err != nil {
-		return err
+		return errors.E(Name, d.Name, err)
 	}
 	d.Name = newName
 
@@ -623,7 +630,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	hash = make([]byte, sha256.Size)
 	n += pdGetBytes(&hash, pd[n:])
 	if n != len(pd) { // sanity check, not a thorough parser test
-		return sig0, nil, nil, fmt.Errorf("got %d, expected %d", n, len(pd))
+		return sig0, nil, nil, fmt.Errorf("unmarshaling packdata: got %d bytes, expected %d", n, len(pd))
 	}
 	return sig, wrap, hash, nil
 }
@@ -720,14 +727,14 @@ func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (
 		return "", err
 	}
 	if len(keys) < 1 {
-		return "", fmt.Errorf(noKnownKeysForUser, user)
+		return "", errors.E(user, errors.NotExist, errNoKnownKeysForUser)
 	}
 	for _, k := range keys {
 		if IsValidKeyForPacker(k, packerString) {
 			return k, nil
 		}
 	}
-	return "", fmt.Errorf(noKnownKeysForUser, user)
+	return "", errors.E(user, errors.NotExist, errNoKnownKeysForUser)
 }
 
 // parsePublicKey takes a string representation of a
@@ -738,7 +745,7 @@ func parsePublicKey(publicKey upspin.PublicKey, packerString string) (*ecdsa.Pub
 		return nil, err
 	}
 	if keyType != packerString {
-		return nil, fmt.Errorf("expected packing %s, got %s", packerString, keyType)
+		return nil, fmt.Errorf("expected packing %q, got %q", packerString, keyType)
 	}
 	return ecdsaPubKey, nil
 }
