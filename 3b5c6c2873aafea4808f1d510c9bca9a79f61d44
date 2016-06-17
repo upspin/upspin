@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_3697785b",
+        "filename": "directory/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-17T18:57:35Z",
+      "side": 1,
+      "message": "Wouldn\u0027t this fall into the NotFound kind?",
+      "range": {
+        "startLine": 155,
+        "startChar": 14,
+        "endLine": 155,
+        "endChar": 20
+      },
+      "revId": "3b5c6c2873aafea4808f1d510c9bca9a79f61d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_19854f1c",
+        "filename": "directory/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-17T18:57:35Z",
+      "side": 1,
+      "message": "and this one as Invalid?",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 59
+      },
+      "revId": "3b5c6c2873aafea4808f1d510c9bca9a79f61d44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
