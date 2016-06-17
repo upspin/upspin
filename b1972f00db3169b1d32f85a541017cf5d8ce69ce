@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_fc0fa124",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-17T20:49:21Z",
+      "side": 1,
+      "message": "Good for now, but this code is going away in my pending CL, replaced by myhash :\u003d keyHash(ctx.Factotum.PublicKey()) since mypub is unused.\n\nBut let\u0027s get this CL in first so I can attempt stash/sync/stashapply and deal with any merge conflicts.",
+      "revId": "b1972f00db3169b1d32f85a541017cf5d8ce69ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
