@@ -7,12 +7,12 @@
 package testenv
 
 import (
-	"errors"
 	"log"
 	"strings"
 
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack/ee"
 	"upspin.io/path"
@@ -83,7 +83,7 @@ var (
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	client, context, err := innerNewUser(setup.OwnerName, &setup.Keys, setup.Packing, setup.Transport)
+	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup.Packing, setup.Transport)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func New(setup *Setup) (*Env, error) {
 	for _, e := range setup.Tree {
 		if strings.HasSuffix(e.P, "/") {
 			if len(e.C) > 0 {
-				return nil, errors.New("directory entry must not have contents")
+				return nil, errors.E("New", errors.Exist, errors.Str("directory entry must not have contents"))
 			}
 			dir := path.Join(upspin.PathName(setup.OwnerName), e.P)
 			loc, err := client.MakeDirectory(dir)
@@ -118,7 +118,7 @@ func New(setup *Setup) (*Env, error) {
 			loc, err := client.Put(name, []byte(e.C))
 			if err != nil {
 				log.Printf("Error creating file %s: %s", name, err)
-				return nil, err
+				return nil, errors.E("New", err)
 			}
 			if setup.Verbose {
 				log.Printf("Tree: Created file %s at %v", name, loc)
@@ -142,16 +142,16 @@ func E(pathName string, contents string) Entry {
 // Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
 func (e *Env) Exit() error {
 	if e.exitCalled {
-		return errors.New("exit already called")
+		return errors.E("Exit", errors.Invalid, errors.Str("exit already called"))
 	}
 	e.exitCalled = true
 	if e.Setup.Cleanup != nil {
-		return e.Setup.Cleanup(e)
+		return errors.E("Exit", e.Setup.Cleanup(e))
 	}
 	return nil
 }
 
-func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
+func innerNewUser(op string, userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
 	var context *upspin.Context
 	var err error
 	if keyPair == nil || *keyPair == zeroKey {
@@ -160,7 +160,7 @@ func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing ups
 		context, err = newContextForUserWithKey(userName, keyPair, packing)
 	}
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.E(op, err)
 	}
 	var client upspin.Client
 	switch transport {
@@ -169,23 +169,23 @@ func innerNewUser(userName upspin.UserName, keyPair *upspin.KeyPair, packing ups
 	case upspin.InProcess:
 		client, err = inProcessClient(context)
 	default:
-		return nil, nil, errors.New("invalid transport")
+		return nil, nil, errors.E(op, errors.Invalid, errors.Str("invalid transport"))
 	}
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.E(op, err)
 	}
 	err = installUserRoot(context)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.E(op, err)
 	}
-	return client, context, err
+	return client, context, nil
 }
 
 // NewUser creates a new client for a user, generating new keys of the right packing type if the provided
 // keys are nil or empty. The new user will not have a root created. Callers should use the client to
 // MakeDirectory if necessary.
 func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin.Client, *upspin.Context, error) {
-	return innerNewUser(userName, keyPair, e.Setup.Packing, e.Setup.Transport)
+	return innerNewUser("NewUser", userName, keyPair, e.Setup.Packing, e.Setup.Transport)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
@@ -272,7 +272,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 	}
 	testUser, ok := user.(*inprocess.Service)
 	if !ok {
-		return nil, errors.New("user service must be the in-process instance")
+		return nil, errors.Str("user service must be the in-process instance")
 	}
 	// Set the public key for the registered user.
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
@@ -291,7 +291,7 @@ func installUserRoot(context *upspin.Context) error {
 	}
 	testUser, ok := user.(*inprocess.Service)
 	if !ok {
-		return errors.New("installUserRoot: user service must be the in-process instance")
+		return errors.Str("user service must be the in-process instance")
 	}
 	testUser.AddRoot(context.UserName, context.Directory)
 	return nil
