@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_d13776d0",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T00:12:36Z",
+      "side": 1,
+      "message": "I\u0027d call it port, for consistency.",
+      "parentUuid": "4959bc44_2e9b13df",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f8d1fb_9ddef670",
         "filename": "cmd/webspin/main.go",
         "patchSetId": 1
@@ -153,6 +171,24 @@
       "side": 1,
       "message": "No it doesn\u0027t. Unexported.",
       "parentUuid": "b4f8d1fb_9ddef670",
+      "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4959bc44_b15be208",
+        "filename": "cmd/webspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-17T00:12:36Z",
+      "side": 1,
+      "message": "I don\u0027t see it yet, but I trust it\u0027s done.",
+      "parentUuid": "4959bc44_0ea04f0b",
       "revId": "0a27a271adc63f8920a280e9d9a7488872733025",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
