@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "4959bc44_91445e8a",
+        "filename": "directory/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-17T01:07:06Z",
+      "side": 1,
+      "message": "I did it because it\u0027s a cross-function method, so if you just got a message that said \"Dial\", you wouldn\u0027t know which. But it\u0027s a small thing and consistency has its virtue. Done.",
+      "parentUuid": "4959bc44_b1ebe2ae",
+      "revId": "7d2c3c78aef756edd994a8c431ad91ab0a73b51f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4959bc44_5126e61c",
         "filename": "store/remote/remote.go",
         "patchSetId": 1
