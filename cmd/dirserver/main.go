@@ -33,6 +33,7 @@ import (
 
 	// Load required transports
 	_ "upspin.io/directory/transports"
+	"upspin.io/metric"
 	_ "upspin.io/store/transports"
 	_ "upspin.io/user/transports"
 )
@@ -56,16 +57,25 @@ type Server struct {
 	grpcauth.SecureServer
 }
 
+const upspinProject = "google.com:upspin"
+
 func main() {
 	flag.Parse()
 
 	if *logFile != "" {
-		log.Connect("google.com:upspin", *logFile)
+		log.Connect(upspinProject, *logFile)
 	}
 
 	if *selfSigned {
 		*certFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem")
 		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
+	}
+
+	svr, err := metric.NewGCPSaver(upspinProject)
+	if err != nil {
+		log.Error.Printf("Can't start a metric saver for GCP project upspin. No metrics will be saved")
+	} else {
+		metric.RegisterSaver(svr)
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.

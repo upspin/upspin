@@ -26,8 +26,10 @@ type accessFileDB map[upspin.PathName]*access.Access
 
 // getRoot retrieves the user's root, possibly by fetching it from storage.
 // It must be called with userlock held.
-func (d *directory) getRoot(user upspin.UserName) (*root, error) {
+func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error) {
 	const op = "getRoot"
+	defer span(opts).StartSpan("getRoot").End()
+
 	userRootPath := upspin.PathName(user)
 
 	// Is it in cache?
@@ -56,8 +58,9 @@ func (d *directory) getRoot(user upspin.UserName) (*root, error) {
 
 // putRoot stores the user's root to stable storage, updating the cache.
 // It must be called with userlock held.
-func (d *directory) putRoot(user upspin.UserName, root *root) error {
+func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) error {
 	const op = "putRoot"
+	defer span(opts).StartSpan("putRoot").End()
 
 	// Put it in the root cache.
 	d.rootCache.Add(user, *root)
@@ -79,7 +82,7 @@ func (d *directory) putRoot(user upspin.UserName, root *root) error {
 
 // handleRootCreation creates a root for a user.
 // It must be called with any userlock held.
-func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry) error {
+func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry, opts ...options) error {
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
 	if user != parsed.User() {
