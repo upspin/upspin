@@ -19,6 +19,7 @@ import (
 	"upspin.io/cache"
 	gcpCloud "upspin.io/cloud/gcp"
 	"upspin.io/log"
+	"upspin.io/metrics"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -53,10 +54,20 @@ type directory struct {
 
 var _ upspin.Directory = (*directory)(nil)
 
+// gcpDir represents a name for the metric for this directory service.
+const gcpDir = "gcpDir"
+
 var (
 	zeroLoc          upspin.Location
 	errNotConfigured = errors.New("directory not configured")
 )
+
+// options are optional parameters to almost every inner method of directory for doing some
+// optional, non-correctness-related work. One option should carry only one non-nil pointer object.
+type options struct {
+	span *metrics.Span
+	// Add other things below (for example, some healthz monitoring stats)
+}
 
 // dirError holds an error description for the directory service.
 // It is not simply an os.PathError because we're smart about suppressing
@@ -103,6 +114,11 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	if !d.isConfigured() {
 		return zeroLoc, errNotConfigured
 	}
+	m := metrics.New(gcpDir)
+	defer m.Done()
+	opts := options{
+		span: m.StartSpan(op),
+	}
 	parsed, err := path.Parse(dirName)
 	if err != nil {
 		return zeroLoc, newDirError(op, dirName, err.Error())
@@ -123,7 +139,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Packdata: nil,
 		},
 	}
-	err = d.put(op, &dirEntry)
+	err = d.put(op, &dirEntry, opts)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -134,14 +150,34 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 // It implements upspin.Directory.
 func (d *directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
-	return d.put(op, dirEntry)
-}
-
-// put is the common implementation between MakeDirectory and Put.
-func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	if !d.isConfigured() {
 		return errNotConfigured
 	}
+	m := metrics.New(gcpDir)
+	defer m.Done()
+	opts := options{
+		span: m.StartSpan(op),
+	}
+	return d.put(op, dirEntry, opts)
+}
+
+// getSpan returns the first metric found in opts or a new one if not found.
+func getSpan(opts ...options) *metrics.Span {
+	for _, o := range opts {
+		if o.span != nil {
+			return o.span
+		}
+	}
+	// This is probably an error. Metrics should be created at the entry points only.
+	return metrics.New("FIXME").StartSpan("FIXME")
+}
+
+// put is the common implementation between MakeDirectory and Put.
+func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) error {
+	s := getSpan(opts...)
+	ss := s.StartSubSpan("put")
+	defer ss.End()
+
 	parsed, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
@@ -160,15 +196,15 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	// If we're creating the root, handle it elsewhere.
 	if parsed.IsRoot() {
 		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
-		return d.handleRootCreation(user, &parsed, dirEntry)
+		return d.handleRootCreation(user, &parsed, dirEntry, opts...)
 	}
 
 	// Check ACLs before we go any further, so we don't leak information about the existence of files and directories.
-	canCreate, err := d.hasRight(op, user, access.Create, &parsed)
+	canCreate, err := d.hasRight(op, user, access.Create, &parsed, opts...)
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
-	canWrite, err := d.hasRight(op, user, access.Write, &parsed)
+	canWrite, err := d.hasRight(op, user, access.Write, &parsed, opts...)
 	if err != nil {
 		return newDirError(op, dirEntry.Name, err.Error())
 	}
@@ -180,7 +216,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	parentParsedPath := parsed.Drop(1) // Can't fail as parsed is NOT root.
 
 	// Verify whether there's a directory with same name.
-	existingDirEntry, err := d.getNonRoot(canonicalPath)
+	existingDirEntry, err := d.getNonRoot(canonicalPath, opts...)
 	if err != nil && err != errEntryNotFound {
 		return newDirError(op, canonicalPath, err.Error())
 
@@ -208,13 +244,13 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	dirEntry.Name = canonicalPath
 
 	// Finally, store the new entry.
-	err = d.putNonRoot(canonicalPath, dirEntry)
+	err = d.putNonRoot(canonicalPath, dirEntry, opts...)
 	if err != nil {
 		return err
 	}
 
 	// Patch the parent: bump sequence number.
-	parentDirEntry, root, err := d.getDirEntry(&parentParsedPath)
+	parentDirEntry, root, err := d.getDirEntry(&parentParsedPath, opts...)
 	if err != nil {
 		if err == errEntryNotFound {
 			return newDirError(op, canonicalPath, "parent path not found")
@@ -229,14 +265,14 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry) error {
 	}
 	parentDirEntry.Metadata.Sequence++
 	if parentParsedPath.IsRoot() {
-		err = d.putRoot(parentParsedPath.User(), root)
+		err = d.putRoot(parentParsedPath.User(), root, opts...)
 	} else {
-		err = d.putNonRoot(parentParsedPath.Path(), parentDirEntry)
+		err = d.putNonRoot(parentParsedPath.Path(), parentDirEntry, opts...)
 	}
 
 	// If this is an Access file or Group file, we have some extra work to do.
 	if access.IsAccessFile(canonicalPath) {
-		err = d.updateAccess(&parsed, &dirEntry.Location)
+		err = d.updateAccess(&parsed, &dirEntry.Location, opts...)
 		if err != nil {
 			return err
 		}
