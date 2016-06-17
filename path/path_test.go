@@ -5,6 +5,7 @@
 package path
 
 import (
+	"strings"
 	"testing"
 
 	"upspin.io/upspin"
@@ -264,27 +265,33 @@ func TestUserAndDomain(t *testing.T) {
 		userName upspin.UserName
 		user     string
 		domain   string
-		err      error
+		errStr   string
 	}
 	var (
 		tests = []cases{
-			{upspin.UserName("me@here.com"), "me", "here.com", nil},
-			{upspin.UserName("@"), "", "", errUserName},
-			{upspin.UserName("a@bcom"), "", "", errUserName},
-			{upspin.UserName("a@b@.com"), "", "", errUserName},
-			{upspin.UserName("@bbc.com"), "", "", errUserName},
-			{upspin.UserName("abc.com@"), "", "", errUserName},
-			{upspin.UserName("a@b.co"), "a", "b.co", nil},
-			{upspin.UserName("me@here/.com"), "", "", errUserName},
+			{upspin.UserName("me@here.com"), "me", "here.com", ""},
+			{upspin.UserName("@"), "", "", "syntax error: no user name"},
+			{upspin.UserName("a@bcom"), "", "", "syntax error: invalid domain name"},
+			{upspin.UserName("a@b@.com"), "", "", "syntax error: extra @ sign"},
+			{upspin.UserName("@bbc.com"), "", "", "syntax error: no user name"},
+			{upspin.UserName("abc.com@"), "", "", "syntax error: invalid domain name"},
+			{upspin.UserName("a@b.co"), "a", "b.co", ""},
+			{upspin.UserName("me@here/.com"), "", "", "syntax error: is a path name"},
 		}
 	)
 	for _, test := range tests {
 		u, d, err := UserAndDomain(test.userName)
-		if err != test.err {
-			t.Fatalf("Expected %q, got %q", test.err, err)
+		if test.errStr == "" {
+			if err != nil {
+				t.Errorf("Expected no error, got %q", err)
+			}
+			continue
 		}
-		if err != nil {
-			// Already validated the error
+		if err == nil {
+			t.Errorf("Expected %q error, got none", test.errStr)
+		}
+		if !strings.Contains(err.Error(), test.errStr) {
+			t.Errorf("Expected %q, got %q", test.errStr, err)
 			continue
 		}
 		if u != test.user {

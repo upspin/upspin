@@ -20,12 +20,12 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"sync"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -35,11 +35,9 @@ const (
 	accessFile = "Access"
 )
 
-var (
-	// ErrPermissionDenied indicates the user does not have the proper rights on path.
-	// This error is never returned by package access, but is provided as a convenience.
-	ErrPermissionDenied = errors.New("permission denied")
-)
+// ErrPermissionDenied is a predeclared error reporting that a permission check has failed.
+// It is not used in this package but is commonly used in its clients.
+var ErrPermissionDenied = errors.E(errors.Permission)
 
 // A Right represents a particular access permission: reading, writing, etc.
 type Right int
@@ -414,7 +412,7 @@ func RemoveGroup(pathName upspin.PathName) error {
 	mu.Lock()
 	defer mu.Unlock()
 	if _, found := groups[parsed.Path()]; !found {
-		return errors.New("unknown group")
+		return errors.E("RemoveGroup", errors.NotExist, errors.Str("group does not exist"))
 	}
 	delete(groups, parsed.Path())
 	return nil

@@ -11,11 +11,11 @@ package path
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 
 	gopath "path"
 
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -91,11 +91,6 @@ func (p Parsed) FilePath() string {
 	return str[strings.IndexByte(str, '/')+1:]
 }
 
-var (
-	pn0         = Parsed{}
-	errUserName = errors.New("user name not properly formatted")
-)
-
 // NameError gives information about an erroneous path name, including the name and error description.
 type NameError struct {
 	name  string
@@ -127,11 +122,11 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	}
 	if len(user) < 6 {
 		// No user name. Must be at least "u@x.co". Silly test - do more.
-		return pn0, NameError{string(pathName), "no user name in path"}
+		return Parsed{}, NameError{string(pathName), "no user name in path"}
 	}
 	if strings.Count(user, "@") != 1 {
 		// User name must contain exactly one "@".
-		return pn0, NameError{string(pathName), "bad user name in path"}
+		return Parsed{}, NameError{string(pathName), "bad user name in path"}
 	}
 	p := Parsed{
 		// If pathName is already clean, which it usually is, this will not allocate.
@@ -304,23 +299,27 @@ func Clean(path upspin.PathName) upspin.PathName {
 // UserAndDomain splits an upspin.UserName into user and domain and returns the pair.
 func UserAndDomain(userName upspin.UserName) (user string, domain string, err error) {
 	u := string(userName)
+	if strings.Count(u, "@") == 0 {
+		return "", "", errUserName(userName, "missing @ sign")
+	}
 	if strings.Count(u, "@") != 1 {
-		return "", "", errUserName
+		return "", "", errUserName(userName, "extra @ sign")
 	}
 	if strings.Count(u, "/") != 0 {
-		return "", "", errUserName
+		return "", "", errUserName(userName, "is a path name")
 	}
 	i := strings.IndexByte(u, '@')
 	user = u[:i]
 	if len(user) < 1 {
-		return "", "", errUserName
+		return "", "", errUserName(userName, "no user name")
 	}
 	domain = u[i+1:]
-	if len(domain) < 4 {
-		return "", "", errUserName
-	}
-	if strings.Count(domain, ".") < 1 {
-		return "", "", errUserName
+	if len(domain) < 4 || strings.Count(domain, ".") < 1 {
+		return "", "", errUserName(userName, "invalid domain name")
 	}
 	return
+}
+
+func errUserName(user upspin.UserName, msg string) error {
+	return errors.E("UserAndDomain", errors.Syntax, user, errors.Str(msg))
 }

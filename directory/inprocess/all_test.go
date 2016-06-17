@@ -167,7 +167,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 			t.Fatal("get redirected blob:", err)
 		}
 	}
-	clear, err := unpackBlob(context, ciphertext, entry1)
+	clear, err := unpackBlob(context, "Put", ciphertext, entry1)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -214,7 +214,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
-		clear, err := unpackBlob(context, ciphertext, entry)
+		clear, err := unpackBlob(context, "Lookup", ciphertext, entry)
 		if err != nil {
 			t.Fatal("unpack:", err)
 		}
@@ -264,7 +264,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
-		data, err := unpackBlob(context, cipher, entry)
+		data, err := unpackBlob(context, "Lookup", cipher, entry)
 		if err != nil {
 			t.Fatalf("%q: unpack file: %v", fileName, err)
 		}
@@ -316,7 +316,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: get redirected file: %v", fileName, err)
 		}
 	}
-	data, err := unpackBlob(context, cipher, entry)
+	data, err := unpackBlob(context, "Get", cipher, entry)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -346,7 +346,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 			t.Fatalf("%q: second get redirected file: %v", fileName, err)
 		}
 	}
-	data, err = unpackBlob(context, cipher, entry)
+	data, err = unpackBlob(context, "Get", cipher, entry)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
 	}

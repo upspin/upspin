@@ -51,7 +51,7 @@ const (
 	Permission             // Permission denied.
 	Syntax                 // Ill-formed argument such as invalid file name.
 	IO                     // External I/O error such as network failure.
-	Exist                  // Item exists but should not.
+	Exist                  // Item already exists.
 	NotExist               // Item does not exist.
 )
 
