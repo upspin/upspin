@@ -6,11 +6,10 @@
 package inprocess
 
 import (
-	"errors"
-	"fmt"
 	"sync"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -49,8 +48,12 @@ var _ upspin.User = (*Service)(nil)
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	s.db.mu.RLock()
 	defer s.db.mu.RUnlock()
+	roots := s.db.root[name]
+	if len(roots) == 0 {
+		return nil, nil, errors.E("Lookup", errors.NotExist, name)
+	}
 	// Return copies so the caller can't modify our data structures.
-	locs := make([]upspin.Endpoint, len(s.db.root[name]))
+	locs := make([]upspin.Endpoint, len(roots))
 	copy(locs, s.db.root[name])
 	keys := make([]upspin.PublicKey, len(s.db.keystore[name]))
 	copy(keys, s.db.keystore[name])
@@ -83,13 +86,13 @@ func (s *Service) ListUsers() []upspin.UserName {
 }
 
 // validateUserName returns a parsed path if the username is valid.
-func validateUserName(name upspin.UserName) (*path.Parsed, error) {
+func validateUserName(op string, name upspin.UserName) (*path.Parsed, error) {
 	parsed, err := path.Parse(upspin.PathName(name))
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	if !parsed.IsRoot() {
-		return nil, fmt.Errorf("inprocess-user: %q not a user name", name)
+		return nil, errors.E(op, errors.Invalid, name, errors.Str("not a valid user name"))
 	}
 	return &parsed, nil
 }
@@ -100,7 +103,7 @@ func validateUserName(name upspin.UserName) (*path.Parsed, error) {
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	// Verify that it is a valid name.
-	parsed, err := validateUserName(name)
+	parsed, err := validateUserName("Install", name)
 	if err != nil {
 		return err
 	}
@@ -122,7 +125,7 @@ func (s *Service) innerAddRoot(userName upspin.UserName, endpoint upspin.Endpoin
 // AddRoot adds an endpoint as the user's.db.root endpoint.
 func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error {
 	// Verify that it is a valid name.
-	parsed, err := validateUserName(name)
+	parsed, err := validateUserName("AddRoot", name)
 	if err != nil {
 		return err
 	}
@@ -139,7 +142,7 @@ func (s *Service) Endpoint() upspin.Endpoint {
 // but the NetAddr is ignored.
 func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
-		return nil, errors.New("user/inprocess: unrecognized transport")
+		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()

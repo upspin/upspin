@@ -32,6 +32,6 @@ func ExampleError() {
 	// jane@doe.com/file: Get: I/O error: network unreachable
 	//
 	// Nested error:
-	// jane@doe.com/file, for joe@blow.com: Read:
+	// jane@doe.com/file, user joe@blow.com: Read:
 	//	jane@doe.com/file: Get: I/O error: network unreachable
 }

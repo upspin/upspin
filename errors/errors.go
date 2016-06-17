@@ -153,7 +153,7 @@ func (e *Error) Error() string {
 	}
 	if e.User != "" {
 		pad(b, ", ")
-		b.WriteString("for ")
+		b.WriteString("user ")
 		b.WriteString(string(e.User))
 	}
 	if e.Op != "" {
