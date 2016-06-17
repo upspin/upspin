@@ -152,12 +152,12 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	dirEntry, ok := s.db.root[parsed.User()]
 	s.db.mu.RUnlock()
 	if !ok {
-		return nil, errors.E(Glob, upspin.PathName(pattern), "no such user")
+		return nil, errors.E(Glob, upspin.PathName(pattern), errors.NotExist, "no such user")
 	}
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
 	if err != nil {
-		return nil, errors.E(Glob, upspin.PathName(pattern), err)
+		return nil, errors.E(Glob, upspin.PathName(pattern), errors.Syntax, err)
 	}
 
 	dirRef := dirEntry.Location.Reference

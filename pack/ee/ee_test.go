@@ -9,12 +9,12 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/test/testfixtures"
@@ -372,7 +372,7 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 			return nil, []upspin.PublicKey{d.keyToReturn[i]}, nil
 		}
 	}
-	return nil, nil, errors.New("user not found")
+	return nil, nil, errors.E("Lookup", userName, errors.NotExist, errors.Str("user not found"))
 }
 func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
