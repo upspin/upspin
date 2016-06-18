@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_0be88d88",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:59:38Z",
+      "side": 1,
+      "message": "s/un-ended/open/ ?",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_2bf46961",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:59:38Z",
+      "side": 1,
+      "message": "finally, channel operations in upspin",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_8bf3bd76",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:59:38Z",
+      "side": 1,
+      "message": "drop the parenthetical. in my experience such suggestions are almost always wrong and just fill up the screen",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_ab079947",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:59:38Z",
+      "side": 1,
+      "message": "these declarations are too important to be at the bottom of the file",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
