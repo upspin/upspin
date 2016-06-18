@@ -196,23 +196,19 @@ func TestSharing(t *testing.T) {
 		bobsUserName  upspin.UserName = "bob@foo.com"
 		text                          = "bob, here's the secret file. Sincerely, The Dude."
 	)
-	dudesKeyPair := upspin.KeyPair{
-		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n"),
-		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934\n"),
-	}
-	bobsKeyPair := upspin.KeyPair{
-		Public:  upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528"),
-		Private: upspin.PrivateKey("93177533964096447201034856864549483929260757048490326880916443359483929789924"),
-	}
+	dudesPublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
+	dudesPrivate := "82201047360680847258309465671292633303992565667422607675215625927005262185934\n"
+	bobsPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
+	bobsPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
 
 	// Set up Dude as the creator/owner.
 	ctx, packer := setup(dudesUserName, packing)
 	// Set up a mock user service that knows about Dude's public keys (for checking signature during unpack).
 	mockUser := &dummyUser{
 		userToMatch: []upspin.UserName{dudesUserName},
-		keyToReturn: []upspin.PublicKey{dudesKeyPair.Public},
+		keyToReturn: []upspin.PublicKey{dudesPublic},
 	}
-	f, err := factotum.New(dudesKeyPair)
+	f, err := factotum.New(dudesPublic, dudesPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -227,7 +223,7 @@ func TestSharing(t *testing.T) {
 	}
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob
-	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesKeyPair.Public, bobsKeyPair.Public}, &d.Metadata.Packdata)
+	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic}, &d.Metadata.Packdata)
 
 	readers, err := packer.ReaderHashes(d.Metadata.Packdata)
 	if err != nil {
@@ -236,23 +232,15 @@ func TestSharing(t *testing.T) {
 	if len(readers) != 2 {
 		t.Errorf("Expected 2 readerhashes, got %d", len(readers))
 	}
-	dudesKey, err := parsePublicKey(dudesKeyPair.Public, packer.String())
-	if err != nil {
-		t.Fatal(err)
-	}
-	bobsKey, err := parsePublicKey(bobsKeyPair.Public, packer.String())
-	if err != nil {
-		t.Fatal(err)
-	}
-	hash0 := keyHash(dudesKey)
-	hash1 := keyHash(bobsKey)
+	hash0 := factotum.KeyHash(dudesPublic)
+	hash1 := factotum.KeyHash(bobsPublic)
 	if !bytes.Equal(readers[0], hash0) || !bytes.Equal(readers[1], hash1) {
 		t.Errorf("text: expected %q; got %q", [][]byte{hash0, hash1}, readers)
 	}
 
 	// Now load Bob as the current user.
 	ctx.UserName = bobsUserName
-	f, err = factotum.New(bobsKeyPair)
+	f, err = factotum.New(bobsPublic, bobsPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,21 +266,17 @@ func TestBadSharing(t *testing.T) {
 		miasUserName     upspin.UserName = "mia@foo.com"
 		text                             = "mia, here's the secret file. sincerely, dudette."
 	)
-	dudettesKeyPair := upspin.KeyPair{
-		Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192"),
-		Private: upspin.PrivateKey("82201047360680847258309465671292633303992565667422607675215625927005262185934"),
-	}
-	miasKeyPair := upspin.KeyPair{
-		Public:  upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528"),
-		Private: upspin.PrivateKey("93177533964096447201034856864549483929260757048490326880916443359483929789924"),
-	}
+	dudettesPublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192")
+	dudettesPrivate := "82201047360680847258309465671292633303992565667422607675215625927005262185934"
+	miasPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528")
+	miasPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
 
 	ctx, packer := setup(dudettesUserName, packing)
 	mockUser := &dummyUser{
 		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
-		keyToReturn: []upspin.PublicKey{miasKeyPair.Public, dudettesKeyPair.Public},
+		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPublic},
 	}
-	f, err := factotum.New(dudettesKeyPair) // Override setup to prevent reading keys from .ssh/
+	f, err := factotum.New(dudettesPublic, dudettesPrivate) // Override setup to prevent reading keys from .ssh/
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -311,7 +295,7 @@ func TestBadSharing(t *testing.T) {
 
 	// Now load Mia as the current user.
 	ctx.UserName = miasUserName
-	f, err = factotum.New(miasKeyPair)
+	f, err = factotum.New(miasPublic, miasPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -343,11 +327,9 @@ func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspi
 		panic("ecdsa.GenerateKey failed")
 		// return ctx, packer
 	}
-	keyPair := upspin.KeyPair{
-		Public:  upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String())),
-		Private: upspin.PrivateKey(fmt.Sprintf("%s\n", priv.D.String())),
-	}
-	ctx.Factotum, err = factotum.New(keyPair)
+	kPublic := upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String()))
+	kPrivate := fmt.Sprintf("%s\n", priv.D.String())
+	ctx.Factotum, err = factotum.New(kPublic, kPrivate)
 	if err != nil {
 		panic("NewFactotum failed")
 	}

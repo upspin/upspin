@@ -110,7 +110,7 @@ func TestParallelOperationsOnAccessAndRoot(t *testing.T) {
 }
 
 func newDirServerWithDummyStore(t *testing.T, gcp gcp.GCP) *directory {
-	f, err := factotum.New(serverKeys)
+	f, err := factotum.New(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
