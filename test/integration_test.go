@@ -314,7 +314,7 @@ func testSharing(t *testing.T, env *e.Env) {
 
 func testAllOnePacking(t *testing.T, packing upspin.Packing) {
 	setup.Packing = packing
-	var readersKey upspin.KeyPair
+	var readersKey keyPair
 	switch packing {
 	case upspin.EEp256Pack, upspin.EEp521Pack:
 		setup.Keys = keyStore[setup.OwnerName][packing]

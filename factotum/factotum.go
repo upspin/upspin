@@ -22,27 +22,36 @@ import (
 
 var sig0 upspin.Signature // for returning nil
 
+// KeyHash returns the hash of a key, given in string format.
+func KeyHash(p upspin.PublicKey) []byte {
+	keyHash := sha256.Sum256([]byte(p))
+	return keyHash[:]
+}
+
 var _ upspin.Factotum = Factotum{}
 
-// Factotum implements upspin.Factotum by reading from ~/.ssh/*.upspinkey.
 type Factotum struct {
-	strKeyPair    upspin.KeyPair   // string form of key pair
+	keyHash       []byte
+	public        upspin.PublicKey
+	private       string
 	ecdsaKeyPair  ecdsa.PrivateKey // ecdsa form of key pair
 	packingString string
 }
 
 // New returns a new Factotum providing all needed private key operations.
-func New(kp upspin.KeyPair) (*Factotum, error) {
-	ePublicKey, packingString, err := ParsePublicKey(kp.Public)
+func New(public upspin.PublicKey, private string) (*Factotum, error) {
+	ePublicKey, packingString, err := ParsePublicKey(public)
 	if err != nil {
 		return nil, err
 	}
-	ecdsaKeyPair, err := parsePrivateKey(ePublicKey, kp.Private)
+	ecdsaKeyPair, err := parsePrivateKey(ePublicKey, private)
 	if err != nil {
 		return nil, err
 	}
 	f := &Factotum{
-		strKeyPair:    kp,
+		keyHash:       KeyHash(public),
+		public:        public,
+		private:       private,
 		ecdsaKeyPair:  *ecdsaKeyPair,
 		packingString: packingString,
 	}
@@ -65,9 +74,14 @@ func (f Factotum) FileSign(p upspin.Packing, n upspin.PathName, t upspin.Time, d
 }
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
-func (f Factotum) ScalarMult(curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int) {
-	log.Debug.Printf("factotum.scalarMult %d %d\n", x, y)
-	return curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
+func (f Factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
+	log.Debug.Printf("factotum.scalarMult %x %d %d\n", keyHash, x, y)
+	if !bytes.Equal(f.keyHash, keyHash) {
+		err = fmt.Errorf("no such key")
+	} else {
+		sx, sy = curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
+	}
+	return
 }
 
 // UserSign assists in authenticating to Upspin servers.
@@ -82,7 +96,7 @@ func (f Factotum) UserSign(hash []byte) (upspin.Signature, error) {
 
 // PublicKey returns the user's public key as loaded by the Factotum.
 func (f Factotum) PublicKey() upspin.PublicKey {
-	return f.strKeyPair.Public
+	return upspin.PublicKey(f.public)
 }
 
 // VerHash provides the basis for signing and verifying files.
@@ -93,8 +107,8 @@ func VerHash(ciphersuite upspin.Packing, pathname upspin.PathName, time upspin.T
 
 // parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
 // string representation of the private key.
-func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (priv *ecdsa.PrivateKey, err error) {
-	privateKey = upspin.PrivateKey(strings.TrimSpace(string(privateKey)))
+func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa.PrivateKey, err error) {
+	privateKey = strings.TrimSpace(string(privateKey))
 	var d big.Int
 	err = d.UnmarshalText([]byte(privateKey))
 	if err != nil {
@@ -104,11 +118,11 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey upspin.PrivateKey) (
 }
 
 // ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key, returning its type.
-func ParsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
+func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
 	var keyType string
 	var x, y big.Int
 
-	n, err := fmt.Fscan(bytes.NewReader([]byte(publicKey)), &keyType, &x, &y)
+	n, err := fmt.Fscan(bytes.NewReader([]byte(public)), &keyType, &x, &y)
 	if err != nil {
 		return nil, "", err
 	}

@@ -23,7 +23,7 @@ const (
 var (
 	errNoKeysFound = errors.Str("no keys found")
 	errNilContext  = errors.Str("nil context")
-	zeroPrivKey    upspin.KeyPair
+	zeroPrivKey    string
 	zeroPubKey     upspin.PublicKey
 )
 
@@ -33,11 +33,11 @@ func Load(context *upspin.Context) error {
 	if context == nil {
 		return errors.E(Load, errors.Invalid, errors.Str("nil context"))
 	}
-	k, err := privateKey("Load")
+	pub, priv, err := privateKey("Load")
 	if err != nil {
 		return err
 	}
-	context.Factotum, err = factotum.New(k)
+	context.Factotum, err = factotum.New(pub, priv)
 	return err
 }
 
@@ -57,27 +57,24 @@ func publicKey(op string) (upspin.PublicKey, error) {
 }
 
 // privateKey returns the private key of the current user by reading from $HOME/.ssh/.
-func privateKey(op string) (upspin.KeyPair, error) {
+func privateKey(op string) (upspin.PublicKey, string, error) {
 	f, err := os.Open(filepath.Join(sshdir(), "secret.upspinkey"))
 	if err != nil {
-		return zeroPrivKey, errors.E(op, errors.NotExist, errNoKeysFound)
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.NotExist, errNoKeysFound)
 	}
 	defer f.Close()
 	buf := make([]byte, 200) // enough for p521
 	n, err := f.Read(buf)
 	if err != nil {
-		return zeroPrivKey, fmt.Errorf(keyloaderErr, err)
+		return zeroPubKey, zeroPrivKey, fmt.Errorf(keyloaderErr, err)
 	}
 	buf = buf[:n]
 	buf = []byte(strings.TrimSpace(string(buf)))
 	pubkey, err := publicKey(op)
 	if err != nil {
-		return zeroPrivKey, err
+		return zeroPubKey, zeroPrivKey, err
 	}
-	return upspin.KeyPair{
-		Public:  pubkey,
-		Private: upspin.PrivateKey(string(buf)),
-	}, nil
+	return pubkey, string(buf), nil
 	// TODO sanity check that Private is consistent with Public
 }
 
