@@ -594,7 +594,7 @@ func (c common) pdMarshal(dst *[]byte, sig upspin.Signature, wrap []wrappedKey, 
 
 func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
 	if pd[0] != byte(c.packing) {
-		return sig0, nil, nil, fmt.Errorf("expected packing %d, got %d", c.packing, pd[0])
+		return sig0, nil, nil, errors.Errorf("expected packing %d, got %d", c.packing, pd[0])
 	}
 	n := 1
 	sig.R = big.NewInt(0)
@@ -609,7 +609,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	n += vlen
 	nwrap := int(nwrap64)
 	if int64(nwrap) != nwrap64 {
-		return sig0, nil, nil, fmt.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
+		return sig0, nil, nil, errors.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
 	}
 	wrap = make([]wrappedKey, nwrap)
 	for i := 0; i < nwrap; i++ {
@@ -630,7 +630,7 @@ func (c common) pdUnmarshal(pd []byte) (sig upspin.Signature, wrap []wrappedKey,
 	hash = make([]byte, sha256.Size)
 	n += pdGetBytes(&hash, pd[n:])
 	if n != len(pd) { // sanity check, not a thorough parser test
-		return sig0, nil, nil, fmt.Errorf("unmarshaling packdata: got %d bytes, expected %d", n, len(pd))
+		return sig0, nil, nil, errors.Errorf("unmarshaling packdata: got %d bytes, expected %d", n, len(pd))
 	}
 	return sig, wrap, hash, nil
 }
@@ -745,7 +745,7 @@ func parsePublicKey(publicKey upspin.PublicKey, packerString string) (*ecdsa.Pub
 		return nil, err
 	}
 	if keyType != packerString {
-		return nil, fmt.Errorf("expected packing %q, got %q", packerString, keyType)
+		return nil, errors.Errorf("expected packing %q, got %q", packerString, keyType)
 	}
 	return ecdsaPubKey, nil
 }

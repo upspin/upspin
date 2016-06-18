@@ -132,7 +132,7 @@ func E(args ...interface{}) error {
 		default:
 			_, file, line, _ := runtime.Caller(1)
 			log.Printf("errors.E: bad call from %s:%d: %v", file, line, args)
-			return fmt.Errorf("unknown type %T, value %v in error call", arg, arg)
+			return Errorf("unknown type %T, value %v in error call", arg, arg)
 		}
 	}
 	return e
@@ -195,6 +195,12 @@ type errorString struct {
 
 func (e *errorString) Error() string {
 	return e.s
+}
+
+// Errorf is equivalent to errors.Errorf, but allows clients to import only this
+// package for all error handling.
+func Errorf(format string, args ...interface{}) error {
+	return &errorString{fmt.Sprintf(format, args...)}
 }
 
 // MarshalAppend marshals err into a byte slice. The result is appended to b,

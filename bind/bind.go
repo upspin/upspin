@@ -6,7 +6,6 @@
 package bind
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -108,7 +107,7 @@ func registerUser(op string, transport upspin.Transport, user upspin.User, allow
 	defer mu.Unlock()
 	_, ok := userMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, fmt.Errorf("cannot override User interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override User interface: %v", transport))
 	}
 	userMap[transport] = user
 	return nil
@@ -130,7 +129,7 @@ func registerDirectory(op string, transport upspin.Transport, dir upspin.Directo
 	defer mu.Unlock()
 	_, ok := directoryMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, fmt.Errorf("cannot override Directory interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override Directory interface: %v", transport))
 	}
 	directoryMap[transport] = dir
 	return nil
@@ -152,7 +151,7 @@ func registerStore(op string, transport upspin.Transport, store upspin.Store, al
 	defer mu.Unlock()
 	_, ok := storeMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, fmt.Errorf("cannot override Store interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override Store interface: %v", transport))
 	}
 	storeMap[transport] = store
 	return nil
@@ -165,7 +164,7 @@ func User(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	u, ok := userMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(User, errors.Invalid, fmt.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(User, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
 	x, err := reachableService(cc, User, e, userDialCache, u)
 	if err != nil {
@@ -181,7 +180,7 @@ func Store(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	s, ok := storeMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(Store, errors.Invalid, fmt.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(Store, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
 	x, err := reachableService(cc, Store, e, storeDialCache, s)
 	if err != nil {
@@ -197,7 +196,7 @@ func Directory(cc *upspin.Context, e upspin.Endpoint) (upspin.Directory, error) 
 	d, ok := directoryMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(Directory, errors.Invalid, fmt.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(Directory, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
 	x, err := reachableService(cc, Directory, e, directoryDialCache, d)
 	if err != nil {
@@ -224,7 +223,7 @@ func Release(service upspin.Service) error {
 	case upspin.User:
 		delete(userDialCache, key)
 	default:
-		return errors.E(Release, errors.Invalid, fmt.Errorf("unknown service type %T", service))
+		return errors.E(Release, errors.Invalid, errors.Errorf("unknown service type %T", service))
 	}
 	service.Close()
 	delete(reverseLookup, service)
@@ -283,7 +282,7 @@ func reachableService(cc *upspin.Context, op string, e upspin.Endpoint, cache di
 		// It's dead; release it and try again.
 		log.Printf("Bind: server is dead for key: %v. Trying again.", key)
 		if err := Release(ds.service); err != nil {
-			return nil, errors.E(op, errors.IO, fmt.Errorf("Releasing cached service: %v", err))
+			return nil, errors.E(op, errors.IO, errors.Errorf("Releasing cached service: %v", err))
 		}
 
 		if n > 100 {

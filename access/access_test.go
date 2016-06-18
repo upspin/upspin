@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -271,7 +272,7 @@ func TestHasAccessWithGroups(t *testing.T) {
 		case "me@here.com/Group/family":
 			return []byte("# My family\n sister@me.com, brother@me.com\n"), nil
 		default:
-			return nil, fmt.Errorf("%s not found", name)
+			return nil, errors.Errorf("%s not found", name)
 		}
 	}
 
@@ -576,7 +577,7 @@ func TestAllUsers(t *testing.T) {
 		case "bob@foo.com/Group/friends":
 			return []byte("nancy@foo.com, anna@foo.com"), nil
 		default:
-			return nil, fmt.Errorf("%s not found", name)
+			return nil, errors.Errorf("%s not found", name)
 		}
 	}
 

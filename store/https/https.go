@@ -158,7 +158,7 @@ func (s *Store) Authenticate(*upspin.Context) error {
 }
 
 func newStoreError(op string, err string, ref upspin.Reference) error {
-	return errors.E(op, fmt.Errorf("%v: %s", ref, err))
+	return errors.E(op, errors.Errorf("%v: %s", ref, err))
 }
 
 // BufferResponse reads the body of an HTTP response up to maxBufLen bytes. It closes the response body.

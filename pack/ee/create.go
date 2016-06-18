@@ -11,7 +11,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/binary"
-	"fmt"
 
 	"upspin.io/errors"
 	"upspin.io/pack"
@@ -55,7 +54,7 @@ func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error)
 	const CreateKeys = "CreateKeys"
 	packer := pack.Lookup(packing)
 	if packer == nil {
-		return nil, errors.E(CreateKeys, errors.Invalid, fmt.Errorf("packing %v not registered", packing))
+		return nil, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %v not registered", packing))
 	}
 	var keyType string
 	var curve elliptic.Curve
@@ -70,7 +69,7 @@ func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error)
 		keyType = (packer.(eep521)).packerString
 		curve = (packer.(eep521)).curve
 	default:
-		return nil, errors.E(CreateKeys, errors.Invalid, fmt.Errorf("packing %d", packing))
+		return nil, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %d", packing))
 	}
 
 	priv, err := createKeysFromEntropy(curve, entropy)

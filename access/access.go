@@ -20,7 +20,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -123,19 +122,19 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		// A line is two non-empty comma-separated lists, separated by a colon.
 		colon := bytes.IndexByte(line, ':')
 		if colon < 0 {
-			return nil, fmt.Errorf("%s:%d: syntax error: no colon on line: %q", pathName, lineNum, line)
+			return nil, errors.Errorf("%s:%d: syntax error: no colon on line: %q", pathName, lineNum, line)
 		}
 
 		// Parse rights and users lists.
 		rightsText := bytes.TrimSpace(line[:colon]) // TrimSpace for good error messages below.
 		rights = splitList(rights[:0], rightsText)
 		if rights == nil {
-			return nil, fmt.Errorf("%s:%d: syntax error: invalid rights list: %q", pathName, lineNum, rightsText)
+			return nil, errors.Errorf("%s:%d: syntax error: invalid rights list: %q", pathName, lineNum, rightsText)
 		}
 		usersText := bytes.TrimSpace(line[colon+1:])
 		users := splitList(users[:0], usersText)
 		if users == nil {
-			return nil, fmt.Errorf("%s:%d: syntax error: invalid users list: %q", pathName, lineNum, usersText)
+			return nil, errors.Errorf("%s:%d: syntax error: invalid users list: %q", pathName, lineNum, usersText)
 		}
 
 		var err error
@@ -148,10 +147,10 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 			case Read, Write, List, Create, Delete:
 				err = a.addRight(r, parsed.User(), users)
 			case Invalid:
-				err = fmt.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
+				err = errors.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
 			}
 			if err != nil {
-				return nil, fmt.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
+				return nil, errors.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
 			}
 		}
 	}
@@ -280,7 +279,7 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 			slash := bytes.IndexByte(user, '/')
 			if slash >= 0 && bytes.Index(user, []byte(groupElem)) == slash {
 				// Looks like a group file but is missing the user name.
-				return nil, fmt.Errorf("bad user name in group path %q", user)
+				return nil, errors.Errorf("bad user name in group path %q", user)
 			}
 			// It has no user name, so it might be a path name for a group file.
 			p, err = path.Parse(upspin.PathName(owner) + groupElem + upspin.PathName(user))
@@ -292,11 +291,11 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 		if !p.IsRoot() {
 			// First element must be group.
 			if p.Elem(0) != "Group" {
-				return nil, fmt.Errorf("illegal group %q", user)
+				return nil, errors.Errorf("illegal group %q", user)
 			}
 			// Groups cannot be wild cards.
 			if bytes.HasPrefix(user, []byte("*@")) {
-				return nil, fmt.Errorf("cannot have wildcard for group name %q", user)
+				return nil, errors.Errorf("cannot have wildcard for group name %q", user)
 			}
 		}
 		list = append(list, p)
@@ -431,14 +430,14 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 
 		users := splitList(users[:0], line)
 		if users == nil {
-			return nil, fmt.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
+			return nil, errors.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
 		}
 		if group == nil {
 			group = make([]path.Parsed, 0, preallocSize(len(users)))
 		}
 		group, err = parsedAppend(group, parsed.User(), users...)
 		if err != nil {
-			return nil, fmt.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
+			return nil, errors.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
 		}
 	}
 	if s.Err() != nil {
@@ -610,7 +609,7 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 	case Read, Write, List, Create, Delete:
 		return a.list[right], nil
 	default:
-		return nil, fmt.Errorf("unrecognized right value %d", right)
+		return nil, errors.Errorf("unrecognized right value %d", right)
 	}
 }
 

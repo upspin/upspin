@@ -15,6 +15,7 @@ import (
 	"math/big"
 	"strings"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
@@ -113,7 +114,7 @@ func ParsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, string, error
 		return nil, "", err
 	}
 	if n != 3 {
-		return nil, "", fmt.Errorf("expected keytype and two big ints, got %d", n)
+		return nil, "", errors.Errorf("expected keytype and two big ints, got %d", n)
 	}
 	var curve elliptic.Curve
 	switch keyType {
@@ -124,7 +125,7 @@ func ParsePublicKey(publicKey upspin.PublicKey) (*ecdsa.PublicKey, string, error
 	case "p384":
 		curve = elliptic.P384()
 	default:
-		return nil, "", fmt.Errorf("unknown key type: %q", keyType)
+		return nil, "", errors.Errorf("unknown key type: %q", keyType)
 	}
 	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, keyType, nil
 }

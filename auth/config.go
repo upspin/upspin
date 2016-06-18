@@ -6,7 +6,6 @@ package auth
 
 import (
 	"crypto/tls"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -39,17 +38,17 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 	const NewDefaultTLSConfig = "NewDefaultTLSConfig"
 	certReadable, err := isReadableFile(certFile)
 	if err != nil {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("SSL certificate in %q: %q", certFile, err))
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("SSL certificate in %q: %q", certFile, err))
 	}
 	if !certReadable {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("certificate file %q not readable", certFile))
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("certificate file %q not readable", certFile))
 	}
 	keyReadable, err := isReadableFile(certKeyFile)
 	if err != nil {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("SSL key in %q: %v", certKeyFile, err))
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("SSL key in %q: %v", certKeyFile, err))
 	}
 	if !keyReadable {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, fmt.Errorf("certificate key file %q not readable", certKeyFile))
+		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("certificate key file %q not readable", certKeyFile))
 	}
 
 	cert, err := tls.LoadX509KeyPair(certFile, certKeyFile)
