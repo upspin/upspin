@@ -51,6 +51,24 @@
       "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_7de1c8d8",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-18T23:05:45Z",
+      "side": 1,
+      "message": "Also, privatekey strings are only passed alongside an upspin.PublicKey in test code, so mistakes are typically caught as type errors.\n\nFurther, I\u0027d been tracking along with all the errors changes but sending this has made my git state unhappy so I may have to abandon this CL anyway.",
+      "parentUuid": "09c98479_9dab048a",
+      "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
