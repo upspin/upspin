@@ -53,7 +53,7 @@ func createKeys(pack upspin.Packing) {
 
 	}
 
-	keyPair, err := ee.CreateKeys(pack, b)
+	pub, priv, err := ee.CreateKeys(pack, b)
 
 	// Save the keys to files.
 	private, err := os.Create(filepath.Join(keydir(), "secret.upspinkey"))
@@ -69,8 +69,8 @@ func createKeys(pack upspin.Packing) {
 		log.Fatal(err)
 	}
 
-	private.WriteString(string(keyPair.Private))
-	public.WriteString(string(keyPair.Public))
+	private.WriteString(priv)
+	public.WriteString(string(pub))
 
 	err = private.Close()
 	if err != nil {

@@ -82,7 +82,8 @@ type Factotum interface {
 	// ScalarMult is the bare private key operator, used in unwrapping packed data.
 	// Each call needs security review to ensure it cannot be abused as a signing
 	// oracle. Read https://en.wikipedia.org/wiki/Confused_deputy_problem.
-	ScalarMult(c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int)
+	// Returns error "no such key" if factotum doesn't hold the necessary private key.
+	ScalarMult(keyHash []byte, c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error)
 
 	// UserSign assists in authenticating to Upspin servers.
 	UserSign(hash []byte) (Signature, error)
@@ -228,18 +229,6 @@ type User interface {
 
 // A PublicKey can be given to anyone and used for authenticating a User.
 type PublicKey string
-
-// A PrivateKey is paired with PublicKey but never leaves the Client.
-// (This is largely being replaced by Factotum;  avoid new uses.)
-type PrivateKey string
-
-// A KeyPair is used when exchanging data with other users. It
-// always contains both the public and private keys.
-// (This is largely being replaced by Factotum;  avoid new uses.)
-type KeyPair struct {
-	Public  PublicKey
-	Private PrivateKey
-}
 
 // Directory service.
 

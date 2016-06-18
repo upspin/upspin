@@ -38,13 +38,21 @@ import (
 
 // wrappedKey encodes a key that will decrypt and verify the ciphertext.
 type wrappedKey struct {
-	keyHash   []byte // sha256(recipient stringPublicKey)
+	keyHash   []byte // recipient's public key
 	dkey      []byte // ciphertext symmetric decryption key
 	nonce     []byte
 	ephemeral ecdsa.PublicKey
 }
 
 type keyHashArray [sha256.Size]byte // sometimes we need the array
+
+// ecdsaKeyHash returns the hash of a key given in ECDSA format
+// and is the binary-format counterpart of KeyHash in package factotum.
+func ecdsaKeyHash(p *ecdsa.PublicKey) []byte {
+	keyBytes := upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packname(p.Curve), p.X.String(), p.Y.String()))
+	// this string should be the same as the file contents ~/.ssh/public.upspinkey
+	return factotum.KeyHash(keyBytes)
+}
 
 // common implements common functions parameterized by cipher-specific values.
 type common struct {
@@ -165,7 +173,6 @@ func (c common) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspi
 	}
 
 	// Wrap for myself.
-	// TODO Update this other readers, as soon as we can get the list.
 	wrap := make([]wrappedKey, 1)
 	p, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
 	if err != nil {
@@ -212,6 +219,8 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
 	}
+	// TODO(ehg) There will no longer be a need for checking against c.packerString.
+	// If fixed here, check for other places the code was copied.
 	ownerPubKey, err := parsePublicKey(ownerRawPubKey, c.packerString)
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
@@ -223,13 +232,9 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
 	}
-	pubkey, err := parsePublicKey(rawPublicKey, c.packerString)
-	if err != nil {
-		return 0, errors.E(Unpack, d.Name, err)
-	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
-	rhash := keyHash(pubkey)
+	rhash := ecdsaKeyHash(rawPublicKey)
 	b := sha256.Sum256(ciphertext)
 	cipherSum := b[:]
 	for _, w := range wrap {
@@ -283,17 +288,9 @@ func (c common) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata 
 		if err != nil {
 			continue
 		}
-		copy(hash[i][:], keyHash(pubkey[i]))
+		copy(hash[i][:], factotum.KeyHash(pub))
 	}
-	mypub, err := parsePublicKey(ctx.Factotum.PublicKey(), c.packerString)
-	if err != nil {
-		log.Printf("Error parsing my public key: %s", err)
-		for i := range packdata {
-			packdata[i] = nil
-		}
-		return
-	}
-	myhash := keyHash(mypub)
+	myhash := factotum.KeyHash(ctx.Factotum.PublicKey())
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdata {
@@ -409,7 +406,7 @@ func (c common) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.Pat
 	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
-	rhash := keyHash(pubkey)
+	rhash := ecdsaKeyHash(pubkey)
 	wrapFound := false
 	var w wrappedKey
 	for _, w = range wrap {
@@ -475,19 +472,6 @@ func packname(curve elliptic.Curve) string {
 	}
 }
 
-// keyHash returns the hash of a key given in ECDSA format
-func keyHash(p *ecdsa.PublicKey) []byte {
-	keyBytes := []byte(fmt.Sprintf("%s\n%s\n%s\n", packname(p.Curve), p.X.String(), p.Y.String()))
-	// this string should be the same as the file contents ~/.ssh/public.upspinkey
-	return stringKeyHash(keyBytes)
-}
-
-// stringKeyHash returns the hash of a key given in string format
-func stringKeyHash(p []byte) []byte {
-	keyHash := sha256.Sum256(p)
-	return keyHash[:]
-}
-
 // aesWrap implements NIST 800-56Ar2; see also RFC6637 §8.
 func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
@@ -504,7 +488,7 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 	if err != nil {
 		return
 	}
-	w.keyHash = keyHash(R)
+	w.keyHash = ecdsaKeyHash(R)
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", c.packing, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO(security-reviewer) reconsider salt
@@ -534,7 +518,10 @@ func (c common) aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err erro
 func (c common) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	sx, sy := f.ScalarMult(c.curve, w.ephemeral.X, w.ephemeral.Y)
+	sx, sy, err := f.ScalarMult(w.keyHash, c.curve, w.ephemeral.X, w.ephemeral.Y)
+	if err != nil {
+		return nil, err
+	}
 	S := elliptic.Marshal(c.curve, sx, sy)
 
 	// Step 2.  Convert shared secret to strong secret via HKDF.
@@ -705,7 +692,7 @@ func (c common) packdataLen(nwrap int) int {
 // publicKey returns the string representation of a user's public key.
 func publicKey(ctx *upspin.Context, user upspin.UserName, packerString string) (upspin.PublicKey, error) {
 
-	// KeyPairs have three representations:
+	// Key pairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup
 	// 2. ecdsa, internal binary format for computation
 	// 3. a secret seed sufficient to reconstruct the key pair
