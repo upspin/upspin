@@ -32,7 +32,6 @@ package grpcauth
 import (
 	"crypto/ecdsa"
 	"crypto/rand"
-	"errors"
 	"fmt"
 	"math/big"
 	"net"
@@ -44,6 +43,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"upspin.io/auth"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -53,9 +53,9 @@ import (
 
 // Errors returned in case of various authentication failure scenarios.
 var (
-	ErrUnauthenticated  = errors.New("user not authenticated")
-	ErrExpired          = errors.New("auth token expired")
-	ErrMissingSignature = errors.New("missing or invalid signature")
+	errUnauthenticated  = errors.Str("user not authenticated")
+	errExpired          = errors.Str("auth token expired")
+	errMissingSignature = errors.Str("missing or invalid signature")
 
 	authTokenDuration = 20 * time.Hour // Max duration an auth token lasts.
 )
@@ -97,7 +97,7 @@ func NewSecureServer(config auth.Config, certFile string, certKeyFile string) (S
 	if certFile != "" && certKeyFile != "" {
 		tlsConfig, err := auth.NewDefaultTLSConfig(certFile, certKeyFile)
 		if err != nil {
-			return nil, err
+			return nil, errors.E("NewSecurServer", err)
 		}
 		creds := credentials.NewTLS(tlsConfig)
 		grpcServer = grpc.NewServer(grpc.Creds(creds))
@@ -106,7 +106,7 @@ func NewSecureServer(config auth.Config, certFile string, certKeyFile string) (S
 			log.Printf("Not using TLS encryption. Allowing unauthenticated users.")
 			grpcServer = grpc.NewServer()
 		} else {
-			return nil, errors.New("No certificate provided but not allowing unauthenticated users")
+			return nil, errors.E("NewSecureServer", errors.Invalid, "no certificate provided but not allowing unauthenticated users")
 		}
 	}
 	return &secureServerImpl{
@@ -124,19 +124,20 @@ var _ SecureServer = (*secureServerImpl)(nil)
 
 // Authenticate authenticates the calling user.
 func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
+	const Authenticate = "Authenticate"
 	log.Printf("Authenticate %q %q", req.UserName, req.Now)
 	// Must be a valid name.
 	parsed, err := path.Parse(upspin.PathName(req.UserName))
 	if err != nil {
 		log.Error.Printf("Authenticate %q: %v", req.UserName, err)
-		return nil, err
+		return nil, errors.E(Authenticate, err)
 	}
 
 	// Time should be sane.
 	reqNow, err := time.Parse(time.ANSIC, req.Now)
 	if err != nil {
 		log.Fatalf("time failed to parse: %q", req.Now)
-		return nil, err
+		return nil, errors.E(Authenticate, err)
 	}
 	var now time.Time
 	if s.config.TimeFunc == nil {
@@ -155,25 +156,25 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	keys, err := s.config.Lookup(parsed.User())
 	log.Printf("Authenticate: Done looking for keys. Error: %v", err)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(Authenticate, err)
 	}
 
 	// Parse signature
 	var rs, ss big.Int
 	_, ok := rs.SetString(req.Signature.R, 10)
 	if !ok {
-		return nil, ErrMissingSignature
+		return nil, errors.E(Authenticate, errMissingSignature)
 	}
 	_, ok = ss.SetString(req.Signature.S, 10)
 	if !ok {
-		return nil, ErrMissingSignature
+		return nil, errors.E(Authenticate, errMissingSignature)
 	}
 
 	// Validate signature.
 	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s", req.UserName)
-		return nil, ErrMissingSignature
+		return nil, errors.E(Authenticate, errMissingSignature)
 	}
 
 	// Generate an auth token and bind it to a session for the user.
@@ -181,7 +182,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	authToken, err := generateRandomToken()
 	if err != nil {
 		log.Error.Printf("Can't create auth token.")
-		return nil, errors.New("can't create auth token")
+		return nil, errors.E(Authenticate, err)
 	}
 	isAuth := !s.config.AllowUnauthenticatedConnections
 	_ = auth.NewSession(parsed.User(), isAuth, expiration, authToken, nil) // session is cached, ignore return value
@@ -209,24 +210,25 @@ func generateRandomToken() (string, error) {
 		return "", err
 	}
 	if n != len(buf) {
-		return "", errors.New("random bytes too short")
+		return "", errors.Str("random bytes too short")
 	}
 	return fmt.Sprintf("%X", buf), nil
 }
 
 // GetSessionFromContext returns a session from the context if there is one.
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
+	const GetSessionFromContext = "GetSessionFromContext"
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.New("invalid metadata")
+		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("invalid metadata"))
 	}
 	data, ok := md[authTokenKey]
 	if !ok || len(data) != 1 {
-		return nil, errors.New("no auth token in metadata")
+		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("no auth token in metadata"))
 	}
 	authToken := data[0]
 	if len(authToken) < authTokenEntropyLen {
-		return nil, errors.New("invalid auth token")
+		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("invalid auth token"))
 	}
 	log.Printf("Got authToken from context: %s", authToken)
 
@@ -236,7 +238,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 		// We don't know this client or have forgotten about it. We must authenticate.
 		// Log it so we can track how often this happens. Maybe we need to increase the session cache size.
 		log.Debug.Printf("Got token from user but there's no session for it.")
-		return nil, ErrUnauthenticated
+		return nil, errors.E(GetSessionFromContext, errors.Permission, errUnauthenticated)
 	}
 
 	// If session has expired, forcibly remove it from the cache and return an error.
@@ -246,7 +248,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 	}
 	if session.Expires().Before(timeFunc()) {
 		auth.ClearSession(authToken)
-		return nil, ErrExpired
+		return nil, errors.E(GetSessionFromContext, errors.Permission, errExpired)
 	}
 
 	return session, nil
