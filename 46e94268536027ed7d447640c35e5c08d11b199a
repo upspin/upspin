@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_8bdc9ded",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "do you want to wrap these? not sure.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_cbddb5e7",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "don\u0027t use fmt.Errorf for simple string errors. use errors.Str.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_2bcd493d",
+        "filename": "cmd/upspinfs/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "i know this is unix-specific and you need this for errno but syscall is dangerous here.\nif errno is all you\u0027re using it may be OK\nat least mark it \"TODO\".\nmaybe we can figure something out.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_4bd285da",
+        "filename": "cmd/upspinfs/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "this is working just by luck.\nwhat i would do for now is put this stuff into a unix.go and give it a unix build tag.\nat least that\u0027s honest.\n\nmaybe the whole file should be unix_errors.go; that would take care of all of it.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_0b6ecd16",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "syscall shouldn\u0027t be here. it\u0027s highly non-portable.\ni shows the solution below.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_8b59fd75",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "i decided not to use dotted names here, because these are for users and they won\u0027t know the components necessarily.\n\ni\u0027d like to be consistent but leave it if you insist.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_4b5fe55a",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "this is a brand new E so it should have a Kind. probably errors.Invalid or maybe errors.Permission, but i\u0027d like those to be actual permission problems",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_0b45ed84",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "there is no errno on some systems. us os.IsPermission instead.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_eb47d18c",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "errors.Str(\"short read\")\notherwise you have two strings in the argument list",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_8b82dddf",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T02:54:53Z",
+      "side": 1,
+      "message": "there are a number of places i touched today that these should be used.\ni will try to find them.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
