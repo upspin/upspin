@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09c98479_7d8f083c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T21:43:29Z",
+      "side": 1,
+      "message": "this is not a very helpful introduction. metaphors don\u0027t make for easy grepping. please be specific.",
+      "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_5d8a4c2d",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-18T21:43:29Z",
+      "side": 1,
+      "message": "we have been careful to use distinct types for strings. it\u0027s too dangerous having just \u0027string\u0027 be used for different things, doubly so when one of the uses is \"private\". introduce upspin.PrivateKey (actually I think we had that before) and use it everywhere",
+      "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
