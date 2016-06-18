@@ -50,11 +50,11 @@ func (d *drng) Read(p []byte) (n int, err error) {
 }
 
 // CreateKeys creates a key pair based on the chosen packing and a slice of entropy.
-func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error) {
+func CreateKeys(packing upspin.Packing, entropy []byte) (public upspin.PublicKey, private string, err error) {
 	const CreateKeys = "CreateKeys"
 	packer := pack.Lookup(packing)
 	if packer == nil {
-		return nil, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %v not registered", packing))
+		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %v not registered", packing))
 	}
 	var keyType string
 	var curve elliptic.Curve
@@ -69,15 +69,15 @@ func CreateKeys(packing upspin.Packing, entropy []byte) (*upspin.KeyPair, error)
 		keyType = (packer.(eep521)).packerString
 		curve = (packer.(eep521)).curve
 	default:
-		return nil, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %d", packing))
+		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %d", packing))
 	}
 
 	priv, err := createKeysFromEntropy(curve, entropy)
 	if err != nil {
-		return nil, errors.E(CreateKeys, errors.Invalid, err)
+		return public, private, errors.E(CreateKeys, errors.Invalid, err)
 	}
-	keypair := encodeKeys(priv, keyType)
-	return keypair, nil
+	public, private = encodeKeys(priv, keyType)
+	return
 }
 
 // GenEntropy fills the slice with cryptographically-secure random bytes.
@@ -90,11 +90,10 @@ func GenEntropy(entropy []byte) error {
 }
 
 // encodeKeys converts an ecsda private key into an upspin key pair. No error checking is performed.
-func encodeKeys(priv *ecdsa.PrivateKey, keyType string) *upspin.KeyPair {
-	return &upspin.KeyPair{
-		Private: upspin.PrivateKey(priv.D.String() + "\n"),
-		Public:  upspin.PublicKey(keyType + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n"),
-	}
+func encodeKeys(priv *ecdsa.PrivateKey, keyType string) (public upspin.PublicKey, private string) {
+	private = priv.D.String() + "\n"
+	public = upspin.PublicKey(keyType + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n")
+	return
 }
 
 // createKeysFromEntropy creates an ecsda private key from a given entropy.

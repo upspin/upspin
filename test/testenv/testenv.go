@@ -29,6 +29,14 @@ type Entry struct {
 	C string
 }
 
+// KeyPair holds the public and private string form of a user key.  Ideally
+// this would not be used, since we want only factotum to have the private key.
+// But it helps the test setup for now.
+type KeyPair struct {
+	Public  upspin.PublicKey
+	Private string
+}
+
 // Setup is a configuration structure that contains a directory tree and other optional flags.
 type Setup struct {
 	// OwnerName is the name of the directory tree owner.
@@ -42,7 +50,7 @@ type Setup struct {
 	Packing upspin.Packing
 
 	// Keys holds all keys for the owner. Leave empty to be assigned randomly-created new keys.
-	Keys upspin.KeyPair
+	Keys KeyPair
 
 	// Tree is the directory tree desired at the start of the test environment.
 	Tree Tree
@@ -78,7 +86,7 @@ type Env struct {
 }
 
 var (
-	zeroKey upspin.KeyPair
+	zeroKey KeyPair
 )
 
 // New creates a new Env for testing.
@@ -151,7 +159,7 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
+func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
 	var context *upspin.Context
 	var err error
 	if keyPair == nil || *keyPair == zeroKey {
@@ -184,7 +192,7 @@ func innerNewUser(op string, userName upspin.UserName, keyPair *upspin.KeyPair, 
 // NewUser creates a new client for a user, generating new keys of the right packing type if the provided
 // keys are nil or empty. The new user will not have a root created. Callers should use the client to
 // MakeDirectory if necessary.
-func (e *Env) NewUser(userName upspin.UserName, keyPair *upspin.KeyPair) (upspin.Client, *upspin.Context, error) {
+func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, *upspin.Context, error) {
 	return innerNewUser("NewUser", userName, keyPair, e.Setup.Packing, e.Setup.Transport)
 }
 
@@ -239,24 +247,27 @@ func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 func newContextForUser(userName upspin.UserName, packing upspin.Packing) (*upspin.Context, error) {
 	entropy := make([]byte, 32) // Enough for p521
 	ee.GenEntropy(entropy)
-	var keyPair *upspin.KeyPair
+	var keyPair *KeyPair
+	var pub upspin.PublicKey
+	var priv string
 	var err error
 	switch packing {
 	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack:
-		keyPair, err = ee.CreateKeys(packing, entropy)
+		pub, priv, err = ee.CreateKeys(packing, entropy)
 	default:
 		// For non-EE packing, a p256 key will do.
-		keyPair, err = ee.CreateKeys(upspin.EEp256Pack, entropy)
+		pub, priv, err = ee.CreateKeys(upspin.EEp256Pack, entropy)
 	}
 	if err != nil {
 		return nil, err
 	}
+	keyPair = &KeyPair{pub, priv}
 	return newContextForUserWithKey(userName, keyPair, packing)
 }
 
 // newContextForUserWithKey adds a new user to the inprocess user service and returns a Context partially filled with user,
 // key and packing type as given.
-func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair, packing upspin.Packing) (*upspin.Context, error) {
+func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, packing upspin.Packing) (*upspin.Context, error) {
 	context := &upspin.Context{
 		UserName: userName,
 		Packing:  packing,
@@ -276,7 +287,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *upspin.KeyPair,
 	}
 	// Set the public key for the registered user.
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
-	context.Factotum, err = factotum.New(*keyPair)
+	context.Factotum, err = factotum.New(keyPair.Public, keyPair.Private)
 	if err != nil {
 		panic("NewFactotum failed")
 	}
