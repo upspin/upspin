@@ -280,5 +280,5 @@ func verifySignature(keys []upspin.PublicKey, hash []byte, r, s *big.Int) error 
 			return nil
 		}
 	}
-	return fmt.Errorf("no keys verified signature")
+	return errors.Errorf("no keys verified signature")
 }

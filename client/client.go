@@ -7,12 +7,12 @@
 package client
 
 import (
-	"fmt"
 	"strings"
 
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client/common/file"
+	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/pack/ee"
 	"upspin.io/path"
@@ -62,7 +62,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
 		packer = pack.Lookup(c.context.Packing)
 		if packer == nil {
-			return zeroLoc, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
+			return zeroLoc, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
 		}
 	}
 
@@ -80,7 +80,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	// Get a buffer big enough for this data
 	cipherLen := packer.PackLen(c.context, data, de)
 	if cipherLen < 0 {
-		return zeroLoc, fmt.Errorf("PackLen failed for %q", name)
+		return zeroLoc, errors.Errorf("PackLen failed for %q", name)
 	}
 	cipher = make([]byte, cipherLen)
 	n, err := packer.Pack(c.context, cipher, data, de)
@@ -221,11 +221,11 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 			// have the correct packing info.
 			packer := pack.Lookup(entry.Metadata.Packing())
 			if packer == nil {
-				return nil, fmt.Errorf("client: unrecognized Packing %d for %q", entry.Metadata.Packing(), name)
+				return nil, errors.Errorf("client: unrecognized Packing %d for %q", entry.Metadata.Packing(), name)
 			}
 			clearLen := packer.UnpackLen(c.context, cipher, entry)
 			if clearLen < 0 {
-				return nil, fmt.Errorf("client: UnpackLen failed for %q", name)
+				return nil, errors.Errorf("client: UnpackLen failed for %q", name)
 			}
 			cleartext := make([]byte, clearLen)
 			n, err := packer.Unpack(c.context, cleartext, cipher, entry)
@@ -249,7 +249,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	if firstError != nil {
 		return nil, firstError
 	}
-	return nil, fmt.Errorf("client: %q not found on any store server", name)
+	return nil, errors.Errorf("client: %q not found on any store server", name)
 }
 
 // Glob implements upspin.Client.
@@ -297,7 +297,7 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 		}
 	}
 	if err == nil {
-		err = fmt.Errorf("client: no endpoint for user %q", parsed.User())
+		err = errors.Errorf("client: no endpoint for user %q", parsed.User())
 	}
 	return nil, err
 }
@@ -316,7 +316,7 @@ func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
 		pubKeys = append(pubKeys, pks...)
 	}
 	if len(pubKeys) == 0 {
-		return nil, fmt.Errorf("client: no public keys for user %q", parsed.User())
+		return nil, errors.Errorf("client: no public keys for user %q", parsed.User())
 	}
 	return pubKeys, nil
 }
@@ -352,16 +352,16 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		return nil, err
 	}
 	if entry.IsDir() {
-		return nil, fmt.Errorf("cannot link or rename directories")
+		return nil, errors.Errorf("cannot link or rename directories")
 	}
 
 	packer := pack.Lookup(entry.Metadata.Packing())
 	if packer == nil {
-		return nil, fmt.Errorf("unrecognized Packing %d for %q", c.context.Packing, oldName)
+		return nil, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing, oldName)
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
 		if entry.Metadata.Packing() != upspin.PlainPack {
-			return nil, fmt.Errorf("can only link plain packed files to access or group files")
+			return nil, errors.Errorf("can only link plain packed files to access or group files")
 		}
 	}
 

@@ -14,7 +14,7 @@ import (
 func ExampleError() {
 	path := upspin.PathName("jane@doe.com/file")
 	user := upspin.UserName("joe@blow.com")
-	err := fmt.Errorf("network unreachable")
+	err := errors.Errorf("network unreachable")
 
 	// Single error.
 	e1 := errors.E(path, "Get", errors.IO, err)

@@ -7,13 +7,13 @@ package context
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"path"
 	"strings"
 
 	"upspin.io/endpoint"
+	"upspin.io/errors"
 	"upspin.io/key/keyloader"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -88,7 +88,7 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 	context.UserName = upspin.UserName(vals["name"])
 	packer := pack.LookupByName(vals["packing"])
 	if packer == nil {
-		return nil, fmt.Errorf("unknown packing %s", vals["packing"])
+		return nil, errors.Errorf("unknown packing %s", vals["packing"])
 	}
 	context.Packing = packer.Packing()
 

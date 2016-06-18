@@ -6,11 +6,11 @@
 package usercache
 
 import (
-	"fmt"
 	"time"
 
 	"upspin.io/bind"
 	"upspin.io/cache"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -57,7 +57,7 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 	// Not found, look it up.
 	user, err := bind.User(&c.context, c.userEndpoint)
 	if err != nil {
-		return nil, nil, fmt.Errorf("usercache: error binding to User service on %v for user %q: %s",
+		return nil, nil, errors.Errorf("usercache: error binding to User service on %v for user %q: %s",
 			c.userEndpoint, c.context.UserName, err.Error())
 	}
 	defer bind.Release(user)

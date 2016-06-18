@@ -6,7 +6,6 @@
 package file
 
 import (
-	"fmt"
 	"io"
 
 	"upspin.io/errors"
@@ -79,10 +78,10 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 		return 0, f.errClosed(op)
 	}
 	if f.writable {
-		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("not open for read"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("not open for read"))
 	}
 	if off < 0 {
-		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("negative offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
 	}
 	if off >= int64(len(f.data)) {
 		return 0, errors.E(op, f.name, io.EOF)
@@ -132,14 +131,14 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 		return 0, f.errClosed(op)
 	}
 	if !f.writable {
-		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("not open for write"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("not open for write"))
 	}
 	if off < 0 {
-		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("negative offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
 	}
 	end := off + int64(len(b))
 	if end > maxInt {
-		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("file too long"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("file too long"))
 	}
 	if end > int64(cap(f.data)) {
 		// Grow the capacity of f.data but keep length the same.

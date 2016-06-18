@@ -6,7 +6,6 @@
 package inprocess
 
 import (
-	"fmt"
 	goPath "path"
 	"sort"
 	"strings"
@@ -93,7 +92,7 @@ func getPacker(packdata upspin.Packdata) (upspin.Packer, error) {
 	}
 	packer := pack.Lookup(upspin.Packing(packdata[0]))
 	if packer == nil {
-		return nil, fmt.Errorf("no packing %#x registered", packdata[0])
+		return nil, errors.Errorf("no packing %#x registered", packdata[0])
 	}
 	return packer, nil
 }

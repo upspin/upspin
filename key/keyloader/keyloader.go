@@ -6,7 +6,6 @@
 package keyloader
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -51,7 +50,7 @@ func publicKey(op string) (upspin.PublicKey, error) {
 	buf := make([]byte, 400) // enough for p521
 	n, err := f.Read(buf)
 	if err != nil {
-		return zeroPubKey, fmt.Errorf(keyloaderErr, err)
+		return zeroPubKey, errors.Errorf(keyloaderErr, err)
 	}
 	return upspin.PublicKey(string(buf[:n])), nil
 }
@@ -66,7 +65,7 @@ func privateKey(op string) (upspin.KeyPair, error) {
 	buf := make([]byte, 200) // enough for p521
 	n, err := f.Read(buf)
 	if err != nil {
-		return zeroPrivKey, fmt.Errorf(keyloaderErr, err)
+		return zeroPrivKey, errors.Errorf(keyloaderErr, err)
 	}
 	buf = buf[:n]
 	buf = []byte(strings.TrimSpace(string(buf)))
