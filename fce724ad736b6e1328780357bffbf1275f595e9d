@@ -33,6 +33,24 @@
       "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_9dab048a",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-18T22:39:14Z",
+      "side": 1,
+      "message": "The point of the CL is to get rid of PrivateKey from upspin so people aren\u0027t tempted to use it.  We want it to only be inside factotum.\n\nOk, maybe it is expedient to leave it in tests as is for now but putting the type explicitly in upspin.go is sending the wrong signal.",
+      "parentUuid": "09c98479_5d8a4c2d",
+      "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
