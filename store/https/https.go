@@ -6,7 +6,6 @@
 package https
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -107,12 +107,12 @@ func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 
 // Put implements Store.
 func (s *Store) Put(data []byte) (upspin.Reference, error) {
-	return "", errors.New("https: Put: not implemented")
+	return "", errors.E("Put", errors.Str("not implemented"))
 }
 
 // Delete implements Store.
 func (s *Store) Delete(ref upspin.Reference) error {
-	return errors.New("https: Delete: not implemented")
+	return errors.E("Delete", errors.Str("not implemented"))
 }
 
 // requestAndReadResponseBody is an internal helper function that
@@ -157,30 +157,9 @@ func (s *Store) Authenticate(*upspin.Context) error {
 	return nil
 }
 
-type storeError struct {
-	op    string
-	error string
-	ref   upspin.Reference
+func newStoreError(op string, err string, ref upspin.Reference) error {
+	return errors.E(op, fmt.Errorf("%v: %s", ref, err))
 }
-
-// Error implements error
-func (s storeError) Error() string {
-	if s.ref != "" {
-		return fmt.Sprintf("https: store error: %s: %s: %s", s.op, s.ref, s.error)
-	}
-	return fmt.Sprintf("https: store error: %s: %s", s.op, s.error)
-}
-
-func newStoreError(op string, error string, ref upspin.Reference) *storeError {
-	return &storeError{
-		op:    op,
-		error: error,
-		ref:   ref,
-	}
-}
-
-// errTooLong is returned when a BufferResponse would not fit in the buffer budget.
-var errTooLong = errors.New("response body too long")
 
 // BufferResponse reads the body of an HTTP response up to maxBufLen bytes. It closes the response body.
 // If the response is larger than maxBufLen, it returns ErrTooLong.
@@ -192,7 +171,7 @@ func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 			buf = make([]byte, resp.ContentLength)
 		} else {
 			// Return an error
-			return nil, errTooLong
+			return nil, errors.E("BufferResponse", errors.Invalid, errors.Str("response body too long"))
 		}
 	} else {
 		buf = make([]byte, maxBufLen)

@@ -6,10 +6,10 @@
 package file
 
 import (
-	"errors"
 	"fmt"
 	"io"
 
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -79,13 +79,13 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 		return 0, f.errClosed(op)
 	}
 	if f.writable {
-		return 0, fmt.Errorf("%s: %q is not open for read", op, f.name)
+		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("not open for read"))
 	}
 	if off < 0 {
-		return 0, fmt.Errorf("%s: %q: negative offset", op, f.name)
+		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("negative offset"))
 	}
 	if off >= int64(len(f.data)) {
-		return 0, io.EOF
+		return 0, errors.E(op, f.name, io.EOF)
 	}
 	n = copy(b, f.data[off:])
 	return n, nil
@@ -104,10 +104,10 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	case 2:
 		ret = int64(len(f.data)) + offset
 	default:
-		return 0, errors.New("bad seek whence")
+		return 0, errors.E("Seek", errors.Invalid, f.name, errors.Str("bad whence"))
 	}
 	if ret < 0 || offset > maxInt {
-		return 0, errors.New("bad seek offset")
+		return 0, errors.E("Seek", errors.Invalid, f.name, errors.Str("bad offset"))
 	}
 	f.offset = ret
 	return ret, nil
@@ -132,14 +132,14 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 		return 0, f.errClosed(op)
 	}
 	if !f.writable {
-		return 0, fmt.Errorf("%s: %q is not open for write", op, f.name)
+		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("not open for write"))
 	}
 	if off < 0 {
-		return 0, fmt.Errorf("%s: %q: negative offset", op, f.name)
+		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("negative offset"))
 	}
 	end := off + int64(len(b))
 	if end > maxInt {
-		return 0, fmt.Errorf("%s: %q: file too long", op, f.name)
+		return 0, errors.E(op, errors.Invalid, f.name, fmt.Errorf("file too long"))
 	}
 	if end > int64(cap(f.data)) {
 		// Grow the capacity of f.data but keep length the same.
@@ -176,5 +176,5 @@ func (f *File) Close() error {
 }
 
 func (f *File) errClosed(op string) error {
-	return fmt.Errorf("%s: %q is closed", op, f.name)
+	return errors.E(op, errors.Invalid, f.name, errors.Str("is closed"))
 }

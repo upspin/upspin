@@ -5,7 +5,6 @@
 package grpcauth
 
 import (
-	"errors"
 	"log"
 	"net"
 	"os"
@@ -15,6 +14,7 @@ import (
 
 	"upspin.io/auth"
 	prototest "upspin.io/auth/grpcauth/testdata"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
 )
@@ -46,7 +46,7 @@ func lookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
 	if userName == user {
 		return []upspin.PublicKey{p256Key.Public, p521Key.Public}, nil
 	}
-	return nil, errors.New("No user here")
+	return nil, errors.Str("No user here")
 }
 
 func pickPort() (listener net.Listener, port string) {

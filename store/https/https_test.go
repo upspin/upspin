@@ -5,12 +5,12 @@
 package https
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/store/https/nettest"
 )
 
@@ -22,7 +22,7 @@ const (
 
 func TestGetError(t *testing.T) {
 	resp := nettest.MockHTTPResponse{
-		Error:    errors.New(errSomethingBad),
+		Error:    errors.Str(errSomethingBad),
 		Response: nil,
 	}
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
@@ -30,7 +30,7 @@ func TestGetError(t *testing.T) {
 
 	_, _, err := s.Get(ref)
 
-	expected := fmt.Sprintf("https: store error: Get: %s: %s", ref, errSomethingBad)
+	expected := fmt.Sprintf("Get: %s: %s", ref, errSomethingBad)
 	if err.Error() != expected {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
@@ -62,7 +62,7 @@ func TestPut(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	const expectedError = "https: Put: not implemented"
+	const expectedError = "Put: not implemented"
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected error %s, got %s", expectedError, err)
 	}
@@ -77,7 +77,7 @@ func TestDelete(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	const expectedError = "https: Delete: not implemented"
+	const expectedError = "Delete: not implemented"
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected error %s, got %s", expectedError, err)
 	}
