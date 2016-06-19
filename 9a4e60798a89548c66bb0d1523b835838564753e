@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "09c98479_9ddce4ed",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9a9905f_25e6aef2",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9a9905f_45d72afb",
         "filename": "metrics/metrics.go",
         "patchSetId": 2
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "I was thinking about adding a Connect() method like cloud.GCP and log, but I it\u0027s probably cleaner and more testable to pass an interface to New and that interface would only have the following method:\n\ntype StoreLogs interface {\n    Store(m *Metric) err\n}\n\nthen each implementation can initialize it anyway it wants to. \n\nSomething like that.",
       "parentUuid": "e9a9905f_05e132d9",
+      "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_bde0c0a4",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "Using Saver interface with a Registration call. Check it out.",
+      "parentUuid": "4959bc44_bcb3b9ab",
       "revId": "9a4e60798a89548c66bb0d1523b835838564753e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
