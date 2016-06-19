@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "09c98479_1d453485",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "how about not-yet-ended to emphasize we expect it to call End()?",
+      "parentUuid": "09c98479_0be88d88",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_2bf46961",
         "filename": "metrics/metrics.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-18T02:59:38Z",
       "side": 1,
       "message": "finally, channel operations in upspin",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_3dcd903d",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "Yay. It took a while, but we had some in tests just in case.",
+      "parentUuid": "09c98479_2bf46961",
       "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "09c98479_5dd24cda",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_8bf3bd76",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_ab079947",
         "filename": "metrics/metrics.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-18T02:59:38Z",
       "side": 1,
       "message": "these declarations are too important to be at the bottom of the file",
+      "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09c98479_7dd708c9",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-19T16:41:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_ab079947",
       "revId": "c40aec7699fef9f7b5487fca780ba742527dbc61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
