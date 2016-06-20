@@ -147,11 +147,26 @@ func E(args ...interface{}) error {
 			return Errorf("unknown type %T, value %v in error call", arg, arg)
 		}
 	}
-	if e.Kind != Other || e.Err == nil {
+	prev, ok := e.Err.(*Error)
+	if !ok {
 		return e
 	}
-	if prev, ok := e.Err.(*Error); ok {
+	// The previous error was also one of ours. Supppress duplications
+	// so the message won't contain the same kind, file name or user name
+	// twice.
+	if prev.Path == e.Path {
+		prev.Path = ""
+	}
+	if prev.User == e.User {
+		prev.User = ""
+	}
+	if prev.Kind == e.Kind {
+		prev.Kind = Other
+	}
+	// If this error has Kind unset or Other, pull up the inner one.
+	if e.Kind == Other {
 		e.Kind = prev.Kind
+		prev.Kind = Other
 	}
 	return e
 }
