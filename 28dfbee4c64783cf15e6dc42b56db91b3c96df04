@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6985a058_91fe3c08",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T16:52:02Z",
+      "side": 1,
+      "message": "// TODO: Rewrite to avoid Fscan.\n\nthis is fine for now but Fscan is inefficient.",
+      "revId": "28dfbee4c64783cf15e6dc42b56db91b3c96df04",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_7113985a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T16:52:02Z",
+      "side": 1,
+      "message": "s/Keyey/Key/",
+      "revId": "28dfbee4c64783cf15e6dc42b56db91b3c96df04",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
