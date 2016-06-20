@@ -87,7 +87,10 @@ func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, 
 		log.Printf("Calling User.Lookup for user %s", userName)
 		_, keys, err := user.Lookup(userName)
 		log.Printf("Lookup answered: %v, %v", keys, err)
-		return keys, errors.E("PublicUserKeyService", err)
+		if err != nil {
+			return nil, errors.E("PublicUserKeyService", err)
+		}
+		return keys, nil
 	}
 }
 
