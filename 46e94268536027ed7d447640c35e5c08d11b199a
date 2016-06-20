@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "09034492_66088e59",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "The caller wraps them.",
+      "parentUuid": "09c98479_8bdc9ded",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_cbddb5e7",
         "filename": "cmd/upspinfs/cache.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-18T02:54:53Z",
       "side": 1,
       "message": "don\u0027t use fmt.Errorf for simple string errors. use errors.Str.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09034492_26029637",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_cbddb5e7",
       "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "09034492_662f6e9e",
+        "filename": "cmd/upspinfs/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_2bcd493d",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_4bd285da",
         "filename": "cmd/upspinfs/errors.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-18T02:54:53Z",
       "side": 1,
       "message": "this is working just by luck.\nwhat i would do for now is put this stuff into a unix.go and give it a unix build tag.\nat least that\u0027s honest.\n\nmaybe the whole file should be unix_errors.go; that would take care of all of it.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_f189c838",
+        "filename": "cmd/upspinfs/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "I made it errors_unix.go with a +build line for systems I think it will work with.  Of course, the bazil fuse package has the same problem, i.e., it assumes a Unix like system.",
+      "parentUuid": "09c98479_4bd285da",
       "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_d1ab648c",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_0b6ecd16",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_8b59fd75",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-06-18T02:54:53Z",
       "side": 1,
       "message": "i decided not to use dotted names here, because these are for users and they won\u0027t know the components necessarily.\n\ni\u0027d like to be consistent but leave it if you insist.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_71ef18bd",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_8b59fd75",
       "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_31e990b6",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_4b5fe55a",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_0b45ed84",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 2
@@ -132,6 +258,24 @@
       "writtenOn": "2016-06-18T02:54:53Z",
       "side": 1,
       "message": "there is no errno on some systems. us os.IsPermission instead.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_b106e06b",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done, albeit differently",
+      "parentUuid": "09c98479_0b45ed84",
       "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_711958c9",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_eb47d18c",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89981491_0273ea03",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -172,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_917cfcd1",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89981491_0273ea03",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_8b82dddf",
         "filename": "errors/errors.go",
         "patchSetId": 2
@@ -183,6 +363,24 @@
       "writtenOn": "2016-06-18T02:54:53Z",
       "side": 1,
       "message": "there are a number of places i touched today that these should be used.\ni will try to find them.",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_f17788eb",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T16:59:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09c98479_8b82dddf",
       "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
