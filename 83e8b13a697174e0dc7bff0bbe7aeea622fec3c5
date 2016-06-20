@@ -16,6 +16,24 @@
       "revId": "83e8b13a697174e0dc7bff0bbe7aeea622fec3c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_45ffaa38",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T19:19:37Z",
+      "side": 1,
+      "message": "Done.    (This will change in the coming CL, in which factotum holds old keys none of which match.  But best to fix the current version, I agree.)",
+      "parentUuid": "6985a058_0526821b",
+      "revId": "83e8b13a697174e0dc7bff0bbe7aeea622fec3c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
