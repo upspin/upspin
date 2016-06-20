@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6985a058_fa02fd6a",
+        "filename": "directory/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T18:23:26Z",
+      "side": 1,
+      "message": "this will make the op be \"file not found\". there should be no string argument other than the op. plus you want th eop.\n\nyou want something like\n\nerrors.E(\"Get\", errors.NotExist, path)\n\nthere is no need for an error argument because errors.NotExist will cover that.",
+      "revId": "0bb7790b05b43e9d1750a7deea634f97c57b3abc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_9af73194",
+        "filename": "directory/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T18:23:26Z",
+      "side": 1,
+      "message": "ditto re: strings",
+      "revId": "0bb7790b05b43e9d1750a7deea634f97c57b3abc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_5af229a4",
+        "filename": "directory/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T18:23:26Z",
+      "side": 1,
+      "message": "this looks right.",
+      "revId": "0bb7790b05b43e9d1750a7deea634f97c57b3abc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_7aefedbc",
+        "filename": "directory/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T18:23:26Z",
+      "side": 1,
+      "message": "this looks wrong",
+      "revId": "0bb7790b05b43e9d1750a7deea634f97c57b3abc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_da205902",
+        "filename": "directory/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T18:23:26Z",
+      "side": 1,
+      "message": "this one is good. etc.",
+      "revId": "0bb7790b05b43e9d1750a7deea634f97c57b3abc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
