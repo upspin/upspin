@@ -155,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "89981491_0273ea03",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T01:01:19Z",
+      "side": 1,
+      "message": "Should this be NotFile?\nOr should the latter be IsFile?\nEither way we should be consistent.\nI think NotFile is probably best, because maybe it\u0027s neither a file nor a directory? A link?",
+      "revId": "46e94268536027ed7d447640c35e5c08d11b199a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09c98479_8b82dddf",
         "filename": "errors/errors.go",
         "patchSetId": 2
