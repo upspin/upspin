@@ -143,7 +143,7 @@ func TestMissingConfiguration(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
-	if !strings.HasPrefix(err.Error(), "not configured") {
+	if !strings.Contains(err.Error(), "not configured") {
 		t.Fatalf("Expected not configured error, got %q", err)
 	}
 	bind.Release(store)
@@ -159,7 +159,7 @@ func TestConfigure(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
-	if !strings.HasPrefix(err.Error(), "invalid configuration") {
+	if !strings.Contains(err.Error(), "invalid configuration") {
 		t.Errorf("Expected invalid configuration error, got %q", err)
 	}
 	// now configure it correctly

@@ -7,9 +7,7 @@ package gcp
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -18,6 +16,7 @@ import (
 
 	"upspin.io/bind"
 	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
 	"upspin.io/store/gcp/cache"
@@ -41,8 +40,7 @@ const (
 )
 
 var (
-	errorPrefix      = "Store: "
-	errNotConfigured = errors.New("not configured")
+	errNotConfigured = errors.E(errors.Invalid, errors.Str("GCP Store service not configured"))
 )
 
 // Server implements upspin.Store.
@@ -69,14 +67,11 @@ func New(context *upspin.Context) upspin.Store {
 
 // Put implements upspin.Store.
 func (s *server) Put(data []byte) (upspin.Reference, error) {
-	return s.innerPut(s.context.UserName, bytes.NewBuffer(data))
-}
-
-// innerPut implements upspin.Store for a given UserName using an io.Reader.
-func (s *server) innerPut(userName upspin.UserName, reader io.Reader) (upspin.Reference, error) {
+	const Put = "Put"
+	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
 	if !s.isConfigured() {
-		return "", errNotConfigured
+		return "", errors.E(Put, errNotConfigured)
 	}
 	mu.RLock()
 	sha := sha256key.NewShaReader(reader)
@@ -84,7 +79,7 @@ func (s *server) innerPut(userName upspin.UserName, reader io.Reader) (upspin.Re
 	err := fileCache.Put(initialRef, sha)
 	if err != nil {
 		mu.RUnlock()
-		return "", fmt.Errorf("%sPut: %s", errorPrefix, err)
+		return "", errors.E(Put, err)
 	}
 	// Figure out the appropriate reference for this blob.
 	ref := sha.EncodedSum()
@@ -117,7 +112,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		defer file.Close()
 		bytes, err := ioutil.ReadAll(file)
 		if err != nil {
-			err = fmt.Errorf("%sGet: %s", errorPrefix, err)
+			err = errors.E("Get", err)
 		}
 		return bytes, nil, err
 	}
@@ -128,8 +123,9 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+	const Get = "Get"
 	if !s.isConfigured() {
-		return nil, upspin.Location{}, errNotConfigured
+		return nil, upspin.Location{}, errors.E(Get, errNotConfigured)
 	}
 	mu.RLock()
 	defer mu.RUnlock()
@@ -144,22 +140,20 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 	var link string
 	link, err = cloudClient.Get(string(ref))
 	if err != nil {
-		err = fmt.Errorf("%sGet: %s", errorPrefix, err)
+		err = errors.E(Get, err)
 		return
 	}
 	// GCP should return an http link
 	if !strings.HasPrefix(link, "http") {
-		errMsg := fmt.Sprintf("%sGet: invalid link returned from GCP: %s", errorPrefix, link)
-		log.Error.Println(errMsg)
-		err = errors.New(errMsg)
+		err = errors.E(Get, errors.Errorf("invalid link returned from GCP: %s", link))
+		log.Error.Println(err)
 		return
 	}
 
 	url, err := url.Parse(link)
 	if err != nil {
-		errMsg := fmt.Sprintf("%sGet: can't parse url: %s: %s", errorPrefix, link, err)
-		log.Error.Print(errMsg)
-		err = errors.New(errMsg)
+		err = errors.E(Get, errors.Errorf("can't parse url: %s: %s", link, err))
+		log.Error.Print(err)
 		return
 	}
 	location.Reference = upspin.Reference(link)
@@ -173,15 +167,16 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 
 // Delete implements upspin.Store.
 func (s *server) Delete(ref upspin.Reference) error {
+	const Delete = "Delete"
 	if !s.isConfigured() {
-		return errNotConfigured
+		return errors.E(Delete, errNotConfigured)
 	}
 	mu.RLock()
 	defer mu.RUnlock()
 	// TODO: verify ownership and proper ACLs to delete blob
 	err := cloudClient.Delete(string(ref))
 	if err != nil {
-		return fmt.Errorf("%sDelete: %s: %s", errorPrefix, ref, err)
+		return errors.E(Delete, errors.Errorf("%s: %s", ref, err))
 	}
 	return nil
 }
@@ -189,7 +184,7 @@ func (s *server) Delete(ref upspin.Reference) error {
 // Dial implements upspin.Service.
 func (s *server) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
-		return nil, errors.New("store gcp: unrecognized transport")
+		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	mu.Lock()
@@ -205,6 +200,7 @@ func (s *server) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servic
 // Configure configures the connection to the backing store (namely, GCP) once the service
 // has been dialed. The details of the configuration are explained at the package comments.
 func (s *server) Configure(options ...string) error {
+	const Configure = "Configure"
 	// These are defaults that only make sense for those running upspin.io.
 	bucketName := "g-upspin-store"
 	projectID := "upspin"
@@ -212,7 +208,7 @@ func (s *server) Configure(options ...string) error {
 	for _, option := range options {
 		opts := strings.Split(option, "=")
 		if len(opts) != 2 {
-			return fmt.Errorf("invalid option format: %q", option)
+			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid option format: %q", option))
 		}
 		switch opts[0] {
 		case ConfigBucketName:
@@ -222,7 +218,7 @@ func (s *server) Configure(options ...string) error {
 		case ConfigTemporaryDir:
 			tempDir = opts[1]
 		default:
-			return fmt.Errorf("invalid configuration option: %q", opts[0])
+			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid configuration option: %q", opts[0]))
 		}
 	}
 
@@ -232,7 +228,7 @@ func (s *server) Configure(options ...string) error {
 	cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.PublicRead)
 	fileCache = cache.NewFileCache(tempDir)
 	if fileCache == nil {
-		return errors.New("filecache failed to create temp directory")
+		return errors.E(Configure, errors.Str("filecache failed to create temp directory"))
 	}
 	log.Debug.Printf("Configured GCP store: %v", options)
 	return nil
