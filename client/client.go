@@ -152,7 +152,6 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 			continue
 		}
 		for _, pubkey := range pubkeys { // pick first key of correct type
-			pubkey = upspin.PublicKey(strings.TrimSpace(string(pubkey)))
 			if ee.IsValidKeyForPacker(pubkey, packerString) {
 				if pubkey != readersPublicKey[0] { // don't duplicate self
 					// TODO(ehg) maybe should check for other duplicates?
