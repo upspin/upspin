@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6985a058_0526821b",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-20T19:08:58Z",
+      "side": 1,
+      "message": "It would be easier to debug if this was something like:\n\nerrors.E(\"scalarMult\", errors.Errorf(\"no such key: %s...\", keyHash[0:5]))\n\n(assuming keyHash has length 6 at least)",
+      "revId": "83e8b13a697174e0dc7bff0bbe7aeea622fec3c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
