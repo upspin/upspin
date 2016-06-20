@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6985a058_cbe5e9e5",
+        "filename": "directory/gcp/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "s/\"No Access.*\"/errors.Str(\"no Access file\")/",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_abf74593",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "you can drop the errors.Other; it\u0027s the default.\ni might just go with\nerrNotConfigured \u003d errors.Str(\"...\")",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_2becb5c5",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "return ok \u0026\u0026 e.Kind \u003d\u003d errors.NotExist",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_cb2f29ed",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "you don\u0027t need the errors.Str message at all, because the error you\u0027ll get is \"syntax error in pattern\".\n\nbut worse, you don\u0027t want it because you\u0027re passing two error values to errors.E.\n\njust delete that argument",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_0b0d318b",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "s/errors.Str(...)/errors.Errorf(\"invalid...\", option)",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_cb06496d",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-20T20:30:57Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3bb61abe4596393c5bdaa0055a82470bae43663a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
