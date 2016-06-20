@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_e5c9feb9",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T19:36:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6985a058_c5039a04",
+      "revId": "ee755ada3c86e634f4a33b6e64a7c7bd48e756af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6985a058_2510664b",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-20T19:24:35Z",
       "side": 1,
       "message": "these should be\nerrors.E(\"ParsePublicKey\", errors.Invalid, errors.Errorf(\"%s is not a big int\", fields[1]))",
+      "revId": "ee755ada3c86e634f4a33b6e64a7c7bd48e756af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_e53c9e8c",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T19:36:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6985a058_2510664b",
       "revId": "ee755ada3c86e634f4a33b6e64a7c7bd48e756af",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
