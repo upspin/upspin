@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6985a058_977cecd1",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T17:51:19Z",
+      "side": 1,
+      "message": "Will work on it in next CL;  set TODO for now.",
+      "parentUuid": "6985a058_91fe3c08",
+      "revId": "28dfbee4c64783cf15e6dc42b56db91b3c96df04",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6985a058_7113985a",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-20T16:52:02Z",
       "side": 1,
       "message": "s/Keyey/Key/",
+      "revId": "28dfbee4c64783cf15e6dc42b56db91b3c96df04",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_f75e985d",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T17:51:19Z",
+      "side": 1,
+      "message": "Thanks, done.     Scary to see that because I wonder what else had similar mangling.  Can\u0027t find anything so will guess it was typeahead during a slow network connection.",
+      "parentUuid": "6985a058_7113985a",
       "revId": "28dfbee4c64783cf15e6dc42b56db91b3c96df04",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
