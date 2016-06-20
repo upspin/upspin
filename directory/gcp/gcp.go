@@ -6,10 +6,7 @@
 package gcp
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
-	"os"
 	goPath "path"
 	"strings"
 	"sync"
@@ -18,6 +15,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/cache"
 	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
@@ -59,7 +57,10 @@ const gcpDir = "gcpDir"
 
 var (
 	zeroLoc          upspin.Location
-	errNotConfigured = errors.New("directory not configured")
+	errNotConfigured = errors.E(errors.Str("GCP Directory not configured"), errors.Other)
+
+	confLock sync.RWMutex // protects all configuration options and the ref count below.
+	refCount uint64
 )
 
 // options are optional parameters to almost every inner method of directory for doing some
@@ -69,41 +70,10 @@ type options struct {
 	// Add other things below (for example, some healthz monitoring stats)
 }
 
-// dirError holds an error description for the directory service.
-// It is not simply an os.PathError because we're smart about suppressing
-// empty fields in the error message.
-type dirError struct {
-	os.PathError
-}
-
-func (d dirError) Error() string {
-	var buf bytes.Buffer
-	if d.Op != "" {
-		buf.WriteString(d.Op)
-		buf.WriteString(": ")
-	}
-	if len(d.Path) > 0 {
-		buf.WriteString(string(d.Path))
-		buf.WriteString(": ")
-	}
-	buf.WriteString(d.Err.Error())
-	return buf.String()
-}
-
-func newDirError(op string, path upspin.PathName, err string) *dirError {
-	return &dirError{
-		PathError: os.PathError{
-			Op:   op,
-			Path: string(path),
-			Err:  errors.New(err),
-		},
-	}
-}
-
 // verifyMetadata checks that the metadata is minimally valid.
 func verifyMetadata(op string, path upspin.PathName, meta upspin.Metadata) error {
 	if meta.Sequence < upspin.SeqNotExist {
-		return newDirError(op, path, "invalid sequence number")
+		return errors.E(op, path, errors.Invalid, errors.Str("invalid sequence number"))
 	}
 	return nil
 }
@@ -111,6 +81,9 @@ func verifyMetadata(op string, path upspin.PathName, meta upspin.Metadata) error
 // MakeDirectory implements upspin.Directory.
 func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
 	const op = "MakeDirectory"
+
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return zeroLoc, errNotConfigured
 	}
@@ -121,7 +94,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	}
 	parsed, err := path.Parse(dirName)
 	if err != nil {
-		return zeroLoc, newDirError(op, dirName, err.Error())
+		return zeroLoc, errors.E(op, err) // path.Parse already populates the path name.
 	}
 	// Prepares a dir entry for storage.
 	dirEntry := upspin.DirEntry{
@@ -150,6 +123,9 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 // It implements upspin.Directory.
 func (d *directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
+
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return errNotConfigured
 	}
@@ -172,6 +148,15 @@ func span(opts []options) *metric.Span {
 	return metric.New("FIXME").StartSpan("FIXME")
 }
 
+// isErrNotExist reports whether the error is of type errors.NotExist.
+func isErrNotExist(err error) bool {
+	e, ok := err.(*errors.Error)
+	if !ok {
+		return false
+	}
+	return e.Kind == errors.NotExist
+}
+
 // put is the common implementation between MakeDirectory and Put.
 func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) error {
 	s := span(opts)
@@ -180,7 +165,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 
 	parsed, err := path.Parse(dirEntry.Name) // canonicalizes dirEntry.Name
 	if err != nil {
-		return newDirError(op, dirEntry.Name, err.Error())
+		return errors.E(op, dirEntry.Name, err)
 	}
 
 	// Lock the user root
@@ -202,14 +187,14 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	// Check ACLs before we go any further, so we don't leak information about the existence of files and directories.
 	canCreate, err := d.hasRight(op, user, access.Create, &parsed, opts...)
 	if err != nil {
-		return newDirError(op, dirEntry.Name, err.Error())
+		return err
 	}
 	canWrite, err := d.hasRight(op, user, access.Write, &parsed, opts...)
 	if err != nil {
-		return newDirError(op, dirEntry.Name, err.Error())
+		return err
 	}
 	if dirEntry.IsDir() && !canCreate || !dirEntry.IsDir() && !canWrite {
-		return newDirError(op, dirEntry.Name, access.ErrPermissionDenied.Error())
+		return errors.E(op, dirEntry.Name, errors.Permission)
 	}
 
 	canonicalPath := parsed.Path()
@@ -217,22 +202,22 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 
 	// Verify whether there's a directory with same name.
 	existingDirEntry, err := d.getNonRoot(canonicalPath, opts...)
-	if err != nil && err != errEntryNotFound {
-		return newDirError(op, canonicalPath, err.Error())
-
+	if err != nil && !isErrNotExist(err) {
+		return errors.E(op, err)
 	}
 	if err == nil {
 		if existingDirEntry.IsDir() {
-			return newDirError(op, canonicalPath, "directory already exists")
+			return errors.E(op, canonicalPath, errors.Exist, errors.Str("directory already exists"))
 		}
 		if dirEntry.IsDir() {
-			return newDirError(op, canonicalPath, "overwriting file with directory")
+			// TODO: use kind.IsDir when Dave submits it.
+			return errors.E(op, canonicalPath, errors.Str("overwriting file with directory"))
 		}
 		if dirEntry.Metadata.Sequence == upspin.SeqNotExist {
-			return newDirError(op, canonicalPath, "file already exists")
+			return errors.E(op, canonicalPath, errors.Exist, errors.Str("file already exists"))
 		}
 		if dirEntry.Metadata.Sequence > upspin.SeqIgnore && dirEntry.Metadata.Sequence != existingDirEntry.Metadata.Sequence {
-			return newDirError(op, canonicalPath, "sequence mismatch")
+			return errors.E(op, canonicalPath, errors.Invalid, errors.Str("sequence mismatch"))
 		}
 		dirEntry.Metadata.Sequence = existingDirEntry.Metadata.Sequence + 1
 	}
@@ -252,14 +237,15 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	// Patch the parent: bump sequence number.
 	parentDirEntry, root, err := d.getDirEntry(&parentParsedPath, opts...)
 	if err != nil {
-		if err == errEntryNotFound {
-			return newDirError(op, canonicalPath, "parent path not found")
+		if isErrNotExist(err) {
+			return errors.E(op, canonicalPath, errors.NotExist, errors.Str("parent path not found"))
 		}
 		return err
 	}
 	// For self-consistency, verify parent really is a directory
 	if !parentDirEntry.IsDir() {
-		err = newDirError(op, canonicalPath, "parent is not a directory")
+		// TODO: use Dave's new IsNotDir when it's submitted
+		err = errors.E(op, canonicalPath, errors.Other, errors.Str("parent is not a directory"))
 		log.Error.Printf("Bad inconsistency: %s", err)
 		return err
 	}
@@ -292,12 +278,19 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Lookup"
 
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return nil, errNotConfigured
 	}
+	m := metric.New(gcpDir)
+	defer m.Done()
+	opts := options{
+		span: m.StartSpan(op),
+	}
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return nil, newDirError(op, pathName, err.Error())
+		return nil, errors.E(op, pathName, err)
 	}
 
 	mu := userLock(parsed.User())
@@ -305,37 +298,32 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	defer mu.Unlock()
 
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
-	canRead, err := d.hasRight(op, d.context.UserName, access.Read, &parsed)
+	canRead, err := d.hasRight(op, d.context.UserName, access.Read, &parsed, opts)
 	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error Read: %s", err)
-		return nil, err
+		return nil, errors.E(op, err)
 	}
-	canList, err := d.hasRight(op, d.context.UserName, access.List, &parsed)
+	canList, err := d.hasRight(op, d.context.UserName, access.List, &parsed, opts)
 	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error List: %s", err)
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	// If the user has no rights, we're done.
 	if !canRead && !canList {
-		return nil, newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
+		return nil, errors.E(op, parsed.Path(), errors.Permission)
 	}
 	// Look up entry
 	var dirEntry *upspin.DirEntry
 	if !parsed.IsRoot() {
-		dirEntry, err = d.getNonRoot(parsed.Path())
+		dirEntry, err = d.getNonRoot(parsed.Path(), opts)
 	} else {
-		root, err := d.getRoot(parsed.User())
+		root, err := d.getRoot(parsed.User(), opts)
 		if err == nil {
 			dirEntry = &root.dirEntry
 		}
 	}
 	if err != nil {
-		if err == errEntryNotFound {
-			err = newDirError(op, parsed.Path(), "path not found")
-		}
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
@@ -350,40 +338,45 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	const op = "WhichAccess"
 
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return "", errNotConfigured
 	}
+	m := metric.New(gcpDir)
+	defer m.Done()
+	opts := options{
+		span: m.StartSpan(op),
+	}
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return "", newDirError(op, pathName, err.Error())
+		return "", errors.E(op, pathName, err)
 	}
 
 	mu := userLock(parsed.User())
 	mu.Lock()
 	defer mu.Unlock()
 
-	accessPath, acc, err := d.whichAccess(op, &parsed)
+	accessPath, acc, err := d.whichAccess(op, &parsed, opts)
 	if err != nil {
-		return "", err
+		return "", errors.E(op, err)
 	}
 
 	user := d.context.UserName
 
 	// Must check whether the user has sufficient rights to List the requested path.
-	canRead, err := d.checkRights(user, access.Read, parsed.Path(), acc)
+	canRead, err := d.checkRights(user, access.Read, parsed.Path(), acc, opts)
 	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("WhichAccess error Read: %s", err)
-		return "", err
+		return "", errors.E(op, err)
 	}
-	canList, err := d.checkRights(user, access.List, parsed.Path(), acc)
+	canList, err := d.checkRights(user, access.List, parsed.Path(), acc, opts)
 	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("WhichAccess error List: %s", err)
-		return "", err
+		return "", errors.E(op, err)
 	}
 	if !canRead && !canList {
-		return "", newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
+		return "", errors.E(op, parsed.Path(), errors.Permission)
 	}
 	return accessPath, nil
 }
@@ -391,13 +384,22 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "Glob"
 
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return nil, errNotConfigured
 	}
+	m := metric.New(gcpDir)
+	s := m.StartSpan(op)
+	defer m.Done()
+	opts := options{
+		span: s,
+	}
+
 	pathName := upspin.PathName(pattern)
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return nil, newDirError(op, pathName, err.Error())
+		return nil, errors.E(op, pathName, err)
 	}
 
 	mu := userLock(parsed.User())
@@ -407,7 +409,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	// Check if pattern is a valid go path pattern
 	_, err = goPath.Match(parsed.FilePath(), "")
 	if err != nil {
-		return nil, newDirError(op, parsed.Path(), err.Error())
+		return nil, errors.E(op, parsed.Path(), errors.Str("invalid glob pattern"), err)
 	}
 
 	// As an optimization, we look for the longest prefix that
@@ -424,6 +426,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	prefix := parsed.First(clear).String()
 	depth := parsed.NElem() - clear
 
+	ss := s.StartSpan("List")
 	var names []string
 	if depth == 1 {
 		if !strings.HasSuffix(prefix, "/") {
@@ -433,6 +436,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	} else {
 		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
 	}
+	ss.End()
 	if err != nil {
 		return nil, err
 	}
@@ -445,9 +449,9 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		if match, _ := goPath.Match(parsed.String(), lookupPath); match {
 			// Now fetch each DirEntry we need
 			log.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
-			de, err := d.getNonRoot(upspin.PathName(lookupPath))
+			de, err := d.getNonRoot(upspin.PathName(lookupPath), opts)
 			if err != nil {
-				return nil, newDirError(op, parsed.Path(), err.Error())
+				return nil, err
 			}
 			// Verify if user has proper list ACL.
 			parsedDirName, err := path.Parse(de.Name)
@@ -455,12 +459,12 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				log.Error.Printf("Internal inconsistency: dir entry name does not parse: %s", err)
 				continue
 			}
-			canList, err := d.hasRight(op, user, access.List, &parsedDirName)
+			canList, err := d.hasRight(op, user, access.List, &parsedDirName, opts)
 			if err != nil {
 				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
-			canRead, err := d.hasRight(op, user, access.Read, &parsedDirName)
+			canRead, err := d.hasRight(op, user, access.Read, &parsedDirName, opts)
 			if err != nil {
 				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
@@ -484,12 +488,19 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 func (d *directory) Delete(pathName upspin.PathName) error {
 	const op = "Delete"
 
+	confLock.RLock()
+	defer confLock.RUnlock()
 	if !d.isConfigured() {
 		return errNotConfigured
 	}
+	m := metric.New(gcpDir)
+	defer m.Done()
+	opts := options{
+		span: m.StartSpan(op),
+	}
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return newDirError(op, pathName, err.Error())
+		return err
 	}
 
 	mu := userLock(parsed.User())
@@ -498,18 +509,17 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 
 	user := d.context.UserName
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
-	canDelete, err := d.hasRight(op, user, access.Delete, &parsed)
+	canDelete, err := d.hasRight(op, user, access.Delete, &parsed, opts)
 	if err != nil {
-		err = newDirError(op, "", err.Error()) // path is included in the original error message.
 		log.Printf("Access error for Delete: %s", err)
 		return err
 	}
 	if !canDelete {
-		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
+		return errors.E(op, parsed.Path(), errors.Permission)
 	}
 
 	// Locate the entry first.
-	dirEntry, _, err := d.getDirEntry(&parsed)
+	dirEntry, _, err := d.getDirEntry(&parsed, opts)
 	if err != nil {
 		return err
 	}
@@ -519,18 +529,18 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	if dirEntry.IsDir() {
 		err = d.isDirEmpty(parsedPath)
 		if err != nil {
-			return newDirError(op, parsedPath, err.Error())
+			return errors.E(op, err)
 		}
 	}
 	// Attempt to delete it from GCP.
 	if err = d.deletePath(parsedPath); err != nil {
-		return newDirError(op, parsedPath, err.Error())
+		return errors.E(op, err)
 	}
 	// If this was an Access file, we need to delete it from the root as well.
 	if access.IsAccessFile(parsedPath) {
 		err = d.deleteAccess(&parsed)
 		if err != nil {
-			return err
+			return errors.E(op, err)
 		}
 	}
 	if access.IsGroupFile(parsedPath) {
@@ -584,7 +594,7 @@ func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 		store, err = d.newStoreClient(loc.Endpoint)
 	}
 	if err != nil {
-		return nil, newDirError("storeGet", upspin.PathName(loc.Reference), fmt.Errorf("can't create new store client: %s", err).Error())
+		return nil, errors.E("storeGet", upspin.PathName(loc.Reference), "can't create new store client", err)
 	}
 	log.Debug.Printf("storeGet: going to get loc: %v", loc)
 	data, locs, err := store.Get(loc.Reference)
@@ -601,25 +611,20 @@ func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 	return data, err
 }
 
-var (
-	mu       sync.Mutex // protects fields below
-	refCount uint64
-)
-
 // Dial implements upspin.Service.
 func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
-		return nil, errors.New("directory gcp: unrecognized transport")
+		return nil, errors.E("Dial", errors.Syntax, errors.Str("unrecognized transport"))
 	}
-	mu.Lock()
-	defer mu.Unlock()
+	confLock.Lock()
+	defer confLock.Unlock()
 
 	refCount++
 	if refCount == 0 {
 		// This is virtually impossible to happen. One will run out of memory before this happens.
 		// It means the ref count wrapped around and thus we can't handle another instance. Fail.
 		refCount--
-		return nil, errors.New("directory gcp: internal error: refCount wrapped around")
+		return nil, errors.E("Dial", errors.Other, errors.Str("refCount wrapped around"))
 	}
 
 	this := *d              // Clone ourselves.
@@ -650,7 +655,7 @@ func (d *directory) Configure(options ...string) error {
 	for _, option := range options {
 		opts := strings.Split(option, "=")
 		if len(opts) != 2 {
-			return fmt.Errorf("invalid option format: %q", option)
+			return errors.E("Configure", errors.Syntax, errors.Str(fmt.Sprintf("invalid option format: %q", option)))
 		}
 		switch opts[0] {
 		case ConfigBucketName:
@@ -658,11 +663,11 @@ func (d *directory) Configure(options ...string) error {
 		case ConfigProjectID:
 			projectID = opts[1]
 		default:
-			return fmt.Errorf("invalid configuration option: %q", opts[0])
+			return errors.E("Configure", errors.Syntax, errors.Str(fmt.Sprintf("invalid configuration option: %q", opts[0])))
 		}
 	}
-	mu.Lock()
-	defer mu.Unlock()
+	confLock.Lock()
+	defer confLock.Unlock()
 
 	d.cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.ProjectPrivate)
 	log.Debug.Printf("Configured GCP directory: %v", options)
@@ -670,6 +675,7 @@ func (d *directory) Configure(options ...string) error {
 }
 
 // isConfigured returns whether this server is configured properly.
+// It must be called with mu locked.
 func (d *directory) isConfigured() bool {
 	return d.cloudClient != nil && d.context.UserName != ""
 }
@@ -681,8 +687,8 @@ func (d *directory) Ping() bool {
 
 // Close implements upspin.Service.
 func (d *directory) Close() {
-	mu.Lock()
-	defer mu.Unlock()
+	confLock.Lock()
+	defer confLock.Unlock()
 
 	// Clean up this instance
 	d.context.UserName = "" // ensure we get an error in subsequent calls.
