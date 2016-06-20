@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 
 	"upspin.io/access"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -36,7 +37,7 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 	if r, found := d.rootCache.Get(user); found {
 		rootEntry, ok := r.(root) // Can't fail, but we check anyway to be abundantly safe.
 		if !ok {
-			err := newDirError(op, userRootPath, "user root cache fubar")
+			err := errors.E(op, userRootPath, errors.IO, "user root cache fubar")
 			log.Error.Print(err)
 			return nil, err
 		}
@@ -49,7 +50,7 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 	}
 	root, err := unmarshalRoot(buf)
 	if err != nil {
-		return nil, newDirError(op, userRootPath, err.Error())
+		return nil, errors.E(op, userRootPath, errors.IO, "marshal error", err)
 	}
 	// Put it in the cache.
 	d.rootCache.Add(user, *root)
@@ -70,12 +71,12 @@ func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) e
 	// Convert root to a savedRoot
 	jsonRoot, err := marshalRoot(root)
 	if err != nil {
-		return newDirError(op, userRootPath, err.Error())
+		return errors.E(op, userRootPath, errors.IO, "marshal error", err)
 	}
 	// Save to backend
 	_, err = d.cloudClient.Put(string(userRootPath), jsonRoot)
 	if err != nil {
-		return newDirError(op, userRootPath, err.Error())
+		return errors.E(op, userRootPath, errors.IO, "backend error", err)
 	}
 	return nil
 }
@@ -86,18 +87,18 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 	const op = "Put"
 	// Permission for root creation is special: only the owner can do it.
 	if user != parsed.User() {
-		return newDirError(op, parsed.Path(), access.ErrPermissionDenied.Error())
+		return errors.E(op, parsed.Path(), user, access.ErrPermissionDenied)
 	}
 	_, err := d.getRoot(parsed.User())
-	if err != nil && err != errEntryNotFound {
-		return newDirError(op, parsed.Path(), err.Error())
+	if err != nil && !isErrNotExist(err) {
+		return err
 	}
 	if err == nil {
-		return newDirError(op, parsed.Path(), "directory already exists")
+		return errors.E(op, parsed.Path(), errors.Exist, errors.Str("directory already exists"))
 	}
 	if !dirEntry.IsDir() {
 		// We could fix this here, but let's force clients to make their requests crystal clear.
-		return newDirError(op, parsed.Path(), "root is not a directory")
+		return errors.E(op, parsed.Path(), errors.NotExist, errors.Str("root is not a directory"))
 	}
 	// Store the entry.
 	root := &root{
@@ -109,9 +110,7 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 	acc, err := access.New(accessPath)
 	if err != nil {
 		// This should never happen because accessPath has been parsed already.
-		newErr := newDirError(op, parsed.Path(), err.Error())
-		log.Error.Print(newErr)
-		return newErr
+		return err
 	}
 	root.accessFiles[accessPath] = acc
 	err = d.putRoot(parsed.User(), root)
@@ -160,7 +159,7 @@ func unmarshalRoot(buf []byte) (*root, error) {
 		if _, exists := root.accessFiles[path]; exists {
 			// This is bad. Our map serialization included a duplicate, which should never happen unless
 			// the JSON entry on disk was modified manually or somehow strangely corrupted.
-			err = newDirError("getRoot", path, "Access file duplicated in root")
+			err = errors.E("unmarshalRoot", path, "Access file duplicated in root")
 			log.Error.Print(err)
 			saveError(err)
 		}

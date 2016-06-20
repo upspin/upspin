@@ -16,6 +16,7 @@ import (
 	"upspin.io/cloud/gcp"
 	"upspin.io/cloud/gcp/gcptest"
 	"upspin.io/factotum"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 )
 
@@ -127,7 +128,7 @@ func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "Put: a@x/myroot/myfile: no user name in path")
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "a@x/myroot/myfile: Put: no user name in path")
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -144,7 +145,8 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "Put: fred@bob.com/myroot/myfile: invalid sequence number")
+	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir,
+		"fred@bob.com/myroot/myfile: Put: invalid operation: invalid sequence number")
 }
 
 func TestLookupPathError(t *testing.T) {
@@ -162,7 +164,7 @@ func TestGlobMissingPattern(t *testing.T) {
 }
 
 func TestGlobBadPath(t *testing.T) {
-	expectedError := "Glob: missing/email/dir/file: bad user name in path"
+	expectedError := "missing/email/dir/file: Glob: bad user name in path"
 	ds := newTestDirServer(t, &gcptest.DummyGCP{})
 	_, err := ds.Glob("missing/email/dir/file")
 	assertError(t, expectedError, err)
@@ -180,12 +182,12 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	Put(t, ds, &dir, "Put: test@foo.com/myroot/myfile: parent path not found")
+	Put(t, ds, &dir, "test@foo.com/myroot/myfile: Put: item does not exist: parent path not found")
 }
 
 func TestLookupPathNotFound(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
-	expectedError := "Lookup: test@foo.com/invalid/invalid/invalid: path not found"
+	expectedError := "Lookup:\n\ttest@foo.com/invalid/invalid/invalid: Download: item does not exist: not found"
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, "something that does not match"},
 		Data: [][]byte{rootJSON, []byte("")},
@@ -389,7 +391,7 @@ func TestPutParentNotDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "Put: test@foo.com/mydir/myfile.txt: parent is not a directory"
+	expectedError := "test@foo.com/mydir/myfile.txt: Put: parent is not a directory"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, parentPathName},
@@ -412,7 +414,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "Put: test@foo.com/mydir/myfile.txt: directory already exists"
+	expectedError := "test@foo.com/mydir/myfile.txt: Put: item already exists: directory already exists"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, pathName, parentPathName},
@@ -434,7 +436,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "MakeDirectory: test@foo.com/mydir/myfile.txt: overwriting file with directory"
+	expectedError := "test@foo.com/mydir/myfile.txt: MakeDirectory: overwriting file with directory"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName, pathName, parentPathName},
@@ -452,7 +454,7 @@ func TestPutPermissionDenied(t *testing.T) {
 	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "") // No one can write, including owner.
 	rootJSON := toRootJSON(t, &newRoot)
 
-	expectedError := "Put: test@foo.com/mydir/myfile.txt: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: Put:\n\tpermission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName},
@@ -548,7 +550,7 @@ func TestMakeRoot(t *testing.T) {
 }
 
 func TestMakeRootPermissionDenied(t *testing.T) {
-	expectedError := "Put: test@foo.com/: permission denied"
+	expectedError := "test@foo.com/, user bozo@theclown.org: Put:\n\tpermission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref: []string{"does not exist"},
@@ -740,7 +742,7 @@ func TestGroupAccessFile(t *testing.T) {
 	// Go back to bro accessing.
 	ds.context.UserName = broUserName
 	// Expected permission denied this time.
-	expectedError := "Lookup: test@foo.com/mydir/myfile.txt: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
 	_, err = ds.Lookup(pathName)
 	assertError(t, expectedError, err)
 }
@@ -803,7 +805,7 @@ func TestGCPCorruptsData(t *testing.T) {
 		Data: [][]byte{rootJSON, []byte("really bad JSON structure that does not parse")},
 	}
 
-	expectedError := "getmeta: test@foo.com/mydir: json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"
+	expectedError := "test@foo.com/mydir: json unmarshal failed retrieving metadata: I/O error: invalid character 'r' looking for beginning of value"
 
 	ds := newTestDirServer(t, egcp)
 	err := ds.Put(&dir)
@@ -832,7 +834,7 @@ func TestLookupPermissionDenied(t *testing.T) {
 		Data: [][]byte{rootJSON},
 	}
 
-	expectedError := "Lookup: test@foo.com/mydir/myfile.txt: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
 	ds := newTestDirServer(t, egcp)
 
 	ds.context.UserName = "sloppyjoe@unauthorized.com"
@@ -880,7 +882,7 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 		fileNames: []string{pathName}, // pathName is inside parentPathName.
 	}
 
-	expectedError := "Delete: test@foo.com/mydir: directory not empty"
+	expectedError := "Delete:\n\ttest@foo.com/mydir: directory not empty"
 
 	ds := newTestDirServer(t, lgcp)
 
@@ -905,7 +907,7 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 		},
 	}
 
-	expectedError := "Delete: test@foo.com/mydir/myfile.txt: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: Delete: permission denied"
 
 	ds := newTestDirServer(t, lgcp)
 
@@ -1021,7 +1023,7 @@ func TestDeleteGroupFile(t *testing.T) {
 	// And now the session for bro can no longer read it.
 	// TODO: this error message is not helpful. It should contain permission denied plus the path
 	// to the missing Group file.
-	expectedError := "Lookup: download: pathname not found"
+	expectedError := "test@foo.com/Group/family: file not found: item does not exist"
 	ds.context.UserName = broUserName
 	_, err = ds.Lookup(pathName)
 	assertError(t, expectedError, err)
@@ -1071,7 +1073,7 @@ func TestWhichAccess(t *testing.T) {
 func TestWhichAccessPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "WhichAccess: test@foo.com/mydir/myfile.txt: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: WhichAccess: permission denied"
 
 	egcp := &gcptest.ExpectDownloadCapturePutGCP{
 		Ref:  []string{userName},
@@ -1190,4 +1192,23 @@ func (d *dummyStore) Close() {
 }
 func (d *dummyStore) Authenticate(*upspin.Context) error {
 	return nil
+}
+
+type sinkSaver struct {
+}
+
+func (s *sinkSaver) Register(ch chan *metric.Metric) {
+	go func() {
+		for {
+			<-ch
+			// Drop it on the floor
+		}
+	}()
+}
+
+var _ metric.Saver = (*sinkSaver)(nil)
+
+func init() {
+	// So we don't see a ton of "Metric channel is full" messages
+	metric.RegisterSaver(&sinkSaver{})
 }
