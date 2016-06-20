@@ -16,6 +16,24 @@
       "revId": "d27e08812eae7daeb94275312bd21590e240a6c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c9fbec84_4ff2910c",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-20T03:46:34Z",
+      "side": 1,
+      "message": "Totally. I discussed this briefly with r@ in the Friday meeting. This is just the first version we get to test-run a little before we graduate it.",
+      "parentUuid": "89981491_a2779eba",
+      "revId": "d27e08812eae7daeb94275312bd21590e240a6c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
