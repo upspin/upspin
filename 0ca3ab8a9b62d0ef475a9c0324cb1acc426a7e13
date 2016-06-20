@@ -1,0 +1,310 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89981491_c27ce2d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Did you forget to \u0027git add\u0027?",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_e2f80658",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Why not handle any number of set fields in an option?",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_c2ed0298",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "I\u0027d name this \u0027span\u0027 and take a []options. That way you don\u0027t need the ... at the call site.",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_a2f2fe71",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "this could be\n\ndefer span(opts).StartSpan(\"put\").End()\n\nsame at most of the other call sites",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_a2db1ef4",
+        "filename": "metrics/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Add a sub-span to these tests, since you\u0027ve implemented that now",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_82e13aaa",
+        "filename": "metrics/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "close the channel instead",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_22e82e89",
+        "filename": "metrics/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "this is a racy and flaky test.\n\nTo fix it, put a \"done chan struct{}\" in dummySaver and populate it at the top of this function.\nThen here, you can block receiving \u003c-saver.done, and at the top of the dummysaver goroutine add defer close(d.done).",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_02f40a60",
+        "filename": "metrics/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Add a TODO to check the actual metrics that were received",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_e25ec65d",
+        "filename": "metrics/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "g.save(\u003c-g.saverQueue)",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_c253c253",
+        "filename": "metrics/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_c2d622cc",
+        "filename": "metrics/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "I\u0027d just inline all of this\n\ntraces :\u003d \u0026trace.Traces{\n  Traces: []*trace.Trace{{\n    ProjectId: g.projectID,\n    TraceId:   makeTraceID(),\n    Spans:     traceSpans,\n  }},\n}",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_a258be70",
+        "filename": "metrics/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "delete, or use log.Debug.Printf",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_4271f2f2",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "I think maybe this should be package \"metric\"? \nThen you have metric.New, metric.Span, etc.",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_226eee16",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "What\u0027s the meaning of 16? It seems to me that different queue lengths might be appropriate for different backends.\n\nI\u0027d also name it queueLength.\n\nBut you can probably just put the constant in the following variable declaration.",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_025aca6b",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "This design seems to be asking to be misused, leading to hard-to-diagnose issues.\nWhy not only permit a single saver, and panic (or return an error) if there is one already defined?",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_6264f636",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "use %q?",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_a281dede",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Perhaps this should also be named StartSpan, so that you can write code that doesn\u0027t care whether it is handed a Metric or a Span.",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89981491_8267fa3b",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T02:07:34Z",
+      "side": 1,
+      "message": "Also log the metric name here?",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
