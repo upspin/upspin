@@ -69,6 +69,24 @@
       "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c9fbec84_0f552909",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-20T00:02:15Z",
+      "side": 1,
+      "message": "The git rebase turned out to be no more difficult than the routine git stash apply conflict resolution, hurray.\n\nPlease take another look.",
+      "parentUuid": "09c98479_7de1c8d8",
+      "revId": "fce724ad736b6e1328780357bffbf1275f595e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
