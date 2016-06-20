@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89981491_a2779eba",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T03:39:38Z",
+      "side": 1,
+      "message": "The more I think about it, this seems like a job for context.Context.\nOtherwise we\u0027ll just have to reimplement this pattern in other services.\n\nWe should probably talk about this in our meeting tomorrow.",
+      "revId": "d27e08812eae7daeb94275312bd21590e240a6c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
