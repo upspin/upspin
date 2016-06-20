@@ -234,7 +234,7 @@ func (c common) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *ups
 	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
-	rhash := ecdsaKeyHash(rawPublicKey)
+	rhash := factotum.KeyHash(rawPublicKey)
 	b := sha256.Sum256(ciphertext)
 	cipherSum := b[:]
 	for _, w := range wrap {
