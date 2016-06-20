@@ -7,13 +7,12 @@ package gcp
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"strings"
 	"sync"
 
 	"upspin.io/bind"
 	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -52,8 +51,8 @@ const (
 )
 
 var (
-	errKeyTooShort     = errors.New("key length too short")
-	errInvalidUserName = errors.New("invalid user name format")
+	errKeyTooShort     = errors.E(errors.Invalid, errors.Str("key length too short"))
+	errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name format"))
 )
 
 var (
@@ -81,17 +80,18 @@ func isKeyInSlice(key upspin.PublicKey, slice []upspin.PublicKey) bool {
 // TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
 // around for re-using later.
 func (u *user) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
+	const AddKey = "AddKey"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
 	if err != nil {
-		return errInvalidUserName
+		return errors.E(AddKey, userName, errInvalidUserName)
 	}
 	if len(key) < minKeyLen {
-		return errKeyTooShort
+		return errors.E(AddKey, userName, errKeyTooShort)
 	}
 
 	// Appends to the current user entry, if any.
-	ue, err := u.fetchUserEntry(userName)
+	ue, err := u.fetchUserEntry(AddKey, userName)
 	if err != nil {
 		// If this is a Not Found error, then allocate a new userEntry and continue.
 		if isNotFound(err) {
@@ -108,7 +108,7 @@ func (u *user) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
 	if !isKeyInSlice(key, ue.Keys) {
 		// Place key at head of slice to indicate higher priority.
 		ue.Keys = append([]upspin.PublicKey{key}, ue.Keys...)
-		err = u.putUserEntry(userName, ue)
+		err = u.putUserEntry(AddKey, userName, ue)
 		if err != nil {
 			return err
 		}
@@ -121,14 +121,15 @@ func (u *user) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
 // TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
 // around for re-using later.
 func (u *user) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error {
+	const AddRoot = "AddRoot"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
 	if err != nil {
-		return errInvalidUserName
+		return errors.E(AddRoot, userName, errInvalidUserName)
 	}
 
 	// Get the user entry from GCP.
-	ue, err := u.fetchUserEntry(userName)
+	ue, err := u.fetchUserEntry(AddRoot, userName)
 	if err != nil {
 		// If this is a Not Found error, then allocate a new userEntry and continue.
 		if isNotFound(err) {
@@ -143,7 +144,7 @@ func (u *user) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error
 	}
 	// Place the endpoint at the head of the slice to indicate higher priority.
 	ue.Endpoints = append([]upspin.Endpoint{endpoint}, ue.Endpoints...)
-	err = u.putUserEntry(userName, ue)
+	err = u.putUserEntry(AddRoot, userName, ue)
 	if err != nil {
 		return err
 	}
@@ -153,13 +154,14 @@ func (u *user) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error
 
 // Lookup implements upspin.User.
 func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+	const Lookup = "Lookup"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
 	if err != nil {
-		return nil, nil, errInvalidUserName
+		return nil, nil, errors.E(Lookup, userName, errInvalidUserName)
 	}
 	// Get the user entry from GCP.
-	ue, err := u.fetchUserEntry(userName)
+	ue, err := u.fetchUserEntry(Lookup, userName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -167,47 +169,51 @@ func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.Pub
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
-func (u *user) fetchUserEntry(userName upspin.UserName) (*userEntry, error) {
+func (u *user) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, error) {
 	// Get the user entry from GCP
 	log.Printf("Going to get user entry on GCP for user %s", userName)
 	buf, err := u.cloudClient.Download(string(userName))
 	if err != nil {
 		log.Printf("Error downloading user entry for %q: %q", userName, err)
-		return nil, err
+		return nil, errors.E(op, userName, errors.NotExist, err)
 	}
 	// Now convert it to a userEntry
 	var ue userEntry
 	err = json.Unmarshal(buf, &ue)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, userName, errors.IO, err)
 	}
 	log.Printf("Fetched user entry for %s", userName)
 	return &ue, nil
 }
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
-func (u *user) putUserEntry(userName upspin.UserName, userEntry *userEntry) error {
+func (u *user) putUserEntry(op string, userName upspin.UserName, userEntry *userEntry) error {
 	if userEntry == nil {
-		return errors.New("nil userEntry")
+		return errors.E(op, errors.Invalid, userName, errors.Str("nil userEntry"))
 	}
 	jsonBuf, err := json.Marshal(userEntry)
 	if err != nil {
-		return fmt.Errorf("conversion to JSON failed: %v", err)
+		return errors.E(op, errors.Invalid, userName, errors.Errorf("conversion to JSON failed: %v", err))
 	}
 	_, err = u.cloudClient.Put(string(userName), jsonBuf)
-	return err
+	if err != nil {
+		return errors.E(op, userName, err)
+	}
+	return nil
 }
 
 // Configure configures an instance of the user service.
 // Required configuration options are listed at the package comments.
 func (u *user) Configure(options ...string) error {
+	const Configure = "Configure"
 	// These are defaults that only make sense for those running upspin.io.
 	bucketName := "g-upspin-store"
 	projectID := "upspin"
 	for _, option := range options {
 		opts := strings.Split(option, "=")
 		if len(opts) != 2 {
-			return fmt.Errorf("invalid option format: %q", option)
+			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid option format: %q", option))
 		}
 		switch opts[0] {
 		case ConfigBucketName:
@@ -215,7 +221,7 @@ func (u *user) Configure(options ...string) error {
 		case ConfigProjectID:
 			projectID = opts[1]
 		default:
-			return fmt.Errorf("invalid configuration option: %q", opts[0])
+			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid configuration option: %q", opts[0]))
 		}
 	}
 
@@ -232,7 +238,7 @@ func (u *user) isServiceConfigured() bool {
 // Dial implements upspin.Service.
 func (u *user) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
-		return nil, errors.New("user gcp: unrecognized transport")
+		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 	mu.Lock()
 	defer mu.Unlock()
@@ -242,7 +248,7 @@ func (u *user) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		// This is virtually impossible to happen. One will run out of memory before this happens.
 		// It means the ref count wrapped around and thus we can't handle another instance. Fail.
 		refCount--
-		return nil, errors.New("user gcp: internal error: refCount wrapped around")
+		return nil, errors.E("Dial", errors.Str("user gcp: internal error: refCount wrapped around"))
 	}
 
 	this := *u              // Clone ourselves.
