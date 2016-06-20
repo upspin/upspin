@@ -78,7 +78,7 @@ func (f Factotum) FileSign(p upspin.Packing, n upspin.PathName, t upspin.Time, d
 func (f Factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
 	log.Debug.Printf("factotum.scalarMult %x %d %d\n", keyHash, x, y)
 	if !bytes.Equal(f.keyHash, keyHash) {
-		err = fmt.Errorf("no such key")
+		err = errors.E("scalarMult", errors.Errorf("no such key %x!=%x", f.keyHash, keyHash))
 	} else {
 		sx, sy = curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
 	}
@@ -119,18 +119,23 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa
 }
 
 // ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key, returning its type.
+// The Upspin string representation uses \n as newline no matter what native OS it runs on.
 func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
-	var keyType string
+	fields := strings.Split(string(public), "\n")
+	if len(fields) != 4 { // 4 is because string should be terminated by \n, hence fields[3]==""
+		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("expected keytype and two big ints, got %d %v", len(fields), fields))
+	}
+	keyType := fields[0]
 	var x, y big.Int
+	_, ok := x.SetString(fields[1], 10)
+	if !ok {
+		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("%s is not a big int", fields[1]))
+	}
+	_, ok = y.SetString(fields[2], 10)
+	if !ok {
+		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("%s is not a big int", fields[2]))
+	}
 
-	// TODO(ehg) Rewrite with something more efficient than Fscan.
-	n, err := fmt.Fscan(bytes.NewReader([]byte(public)), &keyType, &x, &y)
-	if err != nil {
-		return nil, "", err
-	}
-	if n != 3 {
-		return nil, "", errors.Errorf("expected keytype and two big ints, got %d", n)
-	}
 	var curve elliptic.Curve
 	switch keyType {
 	case "p256":
