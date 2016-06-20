@@ -13,16 +13,12 @@ package gcp
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
-)
-
-var (
-	errEntryNotFound = newDirError("download", "", "pathname not found")
 )
 
 // getDirEntry is a convenience function that returns a directory entry for the path, regardless whether it's a root
@@ -58,13 +54,13 @@ func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.D
 	// Not in cache. Is it in the negative cache?
 	if _, ok := d.dirNegCache.Get(path); ok {
 		// It *is* in the *negative* cache, so we know it's not found.
-		return nil, errEntryNotFound
+		return nil, errors.E(path, errors.NotExist, errors.Str("file not found"))
 	}
 	var savedDirEntry upspin.DirEntry
 
 	buf, err := d.getCloudBytes(path, opts...)
 	if err != nil {
-		if err == errEntryNotFound {
+		if isErrNotExist(err) {
 			// Add to the negative cache
 			d.dirNegCache.Add(path, nil)
 		}
@@ -72,7 +68,7 @@ func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.D
 	}
 	err = json.Unmarshal(buf, &savedDirEntry)
 	if err != nil {
-		return nil, newDirError("getmeta", path, fmt.Sprintf("json unmarshal failed retrieving metadata: %v", err))
+		return nil, errors.E(path, errors.IO, errors.Errorf("json unmarshal failed retrieving metadata: %s", err))
 	}
 	d.dirCache.Add(path, savedDirEntry)
 	return &savedDirEntry, nil
@@ -95,7 +91,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
 		errMsg := fmt.Sprintf("internal server error: conversion to json failed: %s", err)
 		log.Error.Printf("%s: %s: %+v", errMsg, path, dirEntry)
-		return newDirError("putmeta", path, errMsg)
+		return errors.E("putmeta", path, errors.Str(errMsg))
 	}
 	log.Printf("Storing dir entry at %q", path)
 	ss2 := ss.StartSpan("putCloudBytes")
@@ -106,14 +102,15 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 
 // isDirEmpty reports whether the directory path is empty.
 // It must be called with userlock held.
-func (d *directory) isDirEmpty(path upspin.PathName) error {
+func (d *directory) isDirEmpty(path upspin.PathName, opts ...options) error {
+	defer span(opts).StartSpan("isDirEmpty").End()
 	dirPrefix := string(path) + "/"
 	files, err := d.cloudClient.ListDir(dirPrefix)
 	if err != nil {
-		return err
+		return errors.E("ListDir", errors.IO, err)
 	}
 	if len(files) > 0 {
-		return errors.New("directory not empty")
+		return errors.E(path, errors.Str("directory not empty"))
 	}
 	return nil
 }
@@ -125,17 +122,17 @@ func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte
 
 	data, err := d.cloudClient.Download(string(path))
 	if err != nil {
-		// TODO: differentiate FILE NOT FOUND from other errors.
-		return nil, errEntryNotFound
+		return nil, errors.E("Download", path, errors.NotExist, err)
 	}
 	return data, nil
 }
 
 // deletePath deletes the path from the storage backend and if successful also deletes it from all caches.
 // It must be called with userlock held.
-func (d *directory) deletePath(path upspin.PathName) error {
+func (d *directory) deletePath(path upspin.PathName, opts ...options) error {
+	defer span(opts).StartSpan("deletePath").End()
 	if err := d.cloudClient.Delete(string(path)); err != nil {
-		return err
+		return errors.E("Delete", errors.IO, err)
 	}
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)
