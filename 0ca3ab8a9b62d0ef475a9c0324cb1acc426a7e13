@@ -457,6 +457,24 @@
     },
     {
       "key": {
+        "uuid": "89981491_0269aae4",
+        "filename": "metrics/metrics.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-20T03:39:38Z",
+      "side": 1,
+      "message": "Well the reason why errors is errors and not error is because \"error\" is a predeclared identifier in Go. Our logs package is called \"log\".",
+      "parentUuid": "c9fbec84_2f78e565",
+      "revId": "0ca3ab8a9b62d0ef475a9c0324cb1acc426a7e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89981491_226eee16",
         "filename": "metrics/metrics.go",
         "patchSetId": 5
