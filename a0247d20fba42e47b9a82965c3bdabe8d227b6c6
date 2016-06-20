@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6985a058_65c0ae38",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T19:09:48Z",
+      "side": 1,
+      "message": "Andrew had me change it to NotFile instead of IsDir for consistency.  It is submitted.",
+      "range": {
+        "startLine": 213,
+        "startChar": 21,
+        "endLine": 213,
+        "endChar": 26
+      },
+      "revId": "a0247d20fba42e47b9a82965c3bdabe8d227b6c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_45b7aae7",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T19:09:48Z",
+      "side": 1,
+      "message": "Just NotDir, not IsNotDir",
+      "revId": "a0247d20fba42e47b9a82965c3bdabe8d227b6c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6985a058_65350e39",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-20T19:09:48Z",
+      "side": 1,
+      "message": "You do this so often, it seems like you could have a routine that does s,done :\u003d StartNewSpan()\ndefer done()",
+      "range": {
+        "startLine": 346,
+        "startChar": 13,
+        "endLine": 346,
+        "endChar": 16
+      },
+      "revId": "a0247d20fba42e47b9a82965c3bdabe8d227b6c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
