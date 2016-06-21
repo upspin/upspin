@@ -79,7 +79,6 @@ func verifyMetadata(op string, path upspin.PathName, meta upspin.Metadata) error
 
 func newOptsForMetric(op string) (options, *metric.Metric) {
 	m := metric.New(gcpDir)
-	defer m.Done()
 	opts := options{
 		span: m.StartSpan(op),
 	}
