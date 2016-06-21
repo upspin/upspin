@@ -70,10 +70,10 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	const Put = "Put"
 	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
+	mu.RLock()
 	if !s.isConfigured() {
 		return "", errors.E(Put, errNotConfigured)
 	}
-	mu.RLock()
 	sha := sha256key.NewShaReader(reader)
 	initialRef := fileCache.RandomRef()
 	err := fileCache.Put(initialRef, sha)
@@ -124,11 +124,11 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
 	const Get = "Get"
+	mu.RLock()
+	defer mu.RUnlock()
 	if !s.isConfigured() {
 		return nil, upspin.Location{}, errors.E(Get, errNotConfigured)
 	}
-	mu.RLock()
-	defer mu.RUnlock()
 	file, err = fileCache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
@@ -168,11 +168,11 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 // Delete implements upspin.Store.
 func (s *server) Delete(ref upspin.Reference) error {
 	const Delete = "Delete"
+	mu.RLock()
+	defer mu.RUnlock()
 	if !s.isConfigured() {
 		return errors.E(Delete, errNotConfigured)
 	}
-	mu.RLock()
-	defer mu.RUnlock()
 	// TODO: verify ownership and proper ACLs to delete blob
 	err := cloudClient.Delete(string(ref))
 	if err != nil {
@@ -235,9 +235,8 @@ func (s *server) Configure(options ...string) error {
 }
 
 // isConfigured returns whether this server is configured properly.
+// It must be called with mu read locked.
 func (s *server) isConfigured() bool {
-	mu.RLock()
-	defer mu.RUnlock()
 	return cloudClient != nil && fileCache != nil
 }
 
