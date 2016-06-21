@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"upspin.io/bind"
-	gcpCloud "upspin.io/cloud/gcp"
+	gcpCloud "upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -33,7 +33,7 @@ const (
 type user struct {
 	context     upspin.Context
 	endpoint    upspin.Endpoint
-	cloudClient gcpCloud.GCP
+	cloudClient gcpCloud.S
 }
 
 var _ upspin.User = (*user)(nil)
