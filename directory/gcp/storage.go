@@ -110,7 +110,7 @@ func (d *directory) isDirEmpty(path upspin.PathName, opts ...options) error {
 		return errors.E("ListDir", errors.IO, err)
 	}
 	if len(files) > 0 {
-		return errors.E(path, errors.Str("directory not empty"))
+		return errors.E(path, errors.NotEmpty)
 	}
 	return nil
 }

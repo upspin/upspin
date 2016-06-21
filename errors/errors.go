@@ -53,8 +53,8 @@ const (
 	IO                     // External I/O error such as network failure.
 	Exist                  // Item already exists.
 	NotExist               // Item does not exist.
-	NotFile                // File operation on a directory.
-	NotDir                 // Directory operation on a File.
+	IsDir                  // Item is a directory.
+	NotDir                 // Item is not a directory..
 	NotEmpty               // Directory not empty.
 )
 
@@ -74,10 +74,10 @@ func (k Kind) String() string {
 		return "item does not exist"
 	case Other:
 		return "other error"
-	case NotFile:
-		return "file operation on a directory"
+	case IsDir:
+		return "item is a directory"
 	case NotDir:
-		return "directory operation on a file"
+		return "item is not a directory"
 	case NotEmpty:
 		return "directory not empty"
 	}

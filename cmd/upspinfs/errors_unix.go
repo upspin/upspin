@@ -45,7 +45,7 @@ var errnoToKind = map[syscall.Errno]errors.Kind{
 	syscall.EPERM:     errors.Permission,
 	syscall.EEXIST:    errors.Exist,
 	syscall.ENOENT:    errors.NotExist,
-	syscall.EISDIR:    errors.NotFile,
+	syscall.EISDIR:    errors.IsDir,
 	syscall.ENOTDIR:   errors.NotDir,
 	syscall.ENOTEMPTY: errors.NotEmpty,
 }
@@ -54,7 +54,7 @@ var kindToErrno = map[errors.Kind]syscall.Errno{
 	errors.Permission: syscall.EPERM,
 	errors.Exist:      syscall.EEXIST,
 	errors.NotExist:   syscall.ENOENT,
-	errors.NotFile:    syscall.EISDIR,
+	errors.IsDir:      syscall.EISDIR,
 	errors.NotDir:     syscall.ENOTDIR,
 	errors.NotEmpty:   syscall.ENOTEMPTY,
 	errors.Syntax:     syscall.ENOENT,

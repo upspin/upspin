@@ -316,7 +316,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	n.Lock()
 	defer n.Unlock()
 	if n.attr.Mode&os.ModeDir != 0 {
-		return nil, e2e(errors.E(op, errors.NotFile, n.uname))
+		return nil, e2e(errors.E(op, errors.IsDir, n.uname))
 	}
 
 	h := allocHandle(n)
@@ -392,7 +392,7 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 		}
 	} else {
 		if de.IsDir() {
-			return e2e(errors.E(op, errors.NotFile, uname))
+			return e2e(errors.E(op, errors.IsDir, uname))
 		}
 	}
 
