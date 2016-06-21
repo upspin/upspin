@@ -13,7 +13,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/cache"
-	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
@@ -40,7 +40,7 @@ type directory struct {
 	// service users, with different keys? If yes, then Configure should configure the caches too.
 	// If not, then these should be singletons.
 	timeNow        func() upspin.Time // returns the current time.
-	cloudClient    gcpCloud.GCP       // handle for GCP bucket g-upspin-directory.
+	cloudClient    storage.Storage    // handle for GCP bucket g-upspin-directory.
 	serverName     upspin.UserName    // this server's user name (for talking to Store, etc).
 	factotum       upspin.Factotum    // this server's factotum with its keys.
 	newStoreClient newStoreClient     // how to create a Store client.
@@ -538,7 +538,7 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 // newStoreClient is a function that creates a store client for an endpoint.
 type newStoreClient func(e upspin.Endpoint) (upspin.Store, error)
 
-func newDirectory(cloudClient gcpCloud.GCP, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
+func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
 	d := &directory{
 		cloudClient:    cloudClient,
 		factotum:       f,
@@ -654,7 +654,7 @@ func (d *directory) Configure(options ...string) error {
 	confLock.Lock()
 	defer confLock.Unlock()
 
-	d.cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.ProjectPrivate)
+	d.cloudClient = storage.New(projectID, bucketName, storage.ProjectPrivate)
 	log.Debug.Printf("Configured GCP directory: %v", options)
 	return nil
 }

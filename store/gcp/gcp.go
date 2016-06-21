@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	"upspin.io/bind"
-	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -54,7 +54,7 @@ var _ upspin.Store = (*server)(nil)
 var (
 	mu          sync.RWMutex // Protects fields below.
 	refCount    uint64       // How many clones of us exist.
-	cloudClient gcpCloud.GCP
+	cloudClient storage.Storage
 	fileCache   *cache.FileCache
 )
 
@@ -225,7 +225,7 @@ func (s *server) Configure(options ...string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.PublicRead)
+	cloudClient = storage.New(projectID, bucketName, storage.PublicRead)
 	fileCache = cache.NewFileCache(tempDir)
 	if fileCache == nil {
 		return errors.E(Configure, errors.Str("filecache failed to create temp directory"))

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"upspin.io/bind"
-	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 )
@@ -118,7 +118,7 @@ func TestGCPErrorsOut(t *testing.T) {
 	s := newStoreServer()
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
-	cloudClient = &gcptest.ExpectGetGCP{
+	cloudClient = &storagetest.ExpectGet{
 		Ref:  "123",
 		Link: "very poorly-formated url",
 	}
@@ -193,7 +193,7 @@ func TestRefCount(t *testing.T) {
 func newStoreServer() *storeTestServer {
 	ch := make(chan bool)
 	cloudClient = &testGCP{
-		ExpectGetGCP: gcptest.ExpectGetGCP{
+		ExpectGet: storagetest.ExpectGet{
 			Ref:  expectedRef,
 			Link: linkForRef,
 		},
@@ -218,7 +218,7 @@ type storeTestServer struct {
 }
 
 type testGCP struct {
-	gcptest.ExpectGetGCP
+	storagetest.ExpectGet
 	ch         chan bool
 	deletedRef string
 }

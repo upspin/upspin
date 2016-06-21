@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements a simple interface with the Google Cloud Platform
-// for storing blobs in buckets and performing other types of maintenance on GCP.
-package gcp
+// Package storage implements a low-level interface for storing blobs in
+// stable storage such as a database.
+package storage
 
 import (
 	"bytes"
@@ -15,13 +15,13 @@ import (
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
-	storage "google.golang.org/api/storage/v1"
+	gcpStorage "google.golang.org/api/storage/v1" // TODO: move to a separate file or package
 
 	"upspin.io/log"
 )
 
 const (
-	scope = storage.DevstorageFullControlScope
+	scope = gcpStorage.DevstorageFullControlScope
 )
 
 // WriteACL defines ACLs for writing data to Cloud Store.
@@ -41,22 +41,24 @@ const (
 	BucketOwnerFullCtrl WriteACL = "bucketOwnerFullControl"
 )
 
-// GCP is how clients talk to GCP.
-type GCP interface {
-	// PutLocalFile copies a local file to GCP using ref as its
-	// name. It returns a direct link for downloading the file
-	// from GCP.
+// Storage is a low-level storage interface for services to store their data permanently.
+type Storage interface {
+	// PutLocalFile copies a local file to storage using ref as its
+	// name. It may return a direct link for downloading the file
+	// from the storage backend, or empty if the backend does not offer
+	// direct links into it.
 	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
 
-	// Get returns a link for downloading ref from GCP, if the ref
-	// is publicly readable.
+	// Get returns a link for downloading ref from the storage backend,
+	// if the ref is publicly readable and the backend offers direct links.
 	Get(ref string) (link string, error error)
 
-	// Download retrieves the bytes from the media link (even if
-	// ref is not publicly readable).
+	// Download retrieves the bytes associated with a ref.
 	Download(ref string) ([]byte, error)
 
-	// Put stores the contents given as ref on GCP.
+	// Put stores the contents given as ref on the storage backend.
+	// It may return a direct link for retrieving data directly from
+	// the backend, if it provides direct links.
 	Put(ref string, contents []byte) (refLink string, error error)
 
 	// ListPrefix lists all files that match a given prefix, up to a
@@ -71,24 +73,26 @@ type GCP interface {
 	// with a ref.
 	Delete(ref string) error
 
-	// Connect connects with the Google Cloud Platform.
+	// Connect connects with the storage backend.
 	Connect()
 }
 
-// gcpImpl is an implementation of GCP that connects to a live GCP instance.
+// TODO: move GCP-dependent code into a separate file or package and rename it to GCS.
+
+// gcpImpl is an implementation of Storage that connects to a live GCP instance.
 type gcpImpl struct {
 	client          *http.Client
-	service         *storage.Service
+	service         *gcpStorage.Service
 	projectID       string
 	bucketName      string
 	defaultWriteACL WriteACL
 }
 
 // Guarantee we implement the GCP interface.
-var _ GCP = (*gcpImpl)(nil)
+var _ Storage = (*gcpImpl)(nil)
 
 // New creates a new GCP instance associated with the given project id and bucket name.
-func New(projectID, bucketName string, defaultWriteACL WriteACL) GCP {
+func New(projectID, bucketName string, defaultWriteACL WriteACL) Storage {
 	gcp := &gcpImpl{
 		projectID:       projectID,
 		bucketName:      bucketName,
@@ -101,7 +105,7 @@ func New(projectID, bucketName string, defaultWriteACL WriteACL) GCP {
 // PutLocalFile implements GCP.
 func (gcp *gcpImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// Insert an object into a bucket.
-	object := &storage.Object{Name: ref}
+	object := &gcpStorage.Object{Name: ref}
 	file, err := os.Open(srcLocalFilename)
 	if err != nil {
 		log.Printf("Error opening: %v", err)
@@ -148,7 +152,7 @@ func (gcp *gcpImpl) Download(ref string) ([]byte, error) {
 func (gcp *gcpImpl) Put(ref string, contents []byte) (refLink string, error error) {
 	buf := bytes.NewBuffer(contents)
 	acl := string(gcp.defaultWriteACL)
-	object := &storage.Object{Name: ref}
+	object := &gcpStorage.Object{Name: ref}
 	res, err := gcp.service.Objects.Insert(gcp.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
 	if err == nil {
 		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
@@ -265,7 +269,7 @@ func (gcp *gcpImpl) Connect() {
 	if err != nil {
 		log.Fatalf("Unable to get default client: %v", err)
 	}
-	service, err := storage.New(client)
+	service, err := gcpStorage.New(client)
 	if err != nil {
 		log.Fatalf("Unable to create storage service: %v", err)
 	}
