@@ -415,9 +415,6 @@ type Client interface {
 	// Directory returns an error or a reachable bound Directory for the user.
 	Directory(name PathName) (Directory, error)
 
-	// PublicKeys returns an error or a slice of public keys for the user.
-	PublicKeys(name PathName) ([]PublicKey, error)
-
 	// Link creates a new name for the reference referred to by the old name,
 	// thereby defining the new name as a link to the old.
 	// There must be no existing item with the new name.
