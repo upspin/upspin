@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2989e8a8_7f278fa9",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:01:07Z",
+      "side": 1,
+      "message": "I\u0027ll keep it because \"v1\" just seems too obscure.",
+      "parentUuid": "2989e8a8_df1b3b74",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2989e8a8_3f13475b",
         "filename": "cloud/storage/storage.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-21T17:50:38Z",
       "side": 1,
       "message": "i\u0027d prefer this was called Storage. it\u0027s not ubiquitous like E (or testing.T) and carries actual information with its full name.",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_9f46133f",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:01:07Z",
+      "side": 1,
+      "message": "I started with it, then changed because of the stutter rule. But I agree, it\u0027s better that way. Fixed.",
+      "parentUuid": "2989e8a8_3f13475b",
       "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "2989e8a8_ff6c7fbb",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:01:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2989e8a8_1f2f639e",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2989e8a8_7f36aff4",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 4
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "2989e8a8_5f5c8b00",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:01:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2989e8a8_7f36aff4",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2989e8a8_9f4ff37c",
         "filename": "user/gcp/gcp.go",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2016-06-21T17:50:38Z",
       "side": 1,
       "message": "you shouldn\u0027t need the special import name now",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_ff9f1fc6",
+        "filename": "user/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:01:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2989e8a8_9f4ff37c",
       "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
