@@ -67,7 +67,7 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 func (p plainPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
 	const Name = "Name"
 	if dirEntry.IsDir() {
-		return errors.E(Name, errors.Invalid, dirEntry.Name, "cannot rename directory")
+		return errors.E(Name, errors.IsDir, dirEntry.Name, "cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
 	if err != nil {

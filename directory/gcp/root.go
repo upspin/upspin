@@ -94,11 +94,11 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 		return err
 	}
 	if err == nil {
-		return errors.E(op, parsed.Path(), errors.Exist, errors.Str("directory already exists"))
+		return errors.E(op, parsed.Path(), errors.Exist)
 	}
 	if !dirEntry.IsDir() {
 		// We could fix this here, but let's force clients to make their requests crystal clear.
-		return errors.E(op, parsed.Path(), errors.NotExist, errors.Str("root is not a directory"))
+		return errors.E(op, parsed.Path(), errors.NotDir)
 	}
 	// Store the entry.
 	root := &root{

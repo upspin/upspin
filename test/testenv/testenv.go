@@ -108,7 +108,7 @@ func New(setup *Setup) (*Env, error) {
 	for _, e := range setup.Tree {
 		if strings.HasSuffix(e.P, "/") {
 			if len(e.C) > 0 {
-				return nil, errors.E("New", errors.Exist, errors.Str("directory entry must not have contents"))
+				return nil, errors.E("New", errors.NotEmpty, errors.Str("directory entry must not have contents"))
 			}
 			dir := path.Join(upspin.PathName(setup.OwnerName), e.P)
 			loc, err := client.MakeDirectory(dir)

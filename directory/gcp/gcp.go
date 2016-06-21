@@ -242,7 +242,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	}
 	// For self-consistency, verify parent really is a directory
 	if !parentDirEntry.IsDir() {
-		err = errors.E(op, canonicalPath, errors.Str("parent is not a directory"))
+		err = errors.E(op, canonicalPath, errors.NotDir, errors.Str("parent is not a directory"))
 		log.Error.Printf("Bad inconsistency: %s", err)
 		return err
 	}
