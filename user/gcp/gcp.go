@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"upspin.io/bind"
-	gcpCloud "upspin.io/cloud/gcp"
+	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -33,7 +33,7 @@ const (
 type user struct {
 	context     upspin.Context
 	endpoint    upspin.Endpoint
-	cloudClient gcpCloud.GCP
+	cloudClient storage.Storage
 }
 
 var _ upspin.User = (*user)(nil)
@@ -225,7 +225,7 @@ func (u *user) Configure(options ...string) error {
 		}
 	}
 
-	u.cloudClient = gcpCloud.New(projectID, bucketName, gcpCloud.BucketOwnerFullCtrl)
+	u.cloudClient = storage.New(projectID, bucketName, storage.BucketOwnerFullCtrl)
 	log.Debug.Printf("Configured GCP user: %v", options)
 	return nil
 }

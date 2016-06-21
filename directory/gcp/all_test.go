@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"upspin.io/access"
-	"upspin.io/cloud/gcp"
-	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/factotum"
 	"upspin.io/metric"
 	"upspin.io/upspin"
@@ -119,14 +119,14 @@ func Put(t *testing.T, ds *directory, dirEntry *upspin.DirEntry, expectedError s
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &upspin.DirEntry{}, "Put: no user name in path")
+	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &upspin.DirEntry{}, "Put: no user name in path")
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir, "a@x/myroot/myfile: Put: no user name in path")
+	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir, "a@x/myroot/myfile: Put: no user name in path")
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -143,27 +143,27 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
 		Metadata: meta,
 	}
-	Put(t, newTestDirServer(t, &gcptest.DummyGCP{}), &dir,
+	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir,
 		"fred@bob.com/myroot/myfile: Put: invalid operation: invalid sequence number")
 }
 
 func TestLookupPathError(t *testing.T) {
 	expectedError := "Lookup: no user name in path"
-	ds := newTestDirServer(t, &gcptest.DummyGCP{})
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Lookup("")
 	assertError(t, expectedError, err)
 }
 
 func TestGlobMissingPattern(t *testing.T) {
 	expectedError := "Glob: no user name in path"
-	ds := newTestDirServer(t, &gcptest.DummyGCP{})
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Glob("")
 	assertError(t, expectedError, err)
 }
 
 func TestGlobBadPath(t *testing.T) {
 	expectedError := "missing/email/dir/file: Glob: bad user name in path"
-	ds := newTestDirServer(t, &gcptest.DummyGCP{})
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Glob("missing/email/dir/file")
 	assertError(t, expectedError, err)
 }
@@ -174,7 +174,7 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 		Metadata: makeValidMeta(),
 	}
 	rootJSON := toRootJSON(t, &userRoot)
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, "something that does not match"},
 		Data: [][]byte{rootJSON, []byte("")},
 	}
@@ -187,7 +187,7 @@ func TestLookupPathNotFound(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/invalid/invalid/invalid: Download: not found"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, "something that does not match"},
 		Data: [][]byte{rootJSON, []byte("")},
 	}
@@ -215,7 +215,7 @@ func TestLookupRoot(t *testing.T) {
 			Time:     1234,
 		},
 	}
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
@@ -240,7 +240,7 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	expectedDirEntry.Location = upspin.Location{} // Zero location
 	expectedDirEntry.Metadata.Packdata = nil      // No pack data either
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
 		Data: [][]byte{rootJSON, dirJSON},
 	}
@@ -286,7 +286,7 @@ func TestGlobComplex(t *testing.T) {
 	// 5) Lookup the the third one. Discover its path. Root is in cache. Discover Access file that rules it. It fails.
 	// 5) Return files to user.
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{"f@b.co/subdir/a.pdf", "f@b.co", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
 			Data: [][]byte{dir1JSON, rootJSON, dir2JSON, dir3JSON},
 		},
@@ -346,7 +346,7 @@ func TestGlobSimple(t *testing.T) {
 	// 4) Lookup the second one. Discover its path. Root is in cache. Apply check. It passes (implicitly again).
 	// 5) Return files to user.
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName + "/subdir/a.pdf", userName, userName + "/subdir/b.pdf"},
 			Data: [][]byte{dir1JSON, rootJSON, dir2JSON},
 		},
@@ -392,7 +392,7 @@ func TestPutParentNotDir(t *testing.T) {
 
 	expectedError := "test@foo.com/mydir/myfile.txt: Put: parent is not a directory"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, parentPathName},
 		Data: [][]byte{rootJSON, dirParentJSON},
 	}
@@ -415,7 +415,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	expectedError := "test@foo.com/mydir/myfile.txt: Put: item already exists: directory already exists"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName, parentPathName},
 		Data: [][]byte{rootJSON, existingDirEntryJSON, dirParentJSON},
 	}
@@ -437,7 +437,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	expectedError := "test@foo.com/mydir/myfile.txt: MakeDirectory: directory operation on a file: overwriting file with directory"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName, parentPathName},
 		Data: [][]byte{rootJSON, existingDirEntryJSON, dirParentJSON},
 	}
@@ -455,7 +455,7 @@ func TestPutPermissionDenied(t *testing.T) {
 
 	expectedError := "test@foo.com/mydir/myfile.txt: Put: permission denied"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
@@ -471,7 +471,7 @@ func TestPut(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, "test@foo.com/mydir"},
 		Data: [][]byte{rootJSON, dirParentJSON},
 	}
@@ -525,7 +525,7 @@ func TestMakeRoot(t *testing.T) {
 	userRootSavedNow.dirEntry.Metadata.Time = timeFunc() // time of creation is now.
 	rootJSON := toRootJSON(t, &userRootSavedNow)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref: []string{"does not exist"},
 	}
 
@@ -551,7 +551,7 @@ func TestMakeRoot(t *testing.T) {
 func TestMakeRootPermissionDenied(t *testing.T) {
 	expectedError := "test@foo.com/, user bozo@theclown.org: MakeDirectory: permission denied"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref: []string{"does not exist"},
 	}
 
@@ -598,7 +598,7 @@ func TestPutAccessFile(t *testing.T) {
 	}
 	dirParentJSON := toJSON(t, dirParent)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, parentDir},
 		Data: [][]byte{rootJSON, dirParentJSON},
 	}
@@ -694,7 +694,7 @@ func TestGroupAccessFile(t *testing.T) {
 
 	// Internally, we look up the root, the Group file and finally the pathName requested. Later, a new group file is
 	// put so we lookup its parent and finally we retrieve the new group entry.
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, userName + "/Group/family", pathName, userName + "/Group", userName + "/Group/family"},
 		Data: [][]byte{rootJSON, groupDirJSON, dirJSON, groupParentDirJSON, newGroupDirJSON},
 	}
@@ -799,7 +799,7 @@ func TestMarshalRoot(t *testing.T) {
 func TestGCPCorruptsData(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, parentPathName},
 		Data: [][]byte{rootJSON, []byte("really bad JSON structure that does not parse")},
 	}
@@ -815,7 +815,7 @@ func TestLookup(t *testing.T) {
 	dirEntryJSON := toJSON(t, dir)
 	rootJSON := toRootJSON(t, &userRoot)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
 		Data: [][]byte{rootJSON, dirEntryJSON},
 	}
@@ -828,7 +828,7 @@ func TestLookup(t *testing.T) {
 func TestLookupPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
@@ -846,7 +846,7 @@ func TestDelete(t *testing.T) {
 	dirEntryJSON := toJSON(t, dir)
 
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName, pathName},
 			Data: [][]byte{rootJSON, dirEntryJSON},
 		},
@@ -873,7 +873,7 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 	parentPathJSON := toJSON(t, dirParent)
 
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName, parentPathName},
 			Data: [][]byte{rootJSON, parentPathJSON},
 		},
@@ -900,7 +900,7 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName}, // only the root is looked up.
 			Data: [][]byte{rootJSON},
 		},
@@ -938,7 +938,7 @@ func TestDeleteAccessFile(t *testing.T) {
 	rootJSON := toRootJSON(t, &newRoot)
 
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName, rootAccessFile},
 			Data: [][]byte{rootJSON, accessDirJSON},
 		},
@@ -994,7 +994,7 @@ func TestDeleteGroupFile(t *testing.T) {
 	groupDirJSON := toJSON(t, groupDir)
 
 	lgcp := &listGCP{
-		ExpectDownloadCapturePutGCP: gcptest.ExpectDownloadCapturePutGCP{
+		ExpectDownloadCapturePut: storagetest.ExpectDownloadCapturePut{
 			Ref:  []string{userName, pathName, string(groupPathName)},
 			Data: [][]byte{rootJSON, dirJSON, groupDirJSON},
 		},
@@ -1032,7 +1032,7 @@ func TestWhichAccessImplicitAtRoot(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	// The Access file at the root really exists.
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
@@ -1054,7 +1054,7 @@ func TestWhichAccess(t *testing.T) {
 	})
 
 	// The Access file at the root really exists.
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, rootAccessFile},
 		Data: [][]byte{rootJSON, accessJSON},
 	}
@@ -1074,7 +1074,7 @@ func TestWhichAccessPermissionDenied(t *testing.T) {
 
 	expectedError := "test@foo.com/mydir/myfile.txt: WhichAccess: permission denied"
 
-	egcp := &gcptest.ExpectDownloadCapturePutGCP{
+	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
 		Data: [][]byte{rootJSON},
 	}
@@ -1109,7 +1109,7 @@ func makeAccess(t *testing.T, path upspin.PathName, accessFileContents string) *
 	return acc
 }
 
-func newTestDirServer(t *testing.T, gcp gcp.GCP) *directory {
+func newTestDirServer(t *testing.T, gcp storage.Storage) *directory {
 	f, err := factotum.New(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
@@ -1123,7 +1123,7 @@ func newTestDirServer(t *testing.T, gcp gcp.GCP) *directory {
 // listGCP is an ExpectDownloadCapturePutGCP that returns a slice of fileNames
 // if a call to ListPrefix or ListDir matches the expected prefix or dir.
 type listGCP struct {
-	gcptest.ExpectDownloadCapturePutGCP
+	storagetest.ExpectDownloadCapturePut
 	prefix             string
 	fileNames          []string
 	listPrefixCalled   bool
