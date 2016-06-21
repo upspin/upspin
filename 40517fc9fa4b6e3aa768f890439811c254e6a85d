@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e40e242_f3d5ea4f",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T23:09:50Z",
+      "side": 1,
+      "message": "I had left this out because the message was weird when printed. Glad you found it.",
+      "revId": "40517fc9fa4b6e3aa768f890439811c254e6a85d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
