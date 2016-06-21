@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	"upspin.io/bind"
-	gcpCloud "upspin.io/cloud/gcp"
+	gcpCloud "upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -54,7 +54,7 @@ var _ upspin.Store = (*server)(nil)
 var (
 	mu          sync.RWMutex // Protects fields below.
 	refCount    uint64       // How many clones of us exist.
-	cloudClient gcpCloud.GCP
+	cloudClient gcpCloud.S
 	fileCache   *cache.FileCache
 )
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/cloud/gcp/gcptest"
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/upspin"
 )
 
@@ -170,15 +170,15 @@ func TestGetExistingUser(t *testing.T) {
 }
 
 func newDummyUserServer() *user {
-	return &user{cloudClient: &gcptest.DummyGCP{}}
+	return &user{cloudClient: &storagetest.DummyStorage{}}
 }
 
 // newUserServerWithMocking sets up a mock GCP client that expects a
 // single lookup of user mockUser and it will reply with the preset
 // data. It returns the user server, the mock GCP client for further
 // verification.
-func newUserServerWithMocking(data []byte) (*user, *gcptest.ExpectDownloadCapturePutGCP) {
-	mockGCP := &gcptest.ExpectDownloadCapturePutGCP{
+func newUserServerWithMocking(data []byte) (*user, *storagetest.ExpectDownloadCapturePut) {
+	mockGCP := &storagetest.ExpectDownloadCapturePut{
 		Ref:         []string{mockUser},
 		Data:        [][]byte{data},
 		PutContents: make([][]byte, 0, 1),
