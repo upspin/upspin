@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2989e8a8_df1b3b74",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-21T17:50:38Z",
+      "side": 1,
+      "message": "you don\u0027t need the special import name here now, but you can keep it for clarity if you prefer",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_3f13475b",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-21T17:50:38Z",
+      "side": 1,
+      "message": "i\u0027d prefer this was called Storage. it\u0027s not ubiquitous like E (or testing.T) and carries actual information with its full name.",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_1f2f639e",
+        "filename": "directory/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-21T17:50:38Z",
+      "side": 1,
+      "message": "delete the special import name. just use the default, storage",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_7f36aff4",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-21T17:50:38Z",
+      "side": 1,
+      "message": "delete the special import name",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2989e8a8_9f4ff37c",
+        "filename": "user/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-21T17:50:38Z",
+      "side": 1,
+      "message": "you shouldn\u0027t need the special import name now",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
