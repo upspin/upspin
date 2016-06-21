@@ -301,25 +301,6 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 	return nil, err
 }
 
-// PublicKeys implements upspin.PublicKeys.
-func (c *Client) PublicKeys(name upspin.PathName) ([]upspin.PublicKey, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	var pubKeys []upspin.PublicKey
-	if parsed.User() == c.context.UserName {
-		pubKeys = append(pubKeys, c.context.Factotum.PublicKey())
-	}
-	if _, pks, err := c.user.Lookup(parsed.User()); err == nil {
-		pubKeys = append(pubKeys, pks...)
-	}
-	if len(pubKeys) == 0 {
-		return nil, errors.Errorf("client: no public keys for user %q", parsed.User())
-	}
-	return pubKeys, nil
-}
-
 // Link implements upspin.Link. This is more a copy on write than a Unix style Link. As soon as
 // one of the two files is written, then will diverge.
 func (c *Client) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
