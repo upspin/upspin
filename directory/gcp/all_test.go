@@ -435,7 +435,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: MakeDirectory: directory operation on a file: overwriting file with directory"
+	expectedError := "test@foo.com/mydir/myfile.txt: MakeDirectory: item is not a directory: overwriting file with directory"
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName, parentPathName},

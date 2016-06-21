@@ -572,7 +572,7 @@ func TestDelete(t *testing.T) {
 	if err == nil {
 		t.Fatal("second Delete succeeds")
 	}
-	const expect = "no such directory entry"
+	const expect = "item does not exist"
 	if !strings.Contains(err.Error(), expect) {
 		t.Fatalf("second delete gives wrong error: %q; expected %q", err, expect)
 	}

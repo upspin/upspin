@@ -455,7 +455,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 			return err
 		}
 		if !e.IsDir() {
-			return errors.E(op, parsed.First(i+1).Path(), errors.Str("not a directory"))
+			return errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
 		}
 		entries = append(entries, e)
 		dirRef = e.Location.Reference
@@ -541,7 +541,7 @@ func (s *Service) Delete(pathName upspin.PathName) error {
 			return errors.E(Delete, err)
 		}
 		if !empty {
-			return errors.E(Delete, pathName, errors.Str("directory not empty"))
+			return errors.E(Delete, pathName, errors.NotEmpty)
 		}
 	}
 
@@ -597,7 +597,7 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 			return nil, err
 		}
 		if !entry.IsDir() {
-			return nil, errors.E(op, parsed.Path(), errors.E("not a directory"))
+			return nil, errors.E(op, parsed.Path(), errors.NotDir)
 		}
 		dirRef = entry.Location.Reference
 	}
@@ -703,7 +703,7 @@ Loop:
 		}
 		return &entry, nil
 	}
-	return nil, errors.E(op, pathName, errors.Str("no such directory entry: "+elem))
+	return nil, errors.E(op, fileName, errors.NotExist)
 }
 
 var errSeq = errors.Str("sequence mismatch")
@@ -741,7 +741,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 			}
 			// If it's already there and is not expected to be a directory, this is an error.
 			if nextEntry.IsDir() && !dirOverwriteOK {
-				return "", errors.E(op, dirName, errors.Str("cannot overwrite directory"))
+				return "", errors.E(op, errors.IsDir, dirName, errors.Str("cannot overwrite directory"))
 			}
 		}
 		// Drop this entry so we can append the updated one (or skip it, if we're deleting).
