@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"upspin.io/cloud/gcp"
+	"upspin.io/cloud/storage"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/test/testfixtures"
@@ -109,7 +109,7 @@ func TestParallelOperationsOnAccessAndRoot(t *testing.T) {
 	wgEnd.Wait()
 }
 
-func newDirServerWithDummyStore(t *testing.T, gcp gcp.GCP) *directory {
+func newDirServerWithDummyStore(t *testing.T, gcp storage.S) *directory {
 	f, err := factotum.New(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
@@ -154,7 +154,7 @@ type gcpMock struct {
 	storage map[string][]byte
 }
 
-var _ gcp.GCP = (*gcpMock)(nil)
+var _ storage.S = (*gcpMock)(nil)
 
 // PutLocalFile implements gcp.GCP.
 func (g *gcpMock) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
