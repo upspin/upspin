@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "2989e8a8_bf96775b",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-21T18:17:59Z",
+      "side": 1,
+      "message": "Fair enough. But this package is now also called storage. It\u0027s cleaner if we use something else. Maybe \u0027gcs\u0027?",
+      "parentUuid": "2989e8a8_3fd42750",
+      "revId": "c6df23a89fa88533e25ca1378f13f61f455fcfb8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2989e8a8_3f13475b",
         "filename": "cloud/storage/storage.go",
         "patchSetId": 4
