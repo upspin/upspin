@@ -225,7 +225,11 @@ func (s *server) Configure(options ...string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	cloudClient = storage.New(projectID, bucketName, storage.PublicRead)
+	cloudClient = storage.NewGCS(projectID, bucketName, storage.PublicRead)
+	err := cloudClient.Connect()
+	if err != nil {
+		return errors.E(Configure, err)
+	}
 	fileCache = cache.NewFileCache(tempDir)
 	if fileCache == nil {
 		return errors.E(Configure, errors.Str("filecache failed to create temp directory"))

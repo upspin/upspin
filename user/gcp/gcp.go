@@ -225,7 +225,11 @@ func (u *user) Configure(options ...string) error {
 		}
 	}
 
-	u.cloudClient = storage.New(projectID, bucketName, storage.BucketOwnerFullCtrl)
+	u.cloudClient = storage.NewGCS(projectID, bucketName, storage.BucketOwnerFullCtrl)
+	err := u.cloudClient.Connect()
+	if err != nil {
+		return errors.E(Configure, err)
+	}
 	log.Debug.Printf("Configured GCP user: %v", options)
 	return nil
 }

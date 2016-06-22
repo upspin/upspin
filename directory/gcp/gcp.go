@@ -633,13 +633,14 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 // Configure configures the connection to the backing store (namely, GCP) once the service
 // has been dialed. The details of the configuration are explained at the package comments.
 func (d *directory) Configure(options ...string) error {
+	const Configure = "Configure"
 	// These are defaults that only make sense for those running upspin.io.
 	bucketName := "g-upspin-directory"
 	projectID := "upspin"
 	for _, option := range options {
 		opts := strings.Split(option, "=")
 		if len(opts) != 2 {
-			return errors.E("Configure", errors.Syntax, errors.Errorf("invalid option format: %q", option))
+			return errors.E(Configure, errors.Syntax, errors.Errorf("invalid option format: %q", option))
 		}
 		switch opts[0] {
 		case ConfigBucketName:
@@ -647,13 +648,22 @@ func (d *directory) Configure(options ...string) error {
 		case ConfigProjectID:
 			projectID = opts[1]
 		default:
-			return errors.E("Configure", errors.Syntax, errors.Errorf("invalid configuration option: %q", opts[0]))
+			return errors.E(Configure, errors.Syntax, errors.Errorf("invalid configuration option: %q", opts[0]))
 		}
 	}
 	confLock.Lock()
 	defer confLock.Unlock()
 
-	d.cloudClient = storage.New(projectID, bucketName, storage.ProjectPrivate)
+	// TODO: we should be doing something like: storage.New().WithBackend(storage.GCS).WithOptions(opts)...
+	if bucketName != "" && projectID != "" {
+		d.cloudClient = storage.NewGCS(projectID, bucketName, storage.ProjectPrivate)
+	} else {
+		// TODO: pass in a list of NetAddrs where mongo can find its backend. Assuming localhost for now.
+		d.cloudClient = storage.NewMongoDB(nil)
+	}
+	if err := d.cloudClient.Connect(); err != nil {
+		return errors.E(Configure, err)
+	}
 	log.Debug.Printf("Configured GCP directory: %v", options)
 	return nil
 }
