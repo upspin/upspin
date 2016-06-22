@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	client      = New(projectID, bucketName, PublicRead)
+	client      = NewGCS(projectID, bucketName, PublicRead)
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
 	fileName    = "test-file"
@@ -271,7 +271,7 @@ func TestDelete(t *testing.T) {
 
 func emptyBucket() {
 	const verbose = true
-	client.(*gcpImpl).EmptyBucket(verbose)
+	client.(*gcsImpl).EmptyBucket(verbose)
 }
 
 func TestMain(m *testing.M) {
