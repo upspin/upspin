@@ -41,6 +41,13 @@ var (
 	_ encoding.BinaryMarshaler   = (*Error)(nil)
 )
 
+// Separator is the string used to separate nested errors. By
+// default, to make errors easier on the eye, nested errors are
+// indented on a new line. A server may instead choose to keep each
+// error on a single line by modifying the separator string, perhaps
+// to ":: ".
+var Separator = ":\n\t"
+
 // Kind defines the kind of error this is, mostly for use by systems
 // such as FUSE that must act differently depending on the error.
 type Kind uint8
@@ -60,6 +67,8 @@ const (
 
 func (k Kind) String() string {
 	switch k {
+	case Other:
+		return "other error"
 	case Invalid:
 		return "invalid operation"
 	case Permission:
@@ -72,8 +81,6 @@ func (k Kind) String() string {
 		return "item already exists"
 	case NotExist:
 		return "item does not exist"
-	case Other:
-		return "other error"
 	case IsDir:
 		return "item is a directory"
 	case NotDir:
@@ -200,7 +207,7 @@ func (e *Error) Error() string {
 	if e.Err != nil {
 		// Indent on new line if we are cascading Upspin errors.
 		if _, ok := e.Err.(*Error); ok {
-			pad(b, ":\n\t")
+			pad(b, Separator)
 		} else {
 			pad(b, ": ")
 		}
