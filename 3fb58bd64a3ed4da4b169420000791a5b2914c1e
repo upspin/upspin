@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e48aafc_fe7681f1",
+        "filename": "directory/gcp/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-22T20:25:52Z",
+      "side": 1,
+      "message": "It seems this change made the error be more cryptical not less. Shouldn\u0027t we add the path back in?",
+      "revId": "3fb58bd64a3ed4da4b169420000791a5b2914c1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
