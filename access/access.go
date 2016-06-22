@@ -132,7 +132,7 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 			return nil, errors.Errorf("%s:%d: syntax error: invalid rights list: %q", pathName, lineNum, rightsText)
 		}
 		usersText := bytes.TrimSpace(line[colon+1:])
-		users := splitList(users[:0], usersText)
+		users = splitList(users[:0], usersText)
 		if users == nil {
 			return nil, errors.Errorf("%s:%d: syntax error: invalid users list: %q", pathName, lineNum, usersText)
 		}
@@ -428,7 +428,7 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 			continue
 		}
 
-		users := splitList(users[:0], line)
+		users = splitList(users[:0], line)
 		if users == nil {
 			return nil, errors.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
 		}

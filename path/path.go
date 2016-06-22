@@ -58,7 +58,6 @@ func (p Parsed) User() upspin.UserName {
 // It panics if n is out of range.
 func (p Parsed) Elem(n int) string {
 	str := string(p.path)
-	var slash int
 	// We start with -1 to treat the user name as an element before the 0th one.
 	for i := -1; i < n; i++ {
 		slash := strings.IndexByte(str, '/')
@@ -67,7 +66,7 @@ func (p Parsed) Elem(n int) string {
 		}
 		str = str[slash+1:]
 	}
-	slash = strings.IndexByte(str, '/')
+	slash := strings.IndexByte(str, '/')
 	if slash < 0 {
 		return str
 	}
