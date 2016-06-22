@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e90aac9_be883934",
+        "filename": "cloud/storage/gcs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-22T23:38:10Z",
+      "side": 1,
+      "message": "I think this should be package cloud/storage/gcs, so that we don\u0027t need to link in the google.golang.org/api/storage package if we\u0027re not using it.",
+      "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e90aac9_de8d0543",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-22T23:38:10Z",
+      "side": 1,
+      "message": "I think we want this to take an address string. For gcs this could be the bucket name. For others, the address of the database.\n\nAlso, should these methods be Open and Close?",
+      "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
