@@ -12,49 +12,54 @@ import (
 	"upspin.io/cloud/storage"
 )
 
-// DummyStorage is a dummy version of storage.S that does nothing.
+// DummyStorage is a dummy version of storage.Storage that does nothing.
 type DummyStorage struct {
 }
 
 var _ storage.Storage = (*DummyStorage)(nil)
 
-// PutLocalFile implements storage.S.
+// PutLocalFile implements storage.Storage.
 func (m *DummyStorage) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	return "", nil
 }
 
-// Get implements storage.S.
+// Get implements storage.Storage.
 func (m *DummyStorage) Get(ref string) (link string, error error) {
 	return "", nil
 }
 
-// Download implements storage.S.
+// Download implements storage.Storage.
 func (m *DummyStorage) Download(ref string) ([]byte, error) {
 	return nil, nil
 }
 
-// Put implements storage.S.
+// Put implements storage.Storage.
 func (m *DummyStorage) Put(ref string, contents []byte) (refLink string, error error) {
 	return "", nil
 }
 
-// ListPrefix implements storage.S.
+// ListPrefix implements storage.Storage.
 func (m *DummyStorage) ListPrefix(prefix string, depth int) ([]string, error) {
 	return []string{}, nil
 }
 
-// ListDir implements storage.S.
+// ListDir implements storage.Storage.
 func (m *DummyStorage) ListDir(dir string) ([]string, error) {
 	return []string{}, nil
 }
 
-// Delete implements storage.S.
+// Delete implements storage.Storage.
 func (m *DummyStorage) Delete(ref string) error {
 	return nil
 }
 
-// Connect implements storage.S.
-func (m *DummyStorage) Connect() {
+// Connect implements storage.Storage.
+func (m *DummyStorage) Connect() error {
+	return nil
+}
+
+// Disconnect implements storage.Storage.
+func (m *DummyStorage) Disconnect() {
 }
 
 // ExpectGet is a DummyStorage that expects Get will be called with a
@@ -65,7 +70,7 @@ type ExpectGet struct {
 	Link string
 }
 
-// Get implements storage.S.
+// Get implements storage.Storage.
 func (e *ExpectGet) Get(ref string) (link string, error error) {
 	if ref == e.Ref {
 		return e.Link, nil
@@ -88,7 +93,7 @@ type ExpectDownloadCapturePut struct {
 	pos int // position of the next Ref to match
 }
 
-// Download implements storage.S.
+// Download implements storage.Storage.
 func (e *ExpectDownloadCapturePut) Download(ref string) ([]byte, error) {
 	if e.pos < len(e.Ref) && ref == e.Ref[e.pos] {
 		data := e.Data[e.pos]
@@ -98,7 +103,7 @@ func (e *ExpectDownloadCapturePut) Download(ref string) ([]byte, error) {
 	return nil, errors.New("not found")
 }
 
-// Put implements storage.S.
+// Put implements storage.Storage.
 func (e *ExpectDownloadCapturePut) Put(ref string, contents []byte) (refLink string, error error) {
 	e.PutRef = append(e.PutRef, ref)
 	e.PutContents = append(e.PutContents, contents)
