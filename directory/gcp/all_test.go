@@ -119,14 +119,14 @@ func Put(t *testing.T, ds *directory, dirEntry *upspin.DirEntry, expectedError s
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &upspin.DirEntry{}, "Put: no user name in path")
+	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &upspin.DirEntry{}, "no user name in path")
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir, "a@x/myroot/myfile: Put: no user name in path")
+	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir, "no user name in path")
 }
 
 func makeValidMeta() upspin.Metadata {
@@ -148,21 +148,21 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 }
 
 func TestLookupPathError(t *testing.T) {
-	expectedError := "Lookup: no user name in path"
+	expectedError := "no user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Lookup("")
 	assertError(t, expectedError, err)
 }
 
 func TestGlobMissingPattern(t *testing.T) {
-	expectedError := "Glob: no user name in path"
+	expectedError := "no user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Glob("")
 	assertError(t, expectedError, err)
 }
 
 func TestGlobBadPath(t *testing.T) {
-	expectedError := "missing/email/dir/file: Glob: bad user name in path"
+	expectedError := "bad user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Glob("missing/email/dir/file")
 	assertError(t, expectedError, err)

@@ -91,22 +91,6 @@ func (p Parsed) FilePath() string {
 	return str[strings.IndexByte(str, '/')+1:]
 }
 
-// NameError gives information about an erroneous path name, including the name and error description.
-type NameError struct {
-	name  string
-	error string
-}
-
-// Name is the path name that caused the error.
-func (n NameError) Name() string {
-	return n.name
-}
-
-// Error is the implementation of the error interface for NameError.
-func (n NameError) Error() string {
-	return n.error
-}
-
 // Parse parses a full file name, including the user, validates it,
 // and returns its parsed form. If the name is a user root directory,
 // the trailing slash is optional.
@@ -122,11 +106,11 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	}
 	if len(user) < 6 {
 		// No user name. Must be at least "u@x.co". Silly test - do more.
-		return Parsed{}, NameError{string(pathName), "no user name in path"}
+		return Parsed{}, errors.E("Parse", pathName, errors.Str("no user name in path"))
 	}
 	if strings.Count(user, "@") != 1 {
 		// User name must contain exactly one "@".
-		return Parsed{}, NameError{string(pathName), "bad user name in path"}
+		return Parsed{}, errors.E("Parse", pathName, errors.Str("bad user name in path"))
 	}
 	p := Parsed{
 		// If pathName is already clean, which it usually is, this will not allocate.
