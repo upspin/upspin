@@ -44,3 +44,27 @@ func TestMarshal(t *testing.T) {
 		t.Errorf("expected Err %q; got %q", in.Err, out.Err)
 	}
 }
+
+func TestSeparator(t *testing.T) {
+	defer func(prev string) {
+		Separator = prev
+	}(Separator)
+	Separator = ":: "
+
+	// Same pattern as above.
+	path := upspin.PathName("jane@doe.com/file")
+	user := upspin.UserName("joe@blow.com")
+	err := Str("network unreachable")
+
+	// Single error. No user is set, so we will have a zero-length field inside.
+	e1 := E(path, "Get", IO, err)
+
+	// Nested error.
+	e2 := E(path, user, "Read", Other, e1)
+
+	want := "jane@doe.com/file, user joe@blow.com: Read: I/O error:: Get: network unreachable"
+	if e2.Error() != want {
+		t.Errorf("expected %q; got %q", want, e2)
+	}
+
+}
