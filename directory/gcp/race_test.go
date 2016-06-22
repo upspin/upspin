@@ -156,17 +156,17 @@ type gcpMock struct {
 
 var _ storage.Storage = (*gcpMock)(nil)
 
-// PutLocalFile implements gcp.GCP.
+// PutLocalFile implements storage.Storage.
 func (g *gcpMock) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	panic("not used")
 }
 
-// Get implements gcp.GCP.
+// Get implements storage.Storage.
 func (g *gcpMock) Get(ref string) (link string, error error) {
 	panic("not used")
 }
 
-// Download implements gcp.GCP.
+// Download implements storage.Storage.
 func (g *gcpMock) Download(ref string) ([]byte, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -176,7 +176,7 @@ func (g *gcpMock) Download(ref string) ([]byte, error) {
 	return nil, errors.New("404 not found")
 }
 
-// Put implements gcp.GCP.
+// Put implements storage.Storage.
 func (g *gcpMock) Put(ref string, contents []byte) (refLink string, error error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -184,17 +184,17 @@ func (g *gcpMock) Put(ref string, contents []byte) (refLink string, error error)
 	return "", nil
 }
 
-// ListPrefix implements gcp.GCP.
+// ListPrefix implements storage.Storage.
 func (g *gcpMock) ListPrefix(prefix string, depth int) ([]string, error) {
 	panic("not used")
 }
 
-// ListDir implements gcp.GCP.
+// ListDir implements storage.Storage.
 func (g *gcpMock) ListDir(dir string) ([]string, error) {
 	panic("not used")
 }
 
-// Delete implements gcp.GCP.
+// Delete implements storage.Storage.
 func (g *gcpMock) Delete(ref string) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -205,6 +205,11 @@ func (g *gcpMock) Delete(ref string) error {
 	return errors.New("404 not found")
 }
 
-// Connect implements gcp.GCP.
-func (g *gcpMock) Connect() {
+// Connect implements storage.Storage.
+func (g *gcpMock) Connect() error {
+	return nil
+}
+
+// Disconnect implements storage.Storage.
+func (g *gcpMock) Disconnect() {
 }
