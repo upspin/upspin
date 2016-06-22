@@ -124,6 +124,7 @@ func (ac *AuthClientService) keepAlive() {
 		case <-ac.closeKeepAlive:
 			log.Debug.Printf("grpcauth: keepAlive: exiting keep alive routine")
 			ac.keepAliveRound = 0
+			ac.closeKeepAlive <- true
 			return
 		}
 	}
@@ -219,6 +220,8 @@ func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 func (ac *AuthClientService) Close() {
 	select { // prevents blocking if Close is called more than once.
 	case ac.closeKeepAlive <- true:
+		<-ac.closeKeepAlive // Wait until we have confirmation.
+		close(ac.closeKeepAlive)
 	default:
 	}
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
