@@ -390,7 +390,7 @@ func TestPutParentNotDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Put: parent is not a directory"
+	expectedError := "test@foo.com/mydir/myfile.txt: Put: item is not a directory: parent is not a directory"
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, parentPathName},
@@ -881,7 +881,7 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 		fileNames: []string{pathName}, // pathName is inside parentPathName.
 	}
 
-	expectedError := "Delete:\n\ttest@foo.com/mydir: directory not empty"
+	expectedError := "Delete: directory not empty:\n\ttest@foo.com/mydir"
 
 	ds := newTestDirServer(t, lgcp)
 
