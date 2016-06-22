@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eeeef635_9d97235a",
+        "filename": "auth/grpcauth/testdata/proto.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-22T21:41:40Z",
+      "side": 1,
+      "message": "i can\u0027t believe you need -I $GOPATH/bin",
+      "revId": "a1ec947bff7bd31704627d7089c0e0dc5c136509",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
