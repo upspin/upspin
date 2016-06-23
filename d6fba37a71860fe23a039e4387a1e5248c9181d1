@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23f5893d_ff5b7f0f",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:41:49Z",
+      "side": 0,
+      "message": "How do I launch one on my local machine? Even if we have a hermetic docker image built locally, we will still need a selfsigned cert for now since we\u0027re not upspin.io. Right?",
+      "revId": "d6fba37a71860fe23a039e4387a1e5248c9181d1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
