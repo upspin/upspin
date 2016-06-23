@@ -52,6 +52,24 @@
       "revId": "d6fba37a71860fe23a039e4387a1e5248c9181d1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e90aac9_7e6dd117",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-23T03:59:13Z",
+      "side": 0,
+      "message": "Yeah I think that\u0027d work. I\u0027ll think about the best way to weave it through.",
+      "parentUuid": "8e33bad6_b0a22067",
+      "revId": "d6fba37a71860fe23a039e4387a1e5248c9181d1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
