@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0e90aac9_de7b45d7",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-23T03:50:19Z",
+      "side": 1,
+      "message": "Yeah there\u0027s gonna be a lot of stuff to tidy up. :-/",
+      "parentUuid": "03fc052a_5ef71564",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ce47723d_52173495",
         "filename": "cmd/admin/deployment/dirserver.yaml",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-23T03:41:49Z",
       "side": 1,
       "message": "What\u0027s the difference between Service and Deployment? Is this testing vs prod?",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e90aac9_9e71bdfd",
+        "filename": "cmd/admin/deployment/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-23T03:50:19Z",
+      "side": 1,
+      "message": "A Deployment specifies the back ends that should run, and how many, etc.\nA Service sets up the front end for the service (IP address, load balancing, etc).\n\nI\u0027ll write a doc describing how this all fits together.",
+      "parentUuid": "ce47723d_52173495",
       "revId": "2be0731784f78b714d291100809622531b54bbab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "0e90aac9_be7679f0",
+        "filename": "cmd/admin/deployment/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-23T03:50:19Z",
+      "side": 1,
+      "message": "Yeah, for Let\u0027s Encrypt.",
+      "parentUuid": "ce47723d_523e541d",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4ed1c28b_9c21d59e",
         "filename": "cmd/admin/service/dirserver.yaml",
         "patchSetId": 11
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-23T03:41:49Z",
       "side": 1,
       "message": "Necessary?",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e90aac9_7e14f18f",
+        "filename": "cmd/admin/service/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-23T03:50:19Z",
+      "side": 1,
+      "message": "Yeah, Let\u0027s Encrypt uses it. It\u0027s nice to redirect, too.",
+      "parentUuid": "4ed1c28b_9c21d59e",
       "revId": "2be0731784f78b714d291100809622531b54bbab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
