@@ -19,6 +19,42 @@
     },
     {
       "key": {
+        "uuid": "ae6ddeb5_d354143f",
+        "filename": "cloud/storage/gcs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T00:14:41Z",
+      "side": 1,
+      "message": "Agreed. I will do this when I implement a generic way of instantiating a backend. The idea is something like:\n\nstorage.NewConfig().WithBackend(\"GCS\").WithOptions(opts)\n\nor something to that effect.\n\nThis is the first step.",
+      "parentUuid": "0e90aac9_be883934",
+      "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ed1c28b_2ec1933d",
+        "filename": "cloud/storage/gcs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T00:14:41Z",
+      "side": 1,
+      "message": "Agreed. I will do this when I implement a generic way of instantiating a backend. The idea is something like:\n\nstorage.NewConfig().WithBackend(\"GCS\").WithOptions(opts)\n\nor something to that effect.\n\nThis is the first step.",
+      "parentUuid": "0e90aac9_be883934",
+      "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0e90aac9_de8d0543",
         "filename": "cloud/storage/storage.go",
         "patchSetId": 2
@@ -30,6 +66,24 @@
       "writtenOn": "2016-06-22T23:38:10Z",
       "side": 1,
       "message": "I think we want this to take an address string. For gcs this could be the bucket name. For others, the address of the database.\n\nAlso, should these methods be Open and Close?",
+      "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aebf9e31_2934e93d",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T00:14:41Z",
+      "side": 1,
+      "message": "These things should have been configured at the time we call New or whatever the function is to create that configuration setup I mentioned above. The options will carry that, or we could just as well add a WithAddr(\"xxx:yyy\") in the sequence of events.\n\nI think Connect/Disconnect is more indicative of what\u0027s happening but we could mimic Service with Dial and Close. \n\nI\u0027ll leave that for another CL too. I don\u0027t think this interface is done changing yet (in particular, I don\u0027t love the refLink returned value in some calls).",
+      "parentUuid": "0e90aac9_de8d0543",
       "revId": "dab48f5a84f45a50beaea53f6cdd906a6741c1f9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
