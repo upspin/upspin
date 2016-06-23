@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03fc052a_5ef71564",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:41:49Z",
+      "side": 1,
+      "message": "We\u0027ll need to fix this string in a few places. Namely, all log.Connect() calls, metric.New() and storage.NewGCS from the top of my head. But grep might yield a few more...",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce47723d_52173495",
+        "filename": "cmd/admin/deployment/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:41:49Z",
+      "side": 1,
+      "message": "What\u0027s the difference between Service and Deployment? Is this testing vs prod?",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce47723d_523e541d",
+        "filename": "cmd/admin/deployment/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:41:49Z",
+      "side": 1,
+      "message": "Do we need port 80?",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ed1c28b_9c21d59e",
+        "filename": "cmd/admin/service/dirserver.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:41:49Z",
+      "side": 1,
+      "message": "Necessary?",
+      "revId": "2be0731784f78b714d291100809622531b54bbab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
