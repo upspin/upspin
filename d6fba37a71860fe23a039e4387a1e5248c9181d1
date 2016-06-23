@@ -34,6 +34,24 @@
       "revId": "d6fba37a71860fe23a039e4387a1e5248c9181d1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e33bad6_b0a22067",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-23T03:56:37Z",
+      "side": 0,
+      "message": "That\u0027s fine, but our Auth won\u0027t work without a cert. It used to, but we decided not to support it. The main issue is that we exchange an auth token and if the auth token leaks, you can impersonate another user. So, we decided that even for testing we wouldn\u0027t allow plain HTTP to prevent accidents. Can we keep that in and plumb the flag through the Docker/kubernetes scripts?",
+      "parentUuid": "0e90aac9_5e173595",
+      "revId": "d6fba37a71860fe23a039e4387a1e5248c9181d1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
