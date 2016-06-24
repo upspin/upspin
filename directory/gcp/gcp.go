@@ -20,6 +20,9 @@ import (
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	// Load useful backends
+	_ "upspin.io/cloud/storage/postgres"
 )
 
 type directory struct {
@@ -633,7 +636,11 @@ func (d *directory) Configure(options ...string) error {
 	defer confLock.Unlock()
 
 	var err error
-	d.cloudClient, err = storage.Dial("GCS", dialOpts...)
+
+	// TODO: fix me.
+	//...............
+	//.............................
+	d.cloudClient, err = storage.Dial("Postgres", storage.WithOptions("user=postgres,host=localhost,port=5432,password=postgres,sslmode=disable"))
 	if err != nil {
 		return errors.E(Configure, err)
 	}
