@@ -22,7 +22,7 @@ import (
 	"upspin.io/upspin"
 
 	// Load useful packers
-	"upspin.io/pack/ee"
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
@@ -160,7 +160,7 @@ func (s *sharer) do() {
 		for _, hash := range hashes {
 			var thisUser upspin.UserName
 			switch packer.Packing() {
-			case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack, upspin.Ed25519Pack:
+			case upspin.EEPack:
 				if len(hash) != sha256.Size {
 					fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
 					s.exitCode = 1
@@ -374,7 +374,7 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	}
 	packer := lookupPacker(entry) // Won't be nil.
 	switch packer.Packing() {
-	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack, upspin.Ed25519Pack:
+	case upspin.EEPack:
 		// Will repack below.
 	default:
 		if !s.quiet {
@@ -389,10 +389,8 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		for _, key := range userKeys {
 			if len(key) > 0 {
 				// TODO: Make this general. This works now only because we are always using ee.
-				if ee.IsValidKeyForPacker(key, packer.String()) {
-					keys = append(keys, key)
-					break
-				}
+				keys = append(keys, key)
+				break
 			}
 		}
 		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)

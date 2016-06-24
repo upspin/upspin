@@ -30,19 +30,19 @@ var (
 	p521Private = "1921083967088521992602096949959788705212477628248305933393351928788805710122036603979819682701613077258730599983893835863485419440554982916289222458067993673"
 )
 
-func BenchmarkPut_p256_1byte(b *testing.B)    { benchmarkPutNbyte(b, upspin.EEp256Pack, 1) }
-func BenchmarkPut_p256_1kbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEp256Pack, 1024) }
-func BenchmarkPut_p256_1Mbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEp256Pack, 1024*1024) }
-func BenchmarkPut_p521_1byte(b *testing.B)    { benchmarkPutNbyte(b, upspin.EEp521Pack, 1) }
-func BenchmarkPut_p521_1kbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEp521Pack, 1024) }
-func BenchmarkPut_p521_1Mbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEp521Pack, 1024*1024) }
-func BenchmarkPut_plain_1byte(b *testing.B)   { benchmarkPutNbyte(b, upspin.PlainPack, 1) }
-func BenchmarkPut_plain_1kbytes(b *testing.B) { benchmarkPutNbyte(b, upspin.PlainPack, 1024) }
-func BenchmarkPut_plain_1Mbytes(b *testing.B) { benchmarkPutNbyte(b, upspin.PlainPack, 1024*1024) }
+func BenchmarkPut_p256_1byte(b *testing.B)    { benchmarkPutNbyte(b, upspin.EEPack, "p256", 1) }
+func BenchmarkPut_p256_1kbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEPack, "p256", 1024) }
+func BenchmarkPut_p256_1Mbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEPack, "p256", 1024*1024) }
+func BenchmarkPut_p521_1byte(b *testing.B)    { benchmarkPutNbyte(b, upspin.EEPack, "p521", 1) }
+func BenchmarkPut_p521_1kbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEPack, "p521", 1024) }
+func BenchmarkPut_p521_1Mbytes(b *testing.B)  { benchmarkPutNbyte(b, upspin.EEPack, "p521", 1024*1024) }
+func BenchmarkPut_plain_1byte(b *testing.B)   { benchmarkPutNbyte(b, upspin.PlainPack, "", 1) }
+func BenchmarkPut_plain_1kbytes(b *testing.B) { benchmarkPutNbyte(b, upspin.PlainPack, "", 1024) }
+func BenchmarkPut_plain_1Mbytes(b *testing.B) { benchmarkPutNbyte(b, upspin.PlainPack, "", 1024*1024) }
 
-func benchmarkPutNbyte(b *testing.B, packing upspin.Packing, fileSize int) {
+func benchmarkPutNbyte(b *testing.B, packing upspin.Packing, curveName string, fileSize int) {
 	u := newUserName()
-	client, block := setupBench(b, u, packing, fileSize)
+	client, block := setupBench(b, u, packing, curveName, fileSize)
 	var err error
 	for i := 0; i < b.N; i++ {
 		_, err = client.Put(upspin.PathName(u)+fileName, block)
@@ -60,7 +60,7 @@ func newUserName() upspin.UserName {
 }
 
 // setupBench returns a new client for the username and packing and a byte slice filled with fileSize random bytes.
-func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, fileSize int) (upspin.Client, []byte) {
+func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, curveName string, fileSize int) (upspin.Client, []byte) {
 	log.SetLevel(log.Lerror)
 	block := make([]byte, fileSize)
 	n, err := rand.Read(block)
@@ -74,21 +74,21 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 
 	var pub upspin.PublicKey
 	var priv string
-	switch packing {
-	case upspin.EEp256Pack:
+	switch curveName {
+	case "p256":
 		pub = p256Public
 		priv = p256Private
-	case upspin.EEp521Pack:
+	case "p521":
 		pub = p521Public
 		priv = p521Private
-	case upspin.PlainPack:
-		// Do nothing. Zero key will work.
+	case "":
+		// Do nothing. Zero key will work for PlainPack.
 	default:
 		b.Fatalf("No such key for packing: %d", packing)
 	}
 
 	context := setup(userName, pub)
-	if packing == upspin.EEp521Pack || packing == upspin.EEp256Pack {
+	if packing == upspin.EEPack {
 		context.Packing = packing
 		f, err := factotum.New(pub, priv)
 		if err != nil {
