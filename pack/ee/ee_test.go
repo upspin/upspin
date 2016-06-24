@@ -21,13 +21,17 @@ import (
 	"upspin.io/upspin"
 )
 
+const (
+	packing = upspin.EEPack
+)
+
 func TestRegister(t *testing.T) {
-	p := pack.Lookup(upspin.EEp256Pack)
+	p := pack.Lookup(upspin.EEPack)
 	if p == nil {
 		t.Fatal("Lookup failed")
 	}
-	if p.Packing() != upspin.EEp256Pack {
-		t.Fatalf("expected EEp256Pack, got %q", p)
+	if p.Packing() != upspin.EEPack {
+		t.Fatalf("expected EEPack, got %q", p)
 	}
 }
 
@@ -96,23 +100,11 @@ func testPackNameAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Pack
 
 func TestPack256(t *testing.T) {
 	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.256")
-		text                    = "this is some text 256"
-		packing                 = upspin.EEp256Pack
+		user upspin.UserName = "user@google.com"
+		name                 = upspin.PathName(user + "/file/of/user.256")
+		text                 = "this is some text 256"
 	)
-	ctx, packer := setup(user, packing)
-	testPackAndUnpack(t, ctx, packer, name, []byte(text))
-}
-
-func TestPack521(t *testing.T) {
-	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.521")
-		text                    = "this is some text 521"
-		packing                 = upspin.EEp521Pack
-	)
-	ctx, packer := setup(user, packing)
+	ctx, packer := setup(user, "p256")
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
@@ -122,25 +114,12 @@ func TestName256(t *testing.T) {
 		name                    = upspin.PathName(user + "/file/of/user.256")
 		newName                 = upspin.PathName(user + "/file/of/user.256.2")
 		text                    = "this is some text 256"
-		packing                 = upspin.EEp256Pack
 	)
-	ctx, packer := setup(user, packing)
+	ctx, packer := setup(user, "p256")
 	testPackNameAndUnpack(t, ctx, packer, name, newName, []byte(text))
 }
 
-func TestName521(t *testing.T) {
-	const (
-		user    upspin.UserName = "user@google.com"
-		name                    = upspin.PathName(user + "/file/of/user.521")
-		name2                   = upspin.PathName(user + "/file/of/user.521.2")
-		text                    = "this is some text 521"
-		packing                 = upspin.EEp521Pack
-	)
-	ctx, packer := setup(user, packing)
-	testPackNameAndUnpack(t, ctx, packer, name, name2, []byte(text))
-}
-
-func benchmarkPack(b *testing.B, packing upspin.Packing, fileSize int, unpack bool) {
+func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	const user upspin.UserName = "user@google.com"
 	data := make([]byte, fileSize)
 	n, err := rand.Read(data)
@@ -152,7 +131,7 @@ func benchmarkPack(b *testing.B, packing upspin.Packing, fileSize int, unpack bo
 	}
 	data = data[:n]
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
-	ctx, packer := setup(user, packing)
+	ctx, packer := setup(user, curveName)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
 			Name: name,
@@ -174,24 +153,21 @@ func benchmarkPack(b *testing.B, packing upspin.Packing, fileSize int, unpack bo
 
 const unpack = true
 
-func BenchmarkPack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, !unpack) }
-func BenchmarkPack256_1kbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024, !unpack) }
-func BenchmarkPack256_1Mbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024*1024, !unpack) }
+func BenchmarkPack256_1byte(b *testing.B)  { benchmarkPack(b, "p256", 1, !unpack) }
+func BenchmarkPack256_1kbyte(b *testing.B) { benchmarkPack(b, "p256", 1024, !unpack) }
+func BenchmarkPack256_1Mbyte(b *testing.B) { benchmarkPack(b, "p256", 1024*1024, !unpack) }
 
-func BenchmarkPack384_1byte(b *testing.B) { benchmarkPack(b, upspin.EEp384Pack, 1, !unpack) }
-func BenchmarkPack521_1byte(b *testing.B) { benchmarkPack(b, upspin.EEp521Pack, 1, !unpack) }
-
-func BenchmarkPackUnpack256_1byte(b *testing.B)  { benchmarkPack(b, upspin.EEp256Pack, 1, unpack) }
-func BenchmarkPackUnpack256_1kbyte(b *testing.B) { benchmarkPack(b, upspin.EEp256Pack, 1024, unpack) }
+func BenchmarkPackUnpack256_1byte(b *testing.B)  { benchmarkPack(b, "p256", 1, unpack) }
+func BenchmarkPackUnpack256_1kbyte(b *testing.B) { benchmarkPack(b, "p256", 1024, unpack) }
 func BenchmarkPackUnpack256_1Mbyte(b *testing.B) {
-	benchmarkPack(b, upspin.EEp256Pack, 1024*1024, unpack)
+	benchmarkPack(b, "p256", 1024*1024, unpack)
 }
 
 func TestSharing(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
 		dudesUserName upspin.UserName = "dude@google.com"
-		packing                       = upspin.EEp256Pack
+		packing                       = upspin.EEPack
 		pathName                      = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
 		bobsUserName  upspin.UserName = "bob@foo.com"
 		text                          = "bob, here's the secret file. Sincerely, The Dude."
@@ -202,7 +178,7 @@ func TestSharing(t *testing.T) {
 	bobsPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
 
 	// Set up Dude as the creator/owner.
-	ctx, packer := setup(dudesUserName, packing)
+	ctx, packer := setup(dudesUserName, "p256")
 	// Set up a mock user service that knows about Dude's public keys (for checking signature during unpack).
 	mockUser := &dummyUser{
 		userToMatch: []upspin.UserName{dudesUserName},
@@ -261,7 +237,7 @@ func TestBadSharing(t *testing.T) {
 	// dudette@google.com is the owner of a file that is attempting to be shared with mia@foo.com, but share wasn't called.
 	const (
 		dudettesUserName upspin.UserName = "dudette@google.com"
-		packing                          = upspin.EEp256Pack
+		packing                          = upspin.EEPack
 		pathName                         = upspin.PathName(dudettesUserName + "/secret_file_shared_with_mia")
 		miasUserName     upspin.UserName = "mia@foo.com"
 		text                             = "mia, here's the secret file. sincerely, dudette."
@@ -271,7 +247,7 @@ func TestBadSharing(t *testing.T) {
 	miasPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 	miasPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
 
-	ctx, packer := setup(dudettesUserName, packing)
+	ctx, packer := setup(dudettesUserName, "p256")
 	mockUser := &dummyUser{
 		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
 		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPublic},
@@ -312,22 +288,31 @@ func TestBadSharing(t *testing.T) {
 	}
 }
 
-func setup(name upspin.UserName, packing upspin.Packing) (*upspin.Context, upspin.Packer) {
-	// because ee.common.curve is not exported
-	curve := []elliptic.Curve{16: elliptic.P256(), 18: elliptic.P384(), 17: elliptic.P521()}
+func setup(name upspin.UserName, curveName string) (*upspin.Context, upspin.Packer) {
+	var curve elliptic.Curve
+	switch curveName {
+	case "p256":
+		curve = elliptic.P256()
+	case "p384":
+		curve = elliptic.P384()
+	case "p521":
+		curve = elliptic.P521()
+	default:
+		errors.E("setup", curveName, errors.NotExist, errors.Str("unknown curve"))
+	}
 
 	ctx := &upspin.Context{
 		UserName: name,
 		Packing:  packing,
 	}
 	packer := pack.Lookup(packing)
-	priv, err := ecdsa.GenerateKey(curve[packing], rand.Reader)
+	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
 		// would be nice to t.Fatal but then can't call from Benchmark?
 		panic("ecdsa.GenerateKey failed")
 		// return ctx, packer
 	}
-	kPublic := upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", packer.String(), priv.X.String(), priv.Y.String()))
+	kPublic := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
 	kPrivate := fmt.Sprintf("%s\n", priv.D.String())
 	ctx.Factotum, err = factotum.New(kPublic, kPrivate)
 	if err != nil {

@@ -17,15 +17,10 @@ import (
 	"upspin.io/upspin"
 )
 
-// p256 keys
 var (
-	ownersKey  = keyStore[ownersName][upspin.EEp256Pack]
-	readersKey = keyStore[readersName][upspin.EEp256Pack]
-)
-
-// p521 keys
-var (
-	ownersKey521 = keyStore[ownersName][upspin.EEp521Pack]
+	ownersKey    = keyStore[ownersName]["p256"]
+	readersKey   = keyStore[readersName]["p256"]
+	ownersKey521 = keyStore[ownersName]["p521"]
 )
 
 type runner struct {
@@ -97,9 +92,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		contentsOfPublic = "public file"
 	)
 	key := ownersKey
-	if packing == upspin.EEp521Pack {
-		key = ownersKey521
-	}
+	// TODO  try different key types
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
 		Packing:   packing,
