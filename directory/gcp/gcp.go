@@ -14,12 +14,14 @@ import (
 	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/cloud/storage"
-	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	// Load useful backends
+	_ "upspin.io/cloud/storage/postgres"
 )
 
 type directory struct {
@@ -624,16 +626,20 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 // has been dialed. The details of the configuration are explained at the package comments.
 func (d *directory) Configure(options ...string) error {
 	const Configure = "Configure"
+	backEndType := "GCS"
 	var dialOpts []storage.DialOpts
 	for _, option := range options {
-		dialOpts = append(dialOpts, storage.WithOptions(option))
+		if strings.Contains(option, "backend=") {
+			backEndType = option[len("backend="):]
+		} else {
+			dialOpts = append(dialOpts, storage.WithOptions(option))
+		}
 	}
-	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.ProjectPrivate))
 	confLock.Lock()
 	defer confLock.Unlock()
 
 	var err error
-	d.cloudClient, err = storage.Dial("GCS", dialOpts...)
+	d.cloudClient, err = storage.Dial(backEndType, dialOpts...)
 	if err != nil {
 		return errors.E(Configure, err)
 	}
