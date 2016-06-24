@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3c4add4_87cfc835",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "list them all explicitly, and verify them after parsing the arguments",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_c75a606e",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "this looks like an expensive struct comparison. can\u0027t use you curve.CurveParams.Name and a map?",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_4747908f",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "what do i use if i don\u0027t want crypto? the zero value?\n\nalso this name assumes elliptic curve cryptography. i would go with Crypto string",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_071f58b5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "s/$/./ and maybe s/See.*/(\u0026)/",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_a77484e8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "could be more sentence-like.",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_877988e2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-24T20:16:36Z",
+      "side": 1,
+      "message": "s/  / /",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
