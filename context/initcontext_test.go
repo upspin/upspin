@@ -54,7 +54,7 @@ func TestInitContext(t *testing.T) {
 		user:      Endpoint(upspin.InProcess, ""),
 		directory: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:   upspin.EEp256Pack,
+		packing:   upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -66,7 +66,7 @@ func TestComments(t *testing.T) {
 		user:      Endpoint(upspin.InProcess, ""),
 		directory: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:   upspin.EEp256Pack,
+		packing:   upspin.EEPack,
 	}
 	testConfig(t, &expect, makeCommentedConfig(&expect))
 }
@@ -90,7 +90,7 @@ func TestEnv(t *testing.T) {
 		user:      Endpoint(upspin.InProcess, ""),
 		directory: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:   upspin.EEp256Pack,
+		packing:   upspin.EEPack,
 	}
 	config := makeConfig(&expect)
 	expect.userName = "quux"

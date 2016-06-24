@@ -7,14 +7,11 @@
 package client
 
 import (
-	"strings"
-
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client/common/file"
 	"upspin.io/errors"
 	"upspin.io/pack"
-	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user/usercache"
@@ -115,8 +112,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 }
 
 func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
-	packerString := packer.String()
-	if packerString[0] != 'p' || strings.IndexByte("235", packerString[1]) < 0 { // TODO generalize for more packers when some exist
+	if packer.String() != "ee" {
 		return nil
 	}
 	directory, err := bind.Directory(c.context, c.context.Directory)
@@ -151,15 +147,10 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 			// TODO warn that we can't process one of the readers?
 			continue
 		}
-		for _, pubkey := range pubkeys { // pick first key of correct type
-			if ee.IsValidKeyForPacker(pubkey, packerString) {
-				if pubkey != readersPublicKey[0] { // don't duplicate self
-					// TODO(ehg) maybe should check for other duplicates?
-					readersPublicKey[n] = pubkey
-					n++
-				}
-				break
-			}
+		if pubkeys[0] != readersPublicKey[0] { // don't duplicate self
+			// TODO(ehg) maybe should check for other duplicates?
+			readersPublicKey[n] = pubkeys[0]
+			n++
 		}
 	}
 	readersPublicKey = readersPublicKey[:n]
