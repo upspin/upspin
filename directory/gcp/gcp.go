@@ -655,9 +655,21 @@ func (d *directory) Configure(options ...string) error {
 	defer confLock.Unlock()
 
 	if bucketName != "" && projectID != "" {
-		d.cloudClient = storage.NewGCS(projectID, bucketName, storage.ProjectPrivate)
+		//d.cloudClient = storage.NewGCS(projectID, bucketName, storage.ProjectPrivate)
+		// TODO: remove and re-instate the above.
+		var err error
+		d.cloudClient, err = storage.NewPostgres()
+		if err != nil {
+			return errors.E(Configure, err)
+		}
+
 	} else {
-		return errors.E(Configure, errors.Syntax, errors.Str("missing GCS bucket or projectID"))
+		var err error
+		d.cloudClient, err = storage.NewPostgres()
+		if err != nil {
+			return errors.E(Configure, err)
+		}
+		//return errors.E(Configure, errors.Syntax, errors.Str("missing GCS bucket or projectID"))
 	}
 	if err := d.cloudClient.Connect(); err != nil {
 		return errors.E(Configure, err)
