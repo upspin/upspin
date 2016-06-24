@@ -12,7 +12,6 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
-	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -199,10 +198,10 @@ func (u *user) Configure(options ...string) error {
 	const Configure = "Configure"
 
 	var dialOpts []storage.DialOpts
+	// All options are for the Storage layer.
 	for _, option := range options {
 		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
-	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.BucketOwnerFullCtrl))
 
 	var err error
 	u.cloudClient, err = storage.Dial("GCS", dialOpts...)

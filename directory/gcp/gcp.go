@@ -14,12 +14,15 @@ import (
 	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/cloud/storage"
-	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	// Load useful backends
+	_ "upspin.io/cloud/storage/gcs"
+	_ "upspin.io/cloud/storage/postgres"
 )
 
 type directory struct {
@@ -43,6 +46,12 @@ var _ upspin.Directory = (*directory)(nil)
 
 // gcpDir represents a name for the metric for this directory service.
 const gcpDir = "gcpDir"
+
+// Configuration options.
+const (
+	// storageType specified which storage backend to use. Current values are "storage=GCS" or "storage=Postgres".
+	storageType = "storage"
+)
 
 var (
 	zeroLoc          upspin.Location
@@ -624,16 +633,26 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 // has been dialed. The details of the configuration are explained at the package comments.
 func (d *directory) Configure(options ...string) error {
 	const Configure = "Configure"
+	var storageBackend string
 	var dialOpts []storage.DialOpts
 	for _, option := range options {
-		dialOpts = append(dialOpts, storage.WithOptions(option))
+		// Parse options that we understand, otherwise pass it down to the storage layer.
+		switch {
+		case strings.Contains(option, storageType):
+			storageBackend = option[len(storageType)+1:]
+		default:
+			dialOpts = append(dialOpts, storage.WithOptions(option))
+		}
 	}
-	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.ProjectPrivate))
+	if storageBackend == "" {
+		return errors.E(Configure, errors.Syntax, errors.Str("must specify storage type"))
+	}
+
 	confLock.Lock()
 	defer confLock.Unlock()
 
 	var err error
-	d.cloudClient, err = storage.Dial("GCS", dialOpts...)
+	d.cloudClient, err = storage.Dial(storageBackend, dialOpts...)
 	if err != nil {
 		return errors.E(Configure, err)
 	}

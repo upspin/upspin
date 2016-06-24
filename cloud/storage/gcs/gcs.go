@@ -230,8 +230,7 @@ func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
 	if v, ok := opts.Opts[defaultACL]; ok {
 		gcs.defaultWriteACL = v
 	} else {
-		// A sensible default
-		gcs.defaultWriteACL = ProjectPrivate
+		return errors.E(Dial, errors.Syntax, errors.Str("Default ACL argument is required"))
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and
