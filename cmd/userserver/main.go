@@ -19,6 +19,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/endpoint"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -139,12 +140,13 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*pr
 	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
+		return &proto.UserLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.UserLookupResponse{
 		Endpoints:  proto.Endpoints(endpoints),
 		PublicKeys: proto.PublicKeys(publicKeys),
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Configure implements upspin.Service
@@ -158,8 +160,9 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 	err = user.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
+		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return nil, err
+	return nil, nil
 }
 
 // Endpoint implements upspin.Service
