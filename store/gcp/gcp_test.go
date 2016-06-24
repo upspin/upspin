@@ -14,6 +14,9 @@ import (
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
+
+	// Import needed storage backend.
+	_ "upspin.io/cloud/storage/gcs"
 )
 
 const (
@@ -164,7 +167,7 @@ func TestConfigure(t *testing.T) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}
 	// now configure it correctly
-	err = store.Configure("gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
 	if err != nil {
 		t.Fatal(err)
 	}

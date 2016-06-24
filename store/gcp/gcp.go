@@ -16,7 +16,6 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
-	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -197,14 +196,14 @@ func (s *server) Configure(options ...string) error {
 	tempDir := ""
 	var dialOpts []storage.DialOpts
 	for _, option := range options {
-		if strings.HasPrefix(option, ConfigTemporaryDir) {
+		// Parse all options we understand. What we don't understand we pass it down to the storage.
+		switch {
+		case strings.HasPrefix(option, ConfigTemporaryDir):
 			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
-		} else {
+		default:
 			dialOpts = append(dialOpts, storage.WithOptions(option))
 		}
 	}
-	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.PublicRead))
-
 	mu.Lock()
 	defer mu.Unlock()
 
