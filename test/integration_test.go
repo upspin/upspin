@@ -312,18 +312,12 @@ func testSharing(t *testing.T, env *e.Env) {
 	}
 }
 
-func testAllOnePacking(t *testing.T, packing upspin.Packing) {
-	setup.Packing = packing
+func testAllOnePacking(t *testing.T, curveName string) {
+	setup.KeyKind = curveName
 	var readersKey keyPair
-	switch packing {
-	case upspin.EEp256Pack, upspin.EEp521Pack:
-		setup.Keys = keyStore[setup.OwnerName][packing]
-		readersKey = keyStore[readersName][packing]
-	default:
-		// Keys are needed with any packing type (even Plain) for auth purposes.
-		setup.Keys = keyStore[setup.OwnerName][upspin.EEp256Pack]
-		readersKey = keyStore[readersName][upspin.EEp256Pack]
-	}
+	// Keys are needed with any packing type (even Plain) for auth purposes.
+	setup.Keys = keyStore[setup.OwnerName][curveName]
+	readersKey = keyStore[readersName][curveName]
 
 	env, err := e.New(&setup)
 	if err != nil {

@@ -20,18 +20,17 @@ import (
 	"upspin.io/cmd/keygen/proquint"
 	"upspin.io/pack"
 	"upspin.io/pack/ee"
-	"upspin.io/upspin"
 )
 
 var (
-	packing = flag.String("packing", "p256", "packing name, such as p256")
-	secret  = flag.String("secretseed", "", "128 bit secret seed in proquint format")
-	where   = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
+	curveName = flag.String("curve", "p256", "curve name: p256, p384, or p521")
+	secret    = flag.String("secretseed", "", "128 bit secret seed in proquint format")
+	where     = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
 )
 
-func createKeys(pack upspin.Packing) {
+func createKeys() {
 	// Pick secret 128 bits.
-	// TODO  Consider whether we are willing to ask users to write long seeds for P521.
+	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
 	var proquintStr string
 	if len(*secret) > 0 {
@@ -53,7 +52,7 @@ func createKeys(pack upspin.Packing) {
 
 	}
 
-	pub, priv, err := ee.CreateKeys(pack, b)
+	pub, priv, err := ee.CreateKeys(*curveName, b)
 
 	// Save the keys to files.
 	private, err := os.Create(filepath.Join(keydir(), "secret.upspinkey"))
@@ -89,17 +88,25 @@ func main() {
 	log.SetFlags(0)
 	log.SetPrefix("keygen: ")
 	flag.Parse()
+	switch *curveName {
+	case "p256":
+	case "p384":
+	case "p521":
+		// ok
+	default:
+		log.Fatal("no such curve")
+	}
 
-	p := pack.Lookup(16)
+	p := pack.Lookup(20)
 	if p == nil {
 		log.Fatal("packers apparently not registered")
 	}
 
-	packer := pack.LookupByName(*packing)
+	packer := pack.LookupByName("ee") // TODO var
 	if packer == nil {
-		log.Fatalf("unrecognized packing %s", *packing)
+		log.Fatal("unrecognized packing ee")
 	}
-	createKeys(packer.Packing())
+	createKeys()
 }
 
 func keydir() string {
