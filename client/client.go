@@ -14,7 +14,6 @@ import (
 	"upspin.io/client/common/file"
 	"upspin.io/errors"
 	"upspin.io/pack"
-	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user/usercache"
@@ -151,15 +150,10 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 			// TODO warn that we can't process one of the readers?
 			continue
 		}
-		for _, pubkey := range pubkeys { // pick first key of correct type
-			if ee.IsValidKeyForPacker(pubkey, packerString) {
-				if pubkey != readersPublicKey[0] { // don't duplicate self
-					// TODO(ehg) maybe should check for other duplicates?
-					readersPublicKey[n] = pubkey
-					n++
-				}
-				break
-			}
+		if pubkeys[0] != readersPublicKey[0] { // don't duplicate self
+			// TODO(ehg) maybe should check for other duplicates?
+			readersPublicKey[n] = pubkeys[0]
+			n++
 		}
 	}
 	readersPublicKey = readersPublicKey[:n]

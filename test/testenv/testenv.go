@@ -49,6 +49,9 @@ type Setup struct {
 	// Packing is the desired packing for the tree.
 	Packing upspin.Packing
 
+	// KeyKind is the desired key type for the tree, e.g. "p256".
+	KeyKind string
+
 	// Keys holds all keys for the owner. Leave empty to be assigned randomly-created new keys.
 	Keys KeyPair
 
@@ -91,7 +94,7 @@ var (
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup.Packing, setup.Transport)
+	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup.KeyKind, setup.Transport)
 	if err != nil {
 		return nil, err
 	}
@@ -159,13 +162,13 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, packing upspin.Packing, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
+func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveName string, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
 	var context *upspin.Context
 	var err error
 	if keyPair == nil || *keyPair == zeroKey {
-		context, err = newContextForUser(userName, packing)
+		context, err = newContextForUser(userName, curveName)
 	} else {
-		context, err = newContextForUserWithKey(userName, keyPair, packing)
+		context, err = newContextForUserWithKey(userName, keyPair, curveName)
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
@@ -193,7 +196,7 @@ func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, packing
 // keys are nil or empty. The new user will not have a root created. Callers should use the client to
 // MakeDirectory if necessary.
 func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, *upspin.Context, error) {
-	return innerNewUser("NewUser", userName, keyPair, e.Setup.Packing, e.Setup.Transport)
+	return innerNewUser("NewUser", userName, keyPair, e.Setup.KeyKind, e.Setup.Transport)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
@@ -244,33 +247,33 @@ func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 
 // newContextForUser adds a new user to the inprocess user service, creates a new key for the user based on
 // the chosen packing type and returns a partially filled Context.
-func newContextForUser(userName upspin.UserName, packing upspin.Packing) (*upspin.Context, error) {
+func newContextForUser(userName upspin.UserName, curveName string) (*upspin.Context, error) {
 	entropy := make([]byte, 32) // Enough for p521
 	ee.GenEntropy(entropy)
 	var keyPair *KeyPair
 	var pub upspin.PublicKey
 	var priv string
 	var err error
-	switch packing {
-	case upspin.EEp256Pack, upspin.EEp384Pack, upspin.EEp521Pack:
-		pub, priv, err = ee.CreateKeys(packing, entropy)
+	switch curveName {
+	case "p256", "p386", "p521":
+		pub, priv, err = ee.CreateKeys(curveName, entropy)
 	default:
-		// For non-EE packing, a p256 key will do.
-		pub, priv, err = ee.CreateKeys(upspin.EEp256Pack, entropy)
+		// For non-EE curveName, a p256 key will do.
+		pub, priv, err = ee.CreateKeys("p256", entropy)
 	}
 	if err != nil {
 		return nil, err
 	}
 	keyPair = &KeyPair{pub, priv}
-	return newContextForUserWithKey(userName, keyPair, packing)
+	return newContextForUserWithKey(userName, keyPair, curveName)
 }
 
 // newContextForUserWithKey adds a new user to the inprocess user service and returns a Context partially filled with user,
-// key and packing type as given.
-func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, packing upspin.Packing) (*upspin.Context, error) {
+// key and curveName type as given.
+func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveName string) (*upspin.Context, error) {
 	context := &upspin.Context{
 		UserName: userName,
-		Packing:  packing,
+		Packing:  upspin.EEPack,
 	}
 
 	endpointInProcess := upspin.Endpoint{

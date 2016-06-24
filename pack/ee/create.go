@@ -13,7 +13,6 @@ import (
 	"encoding/binary"
 
 	"upspin.io/errors"
-	"upspin.io/pack"
 	"upspin.io/upspin"
 )
 
@@ -49,34 +48,26 @@ func (d *drng) Read(p []byte) (n int, err error) {
 	return lenp, nil
 }
 
-// CreateKeys creates a key pair based on the chosen packing and a slice of entropy.
-func CreateKeys(packing upspin.Packing, entropy []byte) (public upspin.PublicKey, private string, err error) {
+// CreateKeys creates a key pair based on the chosen curve and a slice of entropy.
+func CreateKeys(curveName string, entropy []byte) (public upspin.PublicKey, private string, err error) {
 	const CreateKeys = "CreateKeys"
-	packer := pack.Lookup(packing)
-	if packer == nil {
-		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %v not registered", packing))
-	}
-	var keyType string
 	var curve elliptic.Curve
-	switch packer.(type) {
-	case eep256:
-		keyType = (packer.(eep256)).packerString
-		curve = (packer.(eep256)).curve
-	case eep384:
-		keyType = (packer.(eep384)).packerString
-		curve = (packer.(eep384)).curve
-	case eep521:
-		keyType = (packer.(eep521)).packerString
-		curve = (packer.(eep521)).curve
+	switch curveName {
+	case "p256":
+		curve = elliptic.P256()
+	case "p384":
+		curve = elliptic.P384()
+	case "p521":
+		curve = elliptic.P521()
 	default:
-		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("packing %d", packing))
+		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("curveName %s", curveName))
 	}
 
 	priv, err := createKeysFromEntropy(curve, entropy)
 	if err != nil {
 		return public, private, errors.E(CreateKeys, errors.Invalid, err)
 	}
-	public, private = encodeKeys(priv, keyType)
+	public, private = encodeKeys(priv, curveName)
 	return
 }
 
@@ -90,9 +81,9 @@ func GenEntropy(entropy []byte) error {
 }
 
 // encodeKeys converts an ecsda private key into an upspin key pair. No error checking is performed.
-func encodeKeys(priv *ecdsa.PrivateKey, keyType string) (public upspin.PublicKey, private string) {
+func encodeKeys(priv *ecdsa.PrivateKey, curveName string) (public upspin.PublicKey, private string) {
 	private = priv.D.String() + "\n"
-	public = upspin.PublicKey(keyType + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n")
+	public = upspin.PublicKey(curveName + "\n" + priv.X.String() + "\n" + priv.Y.String() + "\n")
 	return
 }
 
