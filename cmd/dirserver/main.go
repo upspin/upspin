@@ -18,6 +18,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/endpoint"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -168,7 +169,7 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest)
 	entry, err := dir.Lookup(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.Name, err)
-		return nil, err
+		return &proto.DirectoryLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	b, err := entry.Marshal()
 	if err != nil {
@@ -178,7 +179,7 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest)
 	resp := &proto.DirectoryLookupResponse{
 		Entry: b,
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Put implements upspin.Directory.
@@ -187,7 +188,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*pro
 
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	if err != nil {
-		return nil, err
+		return &proto.DirectoryPutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	log.Printf("Put %q", entry.Name)
 	dir, err := s.dirFor(ctx)
@@ -197,8 +198,9 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*pro
 	err = dir.Put(entry)
 	if err != nil {
 		log.Printf("Put %q failed: %v", entry.Name, err)
+		return &proto.DirectoryPutResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return &putResponse, err
+	return &putResponse, nil
 }
 
 // MakeDirectory implements upspin.Directory.
@@ -212,13 +214,13 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDir
 	loc, err := dir.MakeDirectory(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
-		return nil, err
+		return &proto.DirectoryMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
 	}
 	locSlice := []upspin.Location{loc}
 	resp := &proto.DirectoryMakeDirectoryResponse{
 		Location: proto.Locations(locSlice)[0], // Clumsy but easy (and rare).
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Glob implements upspin.Directory.
@@ -232,7 +234,7 @@ func (s *Server) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*p
 	entries, err := dir.Glob(req.Pattern)
 	if err != nil {
 		log.Printf("Glob %q failed: %v", req.Pattern, err)
-		return nil, err
+		return &proto.DirectoryGlobResponse{Error: errors.MarshalError(err)}, nil
 	}
 	data, err := proto.DirEntryBytes(entries)
 	resp := &proto.DirectoryGlobResponse{
@@ -252,8 +254,9 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest)
 	err = dir.Delete(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Name, err)
+		return &proto.DirectoryDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return &deleteResponse, err
+	return &deleteResponse, nil
 }
 
 // WhichAccess implements upspin.Directory.
@@ -269,9 +272,10 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirectoryWhichAcce
 		log.Printf("WhichAccess %q failed: %v", req.Name, err)
 	}
 	resp := &proto.DirectoryWhichAccessResponse{
-		Name: string(name),
+		Error: errors.MarshalError(err),
+		Name:  string(name),
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Configure implements upspin.Service
