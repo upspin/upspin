@@ -19,6 +19,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/endpoint"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -140,12 +141,13 @@ func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 	data, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Get %q failed: %v", req.Reference, err)
+		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StoreGetResponse{
 		Data:      data,
 		Locations: proto.Locations(locs),
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Put implements upspin.Store
@@ -160,11 +162,12 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	ref, err := store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
+		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StorePutResponse{
 		Reference: string(ref),
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Delete implements upspin.Store
@@ -179,8 +182,9 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 	err = store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Reference, err)
+		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return &deleteResponse, err
+	return &deleteResponse, nil
 }
 
 // Configure implements upspin.Service
@@ -195,8 +199,9 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 	err = store.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
+		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return &configureResponse, err
+	return &configureResponse, nil
 }
 
 // Endpoint implements upspin.Service
