@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_c74f0053",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-26T19:39:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_87cfc835",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_c75a606e",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-24T20:16:36Z",
       "side": 1,
       "message": "this looks like an expensive struct comparison. can\u0027t use you curve.CurveParams.Name and a map?",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_73b52a45",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-26T19:39:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_c75a606e",
       "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_9382666c",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-26T19:39:33Z",
+      "side": 1,
+      "message": "As I understand it, a key is required for authenticating to the server, so probably this is needed anyway.  But tests may be partial, so yes an empty string is allowed.\n\nI\u0027ve changed CurveName to KeyKind for now, though I suspect when someday elliptic curve cryptography is inadequate we\u0027ll need a larger change such as a pair of classical and quantum-resistant keys.",
+      "parentUuid": "c3c4add4_4747908f",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_071f58b5",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_339292bd",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-26T19:39:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_071f58b5",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_a77484e8",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-06-24T20:16:36Z",
       "side": 1,
       "message": "could be more sentence-like.",
+      "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_138f9693",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-26T19:39:33Z",
+      "side": 1,
+      "message": "I took a crack at it, though still cryptic.  People should read the security doc if actually interested.  But the comment is intended to be a decent handhand for a crypto expert with access only to the code.\n\nLet me know if it is better to just link to the doc somehow.",
+      "parentUuid": "c3c4add4_a77484e8",
       "revId": "0acd614b9d347840718c069a2d7660c0b9fad3a8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
