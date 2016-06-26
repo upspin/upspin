@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43543de4_905b5475",
+        "filename": "cloud/storage/postgres.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-26T22:57:32Z",
+      "side": 1,
+      "message": "The database/sql package takes care of this for us, when you use $1 (as you are on the next line)",
+      "revId": "92cb63478eb7247dc65d29e90c265c6dee785453",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "43543de4_b060581a",
+        "filename": "cloud/storage/postgres.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-26T22:57:32Z",
+      "side": 1,
+      "message": "don\u0027t insert the ref/contents into the query string, pass them as arguments to Exec and refer to them in the query string as $1 $2",
+      "revId": "92cb63478eb7247dc65d29e90c265c6dee785453",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
