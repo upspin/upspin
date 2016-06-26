@@ -171,7 +171,7 @@ func TestAll(t *testing.T) {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.demandCount)
 	}
 
-	if cli.keepAliveRound > 0 {
+	if cli.LastActivity().IsZero() {
 		t.Errorf("Expected keep alive go routine to be alive.")
 	}
 }
@@ -200,12 +200,6 @@ func TestMain(m *testing.M) {
 	log.Printf("Finishing...")
 	cli.Close()
 	srv.Stop()
-
-	// Verify keep alive routine has exited
-	if cli.keepAliveRound != 0 {
-		log.Printf("Keep-alive go routine has not exited")
-		code = -1
-	}
 
 	// Report test results.
 	log.Printf("Finishing e2e tests: %d", code)

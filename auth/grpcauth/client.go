@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net"
 	"strings"
+	"sync"
 	"time"
 
 	gContext "golang.org/x/net/context"
@@ -38,9 +39,9 @@ type AuthClientService struct {
 	lastTokenRefresh time.Time
 
 	keepAliveInterval time.Duration // interval of keep-alive packets.
-	lastNetActivity   time.Time     // last known time of some network activity.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
-	keepAliveRound    uint64        // counts iterations of the keep-alive routine. Mostly for tests.
+	mu                sync.Mutex    // protects the field below.
+	lastNetActivity   time.Time     // last known time of some network activity.
 }
 
 const (
@@ -106,7 +107,6 @@ func (ac *AuthClientService) keepAlive() {
 	log.Debug.Printf("Starting keep alive client")
 	sleepFor := ac.keepAliveInterval
 	for {
-		ac.keepAliveRound++
 		select {
 		case <-time.After(sleepFor):
 			lastIdleness := time.Since(ac.lastNetActivity)
@@ -120,14 +120,27 @@ func (ac *AuthClientService) keepAlive() {
 				log.Error.Printf("grpcauth: keepAlive: ping failed")
 			}
 			log.Debug.Printf("grpcAuth: keepAlive: ping okay")
-			ac.lastNetActivity = time.Now()
+			ac.SetLastActivity()
 		case <-ac.closeKeepAlive:
 			log.Debug.Printf("grpcauth: keepAlive: exiting keep alive routine")
-			ac.keepAliveRound = 0
-			ac.closeKeepAlive <- true
 			return
 		}
 	}
+}
+
+// LastActivity reports the time of the last known network activity.
+func (ac *AuthClientService) LastActivity() time.Time {
+	ac.mu.Lock()
+	defer ac.mu.Unlock()
+	return ac.lastNetActivity
+}
+
+// SetLastActivity sets the current time as the last known network acitivity. This is useful
+// when using application pings, to prevent unnecessarily frequent pings.
+func (ac *AuthClientService) SetLastActivity() {
+	ac.mu.Lock()
+	ac.lastNetActivity = time.Now()
+	ac.mu.Unlock()
 }
 
 // SetService sets the underlying RPC service which was obtained with proto.NewSERVICENAMEClient, where SERVICENAME is
@@ -220,7 +233,6 @@ func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 func (ac *AuthClientService) Close() {
 	select { // prevents blocking if Close is called more than once.
 	case ac.closeKeepAlive <- true:
-		<-ac.closeKeepAlive // Wait until we have confirmation.
 		close(ac.closeKeepAlive)
 	default:
 	}
