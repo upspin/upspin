@@ -196,13 +196,13 @@ func (ac *AuthClientService) Authenticate(ctx *upspin.Context) error {
 	return nil
 }
 
-// Ping implements uspin.Service.
+// Ping implements upspin.Service.
 func (ac *AuthClientService) Ping() bool {
 	seq := rand.Int31()
 	req := &proto.PingRequest{
 		PingSequence: seq,
 	}
-	gctx, _ := gContext.WithTimeout(gContext.Background(), 3*time.Second) // ignore the cancel function.
+	gctx, _ := gContext.WithTimeout(gContext.Background(), 3*time.Second) // TODO do not ignore the cancel function.
 	resp, err := ac.grpcCommon.Ping(gctx, req)
 	if err != nil {
 		log.Printf("Ping error: %s", err)
