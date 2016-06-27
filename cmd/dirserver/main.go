@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Dirserver is a wrapper for a directory implementation that presents it as a Go net/rpc interface.
+// Dirserver is a wrapper for a directory implementation that presents it as a grpc interface.
 package main
 
 import (
