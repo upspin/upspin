@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package storage
+// Package gcs implements a storage backend that saves data to Google Cloud Storage.
+package gcs
 
 import (
 	"bytes"
@@ -15,6 +16,7 @@ import (
 	"golang.org/x/oauth2/google"
 	gcsBE "google.golang.org/api/storage/v1"
 
+	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
 )
@@ -23,21 +25,26 @@ const (
 	scope = gcsBE.DevstorageFullControlScope
 )
 
-// WriteACL defines ACLs for writing data to Cloud Store.
+// These constants define ACLs for writing data to Google Cloud Store.
 // Definitions according to https://github.com/google/google-api-go-client/blob/master/storage/v1/storage-gen.go:
 //   "publicReadWrite" - Project team owners get OWNER access, and
 //       allUsers get WRITER access.
-type WriteACL string
-
 const (
 	// PublicRead means project team owners get owner access and all users get reader access.
-	PublicRead WriteACL = "publicRead"
+	PublicRead = "publicRead"
 	// Private means project team owners get owner access.
-	Private WriteACL = "private"
+	Private = "private"
 	// ProjectPrivate means project team members get access according to their roles.
-	ProjectPrivate WriteACL = "projectPrivate"
+	ProjectPrivate = "projectPrivate"
 	// BucketOwnerFullCtrl means the object owner gets owner access and project team owners get owner access.
-	BucketOwnerFullCtrl WriteACL = "bucketOwnerFullControl"
+	BucketOwnerFullCtrl = "bucketOwnerFullControl"
+)
+
+// Keys used for storing dial options.
+const (
+	projectID  = "gcpProjectID"
+	bucketName = "gcpBucketName"
+	defaultACL = "defaultACL"
 )
 
 // gcsImpl is an implementation of Storage that connects to a Google Cloud Storage (GCS) backend.
@@ -46,23 +53,11 @@ type gcsImpl struct {
 	service         *gcsBE.Service
 	projectID       string
 	bucketName      string
-	defaultWriteACL WriteACL
+	defaultWriteACL string
 }
 
 // Guarantee we implement the Storage interface.
-var _ Storage = (*gcsImpl)(nil)
-
-// NewGCS creates a new GCS instance associated with the given project id and bucket name.
-// TODO: change to New().WithBackend(backend).WithOptions(opts)
-func NewGCS(projectID, bucketName string, defaultWriteACL WriteACL) Storage {
-	gcs := &gcsImpl{
-		projectID:       projectID,
-		bucketName:      bucketName,
-		defaultWriteACL: defaultWriteACL,
-	}
-	gcs.Connect()
-	return gcs
-}
+var _ storage.Storage = (*gcsImpl)(nil)
 
 // PutLocalFile implements Storage.
 func (gcs *gcsImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
@@ -218,25 +213,35 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 	return firstErr
 }
 
-// Connect implements Storage.
-func (gcs *gcsImpl) Connect() error {
-	const Connect = "GCS.Connect"
-	if gcs.projectID == "" {
-		return errors.E(Connect, errors.Syntax, errors.Str("Project argument is required"))
+// Dial implements storage.Storage.
+func (gcs *gcsImpl) Dial(opts *storage.StorageOpts) error {
+	const Dial = "GCS.Dial"
+
+	if v, ok := opts.Opts[projectID]; !ok {
+		return errors.E(Dial, errors.Syntax, errors.Str("Project ID argument is required"))
+	} else {
+		gcs.projectID = v
 	}
-	if gcs.bucketName == "" {
-		return errors.E(Connect, errors.Syntax, errors.Str("Bucket argument is required"))
+	if v, ok := opts.Opts[bucketName]; !ok {
+		return errors.E(Dial, errors.Syntax, errors.Str("Bucket name argument is required"))
+	} else {
+		gcs.bucketName = v
+	}
+	if v, ok := opts.Opts[defaultACL]; !ok {
+		gcs.defaultWriteACL = ProjectPrivate
+	} else {
+		gcs.defaultWriteACL = v
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), scope)
 	if err != nil {
-		return errors.E(Connect, errors.IO, errors.Errorf("Unable to get default client: %s", err))
+		return errors.E(Dial, errors.IO, errors.Errorf("Unable to get default client: %s", err))
 	}
 	service, err := gcsBE.New(client)
 	if err != nil {
-		errors.E(Connect, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
+		errors.E(Dial, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
 	}
 	// Initialize the object
 	gcs.client = client
@@ -244,9 +249,13 @@ func (gcs *gcsImpl) Connect() error {
 	return nil
 }
 
-// Disconnect implements Storage.
-func (gcs *gcsImpl) Disconnect() {
+// Close implements Storage.
+func (gcs *gcsImpl) Close() {
 	// Not much to do, the GCS interface is pretty stateless (HTTP client).
 	gcs.client = nil
 	gcs.service = nil
+}
+
+func init() {
+	storage.Register("GCS", &gcsImpl{})
 }

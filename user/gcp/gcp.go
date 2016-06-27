@@ -12,21 +12,11 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
-)
-
-// Configuration options for this package.
-const (
-	// ConfigProjectID specifies which GCP project to use for talking to GCP.
-	// If not specified, "upspin" is used.
-	ConfigProjectID = "gcpProjectId"
-
-	// ConfigBucketName specifies which GCS bucket to store data in.
-	// If not specified, "g-upspin-store" is used.
-	ConfigBucketName = "gcpBucketName"
 )
 
 // user is the implementation of the User Service on GCP.
@@ -207,26 +197,15 @@ func (u *user) putUserEntry(op string, userName upspin.UserName, userEntry *user
 // Required configuration options are listed at the package comments.
 func (u *user) Configure(options ...string) error {
 	const Configure = "Configure"
-	// These are defaults that only make sense for those running upspin.io.
-	bucketName := "g-upspin-store"
-	projectID := "upspin"
-	for _, option := range options {
-		opts := strings.Split(option, "=")
-		if len(opts) != 2 {
-			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid option format: %q", option))
-		}
-		switch opts[0] {
-		case ConfigBucketName:
-			bucketName = opts[1]
-		case ConfigProjectID:
-			projectID = opts[1]
-		default:
-			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid configuration option: %q", opts[0]))
-		}
-	}
 
-	u.cloudClient = storage.NewGCS(projectID, bucketName, storage.BucketOwnerFullCtrl)
-	err := u.cloudClient.Connect()
+	var dialOpts []storage.DialOpts
+	for _, option := range options {
+		dialOpts = append(dialOpts, storage.WithOptions(option))
+	}
+	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.BucketOwnerFullCtrl))
+
+	var err error
+	u.cloudClient, err = storage.Dial("GCS", dialOpts...)
 	if err != nil {
 		return errors.E(Configure, err)
 	}
@@ -277,7 +256,7 @@ func (u *user) Close() {
 	refCount--
 	if refCount == 0 {
 		if u.cloudClient != nil {
-			u.cloudClient.Disconnect()
+			u.cloudClient.Close()
 		}
 		u.cloudClient = nil
 		// Do any other global clean ups here.
