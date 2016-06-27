@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_bef12972",
+        "filename": "cloud/storage/postgres.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T03:46:14Z",
+      "side": 1,
+      "message": "Good to know. Thanks.",
+      "parentUuid": "43543de4_905b5475",
+      "revId": "92cb63478eb7247dc65d29e90c265c6dee785453",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "43543de4_b060581a",
         "filename": "cloud/storage/postgres.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-26T22:57:32Z",
       "side": 1,
       "message": "don\u0027t insert the ref/contents into the query string, pass them as arguments to Exec and refer to them in the query string as $1 $2",
+      "revId": "92cb63478eb7247dc65d29e90c265c6dee785453",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_9ef6ed65",
+        "filename": "cloud/storage/postgres.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T03:46:14Z",
+      "side": 1,
+      "message": "That didn\u0027t work when I tried. At some point I had a comment here about why I needed to Sprintf this instead of $1,$2. I will play around again to see if I can get it to work.",
+      "parentUuid": "43543de4_b060581a",
       "revId": "92cb63478eb7247dc65d29e90c265c6dee785453",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
