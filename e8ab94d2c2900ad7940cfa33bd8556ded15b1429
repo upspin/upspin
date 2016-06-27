@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3c4add4_3e06d94e",
+        "filename": "auth/grpcauth/testdata/testserver.pb.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T03:48:21Z",
+      "side": 1,
+      "message": "This is bad. There\u0027s no upspin.pb. It should be upspin/proto, like in the original one. Why is it doing this?",
+      "revId": "e8ab94d2c2900ad7940cfa33bd8556ded15b1429",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
