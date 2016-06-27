@@ -14,22 +14,12 @@ import (
 	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
-)
-
-// Configuration options for this package.
-const (
-	// ConfigProjectID specifies which GCP project to use for talking to GCP.
-	// If not specified, "upspin" is used.
-	ConfigProjectID = "gcpProjectId"
-
-	// ConfigBucketName specifies which GCS bucket to store data in.
-	// If not specified, "g-upspin-directory" is used.
-	ConfigBucketName = "gcpBucketName"
 )
 
 type directory struct {
@@ -634,32 +624,17 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 // has been dialed. The details of the configuration are explained at the package comments.
 func (d *directory) Configure(options ...string) error {
 	const Configure = "Configure"
-	// These are defaults that only make sense for those running upspin.io.
-	bucketName := "g-upspin-directory"
-	projectID := "upspin"
+	var dialOpts []storage.DialOpts
 	for _, option := range options {
-		opts := strings.Split(option, "=")
-		if len(opts) != 2 {
-			return errors.E(Configure, errors.Syntax, errors.Errorf("invalid option format: %q", option))
-		}
-		switch opts[0] {
-		case ConfigBucketName:
-			bucketName = opts[1]
-		case ConfigProjectID:
-			projectID = opts[1]
-		default:
-			return errors.E(Configure, errors.Syntax, errors.Errorf("invalid configuration option: %q", opts[0]))
-		}
+		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
+	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.ProjectPrivate))
 	confLock.Lock()
 	defer confLock.Unlock()
 
-	if bucketName != "" && projectID != "" {
-		d.cloudClient = storage.NewGCS(projectID, bucketName, storage.ProjectPrivate)
-	} else {
-		return errors.E(Configure, errors.Syntax, errors.Str("missing GCS bucket or projectID"))
-	}
-	if err := d.cloudClient.Connect(); err != nil {
+	var err error
+	d.cloudClient, err = storage.Dial("GCS", dialOpts...)
+	if err != nil {
 		return errors.E(Configure, err)
 	}
 	log.Debug.Printf("Configured GCP directory: %v", options)
@@ -687,7 +662,7 @@ func (d *directory) Close() {
 
 	refCount--
 	if refCount == 0 {
-		d.cloudClient.Disconnect()
+		d.cloudClient.Close()
 		d.cloudClient = nil
 		d.dirCache = nil
 		d.dirNegCache = nil

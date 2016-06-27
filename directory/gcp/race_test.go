@@ -205,11 +205,11 @@ func (g *gcpMock) Delete(ref string) error {
 	return errors.New("404 not found")
 }
 
-// Connect implements storage.Storage.
-func (g *gcpMock) Connect() error {
+// Dial implements storage.Storage.
+func (g *gcpMock) Dial(o *storage.Opts) error {
 	return nil
 }
 
-// Disconnect implements storage.Storage.
-func (g *gcpMock) Disconnect() {
+// Close implements storage.Storage.
+func (g *gcpMock) Close() {
 }

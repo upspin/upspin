@@ -16,6 +16,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/gcs"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -25,14 +26,6 @@ import (
 
 // Configuration options for this package.
 const (
-	// ConfigProjectID specifies which GCP project to use for talking to GCP.
-	//
-	ConfigProjectID = "gcpProjectId"
-
-	// ConfigBucketName specifies which GCS bucket to store data in.
-	// If not specified, "g-upspin-store" is used.
-	ConfigBucketName = "gcpBucketName"
-
 	// ConfigTemporaryDir specifies which temporary directory to write files to before they're
 	// uploaded to the destination bucket. If not present, one will be created in the
 	// system's default location.
@@ -201,32 +194,22 @@ func (s *server) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servic
 // has been dialed. The details of the configuration are explained at the package comments.
 func (s *server) Configure(options ...string) error {
 	const Configure = "Configure"
-	// These are defaults that only make sense for those running upspin.io.
-	bucketName := "g-upspin-store"
-	projectID := "upspin"
 	tempDir := ""
+	var dialOpts []storage.DialOpts
 	for _, option := range options {
-		opts := strings.Split(option, "=")
-		if len(opts) != 2 {
-			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid option format: %q", option))
-		}
-		switch opts[0] {
-		case ConfigBucketName:
-			bucketName = opts[1]
-		case ConfigProjectID:
-			projectID = opts[1]
-		case ConfigTemporaryDir:
-			tempDir = opts[1]
-		default:
-			return errors.E(Configure, errors.Invalid, errors.Errorf("invalid configuration option: %q", opts[0]))
+		if strings.HasPrefix(option, ConfigTemporaryDir) {
+			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
+		} else {
+			dialOpts = append(dialOpts, storage.WithOptions(option))
 		}
 	}
+	dialOpts = append(dialOpts, storage.WithKeyValue("defaultACL", gcs.PublicRead))
 
 	mu.Lock()
 	defer mu.Unlock()
 
-	cloudClient = storage.NewGCS(projectID, bucketName, storage.PublicRead)
-	err := cloudClient.Connect()
+	var err error
+	cloudClient, err = storage.Dial("GCS", dialOpts...)
 	if err != nil {
 		return errors.E(Configure, err)
 	}
@@ -262,7 +245,7 @@ func (s *server) Close() {
 
 	if refCount == 0 {
 		if cloudClient != nil {
-			cloudClient.Disconnect()
+			cloudClient.Close()
 		}
 		cloudClient = nil
 		if fileCache != nil {
