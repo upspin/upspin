@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3c4add4_6bab7231",
+        "filename": "cloud/storage/gcs/gcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T18:06:20Z",
+      "side": 1,
+      "message": "Please note that this file was moved (with git mv) and lightly edited, but git decided there were too many edits. Everything below line 41 is the same.",
+      "revId": "df4f6c4a35bf65e797287d291426db6143c09fa1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
