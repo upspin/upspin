@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_2e2b4874",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "c3c4add4_2b8fba93",
+      "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_0bc0fe5a",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2016-06-27T18:40:28Z",
       "side": 0,
       "message": "We should probably add a TODO here to bring back different key types (different curves).",
+      "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_8ed4fc1e",
+        "filename": "test/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "c3c4add4_0bb75e03",
       "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
