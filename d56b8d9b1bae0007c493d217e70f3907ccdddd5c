@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_3edff9e6",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T03:43:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43543de4_3066283a",
+      "revId": "d56b8d9b1bae0007c493d217e70f3907ccdddd5c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_d3f33e0c",
         "filename": "auth/grpcauth/testdata/testserver.pb.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "Yes, edpin you need to \u0027go get -u google.golang.org/grpc\u0027 and regenerate this.",
       "parentUuid": "c3c4add4_d3f33e0c",
+      "revId": "d56b8d9b1bae0007c493d217e70f3907ccdddd5c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_1edcbdee",
+        "filename": "auth/grpcauth/testdata/testserver.pb.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T03:43:59Z",
+      "side": 1,
+      "message": "I did do that on mac, but it didn\u0027t work. So I moved to linux. Here\u0027s what that file looks like with protobuf3 on mac. It just won\u0027t compile.\n\nSo, between linux and mac, I can\u0027t get this to work with proto3. What\u0027s the recipe to get proto3 installed on mac? I followed these instructions and things are extremely broken now:\nhttps://github.com/duggan/homebrew-protobuf3",
+      "parentUuid": "43543de4_f083c0e5",
       "revId": "d56b8d9b1bae0007c493d217e70f3907ccdddd5c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
