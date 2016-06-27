@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43543de4_306708ff",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-27T04:25:29Z",
+      "side": 1,
+      "message": "if cli.LastActivity().IsZero() {",
+      "revId": "c6decc37d12a336f1ccb35652870055aeae0cf46",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
