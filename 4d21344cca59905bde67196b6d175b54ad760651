@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_b90823d8",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_d9ca3fac",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_59e00f2b",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-27T17:14:43Z",
       "side": 1,
       "message": "the parens are unnecessary but they are not wrong.",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_39fd53b9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T17:23:15Z",
+      "side": 1,
+      "message": "You\u0027re right, the line break is enough for readability here. Fixed.",
+      "parentUuid": "c3c4add4_59e00f2b",
       "revId": "4d21344cca59905bde67196b6d175b54ad760651",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
