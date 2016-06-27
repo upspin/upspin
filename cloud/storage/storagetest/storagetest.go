@@ -53,13 +53,13 @@ func (m *DummyStorage) Delete(ref string) error {
 	return nil
 }
 
-// Connect implements storage.Storage.
-func (m *DummyStorage) Connect() error {
+// Dial implements storage.Storage.
+func (m *DummyStorage) Dial(opts *storage.StorageOpts) error {
 	return nil
 }
 
-// Disconnect implements storage.Storage.
-func (m *DummyStorage) Disconnect() {
+// Close implements storage.Storage.
+func (m *DummyStorage) Close() {
 }
 
 // ExpectGet is a DummyStorage that expects Get will be called with a

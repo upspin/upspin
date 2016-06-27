@@ -159,11 +159,12 @@ func TestConfigure(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
-	if !strings.Contains(err.Error(), "invalid configuration") {
-		t.Errorf("Expected invalid configuration error, got %q", err)
+	expected := "syntax error"
+	if !strings.Contains(err.Error(), expected) {
+		t.Errorf("Expected %q, got %q", expected, err)
 	}
 	// now configure it correctly
-	err = store.Configure(ConfigProjectID+"=some project id", ConfigBucketName+"=zee bucket", ConfigTemporaryDir+"=")
+	err = store.Configure("gcpProjectID=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
 	if err != nil {
 		t.Fatal(err)
 	}
