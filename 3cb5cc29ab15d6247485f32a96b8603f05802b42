@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3c4add4_2b8fba93",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T18:40:28Z",
+      "side": 0,
+      "message": "You probably need an underscore import here or cmd/upspin might break (unless someone else is already importing pack/ee indirectly -- but for safety, probably best to keep this here).",
+      "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_0bc0fe5a",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T18:40:28Z",
+      "side": 0,
+      "message": "If you remove 521, how do we know it still works? See below for suggestion.",
+      "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_0bb75e03",
+        "filename": "test/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-27T18:40:28Z",
+      "side": 0,
+      "message": "We should probably add a TODO here to bring back different key types (different curves).",
+      "revId": "3cb5cc29ab15d6247485f32a96b8603f05802b42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
