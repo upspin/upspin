@@ -40,7 +40,7 @@ type AuthClientService struct {
 
 	keepAliveInterval time.Duration // interval of keep-alive packets.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
-	mu                sync.Mutex    // protects the field below.
+	mu                *sync.Mutex   // protects the field below.
 	lastNetActivity   time.Time     // last known time of some network activity.
 }
 
@@ -93,6 +93,7 @@ func NewGRPCClient(context *upspin.Context, netAddr upspin.NetAddr, keepAliveInt
 		grpcConn:          conn,
 		context:           *context,
 		keepAliveInterval: keepAliveInterval,
+		mu:                new(sync.Mutex),
 		closeKeepAlive:    make(chan bool, 1),
 	}
 	if keepAliveInterval != 0 {
