@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_ce19d476",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_cb7d4656",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_0bef5e22",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2016-06-27T18:40:28Z",
       "side": 1,
       "message": "Please use log here. Maybe even log.Error.",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_6e25409a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "changed to log.Printf().   supposedly can\u0027t happen anyway.",
+      "parentUuid": "c3c4add4_0bef5e22",
       "revId": "4d21344cca59905bde67196b6d175b54ad760651",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -88,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_8e56bce4",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Do you mean replace \"P-256\" by elliptic.P256().Params().Name?   I\u0027ll do it if people think it actually helps.",
+      "parentUuid": "c3c4add4_2bbdfa17",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_0b459e03",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -99,6 +153,24 @@
       "writtenOn": "2016-06-27T18:40:28Z",
       "side": 1,
       "message": "Please document this.\n// ellipticNames maps ECDSA curves to upspin-friendly curve names.",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_ae9bb8e3",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_0b459e03",
       "revId": "4d21344cca59905bde67196b6d175b54ad760651",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -157,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_ce7d5456",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_cb2f0632",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_cbdee64c",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -168,6 +258,24 @@
       "writtenOn": "2016-06-27T18:40:28Z",
       "side": 1,
       "message": "This seems a little brittle. Can\u0027t you encode the keytype as an int somewhere?",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_8efd1ca9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "I agree; this hurt me to write.   I\u0027ll be discussing with agl.  It should be done at the pkg level, not upspin.",
+      "parentUuid": "c3c4add4_cbdee64c",
       "revId": "4d21344cca59905bde67196b6d175b54ad760651",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -191,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_cec5546f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_0be91eed",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_4bdaf64e",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 2
@@ -208,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "c3c4add4_c1ac05b9",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3c4add4_4bdaf64e",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3c4add4_cb938673",
         "filename": "test/all_test.go",
         "patchSetId": 2
@@ -219,6 +363,24 @@
       "writtenOn": "2016-06-27T18:40:28Z",
       "side": 1,
       "message": "Maybe KeyKind should be called KeyCurveKind or KeyCurve?",
+      "revId": "4d21344cca59905bde67196b6d175b54ad760651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3c4add4_0eb76c03",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-27T21:34:27Z",
+      "side": 1,
+      "message": "They\u0027re curves for now but may be other kinds of keys in the future.   I don\u0027t care deeply, so will change if you insist, but otherwise prefer not to make ee_test use unique terminology compared to general tests.",
+      "parentUuid": "c3c4add4_cb938673",
       "revId": "4d21344cca59905bde67196b6d175b54ad760651",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
