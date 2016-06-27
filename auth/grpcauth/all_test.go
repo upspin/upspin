@@ -102,9 +102,9 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 }
 
 type client struct {
-	AuthClientService // For handling Authenticate, Ping and Close.
-	grpcClient        prototest.TestServiceClient
-	demandCount       int
+	*AuthClientService // For handling Authenticate, Ping and Close.
+	grpcClient         prototest.TestServiceClient
+	demandCount        int
 }
 
 func (c *client) TellTrump(t *testing.T, demand string) (response string) {
@@ -141,7 +141,7 @@ func startClient(port string) {
 	grpcClient := prototest.NewTestServiceClient(authClient.GRPCConn())
 	authClient.SetService(grpcClient)
 	cli = &client{
-		AuthClientService: *authClient,
+		AuthClientService: authClient,
 		grpcClient:        grpcClient,
 	}
 }

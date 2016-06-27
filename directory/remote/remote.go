@@ -28,9 +28,9 @@ type dialContext struct {
 // remote implements upspin.Directory.
 type remote struct {
 	upspin.NoConfiguration
-	grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
-	ctx                        dialContext
-	dirClient                  proto.DirectoryClient
+	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
+	ctx                         dialContext
+	dirClient                   proto.DirectoryClient
 }
 
 var _ upspin.Directory = (*remote)(nil)
@@ -176,7 +176,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	dirClient := proto.NewDirectoryClient(authClient.GRPCConn())
 	authClient.SetService(dirClient)
 	r := &remote{
-		AuthClientService: *authClient,
+		AuthClientService: authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,

@@ -24,9 +24,9 @@ type dialContext struct {
 
 // remote implements upspin.Store.
 type remote struct {
-	grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
-	ctx                        dialContext
-	storeClient                proto.StoreClient
+	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
+	ctx                         dialContext
+	storeClient                 proto.StoreClient
 }
 
 var _ upspin.Store = (*remote)(nil)
@@ -114,7 +114,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 	storeClient := proto.NewStoreClient(authClient.GRPCConn())
 	authClient.SetService(storeClient)
 	r := &remote{
-		AuthClientService: *authClient,
+		AuthClientService: authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName,
