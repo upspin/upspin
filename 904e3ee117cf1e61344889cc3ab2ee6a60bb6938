@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0cf4346_8c9547fd",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T17:40:36Z",
+      "side": 1,
+      "message": "You likely don\u0027t need debug.",
+      "revId": "904e3ee117cf1e61344889cc3ab2ee6a60bb6938",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0cf4346_0cbb9787",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T17:40:36Z",
+      "side": 1,
+      "message": "This is not used.",
+      "revId": "904e3ee117cf1e61344889cc3ab2ee6a60bb6938",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0cf4346_ecb16ba4",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T17:40:36Z",
+      "side": 1,
+      "message": "Mind making this a flag? This will change soon to upspin-prod so it would be useful as a flag. Maybe call it gcpProject?",
+      "revId": "904e3ee117cf1e61344889cc3ab2ee6a60bb6938",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0cf4346_4cc19ff1",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T17:40:36Z",
+      "side": 1,
+      "message": "This shadows the flag config, but you don\u0027t need that, so this is fine.",
+      "revId": "904e3ee117cf1e61344889cc3ab2ee6a60bb6938",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
