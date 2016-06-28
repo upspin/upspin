@@ -92,7 +92,8 @@ func (p Parsed) FilePath() string {
 
 // Parse parses a full file name, including the user, validates it,
 // and returns its parsed form. If the name is a user root directory,
-// the trailing slash is optional.
+// the trailing slash is optional. The name is 'cleaned' (see the Clean
+// function) to canonicalize it.
 func Parse(pathName upspin.PathName) (Parsed, error) {
 	name := string(pathName)
 	// Pull off the user name.
