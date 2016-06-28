@@ -17,7 +17,6 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/pack"
 	"upspin.io/upspin"
 )
 
@@ -32,16 +31,16 @@ func KeyHash(p upspin.PublicKey) []byte {
 var _ upspin.Factotum = Factotum{}
 
 type Factotum struct {
-	keyHash       []byte
-	public        upspin.PublicKey
-	private       string
-	ecdsaKeyPair  ecdsa.PrivateKey // ecdsa form of key pair
-	packingString string
+	keyHash      []byte
+	public       upspin.PublicKey
+	private      string
+	ecdsaKeyPair ecdsa.PrivateKey // ecdsa form of key pair
+	curveName    string
 }
 
 // New returns a new Factotum providing all needed private key operations.
 func New(public upspin.PublicKey, private string) (*Factotum, error) {
-	ePublicKey, packingString, err := ParsePublicKey(public)
+	ePublicKey, curveName, err := ParsePublicKey(public)
 	if err != nil {
 		return nil, err
 	}
@@ -50,24 +49,19 @@ func New(public upspin.PublicKey, private string) (*Factotum, error) {
 		return nil, err
 	}
 	f := &Factotum{
-		keyHash:       KeyHash(public),
-		public:        public,
-		private:       private,
-		ecdsaKeyPair:  *ecdsaKeyPair,
-		packingString: packingString,
+		keyHash:      KeyHash(public),
+		public:       public,
+		private:      private,
+		ecdsaKeyPair: *ecdsaKeyPair,
+		curveName:    curveName,
 	}
 	return f, nil
 }
 
-// PackingString returns the Packing.String() value associated with the key inside f.
-func (f Factotum) PackingString() string {
-	return f.packingString
-}
-
-// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.
-func (f Factotum) FileSign(p upspin.Packing, n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
-	log.Debug.Printf("factotum.fileSign %s %s %d %x\n", pack.Lookup(p).String(), n, t, hash)
-	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, VerHash(p, n, t, dkey, hash))
+// FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.
+func (f Factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
+	log.Debug.Printf("factotum.fileSign %s %s %d %x\n", f.curveName, n, t, hash)
+	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, VerHash(f.curveName, n, t, dkey, hash))
 	if err != nil {
 		return sig0, err
 	}
@@ -101,8 +95,8 @@ func (f Factotum) PublicKey() upspin.PublicKey {
 }
 
 // VerHash provides the basis for signing and verifying files.
-func VerHash(ciphersuite upspin.Packing, pathname upspin.PathName, time upspin.Time, dkey, cipherSum []byte) []byte {
-	b := sha256.Sum256([]byte(fmt.Sprintf("%02x:%s:%d:%x:%x", ciphersuite, pathname, time, dkey, cipherSum)))
+func VerHash(curveName string, pathname upspin.PathName, time upspin.Time, dkey, cipherSum []byte) []byte {
+	b := sha256.Sum256([]byte(fmt.Sprintf("%02x:%s:%d:%x:%x", curveName, pathname, time, dkey, cipherSum)))
 	return b[:]
 }
 
