@@ -69,6 +69,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 			Time:     upspin.Now(),
 			Sequence: 0, // Don't care for now.
 			Size:     uint64(len(data)),
+			Writer:   c.context.UserName,
 		},
 	}
 
