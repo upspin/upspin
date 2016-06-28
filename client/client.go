@@ -92,7 +92,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	// Store contents.
-	store, err := bind.Store(c.context, c.context.Store)
+	store, err := bind.Store(c.context, c.context.StoreEndpoint)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -101,7 +101,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		return zeroLoc, err
 	}
 	de.Location = upspin.Location{
-		Endpoint:  c.context.Store,
+		Endpoint:  c.context.StoreEndpoint,
 		Reference: ref,
 	}
 
@@ -115,7 +115,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	if packer.String() != "ee" {
 		return nil
 	}
-	directory, err := bind.Directory(c.context, c.context.Directory)
+	directory, err := bind.Directory(c.context, c.context.DirectoryEndpoint)
 	if err != nil {
 		return err
 	}
@@ -274,7 +274,7 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 	}
 	var endpoints []upspin.Endpoint
 	if parsed.User() == c.context.UserName {
-		endpoints = append(endpoints, c.context.Directory)
+		endpoints = append(endpoints, c.context.DirectoryEndpoint)
 	}
 	if eps, _, err := c.user.Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)

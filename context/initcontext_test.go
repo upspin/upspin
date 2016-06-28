@@ -165,9 +165,9 @@ func testConfig(t *testing.T, expect *expectations, config string) {
 		expected upspin.Endpoint
 		got      upspin.Endpoint
 	}{
-		{expect.user, context.User},
-		{expect.directory, context.Directory},
-		{expect.store, context.Store},
+		{expect.user, context.UserEndpoint},
+		{expect.directory, context.DirectoryEndpoint},
+		{expect.store, context.StoreEndpoint},
 	}
 	for _, test := range tests {
 		if test.expected != test.got {

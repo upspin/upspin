@@ -63,9 +63,9 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 			t.Fatal(err)
 		}
 	}
-	c.User = e
-	c.Store = e
-	c.Directory = e
+	c.UserEndpoint = e
+	c.StoreEndpoint = e
+	c.DirectoryEndpoint = e
 
 	return s, c
 }

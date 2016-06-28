@@ -80,7 +80,7 @@ func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, 
 		NetAddr:   upspin.NetAddr(userServiceAddr),
 	}
 	context := &upspin.Context{
-		User: e,
+		UserEndpoint: e,
 	}
 	user := usercache.New(context)
 	return func(userName upspin.UserName) ([]upspin.PublicKey, error) {

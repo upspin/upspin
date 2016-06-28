@@ -244,7 +244,7 @@ func getKey(ctx *upspin.Context, name upspin.PathName) (upspin.PublicKey, error)
 	if err != nil {
 		return "", err
 	}
-	user, err := bind.User(ctx, ctx.User)
+	user, err := bind.User(ctx, ctx.UserEndpoint)
 	if err != nil {
 		return "", err
 	}

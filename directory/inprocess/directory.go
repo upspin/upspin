@@ -74,7 +74,7 @@ func newDirEntry(context *upspin.Context, name upspin.PathName) *upspin.DirEntry
 	return &upspin.DirEntry{
 		Name: name,
 		Location: upspin.Location{
-			Endpoint: context.Store,
+			Endpoint: context.StoreEndpoint,
 		},
 		Metadata: upspin.Metadata{
 			Packdata: upspin.Packdata{byte(dirPacking)},
@@ -167,7 +167,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Name: parsed.First(0).Path(), // The root.
 		Location: upspin.Location{
 			Reference: dirRef,
-			Endpoint:  s.context.Store,
+			Endpoint:  s.context.StoreEndpoint,
 		},
 		Metadata: upspin.Metadata{
 			Attr: upspin.AttrDirectory,
@@ -258,7 +258,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 	return &upspin.DirEntry{
 		Name: upspin.PathName(user + "/"),
 		Location: upspin.Location{
-			Endpoint:  s.context.Store,
+			Endpoint:  s.context.StoreEndpoint,
 			Reference: ref,
 		},
 		Metadata: upspin.Metadata{
@@ -294,7 +294,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	store, err := bind.Store(&s.context, s.context.Store)
+	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
 	if err != nil {
 		return loc0, errors.E(MakeDirectory, directoryName, err)
 	}
@@ -323,7 +323,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		return loc0, errors.E(MakeDirectory, directoryName, err)
 	}
 	loc := upspin.Location{
-		Endpoint:  s.context.Store,
+		Endpoint:  s.context.StoreEndpoint,
 		Reference: ref,
 	}
 	entry := newDirEntry(&s.context, parsed.Path())
@@ -473,7 +473,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		dirEntry := &upspin.DirEntry{
 			Name: entries[i+1].Name,
 			Location: upspin.Location{
-				Endpoint:  s.context.Store,
+				Endpoint:  s.context.StoreEndpoint,
 				Reference: dirRef,
 			},
 			Metadata: upspin.Metadata{
@@ -664,7 +664,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 
 // fetchDir returns the decrypted directory data associated with the reference.
 func (s *Service) fetchDir(op string, dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	store, err := bind.Store(&s.context, s.context.Store)
+	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -774,7 +774,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		dirData = append(dirData, data...)
 	}
 	blob, _, err := s.db.packDirBlob(op, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
-	store, err := bind.Store(&s.context, s.context.Store)
+	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
 	if err != nil {
 		return "", errors.E(op, err)
 	}

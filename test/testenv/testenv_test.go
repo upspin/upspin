@@ -38,7 +38,7 @@ func TestInProcess(t *testing.T) {
 	}
 
 	// Now check the tree was setup correctly
-	dir, err := bind.Directory(env.Context, env.Context.Directory)
+	dir, err := bind.Directory(env.Context, env.Context.DirectoryEndpoint)
 	if err != nil {
 		t.Fatal(err)
 	}
