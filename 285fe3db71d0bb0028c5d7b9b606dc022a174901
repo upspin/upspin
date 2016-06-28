@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c0cf4346_b2b73836",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T21:44:46Z",
+      "side": 1,
+      "message": "Ah, that\u0027s the idiom. I couldn\u0027t figure out how to do it without a temporary. Done.",
+      "parentUuid": "c0cf4346_72e9d01b",
+      "revId": "285fe3db71d0bb0028c5d7b9b606dc022a174901",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0cf4346_92e1dc32",
         "filename": "errors/errors_test.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-28T21:41:12Z",
       "side": 1,
       "message": "c/screw with/modify/",
+      "revId": "285fe3db71d0bb0028c5d7b9b606dc022a174901",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0cf4346_523a948d",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-28T21:44:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0cf4346_92e1dc32",
       "revId": "285fe3db71d0bb0028c5d7b9b606dc022a174901",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
