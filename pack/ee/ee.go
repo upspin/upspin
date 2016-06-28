@@ -88,6 +88,7 @@ var (
 	errNoWrappedKey       = errors.Str("no wrapped key for me")
 	errKeyLength          = errors.Str("wrong key length for AES-256")
 	errNoKnownKeysForUser = errors.Str("no known keys for user")
+	name0                 upspin.UserName   // for returning nil of correct type
 	sig0                  upspin.Signature  // for returning nil of correct type
 	ellipticNames         map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
 )
@@ -144,7 +145,7 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	}
 
 	// Wrap for myself.
-	wrap := make([]wrappedKey, 1)
+	wrap := make([]wrappedKey, 2)
 	p, _, err := factotum.ParsePublicKey(ctx.Factotum.PublicKey())
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
@@ -154,8 +155,40 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 		return 0, errors.E(Pack, d.Name, err)
 	}
 
+	// Also wrap for owner, if different.
+	parsed, err := path.Parse(d.Name)
+	if err != nil {
+		return 0, errors.E(Pack, d.Name, err)
+	}
+	owner := parsed.User()
+	if owner == ctx.UserName {
+		wrap = wrap[:1]
+	} else {
+		userConn, err := bind.User(ctx, ctx.User)
+		if err != nil {
+			return 0, errors.E(Pack, owner, err)
+		}
+		_, ownerKeys, err := userConn.Lookup(owner)
+		if err != nil {
+			return 0, errors.E(Pack, owner, err)
+		}
+		if ownerKeys[0] == ctx.Factotum.PublicKey() {
+			fmt.Printf("Is it surprising that %s != %s but they have the same keys?\n", owner, ctx.UserName)
+			wrap = wrap[:1]
+		} else {
+			p, _, err = factotum.ParsePublicKey(ownerKeys[0])
+			if err != nil {
+				return 0, errors.E(Pack, d.Name, err)
+			}
+			wrap[1], err = ee.aesWrap(p, dkey)
+			if err != nil {
+				return 0, errors.E(Pack, d.Name, err)
+			}
+		}
+	}
+
 	// Serialize packer metadata.
-	err = ee.pdMarshal(&d.Metadata.Packdata, sig, sig0, wrap, cipherSum)
+	err = ee.pdMarshal(&d.Metadata.Packdata, ctx.UserName, sig, sig0, wrap, cipherSum)
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
 	}
@@ -174,25 +207,18 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 
 	// Retrieve file decryption key.
 	dkey := make([]byte, aesKeyLen)
-	sig, sig2, wrap, _, err := ee.pdUnmarshal(d.Metadata.Packdata)
+	writer, sig, sig2, wrap, _, err := ee.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
 	}
 
-	// File owner is part of the pathname
-	parsed, err := path.Parse(d.Name)
+	writerRawPubKey, err := publicKey(ctx, writer)
 	if err != nil {
-		return 0, errors.E(Unpack, err)
+		return 0, errors.E(Unpack, writer, err)
 	}
-	owner := parsed.User()
-	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(ctx, owner)
+	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
-		return 0, errors.E(Unpack, d.Name, err)
-	}
-	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
-	if err != nil {
-		return 0, errors.E(Unpack, d.Name, err)
+		return 0, errors.E(Unpack, writer, err)
 	}
 
 	// Now get my own keys
@@ -216,11 +242,11 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 			log.Printf("unwrap failed: %v", err)
 			return 0, errors.E(Unpack, d.Name, err)
 		}
-		// Verify that this was signed with the owner's old or new public key.
+		// Verify that this was signed with the writer's old or new public key.
 		vhash := factotum.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
-		if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
-			(sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S)) {
-			// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
+		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
+			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
 			log.Println("verify failed")
 			return 0, errors.E(Unpack, d.Name, errVerify)
 		}
@@ -232,7 +258,7 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
 func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
-	_, _, wrap, _, err := ee.pdUnmarshal(packdata)
+	_, _, _, wrap, _, err := ee.pdUnmarshal(packdata)
 	if err != nil {
 		return nil, errors.E("ReaderHashes", errors.Invalid, err)
 	}
@@ -249,6 +275,8 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
 	// For efficiency, Share() reuses the wrapped key for readers common to the old and new lists.
+
+	// TODO(ehg) Check that wrapping for owner and writer are retained.
 
 	// Fetch all the public keys we'll need.
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
@@ -269,7 +297,7 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
-		sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(*d)
+		writer, sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(*d)
 		if err != nil {
 			log.Printf("eePack: pdUnmarshal failed in Share: %v", err)
 			for jj := j; j < len(packdata); jj++ {
@@ -321,7 +349,7 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 
 		// Rebuild packdata[j] from existing sig and new wrapped keys.
 		dst := make([]byte, ee.packdataLen(nwrap))
-		if ee.pdMarshal(&dst, sig, sig2, wrap, cipherSum) != nil {
+		if ee.pdMarshal(&dst, writer, sig, sig2, wrap, cipherSum) != nil {
 			packdata[j] = nil // Tell caller this packdata was skipped.
 		} else {
 			*packdata[j] = dst
@@ -340,7 +368,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	dkey := make([]byte, aesKeyLen)
-	sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(d.Metadata.Packdata)
+	writer, sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(d.Metadata.Packdata)
 	if err != nil {
 		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
@@ -421,7 +449,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
-	if err := ee.pdMarshal(&d.Metadata.Packdata, sig, sig0, wrap, cipherSum); err != nil {
+	if err := ee.pdMarshal(&d.Metadata.Packdata, writer, sig, sig0, wrap, cipherSum); err != nil {
 		return errors.E(Name, d.Name, err)
 	}
 	d.Name = newName
@@ -516,7 +544,7 @@ func (ee ee) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error)
 	return
 }
 
-func (ee ee) pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, cipherSum []byte) error {
+func (ee ee) pdMarshal(dst *[]byte, writer upspin.UserName, sig, sig2 upspin.Signature, wrap []wrappedKey, cipherSum []byte) error {
 	// sig2 is a signature with another owner key, to enable smoother key rotation
 	n := ee.packdataLen(len(wrap))
 	if len(*dst) < n {
@@ -524,6 +552,8 @@ func (ee ee) pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKe
 	}
 	(*dst)[0] = byte(upspin.EEPack)
 	n = 1
+	n += pdPutBytes((*dst)[n:], []byte(writer))
+	fmt.Printf("TODO(ehg) Marshal writer %s\n", writer)
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
 	zero := big.NewInt(0)
@@ -545,9 +575,9 @@ func (ee ee) pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKe
 	return nil // err impossible for now but the night is young
 }
 
-func (ee ee) pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
+func (ee ee) pdUnmarshal(pd []byte) (writer upspin.UserName, sig, sig2 upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
 	if pd[0] != byte(upspin.EEPack) {
-		return sig0, sig0, nil, nil, errors.Errorf("expected packing %d, got %d", upspin.EEPack, pd[0])
+		return name0, sig0, sig0, nil, nil, errors.Errorf("expected packing %d, got %d", upspin.EEPack, pd[0])
 	}
 	n := 1
 	sig.R = big.NewInt(0)
@@ -555,6 +585,10 @@ func (ee ee) pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedK
 	sig2.R = big.NewInt(0)
 	sig2.S = big.NewInt(0)
 	buf := make([]byte, marshalBufLen)
+	writer_bytes := make([]byte, 1000) // TODO  What to set here?
+	n += pdGetBytes(&writer_bytes, pd[n:])
+	writer = upspin.UserName(writer_bytes)
+	fmt.Printf("TODO(ehg) Unmarshal writer %s\n", writer)
 	n += pdGetBytes(&buf, pd[n:])
 	sig.R.SetBytes(buf)
 	n += pdGetBytes(&buf, pd[n:])
@@ -567,7 +601,7 @@ func (ee ee) pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedK
 	n += vlen
 	nwrap := int(nwrap64)
 	if int64(nwrap) != nwrap64 {
-		return sig0, sig0, nil, nil, errors.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
+		return name0, sig0, sig0, nil, nil, errors.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
 	}
 	wrap = make([]wrappedKey, nwrap)
 	for i := 0; i < nwrap; i++ {
@@ -595,9 +629,9 @@ func (ee ee) pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedK
 	hash = make([]byte, sha256.Size)
 	n += pdGetBytes(&hash, pd[n:])
 	if hash == nil {
-		return sig0, sig0, nil, nil, errors.Errorf("pdUnmarshal: file hash is required")
+		return name0, sig0, sig0, nil, nil, errors.Errorf("pdUnmarshal: file hash is required")
 	}
-	return sig, sig2, wrap, hash, nil
+	return writer, sig, sig2, wrap, hash, nil
 }
 
 // pdPutBytes puts length header in dst and then copies src to dst; returns bytes consumed
@@ -606,7 +640,7 @@ func pdPutBytes(dst, src []byte) int {
 	return vlen + copy(dst[vlen:], src)
 }
 
-// pdBytes copies (part of) src to dst, based on length header; returns bytes consumed
+// pdGetBytes copies (part of) src to dst, based on length header; returns bytes consumed
 func pdGetBytes(dst *[]byte, src []byte) int {
 	n, vlen := binary.Varint(src)
 	*dst = (*dst)[:n]
