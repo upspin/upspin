@@ -19,6 +19,29 @@
     },
     {
       "key": {
+        "uuid": "c0cf4346_4cf2ff3e",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-28T17:55:32Z",
+      "side": 1,
+      "message": "Paranoid that I am, I\u0027d like a version of this that doesn\u0027t necessarily serve the root, i.e., in main.go take a path to the root, default \u0027/\u0027 and use it here.",
+      "range": {
+        "startLine": 71,
+        "startChar": 3,
+        "endLine": 71,
+        "endChar": 9
+      },
+      "revId": "904e3ee117cf1e61344889cc3ab2ee6a60bb6938",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0cf4346_0cbb9787",
         "filename": "cmd/fileserver/main.go",
         "patchSetId": 4
