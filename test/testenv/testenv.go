@@ -157,7 +157,10 @@ func (e *Env) Exit() error {
 	}
 	e.exitCalled = true
 	if e.Setup.Cleanup != nil {
-		return errors.E("Exit", e.Setup.Cleanup(e))
+		err := e.Setup.Cleanup(e)
+		if err != nil {
+			return errors.E("Exit", err)
+		}
 	}
 	return nil
 }

@@ -27,8 +27,8 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/path"
 	e "upspin.io/test/testenv"
 	"upspin.io/upspin"
@@ -67,6 +67,8 @@ var (
 		Cleanup:                   deleteGCPEnv,
 	}
 	readerClient upspin.Client
+	// TODO: access.ErrPermissionDenied is nil here somehow. Need to figure out why.
+	errPermissionDenied = errors.E(errors.Permission)
 )
 
 func testNoReadersAllowed(t *testing.T, env *e.Env) {
@@ -76,8 +78,8 @@ func testNoReadersAllowed(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-		t.Errorf("Expected error contains %s, got %s", access.ErrPermissionDenied, err)
+	if !strings.Contains(err.Error(), errPermissionDenied.Error()) {
+		t.Errorf("Expected error contains %q, got %q", errPermissionDenied, err)
 	}
 	// But the owner can still read it.
 	data, err := env.Client.Get(fileName)
@@ -247,8 +249,8 @@ func testDelete(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-		t.Errorf("Expected error %s, got %s", access.ErrPermissionDenied, err)
+	if !strings.Contains(err.Error(), errPermissionDenied.Error()) {
+		t.Errorf("Expected error %s, got %s", errPermissionDenied, err)
 	}
 	// But we can always remove the Access file.
 	accessPathName := upspin.PathName(ownersName + "/dir1/Access")
@@ -312,9 +314,9 @@ func testSharing(t *testing.T, env *e.Env) {
 	}
 }
 
-func testAllOnePacking(t *testing.T, curveName string) {
+func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 	setup.KeyKind = curveName
-	var readersKey keyPair
+	var readersKey e.KeyPair
 	// Keys are needed with any packing type (even Plain) for auth purposes.
 	setup.Keys = keyStore[setup.OwnerName][curveName]
 	readersKey = keyStore[readersName][curveName]
@@ -345,14 +347,18 @@ func testAllOnePacking(t *testing.T, curveName string) {
 }
 
 func TestAll(t *testing.T) {
-	for _, packing := range []upspin.Packing{
-		upspin.PlainPack,
-		upspin.EEp256Pack,
-		upspin.DebugPack,
-		upspin.EEp521Pack,
+	type testSetup struct {
+		packing upspin.Packing
+		curve   string
+	}
+	for _, p := range []testSetup{
+		{packing: upspin.PlainPack, curve: "p256"},
+		{packing: upspin.EEPack, curve: "p256"},
+		{packing: upspin.EEPack, curve: "p521"},
+		{packing: upspin.DebugPack, curve: "p256"},
 	} {
-		log.Printf("=== Packing %d", packing)
-		testAllOnePacking(t, packing)
+		log.Printf("=== Packing %d, %q", p.packing, p.curve)
+		testAllOnePacking(t, p.packing, p.curve)
 	}
 }
 

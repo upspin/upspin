@@ -173,8 +173,8 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	// Validate signature.
 	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
-		log.Error.Printf("Invalid signature for user %s", req.UserName)
-		return nil, errors.E(Authenticate, errMissingSignature)
+		log.Error.Printf("Invalid signature for user %s: %s", req.UserName, err)
+		return nil, errors.E(Authenticate, err)
 	}
 
 	// Generate an auth token and bind it to a session for the user.
@@ -280,5 +280,5 @@ func verifySignature(keys []upspin.PublicKey, hash []byte, r, s *big.Int) error 
 			return nil
 		}
 	}
-	return errors.Errorf("no keys verified signature")
+	return errors.Str("no keys verified signature")
 }
