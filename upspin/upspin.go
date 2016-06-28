@@ -28,6 +28,11 @@ const (
 	// typically in memory.
 	InProcess Transport = iota
 
+	// Unused indicates a connection to a service that returns an error
+	// from every method call. It is useful when a component wants to
+	// guarantee it does not access another service.
+	Unused
+
 	// GCP indicates a Google Cloud Store instance.
 	GCP
 

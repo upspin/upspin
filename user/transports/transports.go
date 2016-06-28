@@ -11,4 +11,5 @@ import (
 	_ "upspin.io/user/gcp"
 	_ "upspin.io/user/inprocess"
 	_ "upspin.io/user/remote"
+	_ "upspin.io/user/unused"
 )

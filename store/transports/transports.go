@@ -12,4 +12,5 @@ import (
 	_ "upspin.io/store/https"
 	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
+	_ "upspin.io/store/unused"
 )
