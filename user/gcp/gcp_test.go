@@ -112,7 +112,7 @@ func TestAddRootToExistingUser(t *testing.T) {
 	if mockGCP.PutRef[0] != mockUser {
 		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":1,"NetAddr":"http://there.co.uk"},{"Transport":2,"NetAddr":"http://here.com"}]}`
+	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://there.co.uk"},{"Transport":2,"NetAddr":"http://here.com"}]}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
 	}
@@ -137,14 +137,14 @@ func TestAddRootToNewUser(t *testing.T) {
 	if mockGCP.PutRef[0] != newUser {
 		t.Errorf("Expected update to user %s, got user %s", newUser, mockGCP.PutRef[0])
 	}
-	expectedPutValue := `{"User":"new@user.com","Keys":null,"Endpoints":[{"Transport":1,"NetAddr":"http://there.co.uk"}]}`
+	expectedPutValue := `{"User":"new@user.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://there.co.uk"}]}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
 		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
 	}
 }
 
 func TestGetExistingUser(t *testing.T) {
-	const storedEntry = `{"User":"bob@foo.com","Keys":["my key"],"Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`
+	const storedEntry = `{"User":"bob@foo.com","Keys":["my key"],"Endpoints":[{"Transport":3,"NetAddr":"http://here.com"}]}`
 	u, _ := newUserServerWithMocking([]byte(storedEntry))
 	e, keys, err := u.Lookup(mockUser)
 	if err != nil {

@@ -24,9 +24,15 @@ type PathName string
 type Transport uint8
 
 const (
+	// Unassigned indicates a connection to a service that returns an error
+	// from every method call. It is useful when a component wants to
+	// guarantee it does not access another service.
+	// It is also the zero value for Transport.
+	Unassigned Transport = iota
+
 	// InProcess indicates that contents are located in the current process,
 	// typically in memory.
-	InProcess Transport = iota
+	InProcess
 
 	// GCP indicates a Google Cloud Store instance.
 	GCP
