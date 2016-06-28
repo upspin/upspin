@@ -36,9 +36,10 @@ type Error struct {
 }
 
 var (
-	_ error                      = (*Error)(nil)
-	_ encoding.BinaryUnmarshaler = (*Error)(nil)
-	_ encoding.BinaryMarshaler   = (*Error)(nil)
+	_       error                      = (*Error)(nil)
+	_       encoding.BinaryUnmarshaler = (*Error)(nil)
+	_       encoding.BinaryMarshaler   = (*Error)(nil)
+	zeroErr Error
 )
 
 // Separator is the string used to separate nested errors. By
@@ -52,6 +53,7 @@ var Separator = ":\n\t"
 // such as FUSE that must act differently depending on the error.
 type Kind uint8
 
+// Kinds of errors.
 const (
 	Other      Kind = iota // Unclassified error. This value is not printed in the error message.
 	Invalid                // Invalid operation for this type of item.
@@ -146,6 +148,15 @@ func E(args ...interface{}) error {
 			e.Op = arg
 		case Kind:
 			e.Kind = arg
+		case *Error:
+			// Make a copy
+			e.Err = &Error{
+				Path: arg.Path,
+				User: arg.User,
+				Op:   arg.Op,
+				Kind: arg.Kind,
+				Err:  arg.Err,
+			}
 		case error:
 			e.Err = arg
 		default:
@@ -158,7 +169,8 @@ func E(args ...interface{}) error {
 	if !ok {
 		return e
 	}
-	// The previous error was also one of ours. Supppress duplications
+
+	// The previous error was also one of ours. Suppress duplications
 	// so the message won't contain the same kind, file name or user name
 	// twice.
 	if prev.Path == e.Path {
@@ -205,13 +217,16 @@ func (e *Error) Error() string {
 		b.WriteString(e.Kind.String())
 	}
 	if e.Err != nil {
-		// Indent on new line if we are cascading Upspin errors.
-		if _, ok := e.Err.(*Error); ok {
-			pad(b, Separator)
+		// Indent on new line if we are cascading non-empty Upspin errors.
+		if prevErr, ok := e.Err.(*Error); ok {
+			if *prevErr != zeroErr {
+				pad(b, Separator)
+				b.WriteString(e.Err.Error())
+			}
 		} else {
 			pad(b, ": ")
+			b.WriteString(e.Err.Error())
 		}
-		b.WriteString(e.Err.Error())
 	}
 	if b.Len() == 0 {
 		return "no error"
@@ -246,24 +261,24 @@ func Errorf(format string, args ...interface{}) error {
 // MarshalAppend marshals err into a byte slice. The result is appended to b,
 // which may be nil.
 // It returns the argument slice unchanged if the error is nil.
-func (err *Error) MarshalAppend(b []byte) []byte {
-	if err == nil {
+func (e *Error) MarshalAppend(b []byte) []byte {
+	if e == nil {
 		return b
 	}
-	b = appendString(b, string(err.Path))
-	b = appendString(b, string(err.User))
-	b = appendString(b, err.Op)
+	b = appendString(b, string(e.Path))
+	b = appendString(b, string(e.User))
+	b = appendString(b, e.Op)
 	var tmp [16]byte // For use by PutVarint.
-	N := binary.PutVarint(tmp[:], int64(err.Kind))
+	N := binary.PutVarint(tmp[:], int64(e.Kind))
 	b = append(b, tmp[:N]...)
-	b = MarshalErrorAppend(err.Err, b)
+	b = MarshalErrorAppend(e.Err, b)
 	return b
 }
 
-// Marshal marshals its receiver into a byte slice, which it returns.
+// MarshalBinary marshals its receiver into a byte slice, which it returns.
 // It returns nil if the error is nil. The returned error is always nil.
-func (err *Error) MarshalBinary() ([]byte, error) {
-	return err.MarshalAppend(nil), nil
+func (e *Error) MarshalBinary() ([]byte, error) {
+	return e.MarshalAppend(nil), nil
 }
 
 // MarshalErrorAppend marshals an arbitrary error into a byte slice.
@@ -298,26 +313,26 @@ func MarshalError(err error) []byte {
 
 // UnmarshalBinary unmarshals the byte slice into the receiver, which must be non-nil.
 // The returned error is always nil.
-func (err *Error) UnmarshalBinary(b []byte) error {
+func (e *Error) UnmarshalBinary(b []byte) error {
 	if len(b) == 0 {
 		return nil
 	}
 	data, b := getBytes(b)
 	if data != nil {
-		err.Path = upspin.PathName(data)
+		e.Path = upspin.PathName(data)
 	}
 	data, b = getBytes(b)
 	if data != nil {
-		err.User = upspin.UserName(data)
+		e.User = upspin.UserName(data)
 	}
 	data, b = getBytes(b)
 	if data != nil {
-		err.Op = string(data)
+		e.Op = string(data)
 	}
 	k, N := binary.Varint(b)
-	err.Kind = Kind(k)
+	e.Kind = Kind(k)
 	b = b[N:]
-	err.Err = UnmarshalError(b)
+	e.Err = UnmarshalError(b)
 	return nil
 }
 
