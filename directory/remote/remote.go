@@ -48,6 +48,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E("Glob", errors.IO, err)
 	}
+	r.LastActivity()
 	if len(resp.Error) != 0 {
 		return nil, errors.UnmarshalError(resp.Error)
 	}
@@ -70,6 +71,7 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, 
 	if err != nil {
 		return upspin.Location{}, errors.E("MakeDirectory", errors.IO, err)
 	}
+	r.LastActivity()
 	return proto.UpspinLocation(resp.Location), errors.UnmarshalError(resp.Error)
 }
 
@@ -91,6 +93,7 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 	if err != nil {
 		return errors.E("Put", errors.IO, err)
 	}
+	r.LastActivity()
 	return errors.UnmarshalError(resp.Error)
 }
 
@@ -107,6 +110,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) 
 	if err != nil {
 		return "", errors.E("WhichAccess", errors.IO, err)
 	}
+	r.LastActivity()
 	return upspin.PathName(resp.Name), errors.UnmarshalError(resp.Error)
 }
 
@@ -123,6 +127,7 @@ func (r *remote) Delete(pathName upspin.PathName) error {
 	if err != nil {
 		return errors.E("Delete", errors.IO, err)
 	}
+	r.LastActivity()
 	return errors.UnmarshalError(resp.Error)
 }
 
@@ -142,6 +147,7 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if len(resp.Error) != 0 {
 		return nil, errors.UnmarshalError(resp.Error)
 	}
+	r.LastActivity()
 	return proto.UpspinDirEntry(resp.Entry)
 }
 
