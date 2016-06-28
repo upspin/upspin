@@ -27,8 +27,8 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/access"
 	"upspin.io/bind"
-	"upspin.io/errors"
 	"upspin.io/path"
 	e "upspin.io/test/testenv"
 	"upspin.io/upspin"
@@ -67,8 +67,6 @@ var (
 		Cleanup:                   deleteGCPEnv,
 	}
 	readerClient upspin.Client
-	// TODO: access.ErrPermissionDenied is nil here somehow. Need to figure out why.
-	errPermissionDenied = errors.E(errors.Permission)
 )
 
 func testNoReadersAllowed(t *testing.T, env *e.Env) {
@@ -78,8 +76,8 @@ func testNoReadersAllowed(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	if !strings.Contains(err.Error(), errPermissionDenied.Error()) {
-		t.Errorf("Expected error contains %q, got %q", errPermissionDenied, err)
+	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
+		t.Errorf("Expected error contains %q, got %q", access.ErrPermissionDenied, err)
 	}
 	// But the owner can still read it.
 	data, err := env.Client.Get(fileName)
@@ -112,8 +110,9 @@ func testAllowListAccess(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Errorf("Expected error, got none")
 	}
-	// TODO: this is not an ideal error message. We have list permission, but not read. Need to fix this.
-	expectedError := "empty reference"
+	// An empty reference by default points to an unassigned service, which is what we expect if
+	// we can't read it, but can list.
+	expectedError := "request to unassigned service"
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected error contains %s, got %s", expectedError, err)
 	}
@@ -249,8 +248,8 @@ func testDelete(t *testing.T, env *e.Env) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), errPermissionDenied.Error()) {
-		t.Errorf("Expected error %s, got %s", errPermissionDenied, err)
+	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
+		t.Errorf("Expected error %s, got %s", access.ErrPermissionDenied, err)
 	}
 	// But we can always remove the Access file.
 	accessPathName := upspin.PathName(ownersName + "/dir1/Access")
