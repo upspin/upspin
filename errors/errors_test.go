@@ -68,3 +68,17 @@ func TestSeparator(t *testing.T) {
 	}
 
 }
+
+func TestDoesNotChangePreviousError(t *testing.T) {
+	err := E(Permission)
+	err2 := E("I will NOT modify err", err)
+
+	expected := "I will NOT modify err: permission denied"
+	if err2.Error() != expected {
+		t.Fatalf("Expected %q, got %q", expected, err2)
+	}
+	kind := err.(*Error).Kind
+	if kind != Permission {
+		t.Fatalf("Expected kind %v, got %v", Permission, kind)
+	}
+}
