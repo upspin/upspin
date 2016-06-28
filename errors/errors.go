@@ -158,23 +158,23 @@ func E(args ...interface{}) error {
 	if !ok {
 		return e
 	}
-	// The previous error was also one of ours. Supppress duplications
+	// The previous error was also one of ours. Suppress duplications
 	// so the message won't contain the same kind, file name or user name
 	// twice.
 	if prev.Path == e.Path {
-		prev.Path = ""
+		e.Path = ""
 	}
 	if prev.User == e.User {
-		prev.User = ""
+		e.User = ""
 	}
 	if prev.Kind == e.Kind {
-		prev.Kind = Other
+		e.Kind = Other
 	}
 	// If this error has Kind unset or Other, pull up the inner one.
 	if e.Kind == Other {
 		e.Kind = prev.Kind
-		prev.Kind = Other
 	}
+	e.Err = Str(prev.Error())
 	return e
 }
 
