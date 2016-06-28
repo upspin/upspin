@@ -29,6 +29,8 @@ func Parse(v string) (*upspin.Endpoint, error) {
 			return nil, errors.Errorf("remote endpoint %q requires a netaddr", v)
 		}
 		return &upspin.Endpoint{Transport: upspin.Remote, NetAddr: upspin.NetAddr(elems[1])}, nil
+	case "unassigned":
+		return &upspin.Endpoint{Transport: upspin.Unassigned, NetAddr: upspin.NetAddr("")}, nil
 	}
 	return nil, errors.Errorf("unknown transport type in endpoint %q", v)
 }

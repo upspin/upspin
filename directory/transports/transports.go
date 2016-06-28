@@ -11,4 +11,5 @@ import (
 	_ "upspin.io/directory/gcp"
 	_ "upspin.io/directory/inprocess"
 	_ "upspin.io/directory/remote"
+	_ "upspin.io/directory/unassigned"
 )
