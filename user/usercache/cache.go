@@ -35,7 +35,7 @@ type userCache struct {
 func New(context *upspin.Context) upspin.User {
 	return &userCache{
 		context:      *context, // make a copy.
-		userEndpoint: context.User,
+		userEndpoint: context.UserEndpoint,
 		entries:      cache.NewLRU(256),
 		duration:     time.Minute * 15,
 	}

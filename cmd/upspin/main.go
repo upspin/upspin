@@ -306,7 +306,7 @@ func rm(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.Directory)
+	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint)
 	if err != nil {
 		exit(err)
 	}
@@ -361,7 +361,7 @@ func whichAccess(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.Directory)
+	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint)
 	if err != nil {
 		exit(err)
 	}

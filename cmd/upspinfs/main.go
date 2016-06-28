@@ -64,7 +64,7 @@ func main() {
 
 	// Hack for testing
 	if *testFlag != "" {
-		user, err := bind.User(context, context.User)
+		user, err := bind.User(context, context.UserEndpoint)
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
@@ -73,7 +73,7 @@ func main() {
 			log.Debug.Fatal("Not a inprocess.Service")
 		}
 
-		dir, err := bind.Directory(context, context.Directory)
+		dir, err := bind.Directory(context, context.DirectoryEndpoint)
 		if err != nil {
 			log.Debug.Fatal(err)
 		}

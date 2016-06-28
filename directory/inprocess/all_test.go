@@ -44,11 +44,11 @@ func newContextAndServices(name upspin.UserName) (context *upspin.Context, user 
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context = &upspin.Context{
-		UserName:  name,
-		Packing:   upspin.DebugPack,
-		User:      endpoint,
-		Directory: endpoint,
-		Store:     endpoint,
+		UserName:          name,
+		Packing:           upspin.DebugPack,
+		UserEndpoint:      endpoint,
+		DirectoryEndpoint: endpoint,
+		StoreEndpoint:     endpoint,
 	}
 	var err error
 	user, err = bind.User(context, endpoint)
@@ -118,7 +118,7 @@ func storeDataHelper(t *testing.T, context *upspin.Context, data []byte, name up
 		},
 	}
 	cipher, packdata := packData(t, context, data, entry, packing)
-	store, err := bind.Store(context, context.Store)
+	store, err := bind.Store(context, context.StoreEndpoint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func storeDataHelper(t *testing.T, context *upspin.Context, data []byte, name up
 		t.Fatal(err)
 	}
 	entry.Location = upspin.Location{
-		Endpoint:  context.Store,
+		Endpoint:  context.StoreEndpoint,
 		Reference: ref,
 	}
 	entry.Metadata.Packdata = packdata

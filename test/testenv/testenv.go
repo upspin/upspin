@@ -302,7 +302,7 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 
 // installUserRoot installs a root dir for the user in the context, but does not create the root dir.
 func installUserRoot(context *upspin.Context) error {
-	user, err := bind.User(context, context.User)
+	user, err := bind.User(context, context.UserEndpoint)
 	if err != nil {
 		return err
 	}
@@ -310,13 +310,13 @@ func installUserRoot(context *upspin.Context) error {
 	if !ok {
 		return errors.Str("user service must be the in-process instance")
 	}
-	testUser.AddRoot(context.UserName, context.Directory)
+	testUser.AddRoot(context.UserName, context.DirectoryEndpoint)
 	return nil
 }
 
 func makeRoot(context *upspin.Context) error {
 	// Make the root to be sure it's there.
-	directory, err := bind.Directory(context, context.Directory)
+	directory, err := bind.Directory(context, context.DirectoryEndpoint)
 	if err != nil {
 		return err
 	}
@@ -328,7 +328,7 @@ func makeRoot(context *upspin.Context) error {
 }
 
 func setContextEndpoints(context *upspin.Context, store, dir, user upspin.Endpoint) {
-	context.Store = store
-	context.Directory = dir
-	context.User = user
+	context.StoreEndpoint = store
+	context.DirectoryEndpoint = dir
+	context.UserEndpoint = user
 }
