@@ -190,7 +190,7 @@ func TestSharing(t *testing.T) {
 	}
 	ctx.Factotum = f // Override setup to prevent reading keys from .ssh/
 	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.User = upspin.Endpoint{
+	ctx.UserEndpoint = upspin.Endpoint{
 		Transport: upspin.InProcess,
 	}
 
@@ -258,7 +258,7 @@ func TestBadSharing(t *testing.T) {
 	}
 	ctx.Factotum = f
 	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.User = upspin.Endpoint{
+	ctx.UserEndpoint = upspin.Endpoint{
 		Transport: upspin.InProcess,
 	}
 

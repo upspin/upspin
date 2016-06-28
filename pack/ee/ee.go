@@ -671,7 +671,7 @@ func publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, err
 	if string(user) == string(ctx.UserName) {
 		return ctx.Factotum.PublicKey(), nil
 	}
-	userService, err := bind.User(ctx, ctx.User)
+	userService, err := bind.User(ctx, ctx.UserEndpoint)
 	if err != nil {
 		return "", err
 	}

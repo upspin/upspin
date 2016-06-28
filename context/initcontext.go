@@ -108,16 +108,16 @@ func InitContext(r io.Reader) (*upspin.Context, error) {
 		log.Error.Printf("%s: cannot parse User service: %s", op, err)
 		return nil, err
 	}
-	context.User = *ep
+	context.UserEndpoint = *ep
 	if ep, err = endpoint.Parse(vals["store"]); err != nil {
 		log.Error.Printf("%s: cannot parse Store service: %s", op, err)
 		return nil, err
 	}
-	context.Store = *ep
+	context.StoreEndpoint = *ep
 	if ep, err = endpoint.Parse(vals["directory"]); err != nil {
 		log.Error.Printf("%s: cannot parse Directory service: %s", op, err)
 		return nil, err
 	}
-	context.Directory = *ep
+	context.DirectoryEndpoint = *ep
 	return context, nil
 }

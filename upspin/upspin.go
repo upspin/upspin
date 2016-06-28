@@ -465,14 +465,14 @@ type Context struct {
 	Packing Packing
 
 	// User is the endpoint of the User service to contact to evaluate names.
-	User Endpoint
+	UserEndpoint Endpoint
 
 	// Directory is the endpoint of the Directory in which to place new data items,
 	// usually the location of the user's root.
-	Directory Endpoint
+	DirectoryEndpoint Endpoint
 
 	// Store is the endpoint of the Store in which to place new data items.
-	Store Endpoint
+	StoreEndpoint Endpoint
 }
 
 // Dialer defines how to connect and authenticate to a server. Each

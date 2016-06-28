@@ -29,22 +29,22 @@ func newContext(name upspin.UserName) *upspin.Context {
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
 	context := &upspin.Context{
-		UserName:  name,
-		Packing:   upspin.DebugPack, // TODO.
-		User:      endpoint,
-		Directory: endpoint,
-		Store:     endpoint,
+		UserName:          name,
+		Packing:           upspin.DebugPack, // TODO.
+		UserEndpoint:      endpoint,
+		DirectoryEndpoint: endpoint,
+		StoreEndpoint:     endpoint,
 	}
 	return context
 }
 
 func setup(userName upspin.UserName, key upspin.PublicKey) *upspin.Context {
 	context := newContext(userName)
-	user, err := bind.User(context, context.User)
+	user, err := bind.User(context, context.UserEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	dir, err := bind.Directory(context, context.Directory)
+	dir, err := bind.Directory(context, context.DirectoryEndpoint)
 	if err != nil {
 		panic(err)
 	}
