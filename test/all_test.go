@@ -31,7 +31,7 @@ const (
 var (
 	keyStore = map[upspin.UserName]map[string]testenv.KeyPair{
 		// These keys belong to a fictitious user called upspin-test@google.com. If they're changed here, please upload
-		// the public ones to the keyserver on upspin.io:8082
+		// the public ones to the keyserver on upspin.io:5582
 		upspin.UserName(ownersName): {
 			"p256": testenv.KeyPair{
 				Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n"),
@@ -43,7 +43,7 @@ var (
 			},
 		},
 		// These keys belong to a fictitious user called upspin-friend-test@google.com. If they're changed here, please upload
-		// the public ones to the keyserver on upspin.io:8082
+		// the public ones to the keyserver on upspin.io:5582
 		upspin.UserName(readersName): {
 			"p256": testenv.KeyPair{
 				Public:  upspin.PublicKey("p256\n71924488370379946818987229050653820040970171638729570985826507440590282890744\n98209510739612452175889722244428941929387851511059412496741067489708636153322\n"),

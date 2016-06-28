@@ -20,6 +20,9 @@ import (
 
 // UpspinLocation converts a proto Location struct to upspin.Location.
 func UpspinLocation(loc *Location) upspin.Location {
+	if loc == nil {
+		return upspin.Location{}
+	}
 	return upspin.Location{
 		Endpoint: upspin.Endpoint{
 			Transport: upspin.Transport(loc.Endpoint.Transport),

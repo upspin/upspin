@@ -123,7 +123,7 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa
 func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
 	fields := strings.Split(string(public), "\n")
 	if len(fields) != 4 { // 4 is because string should be terminated by \n, hence fields[3]==""
-		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("expected keytype and two big ints, got %d %v", len(fields), fields))
+		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
 	}
 	keyType := fields[0]
 	var x, y big.Int
