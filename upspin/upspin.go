@@ -83,7 +83,7 @@ type Signature struct {
 // Implementations typically provide NewFactotum() to set the key.
 type Factotum interface {
 	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.
-	FileSign(p Packing, n PathName, t Time, dkey, hash []byte) (Signature, error)
+	FileSign(n PathName, t Time, dkey, hash []byte) (Signature, error)
 
 	// ScalarMult is the bare private key operator, used in unwrapping packed data.
 	// Each call needs security review to ensure it cannot be abused as a signing
@@ -335,6 +335,7 @@ type Metadata struct {
 	Sequence int64          // The sequence (version) number of the item.
 	Size     uint64         // Length of file in bytes.
 	Time     Time           // Time associated with file; might be when it was last written.
+	Writer   UserName       // Writer of the file, often the same as owner.
 	Packdata []byte         // Packing-specific metadata stored in directory.
 }
 
