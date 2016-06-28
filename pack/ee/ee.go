@@ -85,6 +85,7 @@ const (
 var (
 	errTooShort           = errors.Str("destination slice too short")
 	errVerify             = errors.Str("does not verify")
+	errWriter             = errors.Str("empty Writer in Metadata")
 	errNoWrappedKey       = errors.Str("no wrapped key for me")
 	errKeyLength          = errors.Str("wrong key length for AES-256")
 	errNoKnownKeysForUser = errors.Str("no known keys for user")
@@ -138,13 +139,13 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	sig, err := ctx.Factotum.FileSign(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+	sig, err := ctx.Factotum.FileSign(path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
 	}
 
 	// Wrap for myself.
-	wrap := make([]wrappedKey, 1)
+	wrap := make([]wrappedKey, 2)
 	p, _, err := factotum.ParsePublicKey(ctx.Factotum.PublicKey())
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
@@ -152,6 +153,38 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	wrap[0], err = ee.aesWrap(p, dkey)
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
+	}
+
+	// Also wrap for owner, if different.
+	parsed, err := path.Parse(d.Name)
+	if err != nil {
+		return 0, errors.E(Pack, d.Name, err)
+	}
+	owner := parsed.User()
+	if owner == ctx.UserName {
+		wrap = wrap[:1]
+	} else {
+		userConn, err := bind.User(ctx, ctx.User)
+		if err != nil {
+			return 0, errors.E(Pack, owner, err)
+		}
+		_, ownerKeys, err := userConn.Lookup(owner)
+		if err != nil {
+			return 0, errors.E(Pack, owner, err)
+		}
+		if ownerKeys[0] == ctx.Factotum.PublicKey() {
+			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName)
+			wrap = wrap[:1]
+		} else {
+			p, _, err = factotum.ParsePublicKey(ownerKeys[0])
+			if err != nil {
+				return 0, errors.E(Pack, d.Name, err)
+			}
+			wrap[1], err = ee.aesWrap(p, dkey)
+			if err != nil {
+				return 0, errors.E(Pack, d.Name, err)
+			}
+		}
 	}
 
 	// Serialize packer metadata.
@@ -179,20 +212,17 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 		return 0, errors.E(Unpack, d.Name, err)
 	}
 
-	// File owner is part of the pathname
-	parsed, err := path.Parse(d.Name)
-	if err != nil {
-		return 0, errors.E(Unpack, err)
+	writer := d.Metadata.Writer
+	if len(writer) == 0 {
+		return 0, errors.E(Unpack, d.Name, errWriter)
 	}
-	owner := parsed.User()
-	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(ctx, owner)
+	writerRawPubKey, err := publicKey(ctx, writer)
 	if err != nil {
-		return 0, errors.E(Unpack, d.Name, err)
+		return 0, errors.E(Unpack, writer, err)
 	}
-	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
+	writerPubKey, writerCurveName, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
-		return 0, errors.E(Unpack, d.Name, err)
+		return 0, errors.E(Unpack, writer, err)
 	}
 
 	// Now get my own keys
@@ -216,11 +246,11 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 			log.Printf("unwrap failed: %v", err)
 			return 0, errors.E(Unpack, d.Name, err)
 		}
-		// Verify that this was signed with the owner's old or new public key.
-		vhash := factotum.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
-		if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
-			(sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S)) {
-			// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
+		// Verify that this was signed with the writer's old or new public key.
+		vhash := factotum.VerHash(writerCurveName, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
+			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
 			log.Println("verify failed")
 			return 0, errors.E(Unpack, d.Name, errVerify)
 		}
@@ -249,6 +279,8 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
 	// For efficiency, Share() reuses the wrapped key for readers common to the old and new lists.
+
+	// TODO(ehg) Check that wrapping for owner and writer are retained.
 
 	// Fetch all the public keys we'll need.
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
@@ -356,7 +388,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	if err != nil {
 		return errors.E(Name, d.Name, err)
 	}
-	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
+	ownerPubKey, ownerCurveName, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
 		return errors.E(Name, d.Name, err)
 	}
@@ -395,7 +427,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ctx.Packing, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
@@ -414,7 +446,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	// Compute new signature.
-	sig, err = ctx.Factotum.FileSign(ctx.Packing, newName, d.Metadata.Time, dkey, cipherSum)
+	sig, err = ctx.Factotum.FileSign(newName, d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return errors.E(Name, d.Name, err)
 	}
@@ -537,10 +569,7 @@ func (ee ee) pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKe
 		n += pdPutBytes((*dst)[n:], w.ephemeral.X.Bytes())
 		n += pdPutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
 	}
-	// TODO(p): eventually make hash mandatory.  Currently not for backward compatability.
-	if cipherSum != nil {
-		n += pdPutBytes((*dst)[n:], cipherSum)
-	}
+	n += pdPutBytes((*dst)[n:], cipherSum)
 	*dst = (*dst)[:n]
 	return nil // err impossible for now but the night is young
 }
@@ -606,7 +635,7 @@ func pdPutBytes(dst, src []byte) int {
 	return vlen + copy(dst[vlen:], src)
 }
 
-// pdBytes copies (part of) src to dst, based on length header; returns bytes consumed
+// pdGetBytes copies (part of) src to dst, based on length header; returns bytes consumed
 func pdGetBytes(dst *[]byte, src []byte) int {
 	n, vlen := binary.Varint(src)
 	*dst = (*dst)[:n]

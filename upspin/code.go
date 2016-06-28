@@ -94,6 +94,7 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, tmp[:N]...)
 	N = binary.PutVarint(tmp[:], int64(d.Metadata.Time))
 	b = append(b, tmp[:N]...)
+	b = appendBytes(b, []byte(d.Metadata.Writer))
 	b = appendBytes(b, d.Metadata.Packdata)
 	return b, nil
 }
@@ -157,8 +158,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	//	Sequence: varint encoded.
 	//	Size: varint encoded.
 	//	Time: varint encoded.
+	//	Writer: count N, followed by N bytes
 	//	Packdata: count N, followed by N bytes
-	//	Readers: count N followed by N*(count N, followed by N bytes)
 	if len(b) < 1 {
 		return nil, ErrTooShort
 	}
@@ -182,6 +183,11 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	d.Metadata.Time = Time(time)
 	b = b[N:]
+	bytes, b = getBytes(b)
+	if b == nil {
+		return nil, ErrTooShort
+	}
+	d.Metadata.Writer = UserName(bytes)
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort

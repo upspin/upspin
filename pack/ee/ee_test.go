@@ -66,6 +66,7 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
+	d.Metadata.Writer = ctx.UserName
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
@@ -80,6 +81,7 @@ func testPackNameAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Pack
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
+	d.Metadata.Writer = ctx.UserName
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Name to newName.
@@ -197,6 +199,7 @@ func TestSharing(t *testing.T) {
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
+	d.Metadata.Writer = ctx.UserName
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob
 	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic}, &d.Metadata.Packdata)
@@ -265,6 +268,7 @@ func TestBadSharing(t *testing.T) {
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
+	d.Metadata.Writer = ctx.UserName
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 
 	// Don't share with Mia (do nothing).
@@ -303,7 +307,6 @@ func setup(name upspin.UserName, curveName string) (*upspin.Context, upspin.Pack
 
 	ctx := &upspin.Context{
 		UserName: name,
-		Packing:  packing,
 	}
 	packer := pack.Lookup(packing)
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
