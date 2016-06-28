@@ -40,6 +40,7 @@ func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publi
 	if err != nil {
 		return nil, nil, errors.E("Lookup", errors.IO, err)
 	}
+	r.LastActivity()
 	if len(resp.Error) != 0 {
 		return nil, nil, errors.UnmarshalError(resp.Error)
 	}

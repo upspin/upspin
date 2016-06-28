@@ -44,6 +44,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	if err != nil {
 		return nil, nil, errors.E("Get", errors.IO, err)
 	}
+	r.LastActivity()
 	if len(resp.Error) != 0 {
 		return nil, nil, errors.UnmarshalError(resp.Error)
 	}
@@ -64,6 +65,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	if err != nil {
 		return "", errors.E("Put", errors.IO, err)
 	}
+	r.LastActivity()
 	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
 }
 
@@ -80,6 +82,7 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	if err != nil {
 		return errors.E("Delete", errors.IO, err)
 	}
+	r.LastActivity()
 	return errors.UnmarshalError(resp.Error)
 }
 

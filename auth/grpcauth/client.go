@@ -202,7 +202,8 @@ func (ac *AuthClientService) Ping() bool {
 	req := &proto.PingRequest{
 		PingSequence: seq,
 	}
-	gctx, _ := gContext.WithTimeout(gContext.Background(), 3*time.Second) // TODO do not ignore the cancel function.
+	gctx, cancel := gContext.WithTimeout(gContext.Background(), 3*time.Second)
+	defer cancel()
 	resp, err := ac.grpcCommon.Ping(gctx, req)
 	if err != nil {
 		log.Printf("Ping error: %s", err)
