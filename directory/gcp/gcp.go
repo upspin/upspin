@@ -23,6 +23,7 @@ import (
 
 	// Load useful backends
 	_ "upspin.io/cloud/storage/gcs"
+	_ "upspin.io/cloud/storage/mysql"
 	_ "upspin.io/cloud/storage/postgres"
 )
 

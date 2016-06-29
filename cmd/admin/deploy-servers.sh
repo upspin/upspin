@@ -36,7 +36,7 @@ function build {
         exit 1
     fi
 
-    if [ -d "$TMPDIR" ]; then
+    if [ ! -d "$TMPDIR" ]; then
         TMPDIR=/tmp
     fi
 
@@ -53,6 +53,7 @@ function build {
                 dirserver/rc.dirserver
                 dirserver/public.upspinkey
                 dirserver/secret.upspinkey
+                dirserver/config.gcp
                 serviceaccountkey.json
             "
             ;;
