@@ -18,7 +18,6 @@ import (
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
-	"upspin.io/endpoint"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -59,7 +58,7 @@ func main() {
 		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
-	endpoint, err := endpoint.Parse(*endpointFlag)
+	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
 	}

@@ -17,7 +17,6 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/context"
-	"upspin.io/endpoint"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -90,7 +89,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	endpoint, err := endpoint.Parse(*endpointFlag)
+	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
 	}

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package endpoint
+package upspin
 
 import (
 	"strings"
@@ -22,7 +22,7 @@ func TestErrorCases(t *testing.T) {
 }
 
 func assertError(t *testing.T, epString string, substringError string) {
-	_, err := Parse(epString)
+	_, err := ParseEndpoint(epString)
 	if err == nil {
 		t.Fatal("Expected error")
 	}
@@ -32,7 +32,7 @@ func assertError(t *testing.T, epString string, substringError string) {
 }
 
 func assertParsesAndEncodes(t *testing.T, epString string) {
-	ep, err := Parse(epString)
+	ep, err := ParseEndpoint(epString)
 	if err != nil {
 		t.Fatal(err)
 	}

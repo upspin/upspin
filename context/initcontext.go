@@ -12,7 +12,6 @@ import (
 	"path"
 	"strings"
 
-	"upspin.io/endpoint"
 	"upspin.io/errors"
 	"upspin.io/key/keyloader"
 	"upspin.io/log"
@@ -122,7 +121,7 @@ func parseEndpoint(op string, vals map[string]string, name string, errorp *error
 		// No setting for this value, so set to 'unassigned'.
 		return ep0
 	}
-	ep, err := endpoint.Parse(text)
+	ep, err := upspin.ParseEndpoint(text)
 	if err != nil {
 		log.Error.Printf("%s: cannot parse %q service: %s", op, text, err)
 		if *errorp == nil {
