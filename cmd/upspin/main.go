@@ -15,7 +15,6 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
-	"upspin.io/endpoint"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -421,7 +420,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 			}
 
 		}
-		endpt := endpoint.String(&e.Location.Endpoint)
+		endpt := e.Location.Endpoint.String()
 		packStr := "?"
 		packer := lookupPacker(e)
 		if packer != nil {

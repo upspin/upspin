@@ -36,7 +36,7 @@ func assertParsesAndEncodes(t *testing.T, epString string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	retStr := String(ep)
+	retStr := ep.String()
 	if retStr != epString {
 		t.Errorf("Expected %s, got %s", epString, retStr)
 	}
