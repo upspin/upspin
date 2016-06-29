@@ -16,6 +16,24 @@
       "revId": "13c6e19d34b69ccf63164e35ea7abe4a437b246a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40651395_0b29c177",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T23:55:31Z",
+      "side": 1,
+      "message": "Good point. Fixed.",
+      "parentUuid": "40651395_cbf2c975",
+      "revId": "13c6e19d34b69ccf63164e35ea7abe4a437b246a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
