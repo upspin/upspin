@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Fileserver is a directory and store implementation that serves local files through an Upspin grpc interface.
 package main
 
 import (
@@ -38,47 +37,38 @@ func NewStoreServer(context *upspin.Context, endpoint upspin.Endpoint, server gr
 	return s
 }
 
-func (s *StoreServer) Run(errChan chan error) {
-	proto.RegisterStoreServer(s.SecureServer.GRPCServer(), s)
-	listener, err := net.Listen("tcp", colonPort(s.endpoint))
-	if err != nil {
-		errChan <- err
-	}
-	log.Printf("Serve Store at %q", s.endpoint)
+func (s *StoreServer) Run(listener net.Listener, errChan chan error) {
 	errChan <- s.SecureServer.Serve(listener)
 }
 
 // Get implements upspin.Store.
 func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
-	const Get = "Get"
-	log.Printf(Get)
+	log.Printf("Get")
 
 	ref := upspin.PathName(req.Reference)
 	parsed, err := path.Parse(ref)
 	if err != nil {
-		return s.errGet(err)
+		return errGet(err)
 	}
 	// Verify that the user name in the path is the owner of this root.
 	if parsed.User() != s.context.UserName {
-		err = errors.E(Get, errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
-		return s.errGet(err)
+		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+		return errGet(err)
 	}
 	// Is it a directory?
 	localName := *root + parsed.FilePath()
 	info, err := os.Stat(localName)
 	if err != nil {
-		return s.errGet(err)
+		return errGet(err)
 	}
 	if info.IsDir() {
-		return s.errGet(errors.E(Get, errors.IsDir, parsed.Path()))
+		return errGet(errors.E(errors.IsDir, parsed.Path()))
 	}
 	// Symlinks are OK. TODO?
 
 	data, err := ioutil.ReadFile(localName)
 	if err != nil {
-		return &proto.StoreGetResponse{
-			Error: errors.MarshalError(err),
-		}, nil
+		return errGet(err)
 	}
 	return &proto.StoreGetResponse{
 		Data: data,
@@ -86,9 +76,9 @@ func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*pr
 }
 
 // errGet returns an error for a Get.
-func (s *StoreServer) errGet(err error) (*proto.StoreGetResponse, error) {
+func errGet(err error) (*proto.StoreGetResponse, error) {
 	return &proto.StoreGetResponse{
-		Error: errors.MarshalError(err),
+		Error: errors.MarshalError(errors.E("Get", err)),
 	}, nil
 }
 
