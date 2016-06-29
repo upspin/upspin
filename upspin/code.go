@@ -7,6 +7,7 @@ package upspin
 import (
 	"encoding/binary"
 	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"fmt"
 	"time"
 )
 
@@ -259,4 +260,19 @@ func (d *DirEntry) SetLink() error {
 	}
 	d.Metadata.Attr = AttrLink
 	return nil
+}
+
+// String converts an endpoint to a string.
+func (ep Endpoint) String() string {
+	switch ep.Transport {
+	case GCP:
+		return fmt.Sprintf("gcp,%s", string(ep.NetAddr))
+	case InProcess:
+		return "inprocess"
+	case Remote:
+		return fmt.Sprintf("remote,%s", string(ep.NetAddr))
+	case Unassigned:
+		return "unassigned"
+	}
+	return fmt.Sprintf("%v", ep)
 }
