@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "008ebb41_f140a291",
+        "filename": "test/integration_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-29T17:53:18Z",
+      "side": 1,
+      "message": "I thought having Kind in the error meant we didn\u0027t have to do these string checks anymore, at least when echecking returns from our own code.",
+      "range": {
+        "startLine": 79,
+        "startChar": 42,
+        "endLine": 79,
+        "endChar": 61
+      },
+      "revId": "8bc4d2b1c18f87e21b69428cf3f7479b0a9093fa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
