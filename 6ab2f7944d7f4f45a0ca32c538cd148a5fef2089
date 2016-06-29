@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e0cfe79c_d586dc29",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "i don\u0027t see why. this is easy and shorter.",
+      "parentUuid": "60be9792_29aa0d80",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_c995714e",
         "filename": "cmd/fileserver/dir.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "return",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_b58b6030",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "code is gone.",
+      "parentUuid": "60be9792_c995714e",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,60 @@
     },
     {
       "key": {
+        "uuid": "60c4d77d_f92437b8",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_e9bb95d1",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_35a070a4",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done, but it\u0027s hardly worth it.",
+      "parentUuid": "60be9792_e9bb95d1",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_9590645f",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_e9bb95d1",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_69d565f7",
         "filename": "cmd/fileserver/dir.go",
         "patchSetId": 6
@@ -64,6 +154,24 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "i don\u0027t see it explicitly, but does this defend against ../../../etc/passwd style attacks?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0b583f9_1c6235ed",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "yes, because Parse guarantees you can\u0027t .. past the root.",
+      "parentUuid": "60be9792_69d565f7",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -104,6 +212,24 @@
     },
     {
       "key": {
+        "uuid": "e0cfe79c_95a9848d",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_e992b563",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_69b005f4",
         "filename": "cmd/fileserver/main.go",
         "patchSetId": 6
@@ -115,6 +241,24 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "why can\u0027t they both serve on the same port?\ngrpc lets you register multiple services to the same rpc server, right?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_55bc0cca",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "didn\u0027t know how, but now i do.",
+      "parentUuid": "60be9792_69b005f4",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -138,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "e0cfe79c_35b990da",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "but it\u0027s just me.",
+      "parentUuid": "60be9792_a9ca7d4d",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_69fec571",
         "filename": "cmd/fileserver/main.go",
         "patchSetId": 6
@@ -149,6 +311,24 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "net.SplitHostPort ?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_f5cf9864",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "code is gone.",
+      "parentUuid": "60be9792_69fec571",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -172,6 +352,24 @@
     },
     {
       "key": {
+        "uuid": "e0cfe79c_d5d49cfd",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "code is gone",
+      "parentUuid": "60be9792_a99cbd75",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_29f8cd7f",
         "filename": "cmd/fileserver/store.go",
         "patchSetId": 6
@@ -183,6 +381,24 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "need to adorn with errors.E",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_b5d92034",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_29f8cd7f",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -206,6 +422,24 @@
     },
     {
       "key": {
+        "uuid": "e0cfe79c_95de2418",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_c9ec91c4",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_09f389a8",
         "filename": "cmd/fileserver/store.go",
         "patchSetId": 6
@@ -217,6 +451,42 @@
       "writtenOn": "2016-06-29T00:11:44Z",
       "side": 1,
       "message": "needn\u0027t be a method",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_75c4a846",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_09f389a8",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0cfe79c_35ce3065",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T20:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_09f389a8",
       "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
