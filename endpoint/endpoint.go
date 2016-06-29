@@ -6,7 +6,6 @@
 package endpoint
 
 import (
-	"fmt"
 	"strings"
 
 	"upspin.io/errors"
@@ -23,27 +22,14 @@ func Parse(v string) (*upspin.Endpoint, error) {
 		}
 		return &upspin.Endpoint{Transport: upspin.GCP, NetAddr: upspin.NetAddr(elems[1])}, nil
 	case "inprocess":
-		return &upspin.Endpoint{Transport: upspin.InProcess, NetAddr: upspin.NetAddr("")}, nil
+		return &upspin.Endpoint{Transport: upspin.InProcess}, nil
 	case "remote":
 		if len(elems) < 2 {
 			return nil, errors.Errorf("remote endpoint %q requires a netaddr", v)
 		}
 		return &upspin.Endpoint{Transport: upspin.Remote, NetAddr: upspin.NetAddr(elems[1])}, nil
 	case "unassigned":
-		return &upspin.Endpoint{Transport: upspin.Unassigned, NetAddr: upspin.NetAddr("")}, nil
+		return &upspin.Endpoint{Transport: upspin.Unassigned}, nil
 	}
 	return nil, errors.Errorf("unknown transport type in endpoint %q", v)
-}
-
-// String converts an endpoint to a string.
-func String(ep *upspin.Endpoint) string {
-	switch ep.Transport {
-	case upspin.GCP:
-		return fmt.Sprintf("gcp,%s", string(ep.NetAddr))
-	case upspin.InProcess:
-		return "inprocess"
-	case upspin.Remote:
-		return fmt.Sprintf("remote,%s", string(ep.NetAddr))
-	}
-	return fmt.Sprintf("%v", ep)
 }
