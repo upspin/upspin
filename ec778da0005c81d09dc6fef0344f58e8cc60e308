@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "008ebb41_ce822319",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 0,
+      "message": "Should this be called setup.README or maybe just setup.txt?",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0e903d1_c5da10f3",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 0,
+      "message": "See above. Maybe add -p and reset project\u003d\"upspin-prod\"?",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_0bab3d87",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 0,
+      "message": "We may need to do something about error reporting later. Note that if gcloud fails, this can still look successful to another script. Luckily, we don\u0027t use this from other scripts, so not a big deal, maybe a TODO?",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
