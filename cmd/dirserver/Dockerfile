@@ -5,5 +5,5 @@ COPY rc.dirserver /upspin/rc.dirserver
 COPY public.upspinkey /.ssh/public.upspinkey
 COPY secret.upspinkey /.ssh/secret.upspinkey
 COPY dirserver /dirserver
-ENTRYPOINT ["/dirserver", "-endpoint=gcp,local", "-config=gcpProjectId=PROJECT,gcpBucketName=PROJECT-directory,storage=GCS,defaultACL=projectPrivate"]
+ENTRYPOINT ["/dirserver", "-endpoint=gcp,local", "-config=gcpProjectId=PROJECT,storage=SQL,dsn=root:mysqlfoo@tcp(104.155.140.242:3306)/upspin"]
 EXPOSE 80 443
