@@ -21,6 +21,9 @@ import (
 	"upspin.io/log"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
+
+	// We use GCS as the backing for our data.
+	_ "upspin.io/cloud/storage/gcs"
 )
 
 // Configuration options for this package.

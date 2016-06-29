@@ -16,6 +16,9 @@ import (
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	// We use GCS as the backing for our data.
+	_ "upspin.io/cloud/storage/gcs"
 )
 
 // user is the implementation of the User Service on GCP.
