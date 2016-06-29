@@ -29,6 +29,7 @@ type Span struct {
 	kind       Kind    // Server, Client or Other kind of metric span.
 	metric     *Metric // parent of this span; may be nil.
 	parentSpan *Span   // may be nil.
+	annotation string  // optional.
 }
 
 // Saver is the common interface that all implementation-specific backends must implement
@@ -139,7 +140,15 @@ func (s *Span) Metric() *Metric {
 	return s.metric
 }
 
-// SetKind sets the kind of the span s.
-func (s *Span) SetKind(kind Kind) {
+// SetKind sets the kind of the span s and returns it.
+func (s *Span) SetKind(kind Kind) *Span {
 	s.kind = kind
+	return s
+}
+
+// SetAnnotation sets a custom annotation to the span s and returns it.
+// If multiple annotations are set, the last one wins.
+func (s *Span) SetAnnotation(annotation string) *Span {
+	s.annotation = annotation
+	return s
 }
