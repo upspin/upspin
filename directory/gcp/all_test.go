@@ -494,17 +494,17 @@ func TestPut(t *testing.T) {
 	if len(egcp.PutContents) != 2 {
 		t.Fatalf("Expected put to write 2 dir entries, got %d", len(egcp.PutContents))
 	}
-	if egcp.PutRef[0] != string(dir.Name) {
+	if egcp.PutRef[0] != string(dirParent.Name) {
+		t.Errorf("Expected put to write to %s, wrote to %s", dirParent.Name, egcp.PutRef[0])
+	}
+	if !bytes.Equal(updatedParentJSON, egcp.PutContents[0]) {
+		t.Errorf("Expected put to write %s, wrote %s", updatedParentJSON, egcp.PutContents[0])
+	}
+	if egcp.PutRef[1] != string(dir.Name) {
 		t.Errorf("Expected put to write to %s, wrote to %s", dir.Name, egcp.PutRef)
 	}
-	if !bytes.Equal(updatedDirJSON, egcp.PutContents[0]) {
-		t.Errorf("Expected put to write %s, wrote %s", updatedDirJSON, egcp.PutContents[0])
-	}
-	if egcp.PutRef[1] != string(dirParent.Name) {
-		t.Errorf("Expected put to write to %s, wrote to %s", dirParent.Name, egcp.PutRef[1])
-	}
-	if !bytes.Equal(updatedParentJSON, egcp.PutContents[1]) {
-		t.Errorf("Expected put to write %s, wrote %s", updatedParentJSON, egcp.PutContents[1])
+	if !bytes.Equal(updatedDirJSON, egcp.PutContents[1]) {
+		t.Errorf("Expected put to write %s, wrote %s", updatedDirJSON, egcp.PutContents[1])
 	}
 
 	// Check that a second put with SeqNotExist fails.
@@ -627,15 +627,15 @@ func TestPutAccessFile(t *testing.T) {
 	if len(egcp.PutRef) != 3 {
 		t.Fatalf("Expected one Put, got %d", len(egcp.PutRef))
 	}
-	// First, store the Access file.
-	if egcp.PutRef[0] != accessPath {
-		t.Errorf("Expected put to %s, got %s", accessPath, egcp.PutRef[0])
+	// First, update the parent.
+	if egcp.PutRef[0] != parentDir {
+		t.Errorf("Expected put to %s, got %s", parentDir, egcp.PutRef[0])
 	}
-	// Then update the root.
-	if egcp.PutRef[1] != parentDir {
-		t.Errorf("Expected put to %s, got %s", parentDir, egcp.PutRef[1])
+	// Then store the Access file.
+	if egcp.PutRef[1] != accessPath {
+		t.Errorf("Expected put to %s, got %s", accessPath, egcp.PutRef[1])
 	}
-	// Then update the parent.
+	// Finally update the root.
 	if egcp.PutRef[2] != userName {
 		t.Errorf("Expected put to %s, got %s", userName, egcp.PutRef[2])
 	}
