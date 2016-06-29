@@ -100,6 +100,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//*config = "--host=104.155.140.242 --user=root --password=mysqlfoo"
+	*config = "storage=SQL,dns=root:mysqlfoo@tcp(104.155.140.242:3306)/upspin"
+	//*config="storage=SQL,dns=root:root@tcp(localhost:3306)/upspin"
 	// If there are configuration options, set them now.
 	if *config != "" {
 		opts := strings.Split(*config, ",")
