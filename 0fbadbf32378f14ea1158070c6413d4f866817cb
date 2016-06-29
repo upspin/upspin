@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0cf4346_e05c0a0a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T00:15:26Z",
+      "side": 1,
+      "message": "here and below: s/User|Directory|Store/\u0026Endpoint/ in the comments.",
+      "revId": "0fbadbf32378f14ea1158070c6413d4f866817cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
