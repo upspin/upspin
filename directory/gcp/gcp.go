@@ -23,6 +23,7 @@ import (
 
 	// Load useful backends
 	_ "upspin.io/cloud/storage/gcs"
+	_ "upspin.io/cloud/storage/mysql"
 	_ "upspin.io/cloud/storage/postgres"
 )
 
@@ -226,12 +227,6 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	// Canonicalize path.
 	dirEntry.Name = canonicalPath
 
-	// Finally, store the new entry.
-	err = d.putNonRoot(canonicalPath, dirEntry, opts...)
-	if err != nil {
-		return err
-	}
-
 	// Patch the parent: bump sequence number.
 	parentDirEntry, root, err := d.getDirEntry(&parentParsedPath, opts...)
 	if err != nil {
@@ -251,6 +246,12 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		err = d.putRoot(parentParsedPath.User(), root, opts...)
 	} else {
 		err = d.putNonRoot(parentParsedPath.Path(), parentDirEntry, opts...)
+	}
+
+	// Finally, store the new entry.
+	err = d.putNonRoot(canonicalPath, dirEntry, opts...)
+	if err != nil {
+		return err
 	}
 
 	// If this is an Access file or Group file, we have some extra work to do.
