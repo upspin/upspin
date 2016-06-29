@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60be9792_29aa0d80",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "i think these run methods should just return an error. do the concurrency entirely in func main.",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_c995714e",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "return",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_e9bb95d1",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "log.Info.Printf(\"put\") also add some info about the put request.\nditto the other log statements.",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_69d565f7",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "i don\u0027t see it explicitly, but does this defend against ../../../etc/passwd style attacks?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_e9c07533",
+        "filename": "cmd/fileserver/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "this needn\u0027t be a method",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_e992b563",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "duplicate package comment",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_69b005f4",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "why can\u0027t they both serve on the same port?\ngrpc lets you register multiple services to the same rpc server, right?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_a9ca7d4d",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "I think the flag should be -addr and take an address string. that lets the caller specify the specific host and port to listen on",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_69fec571",
+        "filename": "cmd/fileserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "net.SplitHostPort ?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_a99cbd75",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "return",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_29f8cd7f",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "need to adorn with errors.E",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_c9ec91c4",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "not using errGet ?",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60be9792_09f389a8",
+        "filename": "cmd/fileserver/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T00:11:44Z",
+      "side": 1,
+      "message": "needn\u0027t be a method",
+      "revId": "6ab2f7944d7f4f45a0ca32c538cd148a5fef2089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
