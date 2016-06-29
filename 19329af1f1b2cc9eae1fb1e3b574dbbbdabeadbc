@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4017d3d8_38416994",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T21:48:32Z",
+      "side": 1,
+      "message": "is this an unrelated change? i don\u0027t see the connection with the writer field.",
+      "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4017d3d8_5823fdfb",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T21:48:32Z",
+      "side": 1,
+      "message": "i don\u0027t know. is it?",
+      "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
