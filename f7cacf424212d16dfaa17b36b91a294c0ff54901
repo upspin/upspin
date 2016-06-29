@@ -57,6 +57,24 @@
       "revId": "f7cacf424212d16dfaa17b36b91a294c0ff54901",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_0b825d17",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-29T17:58:51Z",
+      "side": 1,
+      "message": "I agree that the parsing should also move.",
+      "parentUuid": "008ebb41_517ed6c7",
+      "revId": "f7cacf424212d16dfaa17b36b91a294c0ff54901",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
