@@ -39,6 +39,24 @@
       "revId": "f7cacf424212d16dfaa17b36b91a294c0ff54901",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_517ed6c7",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T17:56:00Z",
+      "side": 1,
+      "message": "Perhaps the parsing should be here too, which would kill off the endpoint package altogether.\nI am not opposed to that but didn\u0027t want to do something so radical in this CL.\n\nNote that other types in this package have methods defined here, including String methods.",
+      "parentUuid": "008ebb41_51f336a7",
+      "revId": "f7cacf424212d16dfaa17b36b91a294c0ff54901",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
