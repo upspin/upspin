@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "008ebb41_51f336a7",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-06-29T17:50:22Z",
+      "side": 1,
+      "message": "I understand the sentiment but isn\u0027t moving the formatting far from the parsing an invitation for problems?",
+      "range": {
+        "startLine": 266,
+        "startChar": 19,
+        "endLine": 266,
+        "endChar": 25
+      },
+      "revId": "f7cacf424212d16dfaa17b36b91a294c0ff54901",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
