@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Fileserver is a directory and store implementation that serves local files through an Upspin grpc interface.
 package main
 
 import (
@@ -23,9 +22,8 @@ import (
 
 // DirServer is a SecureServer that serves the local file system's directory structure as an upspin.Directory gRPC server.
 type DirServer struct {
-	context       *upspin.Context
-	endpoint      upspin.Endpoint
-	storeEndpoint upspin.Endpoint
+	context  *upspin.Context
+	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
@@ -37,23 +35,16 @@ var (
 	configureResponse proto.ConfigureResponse
 )
 
-func NewDirServer(context *upspin.Context, storeEndpoint, endpoint upspin.Endpoint, server grpcauth.SecureServer) *DirServer {
+func NewDirServer(context *upspin.Context, endpoint upspin.Endpoint, server grpcauth.SecureServer) *DirServer {
 	s := &DirServer{
-		context:       context,
-		endpoint:      endpoint,
-		storeEndpoint: storeEndpoint,
-		SecureServer:  server,
+		context:      context,
+		endpoint:     endpoint,
+		SecureServer: server,
 	}
 	return s
 }
 
-func (s *DirServer) Run(errChan chan error) {
-	proto.RegisterDirectoryServer(s.SecureServer.GRPCServer(), s)
-	listener, err := net.Listen("tcp", colonPort(s.endpoint))
-	if err != nil {
-		errChan <- err
-	}
-	log.Printf("Serve Directory at %q", s.endpoint)
+func (s *DirServer) Run(listener net.Listener, errChan chan error) {
 	errChan <- s.SecureServer.Serve(listener)
 }
 
@@ -104,7 +95,7 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 	entry := upspin.DirEntry{
 		Name: upspin.PathName(name),
 		Location: upspin.Location{
-			Endpoint:  s.storeEndpoint,
+			Endpoint:  s.endpoint,
 			Reference: upspin.Reference(name),
 		},
 		Metadata: upspin.Metadata{
@@ -120,9 +111,16 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 
 // Put implements upspin.Directory.
 func (s *DirServer) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*proto.DirectoryPutResponse, error) {
-	log.Printf("Put")
+	var entry upspin.DirEntry
+	_, err := entry.Unmarshal(req.Entry)
+	if err != nil {
+		return &proto.DirectoryPutResponse{
+			Error: errors.MarshalError(errors.E("Put", err)),
+		}, nil
+	}
+	log.Printf("Put %s", entry.Name)
 
-	err := errors.E("Put", errors.Permission, errors.Str("read-only name space"))
+	err = errors.E("Put", errors.Permission, errors.Str("read-only name space"))
 	return &proto.DirectoryPutResponse{
 		Error: errors.MarshalError(err),
 	}, nil
@@ -144,22 +142,22 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) 
 
 	parsed, err := path.Parse(upspin.PathName(req.Pattern))
 	if err != nil {
-		return s.errGlob(err)
+		return errGlob(err)
 	}
 	// Verify that the user name in the path is the owner of this root.
 	if parsed.User() != s.context.UserName {
-		err = errors.E("Glob", errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
-		return s.errGlob(err)
+		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+		return errGlob(err)
 	}
 	matches, err := filepath.Glob(*root + parsed.FilePath())
 	if err != nil {
-		return s.errGlob(err)
+		return errGlob(err)
 	}
 	entries := make([][]byte, len(matches))
 	for i, match := range matches {
 		entries[i], err = s.entryBytes(match)
 		if err != nil {
-			return s.errGlob(err)
+			return errGlob(err)
 		}
 	}
 	return &proto.DirectoryGlobResponse{
@@ -168,9 +166,9 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) 
 }
 
 // errGlob returns an error for a Glob.
-func (s *DirServer) errGlob(err error) (*proto.DirectoryGlobResponse, error) {
+func errGlob(err error) (*proto.DirectoryGlobResponse, error) {
 	return &proto.DirectoryGlobResponse{
-		Error: errors.MarshalError(err),
+		Error: errors.MarshalError(errors.E("Get", err)),
 	}, nil
 }
 

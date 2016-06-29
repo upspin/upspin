@@ -8,6 +8,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,6 +18,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/log"
 	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 
 	// Load useful packers
 	_ "upspin.io/pack/ee"
@@ -27,7 +29,7 @@ import (
 )
 
 var (
-	storePort   = flag.Int("port", 8080, "TCP port number for store service; directory is +1")
+	port        = flag.Int("port", 8080, "TCP port number for services")
 	ctxfile     = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.fileserver"), "context file to use to configure server")
 	selfSigned  = flag.Bool("selfsigned", false, "start server with a self-signed TLS certificate")
 	certFile    = flag.String("cert", "/etc/letsencrypt/live/upspin.io/fullchain.pem", "TLS certificate file")
@@ -66,38 +68,30 @@ func main() {
 		AllowUnauthenticatedConnections: *selfSigned,
 	}
 
-	errChan := make(chan error)
-	storeEndpoint := upspin.Endpoint{
+	endpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(fmt.Sprintf("localhost:%d", *storePort)), // TODO: Should be domain name.
-	}
-	dirEndpoint := upspin.Endpoint{
-		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(fmt.Sprintf("localhost:%d", *storePort+1)), // TODO: Should be domain name.
+		NetAddr:   upspin.NetAddr(fmt.Sprintf("localhost:%d", *port)), // TODO: Should be domain name.
 	}
 
 	grpcSecureServer, err := grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	storeServer := NewStoreServer(context, storeEndpoint, grpcSecureServer)
-	go storeServer.Run(errChan)
-
-	grpcSecureServer, err = grpcauth.NewSecureServer(config, *certFile, *certKeyFile)
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatal(err)
 	}
-	dirServer := NewDirServer(context, storeEndpoint, dirEndpoint, grpcSecureServer)
-	go dirServer.Run(errChan)
+
+	storeServer := NewStoreServer(context, endpoint, grpcSecureServer)
+	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), storeServer)
+
+	dirServer := NewDirServer(context, endpoint, grpcSecureServer)
+	proto.RegisterDirectoryServer(grpcSecureServer.GRPCServer(), dirServer)
+
+	errChan := make(chan error)
+
+	go storeServer.Run(listener, errChan)
+	go dirServer.Run(listener, errChan)
 
 	log.Fatal(<-errChan)
-}
-
-func colonPort(e upspin.Endpoint) string {
-	addr := string(e.NetAddr)
-	colon := strings.Index(addr, ":")
-	if colon < 0 {
-		log.Fatal("bad network address: no colon in %q", addr)
-	}
-	return addr[colon:]
 }
