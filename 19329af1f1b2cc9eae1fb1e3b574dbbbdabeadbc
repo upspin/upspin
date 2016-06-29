@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4017d3d8_b85b3971",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-29T21:55:28Z",
+      "side": 1,
+      "message": "It is a bug fix caught during testing of the Writer changes.",
+      "parentUuid": "4017d3d8_38416994",
+      "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4017d3d8_5823fdfb",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -47,6 +65,42 @@
       "writtenOn": "2016-06-29T21:53:27Z",
       "side": 1,
       "message": "Please use log (and drop the \\n)",
+      "parentUuid": "4017d3d8_5823fdfb",
+      "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4017d3d8_f8f77162",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-29T21:55:28Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "4017d3d8_5851bd4f",
+      "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4017d3d8_f8ce9138",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-06-29T21:55:28Z",
+      "side": 1,
+      "message": "I honestly don\u0027t know yet.   I wanted to leave this around for the next few weeks or month, then likely delete.\n\nIf you\u0027d prefer log.Debug.Printf or something, fine by me.",
       "parentUuid": "4017d3d8_5823fdfb",
       "revId": "19329af1f1b2cc9eae1fb1e3b574dbbbdabeadbc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
