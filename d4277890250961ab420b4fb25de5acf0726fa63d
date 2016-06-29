@@ -16,6 +16,24 @@
       "revId": "d4277890250961ab420b4fb25de5acf0726fa63d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40651395_68ef23ee",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-29T23:12:19Z",
+      "side": 1,
+      "message": "Good catch",
+      "parentUuid": "40651395_085787e4",
+      "revId": "d4277890250961ab420b4fb25de5acf0726fa63d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
