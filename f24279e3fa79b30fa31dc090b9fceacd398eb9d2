@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_9b24eb54",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_89e699e0",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_e9363544",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-29T00:31:11Z",
       "side": 1,
       "message": "This should just be type postgres, as it\u0027s not implementing postgres but rather implementing storage. I think we generally overuse the \u0027Impl\u0027 suffix in the tree.",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_bb21a743",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Fair enough. But we should probably fix the other ones since I\u0027ve been pretty consistent with calling anything that implements any upspin interface a *Impl, regardless of name collisions.",
+      "parentUuid": "60be9792_e9363544",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_3be3d70f",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "The comments in the interface seem to indicate that this may not be supported. If Exec didn\u0027t fail, I want to just check error here to see if I can trust n.",
+      "parentUuid": "60be9792_692b25de",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_49266119",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-06-29T00:31:11Z",
       "side": 1,
       "message": "include n in the error message",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_5be8a3e7",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_49266119",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_7bed5ff6",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Why is that more efficient? You\u0027re creating a temporary anyway.\nDone.",
+      "parentUuid": "60be9792_c939f134",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_8943f99c",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2016-06-29T00:31:11Z",
       "side": 1,
       "message": "if you don\u0027t know what to preallocate, don\u0027t.\njust write:\nvar res []string",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_bbee07f0",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "60be9792_8943f99c",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_dbfbd3b0",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_a9403d90",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_490f4187",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2016-06-29T00:31:11Z",
       "side": 1,
       "message": "notSubDir :\u003d dir + \"[^/]+/%\"",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_fbf88fb6",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_490f4187",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_1bc7fb78",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60be9792_0909497f",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_290e8d88",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -166,6 +328,24 @@
       "writtenOn": "2016-06-29T00:31:11Z",
       "side": 1,
       "message": "delete",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_3bccb798",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T03:42:10Z",
+      "side": 1,
+      "message": "Why? Not done.",
+      "parentUuid": "60be9792_290e8d88",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
