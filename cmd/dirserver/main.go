@@ -71,7 +71,7 @@ func main() {
 		*certKeyFile = filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem")
 	}
 
-	svr, err := metric.NewGCPSaver(upspinProject)
+	svr, err := metric.NewGCPSaver(upspinProject, "serverName", *logFile)
 	if err != nil {
 		log.Error.Printf("Can't start a metric saver for GCP project upspin. No metrics will be saved")
 	} else {

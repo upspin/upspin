@@ -14,7 +14,7 @@ func TestAll(t *testing.T) {
 
 	m := New("DirGet")
 	m.StartSpan("getRoot").StartSpan("getInnerRoot").End()
-	m.StartSpan("getCloudBytes").End().Done()
+	m.StartSpan("getCloudBytes").SetAnnotation("hello").End().Done()
 
 	// Not much to do here other than assert we have two spans.
 	if len(m.spans) != 3 {
@@ -44,8 +44,15 @@ func TestAll(t *testing.T) {
 	<-saver.done
 	close(saver.done)
 
-	if saver.count != 2 {
-		t.Fatalf("Expected 2 metrics processed, got %d", saver.count)
+	if len(saver.metricsReceived) != 2 {
+		t.Fatalf("Expected 2 metrics processed, got %d", len(saver.metricsReceived))
+	}
+	verifyMetric(t, saver.metricsReceived[0], "DirGet", "getRoot", "getInnerRoot", "getCloudBytes")
+	verifyMetric(t, saver.metricsReceived[1], "MkDir", "putBytes")
+
+	expected = "hello"
+	if saver.metricsReceived[0].spans[2].annotation != expected {
+		t.Errorf("Expected annotation %q, got %q", expected, saver.metricsReceived[0].spans[2].annotation)
 	}
 }
 
@@ -56,10 +63,28 @@ func TestFullChannel(t *testing.T) {
 	// If we block, this test will never finish.
 }
 
+func verifyMetric(t *testing.T, m *Metric, expectedName string, expectedSpanNames ...string) {
+	if m.name != expectedName {
+		t.Errorf("Expected %q, got %q", expectedName, m.name)
+	}
+	if len(m.spans) != len(expectedSpanNames) {
+		t.Errorf("Expected %d spans, got %d", len(expectedSpanNames), len(m.spans))
+	}
+	for i, s := range m.spans {
+		exp := m.name + "." + expectedSpanNames[i]
+		if s.name != exp {
+			t.Errorf("Expected span %d of metric %q to be named %q, got %q", i, m.name, exp, s.name)
+		}
+		if s.endTime.IsZero() {
+			// using %v because s.name may be nil.
+			t.Errorf("Span %d (%v) of metric %q has zero time", i, s.name, m.name)
+		}
+	}
+}
+
 type dummySaver struct {
-	// TODO: check the metrics received as well.
-	count int
-	done  chan bool
+	done            chan bool
+	metricsReceived []*Metric
 }
 
 func (d *dummySaver) Register(queue chan *Metric) {
@@ -71,7 +96,7 @@ func (d *dummySaver) Register(queue chan *Metric) {
 					d.done <- true
 					return
 				}
-				d.count++
+				d.metricsReceived = append(d.metricsReceived, m)
 			}
 		}
 	}()
