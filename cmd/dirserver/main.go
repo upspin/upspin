@@ -7,6 +7,7 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,6 +20,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -33,7 +35,6 @@ import (
 
 	// Load required transports
 	_ "upspin.io/directory/transports"
-	"upspin.io/metric"
 	_ "upspin.io/store/transports"
 	_ "upspin.io/user/transports"
 )
@@ -42,8 +43,8 @@ var (
 	httpsAddr    = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
 	ctxfile      = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.dirserver"), "context file to use to configure server")
 	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
-	logFile      = flag.String("logfile", "dirserver", "Name of the log file on GCP or empty for no GCP logging")
+	project      = flag.String("project", "", "The GCP project name, if any.")
+	configFile   = flag.String("configfile", "", "Name of file with config parameters with one key=value per line")
 )
 
 // Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
@@ -54,20 +55,19 @@ type Server struct {
 	grpcauth.SecureServer
 }
 
-const upspinProject = "google.com:upspin"
+const serverName = "dirserver"
 
 func main() {
 	flag.Parse()
 
-	if *logFile != "" {
-		log.Connect(upspinProject, *logFile)
-	}
-
-	svr, err := metric.NewGCPSaver(upspinProject, "serverName", *logFile)
-	if err != nil {
-		log.Error.Printf("Can't start a metric saver for GCP project upspin. No metrics will be saved")
-	} else {
-		metric.RegisterSaver(svr)
+	if *project != "" {
+		log.Connect(*project, serverName)
+		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
+		if err != nil {
+			log.Error.Printf("Can't start a metric saver for GCP project %q. No metrics will be saved", *project)
+		} else {
+			metric.RegisterSaver(svr)
+		}
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
@@ -93,8 +93,8 @@ func main() {
 	}
 
 	// If there are configuration options, set them now.
-	if *config != "" {
-		opts := strings.Split(*config, ",")
+	if *configFile != "" {
+		opts := parseConfigFile(*configFile)
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
 		err = dir.Configure(opts...)
@@ -130,6 +130,28 @@ var (
 	deleteResponse    proto.DirectoryDeleteResponse
 	configureResponse proto.ConfigureResponse
 )
+
+// parseConfigFile reads fileName's contents and splits it in lines, removing
+// empty lines and leading and trailing spaces on each line.
+func parseConfigFile(fileName string) []string {
+	log.Error.Printf("$HOME=%q", os.Getenv("HOME"))
+	buf, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		log.Error.Printf("Can't read config file %s", fileName)
+		return nil
+	}
+	s := strings.TrimSpace(string(buf))
+	lines := strings.Split(s, "\n")
+	output := make([]string, 0, len(lines))
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if len(l) == 0 {
+			continue
+		}
+		output = append(output, l)
+	}
+	return output
+}
 
 // dirFor returns a Directory service bound to the user specified in the context.
 func (s *Server) dirFor(ctx gContext.Context) (upspin.Directory, error) {
