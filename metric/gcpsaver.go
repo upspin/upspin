@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package metric
 
 import (
@@ -9,22 +13,33 @@ import (
 	"golang.org/x/oauth2/google"
 	trace "google.golang.org/api/cloudtrace/v1"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 )
 
+// saveTraces is an interface to cloudtrace API. It is used mostly for testing.
+type saveTraces interface {
+	// SaveTraces saves the traces to GCP.
+	Save(*trace.Traces) error
+}
+
 // gcpSaver is a Saver that saves to GCP Traces.
 type gcpSaver struct {
-	projectID  string
-	api        *trace.ProjectsService
-	saverQueue chan *Metric
+	projectID    string
+	api          saveTraces
+	saverQueue   chan *Metric
+	staticLabels map[string]string
 }
 
 var _ Saver = (*gcpSaver)(nil)
 
 // NewGCPSaver returns a Saver that saves metrics to GCP Traces for a GCP projectID.
 // The caller must have enabled the StackDriver Traces API for the projectID and have sufficient permission
-// to use the scope "cloud-platform". See
-func NewGCPSaver(projectID string) (Saver, error) {
+// to use the scope "cloud-platform". An optional set of string key-value pairs can be given and they
+// will be saved as labels on GCP. They are useful, for example, in the case of differentiating
+// a metric coming from a test instance versus production.
+func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
+	const NewGCPSaver = "NewGCPSaver"
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), trace.CloudPlatformScope)
@@ -34,11 +49,18 @@ func NewGCPSaver(projectID string) (Saver, error) {
 
 	srv, err := trace.New(client)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(NewGCPSaver, errors.IO, err)
+	}
+	if len(labels)%2 != 0 {
+		return nil, errors.E(NewGCPSaver, errors.Syntax, errors.Str("metric labels must come in pairs"))
 	}
 	return &gcpSaver{
 		projectID: projectID,
-		api:       srv.Projects,
+		api: &saveTracesImpl{
+			projectID: projectID,
+			api:       srv.Projects,
+		},
+		staticLabels: makeLabels(labels),
 	}, nil
 }
 
@@ -58,12 +80,17 @@ func (g *gcpSaver) saverLoop() {
 func (g *gcpSaver) save(m *Metric) error {
 	traceSpans := make([]*trace.TraceSpan, len(m.spans))
 	for i, s := range m.spans {
+		var annotation map[string]string
+		if s.annotation != "" {
+			annotation = map[string]string{"txt": s.annotation}
+		}
 		traceSpans[i] = &trace.TraceSpan{
 			SpanId:    uint64(i + 1),
 			Name:      s.name,
 			StartTime: formatTime(s.startTime),
 			EndTime:   formatTime(s.endTime),
 			Kind:      toKindString(s.kind),
+			Labels:    mergeMaps(g.staticLabels, annotation),
 		}
 		if s.parentSpan != nil {
 			// This can be N^2 if every span has a parent. But we should not have zillions of spans, so ok.
@@ -82,8 +109,7 @@ func (g *gcpSaver) save(m *Metric) error {
 			},
 		},
 	}
-	e, err := g.api.PatchTraces(g.projectID, traces).Do()
-	log.Debug.Printf("Saving Metrics to GCP: %v %v", e, err)
+	err := g.api.Save(traces)
 	return err
 }
 
@@ -127,4 +153,50 @@ func makeTraceID() string {
 		return id[:32]
 	}
 	return fmt.Sprintf("%x", b)
+}
+
+// makeLabels converts an even-length slice of labels to a map.
+// A zero-length slice is valid and returns an empty map.
+func makeLabels(labels []string) map[string]string {
+	var m map[string]string
+	if len(labels) > 0 {
+		m = make(map[string]string, len(labels)/2+1)
+	}
+	for i := 0; i < len(labels); i = i + 2 {
+		m[labels[i]] = labels[i+1]
+	}
+	return m
+}
+
+// mergeMaps merges m1 and m2 together into a new copy and returns it, without changing either m1 or m2.
+func mergeMaps(m1, m2 map[string]string) map[string]string {
+	var m map[string]string
+	if len(m1) == 0 && len(m2) == 0 {
+		return m
+	}
+	m = make(map[string]string, len(m1)+len(m2))
+	copyMap(m, m1)
+	copyMap(m, m2)
+	return m
+}
+
+func copyMap(dst, src map[string]string) {
+	for k, v := range src {
+		dst[k] = v
+	}
+}
+
+// saveTracesImpl is a concrete implementation of saveTraces that writes to GCP.
+type saveTracesImpl struct {
+	projectID string
+	api       *trace.ProjectsService
+}
+
+var _ saveTraces = (*saveTracesImpl)(nil)
+
+// Save implement SaveTraces.
+func (s *saveTracesImpl) Save(traces *trace.Traces) error {
+	e, err := s.api.PatchTraces(s.projectID, traces).Do()
+	log.Debug.Printf("Saving Metrics to GCP: %v %v", e, err)
+	return err
 }
