@@ -124,6 +124,9 @@ service User {
 
 // The Directory interface.
 // DirEntry values are stored as bytes, for simple and fast marshaling.
+// (The upspin.DirEntry type has a Marshal method that returns a []byte;
+// the alternative is to create a DirEntry proto message and copy the fields
+// from one struct to the other, which is needless busywork.)
 
 message DirectoryLookupRequest {
     string Name = 1;
