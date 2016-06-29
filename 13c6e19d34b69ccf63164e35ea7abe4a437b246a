@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "40651395_cbf2c975",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T23:48:27Z",
+      "side": 1,
+      "message": "traceSaver is a more idiomatic name\nor even just saver",
+      "revId": "13c6e19d34b69ccf63164e35ea7abe4a437b246a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
