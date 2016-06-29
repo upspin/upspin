@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "008ebb41_6e492f1e",
+        "filename": "cloud/docker/base/build.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "What does this build? All images? Do we need special permissions for this?\n\nA few comments here would be good.",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_2e680770",
+        "filename": "cloud/docker/base/build.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "If I don\u0027t have the file locally created and I\u0027m not on MacOS, does it work?",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_ce706359",
+        "filename": "cloud/docker/base/protocols",
+        "patchSetId": 18
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Why do we need this?",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_6eedaff6",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "unnecessary empty line.",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_0ec7cb78",
+        "filename": "cloud/letscloud/cloud.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Copyright?",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_6ec68f7a",
+        "filename": "cloud/letscloud/cloud.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "s/URLS/URLs/",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_312b0adf",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Please run shellcheck. It finds many issues. I found it to be super helpful.\nhttps://www.shellcheck.net/",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_d19f2669",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Remove -t here, but see below.",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_71aaf280",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "It would be less typing for us if the -t option set project\u003dupspin-test or alternatively if you had a -p for setting project\u003dupspin-prod. \n\nI switch between them frequently and keeping env vars is not ideal.",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "008ebb41_d1cd6669",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Please check that TMPDIR is not \"/\" or $HOME or set it to /tmp if it\u0027s empty. Who knows if by accident it is $HOME and USER\u003d\"*\" and sever\u003d\"*\" ...\n\nAlso shellcheck says here, above and below:\n\"Double quote to prevent globbing and word splitting.\"",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_cbb855d8",
+        "filename": "cmd/admin/deployment/dirserver.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "I know you said before that letsencrypt uses port 80, but I think it can be configured to use 443 with the old cert no? I worry that the redirect may not work and we allow non-TLS connections. If you\u0027re sure, okay. Just being paranoid here. \n\nIn any case, port 80 is fine for the frontend.",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_8bec8dc3",
+        "filename": "cmd/dirserver/Dockerfile",
+        "patchSetId": 18
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "Please note that these flags have changed. storage\u003dGCS|Postgres is now required. If using GCS, defaultACL\u003dprojectPrivate is necessary. \n\nSee https://upspin-review.git.corp.google.com/#/c/2430/8/cmd/admin/supervisorconf/upspin_directory.conf",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_cbe695e1",
+        "filename": "cmd/storeserver/Dockerfile",
+        "patchSetId": 18
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "defaultACL\u003dpublicRead",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0924f64_6b35a139",
+        "filename": "cmd/userserver/Dockerfile",
+        "patchSetId": 18
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-29T18:08:10Z",
+      "side": 1,
+      "message": "defaultACL\u003dprojectPrivate",
+      "revId": "efd7a028d3cf0744a7cdaa40ed7e58ca99723fc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
