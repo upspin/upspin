@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "a0e40ff8_bee995b2",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T06:06:10Z",
+      "side": 1,
+      "message": "Well, if we want to keep that convention then this could be storageImpl. But I\u0027d be happier still to do away with the suffix. I think we could just file an issue to fix the other occurrences in the tree at some point. It needn\u0027t happen now.",
+      "parentUuid": "a0e40ff8_bb21a743",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60be9792_692b25de",
         "filename": "cloud/storage/postgres/postgres.go",
         "patchSetId": 5
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "The comments in the interface seem to indicate that this may not be supported. If Exec didn\u0027t fail, I want to just check error here to see if I can trust n.",
       "parentUuid": "60be9792_692b25de",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_dee661e1",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T06:06:10Z",
+      "side": 1,
+      "message": "I\u0027d just remove the RowsAffected call entirely. It doesn\u0027t seem to help us.",
+      "parentUuid": "a0e40ff8_3be3d70f",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -171,6 +207,24 @@
       "side": 1,
       "message": "Why is that more efficient? You\u0027re creating a temporary anyway.\nDone.",
       "parentUuid": "60be9792_c939f134",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_fee31dce",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T06:06:10Z",
+      "side": 1,
+      "message": "Sprintf is a function call that does reflection and parses the format string. It does at least the allocation of the simple string concatenation, plus much more.",
+      "parentUuid": "a0e40ff8_7bed5ff6",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -346,6 +400,24 @@
       "side": 1,
       "message": "Why? Not done.",
       "parentUuid": "60be9792_290e8d88",
+      "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0e40ff8_1e260918",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-29T06:06:10Z",
+      "side": 1,
+      "message": "The following line says \"p.db \u003d db\". What information does the comment add beyond the code itself?\n\nMaybe it should say something like \"// We have a healthy database connection.\" but I feel that even that is redundant: what else should happen by the end of a Dial method?\n\nIf you feel like I\u0027m being needlessly picky here, just ignore this.",
+      "parentUuid": "a0e40ff8_3bccb798",
       "revId": "f24279e3fa79b30fa31dc090b9fceacd398eb9d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
