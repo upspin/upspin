@@ -8,8 +8,11 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"upspin.io/log"
 )
 
 // We define the flags in two steps so clients don't have to write *flags.Flag.
@@ -33,7 +36,47 @@ var (
 
 	// LogFile names the log file on GCP; leave empty to disable GCP logging.
 	LogFile = ""
+
+	// LogLevel sets the level of logging.
+	LogLevel logFlag
 )
+
+type logFlag struct {
+	logLevel log.Level
+}
+
+// String implements flag.Value.
+func (l *logFlag) String() string {
+	switch l.logLevel {
+	case log.Ldebug:
+		return "debug"
+	case log.Linfo:
+		return "info"
+	case log.Lerror:
+		return "error"
+	case log.Ldisabled:
+		return "disabled"
+	}
+	return "unknown log level"
+}
+
+// Set implements flag.Value.
+func (l *logFlag) Set(level string) error {
+	switch level {
+	case "info":
+		l.logLevel = log.Linfo
+	case "debug":
+		l.logLevel = log.Ldebug
+	case "error":
+		l.logLevel = log.Lerror
+	case "disabled":
+		l.logLevel = log.Ldisabled
+	default:
+		return fmt.Errorf("invalid level %q", level) // Can't use upspin.errors
+	}
+	log.SetLevel(l.logLevel)
+	return nil
+}
 
 func init() {
 	flag.BoolVar(&Debug, "debug", Debug, "enable fine-grain debug logging")
@@ -43,4 +86,6 @@ func init() {
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
 	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "listen address for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+	flag.Var(&LogLevel, "loglevel", "sets the level of logging")
+	LogLevel.logLevel = log.CurrentLevel()
 }
