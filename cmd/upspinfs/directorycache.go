@@ -17,7 +17,7 @@ type directoryCache struct {
 	entries map[upspin.UserName]upspin.Directory
 }
 
-func newDirectoryCache(context *upspin.Context) *directoryCache {
+func newDirectoryCache(context upspin.Context) *directoryCache {
 	c := &directoryCache{client: client.New(context), entries: make(map[upspin.UserName]upspin.Directory)}
 	return c
 }

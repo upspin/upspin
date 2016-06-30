@@ -158,7 +158,7 @@ func registerStore(op string, transport upspin.Transport, store upspin.Store, al
 }
 
 // User returns a User interface bound to the endpoint.
-func User(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
+func User(cc upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	const User = "User"
 	mu.Lock()
 	u, ok := userMap[e.Transport]
@@ -174,7 +174,7 @@ func User(cc *upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 }
 
 // Store returns a Store interface bound to the endpoint.
-func Store(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
+func Store(cc upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	const Store = "Store"
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
@@ -190,7 +190,7 @@ func Store(cc *upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 }
 
 // Directory returns a Directory interface bound to the endpoint.
-func Directory(cc *upspin.Context, e upspin.Endpoint) (upspin.Directory, error) {
+func Directory(cc upspin.Context, e upspin.Endpoint) (upspin.Directory, error) {
 	const Directory = "Directory"
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
@@ -231,9 +231,9 @@ func Release(service upspin.Service) error {
 }
 
 // reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
-func reachableService(cc *upspin.Context, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
+func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
 	key := dialKey{
-		context:  *cc,
+		context:  cc,
 		endpoint: e,
 	}
 
@@ -293,7 +293,7 @@ func reachableService(cc *upspin.Context, op string, e upspin.Endpoint, cache di
 
 	var err error
 	ds = new(dialedService)
-	ds.service, err = dialer.Dial(&key.context, key.endpoint)
+	ds.service, err = dialer.Dial(key.context, key.endpoint)
 	if err == nil && !ds.ping() {
 		// The dial succeeded, but ping did not, so return an error.
 		err = errors.Str("Ping failed")

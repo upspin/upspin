@@ -140,7 +140,7 @@ func (s *Service) Endpoint() upspin.Endpoint {
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
-func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -149,15 +149,15 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	if s.db.serviceOwner == "" {
 		// This is the first call; set the owner and endpoint.
 		s.db.endpoint = e
-		s.db.serviceOwner = context.UserName
+		s.db.serviceOwner = context.UserName()
 	}
 	// Is there already a service for this user?
-	if this := s.db.serviceCache[*context]; this != nil {
+	if this := s.db.serviceCache[context]; this != nil {
 		return this, nil
 	}
 	this := *s // Make a copy.
-	this.context = *context
-	s.db.serviceCache[*context] = &this
+	this.context = context.Copy()
+	s.db.serviceCache[context] = &this
 	return &this, nil
 }
 
@@ -171,7 +171,7 @@ func (s *Service) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (s *Service) Authenticate(*upspin.Context) error {
+func (s *Service) Authenticate(upspin.Context) error {
 	return nil
 }
 

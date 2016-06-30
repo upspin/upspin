@@ -46,7 +46,7 @@ func (testPack) ReaderHashes(packdata []byte) ([][]byte, error) {
 	return nil, nil
 }
 
-func (testPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+func (testPack) Share(context upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }
 
@@ -95,7 +95,7 @@ func addSignature(meta *upspin.Metadata, signature byte) error {
 	}
 }
 
-func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func (p testPack) Pack(context upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Pack = "Pack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
@@ -124,7 +124,7 @@ func (p testPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, di
 	return len(ciphertext), nil
 }
 
-func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func (p testPack) Unpack(context upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Unpack = "Unpack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
@@ -157,7 +157,7 @@ func (p testPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, 
 	return i, nil
 }
 
-func (p testPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
+func (p testPack) PackLen(context upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
@@ -173,7 +173,7 @@ func (p testPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *u
 	return len(cleartext)
 }
 
-func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
+func (p testPack) UnpackLen(context upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1
@@ -181,7 +181,7 @@ func (p testPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry
 	return len(ciphertext)
 }
 
-func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
+func sign(ctx upspin.Context, data []byte, name upspin.PathName) byte {
 	key, err := getKey(ctx, name)
 	if err != nil {
 		panic(err)
@@ -197,7 +197,7 @@ func sign(ctx *upspin.Context, data []byte, name upspin.PathName) byte {
 }
 
 // Name implements upspin.Pack.Name.
-func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+func (testPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
 	const Name = "Name"
 	if dirEntry.IsDir() {
 		return errors.E(Name, errors.IsDir, dirEntry.Name, "cannot rename directory")
@@ -239,12 +239,12 @@ func (testPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName ups
 }
 
 // getKey returns the first user key for the user in name.
-func getKey(ctx *upspin.Context, name upspin.PathName) (upspin.PublicKey, error) {
+func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return "", err
 	}
-	user, err := bind.User(ctx, ctx.UserEndpoint)
+	user, err := bind.User(ctx, ctx.UserEndpoint())
 	if err != nil {
 		return "", err
 	}

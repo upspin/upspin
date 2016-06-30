@@ -63,7 +63,7 @@ func IsServerReachable(serverURL string) bool {
 }
 
 // Dial implements Dialer.
-func (s *Store) Dial(context *upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
+func (s *Store) Dial(context upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
 	const op = "Dial"
 	if context == nil {
 		return nil, newStoreError(op, "nil context", "")
@@ -153,7 +153,7 @@ func (s *Store) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (s *Store) Authenticate(*upspin.Context) error {
+func (s *Store) Authenticate(upspin.Context) error {
 	return nil
 }
 

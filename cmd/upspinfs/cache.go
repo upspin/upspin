@@ -46,7 +46,7 @@ type cachedFile struct {
 	de   []*upspin.DirEntry // If this is a directory, its contents.
 }
 
-func newCache(context *upspin.Context, dir string) *cache {
+func newCache(context upspin.Context, dir string) *cache {
 	c := &cache{dir: dir, client: client.New(context)}
 	os.Mkdir(dir, 0700)
 

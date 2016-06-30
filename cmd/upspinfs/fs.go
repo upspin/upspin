@@ -30,7 +30,7 @@ const (
 // upspinFS represents an instance of the mounted file system.
 type upspinFS struct {
 	sync.Mutex                               // Protects concurrent access to the rest of this struct.
-	context    *upspin.Context               // Upspin context used for all requests.
+	context    upspin.Context                // Upspin context used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
 	dc         *directoryCache               // A cache of bindings to user directories.
 	root       *node                         // The root of the upspin file system.
@@ -84,7 +84,7 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context *upspin.Context, dc *directoryCache) *upspinFS {
+func newUpspinFS(context upspin.Context, dc *directoryCache) *upspinFS {
 	f := &upspinFS{
 		context:   context,
 		client:    client.New(context),

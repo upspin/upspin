@@ -159,23 +159,23 @@ func testConfig(t *testing.T, expect *expectations, config string) {
 	if err != nil {
 		t.Fatalf("could not parse config %s: %s", config, err)
 	}
-	if context.UserName != expect.userName {
-		t.Errorf("name: got %s expected %s", context.UserName, expect.userName)
+	if context.UserName() != expect.userName {
+		t.Errorf("name: got %s expected %s", context.UserName(), expect.userName)
 	}
 	tests := []struct {
 		expected upspin.Endpoint
 		got      upspin.Endpoint
 	}{
-		{expect.user, context.UserEndpoint},
-		{expect.directory, context.DirectoryEndpoint},
-		{expect.store, context.StoreEndpoint},
+		{expect.user, context.UserEndpoint()},
+		{expect.directory, context.DirectoryEndpoint()},
+		{expect.store, context.StoreEndpoint()},
 	}
 	for i, test := range tests {
 		if test.expected != test.got {
 			t.Errorf("%d: got %s expected %s", i, test.got, test.expected)
 		}
 	}
-	if context.Packing != expect.packing {
+	if context.Packing() != expect.packing {
 		t.Errorf("got %s expected %s", context.Packing, expect.packing)
 	}
 }

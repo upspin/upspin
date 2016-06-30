@@ -104,7 +104,7 @@ func (r *remote) Configure(options ...string) error {
 }
 
 // Dial implements upspin.Service.
-func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Remote {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -120,7 +120,7 @@ func (*remote) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		AuthClientService: authClient,
 		ctx: dialContext{
 			endpoint: e,
-			userName: context.UserName,
+			userName: context.UserName(),
 		},
 		storeClient: storeClient,
 	}
