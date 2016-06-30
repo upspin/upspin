@@ -217,11 +217,11 @@ func (u *user) Configure(options ...string) error {
 
 // isServiceConfigured reports whether the user service has been configured via a Configure call.
 func (u *user) isServiceConfigured() bool {
-	return u.cloudClient != nil && u.context.UserName != ""
+	return u.cloudClient != nil && u.context.UserName() != ""
 }
 
 // Dial implements upspin.Service.
-func (u *user) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (u *user) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -236,8 +236,8 @@ func (u *user) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service,
 		return nil, errors.E("Dial", errors.Str("user gcp: internal error: refCount wrapped around"))
 	}
 
-	this := *u              // Clone ourselves.
-	this.context = *context // Make a copy of the context, to prevent changes.
+	this := *u                    // Clone ourselves.
+	this.context = context.Copy() // Make a copy of the context, to prevent changes.
 	this.endpoint = e
 	return &this, nil
 }
@@ -253,7 +253,7 @@ func (u *user) Close() {
 	defer mu.Unlock()
 
 	// Clean up this instance
-	u.context.UserName = "" // ensure we get an error in subsequent calls.
+	u.context.SetUserName("") // ensure we get an error in subsequent calls.
 
 	refCount--
 	if refCount == 0 {
@@ -266,7 +266,7 @@ func (u *user) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (u *user) Authenticate(*upspin.Context) error {
+func (u *user) Authenticate(upspin.Context) error {
 	// Authentication is not dealt here. It happens at other layers.
 	return nil
 }

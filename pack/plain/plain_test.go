@@ -8,15 +8,14 @@ import (
 	"crypto/rand"
 	"testing"
 
+	"upspin.io/context"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
 
 var (
-	context = &upspin.Context{}
-	meta    = &upspin.Metadata{
-		Packdata: []byte{byte(upspin.PlainPack)},
-	}
+	globalContext = context.New()
+	meta          = &upspin.Metadata{Packdata: []byte{byte(upspin.PlainPack)}}
 )
 
 func TestRegister(t *testing.T) {
@@ -49,12 +48,12 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 	de := &upspin.DirEntry{
 		Name: name,
 	}
-	n := packer.PackLen(context, data, de)
+	n := packer.PackLen(globalContext, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
 	cipher := make([]byte, n)
-	m, err := packer.Pack(context, cipher, data, de)
+	m, err := packer.Pack(globalContext, cipher, data, de)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -64,12 +63,12 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 // doUnpack unpacks cipher for a dir entry and returns the clear text.
 func doUnpack(t testing.TB, cipher []byte, de *upspin.DirEntry) []byte {
 	packer := plainPack{}
-	n := packer.UnpackLen(context, cipher, de)
+	n := packer.UnpackLen(globalContext, cipher, de)
 	if n < 1 {
 		t.Fatalf("UnpackLen failed with size %d", n)
 	}
 	clear := make([]byte, n)
-	m, err := packer.Unpack(context, clear, cipher, de)
+	m, err := packer.Unpack(globalContext, clear, cipher, de)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}

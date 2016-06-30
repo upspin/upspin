@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
+	"upspin.io/context"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 	testUser "upspin.io/user/inprocess"
@@ -30,9 +31,7 @@ const (
 )
 
 var (
-	context = &upspin.Context{
-		UserName: userName,
-	}
+	globalContext = context.New().SetUserName(userName)
 )
 
 // The values returned by PackLen and UnpackLen should be exact,
@@ -46,12 +45,12 @@ func TestPackLen(t *testing.T) {
 	de := &upspin.DirEntry{
 		Name: name,
 	}
-	n := packer.PackLen(context, data, de)
+	n := packer.PackLen(globalContext, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
 	cipher := make([]byte, n)
-	m, err := packer.Pack(context, cipher, data, de)
+	m, err := packer.Pack(globalContext, cipher, data, de)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -61,12 +60,12 @@ func TestPackLen(t *testing.T) {
 	cipher = cipher[:m] // Already true, but be thorough.
 
 	// Now unpack.
-	n = packer.UnpackLen(context, cipher, de)
+	n = packer.UnpackLen(globalContext, cipher, de)
 	if n < 0 {
 		t.Fatal("UnpackLen failed")
 	}
 	clear := make([]byte, n)
-	m, err = packer.Unpack(context, clear, cipher, de)
+	m, err = packer.Unpack(globalContext, clear, cipher, de)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
@@ -91,11 +90,11 @@ func TestPack(t *testing.T) {
 	de := &upspin.DirEntry{
 		Name: name,
 	}
-	n := packer.PackLen(context, data, de)
+	n := packer.PackLen(globalContext, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
-	m, err := packer.Pack(context, cipher, data, de)
+	m, err := packer.Pack(globalContext, cipher, data, de)
 	if err != nil {
 		t.Fatal("Pack: ", err)
 	}
@@ -103,7 +102,7 @@ func TestPack(t *testing.T) {
 
 	// Now unpack.
 	clear := make([]byte, 1024)
-	m, err = packer.Unpack(context, clear, cipher, de)
+	m, err = packer.Unpack(globalContext, clear, cipher, de)
 	if err != nil {
 		t.Fatal("Unpack: ", err)
 	}
@@ -115,7 +114,7 @@ func TestPack(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	user, err := bind.User(&upspin.Context{}, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""})
+	user, err := bind.User(context.New(), upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""})
 	if err != nil {
 		panic(err)
 	}

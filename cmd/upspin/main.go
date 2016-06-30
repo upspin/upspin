@@ -305,7 +305,7 @@ func rm(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint)
+	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -360,7 +360,7 @@ func whichAccess(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint)
+	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -438,7 +438,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 	}
 }
 
-func newClient() (upspin.Client, *upspin.Context) {
+func newClient() (upspin.Client, upspin.Context) {
 	ctx, err := context.InitContext(nil)
 	if err != nil {
 		exit(err)

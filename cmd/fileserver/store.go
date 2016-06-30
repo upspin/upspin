@@ -22,13 +22,13 @@ import (
 // StoreServer is a SecureServer that serves the local files as an Upspin.Store gRPC server.
 // Its references are simply the owner name followed by the path name: me@foo.com/etc/passwd.
 type StoreServer struct {
-	context  *upspin.Context
+	context  upspin.Context
 	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
 
-func NewStoreServer(context *upspin.Context, endpoint upspin.Endpoint, server grpcauth.SecureServer) *StoreServer {
+func NewStoreServer(context upspin.Context, endpoint upspin.Endpoint, server grpcauth.SecureServer) *StoreServer {
 	s := &StoreServer{
 		context:      context,
 		endpoint:     endpoint,
@@ -51,7 +51,7 @@ func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*pr
 		return errGet(err)
 	}
 	// Verify that the user name in the path is the owner of this root.
-	if parsed.User() != s.context.UserName {
+	if parsed.User() != s.context.UserName() {
 		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
 		return errGet(err)
 	}

@@ -51,7 +51,7 @@ var (
 
 // Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
 type Server struct {
-	context  *upspin.Context
+	context  upspin.Context
 	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
@@ -152,9 +152,8 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.Directory, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := *s.context
-	context.UserName = session.User()
-	return bind.Directory(&context, s.endpoint)
+	context := s.context.Copy().SetUserName(session.User())
+	return bind.Directory(context, s.endpoint)
 }
 
 // Lookup implements upspin.Directory.

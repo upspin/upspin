@@ -89,12 +89,12 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 
 	context := setup(userName, pub)
 	if packing == upspin.EEPack {
-		context.Packing = packing
+		context.SetPacking(packing)
 		f, err := factotum.New(pub, priv)
 		if err != nil {
 			b.Fatal(err)
 		}
-		context.Factotum = f
+		context.SetFactotum(f)
 	}
 	return New(context), block
 }

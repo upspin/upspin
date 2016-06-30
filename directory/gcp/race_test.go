@@ -118,7 +118,7 @@ func newDirServerWithDummyStore(t *testing.T, gcp storage.Storage) *directory {
 		return new(dummyAccessStore), nil
 	}
 	ds := newDirectory(gcp, f, storeFunc, timeFunc)
-	ds.context.UserName = userName // the default user for the default session.
+	ds.context.SetUserName(userName) // the default user for the default session.
 	ds.endpoint = serviceEndpoint
 	return ds
 }

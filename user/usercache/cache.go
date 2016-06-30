@@ -32,10 +32,10 @@ type userCache struct {
 //
 // TODO(p): New is not concurrency safe since context is assumed to be immutable
 // everywhere else.  Not sure this needs to be fixed but should at least be noted.
-func New(context *upspin.Context) upspin.User {
+func New(context upspin.Context) upspin.User {
 	return &userCache{
-		context:      *context, // make a copy.
-		userEndpoint: context.UserEndpoint,
+		context:      context,
+		userEndpoint: context.UserEndpoint(),
 		entries:      cache.NewLRU(256),
 		duration:     time.Minute * 15,
 	}
@@ -55,10 +55,10 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 	}
 
 	// Not found, look it up.
-	user, err := bind.User(&c.context, c.userEndpoint)
+	user, err := bind.User(c.context, c.userEndpoint)
 	if err != nil {
 		return nil, nil, errors.Errorf("usercache: error binding to User service on %v for user %q: %s",
-			c.userEndpoint, c.context.UserName, err.Error())
+			c.userEndpoint, c.context.UserName(), err.Error())
 	}
 	defer bind.Release(user)
 	eps, pub, err := user.Lookup(name)
@@ -75,7 +75,7 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 }
 
 // Dial implements upspin.User.Dial.
-func (c *userCache) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (c *userCache) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return c, nil
 }
 
@@ -100,7 +100,7 @@ func (c *userCache) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (c *userCache) Authenticate(*upspin.Context) error {
+func (c *userCache) Authenticate(upspin.Context) error {
 	return nil
 }
 

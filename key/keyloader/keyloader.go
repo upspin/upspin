@@ -28,7 +28,7 @@ var (
 
 // Load reads a key pair from the user's .ssh directory and loads
 // them into the context.
-func Load(context *upspin.Context) error {
+func Load(context upspin.Context) error {
 	if context == nil {
 		return errors.E(Load, errors.Invalid, errors.Str("nil context"))
 	}
@@ -36,8 +36,13 @@ func Load(context *upspin.Context) error {
 	if err != nil {
 		return err
 	}
-	context.Factotum, err = factotum.New(pub, priv)
-	return err
+	var f upspin.Factotum
+	f, err = factotum.New(pub, priv)
+	if err != nil {
+		return err
+	}
+	context.SetFactotum(f)
+	return nil
 }
 
 // publicKey returns the public key of the current user by reading from $HOME/.ssh/.
