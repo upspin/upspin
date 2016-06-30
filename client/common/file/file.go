@@ -84,7 +84,7 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
 	}
 	if off >= int64(len(f.data)) {
-		return 0, errors.E(op, f.name, io.EOF)
+		return 0, io.EOF
 	}
 	n = copy(b, f.data[off:])
 	return n, nil
