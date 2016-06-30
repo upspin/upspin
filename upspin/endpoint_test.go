@@ -21,6 +21,17 @@ func TestErrorCases(t *testing.T) {
 	assertError(t, "gcp", "requires a netaddr")
 }
 
+// Test printing of an erroneous endpoint. Mostly to protect
+// against an error found by vet and fixed.
+func TestErroneousString(t *testing.T) {
+	e := Endpoint{Transport: 127, NetAddr: "whatnot"}
+	const expect = "unknown endpoint {127, whatnot}"
+	got := e.String()
+	if got != expect {
+		t.Fatal("expected %q; got %q", expect, got)
+	}
+}
+
 func assertError(t *testing.T, epString string, substringError string) {
 	_, err := ParseEndpoint(epString)
 	if err == nil {

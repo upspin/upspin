@@ -43,5 +43,5 @@ func (ep Endpoint) String() string {
 	case Unassigned:
 		return "unassigned"
 	}
-	return fmt.Sprintf("%v", ep)
+	return fmt.Sprintf("unknown endpoint {%v, %v}", ep.Transport, ep.NetAddr)
 }
