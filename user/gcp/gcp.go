@@ -164,6 +164,9 @@ func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.Pub
 func (u *user) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, error) {
 	// Get the user entry from GCP
 	log.Printf("Going to get user entry on GCP for user %s", userName)
+	if !u.isServiceConfigured() {
+		log.Fatal("Cloud service is not configured; giving up.")
+	}
 	buf, err := u.cloudClient.Download(string(userName))
 	if err != nil {
 		log.Printf("Error downloading user entry for %q: %q", userName, err)
@@ -209,6 +212,7 @@ func (u *user) Configure(options ...string) error {
 	var err error
 	u.cloudClient, err = storage.Dial("GCS", dialOpts...)
 	if err != nil {
+		log.Debug.Printf("Error %s when trying to configure GCP user: %v", err, options)
 		return errors.E(Configure, err)
 	}
 	log.Debug.Printf("Configured GCP user: %v", options)
@@ -249,6 +253,7 @@ func (u *user) Ping() bool {
 
 // Close implements upspin.Service.
 func (u *user) Close() {
+	log.Debug.Printf("closing Cloud Service")
 	mu.Lock()
 	defer mu.Unlock()
 
