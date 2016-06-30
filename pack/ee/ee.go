@@ -164,7 +164,7 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	if owner == ctx.UserName {
 		wrap = wrap[:1]
 	} else {
-		userConn, err := bind.User(ctx, ctx.User)
+		userConn, err := bind.User(ctx, ctx.UserEndpoint)
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
