@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -59,6 +60,8 @@ func main() {
 		rm(args...)
 	case "share":
 		share(args...)
+	case "user":
+		user(args...)
 	case "whichaccess":
 		whichAccess(args...)
 	default:
@@ -313,6 +316,38 @@ func rm(args ...string) {
 		err := dir.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
+		}
+	}
+}
+
+func user(args ...string) {
+	fs := flag.NewFlagSet("user", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "user username...")
+	err := fs.Parse(args)
+	if err != nil {
+		exit(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	_, ctx := newClient()
+	user, err := bind.User(ctx, ctx.UserEndpoint)
+	if err != nil {
+		exit(err)
+	}
+	for i := 0; i < fs.NArg(); i++ {
+		endpoints, keys, err := user.Lookup(upspin.UserName(fs.Arg(i)))
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s:\n", fs.Arg(i))
+		fmt.Printf("endpoints:\n")
+		for _, e := range endpoints {
+			fmt.Println(e)
+		}
+		fmt.Printf("keys:\n")
+		for _, k := range keys {
+			fmt.Println(k)
 		}
 	}
 }
