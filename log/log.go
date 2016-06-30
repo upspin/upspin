@@ -10,6 +10,7 @@ package log
 // 2) it mimics Go's log package and can be used as a drop-in replacement for it.
 
 import (
+	"flag"
 	goLog "log"
 	"os"
 
@@ -41,9 +42,11 @@ type Level int
 
 // Different levels of logging.
 const (
-	Ldebug = Level(logging.Debug)
-	Linfo  = Level(logging.Info)
-	Lerror = Level(logging.Error)
+	Ldebug    = Level(logging.Debug)
+	Linfo     = Level(logging.Info)
+	Lerror    = Level(logging.Error)
+	Ldisabled = Level(4000) // Some big value we'll never use.
+	Linvalid  = Level(-2)
 )
 
 // Pre-allocated Loggers at each logging level.
@@ -52,7 +55,7 @@ var (
 	Info  = newLogger(Linfo)
 	Error = newLogger(Lerror)
 
-	currentLevel  Level = Linfo
+	logLevel      = flag.String("loglevel", "info", "sets the log level to one of {debug, info, error, disabled}'")
 	defaultClient *logging.Client
 	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
@@ -81,9 +84,37 @@ func New(level Level, projectID, logName string) (Logger, error) {
 	}, nil
 }
 
+func (l Level) String() string {
+	switch l {
+	case Ldebug:
+		return "debug"
+	case Linfo:
+		return "info"
+	case Lerror:
+		return "error"
+	case Ldisabled:
+		return "disabled"
+	}
+	return "unknown error type"
+}
+
+func logLevelFromString(s string) Level {
+	switch s {
+	case "debug":
+		return Ldebug
+	case "info":
+		return Linfo
+	case "error":
+		return Lerror
+	case "disabled":
+		return Ldisabled
+	}
+	return Linvalid
+}
+
 // Printf writes a formated message to the log.
 func (l *logger) Printf(format string, v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < logging.Level(CurrentLevel()) {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
@@ -96,7 +127,7 @@ func (l *logger) Printf(format string, v ...interface{}) {
 
 // Print writes a message to the log.
 func (l *logger) Print(v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < logging.Level(CurrentLevel()) {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
@@ -109,7 +140,7 @@ func (l *logger) Print(v ...interface{}) {
 
 // Println writes a line to the log.
 func (l *logger) Println(v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < logging.Level(CurrentLevel()) {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
@@ -144,17 +175,22 @@ func (l *logger) Fatalf(format string, v ...interface{}) {
 
 // SetLevel sets the current logging level. Lower levels than current will not be logged.
 func SetLevel(level Level) {
-	currentLevel = level
+	*logLevel = level.String()
 }
 
 // CurrentLevel returns the current logging level.
 func CurrentLevel() Level {
-	return currentLevel
+	l := logLevelFromString(*logLevel)
+	if l == Linvalid {
+		Error.Printf("Invalid log level %q", *logLevel)
+		return Linfo
+	}
+	return l
 }
 
 // At returns whether the level will be logged currently.
 func At(level Level) bool {
-	return currentLevel <= level
+	return CurrentLevel() <= level
 }
 
 // Printf writes a formated message to the log.
