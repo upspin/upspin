@@ -61,7 +61,7 @@ func newUserName() upspin.UserName {
 
 // setupBench returns a new client for the username and packing and a byte slice filled with fileSize random bytes.
 func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, curveName string, fileSize int) (upspin.Client, []byte) {
-	log.SetLevel(log.Lerror)
+	log.SetLevel("error")
 	block := make([]byte, fileSize)
 	n, err := rand.Read(block)
 	if err != nil {
