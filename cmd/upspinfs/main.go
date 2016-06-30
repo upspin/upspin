@@ -48,7 +48,7 @@ func main() {
 
 	if *debugFlag {
 		fuse.Debug = debug
-		log.SetLevel(log.Ldebug)
+		log.SetLevel("debug")
 	}
 
 	if flag.NArg() != 1 {
