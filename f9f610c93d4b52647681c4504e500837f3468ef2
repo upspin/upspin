@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d5c1e64_62530c28",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-06-30T22:48:52Z",
+      "side": 1,
+      "message": "Should probably be parameterized at some point. TODO?",
+      "revId": "f9f610c93d4b52647681c4504e500837f3468ef2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
