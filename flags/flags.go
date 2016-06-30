@@ -10,6 +10,8 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+
+	"upspin.io/log"
 )
 
 // We define the flags in two steps so clients don't have to write *flags.Flag.
@@ -33,6 +35,9 @@ var (
 
 	// LogFile names the log file on GCP; leave empty to disable GCP logging.
 	LogFile = ""
+
+	// LogLevel sets the level of logging.
+	LogLevel = log.Linfo
 )
 
 func init() {
@@ -43,4 +48,5 @@ func init() {
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
 	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "listen address for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+	flag.Var(&LogLevel, "loglevel", "sets the level of logging")
 }
