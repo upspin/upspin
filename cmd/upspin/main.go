@@ -15,6 +15,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -30,11 +31,18 @@ import (
 	_ "upspin.io/user/transports"
 )
 
-var op string // The subcommand we are running.
+var (
+	op        string // The subcommand we are running.
+	debugFlag = flag.Bool("d", false, "turn on debugging")
+)
 
 func main() {
 	flag.Usage = usage
 	flag.Parse()
+
+	if *debugFlag {
+		log.SetLevel(log.Ldebug)
+	}
 
 	if len(flag.Args()) < 1 {
 		usage()
