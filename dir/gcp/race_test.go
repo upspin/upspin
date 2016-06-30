@@ -124,7 +124,7 @@ func newDirServerWithDummyStore(t *testing.T, gcp storage.Storage) *directory {
 }
 
 func startDir(t *testing.T) *directory {
-	log.SetLevel(log.Lerror) // silence most messages
+	log.SetLevel(log.error) // silence most messages
 	d := newDirServerWithDummyStore(t, &gcpMock{storage: make(map[string][]byte)})
 
 	root := &upspin.DirEntry{

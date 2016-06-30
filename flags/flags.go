@@ -10,15 +10,14 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+
+	"upspin.io/log"
 )
 
 // We define the flags in two steps so clients don't have to write *flags.Flag.
 // It also makes the documentation easier to read.
 
 var (
-	// Debug enables fine-grain debug logging.
-	Debug = false
-
 	// Config is a comma-separated list of configuration options (key=value) for this server.
 	Config = ""
 
@@ -33,14 +32,32 @@ var (
 
 	// LogFile names the log file on GCP; leave empty to disable GCP logging.
 	LogFile = ""
+
+	// LogLevel sets the level of logging.
+	Log = logFlag("info")
 )
 
-func init() {
-	flag.BoolVar(&Debug, "debug", Debug, "enable fine-grain debug logging")
+type logFlag string
 
+// String implements flag.Value.
+func (l *logFlag) String() string {
+	return log.Level()
+}
+
+// Set implements flag.Value.
+func (l *logFlag) Set(level string) error {
+	return log.SetLevel(level)
+}
+
+func (l *logFlag) Get() interface{} {
+	return log.Level()
+}
+
+func init() {
 	flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
-	flag.StringVar(&Context, "context", Context, "context file to use")
+	flag.StringVar(&Context, "context", Context, "context file")
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
-	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "listen address for incoming network connections")
+	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "laddress for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+	flag.Var(&Log, "log", "level of logging")
 }
