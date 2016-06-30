@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/user/usercache"
@@ -79,10 +80,8 @@ func PublicUserKeyService() func(userName upspin.UserName) ([]upspin.PublicKey, 
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(userServiceAddr),
 	}
-	context := &upspin.Context{
-		UserEndpoint: e,
-	}
-	user := usercache.New(context)
+	ctx := context.New().SetUserEndpoint(e)
+	user := usercache.New(ctx)
 	return func(userName upspin.UserName) ([]upspin.PublicKey, error) {
 		log.Printf("Calling User.Lookup for user %s", userName)
 		_, keys, err := user.Lookup(userName)

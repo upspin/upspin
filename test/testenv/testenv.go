@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack/ee"
@@ -80,7 +81,7 @@ type Env struct {
 	Client upspin.Client
 
 	// Context is the context used when creating the client.
-	Context *upspin.Context
+	Context upspin.Context
 
 	// Setup contains the original setup options.
 	Setup *Setup
@@ -165,8 +166,8 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveName string, transport upspin.Transport) (upspin.Client, *upspin.Context, error) {
-	var context *upspin.Context
+func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveName string, transport upspin.Transport) (upspin.Client, upspin.Context, error) {
+	var context upspin.Context
 	var err error
 	if keyPair == nil || *keyPair == zeroKey {
 		context, err = newContextForUser(userName, curveName)
@@ -198,13 +199,13 @@ func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveNa
 // NewUser creates a new client for a user, generating new keys of the right packing type if the provided
 // keys are nil or empty. The new user will not have a root created. Callers should use the client to
 // MakeDirectory if necessary.
-func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, *upspin.Context, error) {
+func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, upspin.Context, error) {
 	return innerNewUser("NewUser", userName, keyPair, e.Setup.KeyKind, e.Setup.Transport)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
 // with a user and keys.
-func gcpClient(context *upspin.Context) (upspin.Client, error) {
+func gcpClient(context upspin.Context) (upspin.Client, error) {
 	// Use a test GCP Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.Remote,
@@ -227,7 +228,7 @@ func gcpClient(context *upspin.Context) (upspin.Client, error) {
 
 // inProcessClient returns a Client pointing to in-process instances given a Context partially initialized
 // with a user and keys.
-func inProcessClient(context *upspin.Context) (upspin.Client, error) {
+func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	// Use an in-process Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -250,7 +251,7 @@ func inProcessClient(context *upspin.Context) (upspin.Client, error) {
 
 // newContextForUser adds a new user to the inprocess user service, creates a new key for the user based on
 // the chosen packing type and returns a partially filled Context.
-func newContextForUser(userName upspin.UserName, curveName string) (*upspin.Context, error) {
+func newContextForUser(userName upspin.UserName, curveName string) (upspin.Context, error) {
 	entropy := make([]byte, 32) // Enough for p521
 	ee.GenEntropy(entropy)
 	var keyPair *KeyPair
@@ -273,11 +274,8 @@ func newContextForUser(userName upspin.UserName, curveName string) (*upspin.Cont
 
 // newContextForUserWithKey adds a new user to the inprocess user service and returns a Context partially filled with user,
 // key and curveName type as given.
-func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveName string) (*upspin.Context, error) {
-	context := &upspin.Context{
-		UserName: userName,
-		Packing:  upspin.EEPack,
-	}
+func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveName string) (upspin.Context, error) {
+	context := context.New().SetUserName(userName).SetPacking(upspin.EEPack)
 
 	endpointInProcess := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -293,16 +291,17 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 	}
 	// Set the public key for the registered user.
 	testUser.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
-	context.Factotum, err = factotum.New(keyPair.Public, keyPair.Private)
+	f, err := factotum.New(keyPair.Public, keyPair.Private)
 	if err != nil {
 		panic("NewFactotum failed")
 	}
+	context.SetFactotum(f)
 	return context, nil
 }
 
 // installUserRoot installs a root dir for the user in the context, but does not create the root dir.
-func installUserRoot(context *upspin.Context) error {
-	user, err := bind.User(context, context.UserEndpoint)
+func installUserRoot(context upspin.Context) error {
+	user, err := bind.User(context, context.UserEndpoint())
 	if err != nil {
 		return err
 	}
@@ -310,25 +309,25 @@ func installUserRoot(context *upspin.Context) error {
 	if !ok {
 		return errors.Str("user service must be the in-process instance")
 	}
-	testUser.AddRoot(context.UserName, context.DirectoryEndpoint)
+	testUser.AddRoot(context.UserName(), context.DirectoryEndpoint())
 	return nil
 }
 
-func makeRoot(context *upspin.Context) error {
+func makeRoot(context upspin.Context) error {
 	// Make the root to be sure it's there.
-	directory, err := bind.Directory(context, context.DirectoryEndpoint)
+	directory, err := bind.Directory(context, context.DirectoryEndpoint())
 	if err != nil {
 		return err
 	}
-	_, err = directory.MakeDirectory(upspin.PathName(context.UserName + "/"))
+	_, err = directory.MakeDirectory(upspin.PathName(context.UserName() + "/"))
 	if err != nil && !strings.Contains(err.Error(), "already ") {
 		return err
 	}
 	return nil
 }
 
-func setContextEndpoints(context *upspin.Context, store, dir, user upspin.Endpoint) {
-	context.StoreEndpoint = store
-	context.DirectoryEndpoint = dir
-	context.UserEndpoint = user
+func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoint) {
+	context.SetStoreEndpoint(store)
+	context.SetDirectoryEndpoint(dir)
+	context.SetUserEndpoint(user)
 }

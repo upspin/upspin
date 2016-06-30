@@ -44,7 +44,7 @@ type sharer struct {
 
 	exitCode int // Exit with non-zero status for minor problems.
 
-	context *upspin.Context
+	context upspin.Context
 	client  upspin.Client
 
 	// accessFiles contains the parsed Access files, keyed by directory to which it applies.
@@ -85,8 +85,8 @@ func (s *sharer) do() {
 		for i := 0; i < s.fs.NArg(); i++ {
 			name := upspin.PathName(s.fs.Arg(i))
 			parsed, _ := path.Parse(name)
-			if parsed.User() != s.context.UserName {
-				exitf("%q: %q is not owner", name, s.context.UserName)
+			if parsed.User() != s.context.UserName() {
+				exitf("%q: %q is not owner", name, s.context.UserName())
 			}
 		}
 	}
@@ -225,7 +225,7 @@ func userListToString(userList []upspin.UserName) string {
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
 func (s *sharer) allEntries() []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint)
+	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -253,7 +253,7 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint)
+	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -309,7 +309,7 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 	if _, ok := s.accessFiles[name]; ok {
 		return
 	}
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint)
+	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -355,7 +355,7 @@ func read(c upspin.Client, file upspin.PathName) []byte {
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
 func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint)
+	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -416,7 +416,7 @@ func (s *sharer) lookupKey(user upspin.UserName) []upspin.PublicKey {
 	if ok {
 		return keys
 	}
-	userService, err := bind.User(s.context, s.context.UserEndpoint)
+	userService, err := bind.User(s.context, s.context.UserEndpoint())
 	if err != nil {
 		exit(err)
 	}

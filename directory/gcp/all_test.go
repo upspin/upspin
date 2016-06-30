@@ -246,7 +246,7 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.context.UserName = "lister-dude@me.com"
+	ds.context.SetUserName("lister-dude@me.com")
 	de, err := ds.Lookup(pathName)
 	assertDirEntry(t, &expectedDirEntry, de, err)
 }
@@ -370,7 +370,7 @@ func TestGlobSimple(t *testing.T) {
 
 	// Now check that another user who doesn't have read permission, but does have list permission would get the
 	// same list, but without the location in them.
-	ds.context.UserName = "listerdude@me.com"
+	ds.context.SetUserName("listerdude@me.com")
 	// Location and Packdata are anonymized.
 	dir1.Location = upspin.Location{}
 	dir2.Location = upspin.Location{}
@@ -558,7 +558,7 @@ func TestMakeRootPermissionDenied(t *testing.T) {
 	ds := newTestDirServer(t, egcp)
 
 	// The session is for a user other than the expected root owner.
-	ds.context.UserName = "bozo@theclown.org"
+	ds.context.SetUserName("bozo@theclown.org")
 	_, err := ds.MakeDirectory(userRoot.dirEntry.Name)
 	assertError(t, expectedError, err)
 
@@ -616,7 +616,7 @@ func TestPutAccessFile(t *testing.T) {
 				contents: []byte(accessContents),
 			}, nil
 		}, timeFunc)
-	ds.context.UserName = userName // the default user for the default session.
+	ds.context.SetUserName(userName) // the default user for the default session.
 	ds.endpoint = serviceEndpoint
 	err = ds.Put(&dir)
 	if err != nil {
@@ -725,21 +725,21 @@ func TestGroupAccessFile(t *testing.T) {
 		return nil, errors.New("invalid")
 	}, timeFunc)
 	// Create a session for broUserName
-	ds.context.UserName = broUserName
+	ds.context.SetUserName(broUserName)
 	de, err := ds.Lookup(pathName)
 	assertDirEntry(t, &dir, de, err)
 
 	// Now Put a new Group with new contents that does not include broUserName and check that if we fetch the file
 	// again with access will be denied, because the new definition got picked up (after first being invalidated).
 
-	ds.context.UserName = userName
+	ds.context.SetUserName(userName)
 	err = ds.Put(&newGroupDir) // This is the owner of the file putting the new group file.
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Go back to bro accessing.
-	ds.context.UserName = broUserName
+	ds.context.SetUserName(broUserName)
 	// Expected permission denied this time.
 	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
 	_, err = ds.Lookup(pathName)
@@ -836,7 +836,7 @@ func TestLookupPermissionDenied(t *testing.T) {
 	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
 	ds := newTestDirServer(t, egcp)
 
-	ds.context.UserName = "sloppyjoe@unauthorized.com"
+	ds.context.SetUserName("sloppyjoe@unauthorized.com")
 	_, err := ds.Lookup(pathName)
 	assertError(t, expectedError, err)
 }
@@ -910,7 +910,7 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 
 	ds := newTestDirServer(t, lgcp)
 
-	ds.context.UserName = "some-random-dude@bozo.com"
+	ds.context.SetUserName("some-random-dude@bozo.com")
 	err := ds.Delete(pathName)
 	assertError(t, expectedError, err)
 
@@ -1004,12 +1004,12 @@ func TestDeleteGroupFile(t *testing.T) {
 	// Verify that bro@family.com has access.
 	ds := newTestDirServer(t, lgcp)
 
-	ds.context.UserName = broUserName
+	ds.context.SetUserName(broUserName)
 	de, err := ds.Lookup(pathName)
 	assertDirEntry(t, &dir, de, err)
 
 	// Now the owner deletes the group file.
-	ds.context.UserName = userName
+	ds.context.SetUserName(userName)
 	err = ds.Delete(groupPathName)
 	if err != nil {
 		t.Fatal(err)
@@ -1023,7 +1023,7 @@ func TestDeleteGroupFile(t *testing.T) {
 	// TODO: this error message is not helpful. It should contain permission denied plus the path
 	// to the missing Group file.
 	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/Group/family: file not found"
-	ds.context.UserName = broUserName
+	ds.context.SetUserName(broUserName)
 	_, err = ds.Lookup(pathName)
 	assertError(t, expectedError, err)
 }
@@ -1080,7 +1080,7 @@ func TestWhichAccessPermissionDenied(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	ds.context.UserName = "somerandomguy@a.co"
+	ds.context.SetUserName("somerandomguy@a.co")
 	_, err := ds.WhichAccess(pathName)
 	assertError(t, expectedError, err)
 }
@@ -1115,7 +1115,7 @@ func newTestDirServer(t *testing.T, gcp storage.Storage) *directory {
 		t.Fatal(err)
 	}
 	ds := newDirectory(gcp, f, nil, timeFunc)
-	ds.context.UserName = userName // the default user for the default session.
+	ds.context.SetUserName(userName) // the default user for the default session.
 	ds.endpoint = serviceEndpoint
 	return ds
 }
@@ -1172,7 +1172,7 @@ func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error
 func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 	panic("unimplemented")
 }
-func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyStore) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	panic("unimplemented")
 }
 func (d *dummyStore) Ping() bool {
@@ -1189,7 +1189,7 @@ func (d *dummyStore) Delete(ref upspin.Reference) error {
 }
 func (d *dummyStore) Close() {
 }
-func (d *dummyStore) Authenticate(*upspin.Context) error {
+func (d *dummyStore) Authenticate(upspin.Context) error {
 	return nil
 }
 

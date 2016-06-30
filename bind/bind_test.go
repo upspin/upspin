@@ -16,7 +16,7 @@ import (
 )
 
 func TestSwitch(t *testing.T) {
-	var ctx upspin.Context
+	ctx := testfixtures.NewSimpleContext()
 
 	// These should succeed.
 	du := &dummyUser{}
@@ -53,19 +53,19 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
-	s2, _ := Store(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
+	s1, _ := Store(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	s2, _ := Store(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
 	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := Store(&ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
+	if _, err := Store(ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
 		t.Errorf("expected bind.Store of undefined to fail")
 	}
 
 	// Directory is never reachable (our dummyDirectory answers false to ping)
-	_, err := Directory(&ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	_, err := Directory(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
 	if err == nil {
 		t.Error("Expected error")
 	}
@@ -76,11 +76,11 @@ func TestSwitch(t *testing.T) {
 
 	// Test caching. dummyUser has a dial count.
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"}
-	u1, err := User(&ctx, e) // Dials once.
+	u1, err := User(ctx, e) // Dials once.
 	if err != nil {
 		t.Fatal(err)
 	}
-	u2, err := User(&ctx, e) // Does not dial; hits the cache.
+	u2, err := User(ctx, e) // Does not dial; hits the cache.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,10 +91,8 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("Expected only one dial. Got %d", du.dialed)
 	}
 	// But a different context forces a new dial.
-	ctx2 := upspin.Context{
-		UserName: upspin.UserName("bob@foo.com"),
-	}
-	u3, err := User(&ctx2, e) // Dials again,
+	ctx2 := testfixtures.NewSimpleContext().SetUserName(upspin.UserName("bob@foo.com"))
+	u3, err := User(ctx2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,14 +134,14 @@ func TestConcurrency(t *testing.T) {
 	pingFreshnessDuration = 0 // Forces ping to always be invalid
 	defer func() { pingFreshnessDuration = 15 * time.Minute }()
 
-	var ctx upspin.Context
+	ctx := testfixtures.NewSimpleContext()
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr17"}
 
 	var wg sync.WaitGroup
 	store := func(release bool) {
 		defer wg.Done()
 		for i := 0; i < nRuns; i++ {
-			s, err := Store(&ctx, e)
+			s, err := Store(ctx, e)
 			if err != nil {
 				t.Error("Store:", err)
 				return
@@ -179,6 +177,7 @@ type dummyStore struct {
 	testfixtures.DummyStore
 	endpoint upspin.Endpoint
 }
+
 type dummyDirectory struct {
 	testfixtures.DummyDirectory
 	endpoint upspin.Endpoint
@@ -188,11 +187,12 @@ func (d *dummyUser) Ping() bool {
 	d.pingCount++
 	return true
 }
+
 func (d *dummyUser) Close() {
 	d.closeCalled++
 }
 
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyUser) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	user := &dummyUser{endpoint: e}
 	d.dialed++
 	return user, nil
@@ -212,12 +212,12 @@ func (d *dummyStore) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
 
-func (d *dummyStore) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyStore) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	store := &dummyStore{endpoint: e}
 	return store, nil
 }
 
-func (d *dummyDirectory) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyDirectory) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	dir := &dummyDirectory{endpoint: e}
 	return dir, nil
 }

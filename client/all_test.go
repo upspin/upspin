@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
+	"upspin.io/context"
 	"upspin.io/upspin"
 	"upspin.io/user/inprocess"
 
@@ -21,30 +22,24 @@ import (
 
 // TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.
 
-func newContext(name upspin.UserName) *upspin.Context {
+func newContext(name upspin.UserName) upspin.Context {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	context := &upspin.Context{
-		UserName:          name,
-		Packing:           upspin.DebugPack, // TODO.
-		UserEndpoint:      endpoint,
-		DirectoryEndpoint: endpoint,
-		StoreEndpoint:     endpoint,
-	}
+	context := context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetUserEndpoint(endpoint).SetDirectoryEndpoint(endpoint).SetStoreEndpoint(endpoint)
 	return context
 }
 
-func setup(userName upspin.UserName, key upspin.PublicKey) *upspin.Context {
+func setup(userName upspin.UserName, key upspin.PublicKey) upspin.Context {
 	context := newContext(userName)
-	user, err := bind.User(context, context.UserEndpoint)
+	user, err := bind.User(context, context.UserEndpoint())
 	if err != nil {
 		panic(err)
 	}
-	dir, err := bind.Directory(context, context.DirectoryEndpoint)
+	dir, err := bind.Directory(context, context.DirectoryEndpoint())
 	if err != nil {
 		panic(err)
 	}

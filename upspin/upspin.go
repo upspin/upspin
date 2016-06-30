@@ -132,7 +132,7 @@ type Packer interface {
 	// the PackLen method may be used to find a suitable size to
 	// allocate.
 	// The returned count is the written length of the ciphertext.
-	Pack(context *Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
+	Pack(context Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
 
 	// Unpack takes ciphertext data and stores the cleartext version
 	// in the cleartext slice, which must be large enough, using the
@@ -146,7 +146,7 @@ type Packer interface {
 	// must have the correct Packing value already present in its
 	// first byte.
 	// Unpack returns the number of bytes written to the slice.
-	Unpack(context *Context, cleartext, ciphertext []byte, entry *DirEntry) (int, error)
+	Unpack(context Context, cleartext, ciphertext []byte, entry *DirEntry) (int, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
@@ -155,14 +155,14 @@ type Packer interface {
 	// length greather than 0,  the first byte must be the correct
 	// value of Packing.
 	// PackLen returns -1 if there is an error.
-	PackLen(context *Context, cleartext []byte, entry *DirEntry) int
+	PackLen(context Context, cleartext []byte, entry *DirEntry) int
 
 	// UnpackLen returns an upper bound on the number of bytes
 	// required to store the unpacked cleartext.  UnpackLen might
 	// update the entry's Metadata, which must have the correct Packing
 	// value already present in Packdata[0].
 	// UnpackLen eturns -1 if there is an error.
-	UnpackLen(context *Context, ciphertext []byte, entry *DirEntry) int
+	UnpackLen(context Context, ciphertext []byte, entry *DirEntry) int
 
 	// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
 	// associated ciphertext.
@@ -176,13 +176,13 @@ type Packer interface {
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
-	Share(context *Context, readers []PublicKey, packdata []*[]byte)
+	Share(context Context, readers []PublicKey, packdata []*[]byte)
 
 	// Name updates the DirEntry to refer to a new path. If the new
 	// path is in a different directory, the wrapped keys are reduced to
 	// only that of the Upspin user invoking the method. The Packdata
 	// in entry must contain a wrapped key for that user.
-	Name(context *Context, entry *DirEntry, path PathName) error
+	Name(context Context, entry *DirEntry, path PathName) error
 }
 
 const (
@@ -456,27 +456,48 @@ type File interface {
 
 // Context contains client information such as the user's keys and
 // preferred User, Directory, and Store server endpoints.
-type Context struct {
+type Context interface {
 	// The name of the user requesting access.
-	UserName UserName
+	UserName() UserName
+
+	// SetUserName sets the UserName.
+	SetUserName(UserName) Context
 
 	// Factotum holds the user's cryptographic keys and encapsulates crypto operations.
-	Factotum Factotum
+	Factotum() Factotum
+
+	// SetFactotum sets Factotum.
+	SetFactotum(Factotum) Context
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related
 	// to the directory.
-	Packing Packing
+	Packing() Packing
 
-	// User is the endpoint of the User service to contact to evaluate names.
-	UserEndpoint Endpoint
+	// SetPacking sets the Packing.
+	SetPacking(Packing) Context
 
-	// Directory is the endpoint of the Directory in which to place new data items,
+	// UserEndpoint is the endpoint of the User service to contact to evaluate names.
+	UserEndpoint() Endpoint
+
+	// SetUserEndpoint sets the UserEndpoint.
+	SetUserEndpoint(Endpoint) Context
+
+	// DirectoryEndpoint is the endpoint of the Directory in which to place new data items.  It is
 	// usually the location of the user's root.
-	DirectoryEndpoint Endpoint
+	DirectoryEndpoint() Endpoint
 
-	// Store is the endpoint of the Store in which to place new data items.
-	StoreEndpoint Endpoint
+	// SetDirectoryEndpoint sets the DirectoryEndpoint.
+	SetDirectoryEndpoint(Endpoint) Context
+
+	// StoreEndpoint is the endpoint of the Store in which to place new data items.
+	StoreEndpoint() Endpoint
+
+	// SetStoreEndpoint sets the StoreEndpoint.
+	SetStoreEndpoint(Endpoint) Context
+
+	// Copy creates a copy of the receiver context.
+	Copy() Context
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
@@ -486,7 +507,7 @@ type Context struct {
 // the Upspin "bind" package to connect to services.
 type Dialer interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(*Context, Endpoint) (Service, error)
+	Dial(Context, Endpoint) (Service, error)
 }
 
 // Service is the general interface returned by a dialer. It includes
@@ -503,7 +524,7 @@ type Service interface {
 	Ping() bool
 
 	// Authenticate authenticates the user in the context.
-	Authenticate(*Context) error
+	Authenticate(Context) error
 
 	// Close closes the connection to the service and releases all resources used.
 	// A Service may not be re-used after close.

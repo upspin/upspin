@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"upspin.io/bind"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 
@@ -34,11 +35,8 @@ type service struct {
 	dialed   int
 }
 
-func setup(t *testing.T) (*service, *upspin.Context) {
-	c := &upspin.Context{
-		UserName: "unused@unused.com",
-		Packing:  upspin.DebugPack,
-	}
+func setup(t *testing.T) (*service, upspin.Context) {
+	c := context.New().SetUserName("unused@unused.com").SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
@@ -47,7 +45,7 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 	s := &service{
 		entries:  make(map[string]testEntry),
 		endpoint: e,
-		context:  *c,
+		context:  c.Copy(),
 	}
 	s.add("a@a.com")
 	s.add("b@b.com")
@@ -63,9 +61,9 @@ func setup(t *testing.T) (*service, *upspin.Context) {
 			t.Fatal(err)
 		}
 	}
-	c.UserEndpoint = e
-	c.StoreEndpoint = e
-	c.DirectoryEndpoint = e
+	c.SetUserEndpoint(e)
+	c.SetStoreEndpoint(e)
+	c.SetDirectoryEndpoint(e)
 
 	return s, c
 }
@@ -183,9 +181,9 @@ func (s *service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 	return nil, nil, errors.E("Lookup", name, errors.NotExist)
 }
 
-func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	s.dialed++
-	s.context = *context
+	s.context = context.Copy()
 	s.endpoint = e
 	return s, nil
 }
@@ -205,6 +203,6 @@ func (s *service) Ping() bool {
 func (s *service) Close() {
 }
 
-func (s *service) Authenticate(*upspin.Context) error {
+func (s *service) Authenticate(upspin.Context) error {
 	return nil
 }

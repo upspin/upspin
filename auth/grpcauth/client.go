@@ -65,7 +65,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // keep-alive packets.
 // If allowSelfSignedCertificates is true, the client will connect with a server with a self-signed certificate.
 // Otherwise it will reject it. Mostly only useful for testing a local server.
-func NewGRPCClient(context *upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, allowSelfSignedCertificate bool) (*AuthClientService, error) {
+func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, allowSelfSignedCertificate bool) (*AuthClientService, error) {
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
 	}
@@ -91,7 +91,7 @@ func NewGRPCClient(context *upspin.Context, netAddr upspin.NetAddr, keepAliveInt
 	}
 	ac := &AuthClientService{
 		grpcConn:          conn,
-		context:           *context,
+		context:           context.Copy(),
 		keepAliveInterval: keepAliveInterval,
 		closeKeepAlive:    make(chan bool, 1),
 	}
@@ -171,12 +171,12 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 }
 
 // Authenticate implements upspin.Service.
-func (ac *AuthClientService) Authenticate(ctx *upspin.Context) error {
+func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
 	req := &proto.AuthenticateRequest{
-		UserName: string(ctx.UserName),
+		UserName: string(ctx.UserName()),
 		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
 	}
-	sig, err := ctx.Factotum.UserSign([]byte(string(req.UserName) + " Authenticate " + req.Now))
+	sig, err := ctx.Factotum().UserSign([]byte(string(req.UserName) + " Authenticate " + req.Now))
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 	var err error
 	if ac.isAuthTokenExpired() {
-		err = ac.Authenticate(&ac.context)
+		err = ac.Authenticate(ac.context)
 		if err != nil {
 			return nil, err
 		}

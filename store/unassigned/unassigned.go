@@ -50,7 +50,7 @@ func (*unassigned) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (*unassigned) Authenticate(context *upspin.Context) error {
+func (*unassigned) Authenticate(context upspin.Context) error {
 	return errors.E("Authenticate", errors.Invalid, unassignedErr)
 }
 
@@ -60,7 +60,7 @@ func (*unassigned) Ping() bool {
 }
 
 // Dial implements upspin.Service.
-func (u *unassigned) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.Unassigned {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}

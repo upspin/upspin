@@ -62,7 +62,7 @@ func (r *runner) Errorf(format string, args ...interface{}) {
 		if slash := strings.LastIndexByte(file, '/'); slash >= 0 {
 			file = file[slash+1:]
 		}
-		r.t.Errorf("called from %s:%d with %s packing:", file, line, pack.Lookup(r.env.Context.Packing))
+		r.t.Errorf("called from %s:%d with %s packing:", file, line, pack.Lookup(r.env.Context.Packing()))
 	}
 	r.t.Errorf(format, args...)
 }
