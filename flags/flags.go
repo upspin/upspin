@@ -33,6 +33,9 @@ var (
 
 	// LogFile names the log file on GCP; leave empty to disable GCP logging.
 	LogFile = ""
+
+	// LogLevel sets the level of logging: 0=Debug, 1=Info, 2=Error, 3=Disabled
+	LogLevel = 1
 )
 
 func init() {
@@ -43,4 +46,5 @@ func init() {
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
 	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "listen address for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+	flag.IntVar(&LogLevel, "loglevel", LogLevel, "sets the level of logging: 0=Debug, 1=Info, 2=Error, 3=Disabled")
 }
