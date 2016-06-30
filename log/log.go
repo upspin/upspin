@@ -16,6 +16,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/cloud"
 	"google.golang.org/cloud/logging"
+
+	"upspin.io/flags"
 )
 
 // Logger is the interface for logging messages.
@@ -36,29 +38,18 @@ type Logger interface {
 	Fatalf(format string, v ...interface{})
 }
 
-// Level is the level of logging.
-type Level int
-
-// Different levels of logging.
-const (
-	Ldebug = Level(logging.Debug)
-	Linfo  = Level(logging.Info)
-	Lerror = Level(logging.Error)
-)
-
 // Pre-allocated Loggers at each logging level.
 var (
-	Debug = newLogger(Ldebug)
-	Info  = newLogger(Linfo)
-	Error = newLogger(Lerror)
+	Debug = newLogger(flags.Ldebug)
+	Info  = newLogger(flags.Linfo)
+	Error = newLogger(flags.Lerror)
 
-	currentLevel  Level = Linfo
 	defaultClient *logging.Client
 	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
 
 type logger struct {
-	level  logging.Level
+	level  flags.LogLevelT
 	client *logging.Client
 }
 
@@ -66,7 +57,7 @@ var _ Logger = (*logger)(nil)
 
 // New creates a new logger at a given level, possibly backed by a Google Cloud Logging instance assigned to a
 // project ID and logName if projectID is not empty and is a valid Google Cloud project ID.
-func New(level Level, projectID, logName string) (Logger, error) {
+func New(level flags.LogLevelT, projectID, logName string) (Logger, error) {
 	var client *logging.Client
 	var err error
 	if projectID != "" {
@@ -76,46 +67,62 @@ func New(level Level, projectID, logName string) (Logger, error) {
 		}
 	}
 	return &logger{
-		level:  logging.Level(level),
+		level:  level,
 		client: client,
 	}, nil
 }
 
+func toCloudLevel(level flags.LogLevelT) logging.Level {
+	switch level {
+	case flags.Ldebug:
+		return logging.Debug
+	case flags.Linfo:
+		return logging.Info
+	case flags.Lerror:
+		return logging.Error
+	case flags.Ldisabled:
+		Error.Println("logging called from disabled log")
+	default:
+		Error.Printf("unknown log level %d", level)
+	}
+	return logging.Error
+}
+
 // Printf writes a formated message to the log.
 func (l *logger) Printf(format string, v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < CurrentLevel() {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
-		l.client.Logger(l.level).Printf(format, v...)
+		l.client.Logger(toCloudLevel(l.level)).Printf(format, v...)
 	} else if defaultClient != nil {
-		defaultClient.Logger(l.level).Printf(format, v...)
+		defaultClient.Logger(toCloudLevel(l.level)).Printf(format, v...)
 	}
 	defaultLogger.Printf(format, v...)
 }
 
 // Print writes a message to the log.
 func (l *logger) Print(v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < CurrentLevel() {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
-		l.client.Logger(l.level).Print(v...)
+		l.client.Logger(toCloudLevel(l.level)).Print(v...)
 	} else if defaultClient != nil {
-		defaultClient.Logger(l.level).Print(v...)
+		defaultClient.Logger(toCloudLevel(l.level)).Print(v...)
 	}
 	defaultLogger.Print(v...)
 }
 
 // Println writes a line to the log.
 func (l *logger) Println(v ...interface{}) {
-	if l.level < logging.Level(currentLevel) {
+	if l.level < CurrentLevel() {
 		return // Don't log at lower levels.
 	}
 	if l.client != nil {
-		l.client.Logger(l.level).Println(v...)
+		l.client.Logger(toCloudLevel(l.level)).Println(v...)
 	} else if defaultClient != nil {
-		defaultClient.Logger(l.level).Println(v...)
+		defaultClient.Logger(toCloudLevel(l.level)).Println(v...)
 	}
 	defaultLogger.Println(v...)
 }
@@ -124,9 +131,9 @@ func (l *logger) Println(v ...interface{}) {
 func (l *logger) Fatal(v ...interface{}) {
 	// Fatal always logs.
 	if l.client != nil {
-		l.client.Logger(l.level).Print(v...)
+		l.client.Logger(toCloudLevel(l.level)).Print(v...)
 	} else if defaultClient != nil {
-		defaultClient.Logger(l.level).Print(v...)
+		defaultClient.Logger(toCloudLevel(l.level)).Print(v...)
 	}
 	defaultLogger.Fatal(v...)
 }
@@ -135,26 +142,30 @@ func (l *logger) Fatal(v ...interface{}) {
 func (l *logger) Fatalf(format string, v ...interface{}) {
 	// Fatalf always logs.
 	if l.client != nil {
-		l.client.Logger(l.level).Printf(format, v...)
+		l.client.Logger(toCloudLevel(l.level)).Printf(format, v...)
 	} else if defaultClient != nil {
-		defaultClient.Logger(l.level).Printf(format, v...)
+		defaultClient.Logger(toCloudLevel(l.level)).Printf(format, v...)
 	}
 	defaultLogger.Fatalf(format, v...)
 }
 
-// SetLevel sets the current logging level. Lower levels than current will not be logged.
-func SetLevel(level Level) {
-	currentLevel = level
+func SetLevel(level flags.LogLevelT) {
+	flags.LogLevel = level
 }
 
 // CurrentLevel returns the current logging level.
-func CurrentLevel() Level {
-	return currentLevel
+func CurrentLevel() flags.LogLevelT {
+	l := flags.LogLevel
+	if l == flags.Linvalid {
+		Error.Printf("Invalid log level %q", l)
+		return flags.Linfo
+	}
+	return l
 }
 
 // At returns whether the level will be logged currently.
-func At(level Level) bool {
-	return currentLevel <= level
+func At(level flags.LogLevelT) bool {
+	return CurrentLevel() <= level
 }
 
 // Printf writes a formated message to the log.
@@ -203,8 +214,8 @@ func newClient(projectID, logName string) (*logging.Client, error) {
 }
 
 // newLogger instantiates an implicit Logger using the default client.
-func newLogger(level Level) Logger {
+func newLogger(level flags.LogLevelT) Logger {
 	return &logger{
-		level: logging.Level(level),
+		level: level,
 	}
 }

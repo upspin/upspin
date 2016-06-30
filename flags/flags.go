@@ -8,6 +8,7 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -33,6 +34,8 @@ var (
 
 	// LogFile names the log file on GCP; leave empty to disable GCP logging.
 	LogFile = ""
+
+	LogLevel = Linfo
 )
 
 func init() {
@@ -43,4 +46,44 @@ func init() {
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
 	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "listen address for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+	flag.Var(&LogLevel, "loglevel", "sets the level of logging")
+}
+
+type LogLevelT int
+
+// Different levels of logging.
+const (
+	Ldebug LogLevelT = iota
+	Linfo
+	Lerror
+	Ldisabled
+	Linvalid
+)
+
+func (l LogLevelT) String() string {
+	switch l {
+	case Ldebug:
+		return "debug"
+	case Linfo:
+		return "info"
+	case Lerror:
+		return "error"
+	case Ldisabled:
+		return "disabled"
+	}
+	return "unknown log level"
+}
+
+func (l LogLevelT) Set(level string) error {
+	switch level {
+	case "info":
+		l = Linfo
+	case "debug":
+		l = Ldebug
+	case "error":
+		l = Lerror
+	case "disabled":
+		l = Ldisabled
+	}
+	return fmt.Errorf("invalid level %s", level) // Can't use upspin.errors
 }

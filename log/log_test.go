@@ -9,6 +9,8 @@ package log
 import (
 	"fmt"
 	"testing"
+
+	"upspin.io/flags"
 )
 
 func TestLogLevel(t *testing.T) {
@@ -19,14 +21,23 @@ func TestLogLevel(t *testing.T) {
 	)
 	setMockLogger(fmt.Sprintf("%shello: %s", msg2, msg3), false)
 
-	SetLevel(Linfo)
-	if CurrentLevel() != Linfo {
-		t.Fatalf("Expected %d, got %d", Linfo, CurrentLevel())
+	SetLevel(flags.Linfo)
+	if CurrentLevel() != flags.Linfo {
+		t.Fatalf("Expected %d, got %d", flags.Linfo, CurrentLevel())
 	}
 	Debug.Println(msg1)             // not logged
 	Info.Print(msg2)                // logged
 	Error.Printf("hello: %s", msg3) // logged
 
+	defaultLogger.(*mockLogger).Verify(t)
+}
+
+func TestDisable(t *testing.T) {
+	setMockLogger("Starting server...", false)
+	SetLevel(flags.Ldebug)
+	Debug.Printf("Starting server...")
+	SetLevel(flags.Ldisabled)
+	Error.Printf("Important stuff you'll miss!")
 	defaultLogger.(*mockLogger).Verify(t)
 }
 
@@ -36,19 +47,19 @@ func TestFatal(t *testing.T) {
 	)
 	setMockLogger(msg, true)
 
-	SetLevel(Lerror)
+	SetLevel(flags.Lerror)
 	Info.Fatal(msg)
 
 	defaultLogger.(*mockLogger).Verify(t)
 }
 
 func TestAt(t *testing.T) {
-	SetLevel(Linfo)
+	SetLevel(flags.Linfo)
 
-	if At(Ldebug) {
+	if At(flags.Ldebug) {
 		t.Errorf("Debug is expected to be disabled when level is info")
 	}
-	if !At(Lerror) {
+	if !At(flags.Lerror) {
 		t.Errorf("Error is expected to be enabled when level is info")
 	}
 }
