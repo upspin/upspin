@@ -30,6 +30,15 @@ func TestLogLevel(t *testing.T) {
 	defaultLogger.(*mockLogger).Verify(t)
 }
 
+func TestDisable(t *testing.T) {
+	setMockLogger("Starting server...", false)
+	SetLevel(Ldebug)
+	Debug.Printf("Starting server...")
+	SetLevel(Ldisabled)
+	Error.Printf("Important stuff you'll miss!")
+	defaultLogger.(*mockLogger).Verify(t)
+}
+
 func TestFatal(t *testing.T) {
 	const (
 		msg = "will abort anyway"
