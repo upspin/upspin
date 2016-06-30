@@ -21,7 +21,7 @@ import (
 
 // Client implements upspin.Client.
 type Client struct {
-	context *upspin.Context
+	context upspin.Context
 	user    upspin.User
 }
 
@@ -32,7 +32,7 @@ var (
 )
 
 // New creates a Client. The client finds the servers according to the given Context.
-func New(context *upspin.Context) upspin.Client {
+func New(context upspin.Context) upspin.Client {
 	return &Client{
 		context: context,
 		user:    usercache.New(context),
@@ -57,7 +57,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	} else {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
-		packer = pack.Lookup(c.context.Packing)
+		packer = pack.Lookup(c.context.Packing())
 		if packer == nil {
 			return zeroLoc, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
 		}
@@ -69,7 +69,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 			Time:     upspin.Now(),
 			Sequence: 0, // Don't care for now.
 			Size:     uint64(len(data)),
-			Writer:   c.context.UserName,
+			Writer:   c.context.UserName(),
 		},
 	}
 
@@ -93,7 +93,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	// Store contents.
-	store, err := bind.Store(c.context, c.context.StoreEndpoint)
+	store, err := bind.Store(c.context, c.context.StoreEndpoint())
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -102,7 +102,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		return zeroLoc, err
 	}
 	de.Location = upspin.Location{
-		Endpoint:  c.context.StoreEndpoint,
+		Endpoint:  c.context.StoreEndpoint(),
 		Reference: ref,
 	}
 
@@ -116,7 +116,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	if packer.String() != "ee" {
 		return nil
 	}
-	directory, err := bind.Directory(c.context, c.context.DirectoryEndpoint)
+	directory, err := bind.Directory(c.context, c.context.DirectoryEndpoint())
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		readers, err = acc.Users(access.Read, c.Get)
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-	readersPublicKey[0] = c.context.Factotum.PublicKey()
+	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
 	for _, r := range readers {
 		_, pubkeys, err := c.user.Lookup(r)
@@ -274,8 +274,8 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 		return nil, err
 	}
 	var endpoints []upspin.Endpoint
-	if parsed.User() == c.context.UserName {
-		endpoints = append(endpoints, c.context.DirectoryEndpoint)
+	if parsed.User() == c.context.UserName() {
+		endpoints = append(endpoints, c.context.DirectoryEndpoint())
 	}
 	if eps, _, err := c.user.Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)

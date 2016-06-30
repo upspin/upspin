@@ -21,7 +21,7 @@ import (
 
 // DirServer is a SecureServer that serves the local file system's directory structure as an upspin.Directory gRPC server.
 type DirServer struct {
-	context  *upspin.Context
+	context  upspin.Context
 	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
@@ -34,7 +34,7 @@ var (
 	configureResponse proto.ConfigureResponse
 )
 
-func NewDirServer(context *upspin.Context, endpoint upspin.Endpoint, server grpcauth.SecureServer) *DirServer {
+func NewDirServer(context upspin.Context, endpoint upspin.Endpoint, server grpcauth.SecureServer) *DirServer {
 	s := &DirServer{
 		context:      context,
 		endpoint:     endpoint,
@@ -52,7 +52,7 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirectoryLookupReque
 		return s.errLookup(err)
 	}
 	// Verify that the user name in the path is the owner of this root.
-	if parsed.User() != s.context.UserName {
+	if parsed.User() != s.context.UserName() {
 		err = errors.E("Lookup", errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
 		return s.errLookup(err)
 	}
@@ -86,7 +86,7 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 		return nil, errors.Str("internal error: not in root")
 	}
 	file = file[len(*root):]
-	name := string(s.context.UserName) + "/" + file
+	name := string(s.context.UserName()) + "/" + file
 	entry := upspin.DirEntry{
 		Name: upspin.PathName(name),
 		Location: upspin.Location{
@@ -140,7 +140,7 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) 
 		return errGlob(err)
 	}
 	// Verify that the user name in the path is the owner of this root.
-	if parsed.User() != s.context.UserName {
+	if parsed.User() != s.context.UserName() {
 		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
 		return errGlob(err)
 	}

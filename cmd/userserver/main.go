@@ -16,6 +16,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/cloud/https"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -37,7 +38,7 @@ const serverName = "userserver"
 
 // Server is a SecureServer that talks to a User interface and serves gRPC requests.
 type Server struct {
-	context  *upspin.Context
+	context  upspin.Context
 	endpoint upspin.Endpoint
 	user     upspin.User // default user service for looking up keys for unauthenticated users.
 	// Automatically handles authentication by implementing the Authenticate server method.
@@ -57,9 +58,7 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	context := &upspin.Context{
-		UserName: serverName,
-	}
+	context := context.New().SetUserName(serverName)
 
 	// Get an instance so we can configure it and use it for authenticated connections.
 	user, err := bind.User(context, *endpoint)
@@ -112,9 +111,8 @@ func (s *Server) userFor(ctx gContext.Context) (upspin.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := *s.context
-	context.UserName = session.User()
-	return bind.User(&context, s.endpoint)
+	context := s.context.Copy().SetUserName(session.User())
+	return bind.User(context, s.endpoint)
 }
 
 // Lookup implements upspin.User, and does not do any authentication.

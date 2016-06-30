@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/context"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 
@@ -138,7 +139,7 @@ func TestGCPErrorsOut(t *testing.T) {
 
 func TestMissingConfiguration(t *testing.T) {
 	cleanSetup()
-	store, err := bind.Store(&upspin.Context{}, upspin.Endpoint{Transport: upspin.GCP})
+	store, err := bind.Store(context.New(), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +155,7 @@ func TestMissingConfiguration(t *testing.T) {
 
 func TestConfigure(t *testing.T) {
 	cleanSetup()
-	store, err := bind.Store(&upspin.Context{}, upspin.Endpoint{Transport: upspin.GCP})
+	store, err := bind.Store(context.New(), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,11 +177,11 @@ func TestConfigure(t *testing.T) {
 
 func TestRefCount(t *testing.T) {
 	cleanSetup()
-	s1, err := bind.Store(&upspin.Context{UserName: "a"}, upspin.Endpoint{Transport: upspin.GCP})
+	s1, err := bind.Store(context.New().SetUserName("a"), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
-	s2, err := bind.Store(&upspin.Context{UserName: "b"}, upspin.Endpoint{Transport: upspin.GCP})
+	s2, err := bind.Store(context.New().SetUserName("b"), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,10 +206,12 @@ func newStoreServer() *storeTestServer {
 	}
 	fileCache = cache.NewFileCache("")
 
-	return &storeTestServer{
+	s := &storeTestServer{
 		server: new(server),
 		ch:     ch,
 	}
+	s.server.context = context.New()
+	return s
 }
 
 func cleanSetup() {

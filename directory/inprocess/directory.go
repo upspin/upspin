@@ -45,7 +45,7 @@ type Service struct {
 type database struct {
 	endpoint upspin.Endpoint
 
-	dirContext *upspin.Context // For accessing store holding directory entries.
+	dirContext upspin.Context // For accessing store holding directory entries.
 
 	// mu is used to serialize access to the maps.
 	// It's also used to serialize all access to the store through the
@@ -70,11 +70,11 @@ type database struct {
 
 var _ upspin.Directory = (*Service)(nil)
 
-func newDirEntry(context *upspin.Context, name upspin.PathName) *upspin.DirEntry {
+func newDirEntry(context upspin.Context, name upspin.PathName) *upspin.DirEntry {
 	return &upspin.DirEntry{
 		Name: name,
 		Location: upspin.Location{
-			Endpoint: context.StoreEndpoint,
+			Endpoint: context.StoreEndpoint(),
 		},
 		Metadata: upspin.Metadata{
 			Packdata: upspin.Packdata{byte(dirPacking)},
@@ -98,7 +98,7 @@ func getPacker(packdata upspin.Packdata) (upspin.Packer, error) {
 }
 
 // packBlob packs an arbitrary blob and its metadata.
-func packBlob(context *upspin.Context, op string, cleartext []byte, entry *upspin.DirEntry) ([]byte, *upspin.Metadata, error) {
+func packBlob(context upspin.Context, op string, cleartext []byte, entry *upspin.DirEntry) ([]byte, *upspin.Metadata, error) {
 	packer, err := getPacker(entry.Metadata.Packdata)
 	if err != nil {
 		return nil, nil, errors.E(op, entry.Name, errors.Invalid, err)
@@ -117,7 +117,7 @@ func packBlob(context *upspin.Context, op string, cleartext []byte, entry *upspi
 
 // unpackBlob unpacks a blob.
 // Other than from unpackDirBlob, only used in tests.
-func unpackBlob(context *upspin.Context, op string, ciphertext []byte, entry *upspin.DirEntry) ([]byte, error) {
+func unpackBlob(context upspin.Context, op string, ciphertext []byte, entry *upspin.DirEntry) ([]byte, error) {
 	packer, err := getPacker(entry.Metadata.Packdata)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, errors.Invalid, err)
@@ -135,7 +135,7 @@ func unpackBlob(context *upspin.Context, op string, ciphertext []byte, entry *up
 }
 
 // unpackDirBlob unpacks a blob that is known to be a directory record.
-func unpackDirBlob(context *upspin.Context, op string, ciphertext []byte, name upspin.PathName) ([]byte, error) {
+func unpackDirBlob(context upspin.Context, op string, ciphertext []byte, name upspin.PathName) ([]byte, error) {
 	return unpackBlob(context, op, ciphertext, newDirEntry(context, name))
 }
 
@@ -167,7 +167,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Name: parsed.First(0).Path(), // The root.
 		Location: upspin.Location{
 			Reference: dirRef,
-			Endpoint:  s.context.StoreEndpoint,
+			Endpoint:  s.context.StoreEndpoint(),
 		},
 		Metadata: upspin.Metadata{
 			Attr: upspin.AttrDirectory,
@@ -258,7 +258,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 	return &upspin.DirEntry{
 		Name: upspin.PathName(user + "/"),
 		Location: upspin.Location{
-			Endpoint:  s.context.StoreEndpoint,
+			Endpoint:  s.context.StoreEndpoint(),
 			Reference: ref,
 		},
 		Metadata: upspin.Metadata{
@@ -294,7 +294,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
+	store, err := bind.Store(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return loc0, errors.E(MakeDirectory, directoryName, err)
 	}
@@ -323,10 +323,10 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		return loc0, errors.E(MakeDirectory, directoryName, err)
 	}
 	loc := upspin.Location{
-		Endpoint:  s.context.StoreEndpoint,
+		Endpoint:  s.context.StoreEndpoint(),
 		Reference: ref,
 	}
-	entry := newDirEntry(&s.context, parsed.Path())
+	entry := newDirEntry(s.context, parsed.Path())
 	entry.SetDir()
 	entry.Location = loc
 	return loc, s.put(MakeDirectory, entry, false)
@@ -473,7 +473,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		dirEntry := &upspin.DirEntry{
 			Name: entries[i+1].Name,
 			Location: upspin.Location{
-				Endpoint:  s.context.StoreEndpoint,
+				Endpoint:  s.context.StoreEndpoint(),
 				Reference: dirRef,
 			},
 			Metadata: upspin.Metadata{
@@ -497,7 +497,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 
 // getData retrieves the data for the entry. s.db.mu is held for write.
 func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
-	store, err := bind.Store(&s.context, entry.Location.Endpoint)
+	store, err := bind.Store(s.context, entry.Location.Endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -610,7 +610,7 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 	return entry, nil
 }
 
-// can reports whether the calling user (defined by s.context.UserName) has the
+// can reports whether the calling user (defined by s.context.UserName()) has the
 // access right for this file or directory.
 // s.db.mu is _not_ held.
 func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
@@ -618,7 +618,7 @@ func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
 	if accessFile == nil {
 		accessFile = s.rootAccessFile(parsed)
 	}
-	return accessFile.Can(s.context.UserName, right, parsed.Path(), s.load)
+	return accessFile.Can(s.context.UserName(), right, parsed.Path(), s.load)
 }
 
 // load is a helper for Access.Can that gets the entire contents of the named item.
@@ -664,7 +664,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 
 // fetchDir returns the decrypted directory data associated with the reference.
 func (s *Service) fetchDir(op string, dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
+	store, err := bind.Store(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return nil, err
 	}
@@ -774,7 +774,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		dirData = append(dirData, data...)
 	}
 	blob, _, err := s.db.packDirBlob(op, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
-	store, err := bind.Store(&s.context, s.context.StoreEndpoint)
+	store, err := bind.Store(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return "", errors.E(op, err)
 	}
@@ -799,7 +799,7 @@ func (s *Service) DeleteAll() {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	const Dial = "Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(Dial, errors.Invalid, errors.Str("unrecognized transport"))
@@ -807,16 +807,16 @@ func (s *Service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
 	if s.db.serviceOwner == "" {
-		if context.UserName == "" {
+		if context.UserName() == "" {
 			return nil, errors.E(Dial, errors.Invalid, errors.Str("no user name"))
 		}
 		// This is the first call; set the owner and endpoint.
 		s.db.endpoint = e
 		s.db.dirContext = context
-		s.db.serviceOwner = context.UserName
+		s.db.serviceOwner = context.UserName()
 	}
 	this := *s // Make a copy.
-	this.context = *context
+	this.context = context
 	return &this, nil
 }
 
@@ -836,7 +836,7 @@ func (s *Service) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (s *Service) Authenticate(*upspin.Context) error {
+func (s *Service) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
 }
