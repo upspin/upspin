@@ -35,11 +35,11 @@ func (plainPack) ReaderHashes(packdata []byte) ([][]byte, error) {
 	return nil, nil
 }
 
-func (plainPack) Share(context *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+func (plainPack) Share(context upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }
 
-func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func (p plainPack) Pack(context upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Pack = "Pack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
@@ -51,7 +51,7 @@ func (p plainPack) Pack(context *upspin.Context, ciphertext, cleartext []byte, d
 	return copy(ciphertext, cleartext), nil
 }
 
-func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func (p plainPack) Unpack(context upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Unpack = "Unpack"
 	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
@@ -64,7 +64,7 @@ func (p plainPack) Unpack(context *upspin.Context, cleartext, ciphertext []byte,
 }
 
 // Name implements upspin.Name.
-func (p plainPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+func (p plainPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
 	const Name = "Name"
 	if dirEntry.IsDir() {
 		return errors.E(Name, errors.IsDir, dirEntry.Name, "cannot rename directory")
@@ -77,7 +77,7 @@ func (p plainPack) Name(ctx *upspin.Context, dirEntry *upspin.DirEntry, newName 
 	return nil
 }
 
-func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
+func (p plainPack) PackLen(context upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckPackMeta(p, meta); err != nil {
 		return -1
@@ -89,7 +89,7 @@ func (p plainPack) PackLen(context *upspin.Context, cleartext []byte, dirEntry *
 	return len(cleartext)
 }
 
-func (p plainPack) UnpackLen(context *upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
+func (p plainPack) UnpackLen(context upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
 	meta := &dirEntry.Metadata
 	if err := pack.CheckUnpackMeta(p, meta); err != nil {
 		return -1

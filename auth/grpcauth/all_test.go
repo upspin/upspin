@@ -17,6 +17,7 @@ import (
 	"upspin.io/auth"
 	prototest "upspin.io/auth/grpcauth/testdata"
 	"upspin.io/cloud/https"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
@@ -129,10 +130,7 @@ func startClient(port string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx := &upspin.Context{
-		UserName: user,
-		Factotum: f,
-	}
+	ctx := context.New().SetUserName(user).SetFactotum(f)
 
 	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, AllowSelfSignedCertificate)
 	if err != nil {

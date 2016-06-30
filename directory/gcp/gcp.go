@@ -14,6 +14,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/cloud/storage"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
@@ -175,7 +176,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		return err
 	}
 
-	user := d.context.UserName
+	user := d.context.UserName()
 	// If we're creating the root, handle it elsewhere.
 	if parsed.IsRoot() {
 		// We handle root elsewhere because otherwise this code would be riddled with "if IsRoot..."
@@ -291,12 +292,12 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	defer mu.Unlock()
 
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
-	canRead, err := d.hasRight(op, d.context.UserName, access.Read, &parsed, opts)
+	canRead, err := d.hasRight(op, d.context.UserName(), access.Read, &parsed, opts)
 	if err != nil {
 		log.Printf("Access error Read: %s", err)
 		return nil, errors.E(op, err)
 	}
-	canList, err := d.hasRight(op, d.context.UserName, access.List, &parsed, opts)
+	canList, err := d.hasRight(op, d.context.UserName(), access.List, &parsed, opts)
 	if err != nil {
 		log.Printf("Access error List: %s", err)
 		return nil, errors.E(op, err)
@@ -320,11 +321,11 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		log.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName, parsed)
+		log.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
 		dirEntry.Location = upspin.Location{}
 		dirEntry.Metadata.Packdata = nil
 	}
-	log.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName, parsed.Path(), dirEntry)
+	log.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
 	return dirEntry, nil
 }
 
@@ -352,7 +353,7 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 		return "", errors.E(op, err)
 	}
 
-	user := d.context.UserName
+	user := d.context.UserName()
 
 	// Must check whether the user has sufficient rights to List the requested path.
 	canRead, err := d.checkRights(user, access.Read, parsed.Path(), acc, opts)
@@ -427,7 +428,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, err
 	}
 
-	user := d.context.UserName
+	user := d.context.UserName()
 	dirEntries := make([]*upspin.DirEntry, 0, len(names))
 	// Now do the actual globbing.
 	for _, lookupPath := range names {
@@ -490,7 +491,7 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	user := d.context.UserName
+	user := d.context.UserName()
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
 	canDelete, err := d.hasRight(op, user, access.Delete, &parsed, opts)
 	if err != nil {
@@ -538,6 +539,7 @@ type newStoreClient func(e upspin.Endpoint) (upspin.Store, error)
 
 func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
 	d := &directory{
+		context:        context.New(),
 		cloudClient:    cloudClient,
 		factotum:       f,
 		newStoreClient: newStoreClient,
@@ -557,12 +559,8 @@ func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient
 // newStoreClient is newStoreCllient function that creates a Store object connected to the Store endpoint and loads
 // a context for this server (using its factotum for keys).
 func (d *directory) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, error) {
-	serverContext := upspin.Context{
-		UserName: d.serverName,
-		Factotum: d.factotum,
-	}
-
-	return bind.Store(&serverContext, e)
+	serverContext := context.New().SetFactotum(d.factotum).SetUserName(d.serverName)
+	return bind.Store(serverContext, e)
 }
 
 // storeGet binds to the endpoint in the location, calls the store client and resolves up to one indirection,
@@ -595,7 +593,7 @@ func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 }
 
 // Dial implements upspin.Service.
-func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *directory) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
 		return nil, errors.E("Dial", errors.Syntax, errors.Str("unrecognized transport"))
 	}
@@ -610,8 +608,8 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 		return nil, errors.E("Dial", errors.Other, errors.Str("refCount wrapped around"))
 	}
 
-	this := *d              // Clone ourselves.
-	this.context = *context // Make a copy of the context, to prevent changes.
+	this := *d                    // Clone ourselves.
+	this.context = context.Copy() // Make a copy of the context, to prevent changes.
 	this.endpoint = e
 
 	// Did we inherit keys and a service username from a generator instance (the instance that was
@@ -619,11 +617,11 @@ func (d *directory) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Ser
 
 	// Have we keys for this service already?
 	if this.factotum == nil {
-		this.factotum = context.Factotum
+		this.factotum = context.Factotum()
 	}
 	// Have we a server name already?
 	if this.serverName == "" {
-		this.serverName = context.UserName
+		this.serverName = context.UserName()
 	}
 
 	return &this, nil
@@ -663,7 +661,7 @@ func (d *directory) Configure(options ...string) error {
 // isConfigured returns whether this server is configured properly.
 // It must be called with mu locked.
 func (d *directory) isConfigured() bool {
-	return d.cloudClient != nil && d.context.UserName != ""
+	return d.cloudClient != nil && d.context.UserName() != ""
 }
 
 // Ping implements upspin.Service.
@@ -677,7 +675,7 @@ func (d *directory) Close() {
 	defer confLock.Unlock()
 
 	// Clean up this instance
-	d.context.UserName = "" // ensure we get an error in subsequent calls.
+	d.context.SetUserName("") // ensure we get an error in subsequent calls.
 
 	refCount--
 	if refCount == 0 {
@@ -691,7 +689,7 @@ func (d *directory) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (d *directory) Authenticate(*upspin.Context) error {
+func (d *directory) Authenticate(upspin.Context) error {
 	// Authentication is not dealt here. It happens at other layers.
 	return nil
 }

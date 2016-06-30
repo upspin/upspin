@@ -16,6 +16,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -54,9 +55,9 @@ var (
 )
 
 // New returns a new, unconfigured Store bound to the user in the context.
-func New(context *upspin.Context) upspin.Store {
+func New(context upspin.Context) upspin.Store {
 	return &server{
-		context: *context, // Make a copy to prevent user making further changes.
+		context: context.Copy(), // Make a copy to prevent user making further changes.
 	}
 }
 
@@ -99,7 +100,8 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 
 // Get implements upspin.Store.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	file, loc, err := s.innerGet(s.context.UserName, ref)
+	fmt.Printf("context is %v\n", s.context)
+	file, loc, err := s.innerGet(s.context.UserName(), ref)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -177,7 +179,7 @@ func (s *server) Delete(ref upspin.Reference) error {
 }
 
 // Dial implements upspin.Service.
-func (s *server) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -186,8 +188,8 @@ func (s *server) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servic
 	defer mu.Unlock()
 	refCount++
 
-	this := *s              // Clone ourselves.
-	this.context = *context // Make a copy of the context, to prevent changes.
+	this := *s                    // Clone ourselves.
+	this.context = context.Copy() // Make a copy of the context, to prevent changes.
 	this.endpoint = e
 	return &this, nil
 }
@@ -259,7 +261,7 @@ func (s *server) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (s *server) Authenticate(*upspin.Context) error {
+func (s *server) Authenticate(upspin.Context) error {
 	// Authentication is not dealt here. It happens at other layers.
 	return nil
 }
@@ -270,5 +272,5 @@ func (s *server) Endpoint() upspin.Endpoint {
 }
 
 func init() {
-	bind.RegisterStore(upspin.GCP, New(&upspin.Context{}))
+	bind.RegisterStore(upspin.GCP, New(context.New()))
 }

@@ -64,7 +64,7 @@ func main() {
 
 	// Hack for testing
 	if *testFlag != "" {
-		user, err := bind.User(context, context.UserEndpoint)
+		user, err := bind.User(context, context.UserEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
@@ -73,7 +73,7 @@ func main() {
 			log.Debug.Fatal("Not a inprocess.Service")
 		}
 
-		dir, err := bind.Directory(context, context.DirectoryEndpoint)
+		dir, err := bind.Directory(context, context.DirectoryEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
@@ -89,7 +89,7 @@ func main() {
 		fuse.FSName("upspin"),
 		fuse.Subtype("fs"),
 		fuse.LocalVolume(),
-		fuse.VolumeName(string(f.context.UserName)),
+		fuse.VolumeName(string(f.context.UserName())),
 		fuse.DaemonTimeout("240"),
 		//fuse.OSXDebugFuseKernel(),
 		fuse.NoAppleDouble(),

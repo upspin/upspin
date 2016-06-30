@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -36,7 +37,7 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
 	cipher := make([]byte, packer.PackLen(ctx, text, d))
 	m, err := packer.Pack(ctx, cipher, text, d)
 	if err != nil {
@@ -46,7 +47,7 @@ func packBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
-func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
 	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
 	m, err := packer.Unpack(ctx, clear, cipher, d)
 	if err != nil {
@@ -56,17 +57,17 @@ func unpackBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, d *upsp
 }
 
 // shareBlob updates the packdata of a blob such that the public keys given are readers of the blob.
-func shareBlob(t *testing.T, ctx *upspin.Context, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
+func shareBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
 	pd := make([]*[]byte, 1)
 	pd[0] = packdata
 	packer.Share(ctx, readers, pd)
 }
 
-func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
-	d.Metadata.Writer = ctx.UserName
+	d.Metadata.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
@@ -77,11 +78,11 @@ func testPackAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, 
 	}
 }
 
-func testPackNameAndUnpack(t *testing.T, ctx *upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
+func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
-	d.Metadata.Writer = ctx.UserName
+	d.Metadata.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Name to newName.
@@ -190,16 +191,14 @@ func TestSharing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.Factotum = f // Override setup to prevent reading keys from .ssh/
+	ctx.SetFactotum(f) // Override setup to prevent reading keys from .ssh/
 	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.UserEndpoint = upspin.Endpoint{
-		Transport: upspin.InProcess,
-	}
+	ctx.SetUserEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
-	d.Metadata.Writer = ctx.UserName
+	d.Metadata.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob
 	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic}, &d.Metadata.Packdata)
@@ -218,12 +217,12 @@ func TestSharing(t *testing.T) {
 	}
 
 	// Now load Bob as the current user.
-	ctx.UserName = bobsUserName
+	ctx.SetUserName(bobsUserName)
 	f, err = factotum.New(bobsPublic, bobsPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.Factotum = f
+	ctx.SetFactotum(f)
 
 	clear := unpackBlob(t, ctx, packer, d, cipher)
 	if string(clear) != text {
@@ -259,27 +258,27 @@ func TestBadSharing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.Factotum = f
+	ctx.SetFactotum(f)
 	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.UserEndpoint = upspin.Endpoint{
+	ctx.SetUserEndpoint(upspin.Endpoint{
 		Transport: upspin.InProcess,
-	}
+	})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
-	d.Metadata.Writer = ctx.UserName
+	d.Metadata.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 
 	// Don't share with Mia (do nothing).
 
 	// Now load Mia as the current user.
-	ctx.UserName = miasUserName
+	ctx.SetUserName(miasUserName)
 	f, err = factotum.New(miasPublic, miasPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.Factotum = f
+	ctx.SetFactotum(f)
 
 	// Mia can't unpack.
 	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
@@ -292,7 +291,7 @@ func TestBadSharing(t *testing.T) {
 	}
 }
 
-func setup(name upspin.UserName, curveName string) (*upspin.Context, upspin.Packer) {
+func setup(name upspin.UserName, curveName string) (upspin.Context, upspin.Packer) {
 	var curve elliptic.Curve
 	switch curveName {
 	case "p256":
@@ -305,9 +304,7 @@ func setup(name upspin.UserName, curveName string) (*upspin.Context, upspin.Pack
 		errors.E("setup", curveName, errors.NotExist, errors.Str("unknown curve"))
 	}
 
-	ctx := &upspin.Context{
-		UserName: name,
-	}
+	ctx := context.New().SetUserName(name)
 	packer := pack.Lookup(packing)
 	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
@@ -317,10 +314,11 @@ func setup(name upspin.UserName, curveName string) (*upspin.Context, upspin.Pack
 	}
 	kPublic := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
 	kPrivate := fmt.Sprintf("%s\n", priv.D.String())
-	ctx.Factotum, err = factotum.New(kPublic, kPrivate)
+	f, err := factotum.New(kPublic, kPrivate)
 	if err != nil {
 		panic("NewFactotum failed")
 	}
+	ctx.SetFactotum(f)
 	return ctx, packer
 }
 
@@ -344,6 +342,6 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 	}
 	return nil, nil, errors.E("Lookup", userName, errors.NotExist, errors.Str("user not found"))
 }
-func (d *dummyUser) Dial(cc *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyUser) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
 }
