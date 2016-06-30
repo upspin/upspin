@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "40651395_4b25794d",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-30T01:22:14Z",
+      "side": 0,
+      "message": "We could... but it\u0027ll go away soon anyway. I kinda like SETUP. :-)",
+      "parentUuid": "008ebb41_ce822319",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0e903d1_c5da10f3",
         "filename": "cmd/admin/deploy-servers.sh",
         "patchSetId": 18
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "40ea7321_a0d47afc",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-30T01:22:14Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "c0e903d1_c5da10f3",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0924f64_0bab3d87",
         "filename": "cmd/admin/deploy-servers.sh",
         "patchSetId": 18
@@ -47,6 +83,24 @@
       "writtenOn": "2016-06-29T18:08:10Z",
       "side": 0,
       "message": "We may need to do something about error reporting later. Note that if gcloud fails, this can still look successful to another script. Luckily, we don\u0027t use this from other scripts, so not a big deal, maybe a TODO?",
+      "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40ea7321_00da8626",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 18
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-06-30T01:22:14Z",
+      "side": 0,
+      "message": "I\u0027m setting -e at the top of this script now, so any failing sub-commands will cause the script to fail.",
+      "parentUuid": "a0924f64_0bab3d87",
       "revId": "ec778da0005c81d09dc6fef0344f58e8cc60e308",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
