@@ -43,7 +43,7 @@ type dummyDialer struct {
 var _ upspin.Dialer = (*dummyDialer)(nil)
 
 // Dial implements upspin.Dialer.
-func (d *dummyDialer) Dial(*upspin.Context, upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyDialer) Dial(upspin.Context, upspin.Endpoint) (upspin.Service, error) {
 	return nil, nil
 }
 
@@ -58,7 +58,7 @@ func (d *dummyService) Configure(options ...string) error {
 }
 
 // Authenticate implements upspin.Service.
-func (d *dummyService) Authenticate(*upspin.Context) error {
+func (d *dummyService) Authenticate(upspin.Context) error {
 	return nil
 }
 

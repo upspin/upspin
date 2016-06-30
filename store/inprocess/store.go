@@ -100,7 +100,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 // There is only one data set in the address space.
 // Dial ignores the address within the endpoint but requires that the transport be InProcess.
 // TODO: Authenticate the caller.
-func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E("Store", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -109,10 +109,10 @@ func (s *service) Dial(context *upspin.Context, e upspin.Endpoint) (upspin.Servi
 	if s.data.serviceOwner == "" {
 		// This is the first call; set the owner and endpoint.
 		s.data.endpoint = e
-		s.data.serviceOwner = context.UserName
+		s.data.serviceOwner = context.UserName()
 	}
 	thisUser := *s // Make a copy.
-	thisUser.userName = context.UserName
+	thisUser.userName = context.UserName()
 	return &thisUser, nil
 }
 
@@ -127,7 +127,7 @@ func (s *service) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (s *service) Authenticate(*upspin.Context) error {
+func (s *service) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
 }

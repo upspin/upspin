@@ -16,6 +16,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/cloud/https"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -35,7 +36,7 @@ var (
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
-	context  *upspin.Context
+	context  upspin.Context
 	endpoint upspin.Endpoint
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
@@ -54,9 +55,7 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	context := &upspin.Context{
-		UserName: "storeserver",
-	}
+	context := context.New().SetUserName("storeserver")
 	// If there are configuration options, set them now
 	if *config != "" {
 		// Get an instance so we can configure it.
@@ -107,9 +106,8 @@ func (s *Server) storeFor(ctx gContext.Context) (upspin.Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := *s.context
-	context.UserName = session.User()
-	return bind.Store(&context, s.endpoint)
+	context := s.context.Copy().SetUserName(session.User())
+	return bind.Store(context, s.endpoint)
 }
 
 // Get implements upspin.Store

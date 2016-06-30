@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
+	"upspin.io/context"
 	"upspin.io/upspin"
 
 	_ "upspin.io/directory/inprocess"
@@ -19,11 +20,8 @@ var (
 	userName = upspin.UserName("joe@blow.com")
 )
 
-func setup(t *testing.T) (upspin.User, *upspin.Context) {
-	c := &upspin.Context{
-		Packing:  upspin.DebugPack,
-		UserName: userName,
-	}
+func setup(t *testing.T) (upspin.User, upspin.Context) {
+	c := context.New().SetUserName(userName).SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -32,9 +30,9 @@ func setup(t *testing.T) (upspin.User, *upspin.Context) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.UserEndpoint = e
-	c.StoreEndpoint = e
-	c.DirectoryEndpoint = e
+	c.SetUserEndpoint(e)
+	c.SetStoreEndpoint(e)
+	c.SetDirectoryEndpoint(e)
 	return u, c
 }
 
@@ -45,7 +43,7 @@ func TestInstallAndLookup(t *testing.T) {
 		t.Fatal("Not an inprocess User Service")
 	}
 
-	dir, err := bind.Directory(ctxt, ctxt.DirectoryEndpoint)
+	dir, err := bind.Directory(ctxt, ctxt.DirectoryEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}

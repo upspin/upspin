@@ -97,14 +97,14 @@ func (ee ee) Packing() upspin.Packing {
 	return upspin.EEPack
 }
 
-func (ee ee) PackLen(ctx *upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
+func (ee ee) PackLen(ctx upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPackMeta(ee, &d.Metadata); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (ee ee) UnpackLen(ctx *upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
+func (ee ee) UnpackLen(ctx upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckUnpackMeta(ee, &d.Metadata); err != nil {
 		return -1
 	}
@@ -115,7 +115,7 @@ func (ee ee) String() string {
 	return "ee"
 }
 
-func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
+func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
 	const Pack = "Pack"
 	if err := pack.CheckPackMeta(ee, &d.Metadata); err != nil {
 		return 0, errors.E(Pack, errors.Invalid, d.Name, err)
@@ -139,14 +139,14 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	cipherSum := b[:]
 
 	// Sign ciphertext.
-	sig, err := ctx.Factotum.FileSign(path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+	sig, err := ctx.Factotum().FileSign(path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
 	}
 
 	// Wrap for myself.
 	wrap := make([]wrappedKey, 2)
-	p, _, err := factotum.ParsePublicKey(ctx.Factotum.PublicKey())
+	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey())
 	if err != nil {
 		return 0, errors.E(Pack, d.Name, err)
 	}
@@ -161,10 +161,10 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 		return 0, errors.E(Pack, d.Name, err)
 	}
 	owner := parsed.User()
-	if owner == ctx.UserName {
+	if owner == ctx.UserName() {
 		wrap = wrap[:1]
 	} else {
-		userConn, err := bind.User(ctx, ctx.UserEndpoint)
+		userConn, err := bind.User(ctx, ctx.UserEndpoint())
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
@@ -172,8 +172,8 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
-		if ownerKeys[0] == ctx.Factotum.PublicKey() {
-			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName)
+		if ownerKeys[0] == ctx.Factotum().PublicKey() {
+			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName())
 			wrap = wrap[:1]
 		} else {
 			p, _, err = factotum.ParsePublicKey(ownerKeys[0])
@@ -195,7 +195,7 @@ func (ee ee) Pack(ctx *upspin.Context, ciphertext, cleartext []byte, d *upspin.D
 	return cipherLen, err
 }
 
-func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
+func (ee ee) Unpack(ctx upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
 	const Unpack = "Unpack"
 	if err := pack.CheckUnpackMeta(ee, &d.Metadata); err != nil {
 		return 0, errors.E(Unpack, errors.Invalid, d.Name, err)
@@ -226,7 +226,7 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 	}
 
 	// Now get my own keys
-	me := ctx.UserName // Recipient of the file is me (the user in the context)
+	me := ctx.UserName() // Recipient of the file is me (the user in the context)
 	rawPublicKey, err := publicKey(ctx, me)
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
@@ -241,7 +241,7 @@ func (ee ee) Unpack(ctx *upspin.Context, cleartext, ciphertext []byte, d *upspin
 			continue
 		}
 		// Decode my wrapped key using my private key
-		dkey, err = ee.aesUnwrap(ctx.Factotum, w)
+		dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
 		if err != nil {
 			log.Printf("unwrap failed: %v", err)
 			return 0, errors.E(Unpack, d.Name, err)
@@ -274,7 +274,7 @@ func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 }
 
 // Share extracts the file decryption key from the packdata, wraps it for a revised list of readers, and updates packdata.
-func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
 
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
@@ -293,7 +293,7 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 		}
 		copy(hash[i][:], factotum.KeyHash(pub))
 	}
-	myhash := factotum.KeyHash(ctx.Factotum.PublicKey())
+	myhash := factotum.KeyHash(ctx.Factotum().PublicKey())
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdata {
@@ -317,7 +317,7 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 				// to unwrap dkey, we can only use our own private key
 				continue
 			}
-			dkey, err = ee.aesUnwrap(ctx.Factotum, w)
+			dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
 			if err != nil {
 				log.Printf("dkey unwrap failed: %v", err)
 				break // give up;  might mean that owner has changed keys
@@ -362,7 +362,7 @@ func (ee ee) Share(ctx *upspin.Context, readers []upspin.PublicKey, packdata []*
 }
 
 // Name implements upspin.Name.
-func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
 	const Name = "Name"
 	if d.IsDir() {
 		return errors.E(Name, d.Name, errors.IsDir, "cannot rename directory")
@@ -394,7 +394,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	// Now get my own keys
-	me := ctx.UserName // Recipient of the file is me (the user in the context)
+	me := ctx.UserName() // Recipient of the file is me (the user in the context)
 	rawPublicKey, err := publicKey(ctx, me)
 	if err != nil {
 		return errors.E(Name, d.Name, err)
@@ -420,7 +420,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	// Decode my wrapped key using my private key
-	dkey, err = ee.aesUnwrap(ctx.Factotum, w)
+	dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
 	if err != nil {
 		log.Printf("unwrap failed: %s", err)
 		return errors.E(Name, d.Name, errors.Str("unwrap failed"))
@@ -446,7 +446,7 @@ func (ee ee) Name(ctx *upspin.Context, d *upspin.DirEntry, newName upspin.PathNa
 	}
 
 	// Compute new signature.
-	sig, err = ctx.Factotum.FileSign(newName, d.Metadata.Time, dkey, cipherSum)
+	sig, err = ctx.Factotum().FileSign(newName, d.Metadata.Time, dkey, cipherSum)
 	if err != nil {
 		return errors.E(Name, d.Name, err)
 	}
@@ -685,7 +685,7 @@ func (ee ee) packdataLen(nwrap int) int {
 }
 
 // publicKey returns the string representation of a user's public key.
-func publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
 
 	// Key pairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup
@@ -697,10 +697,10 @@ func publicKey(ctx *upspin.Context, user upspin.UserName) (upspin.PublicKey, err
 
 	log.Debug.Printf("Getting pub key for user: %s", user) // TODO(ehg) Log no longer needed?
 	// Are we requesting our own public key?
-	if string(user) == string(ctx.UserName) {
-		return ctx.Factotum.PublicKey(), nil
+	if string(user) == string(ctx.UserName()) {
+		return ctx.Factotum().PublicKey(), nil
 	}
-	userService, err := bind.User(ctx, ctx.UserEndpoint)
+	userService, err := bind.User(ctx, ctx.UserEndpoint())
 	if err != nil {
 		return "", err
 	}
