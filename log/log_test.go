@@ -13,83 +13,96 @@ import (
 
 func TestLogLevel(t *testing.T) {
 	const (
-		msg1 = "log line1"
-		msg2 = "log line2"
-		msg3 = "log line3"
+		msg1  = "log line1"
+		msg2  = "log line2"
+		msg3  = "log line3"
+		level = "info"
 	)
-	setMockLogger(fmt.Sprintf("%shello: %s", msg2, msg3), false)
+	setFakeLogger(fmt.Sprintf("%shello: %s", msg2, msg3), false)
 
-	SetLevel(Linfo)
-	if CurrentLevel() != Linfo {
-		t.Fatalf("Expected %d, got %d", Linfo, CurrentLevel())
+	SetLevel(level)
+	if Level() != level {
+		t.Fatalf("Expected %q, got %q", level, Level())
 	}
 	Debug.Println(msg1)             // not logged
 	Info.Print(msg2)                // logged
 	Error.Printf("hello: %s", msg3) // logged
 
-	defaultLogger.(*mockLogger).Verify(t)
+	defaultLogger.(*fakeLogger).Verify(t)
+}
+
+func TestDisable(t *testing.T) {
+	setFakeLogger("Starting server...", false)
+	SetLevel("debug")
+	Debug.Printf("Starting server...")
+	SetLevel("disabled")
+	Error.Printf("Important stuff you'll miss!")
+	defaultLogger.(*fakeLogger).Verify(t)
 }
 
 func TestFatal(t *testing.T) {
 	const (
 		msg = "will abort anyway"
 	)
-	setMockLogger(msg, true)
+	setFakeLogger(msg, true)
 
-	SetLevel(Lerror)
+	SetLevel("error")
 	Info.Fatal(msg)
 
-	defaultLogger.(*mockLogger).Verify(t)
+	defaultLogger.(*fakeLogger).Verify(t)
 }
 
 func TestAt(t *testing.T) {
-	SetLevel(Linfo)
+	SetLevel("info")
 
-	if At(Ldebug) {
-		t.Errorf("Debug is expected to be disabled when level is info")
+	if At("debug") {
+		t.Error("Debug is expected to be disabled when level is info")
 	}
-	if !At(Lerror) {
-		t.Errorf("Error is expected to be enabled when level is info")
+	if !At("error") {
+		t.Error("Error is expected to be enabled when level is info")
+	}
+	if !At("some random invalid level but we should log anyway for this very reason") {
+		t.Error("Should log when level is invalid")
 	}
 }
 
-func setMockLogger(expected string, fatalExpected bool) {
-	defaultLogger = &mockLogger{
+func setFakeLogger(expected string, fatalExpected bool) {
+	defaultLogger = &fakeLogger{
 		expected:      expected,
 		fatalExpected: fatalExpected,
 	}
 }
 
-type mockLogger struct {
+type fakeLogger struct {
 	fatal         bool
 	logged        string
 	expected      string
 	fatalExpected bool
 }
 
-func (ml *mockLogger) Printf(format string, v ...interface{}) {
+func (ml *fakeLogger) Printf(format string, v ...interface{}) {
 	ml.logged += fmt.Sprintf(format, v...)
 }
 
-func (ml *mockLogger) Print(v ...interface{}) {
+func (ml *fakeLogger) Print(v ...interface{}) {
 	ml.logged += fmt.Sprint(v...)
 }
 
-func (ml *mockLogger) Println(v ...interface{}) {
+func (ml *fakeLogger) Println(v ...interface{}) {
 	ml.logged += fmt.Sprintln(v...)
 }
 
-func (ml *mockLogger) Fatal(v ...interface{}) {
+func (ml *fakeLogger) Fatal(v ...interface{}) {
 	ml.fatal = true
 	ml.Print(v...)
 }
 
-func (ml *mockLogger) Fatalf(format string, v ...interface{}) {
+func (ml *fakeLogger) Fatalf(format string, v ...interface{}) {
 	ml.fatal = true
 	ml.Printf(format, v...)
 }
 
-func (ml *mockLogger) Verify(t *testing.T) {
+func (ml *fakeLogger) Verify(t *testing.T) {
 	if ml.logged != ml.expected {
 		t.Errorf("Expected %q, got %q", ml.expected, ml.logged)
 	}
