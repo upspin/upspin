@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d5c1e64_5f86a3fa",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-06-30T20:54:30Z",
+      "side": 1,
+      "message": "// TODO: Find a way to make this apply to all commands.",
+      "revId": "dfb5e82630c39ac2682dcb6764609c2a3f6e5b72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
