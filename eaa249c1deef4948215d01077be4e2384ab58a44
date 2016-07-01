@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd1efa57_8ef0cf6a",
+        "filename": "bind/bind_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T17:58:12Z",
+      "side": 1,
+      "message": "You may want these to live in test/testfixtures for later re-use.",
+      "revId": "eaa249c1deef4948215d01077be4e2384ab58a44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
