@@ -96,10 +96,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	// At this point we may have the reference cached but we first need to look in
 	// the directory to see what the reference is.
 	cf := &cachedFile{c: c, inStore: true}
-	dir, err := n.f.dc.lookup(n.user)
-	if err != nil {
-		return err
-	}
+	dir := n.f.dirLookup(n.user)
 	de, err := dir.Lookup(n.uname)
 	if err != nil {
 		return err

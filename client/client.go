@@ -34,8 +34,7 @@ var (
 // New creates a Client. The client finds the servers according to the given Context.
 func New(context upspin.Context) upspin.Client {
 	return &Client{
-		context: context,
-		user:    usercache.New(context),
+		context: usercache.Global(context),
 	}
 }
 
@@ -143,7 +142,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
 	for _, r := range readers {
-		_, pubkeys, err := c.user.Lookup(r)
+		_, pubkeys, err := c.context.User().Lookup(r)
 		if err != nil || len(pubkeys) < 1 {
 			// TODO warn that we can't process one of the readers?
 			continue
@@ -277,7 +276,7 @@ func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
 	if parsed.User() == c.context.UserName() {
 		endpoints = append(endpoints, c.context.DirectoryEndpoint())
 	}
-	if eps, _, err := c.user.Lookup(parsed.User()); err == nil {
+	if eps, _, err := c.context.User().Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	var dir upspin.Directory
