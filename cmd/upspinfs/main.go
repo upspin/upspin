@@ -18,6 +18,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/user/inprocess"
+	"upspin.io/user/usercache"
 
 	_ "upspin.io/directory/transports"
 	_ "upspin.io/pack/ee"
@@ -82,7 +83,8 @@ func main() {
 		}
 	}
 
-	f := newUpspinFS(context, newDirectoryCache(context))
+	context = usercache.Global(context)
+	f := newUpspinFS(context)
 
 	c, err := fuse.Mount(
 		mountpoint,

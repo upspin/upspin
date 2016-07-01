@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package usercache pushes a user cache in front of context.User.
+// Package usercache pushes a new Context onto an old. It passes all operations except User()
+// to the underlying context. User() returns a pointer to a cached version of the underlying
+// context's User() service.
 package usercache
 
 import (
 	"time"
 
-	"upspin.io/bind"
 	"upspin.io/cache"
-	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -20,30 +20,46 @@ type entry struct {
 	pub     []upspin.PublicKey
 }
 
-type userCache struct {
-	userEndpoint upspin.Endpoint
-	context      upspin.Context
-	entries      *cache.LRU
-	duration     time.Duration
+type userCacheContext struct {
+	context upspin.Context
+	cache   *userCache
 }
 
-// New creates a cache onto the User service.  After this all User service requests will
-// be filtered through the cache.
-//
-// TODO(p): New is not concurrency safe since context is assumed to be immutable
-// everywhere else.  Not sure this needs to be fixed but should at least be noted.
-func New(context upspin.Context) upspin.User {
-	return &userCache{
-		context:      context,
-		userEndpoint: context.UserEndpoint(),
-		entries:      cache.NewLRU(256),
-		duration:     time.Minute * 15,
+type userCache struct {
+	entries  *cache.LRU
+	duration time.Duration
+}
+
+const defaultDuration = 15 * time.Minute
+
+var globalCache = userCache{entries: cache.NewLRU(256), duration: defaultDuration}
+
+// Private pushes a new user cache onto a context. If duration is non-zero
+// it specifies the lifetime of cache entries.
+func Private(context upspin.Context, duration time.Duration) upspin.Context {
+	if duration == 0 {
+		duration = defaultDuration
+	}
+	return &userCacheContext{
+		context: context.Copy(),
+		cache: &userCache{
+			entries:  cache.NewLRU(256),
+			duration: duration,
+		},
+	}
+}
+
+// Global pushes a global user cache onto a context.
+func Global(context upspin.Context) upspin.Context {
+	return &userCacheContext{
+		context: context.Copy(),
+		cache:   &globalCache,
 	}
 }
 
 // Lookup implements upspin.User.Lookup.
-func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	v, ok := c.entries.Get(name)
+func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+	v, ok := c.cache.entries.Get(name)
 
 	// If we have an unexpired binding, use it.
 	if ok {
@@ -51,61 +67,138 @@ func (c *userCache) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Pu
 			e := v.(*entry)
 			return e.eps, e.pub, nil
 		}
-		c.entries.Remove(name)
+		c.cache.entries.Remove(name)
 	}
 
 	// Not found, look it up.
-	user, err := bind.User(c.context, c.userEndpoint)
-	if err != nil {
-		return nil, nil, errors.Errorf("usercache: error binding to User service on %v for user %q: %s",
-			c.userEndpoint, c.context.UserName(), err.Error())
-	}
-	defer bind.Release(user)
-	eps, pub, err := user.Lookup(name)
+	eps, pub, err := c.context.User().Lookup(name)
 	if err != nil {
 		return nil, nil, err
 	}
 	e := &entry{
-		expires: time.Now().Add(c.duration),
+		expires: time.Now().Add(c.cache.duration),
 		eps:     eps,
 		pub:     pub,
 	}
-	c.entries.Add(name, e)
+	c.cache.entries.Add(name, e)
 	return eps, pub, nil
 }
 
 // Dial implements upspin.User.Dial.
-func (c *userCache) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (c *userCacheContext) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return c, nil
 }
 
 // Configure implements upspin.Service.
-func (c *userCache) Configure(options ...string) error {
+func (c *userCacheContext) Configure(options ...string) error {
 	panic("unimplemented")
 }
 
 // Endpoint implements upspin.Service.
-func (c *userCache) Endpoint() upspin.Endpoint {
+func (c *userCacheContext) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
 
 // Ping implements upspin.Service.
-func (c *userCache) Ping() bool {
+func (c *userCacheContext) Ping() bool {
 	return true
 }
 
 // Close implements upspin.Service.
-func (c *userCache) Close() {
-	c.entries = nil
+func (c *userCacheContext) Close() {
+	c.cache.entries = nil
 }
 
 // Authenticate implements upspin.Service.
-func (c *userCache) Authenticate(upspin.Context) error {
+func (c *userCacheContext) Authenticate(upspin.Context) error {
 	return nil
 }
 
-// SetDuration sets the duration until entries expire.  Primarily
-// intended for testing.
-func (c *userCache) SetDuration(d time.Duration) {
-	c.duration = d
+// User implements upspin.Context. It returns a pointer to the caching user service.
+func (ctx *userCacheContext) User() upspin.User {
+	return ctx
+}
+
+// Directory implements upspin.Context.
+func (ctx *userCacheContext) Directory(name upspin.PathName) upspin.Directory {
+	return ctx.context.Directory(name)
+}
+
+// Store implements upspin.Context.
+func (ctx *userCacheContext) Store() upspin.Store {
+	return ctx.context.Store()
+}
+
+// Store implements upspin.Context.
+func (ctx *userCacheContext) UserName() upspin.UserName {
+	return ctx.context.UserName()
+}
+
+// SetUserName implements upspin.Context.
+func (ctx *userCacheContext) SetUserName(u upspin.UserName) upspin.Context {
+	ctx.context.SetUserName(u)
+	return ctx
+}
+
+// Factotum implements upspin.Context.
+func (ctx *userCacheContext) Factotum() upspin.Factotum {
+	return ctx.context.Factotum()
+}
+
+// SetFactotum implements upspin.Context.
+func (ctx *userCacheContext) SetFactotum(f upspin.Factotum) upspin.Context {
+	ctx.context.SetFactotum(f)
+	return ctx
+}
+
+// Packing implements upspin.Context.
+func (ctx *userCacheContext) Packing() upspin.Packing {
+	return ctx.context.Packing()
+}
+
+// SetPacking implements upspin.Context.
+func (ctx *userCacheContext) SetPacking(p upspin.Packing) upspin.Context {
+	ctx.context.SetPacking(p)
+	return ctx
+}
+
+// UserEndpoint implements upspin.Context.
+func (ctx *userCacheContext) UserEndpoint() upspin.Endpoint {
+	return ctx.context.UserEndpoint()
+}
+
+// SetUserEndpoint implements upspin.Context.
+func (ctx *userCacheContext) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.context.SetUserEndpoint(e)
+	return ctx
+}
+
+// DirectoryEndpoint implements upspin.Context.
+func (ctx *userCacheContext) DirectoryEndpoint() upspin.Endpoint {
+	return ctx.context.DirectoryEndpoint()
+}
+
+// SetDirectoryEndpoint implements upspin.Context.
+func (ctx *userCacheContext) SetDirectoryEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.context.SetDirectoryEndpoint(e)
+	return ctx
+}
+
+// StoreEndpoint implements upspin.Context.
+func (ctx *userCacheContext) StoreEndpoint() upspin.Endpoint {
+	return ctx.context.StoreEndpoint()
+}
+
+// SetStoreEndpoint implements upspin.Context.
+func (ctx *userCacheContext) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.context.SetStoreEndpoint(e)
+	return ctx
+}
+
+// Copy implements upspin.Context. We are actually copying the underlying context but
+// still pointing to the same LRU cache.
+func (ctx *userCacheContext) Copy() upspin.Context {
+	c := *ctx
+	c.context = ctx.context.Copy()
+	return &c
 }

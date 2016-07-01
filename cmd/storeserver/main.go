@@ -56,6 +56,7 @@ func main() {
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	context := context.New().SetUserName("storeserver")
+
 	// If there are configuration options, set them now
 	if *config != "" {
 		// Get an instance so we can configure it.
@@ -77,7 +78,7 @@ func main() {
 		}
 	}
 
-	authConfig := auth.Config{Lookup: auth.PublicUserKeyService()}
+	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(context)}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)

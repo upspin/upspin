@@ -108,7 +108,7 @@ func main() {
 		}
 	}
 
-	config := auth.Config{Lookup: auth.PublicUserKeyService()}
+	config := auth.Config{Lookup: auth.PublicUserKeyService(context)}
 	grpcSecureServer, err := grpcauth.NewSecureServer(config)
 	if err != nil {
 		log.Fatal(err)

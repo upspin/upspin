@@ -32,7 +32,6 @@ type upspinFS struct {
 	sync.Mutex                               // Protects concurrent access to the rest of this struct.
 	context    upspin.Context                // Upspin context used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
-	dc         *directoryCache               // A cache of bindings to user directories.
 	root       *node                         // The root of the upspin file system.
 	uid        int                           // OS user id of this process' owner.
 	gid        int                           // OS group id of this process' owner.
@@ -84,11 +83,10 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context upspin.Context, dc *directoryCache) *upspinFS {
+func newUpspinFS(context upspin.Context) *upspinFS {
 	f := &upspinFS{
 		context:   context,
 		client:    client.New(context),
-		dc:        dc,
 		uid:       os.Getuid(),
 		gid:       os.Getgid(),
 		userDirs:  make(map[string]bool),
@@ -148,6 +146,11 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 	f.Unlock()
 	n.attr.Inode = uint64(n.id)
 	return n
+}
+
+// dirLookup returns a bound directory for user 'name'.
+func (f *upspinFS) dirLookup(name upspin.UserName) upspin.Directory {
+	return f.context.Directory(upspin.PathName(name))
 }
 
 var handleID int
@@ -247,10 +250,7 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
-	dir, err := n.f.dc.lookup(nn.user)
-	if err != nil {
-		return nil, e2e(errors.E(op, err, nn.uname))
-	}
+	dir := n.f.dirLookup(nn.user)
 	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
 		// TODO(p): remove from directory cache and retry?
 		return nil, e2e(errors.E(op, err, nn.uname))
@@ -292,10 +292,7 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 		n.de = de
 		return h, nil
 	}
-	dir, err := n.f.dc.lookup(n.user)
-	if err != nil {
-		return nil, e2e(errors.E(op, err, n.uname))
-	}
+	dir := n.f.dirLookup(n.user)
 	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
 	log.Debug.Printf("Glob returned %s", err)
@@ -338,10 +335,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 	if n.t == rootNode {
 		user = upspin.UserName(uname)
 	}
-	dir, err := f.dc.lookup(user)
-	if err != nil {
-		return nil, nil, err
-	}
+	dir := f.dirLookup(user)
 	de, err := dir.Lookup(uname)
 	if err != nil {
 		kind := classify(err)
@@ -357,11 +351,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin
 		}
 		// Any other error may imply that our directory connection is
 		// stale.  Forget the cached value and try again.
-		f.dc.remove(user)
-		dir, err = f.dc.lookup(user)
-		if err != nil {
-			return nil, nil, err
-		}
+		dir = f.dirLookup(user)
 		de, err = dir.Lookup(uname)
 		if err != nil {
 			return nil, nil, err
