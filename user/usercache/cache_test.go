@@ -35,7 +35,8 @@ type service struct {
 	dialed   int
 }
 
-func setup(t *testing.T) (*service, upspin.Context) {
+// setup returns contexts with the User service uncached and cached.
+func setup(t *testing.T, d time.Duration) (upspin.Context, upspin.Context, *service) {
 	c := context.New().SetUserName("unused@unused.com").SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
@@ -62,27 +63,23 @@ func setup(t *testing.T) (*service, upspin.Context) {
 		}
 	}
 	c.SetUserEndpoint(e)
-	c.SetStoreEndpoint(e)
-	c.SetDirectoryEndpoint(e)
 
-	return s, c
+	return c, Private(c, d), s
 }
 
 // TestCache tests the User cache for equivalence with the uncached version and
 // for efficacy of the cached version.
 func TestCache(t *testing.T) {
-	s, c := setup(t)
-	user := New(c)
-	u := user.(*userCache)
+	unc, c, s := setup(t, 0)
 
-	// Cache the 4 names.
-	try(t, s, u, "a@a.com")
-	try(t, s, u, "b@b.com")
-	try(t, s, u, "c@c.com")
-	try(t, s, u, "d@d.com")
+	// Compare the 4 names twixt cached and uncached.
+	try(t, unc, c, "a@a.com")
+	try(t, unc, c, "b@b.com")
+	try(t, unc, c, "c@c.com")
+	try(t, unc, c, "d@d.com")
 
-	if s.dialed != 4 {
-		t.Errorf("Expected 4 dials; one for each cache miss. Got %d", s.dialed)
+	if s.dialed != 2 {
+		t.Errorf("Expected 2 dials; one for each cache. Got %d", s.dialed)
 	}
 
 	sofar := s.lookups
@@ -90,15 +87,15 @@ func TestCache(t *testing.T) {
 	// Check for consistency between cached and uncached.
 	loops := 200
 	for i := 0; i < loops; i++ {
-		try(t, s, u, "a@a.com")
-		try(t, s, u, "b@b.com")
-		try(t, s, u, "c@c.com")
-		try(t, s, u, "d@d.com")
+		try(t, unc, c, "a@a.com")
+		try(t, unc, c, "b@b.com")
+		try(t, unc, c, "c@c.com")
+		try(t, unc, c, "d@d.com")
 	}
 
 	// No new cache misses, so no new dials.
-	if s.dialed != 4 {
-		t.Errorf("Expected no new dials, just the original 4. Got %d", s.dialed)
+	if s.dialed != 2 {
+		t.Errorf("Expected no new dials, just the original 2. Got %d", s.dialed)
 	}
 
 	// If the cache worked, we should only have 1 uncached access per try() in the loop.
@@ -112,39 +109,36 @@ func TestExpiration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Expiration tests skipped in short mode")
 	}
-	s, c := setup(t)
-	user := New(c)
-	u := user.(*userCache)
-	u.SetDuration(time.Second)
+	unc, c, s := setup(t, time.Second)
 
 	// Cache the 4 names.
-	try(t, s, u, "a@a.com")
-	try(t, s, u, "b@b.com")
-	try(t, s, u, "c@c.com")
-	try(t, s, u, "d@d.com")
+	try(t, unc, c, "a@a.com")
+	try(t, unc, c, "b@b.com")
+	try(t, unc, c, "c@c.com")
+	try(t, unc, c, "d@d.com")
 	sofar := s.lookups
 
 	time.Sleep(2 * time.Second)
 
 	// After a few seconds all entries should expire.
-	try(t, s, u, "a@a.com")
-	try(t, s, u, "b@b.com")
-	try(t, s, u, "c@c.com")
-	try(t, s, u, "d@d.com")
+	try(t, unc, c, "a@a.com")
+	try(t, unc, c, "b@b.com")
+	try(t, unc, c, "c@c.com")
+	try(t, unc, c, "d@d.com")
 	if s.lookups != sofar+2*4 {
 		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+2*4)
 	}
 
-	if s.dialed != 8 {
-		t.Errorf("Expected 8 dials, got %d", s.dialed)
+	if s.dialed != 2 {
+		t.Errorf("Expected 2 dials, got %d", s.dialed)
 	}
 }
 
 // try looks up a name through the cached and uncached User services and
 // compares the results.
-func try(t *testing.T, s *service, u *userCache, name string) {
-	seps, spks, serr := s.Lookup(upspin.UserName(name))
-	ceps, cpks, cerr := u.Lookup(upspin.UserName(name))
+func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
+	seps, spks, serr := unc.User().Lookup(upspin.UserName(name))
+	ceps, cpks, cerr := c.User().Lookup(upspin.UserName(name))
 	if !reflect.DeepEqual(seps, ceps) {
 		t.Errorf("for %s got %v expect %v", name, ceps, seps)
 	}

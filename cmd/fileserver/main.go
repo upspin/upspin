@@ -55,7 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	config := auth.Config{Lookup: auth.PublicUserKeyService()}
+	config := auth.Config{Lookup: auth.PublicUserKeyService(context)}
 
 	endpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
