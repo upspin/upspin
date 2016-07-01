@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "bd1efa57_5db4affc",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T05:06:09Z",
+      "side": 1,
+      "message": "I found a better way. It will require that updates be atomic, but that can be solved with a transaction (even though there is a userlock, we need to prevent two independent dir servers from corrupting each other).\n\nI\u0027ll have it ready tomorrow.",
+      "parentUuid": "bd1efa57_b783e21d",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "606e977c_0c06b7c5",
         "filename": "cloud/storage/sql/sql.go",
         "patchSetId": 5
