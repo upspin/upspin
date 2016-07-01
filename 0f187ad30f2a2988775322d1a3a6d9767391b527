@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd1efa57_2e69bba5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-01T18:33:48Z",
+      "side": 1,
+      "message": "s/User/\u0026Endpoint/",
+      "revId": "0f187ad30f2a2988775322d1a3a6d9767391b527",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd1efa57_8e268fbf",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-01T18:33:48Z",
+      "side": 1,
+      "message": "s/Directory/\u0026Endpoint/\ns/ndpoint$//",
+      "revId": "0f187ad30f2a2988775322d1a3a6d9767391b527",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
