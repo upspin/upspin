@@ -209,12 +209,12 @@ func gcpClient(context upspin.Context) (upspin.Client, error) {
 	// Use a test GCP Store...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   "upspin.io:9980", // Test store server.
+		NetAddr:   "store.test.upspin.io:443", // Test store server.
 	}
 	// ... and a test GCP directory ...
 	endpointDir := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   "upspin.io:9981", // Test dir server.
+		NetAddr:   "directory.test.upspin.io:443", // Test dir server.
 	}
 	// and an in-process test user.
 	endpointUser := upspin.Endpoint{

@@ -339,7 +339,7 @@ func user(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	user, err := bind.User(ctx, ctx.UserEndpoint)
+	user, err := bind.User(ctx, ctx.UserEndpoint())
 	if err != nil {
 		exit(err)
 	}
