@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bd1efa57_f7a27abf",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0ee0736_6026eca9",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a07a4f31_ae23d7ab",
         "filename": "cloud/storage/sql/sql.go",
         "patchSetId": 5
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "bd1efa57_97a906a4",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "Ah, my bad. I copied this from an older version. :-(\nFixed.",
+      "parentUuid": "bd1efa57_d7709e56",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e070c751_93d96434",
         "filename": "cloud/storage/sql/sql.go",
         "patchSetId": 5
@@ -64,6 +100,24 @@
       "writtenOn": "2016-07-01T00:27:28Z",
       "side": 1,
       "message": "I think this can be\n\nref TEXT UNIQUE NOT NULL, INDEX(ref(500)),\n\nso that ref can be unbounded, and the first 500 characters are indexed",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd1efa57_b783e21d",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "No, it doesn\u0027t work. I tried several combinations. TEXT apparently cannot be UNIQUE, even though the error message says to do something like that.\n\nI\u0027ll play around some more to see if I can get this to work. I even tried an ALTER TABLE approach that seemed promising but no dice.",
+      "parentUuid": "e070c751_93d96434",
       "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "bd1efa57_9780e611",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "606e977c_0c06b7c5",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bd1efa57_d7ed3ef9",
         "filename": "cloud/storage/sql/sql.go",
         "patchSetId": 5
@@ -98,6 +170,24 @@
       "writtenOn": "2016-07-01T00:27:28Z",
       "side": 1,
       "message": "I don\u0027t think we need this if we put the INDEX(ref(500)) in the CREATE TABLE syntax above",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd1efa57_1a907d59",
+        "filename": "cloud/storage/sql/sql.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "See above.",
+      "parentUuid": "bd1efa57_d7ed3ef9",
       "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -133,6 +223,24 @@
       "side": 1,
       "message": "We could do this, but I think there will be a better way if sharing these secrets with the container.\n\nIs it possible for this config to be pulled out of an rc file? If so, we could have the server set up its own rc based on data from metadata or some other secure service, rather than having it configured in the code here.",
       "parentUuid": "bd1efa57_77dd4a4e",
+      "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd1efa57_dab8c5d7",
+        "filename": "cmd/dirserver/Dockerfile",
+        "patchSetId": 5
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-01T00:37:06Z",
+      "side": 1,
+      "message": "It is possible. This is currently being passed in by cmd/dirserver/main.go, which simply passes the flag in. But it could read a file or do some simple HTTP Get.\n\nI\u0027ll do this tomorrow. I won\u0027t submit this now then.",
+      "parentUuid": "bd1efa57_97f7c6c3",
       "revId": "1b6ac9215cf620764e7de830307237b6c40c6f19",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
