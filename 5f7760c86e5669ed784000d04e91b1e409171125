@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dddace34_86957055",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-04T02:07:01Z",
+      "side": 1,
+      "message": "Temporarily. I\u0027m not very happy about this either. Context is in flux. But it might not be the right place for it either. One place for it is in Endpoint. We could create a field ConfigOpts or something like that. Just a list of key-value pairs.",
+      "parentUuid": "7d83a21d_cafda33e",
+      "revId": "5f7760c86e5669ed784000d04e91b1e409171125",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7d83a21d_aa006f33",
         "filename": "cmd/dirserver/main.go",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-04T01:16:47Z",
       "side": 1,
       "message": "delete?",
+      "revId": "5f7760c86e5669ed784000d04e91b1e409171125",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dddace34_a6898c42",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-04T02:07:01Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "7d83a21d_aa006f33",
       "revId": "5f7760c86e5669ed784000d04e91b1e409171125",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
