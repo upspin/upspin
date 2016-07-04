@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d83a21d_4a58d374",
+        "filename": "flags/funcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "Emit a comment that this is a generated file.",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_6a5d9763",
+        "filename": "flags/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "copyright",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_8a51eb4f",
+        "filename": "flags/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "shouldn\u0027t you explicitly match the leading underscore?",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_aa4eafae",
+        "filename": "flags/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "I think this would be more readable if it used text/template, but it might not be worth the trouble to change it now.",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_ea48a7a3",
+        "filename": "flags/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "maybe\n\nprintln :\u003d func(args ...interface{}) { fmt.Fprintln(\u0026b, args...) }\nprintf :\u003d func(format string, args ...interface{}) { fmt.Fprintf(\u0026b, format, args...) }",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_ca74c3e2",
+        "filename": "flags/vars.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "Copyright",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_ea7187ef",
+        "filename": "flags/vars.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "\"make available\" ?",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_0a5edb63",
+        "filename": "flags/vars.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "enabling all flags seems like an antipattern. why would we want to do this?",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_2a639f28",
+        "filename": "flags/vars.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-04T00:22:50Z",
+      "side": 1,
+      "message": "this should be https_addr, and be a string. we want to take a listen address, not just a port. also it\u0027s HTTPS not HTTP.",
+      "revId": "65991cd03e0715e7b327c7a4bcbd557091e22784",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
