@@ -191,18 +191,29 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 	const maxParallelDeletes = 10
 	pageToken := ""
 	var firstErr error
+	recordErr := func(err error) bool {
+		if err == nil {
+			return false
+		}
+		if firstErr == nil {
+			firstErr = err
+		}
+		return true
+	}
 	for {
 		objs, err := gcs.service.Objects.List(gcs.bucketName).MaxResults(maxParallelDeletes).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
+		if recordErr(err) {
+			log.Error.Printf("EmptyBucket: List(%q): %v", gcs.bucketName, err)
+			break
+		}
 		for _, o := range objs.Items {
 			if verbose {
 				log.Debug.Printf("Deleting: %q", o.Name)
 			}
 			err = gcs.Delete(o.Name)
-			if err != nil {
-				if firstErr == nil {
-					firstErr = err
-				}
-				log.Debug.Printf("EmptyBucket: %q: %s", o.Name, err)
+			if recordErr(err) {
+				log.Error.Printf("EmptyBucket: Delete(%q): %v", o.Name, err)
+				continue
 			}
 		}
 		if objs.NextPageToken == "" {
