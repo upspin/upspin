@@ -5,9 +5,9 @@
 package gcs
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"upspin.io/cloud/storage"
+	"upspin.io/log"
 )
 
 const (
@@ -28,17 +29,6 @@ var (
 	testData    = []byte(testDataStr)
 	fileName    = "test-file"
 )
-
-func dial() storage.Storage {
-	s, err := storage.Dial("GCS",
-		storage.WithKeyValue("gcpProjectId", testProjectID),
-		storage.WithKeyValue("gcpBucketName", testBucketName),
-		storage.WithKeyValue("defaultACL", PublicRead))
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
 
 // This is more of a regression test as it uses the running cloud
 // storage in prod. However, since GCP is always available, we accept
@@ -238,7 +228,7 @@ func testListPrefix(t *testing.T, prefix string, depth int, expected []string) {
 	if err != nil {
 		t.Fatalf("Error in client.List: %v", err)
 	}
-	log.Printf("Prefix: got: %+v", names)
+	t.Logf("Prefix: got: %+v", names)
 	if len(names) != len(expected) {
 		t.Fatalf("Expected %d results, got %d", len(expected), len(names))
 	}
@@ -282,14 +272,30 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func emptyBucket() {
-	const verbose = true
-	client.(*gcsImpl).EmptyBucket(verbose)
-}
-
 func TestMain(m *testing.M) {
-	client = dial()
+	flag.Parse()
+	if testing.Short() {
+		log.Print("cloud/storage/gcs: skipping network-based tests while -test.short specified")
+		os.Exit(0)
+	}
 
-	m.Run()
-	emptyBucket()
+	// Create client that writes to test bucket.
+	var err error
+	client, err = storage.Dial("GCS",
+		storage.WithKeyValue("gcpProjectId", testProjectID),
+		storage.WithKeyValue("gcpBucketName", testBucketName),
+		storage.WithKeyValue("defaultACL", PublicRead))
+	if err != nil {
+		log.Fatalf("cloud/storage/gcs: couldn't set up client: %v", err)
+	}
+
+	code := m.Run()
+
+	// Clean up.
+	const verbose = true
+	if err := client.(*gcsImpl).EmptyBucket(verbose); err != nil {
+		log.Print("cloud/storage/gcs: EmptyBucket failed: %v", err)
+	}
+
+	os.Exit(code)
 }

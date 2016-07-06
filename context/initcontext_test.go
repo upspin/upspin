@@ -150,8 +150,9 @@ func TestMain(m *testing.M) {
 	var e envs
 	saveEnvs(&e)
 	resetEnvs()
-	m.Run()
+	code := m.Run()
 	restoreEnvs(&e)
+	os.Exit(code)
 }
 
 func testConfig(t *testing.T, expect *expectations, config string) {

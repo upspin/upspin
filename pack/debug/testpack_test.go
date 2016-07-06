@@ -5,6 +5,8 @@
 package debugpack
 
 import (
+	"log"
+	"os"
 	"testing"
 
 	"upspin.io/bind"
@@ -116,11 +118,12 @@ func TestPack(t *testing.T) {
 func TestMain(m *testing.M) {
 	user, err := bind.User(context.New(), upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""})
 	if err != nil {
-		panic(err)
+		log.Fatalf("error binding user: %v", err)
 	}
 	testuser, ok := user.(*testUser.Service)
 	if !ok {
 		panic("not a testuser")
 	}
 	testuser.SetPublicKeys(userName, []upspin.PublicKey{"a key"})
+	os.Exit(m.Run())
 }

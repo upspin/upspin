@@ -5,6 +5,7 @@
 package cache
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
@@ -114,6 +115,7 @@ func TestIsCached(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	m.Run()
+	code := m.Run()
 	fc.Delete()
+	os.Exit(code)
 }
