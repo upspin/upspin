@@ -5,6 +5,7 @@
 package cache
 
 import (
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -15,9 +16,7 @@ const (
 	testString = "This is a test."
 )
 
-var (
-	fc = NewFileCache("")
-)
+var fc *FileCache
 
 func TestPutAndGet(t *testing.T) {
 	err := fc.Put(ref, strings.NewReader(testString))
@@ -115,6 +114,14 @@ func TestIsCached(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	dir, err := ioutil.TempDir("", "cache-test")
+	if err != nil {
+		panic(err)
+	}
+	fc, err = NewFileCache(dir)
+	if err != nil {
+		panic(err)
+	}
 	code := m.Run()
 	fc.Delete()
 	os.Exit(code)
