@@ -17,6 +17,8 @@ import (
 	"upspin.io/upspin"
 
 	// Import needed storage backend.
+	"io/ioutil"
+	"log"
 	_ "upspin.io/cloud/storage/gcs"
 )
 
@@ -168,7 +170,11 @@ func TestConfigure(t *testing.T) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}
 	// now configure it correctly
-	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	dir, err := ioutil.TempDir("", "gcp-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigCacheDir+"="+dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,8 +210,13 @@ func newStoreServer() *storeTestServer {
 		},
 		ch: ch,
 	}
-	fileCache = cache.NewFileCache("")
-
+	log.Printf("===== calling tempdir")
+	dir, err := ioutil.TempDir("", "gcp-test")
+	log.Printf("dir: %s", dir)
+	if err != nil {
+		panic("error in tmpdir: " + err.Error())
+	}
+	fileCache, err = cache.NewFileCache(dir)
 	s := &storeTestServer{
 		server: new(server),
 		ch:     ch,
