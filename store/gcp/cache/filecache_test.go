@@ -15,9 +15,7 @@ const (
 	testString = "This is a test."
 )
 
-var (
-	fc = NewFileCache("")
-)
+var fc *FileCache
 
 func TestPutAndGet(t *testing.T) {
 	err := fc.Put(ref, strings.NewReader(testString))
@@ -115,6 +113,15 @@ func TestIsCached(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	var err error
+	tmpDir := os.Getenv("TMPDIR")
+	if tmpDir == "" {
+		tmpDir = "/tmp"
+	}
+	fc, err = NewFileCache(tmpDir)
+	if err != nil {
+		panic(err)
+	}
 	code := m.Run()
 	fc.Delete()
 	os.Exit(code)

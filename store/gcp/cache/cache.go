@@ -35,4 +35,7 @@ type StoreCache interface {
 
 	// IsCached returns true if a reference is in the cache, false otherwise.
 	IsCached(ref string) bool
+
+	// Returns the root of the cache.
+	Root() string
 }
