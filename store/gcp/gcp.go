@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -29,11 +31,17 @@ import (
 
 // Configuration options for this package.
 const (
-	// ConfigTemporaryDir specifies which temporary directory to write files to before they're
-	// uploaded to the destination bucket. If not present, one will be created in the
-	// system's default location.
-	ConfigTemporaryDir = "gcpTemporaryDir"
+	// ConfigCacheDir specifies a directory to write files to before they're
+	// uploaded to the destination bucket. If the specified directory does not exist,
+	// an attempt is made to create it. This is a mandatory configuration option.
+	ConfigCacheDir = "gcpStore.CacheDir"
+
+	// ConfigNumUploadTasks specifies the number of background tasks used for
+	// uploading files to the backend. If not set a default of 4 will be used.
+	ConfigNumUploadTasks = "gcpStore.NumUploadTasks"
 )
+
+const numDefaultUploadTasks = 4
 
 var (
 	errNotConfigured = errors.E(errors.Invalid, errors.Str("GCP Store service not configured"))
@@ -41,8 +49,9 @@ var (
 
 // Server implements upspin.Store.
 type server struct {
-	context  upspin.Context
-	endpoint upspin.Endpoint
+	context    upspin.Context
+	endpoint   upspin.Endpoint
+	uploadReqs chan string // Channel for requesting background uploads to backend.
 }
 
 var _ upspin.Store = (*server)(nil)
@@ -57,7 +66,8 @@ var (
 // New returns a new, unconfigured Store bound to the user in the context.
 func New(context upspin.Context) upspin.Store {
 	return &server{
-		context: context.Copy(), // Make a copy to prevent user making further changes.
+		context:    context.Copy(), // Make a copy to prevent user making further changes.
+		uploadReqs: make(chan string, 200),
 	}
 }
 
@@ -67,6 +77,7 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
 	mu.RLock()
+	defer mu.RUnlock()
 	if !s.isConfigured() {
 		return "", errors.E(Put, errNotConfigured)
 	}
@@ -74,7 +85,6 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	initialRef := fileCache.RandomRef()
 	err := fileCache.Put(initialRef, sha)
 	if err != nil {
-		mu.RUnlock()
 		return "", errors.E(Put, err)
 	}
 	// Figure out the appropriate reference for this blob.
@@ -83,8 +93,20 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	// Rename it in the cache
 	fileCache.Rename(ref, initialRef)
 
-	// Now go store it in the cloud.
-	go func() {
+	// Now request that it be uploaded to the cloud.
+	s.uploadReqs <- ref
+
+	return upspin.Reference(ref), nil
+}
+
+func (s *server) uploadTask() {
+	for {
+		ref := <-s.uploadReqs
+		if ref == "" {
+			// An empty ref means we should finish.
+			return
+		}
+		mu.RLock() // We need to ensure the fileCache and cloudClient don't disappear.
 		if _, err := cloudClient.PutLocalFile(fileCache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
@@ -92,15 +114,30 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 			// storage backend.  This is safe to do
 			// because FileCache is thread safe.
 			fileCache.Purge(ref)
+		} else {
+			log.Error.Printf("Error putting local file: %s", err)
 		}
 		mu.RUnlock()
-	}()
-	return upspin.Reference(ref), nil
+	}
+}
+
+// resumeUploading globs the cache and sends any existing ref to the uploader tasks.
+// It must be called with mu locked.
+func (s *server) resumeUploading() {
+	root := fileCache.Root()
+	// Lists all files in the cache directory and put them in the upload queue.
+	refs, err := filepath.Glob(root + "/*")
+	if err != nil {
+		log.Error.Printf("Store.resumeUploading: can't glob cache root at %q", fileCache.Root())
+		return
+	}
+	for _, ref := range refs {
+		s.uploadReqs <- ref[len(root)+1:] // send just the ref to the uploader tasks.
+	}
 }
 
 // Get implements upspin.Store.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	fmt.Printf("context is %v\n", s.context)
 	file, loc, err := s.innerGet(s.context.UserName(), ref)
 	if err != nil {
 		return nil, nil, err
@@ -198,13 +235,22 @@ func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 // has been dialed. The details of the configuration are explained at the package comments.
 func (s *server) Configure(options ...string) error {
 	const Configure = "Configure"
-	tempDir := ""
+	cacheDir := ""
+	numUploadTasks := numDefaultUploadTasks
+	var err error
 	var dialOpts []storage.DialOpts
 	for _, option := range options {
 		// Parse all options we understand. What we don't understand we pass it down to the storage.
 		switch {
-		case strings.HasPrefix(option, ConfigTemporaryDir):
-			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
+		case strings.HasPrefix(option, ConfigCacheDir):
+			cacheDir = option[len(ConfigCacheDir)+1:] // skip 'ConfigCacheDir='
+		case strings.HasPrefix(option, ConfigNumUploadTasks):
+			var num int64
+			num, err = strconv.ParseInt(option[len(ConfigNumUploadTasks)+1:], 10, 32)
+			if err != nil {
+				return errors.E(Configure, errors.Syntax, err)
+			}
+			numUploadTasks = int(num)
 		default:
 			dialOpts = append(dialOpts, storage.WithOptions(option))
 		}
@@ -212,15 +258,19 @@ func (s *server) Configure(options ...string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	var err error
 	cloudClient, err = storage.Dial("GCS", dialOpts...)
 	if err != nil {
 		return errors.E(Configure, err)
 	}
-	fileCache = cache.NewFileCache(tempDir)
-	if fileCache == nil {
-		return errors.E(Configure, errors.Str("filecache failed to create temp directory"))
+	fileCache, err = cache.NewFileCache(cacheDir)
+	if err != nil {
+		return errors.E(Configure, err)
 	}
+	// Launch uploader tasks.
+	for i := 0; i < numUploadTasks; i++ {
+		go s.uploadTask()
+	}
+	s.resumeUploading()
 	log.Debug.Printf("Configured GCP store: %v", options)
 	return nil
 }

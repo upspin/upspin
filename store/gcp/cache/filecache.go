@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"upspin.io/errors"
 )
 
 // FileCache implements a StoreCache for storing local files.
@@ -106,16 +108,27 @@ func (fc *FileCache) createFile(name string) (*os.File, error) {
 	return f, nil
 }
 
-// NewFileCache creates a new FileCache rooted under cacheRootDir, if
-// that dir is available. If it's not available, it returns nil. An
-// empty argument uses the system's default location (but it's not guaranteed to succeed).
-func NewFileCache(cacheRootDir string) *FileCache {
-	cacheRoot, err := ioutil.TempDir(cacheRootDir, "upspin-cache-")
-	if err != nil {
-		log.Fatalf("Can't create tempdir: %v", err)
+// Root returns the root of the cache.
+func (fc *FileCache) Root() string {
+	return fc.cacheRoot
+}
+
+// NewFileCache creates a new FileCache rooted under cacheRootDir.
+// The directory must exist and be writable. If it doesn't exist, an attempt is
+// made to create it.
+func NewFileCache(cacheRootDir string) (*FileCache, error) {
+	if cacheRootDir == "" {
+		panic("cacheRootDir is nil")
 	}
-	fc := &FileCache{cacheRoot: cacheRoot}
-	return fc
+	if cacheRootDir[0] != '/' {
+		panic("cacheRootDir has no leading /")
+	}
+	err := os.MkdirAll(cacheRootDir, os.ModeDir|0755)
+	if err != nil {
+		return nil, errors.E("NewFileCache", errors.IO, err)
+	}
+	fc := &FileCache{cacheRoot: cacheRootDir}
+	return fc, nil
 }
 
 // Delete removes all files from the cache and invalidates
@@ -124,7 +137,7 @@ func NewFileCache(cacheRootDir string) *FileCache {
 func (fc *FileCache) Delete() {
 	fc.m.Lock()
 	defer fc.m.Unlock()
-	err := os.RemoveAll(fc.cacheRoot)
+	err := os.RemoveAll(fc.cacheRoot + "/")
 	if err != nil {
 		log.Fatalf("Can't delete cache dir: %v", err)
 	}
