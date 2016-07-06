@@ -6,6 +6,7 @@ package gcp
 
 import (
 	"bytes"
+	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"upspin.io/upspin"
 
 	// Import needed storage backend.
+
 	_ "upspin.io/cloud/storage/gcs"
 )
 
@@ -28,7 +30,7 @@ const (
 )
 
 func TestPutAndGet(t *testing.T) {
-	s := newStoreServer()
+	s := newStoreServer(t)
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	ref, err := s.server.Put([]byte(contents))
@@ -64,7 +66,7 @@ func TestPutAndGet(t *testing.T) {
 }
 
 func TestGetFromLocalCache(t *testing.T) {
-	s := newStoreServer()
+	s := newStoreServer(t)
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	// Simulate file still being locally on the server. Get the bytes instead of a new location.
@@ -89,7 +91,7 @@ func TestGetFromLocalCache(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	s := newStoreServer()
+	s := newStoreServer(t)
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	err := s.server.Delete(expectedRef)
@@ -102,10 +104,52 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestResumesUpload(t *testing.T) {
+	dir := newTempDir(t)
+	var err error
+	fileCache, err = cache.NewFileCache(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+
+	// Simulate file still being locally on the server. Get the bytes instead of a new location.
+	err = fileCache.Put(expectedRef, bytes.NewReader([]byte(contents)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := newStoreServerOnCacheDir(t, dir)
+
+	<-s.ch // Wait until the file has been put by the startup go routine.
+
+	data, locs, err := s.server.Get(expectedRef)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check that we got redirected to the backend, because the ref is no longer on local disk.
+	if data != nil {
+		t.Fatal("Expected data to be nil")
+	}
+	if len(locs) != 1 {
+		t.Fatalf("Expected one new location, got %d", len(locs))
+	}
+	expectedLoc := upspin.Location{
+		Endpoint: upspin.Endpoint{
+			Transport: upspin.HTTPS,
+			NetAddr:   serverBaseURL,
+		},
+		Reference: linkForRef,
+	}
+	if locs[0] != expectedLoc {
+		t.Errorf("Expected %v, got %v", expectedLoc, locs[0])
+	}
+}
+
 // Test some error conditions.
 
 func TestGetInvalidRef(t *testing.T) {
-	s := newStoreServer()
+	s := newStoreServer(t)
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	_, _, err := s.server.Get("bla bla bla")
@@ -119,7 +163,7 @@ func TestGetInvalidRef(t *testing.T) {
 }
 
 func TestGCPErrorsOut(t *testing.T) {
-	s := newStoreServer()
+	s := newStoreServer(t)
 	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	cloudClient = &storagetest.ExpectGet{
@@ -168,7 +212,11 @@ func TestConfigure(t *testing.T) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}
 	// now configure it correctly
-	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	dir, err := ioutil.TempDir("", "gcp-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigCacheDir+"="+dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,8 +243,29 @@ func TestRefCount(t *testing.T) {
 	}
 }
 
-func newStoreServer() *storeTestServer {
+func newStoreServer(t *testing.T) *storeTestServer {
+	// Always pick a new dir for the cache to ensure we start clean.
+	return newStoreServerOnCacheDir(t, newTempDir(t))
+}
+
+func newTempDir(t *testing.T) string {
+	dir, err := ioutil.TempDir("", "gcp-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
+
+func newStoreServerOnCacheDir(t *testing.T, dir string) *storeTestServer {
 	ch := make(chan bool)
+	s := &storeTestServer{
+		server: New(context.New()),
+		ch:     ch,
+	}
+	err := s.server.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigCacheDir+"="+dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 	cloudClient = &testGCP{
 		ExpectGet: storagetest.ExpectGet{
 			Ref:  expectedRef,
@@ -204,13 +273,6 @@ func newStoreServer() *storeTestServer {
 		},
 		ch: ch,
 	}
-	fileCache = cache.NewFileCache("")
-
-	s := &storeTestServer{
-		server: new(server),
-		ch:     ch,
-	}
-	s.server.context = context.New()
 	return s
 }
 
@@ -220,7 +282,7 @@ func cleanSetup() {
 }
 
 type storeTestServer struct {
-	server *server
+	server upspin.Store
 	ch     chan bool // channel for listening to GCP events.
 }
 
