@@ -27,13 +27,14 @@ func TestRegister(t *testing.T) {
 }
 
 const (
-	name     upspin.PathName = "user@google.com/file/of/user"
+	name     upspin.PathName = userName + "/file/of/user"
 	text                     = "this is some text"
 	userName                 = "joe@blow.com"
 )
 
 var (
-	globalContext = context.New().SetUserName(userName)
+	userEndpoint  = upspin.Endpoint{Transport: upspin.InProcess}
+	globalContext = context.New().SetUserName(userName).SetPacking(upspin.DebugPack).SetUserEndpoint(userEndpoint)
 )
 
 // The values returned by PackLen and UnpackLen should be exact,
@@ -116,7 +117,7 @@ func TestPack(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	user, err := bind.User(context.New(), upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""})
+	user, err := bind.User(globalContext, userEndpoint)
 	if err != nil {
 		log.Fatalf("error binding user: %v", err)
 	}

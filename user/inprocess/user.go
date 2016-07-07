@@ -21,43 +21,32 @@ type Service struct {
 	upspin.NoConfiguration
 	// context holds the context that created the call.
 	context upspin.Context
-	db      *database
 }
 
 // A database holds the information for the known users.
 // There is one instance, created in init, shared by all Service objects.
 type database struct {
-	endpoint upspin.Endpoint
 	// mu protects the fields below.
-	mu sync.RWMutex
-	// serviceOwner identifies the user running the user service. TODO: unused.
-	serviceOwner upspin.UserName
-	// serviceCache maintains a cache of existing service objects.
-	// Note the key is by value, so multiple equivalent contexts will end up
-	// with the same service.
-	serviceCache map[upspin.Context]*Service
-	root         map[upspin.UserName][]upspin.Endpoint
-	keystore     map[upspin.UserName][]upspin.PublicKey
+	mu       sync.RWMutex
+	root     map[upspin.UserName][]upspin.Endpoint
+	keystore map[upspin.UserName][]upspin.PublicKey
 }
 
 var _ upspin.User = (*Service)(nil)
+
+var db *database
 
 // Lookup reports the set of locations the user's directory might be,
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	s.db.mu.RLock()
-	defer s.db.mu.RUnlock()
-	roots := s.db.root[name]
-	if len(roots) == 0 {
-		return nil, nil, errors.E("Lookup", errors.NotExist, name)
-	}
+	db.mu.RLock()
+	defer db.mu.RUnlock()
 	// Return copies so the caller can't modify our data structures.
-	locs := make([]upspin.Endpoint, len(roots))
-	copy(locs, s.db.root[name])
-	keys := make([]upspin.PublicKey, len(s.db.keystore[name]))
-	copy(keys, s.db.keystore[name])
-	return locs, keys, nil
+
+	roots := append([]upspin.Endpoint{}, db.root[name]...)
+	keys := append([]upspin.PublicKey{}, db.keystore[name]...)
+	return roots, keys, nil
 }
 
 // SetPublicKeys sets a slice of public keys to the keystore for a
@@ -65,21 +54,21 @@ func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 // forgotten. To add keys to the existing set, Lookup and append to
 // the slice. If keys is nil, the user is forgotten.
 func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
-	s.db.mu.Lock()
-	defer s.db.mu.Unlock()
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	if keys == nil {
-		delete(s.db.keystore, name)
+		delete(db.keystore, name)
 	} else {
-		s.db.keystore[name] = keys
+		db.keystore[name] = keys
 	}
 }
 
 // ListUsers returns a slice of all known users with at least one public key.
 func (s *Service) ListUsers() []upspin.UserName {
-	s.db.mu.RLock()
-	defer s.db.mu.RUnlock()
-	users := make([]upspin.UserName, 0, len(s.db.keystore))
-	for u := range s.db.keystore {
+	db.mu.RLock()
+	defer db.mu.RUnlock()
+	users := make([]upspin.UserName, 0, len(db.keystore))
+	for u := range db.keystore {
 		users = append(users, u)
 	}
 	return users
@@ -117,9 +106,9 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 
 // innerAddRoot adds a root for the user, which must be a parsed, valid Upspin user name.
 func (s *Service) innerAddRoot(userName upspin.UserName, endpoint upspin.Endpoint) {
-	s.db.mu.Lock()
-	s.db.root[userName] = append(s.db.root[userName], endpoint)
-	s.db.mu.Unlock()
+	db.mu.Lock()
+	db.root[userName] = append(db.root[userName], endpoint)
+	db.mu.Unlock()
 }
 
 // AddRoot adds an endpoint as the user's.db.root endpoint.
@@ -135,7 +124,10 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 
 // Endpoint implements upspin.Service.
 func (s *Service) Endpoint() upspin.Endpoint {
-	return s.db.endpoint
+	return upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "",
+	}
 }
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
@@ -144,21 +136,12 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
-	s.db.mu.Lock()
-	defer s.db.mu.Unlock()
-	if s.db.serviceOwner == "" {
-		// This is the first call; set the owner and endpoint.
-		s.db.endpoint = e
-		s.db.serviceOwner = context.UserName()
-	}
-	// Is there already a service for this user?
-	if this := s.db.serviceCache[context]; this != nil {
-		return this, nil
-	}
-	this := *s // Make a copy.
-	this.context = context.Copy()
-	s.db.serviceCache[context] = &this
-	return &this, nil
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	return &Service{
+		context: context.Copy(),
+	}, nil
 }
 
 // Ping implements upspin.Service.
@@ -176,16 +159,10 @@ func (s *Service) Authenticate(upspin.Context) error {
 }
 
 func init() {
-	s := &Service{
-		db: &database{
-			endpoint: upspin.Endpoint{
-				Transport: upspin.InProcess,
-				NetAddr:   "", // Ignored.
-			},
-			serviceCache: make(map[upspin.Context]*Service),
-			root:         make(map[upspin.UserName][]upspin.Endpoint),
-			keystore:     make(map[upspin.UserName][]upspin.PublicKey),
-		},
+	db = &database{
+		root:     make(map[upspin.UserName][]upspin.Endpoint),
+		keystore: make(map[upspin.UserName][]upspin.PublicKey),
 	}
-	bind.RegisterUser(upspin.InProcess, s)
+
+	bind.RegisterUser(upspin.InProcess, &Service{})
 }
