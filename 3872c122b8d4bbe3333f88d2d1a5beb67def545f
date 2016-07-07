@@ -16,6 +16,24 @@
       "revId": "3872c122b8d4bbe3333f88d2d1a5beb67def545f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_7ce65953",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "Yes. This is the kind of thing I am worried about. We don\u0027t have a satisfactory implementation for ourselves yet, and this proposes weakening even that.\n\nOnce we have a working system, we can have a conversation about interoperability. We could even have the conversation before. But a mobile app is not the right starting point.\n\n\nI can explain this better in the meeting.",
+      "parentUuid": "ba052000_5c703d89",
+      "revId": "3872c122b8d4bbe3333f88d2d1a5beb67def545f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
