@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fd75d23e_148b1cd1",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-07T03:51:45Z",
+      "side": 1,
+      "message": "Some of us have been urging keystore as the name of the database, for familiarity by outsiders, and \"key\" is rather widely used elsewhere in the code base, so I\u0027d be ok leaving as is.   I see the argument for making it analogous to \"root\", so don\u0027t strongly object to \"key\" here.",
+      "parentUuid": "7d83a21d_0dc99534",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7d83a21d_2dce593d",
         "filename": "user/inprocess/user.go",
         "patchSetId": 1
