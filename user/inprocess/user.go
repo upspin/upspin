@@ -27,17 +27,10 @@ type Service struct {
 // A database holds the information for the known users.
 // There is one instance, created in init, shared by all Service objects.
 type database struct {
-	endpoint upspin.Endpoint
 	// mu protects the fields below.
-	mu sync.RWMutex
-	// serviceOwner identifies the user running the user service. TODO: unused.
-	serviceOwner upspin.UserName
-	// serviceCache maintains a cache of existing service objects.
-	// Note the key is by value, so multiple equivalent contexts will end up
-	// with the same service.
-	serviceCache map[upspin.Context]*Service
-	root         map[upspin.UserName][]upspin.Endpoint
-	keystore     map[upspin.UserName][]upspin.PublicKey
+	mu       sync.RWMutex
+	root     map[upspin.UserName][]upspin.Endpoint
+	keystore map[upspin.UserName][]upspin.PublicKey
 }
 
 var _ upspin.User = (*Service)(nil)
@@ -49,9 +42,6 @@ func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publ
 	s.db.mu.RLock()
 	defer s.db.mu.RUnlock()
 	roots := s.db.root[name]
-	if len(roots) == 0 {
-		return nil, nil, errors.E("Lookup", errors.NotExist, name)
-	}
 	// Return copies so the caller can't modify our data structures.
 	locs := make([]upspin.Endpoint, len(roots))
 	copy(locs, s.db.root[name])
@@ -135,7 +125,10 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 
 // Endpoint implements upspin.Service.
 func (s *Service) Endpoint() upspin.Endpoint {
-	return s.db.endpoint
+	return upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "",
+	}
 }
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
@@ -146,18 +139,8 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	if s.db.serviceOwner == "" {
-		// This is the first call; set the owner and endpoint.
-		s.db.endpoint = e
-		s.db.serviceOwner = context.UserName()
-	}
-	// Is there already a service for this user?
-	if this := s.db.serviceCache[context]; this != nil {
-		return this, nil
-	}
 	this := *s // Make a copy.
 	this.context = context.Copy()
-	s.db.serviceCache[context] = &this
 	return &this, nil
 }
 
@@ -178,13 +161,8 @@ func (s *Service) Authenticate(upspin.Context) error {
 func init() {
 	s := &Service{
 		db: &database{
-			endpoint: upspin.Endpoint{
-				Transport: upspin.InProcess,
-				NetAddr:   "", // Ignored.
-			},
-			serviceCache: make(map[upspin.Context]*Service),
-			root:         make(map[upspin.UserName][]upspin.Endpoint),
-			keystore:     make(map[upspin.UserName][]upspin.PublicKey),
+			root:     make(map[upspin.UserName][]upspin.Endpoint),
+			keystore: make(map[upspin.UserName][]upspin.PublicKey),
 		},
 	}
 	bind.RegisterUser(upspin.InProcess, s)
