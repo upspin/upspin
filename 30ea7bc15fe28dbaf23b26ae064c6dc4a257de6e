@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_5c66fda9",
+        "filename": "auth/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-07T21:57:55Z",
+      "side": 0,
+      "message": "now you can remove this, which is already outdated anyway.",
+      "revId": "30ea7bc15fe28dbaf23b26ae064c6dc4a257de6e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
