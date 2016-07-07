@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d83a21d_0dc99534",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-07T03:02:20Z",
+      "side": 1,
+      "message": "s/keystore/key/",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_2dce593d",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-07T03:02:20Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_ed48c1a3",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-07T03:02:20Z",
+      "side": 1,
+      "message": "roots :\u003d append([]upspin.Endpoint{}, s.db.root[name]...)\nkeys :\u003d append([]upspin.PublicKey{}, s.db.keystore[name]...)",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_4dd38de0",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-07T03:02:20Z",
+      "side": 1,
+      "message": "This just seems to be asking for trouble\n\nhow about\n\nreturn \u0026Service{\n  context: context.Copy(),\n  db: s.db,\n}, nil",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d83a21d_6dd851fc",
+        "filename": "user/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-07T03:02:20Z",
+      "side": 1,
+      "message": "this is a single global database shared by all Services\nI think we should move it to a global variable\n\nvar db \u003d \u0026database{\n   root: make(...),\n   key: make(...),\n}\n\ninstead of passing it to each new Service as they are created",
+      "revId": "cb7320e29c853ae9a4ab0b6477f9dee026aa1435",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
