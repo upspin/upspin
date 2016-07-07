@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "ba052000_df179f49",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:00:58Z",
+      "side": 1,
+      "message": "Here\u0027s what I mean. Change this to\n\ntype userCacheContext struct {\n   upspin.Context\n   cache *userCache\n}\n\nthen in Global e.g. the return is\n\nreturn \u0026userCacheContext {\n   Context: context.Copy(),\n   cache: \u0026globalCache,\n}\n\nThis embeds a copy of the original context. Now you can get rid of methods like this:\n\n// Store implements upspin.Context.\nfunc (ctx *userCacheContext) UserName() upspin.UserName {\n\treturn ctx.context.UserName()\n}\n\nbecause userCacheContext already implements this method, with the right semantics.\nUnder the cover, the compiler will generate this for you, writing it as\n\nfunc (ctx *userCacheContext) UserName() upspin.UserName {\n         return ctx.Context.UserName()\n}\n\nand methods that modify the context will modify the embedded copy, so it works exactly the same but with much less manually written code. Plus if the Context method set changes, the code continues to work without any changes.",
+      "parentUuid": "ba052000_dc29ed7b",
+      "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba052000_1c187569",
         "filename": "user/usercache/cache.go",
         "patchSetId": 1
