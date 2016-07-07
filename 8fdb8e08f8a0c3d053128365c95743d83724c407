@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_dc29ed7b",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T21:38:33Z",
+      "side": 1,
+      "message": "if this was an embedded field you wouldn\u0027t need all the forwarding methods below.\nyou\u0027d just need to write the override methods.\n\nthat\u0027s a design choice and you could leave it as is but it would be tidier and easier maintain that way.",
+      "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_1c187569",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T21:38:33Z",
+      "side": 1,
+      "message": "if it\u0027s already global, you probably don\u0027t want to do this. can you probe down and check?",
+      "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
