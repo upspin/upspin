@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7d6562c3_7a815914",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-07T22:56:51Z",
+      "side": 1,
+      "message": "Please eplain",
+      "parentUuid": "ba052000_dc29ed7b",
+      "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba052000_1c187569",
         "filename": "user/usercache/cache.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-07T21:38:33Z",
       "side": 1,
       "message": "if it\u0027s already global, you probably don\u0027t want to do this. can you probe down and check?",
+      "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_9fe597d8",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-07T22:56:51Z",
+      "side": 1,
+      "message": "Righto, will do, just have to compare the concrete type against the globalCache var.",
+      "parentUuid": "ba052000_1c187569",
       "revId": "8fdb8e08f8a0c3d053128365c95743d83724c407",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
