@@ -100,12 +100,12 @@ func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
 	if err != nil {
 		return err
 	}
-	s.innerAddRoot(parsed.User(), loc.Endpoint)
+	s.addRoot(parsed.User(), loc.Endpoint)
 	return nil
 }
 
-// innerAddRoot adds a root for the user, which must be a parsed, valid Upspin user name.
-func (s *Service) innerAddRoot(userName upspin.UserName, endpoint upspin.Endpoint) {
+// addRoot adds a root for the user, which must be a parsed, valid Upspin user name.
+func (s *Service) addRoot(userName upspin.UserName, endpoint upspin.Endpoint) {
 	db.mu.Lock()
 	db.root[userName] = append(db.root[userName], endpoint)
 	db.mu.Unlock()
@@ -118,7 +118,7 @@ func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error 
 	if err != nil {
 		return err
 	}
-	s.innerAddRoot(parsed.User(), endpoint)
+	s.addRoot(parsed.User(), endpoint)
 	return nil
 }
 
