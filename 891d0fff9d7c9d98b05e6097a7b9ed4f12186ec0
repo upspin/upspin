@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_9f1d9709",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "s/go bindings/Go bindings/",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_7fdc0b52",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "s/go bindings/Go bindings/",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_5fe14f06",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "s/upspin/Upspin/",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_dfec3ffd",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "you don\u0027t need i here.",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_9ff6b7c7",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-07T23:40:02Z",
+      "side": 1,
+      "message": "if last !\u003d nil {",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
