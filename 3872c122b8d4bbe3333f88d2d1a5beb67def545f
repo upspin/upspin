@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_5c703d89",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-07T21:41:45Z",
+      "side": 1,
+      "message": "\"most relevant pieces\" suggests that it is too hard to pass the entire DirEntry and that it is too hard for the names here to match the ones in upspin.go.   That\u0027s worrisome.\n\nI don\u0027t mind that the app is read-only for now.  But information like Writer and Packdata seem relevant even for reading.",
+      "revId": "3872c122b8d4bbe3333f88d2d1a5beb67def545f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
