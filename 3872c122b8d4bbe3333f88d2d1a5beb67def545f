@@ -34,6 +34,24 @@
       "revId": "3872c122b8d4bbe3333f88d2d1a5beb67def545f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_026a4e00",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "I understand. And I agree. It\u0027s just good to have something going so we can explore, test, learn, throw away and propose new things. I think we all agree.",
+      "parentUuid": "ba052000_7ce65953",
+      "revId": "3872c122b8d4bbe3333f88d2d1a5beb67def545f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
