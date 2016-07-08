@@ -1,0 +1,9 @@
+Code-Review+2: David Presotto <p@google.com>
+Code-Review+2: Eduardo Pinheiro <edpin@google.com>
+Code-Review+2: Andrew Gerrand <adg@google.com>
+Code-Review+2: Eric Grosse <ehg@google.com>
+Submitted-by: Rob Pike <r@google.com>
+Submitted-at: Fri, 08 Jul 2016 06:13:26 +0000
+Reviewed-on: https://upspin-review.googlesource.com/2611
+Project: upspin
+Branch: refs/heads/master
