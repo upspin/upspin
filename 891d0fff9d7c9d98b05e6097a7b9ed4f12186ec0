@@ -36,6 +36,42 @@
     },
     {
       "key": {
+        "uuid": "ba052000_02212ef4",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba052000_7fdc0b52",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_220c2a90",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba052000_9f1d9709",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba052000_5fe14f06",
         "filename": "client/gobind/gobind.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-07-07T23:40:02Z",
       "side": 1,
       "message": "s/upspin/Upspin/",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_e21d22ba",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba052000_5fe14f06",
       "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "ba052000_c21a26c0",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba052000_dfec3ffd",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba052000_9ff6b7c7",
         "filename": "client/gobind/gobind.go",
         "patchSetId": 3
@@ -81,6 +153,24 @@
       "writtenOn": "2016-07-07T23:40:02Z",
       "side": 1,
       "message": "if last !\u003d nil {",
+      "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_627b52d6",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T00:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba052000_9ff6b7c7",
       "revId": "891d0fff9d7c9d98b05e6097a7b9ed4f12186ec0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
