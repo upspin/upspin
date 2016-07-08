@@ -26,6 +26,7 @@ type testEntry struct {
 	pks []upspin.PublicKey
 }
 
+// service is a KeyServer implementation that counts lookups.
 type service struct {
 	lookups int
 	entries map[string]testEntry
@@ -35,7 +36,7 @@ type service struct {
 	dialed   int
 }
 
-// setup returns contexts with the User service uncached and cached.
+// setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, d time.Duration) (upspin.Context, upspin.Context, *service) {
 	c := context.New().SetUserName("unused@unused.com").SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
@@ -53,16 +54,16 @@ func setup(t *testing.T, d time.Duration) (upspin.Context, upspin.Context, *serv
 	s.add("c@c.com")
 	s.add("d@d.com")
 
-	err := bind.RegisterUser(e.Transport, s)
+	err := bind.RegisterKeyServer(e.Transport, s)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot override") {
-			err = bind.ReregisterUser(e.Transport, s)
+			err = bind.ReregisterKeyServer(e.Transport, s)
 		}
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	c.SetUserEndpoint(e)
+	c.SetKeyEndpoint(e)
 
 	return c, Private(c, d), s
 }
@@ -134,11 +135,11 @@ func TestExpiration(t *testing.T) {
 	}
 }
 
-// try looks up a name through the cached and uncached User services and
+// try looks up a name through the cached and uncached KeyServers and
 // compares the results.
 func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
-	seps, spks, serr := unc.User().Lookup(upspin.UserName(name))
-	ceps, cpks, cerr := c.User().Lookup(upspin.UserName(name))
+	seps, spks, serr := unc.KeyServer().Lookup(upspin.UserName(name))
+	ceps, cpks, cerr := c.KeyServer().Lookup(upspin.UserName(name))
 	if !reflect.DeepEqual(seps, ceps) {
 		t.Errorf("for %s got %v expect %v", name, ceps, seps)
 	}
@@ -150,7 +151,6 @@ func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
 	}
 }
 
-// service is a User implementation that counts lookups.
 func (s *service) add(name string) {
 	var e testEntry
 	for i := 0; i < 3; i++ {

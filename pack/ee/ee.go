@@ -164,7 +164,7 @@ func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.Di
 	if owner == ctx.UserName() {
 		wrap = wrap[:1]
 	} else {
-		userConn, err := bind.User(ctx, ctx.UserEndpoint())
+		userConn, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
@@ -700,7 +700,7 @@ func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, erro
 	if string(user) == string(ctx.UserName()) {
 		return ctx.Factotum().PublicKey(), nil
 	}
-	userService, err := bind.User(ctx, ctx.UserEndpoint())
+	userService, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		return "", err
 	}

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Userserver is a wrapper for a user implementation that presents it as a grpc interface.
+// Keyserver is a wrapper for a key implementation that presents it as a grpc interface.
 package main
 
 import (
@@ -28,13 +28,13 @@ import (
 )
 
 // The upspin username for this server.
-const serverName = "userserver"
+const serverName = "keyserver"
 
-// Server is a SecureServer that talks to a User interface and serves gRPC requests.
+// Server is a SecureServer that talks to a KeyServer interface and serves gRPC requests.
 type Server struct {
 	context  upspin.Context
 	endpoint upspin.Endpoint
-	user     upspin.User // default user service for looking up keys for unauthenticated users.
+	key      upspin.KeyServer // default user service for looking up keys for unauthenticated users.
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
@@ -55,7 +55,7 @@ func main() {
 	context := context.New().SetUserName(serverName)
 
 	// Get an instance so we can configure it and use it for authenticated connections.
-	user, err := bind.User(context, *endpoint)
+	key, err := bind.KeyServer(context, *endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,12 +65,12 @@ func main() {
 		opts := strings.Split(flags.Config, ",")
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
-		err = user.Configure(opts...)
+		err = key.Configure(opts...)
 		if err != nil {
 			log.Fatal(err)
 		}
 		// Now this pre-configured store is the one that will generate new instances for this server.
-		err = bind.ReregisterUser(endpoint.Transport, user)
+		err = bind.ReregisterKeyServer(endpoint.Transport, key)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -79,7 +79,7 @@ func main() {
 	s := &Server{
 		context:  context,
 		endpoint: *endpoint,
-		user:     user,
+		key:      key,
 	}
 	authConfig := auth.Config{Lookup: s.internalLookup}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
@@ -87,38 +87,38 @@ func main() {
 		log.Fatal(err)
 	}
 	s.SecureServer = grpcSecureServer
-	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
+	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
 }
 
 func (s *Server) internalLookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
-	_, keys, err := s.user.Lookup(userName)
+	_, keys, err := s.key.Lookup(userName)
 	return keys, err
 }
 
-// userFor returns a User service bound to the user specified in the context.
-func (s *Server) userFor(ctx gContext.Context) (upspin.User, error) {
+// keyServerFor returns a KeyServer bound to the user specified in the context.
+func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	context := s.context.Copy().SetUserName(session.User())
-	return bind.User(context, s.endpoint)
+	return bind.KeyServer(context, s.endpoint)
 }
 
-// Lookup implements upspin.User, and does not do any authentication.
-func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*proto.UserLookupResponse, error) {
+// Lookup implements upspin.KeyServer, and does not do any authentication.
+func (s *Server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*proto.KeyLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
 
-	endpoints, publicKeys, err := s.user.Lookup(upspin.UserName(req.UserName))
+	endpoints, publicKeys, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
-		return &proto.UserLookupResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
-	resp := &proto.UserLookupResponse{
+	resp := &proto.KeyLookupResponse{
 		Endpoints:  proto.Endpoints(endpoints),
 		PublicKeys: proto.PublicKeys(publicKeys),
 	}
@@ -129,11 +129,11 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.UserLookupRequest) (*pr
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 
-	user, err := s.userFor(ctx)
+	key, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}
-	err = user.Configure(req.Options...)
+	err = key.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
@@ -145,11 +145,11 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 
-	user, err := s.userFor(ctx)
+	key, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}
-	endpoint := user.Endpoint()
+	endpoint := key.Endpoint()
 	resp := &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(endpoint.Transport),

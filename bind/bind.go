@@ -76,7 +76,7 @@ type dialCache map[dialKey]*dialedService
 var (
 	mu sync.Mutex // Guards the variables below.
 
-	userMap      = make(map[upspin.Transport]upspin.User)
+	userMap      = make(map[upspin.Transport]upspin.KeyServer)
 	directoryMap = make(map[upspin.Transport]upspin.DirServer)
 	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
 
@@ -91,23 +91,23 @@ var (
 
 const allowOverwrite = true // for documentation purposes
 
-// RegisterUser registers a User interface for the transport.
+// RegisterKeyServer registers a KeyServer interface for the transport.
 // There must be no previous registration.
-func RegisterUser(transport upspin.Transport, user upspin.User) error {
-	return registerUser("RegisterUser", transport, user, !allowOverwrite)
+func RegisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
+	return registerKeyServer("RegisterKeyServer", transport, user, !allowOverwrite)
 }
 
-// ReregisterUser replaces the User interface for the transport.
-func ReregisterUser(transport upspin.Transport, user upspin.User) error {
-	return registerUser("ReregisterUser", transport, user, allowOverwrite)
+// ReregisterKeyServer replaces the KeyServer interface for the transport.
+func ReregisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
+	return registerKeyServer("ReregisterKeyServer", transport, user, allowOverwrite)
 }
 
-func registerUser(op string, transport upspin.Transport, user upspin.User, allowOverwrite bool) error {
+func registerKeyServer(op string, transport upspin.Transport, user upspin.KeyServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := userMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override User interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override KeyServer interface: %v", transport))
 	}
 	userMap[transport] = user
 	return nil
@@ -157,20 +157,20 @@ func registerStoreServer(op string, transport upspin.Transport, store upspin.Sto
 	return nil
 }
 
-// User returns a User interface bound to the endpoint.
-func User(cc upspin.Context, e upspin.Endpoint) (upspin.User, error) {
-	const User = "User"
+// KeyServer returns a KeyServer interface bound to the endpoint.
+func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
+	const KeyServer = "KeyServer"
 	mu.Lock()
 	u, ok := userMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(User, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(KeyServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, User, e, userDialCache, u)
+	x, err := reachableService(cc, KeyServer, e, userDialCache, u)
 	if err != nil {
 		return nil, err
 	}
-	return x.(upspin.User), nil
+	return x.(upspin.KeyServer), nil
 }
 
 // StoreServer returns a StoreServer interface bound to the endpoint.
@@ -220,7 +220,7 @@ func Release(service upspin.Service) error {
 		delete(directoryDialCache, key)
 	case upspin.StoreServer:
 		delete(storeDialCache, key)
-	case upspin.User:
+	case upspin.KeyServer:
 		delete(userDialCache, key)
 	default:
 		return errors.E(Release, errors.Invalid, errors.Errorf("unknown service type %T", service))

@@ -183,7 +183,7 @@ func TestSharing(t *testing.T) {
 	// Set up Dude as the creator/owner.
 	ctx, packer := setup(dudesUserName, "p256")
 	// Set up a mock user service that knows about Dude's public keys (for checking signature during unpack).
-	mockUser := &dummyUser{
+	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{dudesUserName},
 		keyToReturn: []upspin.PublicKey{dudesPublic},
 	}
@@ -192,8 +192,8 @@ func TestSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx.SetFactotum(f) // Override setup to prevent reading keys from .ssh/
-	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.SetUserEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	bind.ReregisterKeyServer(upspin.InProcess, mockKey)
+	ctx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
@@ -230,7 +230,7 @@ func TestSharing(t *testing.T) {
 	}
 
 	// Finally, check that unpack looked up Dude's public key, to verify the signature.
-	if mockUser.returnedKeys != 1 {
+	if mockKey.returnedKeys != 1 {
 		t.Fatal("Packer failed to request dude's public key")
 	}
 }
@@ -250,7 +250,7 @@ func TestBadSharing(t *testing.T) {
 	miasPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
 
 	ctx, packer := setup(dudettesUserName, "p256")
-	mockUser := &dummyUser{
+	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
 		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPublic},
 	}
@@ -259,8 +259,8 @@ func TestBadSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx.SetFactotum(f)
-	bind.ReregisterUser(upspin.InProcess, mockUser)
-	ctx.SetUserEndpoint(upspin.Endpoint{
+	bind.ReregisterKeyServer(upspin.InProcess, mockKey)
+	ctx.SetKeyEndpoint(upspin.Endpoint{
 		Transport: upspin.InProcess,
 	})
 
@@ -322,18 +322,18 @@ func setup(name upspin.UserName, curveName string) (upspin.Context, upspin.Packe
 	return ctx, packer
 }
 
-// dummyUser is a User service that returns a key for a given user.
-type dummyUser struct {
-	testfixtures.DummyUser
+// dummyKey is a User service that returns a key for a given user.
+type dummyKey struct {
+	testfixtures.DummyKey
 	// The two slices go together
 	userToMatch  []upspin.UserName
 	keyToReturn  []upspin.PublicKey
 	returnedKeys int
 }
 
-var _ upspin.User = (*dummyUser)(nil)
+var _ upspin.KeyServer = (*dummyKey)(nil)
 
-func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (d *dummyKey) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	for i, u := range d.userToMatch {
 		if u == userName {
 			d.returnedKeys++
@@ -342,6 +342,6 @@ func (d *dummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspi
 	}
 	return nil, nil, errors.E("Lookup", userName, errors.NotExist, errors.Str("user not found"))
 }
-func (d *dummyUser) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
 }

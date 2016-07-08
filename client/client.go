@@ -22,7 +22,7 @@ import (
 // Client implements upspin.Client.
 type Client struct {
 	context upspin.Context
-	user    upspin.User
+	user    upspin.KeyServer
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -142,7 +142,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
 	for _, r := range readers {
-		_, pubkeys, err := c.context.User().Lookup(r)
+		_, pubkeys, err := c.context.KeyServer().Lookup(r)
 		if err != nil || len(pubkeys) < 1 {
 			// TODO warn that we can't process one of the readers?
 			continue
@@ -276,7 +276,7 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	if parsed.User() == c.context.UserName() {
 		endpoints = append(endpoints, c.context.DirEndpoint())
 	}
-	if eps, _, err := c.context.User().Lookup(parsed.User()); err == nil {
+	if eps, _, err := c.context.KeyServer().Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	var dir upspin.DirServer

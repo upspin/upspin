@@ -416,7 +416,7 @@ func (s *sharer) lookupKey(user upspin.UserName) []upspin.PublicKey {
 	if ok {
 		return keys
 	}
-	userService, err := bind.User(s.context, s.context.UserEndpoint())
+	userService, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
 	if err != nil {
 		exit(err)
 	}

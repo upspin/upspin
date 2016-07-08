@@ -16,7 +16,7 @@ import (
 
 // Service maps user names to potential machines holding root of the user's tree.
 // There is one for each Dial call, but they all share the underlying database.
-// It implements the upspin.User interface.
+// It implements the upspin.KeyServer interface.
 type Service struct {
 	upspin.NoConfiguration
 	// context holds the context that created the call.
@@ -32,7 +32,7 @@ type database struct {
 	keystore map[upspin.UserName][]upspin.PublicKey
 }
 
-var _ upspin.User = (*Service)(nil)
+var _ upspin.KeyServer = (*Service)(nil)
 
 var db *database
 
@@ -87,7 +87,7 @@ func validateUserName(op string, name upspin.UserName) (*path.Parsed, error) {
 }
 
 // Install installs a user and its.db.root in the provided DirServer.
-// For a real User service, this would be done by some offline
+// For a real KeyServer, this would be done by some offline
 // administrative procedure. For this test version, we just provide a
 // simple hook for testing.
 func (s *Service) Install(name upspin.UserName, dir upspin.DirServer) error {
@@ -164,5 +164,5 @@ func init() {
 		keystore: make(map[upspin.UserName][]upspin.PublicKey),
 	}
 
-	bind.RegisterUser(upspin.InProcess, &Service{})
+	bind.RegisterKeyServer(upspin.InProcess, &Service{})
 }

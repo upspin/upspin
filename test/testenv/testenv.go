@@ -217,11 +217,11 @@ func gcpClient(context upspin.Context) (upspin.Client, error) {
 		NetAddr:   "directory.test.upspin.io:443", // Test dir server.
 	}
 	// and an in-process test user.
-	endpointUser := upspin.Endpoint{
+	endpointKey := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	setContextEndpoints(context, endpointStore, endpointDir, endpointUser)
+	setContextEndpoints(context, endpointStore, endpointDir, endpointKey)
 	client := client.New(context)
 	return client, nil
 }
@@ -240,11 +240,11 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 		NetAddr:   "",
 	}
 	// and an in-process test user.
-	endpointUser := upspin.Endpoint{
+	endpointKey := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	setContextEndpoints(context, endpointStore, endpointDir, endpointUser)
+	setContextEndpoints(context, endpointStore, endpointDir, endpointKey)
 	client := client.New(context)
 	return client, nil
 }
@@ -281,16 +281,16 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	user, err := bind.User(context, endpointInProcess)
+	user, err := bind.KeyServer(context, endpointInProcess)
 	if err != nil {
 		return nil, err
 	}
-	testUser, ok := user.(*inprocess.Service)
+	testKey, ok := user.(*inprocess.Service)
 	if !ok {
-		return nil, errors.Str("user service must be the in-process instance")
+		return nil, errors.Str("key service must be the in-process instance")
 	}
 	// Set the public key for the registered user.
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
+	testKey.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
 	f, err := factotum.New(keyPair.Public, keyPair.Private)
 	if err != nil {
 		panic("NewFactotum failed")
@@ -301,15 +301,15 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 
 // installUserRoot installs a root dir for the user in the context, but does not create the root dir.
 func installUserRoot(context upspin.Context) error {
-	user, err := bind.User(context, context.UserEndpoint())
+	user, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		return err
 	}
-	testUser, ok := user.(*inprocess.Service)
+	testKey, ok := user.(*inprocess.Service)
 	if !ok {
 		return errors.Str("user service must be the in-process instance")
 	}
-	testUser.AddRoot(context.UserName(), context.DirEndpoint())
+	testKey.AddRoot(context.UserName(), context.DirEndpoint())
 	return nil
 }
 
@@ -329,5 +329,5 @@ func makeRoot(context upspin.Context) error {
 func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoint) {
 	context.SetStoreEndpoint(store)
 	context.SetDirEndpoint(dir)
-	context.SetUserEndpoint(user)
+	context.SetKeyEndpoint(user)
 }

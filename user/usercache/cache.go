@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package usercache pushes a new Context onto an old. It passes all operations except User()
-// to the underlying context. User() returns a pointer to a cached version of the underlying
-// context's User() service.
+// Package usercache pushes a new Context onto an old. It passes all operations except KeyServer
+// to the underlying context. KeyServer returns a pointer to a cached version of the underlying
+// context's KeyServer.
 package usercache
 
 import (
@@ -62,7 +62,7 @@ func Global(context upspin.Context) upspin.Context {
 	}
 }
 
-// Lookup implements upspin.User.Lookup.
+// Lookup implements upspin.KeyServer.Lookup.
 func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	v, ok := c.cache.entries.Get(name)
 
@@ -76,7 +76,7 @@ func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []up
 	}
 
 	// Not found, look it up.
-	eps, pub, err := c.Context.User().Lookup(name)
+	eps, pub, err := c.Context.KeyServer().Lookup(name)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -89,7 +89,7 @@ func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []up
 	return eps, pub, nil
 }
 
-// Dial implements upspin.User.Dial.
+// Dial implements upspin.Service.
 func (c *userCacheContext) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return c, nil
 }
@@ -119,8 +119,8 @@ func (c *userCacheContext) Authenticate(upspin.Context) error {
 	return nil
 }
 
-// User implements upspin.Context. It returns a pointer to the caching user service.
-func (ctx *userCacheContext) User() upspin.User {
+// KeyServer implements upspin.Context. It returns a pointer to the caching user service.
+func (ctx *userCacheContext) KeyServer() upspin.KeyServer {
 	return ctx
 }
 
@@ -147,9 +147,9 @@ func (ctx *userCacheContext) SetPacking(p upspin.Packing) upspin.Context {
 	return ctx
 }
 
-// SetUserEndpoint implements upspin.Context.
-func (ctx *userCacheContext) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.Context.SetUserEndpoint(e)
+// SetKeyEndpoint implements upspin.Context.
+func (ctx *userCacheContext) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.Context.SetKeyEndpoint(e)
 	return ctx
 }
 
