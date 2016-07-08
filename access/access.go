@@ -86,7 +86,7 @@ type Access struct {
 	// path is parsed path name of the file.
 	parsed path.Parsed
 
-	// user is the user@domain.com name of the path of the file.
+	// owner is the user@domain.com name of the path of the file.
 	owner upspin.UserName
 
 	// domain is the domain.com part of the user name of the path of the file.
@@ -616,7 +616,7 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 }
 
 // usersNoGroupLoad returns the user names granted a given right according to the rules
-// of the Access file.
+// of the Access file.  The list is unsorted and may contain duplicates.
 //
 // If the Access file does not know the members of a group that it
 // needs to resolve the answer, it returns a list of the group files it needs to
@@ -627,7 +627,11 @@ func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.Path
 	if err != nil {
 		return nil, nil, err
 	}
-	userNames := make([]upspin.UserName, 0, len(list))
+	userNames := make([]upspin.UserName, 0, len(list)+1)
+	switch right {
+	case Read, List:
+		userNames = append(userNames, a.owner)
+	}
 	var groups []upspin.PathName
 	for _, user := range list {
 		if user.IsRoot() {
@@ -640,7 +644,7 @@ func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.Path
 	}
 	if len(groups) > 0 {
 		users, missingGroups := a.expandGroups(groups)
-		userNames = mergeUsers(userNames, users)
+		userNames = append(userNames, users...)
 		if missingGroups != nil {
 			return userNames, missingGroups, err
 		}
@@ -648,17 +652,26 @@ func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.Path
 	return userNames, nil, nil
 }
 
-// AllUsers returns the user names granted a given right according to the rules
+// For sorting the lists of UserNames.
+type sliceOfUserName []upspin.UserName
+
+func (s sliceOfUserName) Len() int           { return len(s) }
+func (s sliceOfUserName) Less(i, j int) bool { return strings.Compare(string(s[i]), string(s[j])) < 0 }
+func (s sliceOfUserName) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+
+// Users returns the user names granted a given right according to the rules
 // of the Access file. AllUsers loads group files as needed by
 // calling the provided function to read each file's contents.
 func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
+	var userNames []upspin.UserName
 	for {
-		readers, neededGroups, err := a.usersNoGroupLoad(right)
+		users, neededGroups, err := a.usersNoGroupLoad(right)
 		if err != nil {
 			return nil, err
 		}
 		if neededGroups == nil {
-			return readers, nil
+			userNames = users
+			break
 		}
 		for _, group := range neededGroups {
 			groupData, err := load(group)
@@ -671,20 +684,22 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 			}
 		}
 	}
-}
-
-// mergeUsers merges src into dst skipping duplicates and returns the updated dst.
-func mergeUsers(dst []upspin.UserName, src []upspin.UserName) []upspin.UserName {
-	known := make(map[upspin.UserName]bool)
-	for _, d := range dst {
-		known[d] = true
+	if len(userNames) == 0 {
+		return nil, nil
 	}
-	for _, s := range src {
-		if _, found := known[s]; !found {
-			dst = append(dst, s)
+
+	sort.Sort(sliceOfUserName(userNames))
+	// Remove duplicates.
+	n := 0
+	for j := range userNames {
+		if userNames[n] != userNames[j] {
+			n++
+			userNames[n] = userNames[j]
 		}
 	}
-	return dst
+	userNames = userNames[:n+1]
+
+	return userNames, nil
 }
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
