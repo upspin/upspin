@@ -515,7 +515,7 @@ func TestNew(t *testing.T) {
 
 func TestUsersNoGroupLoad(t *testing.T) {
 	acc, err := Parse("bob@foo.com/Access",
-		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -567,7 +567,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
-func TestAllUsers(t *testing.T) {
+func TestUsers(t *testing.T) {
 	loaded := false
 	loadTest := func(name upspin.PathName) ([]byte, error) {
 		loaded = true
@@ -593,6 +593,50 @@ func TestAllUsers(t *testing.T) {
 	}
 	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"}
 	expectEqual(t, expectedReaders, listFromUserName(readersList))
+
+	// Retry with owner left out of Access.
+	acc, err = Parse("bob@foo.com/Access",
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com, friends"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, err = acc.Users(Read, loadTest)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	expectedReaders = []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+
+	// Retry with repeated readers and no group.
+	acc, err = Parse("bob@foo.com/Access",
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com, joe@foo.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, err = acc.Users(Read, loadTest)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	expectedReaders = []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+
+	// Retry with empty Access.
+	acc, err = Parse("bob@foo.com/Access", []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, err = acc.Users(Read, loadTest)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	expectedReaders = []string{"bob@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+	writersList, err := acc.Users(Write, loadTest)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	expectedWriters := []string{}
+	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
 // We test the differenceString function used in assertEqual.
