@@ -515,7 +515,7 @@ func TestNew(t *testing.T) {
 
 func TestUsersNoGroupLoad(t *testing.T) {
 	acc, err := Parse("bob@foo.com/Access",
-		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
 	if err != nil {
 		t.Fatal(err)
 	}

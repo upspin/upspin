@@ -625,7 +625,7 @@ func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.Path
 	if err != nil {
 		return nil, nil, err
 	}
-	userNames := make([]upspin.UserName, 0, len(list))
+	userNames := make([]upspin.UserName, 0, len(list)+1)
 	var groups []upspin.PathName
 	for _, user := range list {
 		if user.IsRoot() {
@@ -635,6 +635,10 @@ func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.Path
 			// It's a group. Need to unroll groups.
 			groups = append(groups, user.Path())
 		}
+	}
+	switch right {
+	case Read, List:
+		userNames = mergeUser(userNames, a.owner)
 	}
 	if len(groups) > 0 {
 		users, missingGroups := a.expandGroups(groups)
@@ -669,6 +673,16 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 			}
 		}
 	}
+}
+
+// mergeUser adds src into dst if not already there and returns the updated dst.
+func mergeUser(dst []upspin.UserName, src upspin.UserName) []upspin.UserName {
+	for _, d := range dst {
+		if d == src {
+			return dst
+		}
+	}
+	return append(dst, src)
 }
 
 // mergeUsers merges src into dst skipping duplicates and returns the updated dst.
