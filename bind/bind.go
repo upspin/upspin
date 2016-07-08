@@ -16,7 +16,7 @@ import (
 
 // dialKey is the key to the LRU caches that store dialed services.
 type dialKey struct {
-	context  upspin.Context
+	user     upspin.UserName
 	endpoint upspin.Endpoint
 }
 
@@ -233,7 +233,7 @@ func Release(service upspin.Service) error {
 // reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
 func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
 	key := dialKey{
-		context:  cc,
+		user:     cc.UserName(),
 		endpoint: e,
 	}
 
@@ -293,7 +293,7 @@ func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dia
 
 	var err error
 	ds = new(dialedService)
-	ds.service, err = dialer.Dial(key.context, key.endpoint)
+	ds.service, err = dialer.Dial(cc, key.endpoint)
 	if err == nil && !ds.ping() {
 		// The dial succeeded, but ping did not, so return an error.
 		err = errors.Str("Ping failed")

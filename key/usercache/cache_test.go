@@ -37,8 +37,8 @@ type service struct {
 }
 
 // setup returns contexts with the KeyServer uncached and cached.
-func setup(t *testing.T, d time.Duration) (upspin.Context, upspin.Context, *service) {
-	c := context.New().SetUserName("unused@unused.com").SetPacking(upspin.DebugPack)
+func setup(t *testing.T, d time.Duration, user string) (upspin.Context, upspin.Context, *service) {
+	c := context.New().SetUserName(upspin.UserName(user)).SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
@@ -71,7 +71,7 @@ func setup(t *testing.T, d time.Duration) (upspin.Context, upspin.Context, *serv
 // TestCache tests the User cache for equivalence with the uncached version and
 // for efficacy of the cached version.
 func TestCache(t *testing.T) {
-	unc, c, s := setup(t, 0)
+	unc, c, s := setup(t, 0, "TestCache@nowhere.com")
 
 	// Compare the 4 names twixt cached and uncached.
 	try(t, unc, c, "a@a.com")
@@ -79,8 +79,8 @@ func TestCache(t *testing.T) {
 	try(t, unc, c, "c@c.com")
 	try(t, unc, c, "d@d.com")
 
-	if s.dialed != 2 {
-		t.Errorf("Expected 2 dials; one for each cache. Got %d", s.dialed)
+	if s.dialed != 1 {
+		t.Errorf("Expected 1 dial. Got %d", s.dialed)
 	}
 
 	sofar := s.lookups
@@ -95,8 +95,8 @@ func TestCache(t *testing.T) {
 	}
 
 	// No new cache misses, so no new dials.
-	if s.dialed != 2 {
-		t.Errorf("Expected no new dials, just the original 2. Got %d", s.dialed)
+	if s.dialed != 1 {
+		t.Errorf("Expected no new dials, just the original 1. Got %d", s.dialed)
 	}
 
 	// If the cache worked, we should only have 1 uncached access per try() in the loop.
@@ -110,7 +110,7 @@ func TestExpiration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Expiration tests skipped in short mode")
 	}
-	unc, c, s := setup(t, time.Second)
+	unc, c, s := setup(t, time.Second, "TestExpiration@nowhere.com")
 
 	// Cache the 4 names.
 	try(t, unc, c, "a@a.com")
@@ -130,8 +130,8 @@ func TestExpiration(t *testing.T) {
 		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+2*4)
 	}
 
-	if s.dialed != 2 {
-		t.Errorf("Expected 2 dials, got %d", s.dialed)
+	if s.dialed != 1 {
+		t.Errorf("Expected 1 dial, got %d", s.dialed)
 	}
 }
 

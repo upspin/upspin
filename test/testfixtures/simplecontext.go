@@ -41,6 +41,7 @@ func (ctx *simpleContext) UserName() upspin.UserName {
 
 // SetUserName implements upspin.Context.
 func (ctx *simpleContext) SetUserName(u upspin.UserName) upspin.Context {
+	ctx.userName = u
 	return ctx
 }
 
