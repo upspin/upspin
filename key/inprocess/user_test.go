@@ -11,7 +11,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/inprocess"
+	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )

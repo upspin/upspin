@@ -20,9 +20,9 @@ import (
 	"upspin.io/upspin"
 
 	// Load required transports
-	_ "upspin.io/directory/transports"
+	_ "upspin.io/dir/transports"
+	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
 )
 
 var httpAddr = flag.String("http", "localhost:8080", "HTTP listen address")

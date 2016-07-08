@@ -8,8 +8,8 @@
 package transports
 
 import (
-	_ "upspin.io/user/gcp"
-	_ "upspin.io/user/inprocess"
-	_ "upspin.io/user/remote"
-	_ "upspin.io/user/unassigned"
+	_ "upspin.io/key/gcp"
+	_ "upspin.io/key/inprocess"
+	_ "upspin.io/key/remote"
+	_ "upspin.io/key/unassigned"
 )
