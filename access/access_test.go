@@ -515,7 +515,7 @@ func TestNew(t *testing.T) {
 
 func TestUsersNoGroupLoad(t *testing.T) {
 	acc, err := Parse("bob@foo.com/Access",
-		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com\nw: bob@foo.com, family"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -567,7 +567,19 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
-func TestAllUsers(t *testing.T) {
+func usersCheck(t *testing.T, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
+	acc, err := Parse(file, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, err := acc.Users(Read, load)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	expectEqual(t, expected, listFromUserName(readersList))
+}
+
+func TestUsers(t *testing.T) {
 	loaded := false
 	loadTest := func(name upspin.PathName) ([]byte, error) {
 		loaded = true
@@ -579,20 +591,28 @@ func TestAllUsers(t *testing.T) {
 		}
 	}
 
-	acc, err := Parse("bob@foo.com/Access",
-		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com, friends"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	readersList, err := acc.Users(Read, loadTest)
-	if err != nil {
-		t.Fatalf("Expected no error, got %s", err)
-	}
+	usersCheck(t, loadTest, "bob@foo.com/Access",
+		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com, friends"),
+		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"})
 	if !loaded {
 		t.Fatalf("group file was not loaded")
 	}
-	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"}
-	expectEqual(t, expectedReaders, listFromUserName(readersList))
+
+	// Retry with owner left out of Access.
+	usersCheck(t, loadTest, "bob@foo.com/Access",
+		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com, friends"),
+		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"})
+
+	// Retry with repeated readers and no group.
+	usersCheck(t, loadTest, "bob@foo.com/Access",
+		[]byte("r: al@foo.com, sue@foo.com, bob@foo.com, tommy@foo.com, al@foo.com"),
+		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "al@foo.com"})
+
+	// Retry with empty Access.
+	usersCheck(t, loadTest, "bob@foo.com/Access",
+		[]byte(""),
+		[]string{"bob@foo.com"})
+
 }
 
 // We test the differenceString function used in assertEqual.
