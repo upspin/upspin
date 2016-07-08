@@ -74,7 +74,7 @@ func main() {
 			log.Debug.Fatal("Not a inprocess.Service")
 		}
 
-		dir, err := bind.Directory(context, context.DirectoryEndpoint())
+		dir, err := bind.DirServer(context, context.DirEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}

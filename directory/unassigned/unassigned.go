@@ -11,42 +11,42 @@ import (
 	"upspin.io/upspin"
 )
 
-// unassigned implements upspin.Directory.
+// unassigned implements upspin.DirServer.
 type unassigned struct {
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.Directory = (*unassigned)(nil)
+var _ upspin.DirServer = (*unassigned)(nil)
 
 var unassignedErr = errors.Str("request to unassigned service")
 
-// Glob implements upspin.Directory.Glob.
+// Glob implements upspin.DirServer.Glob.
 func (*unassigned) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, errors.E("Glob", errors.Invalid, unassignedErr)
 }
 
-// MakeDirectory implements upspin.Directory.MakeDirectory.
+// MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (*unassigned) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	return upspin.Location{}, errors.E("MakeDirectory", errors.Invalid, unassignedErr)
 }
 
-// Put implements upspin.Directory.Put.
+// Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (*unassigned) Put(entry *upspin.DirEntry) error {
 	return errors.E("Put", errors.Invalid, unassignedErr)
 }
 
-// WhichAccess implements upspin.Directory.WhichAccess.
+// WhichAccess implements upspin.DirServer.WhichAccess.
 func (*unassigned) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	return "", errors.E("WhichAccess", errors.Invalid, unassignedErr)
 }
 
-// Delete implements upspin.Directory.Delete.
+// Delete implements upspin.DirServer.Delete.
 func (*unassigned) Delete(pathName upspin.PathName) error {
 	return errors.E("Delete", errors.Invalid, unassignedErr)
 }
 
-// Lookup implements upspin.Directory.Lookup.
+// Lookup implements upspin.DirServer.Lookup.
 func (*unassigned) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.E("Lookup", errors.Invalid, unassignedErr)
 }
@@ -87,5 +87,5 @@ func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Ser
 const transport = upspin.Unassigned
 
 func init() {
-	bind.RegisterDirectory(transport, &unassigned{})
+	bind.RegisterDirServer(transport, &unassigned{})
 }

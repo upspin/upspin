@@ -225,7 +225,7 @@ func userListToString(userList []upspin.UserName) string {
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
 func (s *sharer) allEntries() []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
+	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -253,7 +253,7 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
+	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -309,7 +309,7 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 	if _, ok := s.accessFiles[name]; ok {
 		return
 	}
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
+	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -355,7 +355,7 @@ func read(c upspin.Client, file upspin.PathName) []byte {
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
 func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
-	directory, err := bind.Directory(s.context, s.context.DirectoryEndpoint())
+	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}

@@ -77,7 +77,7 @@ var (
 	mu sync.Mutex // Guards the variables below.
 
 	userMap      = make(map[upspin.Transport]upspin.User)
-	directoryMap = make(map[upspin.Transport]upspin.Directory)
+	directoryMap = make(map[upspin.Transport]upspin.DirServer)
 	storeMap     = make(map[upspin.Transport]upspin.Store)
 
 	// These caches hold <dialKey, *dialedService> for each respective service type.
@@ -113,23 +113,23 @@ func registerUser(op string, transport upspin.Transport, user upspin.User, allow
 	return nil
 }
 
-// RegisterDirectory registers a Directory interface for the transport.
+// RegisterDirServer registers a DirServer interface for the transport.
 // There must be no previous registration.
-func RegisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
-	return registerDirectory("RegisterDirectory", transport, dir, !allowOverwrite)
+func RegisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
+	return registerDirServer("RegisterDirServer", transport, dir, !allowOverwrite)
 }
 
-// ReregisterDirectory replaces the Directory interface for the transport.
-func ReregisterDirectory(transport upspin.Transport, dir upspin.Directory) error {
-	return registerDirectory("ReregisterDirectory", transport, dir, allowOverwrite)
+// ReregisterDirServer replaces the DirServer interface for the transport.
+func ReregisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
+	return registerDirServer("ReregisterDirServer", transport, dir, allowOverwrite)
 }
 
-func registerDirectory(op string, transport upspin.Transport, dir upspin.Directory, allowOverwrite bool) error {
+func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := directoryMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override Directory interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override DirServer interface: %v", transport))
 	}
 	directoryMap[transport] = dir
 	return nil
@@ -189,20 +189,20 @@ func Store(cc upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
 	return x.(upspin.Store), nil
 }
 
-// Directory returns a Directory interface bound to the endpoint.
-func Directory(cc upspin.Context, e upspin.Endpoint) (upspin.Directory, error) {
-	const Directory = "Directory"
+// DirServer returns a DirServer interface bound to the endpoint.
+func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
+	const DirServer = "DirServer"
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(Directory, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(DirServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, Directory, e, directoryDialCache, d)
+	x, err := reachableService(cc, DirServer, e, directoryDialCache, d)
 	if err != nil {
 		return nil, err
 	}
-	return x.(upspin.Directory), nil
+	return x.(upspin.DirServer), nil
 }
 
 // Release closes the service and releases all resources associated with it.
@@ -216,7 +216,7 @@ func Release(service upspin.Service) error {
 		return errors.E(Release, errors.NotExist, errors.Str("service not found"))
 	}
 	switch service.(type) {
-	case upspin.Directory:
+	case upspin.DirServer:
 		delete(directoryDialCache, key)
 	case upspin.Store:
 		delete(storeDialCache, key)

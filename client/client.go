@@ -40,7 +40,7 @@ func New(context upspin.Context) upspin.Client {
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
-	dir, err := c.Directory(name)
+	dir, err := c.DirServer(name)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -115,7 +115,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	if packer.String() != "ee" {
 		return nil
 	}
-	directory, err := bind.Directory(c.context, c.context.DirectoryEndpoint())
+	directory, err := bind.DirServer(c.context, c.context.DirEndpoint())
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 
 // MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	dir, err := c.Directory(dirName)
+	dir, err := c.DirServer(dirName)
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -171,7 +171,7 @@ func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error)
 
 // Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	dir, err := c.Directory(name)
+	dir, err := c.DirServer(name)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +244,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	dir, err := c.Directory(upspin.PathName(pattern))
+	dir, err := c.DirServer(upspin.PathName(pattern))
 	if err != nil {
 		return nil, err
 	}
@@ -266,22 +266,22 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	return file.Readable(c, name, data), nil
 }
 
-// Directory implements upspin.Client.
-func (c *Client) Directory(name upspin.PathName) (upspin.Directory, error) {
+// DirServer implements upspin.Client.
+func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, err
 	}
 	var endpoints []upspin.Endpoint
 	if parsed.User() == c.context.UserName() {
-		endpoints = append(endpoints, c.context.DirectoryEndpoint())
+		endpoints = append(endpoints, c.context.DirEndpoint())
 	}
 	if eps, _, err := c.context.User().Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
-	var dir upspin.Directory
+	var dir upspin.DirServer
 	for _, e := range endpoints {
-		dir, err = bind.Directory(c.context, e)
+		dir, err = bind.DirServer(c.context, e)
 		if dir != nil {
 			return dir, nil
 		}
@@ -314,7 +314,7 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		return nil, err
 	}
 
-	oldDir, err := c.Directory(oldName)
+	oldDir, err := c.DirServer(oldName)
 	if err != nil {
 		return nil, err
 	}
@@ -343,10 +343,10 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		}
 	}
 
-	// Get the destination upspin.Directory.
+	// Get the destination upspin.DirServer.
 	newDir := oldDir
 	if oldParsed.User() != newParsed.User() {
-		newDir, err = c.Directory(oldName)
+		newDir, err = c.DirServer(oldName)
 		if err != nil {
 			return nil, err
 		}

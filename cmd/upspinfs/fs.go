@@ -149,8 +149,8 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 }
 
 // dirLookup returns a bound directory for user 'name'.
-func (f *upspinFS) dirLookup(name upspin.UserName) upspin.Directory {
-	return f.context.Directory(upspin.PathName(name))
+func (f *upspinFS) dirLookup(name upspin.UserName) upspin.DirServer {
+	return f.context.DirServer(upspin.PathName(name))
 }
 
 var handleID int
@@ -202,7 +202,7 @@ func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 
 // Create implements fs.NodeCreator.Create. Creates and opens a file.
 // Every created file is initially backed by a clear text local file which is
-// Put in an upspin Directory on close.  It is assumed that 'n' is a directory.
+// Put in an upspin DirServer on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
 	const op = "Fuse Create"
 	n.Lock()
@@ -323,7 +323,7 @@ func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *f
 	return h, nil
 }
 
-func (n *node) directoryLookup(uname upspin.PathName) (upspin.Directory, *upspin.DirEntry, error) {
+func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry, error) {
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, nil, errors.E(errors.NotDir, n.uname)
 	}
@@ -425,7 +425,7 @@ func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
 	}
 	f.Unlock()
 
-	// Ask the Directory.
+	// Ask the Dirserver.
 	_, de, err := n.directoryLookup(uname)
 	if err != nil {
 		return nil, e2e(errors.E(op, uname, err))

@@ -25,23 +25,23 @@ type dialContext struct {
 	userName upspin.UserName
 }
 
-// remote implements upspin.Directory.
+// remote implements upspin.DirServer.
 type remote struct {
 	upspin.NoConfiguration
 	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
 	ctx                         dialContext
-	dirClient                   proto.DirectoryClient
+	dirClient                   proto.DirClient
 }
 
-var _ upspin.Directory = (*remote)(nil)
+var _ upspin.DirServer = (*remote)(nil)
 
-// Glob implements upspin.Directory.Glob.
+// Glob implements upspin.DirServer.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, err
 	}
-	req := &proto.DirectoryGlobRequest{
+	req := &proto.DirGlobRequest{
 		Pattern: pattern,
 	}
 	resp, err := r.dirClient.Glob(gCtx, req)
@@ -58,13 +58,13 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return proto.UpspinDirEntries(resp.Entries)
 }
 
-// MakeDirectory implements upspin.Directory.MakeDirectory.
+// MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return upspin.Location{}, err
 	}
-	req := &proto.DirectoryMakeDirectoryRequest{
+	req := &proto.DirMakeDirectoryRequest{
 		Name: string(directoryName),
 	}
 	resp, err := r.dirClient.MakeDirectory(gCtx, req)
@@ -75,7 +75,7 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, 
 	return proto.UpspinLocation(resp.Location), errors.UnmarshalError(resp.Error)
 }
 
-// Put implements upspin.Directory.Put.
+// Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (r *remote) Put(entry *upspin.DirEntry) error {
 	gCtx, err := r.NewAuthContext()
@@ -86,7 +86,7 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 	if err != nil {
 		return err
 	}
-	req := &proto.DirectoryPutRequest{
+	req := &proto.DirPutRequest{
 		Entry: b,
 	}
 	resp, err := r.dirClient.Put(gCtx, req)
@@ -97,13 +97,13 @@ func (r *remote) Put(entry *upspin.DirEntry) error {
 	return errors.UnmarshalError(resp.Error)
 }
 
-// WhichAccess implements upspin.Directory.WhichAccess.
+// WhichAccess implements upspin.DirServer.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return "", err
 	}
-	req := &proto.DirectoryWhichAccessRequest{
+	req := &proto.DirWhichAccessRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req)
@@ -114,13 +114,13 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) 
 	return upspin.PathName(resp.Name), errors.UnmarshalError(resp.Error)
 }
 
-// Delete implements upspin.Directory.Delete.
+// Delete implements upspin.DirServer.Delete.
 func (r *remote) Delete(pathName upspin.PathName) error {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
 	}
-	req := &proto.DirectoryDeleteRequest{
+	req := &proto.DirDeleteRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Delete(gCtx, req)
@@ -131,13 +131,13 @@ func (r *remote) Delete(pathName upspin.PathName) error {
 	return errors.UnmarshalError(resp.Error)
 }
 
-// Lookup implements upspin.Directory.Lookup.
+// Lookup implements upspin.DirServer.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, err
 	}
-	req := &proto.DirectoryLookupRequest{
+	req := &proto.DirLookupRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Lookup(gCtx, req)
@@ -179,7 +179,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		return nil, err
 	}
 	// The connection is closed when this service is released (see Bind.Release)
-	dirClient := proto.NewDirectoryClient(authClient.GRPCConn())
+	dirClient := proto.NewDirClient(authClient.GRPCConn())
 	authClient.SetService(dirClient)
 	r := &remote{
 		AuthClientService: authClient,
@@ -197,5 +197,5 @@ const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
-	bind.RegisterDirectory(transport, r)
+	bind.RegisterDirServer(transport, r)
 }

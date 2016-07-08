@@ -153,9 +153,9 @@ func (ctx *userCacheContext) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
 	return ctx
 }
 
-// SetDirectoryEndpoint implements upspin.Context.
-func (ctx *userCacheContext) SetDirectoryEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.Context.SetDirectoryEndpoint(e)
+// SetDirEndpoint implements upspin.Context.
+func (ctx *userCacheContext) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.Context.SetDirEndpoint(e)
 	return ctx
 }
 

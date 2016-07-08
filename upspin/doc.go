@@ -27,7 +27,7 @@ There are three fundamental services defined in Upspin.
 piece of user data stored in the system is identified by a Location,
 which identifies where it is stored and how to address it.
 
-* The Directory service implements the name space, binding hierarchical,
+* The DirServer service implements the name space, binding hierarchical,
 Unix-like names to Locations of data stored in Store servers.
 Directories also attach metadata to file names, which may include
 encryption/decryption keys or other access-control information.
@@ -37,8 +37,8 @@ of the user root and any public encryption keys exported by that
 user.
 
 Each of these three services is itself distributed, so for instance
-a user root may be hosted on or split across multiple Directory
-servers, which coordinate to provide a consistent view of the user's
+a user root may be hosted on or split across multiple DirServer
+instances, which coordinate to provide a consistent view of the user's
 data.
 
 Finally, the Client interface provides a coherent high-level file-like API that,

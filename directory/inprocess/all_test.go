@@ -37,14 +37,14 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspin.User, dir upspin.Directory, store upspin.Store) {
+func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspin.User, dir upspin.DirServer, store upspin.Store) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetUserEndpoint(endpoint).SetDirectoryEndpoint(endpoint).SetStoreEndpoint(endpoint)
+	ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetUserEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
 	var err error
 	user, err = bind.User(ctx, endpoint)
 	if err != nil {
@@ -54,14 +54,14 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 	if err != nil {
 		panic(err)
 	}
-	dir, err = bind.Directory(ctx, endpoint)
+	dir, err = bind.DirServer(ctx, endpoint)
 	if err != nil {
 		panic(err)
 	}
 	return
 }
 
-func setup() (upspin.Context, upspin.User, upspin.Directory, upspin.Store) {
+func setup() (upspin.Context, upspin.User, upspin.DirServer, upspin.Store) {
 	context, user, dir, store := newContextAndServices(nextUser())
 	err := user.(*inprocess.Service).Install(context.UserName(), dir)
 	if err != nil {

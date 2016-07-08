@@ -309,13 +309,13 @@ func installUserRoot(context upspin.Context) error {
 	if !ok {
 		return errors.Str("user service must be the in-process instance")
 	}
-	testUser.AddRoot(context.UserName(), context.DirectoryEndpoint())
+	testUser.AddRoot(context.UserName(), context.DirEndpoint())
 	return nil
 }
 
 func makeRoot(context upspin.Context) error {
 	// Make the root to be sure it's there.
-	directory, err := bind.Directory(context, context.DirectoryEndpoint())
+	directory, err := bind.DirServer(context, context.DirEndpoint())
 	if err != nil {
 		return err
 	}
@@ -328,6 +328,6 @@ func makeRoot(context upspin.Context) error {
 
 func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoint) {
 	context.SetStoreEndpoint(store)
-	context.SetDirectoryEndpoint(dir)
+	context.SetDirEndpoint(dir)
 	context.SetUserEndpoint(user)
 }

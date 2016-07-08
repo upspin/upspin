@@ -22,12 +22,12 @@ import (
 )
 
 type contextImpl struct {
-	userName          upspin.UserName
-	factotum          upspin.Factotum
-	packing           upspin.Packing
-	userEndpoint      upspin.Endpoint
-	directoryEndpoint upspin.Endpoint
-	storeEndpoint     upspin.Endpoint
+	userName      upspin.UserName
+	factotum      upspin.Factotum
+	packing       upspin.Packing
+	userEndpoint  upspin.Endpoint
+	dirEndpoint   upspin.Endpoint
+	storeEndpoint upspin.Endpoint
 }
 
 // New returns a context with all fields set as defaults.
@@ -43,7 +43,7 @@ func New() upspin.Context {
 //
 // The default configuration file location is $HOME/upspin/rc.
 // If passed a non-nil io.Reader, that is used instead of the default file.
-// The upspinuser, upspindirectory, upspinstore, and upspinpacking environment
+// The upspinuser, upspindirserver, upspinstore, and upspinpacking environment
 // variables specify the user, directory, store, and packing, and will override
 // values in the provided reader or default rc file.
 //
@@ -60,7 +60,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	vals := map[string]string{
 		"name":      "noone@nowhere.org",
 		"user":      "",
-		"directory": "",
+		"dirserver": "",
 		"store":     "",
 		"packing":   "plain"}
 
@@ -128,7 +128,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	context.userEndpoint = parseEndpoint(op, vals, "user", &err)
 	context.storeEndpoint = parseEndpoint(op, vals, "store", &err)
-	context.directoryEndpoint = parseEndpoint(op, vals, "directory", &err)
+	context.dirEndpoint = parseEndpoint(op, vals, "dirserver", &err)
 	return context, err
 }
 
@@ -160,36 +160,36 @@ func (ctx *contextImpl) User() upspin.User {
 	return u
 }
 
-// Directory implements upspin.Context.
-func (ctx *contextImpl) Directory(name upspin.PathName) upspin.Directory {
+// DirServer implements upspin.Context.
+func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 	if len(name) == 0 {
 		// If name is empty, just return the directory at
 		// ctx.directoryEndpoint.
-		d, err := bind.Directory(ctx, ctx.directoryEndpoint)
+		d, err := bind.DirServer(ctx, ctx.dirEndpoint)
 		if err != nil {
-			d, _ = bind.Directory(ctx, ep0)
+			d, _ = bind.DirServer(ctx, ep0)
 		}
 		return d
 	}
 	parsed, err := path.Parse(name)
 	if err != nil {
-		d, _ := bind.Directory(ctx, ep0)
+		d, _ := bind.DirServer(ctx, ep0)
 		return d
 	}
 	var endpoints []upspin.Endpoint
 	if parsed.User() == ctx.userName {
-		endpoints = append(endpoints, ctx.directoryEndpoint)
+		endpoints = append(endpoints, ctx.dirEndpoint)
 	}
 	if eps, _, err := ctx.User().Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	for _, e := range endpoints {
-		d, _ := bind.Directory(ctx, e)
+		d, _ := bind.DirServer(ctx, e)
 		if d != nil {
 			return d
 		}
 	}
-	d, _ := bind.Directory(ctx, ep0)
+	d, _ := bind.DirServer(ctx, ep0)
 	return d
 }
 
@@ -246,14 +246,14 @@ func (ctx *contextImpl) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
 	return ctx
 }
 
-// DirectoryEndpoint implements upspin.Context.
-func (ctx *contextImpl) DirectoryEndpoint() upspin.Endpoint {
-	return ctx.directoryEndpoint
+// DirEndpoint implements upspin.Context.
+func (ctx *contextImpl) DirEndpoint() upspin.Endpoint {
+	return ctx.dirEndpoint
 }
 
-// SetDirectoryEndpoint implements upspin.Context.
-func (ctx *contextImpl) SetDirectoryEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.directoryEndpoint = e
+// SetDirEndpoint implements upspin.Context.
+func (ctx *contextImpl) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.dirEndpoint = e
 	return ctx
 }
 

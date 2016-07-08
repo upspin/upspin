@@ -86,11 +86,11 @@ func validateUserName(op string, name upspin.UserName) (*path.Parsed, error) {
 	return &parsed, nil
 }
 
-// Install installs a user and its.db.root in the provided Directory
-// service. For a real User service, this would be done by some offline
+// Install installs a user and its.db.root in the provided DirServer.
+// For a real User service, this would be done by some offline
 // administrative procedure. For this test version, we just provide a
 // simple hook for testing.
-func (s *Service) Install(name upspin.UserName, dir upspin.Directory) error {
+func (s *Service) Install(name upspin.UserName, dir upspin.DirServer) error {
 	// Verify that it is a valid name.
 	parsed, err := validateUserName("Install", name)
 	if err != nil {

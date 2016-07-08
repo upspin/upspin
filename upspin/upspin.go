@@ -171,8 +171,9 @@ type Packer interface {
 	// Share updates each packdata element to enable all the readers,
 	// and only those readers, to be able to decrypt the associated ciphertext,
 	// which is held separate from this call. It is invoked in response to
-	// Directory updates returning information about entries that need updating due to
+	// DirServer updates returning information about entries that need updating due to
 	// changes in the set of users with permissions to read the associated items.
+	// (TODO: DirServer updates not yet implemented.)
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
@@ -220,8 +221,8 @@ type User interface {
 	Dialer
 	Service
 
-	// Lookup returns a list (slice) of Endpoints of Directory
-	// services that may hold the root directory for the named
+	// Lookup returns a list (slice) of Endpoints of DirServers
+	// that may hold the root directory for the named
 	// user and a list (slice) of public keys for that user. Those
 	// earlier in the lists are better places to look.
 	Lookup(userName UserName) ([]Endpoint, []PublicKey, error)
@@ -230,10 +231,8 @@ type User interface {
 // A PublicKey can be given to anyone and used for authenticating a User.
 type PublicKey string
 
-// Directory service.
-
-// The Directory service manages the name space for one or more users.
-type Directory interface {
+// DirServer manages the name space for one or more users.
+type DirServer interface {
 	Dialer
 	Service
 
@@ -257,7 +256,7 @@ type Directory interface {
 	// but is included in the packing signature and so should usually
 	// be set to a non-zero value.
 	// Sequence represents a sequence number that is incremented
-	// after each Put. If it is neither 0 nor -1, the Directory service will
+	// after each Put. If it is neither 0 nor -1, the DirServer will
 	// reject the Put operation unless Sequence is the same as that
 	// stored in the metadata for the existing item with the same
 	// path name. If it is -1, Put will fail if there is already an item
@@ -378,7 +377,7 @@ type Store interface {
 // that wish to access Upspin's name space. When Client evaluates a path
 // name and encounters a link, it evaluates the link, iteratively if necessary,
 // until it reaches an item that is not a link.
-// (The Directory interface does no special processing for links.)
+// (The DirServer interface does no special processing for links.)
 type Client interface {
 	// Get returns the clear, decrypted data stored under the given name.
 	// It is intended only for special purposes, since it will allocate memory
@@ -413,8 +412,8 @@ type Client interface {
 	Create(name PathName) (File, error)
 	Open(name PathName) (File, error)
 
-	// Directory returns an error or a reachable bound Directory for the user.
-	Directory(name PathName) (Directory, error)
+	// DirServer returns an error or a reachable bound DirServer for the user.
+	DirServer(name PathName) (DirServer, error)
 
 	// Link creates a new name for the reference referred to by the old name,
 	// thereby defining the new name as a link to the old.
@@ -455,7 +454,7 @@ type File interface {
 }
 
 // Context contains client information such as the user's keys and
-// preferred User, Directory, and Store server endpoints.
+// preferred User, DirServer, and Store server endpoints.
 type Context interface {
 	// The name of the user requesting access.
 	UserName() UserName
@@ -487,17 +486,17 @@ type Context interface {
 	// error binding, all subsequent calls on the User service will return errors.
 	User() User
 
-	// DirectoryEndpoint is the endpoint of the Directory in which to place new data items.  It is
+	// DirEndpoint is the endpoint of the DirServer in which to place new data items.  It is
 	// usually the location of the user's root.
-	DirectoryEndpoint() Endpoint
+	DirEndpoint() Endpoint
 
-	// SetDirectoryEndpoint sets the DirectoryEndpoint.
-	SetDirectoryEndpoint(Endpoint) Context
+	// SetDirEndpoint sets the DirEndpoint.
+	SetDirEndpoint(Endpoint) Context
 
-	// Directory returns a Directory service responsible for the path.  If the path is
-	// empty, it will return a Directory service bound to DirectoryEndpoint(). In the
+	// DirServer returns a DirServer instance responsible for the path. If the path is
+	// empty, it will return a DirServer service bound to DirEndpoint. In the
 	// event of an error binding, all subsequent calls on the User service will return errors.
-	Directory(PathName) Directory
+	DirServer(PathName) DirServer
 
 	// StoreEndpoint is the endpoint of the Store in which to place new data items.
 	StoreEndpoint() Endpoint
@@ -514,7 +513,7 @@ type Context interface {
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
-// service type (User, Directory, Store) implements the methods of
+// service type (User, DirServer, Store) implements the methods of
 // the Dialer interface. These methods are not used directly by
 // clients. Instead, clients should use the methods of
 // the Upspin "bind" package to connect to services.
