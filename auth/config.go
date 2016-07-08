@@ -12,8 +12,8 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/key/usercache"
 	"upspin.io/upspin"
-	"upspin.io/user/usercache"
 )
 
 // Config holds the configuration parameters for instantiating a server (HTTP or gRPC).

@@ -10,10 +10,10 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
+	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
-	"upspin.io/user/inprocess"
 )
 
 func TestRegister(t *testing.T) {

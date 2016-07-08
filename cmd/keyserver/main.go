@@ -24,7 +24,7 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
-	_ "upspin.io/user/transports"
+	_ "upspin.io/key/transports"
 )
 
 // The upspin username for this server.

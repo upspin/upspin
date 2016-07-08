@@ -25,7 +25,7 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports. We only use the KeyServer interface itself; we are DirServer and StoreServer.
-	_ "upspin.io/user/transports"
+	_ "upspin.io/key/transports"
 )
 
 var (

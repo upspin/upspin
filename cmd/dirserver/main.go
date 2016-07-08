@@ -34,9 +34,9 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-	_ "upspin.io/directory/transports"
+	_ "upspin.io/dir/transports"
+	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
 )
 
 var (

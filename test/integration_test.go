@@ -33,12 +33,12 @@ import (
 	e "upspin.io/test/testenv"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/transports"
+	_ "upspin.io/dir/transports"
+	_ "upspin.io/key/transports"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
 )
 
 const (

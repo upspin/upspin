@@ -15,16 +15,16 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
+	"upspin.io/key/inprocess"
+	"upspin.io/key/usercache"
 	"upspin.io/log"
 	"upspin.io/upspin"
-	"upspin.io/user/inprocess"
-	"upspin.io/user/usercache"
 
-	_ "upspin.io/directory/transports"
+	_ "upspin.io/dir/transports"
+	_ "upspin.io/key/transports"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
 )
 
 var (

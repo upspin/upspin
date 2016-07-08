@@ -17,7 +17,7 @@ import (
 
 	"strings"
 
-	_ "upspin.io/directory/inprocess"
+	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/store/inprocess"
 )
 

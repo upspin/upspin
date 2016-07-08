@@ -15,10 +15,10 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/key/inprocess"
 	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
-	"upspin.io/user/inprocess"
 )
 
 // Entry is an entry in the Upspin namespace.

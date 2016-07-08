@@ -11,10 +11,10 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client/common/file"
 	"upspin.io/errors"
+	"upspin.io/key/usercache"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
-	"upspin.io/user/usercache"
 
 	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
 )

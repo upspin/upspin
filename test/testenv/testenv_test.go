@@ -10,7 +10,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/upspin"
 
-	_ "upspin.io/directory/inprocess"
+	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/store/inprocess"
 )
 

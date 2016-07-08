@@ -23,8 +23,8 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
+	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-	_ "upspin.io/user/transports"
 )
 
 var (
