@@ -23,7 +23,7 @@ deployonly=0
 buildonly=0
 restartonly=0
 project=${PROJECT:-upspin-test}
-default_serverlist=(userserver dirserver storeserver frontend)
+default_serverlist=(keyserver dirserver storeserver frontend)
 
 # Builds the named binary statically.
 function build {
@@ -147,8 +147,8 @@ function main {
             dirserver)
             serverlist[${#serverlist[*]}]="dirserver"
             ;;
-            userserver)
-            serverlist[${#serverlist[*]}]="userserver"
+            keyserver)
+            serverlist[${#serverlist[*]}]="keyserver"
             ;;
             frontend)
             serverlist[${#serverlist[*]}]="frontend"
