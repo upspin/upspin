@@ -1,17 +1,17 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: userserver
+  name: keyserver
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: userserver
+        app: keyserver
     spec:
       containers:
-      - name: userserver
-        image: gcr.io/PROJECT/userserver
+      - name: keyserver
+        image: gcr.io/PROJECT/keyserver
         ports:
         - containerPort: 80
         - containerPort: 443
