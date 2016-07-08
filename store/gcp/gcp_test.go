@@ -139,7 +139,7 @@ func TestGCPErrorsOut(t *testing.T) {
 
 func TestMissingConfiguration(t *testing.T) {
 	cleanSetup()
-	store, err := bind.Store(context.New(), upspin.Endpoint{Transport: upspin.GCP})
+	store, err := bind.StoreServer(context.New(), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +155,7 @@ func TestMissingConfiguration(t *testing.T) {
 
 func TestConfigure(t *testing.T) {
 	cleanSetup()
-	store, err := bind.Store(context.New(), upspin.Endpoint{Transport: upspin.GCP})
+	store, err := bind.StoreServer(context.New(), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,11 +177,11 @@ func TestConfigure(t *testing.T) {
 
 func TestRefCount(t *testing.T) {
 	cleanSetup()
-	s1, err := bind.Store(context.New().SetUserName("a"), upspin.Endpoint{Transport: upspin.GCP})
+	s1, err := bind.StoreServer(context.New().SetUserName("a"), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}
-	s2, err := bind.Store(context.New().SetUserName("b"), upspin.Endpoint{Transport: upspin.GCP})
+	s2, err := bind.StoreServer(context.New().SetUserName("b"), upspin.Endpoint{Transport: upspin.GCP})
 	if err != nil {
 		t.Fatal(err)
 	}

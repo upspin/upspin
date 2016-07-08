@@ -610,7 +610,7 @@ func TestPutAccessFile(t *testing.T) {
 	}
 
 	ds := newDirectory(egcp, f,
-		func(e upspin.Endpoint) (upspin.Store, error) {
+		func(e upspin.Endpoint) (upspin.StoreServer, error) {
 			return &dummyStore{
 				ref:      upspin.Reference("1234"),
 				contents: []byte(accessContents),
@@ -714,7 +714,7 @@ func TestGroupAccessFile(t *testing.T) {
 	}
 	// Create a store factory that returns d1 then d2.
 	count := 0
-	ds := newDirectory(egcp, f, func(e upspin.Endpoint) (upspin.Store, error) {
+	ds := newDirectory(egcp, f, func(e upspin.Endpoint) (upspin.StoreServer, error) {
 		count++
 		switch count {
 		case 1:
@@ -1161,7 +1161,7 @@ type dummyStore struct {
 	contents []byte
 }
 
-var _ upspin.Store = (*dummyStore)(nil)
+var _ upspin.StoreServer = (*dummyStore)(nil)
 
 func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	if ref == d.ref {

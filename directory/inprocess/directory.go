@@ -294,7 +294,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	store, err := bind.Store(s.context, s.context.StoreEndpoint())
+	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return loc0, errors.E(MakeDirectory, directoryName, err)
 	}
@@ -497,7 +497,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 
 // getData retrieves the data for the entry. s.db.mu is held for write.
 func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
-	store, err := bind.Store(s.context, entry.Location.Endpoint)
+	store, err := bind.StoreServer(s.context, entry.Location.Endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -664,7 +664,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 
 // fetchDir returns the decrypted directory data associated with the reference.
 func (s *Service) fetchDir(op string, dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
-	store, err := bind.Store(s.context, s.context.StoreEndpoint())
+	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return nil, err
 	}
@@ -774,7 +774,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		dirData = append(dirData, data...)
 	}
 	blob, _, err := s.db.packDirBlob(op, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
-	store, err := bind.Store(s.context, s.context.StoreEndpoint())
+	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
 	if err != nil {
 		return "", errors.E(op, err)
 	}

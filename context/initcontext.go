@@ -43,7 +43,7 @@ func New() upspin.Context {
 //
 // The default configuration file location is $HOME/upspin/rc.
 // If passed a non-nil io.Reader, that is used instead of the default file.
-// The upspinuser, upspindirserver, upspinstore, and upspinpacking environment
+// The upspinuser, upspindirserver, upspinstoreserver, and upspinpacking environment
 // variables specify the user, directory, store, and packing, and will override
 // values in the provided reader or default rc file.
 //
@@ -58,11 +58,11 @@ func New() upspin.Context {
 func InitContext(r io.Reader) (upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{
-		"name":      "noone@nowhere.org",
-		"user":      "",
-		"dirserver": "",
-		"store":     "",
-		"packing":   "plain"}
+		"name":        "noone@nowhere.org",
+		"user":        "",
+		"dirserver":   "",
+		"storeserver": "",
+		"packing":     "plain"}
 
 	if r == nil {
 		home := os.Getenv("HOME")
@@ -127,7 +127,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 
 	context.userEndpoint = parseEndpoint(op, vals, "user", &err)
-	context.storeEndpoint = parseEndpoint(op, vals, "store", &err)
+	context.storeEndpoint = parseEndpoint(op, vals, "storeserver", &err)
 	context.dirEndpoint = parseEndpoint(op, vals, "dirserver", &err)
 	return context, err
 }
@@ -193,16 +193,16 @@ func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 	return d
 }
 
-// Store implements upspin.Context.
-func (ctx *contextImpl) Store() upspin.Store {
-	u, err := bind.Store(ctx, ctx.userEndpoint)
+// StoreServer implements upspin.Context.
+func (ctx *contextImpl) StoreServer() upspin.StoreServer {
+	u, err := bind.StoreServer(ctx, ctx.userEndpoint)
 	if err != nil {
-		u, _ = bind.Store(ctx, ep0)
+		u, _ = bind.StoreServer(ctx, ep0)
 	}
 	return u
 }
 
-// Store implements upspin.Context.
+// UserName implements upspin.Context.
 func (ctx *contextImpl) UserName() upspin.UserName {
 	return ctx.userName
 }

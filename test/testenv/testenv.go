@@ -206,7 +206,7 @@ func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
 // with a user and keys.
 func gcpClient(context upspin.Context) (upspin.Client, error) {
-	// Use a test GCP Store...
+	// Use a test GCP StoreServer...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   "store.test.upspin.io:443", // Test store server.
@@ -229,7 +229,7 @@ func gcpClient(context upspin.Context) (upspin.Client, error) {
 // inProcessClient returns a Client pointing to in-process instances given a Context partially initialized
 // with a user and keys.
 func inProcessClient(context upspin.Context) (upspin.Client, error) {
-	// Use an in-process Store...
+	// Use an in-process StoreServer...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",

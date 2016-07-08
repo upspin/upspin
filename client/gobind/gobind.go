@@ -54,7 +54,7 @@ type ClientConfig struct {
 	// UserNetAddr is the upspin.NetAddr of an upspin.Remote User endpoint.
 	UserNetAddr string
 
-	// StoreNetAddr is the upspin.NetAddr of an upspin.Remote Store endpoint.
+	// StoreNetAddr is the upspin.NetAddr of an upspin.Remote StoreServer endpoint.
 	StoreNetAddr string
 
 	// DirNetAddr is the upspin.NetAddr of an upspin.Remote DirServer endpoint.

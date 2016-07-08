@@ -35,8 +35,8 @@ type dataService struct {
 	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
 }
 
-// This package (well, the service type) implements the upspin.Store interface.
-var _ upspin.Store = (*service)(nil)
+// This package (well, the service type) implements the upspin.StoreServer interface.
+var _ upspin.StoreServer = (*service)(nil)
 
 func copyOf(in []byte) (out []byte) {
 	out = make([]byte, len(in))
@@ -44,12 +44,12 @@ func copyOf(in []byte) (out []byte) {
 	return out
 }
 
-// Endpoint implements upspin.Store
+// Endpoint implements upspin.StoreServer
 func (s *service) Endpoint() upspin.Endpoint {
 	return s.data.endpoint
 }
 
-// Put implements upspin.Store
+// Put implements upspin.StoreServer
 func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 	ref := upspin.Reference(sha256key.Of(ciphertext).String())
 	s.data.mu.Lock()
@@ -58,7 +58,7 @@ func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 	return ref, nil
 }
 
-// Delete implements upspin.Store
+// Delete implements upspin.StoreServer
 func (s *service) Delete(ref upspin.Reference) error {
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
@@ -77,7 +77,7 @@ func (s *service) DeleteAll() {
 	s.data.mu.Unlock()
 }
 
-// Get implements upspin.Store
+// Get implements upspin.StoreServer
 // TODO: Get should provide alternate location if missing.
 func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
 	const Get = "Get"
@@ -91,7 +91,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.L
 		return nil, nil, errors.E(Get, errors.NotExist, "no such blob")
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
-		return nil, nil, errors.E(Get, errors.Invalid, "internal hash mismatch in Store.Get")
+		return nil, nil, errors.E(Get, errors.Invalid, "internal hash mismatch in StoreServer.Get")
 	}
 	return copyOf(data), nil, nil
 }
@@ -144,5 +144,5 @@ func init() {
 			blob: make(map[upspin.Reference][]byte),
 		},
 	}
-	bind.RegisterStore(transport, s)
+	bind.RegisterStoreServer(transport, s)
 }

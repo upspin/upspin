@@ -23,12 +23,12 @@ There is no leading slash in a path name.
 
 There are three fundamental services defined in Upspin.
 
-* The Store is the ultimate location for user-provided data.  Every
+* The StoreServer is the ultimate location for user-provided data.  Every
 piece of user data stored in the system is identified by a Location,
 which identifies where it is stored and how to address it.
 
 * The DirServer service implements the name space, binding hierarchical,
-Unix-like names to Locations of data stored in Store servers.
+Unix-like names to Locations of data stored in StoreServers.
 Directories also attach metadata to file names, which may include
 encryption/decryption keys or other access-control information.
 

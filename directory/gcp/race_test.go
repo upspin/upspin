@@ -114,7 +114,7 @@ func newDirServerWithDummyStore(t *testing.T, gcp storage.Storage) *directory {
 	if err != nil {
 		t.Fatal(err)
 	}
-	storeFunc := func(e upspin.Endpoint) (upspin.Store, error) {
+	storeFunc := func(e upspin.Endpoint) (upspin.StoreServer, error) {
 		return new(dummyAccessStore), nil
 	}
 	ds := newDirectory(gcp, f, storeFunc, timeFunc)
@@ -141,7 +141,7 @@ func startDir(t *testing.T) *directory {
 }
 
 type dummyAccessStore struct {
-	testfixtures.DummyStore
+	testfixtures.DummyStoreServer
 }
 
 func (d *dummyAccessStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {

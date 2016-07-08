@@ -36,9 +36,9 @@ type directory struct {
 	// If not, then these should be singletons.
 	timeNow        func() upspin.Time // returns the current time.
 	cloudClient    storage.Storage    // handle for GCP bucket g-upspin-directory.
-	serverName     upspin.UserName    // this server's user name (for talking to Store, etc).
+	serverName     upspin.UserName    // this server's user name (for talking to StoreServer, etc).
 	factotum       upspin.Factotum    // this server's factotum with its keys.
-	newStoreClient newStoreClient     // how to create a Store client.
+	newStoreClient newStoreClient     // how to create a StoreServer client.
 	dirCache       *cache.LRU         // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
 	rootCache      *cache.LRU         // caches <upspin.UserName, root>. It is thread safe.
 	dirNegCache    *cache.LRU         // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
@@ -536,7 +536,7 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 }
 
 // newStoreClient is a function that creates a store client for an endpoint.
-type newStoreClient func(e upspin.Endpoint) (upspin.Store, error)
+type newStoreClient func(e upspin.Endpoint) (upspin.StoreServer, error)
 
 func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
 	d := &directory{
@@ -557,17 +557,17 @@ func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient
 	return d
 }
 
-// newStoreClient is newStoreCllient function that creates a Store object connected to the Store endpoint and loads
+// newStoreClient is newStoreCllient function that creates a StoreServer instance connected to the StoreServer endpoint and loads
 // a context for this server (using its factotum for keys).
-func (d *directory) newDefaultStoreClient(e upspin.Endpoint) (upspin.Store, error) {
+func (d *directory) newDefaultStoreClient(e upspin.Endpoint) (upspin.StoreServer, error) {
 	serverContext := context.New().SetFactotum(d.factotum).SetUserName(d.serverName)
-	return bind.Store(serverContext, e)
+	return bind.StoreServer(serverContext, e)
 }
 
 // storeGet binds to the endpoint in the location, calls the store client and resolves up to one indirection,
 // returning the contents of the file.
 func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
-	var store upspin.Store
+	var store upspin.StoreServer
 	var err error
 	// Use our default if not given one.
 	if d.newStoreClient == nil {

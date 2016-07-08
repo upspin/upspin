@@ -60,7 +60,7 @@ func main() {
 	// If there are configuration options, set them now
 	if *config != "" {
 		// Get an instance so we can configure it.
-		store, err := bind.Store(context, *endpoint)
+		store, err := bind.StoreServer(context, *endpoint)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -72,7 +72,7 @@ func main() {
 			log.Fatal(err)
 		}
 		// Now this pre-configured store is the one that will generate new instances for this server.
-		err = bind.ReregisterStore(endpoint.Transport, store)
+		err = bind.ReregisterStoreServer(endpoint.Transport, store)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -100,18 +100,18 @@ var (
 	configureResponse proto.ConfigureResponse
 )
 
-// storeFor returns a Store service bound to the user specified in the context.
-func (s *Server) storeFor(ctx gContext.Context) (upspin.Store, error) {
+// storeFor returns a StoreServer instance bound to the user specified in the context.
+func (s *Server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	context := s.context.Copy().SetUserName(session.User())
-	return bind.Store(context, s.endpoint)
+	return bind.StoreServer(context, s.endpoint)
 }
 
-// Get implements upspin.Store
+// Get implements upspin.StoreServer.
 func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get %q", req.Reference)
 
@@ -132,7 +132,7 @@ func (s *Server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 	return resp, nil
 }
 
-// Put implements upspin.Store
+// Put implements upspin.StoreServer.
 func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put %.30x...", req.Data)
 
@@ -152,7 +152,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	return resp, nil
 }
 
-// Delete implements upspin.Store
+// Delete implements upspin.StoreServer.
 func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
 

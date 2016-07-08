@@ -36,7 +36,7 @@ func NewStoreServer(context upspin.Context, endpoint upspin.Endpoint, server grp
 	return s
 }
 
-// Get implements upspin.Store.
+// Get implements upspin.StoreServer.
 func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	log.Printf("Get")
 
@@ -77,7 +77,7 @@ func errGet(err error) (*proto.StoreGetResponse, error) {
 	}, nil
 }
 
-// Put implements upspin.Store.
+// Put implements upspin.StoreServer.
 func (s *StoreServer) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	log.Printf("Put")
 
@@ -87,7 +87,7 @@ func (s *StoreServer) Put(ctx gContext.Context, req *proto.StorePutRequest) (*pr
 	}, nil
 }
 
-// Delete implements upspin.Store.
+// Delete implements upspin.StoreServer.
 func (s *StoreServer) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
 

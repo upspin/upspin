@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package https implements the HTTPS transport protocol for upspin.Store.
+// Package https implements the HTTPS transport protocol for upspin.StoreServer.
 package https
 
 import (
@@ -17,7 +17,7 @@ import (
 	"upspin.io/upspin"
 )
 
-// Store is an implementation of upspin.Store that interfaces
+// Store is an implementation of upspin.StoreServer that interfaces
 // with an HTTP server for serving data.
 type Store struct {
 	upspin.NoConfiguration
@@ -26,7 +26,7 @@ type Store struct {
 }
 
 // Guarantee we implement the interface
-var _ upspin.Store = (*Store)(nil)
+var _ upspin.StoreServer = (*Store)(nil)
 
 // maxBytesLimit is the maximum number of bytes to retrieve in one request.
 const maxBytesLimit = 1 << 30 // 1GB
@@ -46,7 +46,7 @@ type HTTPClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-// New returns a concrete implementation of Store, pointing to a
+// New returns a concrete implementation of StoreServer, pointing to a
 // server at a given URL (including the port), for performing Get and
 // Put requests on blocks of data. Use this only for testing.
 func New(serverURL string, httpClient HTTPClient) *Store {
@@ -84,7 +84,7 @@ func (s *Store) Ping() bool {
 	return IsServerReachable(s.serverURL)
 }
 
-// Get implements Store.
+// Get implements StoreServer.
 func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	const op = "Get"
 	if ref == "" {
@@ -105,12 +105,12 @@ func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	return body, nil, nil
 }
 
-// Put implements Store.
+// Put implements StoreServer.
 func (s *Store) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.E("Put", errors.Str("not implemented"))
 }
 
-// Delete implements Store.
+// Delete implements StoreServer.
 func (s *Store) Delete(ref upspin.Reference) error {
 	return errors.E("Delete", errors.Str("not implemented"))
 }
@@ -188,5 +188,5 @@ func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 
 func init() {
 	// By default, set up only the HTTP client. The server URL gets bound at Dial time.
-	bind.RegisterStore(upspin.HTTPS, New("", &http.Client{}))
+	bind.RegisterStoreServer(upspin.HTTPS, New("", &http.Client{}))
 }
