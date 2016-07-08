@@ -53,12 +53,12 @@ func New() upspin.Context {
 // A configuration file should be of the format
 //   # lines that begin with a hash are ignored
 //   key = value
-// where key may be one of keyserver, dirserver, storeserver, or packing.
+// where key may be one of user, keyserver, dirserver, storeserver, or packing.
 //
 func InitContext(r io.Reader) (upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{
-		"name":        "noone@nowhere.org",
+		"user":        "noone@nowhere.org",
 		"keyserver":   "",
 		"dirserver":   "",
 		"storeserver": "",
@@ -108,7 +108,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 
 	context := new(contextImpl)
-	context.userName = upspin.UserName(vals["name"])
+	context.userName = upspin.UserName(vals["user"])
 	packer := pack.LookupByName(vals["packing"])
 	if packer == nil {
 		return nil, errors.Errorf("unknown packing %s", vals["packing"])
@@ -134,8 +134,8 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
-func parseEndpoint(op string, vals map[string]string, name string, errorp *error) upspin.Endpoint {
-	text, ok := vals[name]
+func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
+	text, ok := vals[key]
 	if !ok || text == "" {
 		// No setting for this value, so set to 'unassigned'.
 		return ep0

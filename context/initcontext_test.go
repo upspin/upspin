@@ -85,7 +85,7 @@ func TestEnv(t *testing.T) {
 	}
 	config := makeConfig(&expect)
 	expect.userName = "quux"
-	os.Setenv("upspinname", string(expect.userName))
+	os.Setenv("upspinuser", string(expect.userName))
 	expect.keyserver = Endpoint(upspin.InProcess, "")
 	expect.dirserver = Endpoint(upspin.GCP, "who.knows:1234")
 	expect.storeserver = Endpoint(upspin.GCP, "who.knows:1234")
@@ -101,7 +101,7 @@ func makeConfig(expect *expectations) string {
 	var buf bytes.Buffer
 	var zero upspin.Endpoint
 	if expect.userName != "" {
-		fmt.Fprintf(&buf, "name = %s\n", expect.userName)
+		fmt.Fprintf(&buf, "user = %s\n", expect.userName)
 	}
 	if expect.keyserver != zero {
 		fmt.Fprintf(&buf, "keyserver = %s\n", expect.keyserver)
@@ -117,7 +117,7 @@ func makeConfig(expect *expectations) string {
 }
 
 func makeCommentedConfig(expect *expectations) string {
-	return fmt.Sprintf("# Line one is a comment\nname = %s # Ignore this.\nkeyserver= %s\nstoreserver = %s\n  dirserver =%s   \npacking=%s #Ignore this",
+	return fmt.Sprintf("# Line one is a comment\nuser = %s # Ignore this.\nkeyserver= %s\nstoreserver = %s\n  dirserver =%s   \npacking=%s #Ignore this",
 		expect.userName,
 		expect.keyserver,
 		expect.storeserver,
