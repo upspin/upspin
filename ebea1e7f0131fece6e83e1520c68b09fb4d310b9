@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_f1296a7b",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-08T22:10:27Z",
+      "side": 1,
+      "message": "restore this file. no need for these changes.",
+      "revId": "ebea1e7f0131fece6e83e1520c68b09fb4d310b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
