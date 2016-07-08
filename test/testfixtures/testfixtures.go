@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package testfixtures implements dummies for StoreServers, DirServers and User services for tests.
+// Package testfixtures implements dummies for StoreServers, DirServers and KeyServers for tests.
 package testfixtures
 
 import "upspin.io/upspin"
 
-// DummyUser is an implementation of upspin.User that does nothing.
-type DummyUser struct {
+// DummyKey is an implementation of upspin.KeyServer that does nothing.
+type DummyKey struct {
 	dummyDialer
 	dummyService
 }
 
-var _ upspin.User = (*DummyUser)(nil)
+var _ upspin.KeyServer = (*DummyKey)(nil)
 
 // DummyStore is an implementation of upspin.StoreServer that does nothing.
 type DummyStoreServer struct {
@@ -71,8 +71,8 @@ func (d *dummyService) Ping() bool {
 	return true
 }
 
-// Lookup implements upspin.User.
-func (d *DummyUser) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+// Lookup implements upspin.KeyServer.
+func (d *DummyKey) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	return nil, nil, nil
 }
 

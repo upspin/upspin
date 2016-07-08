@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package remote implements an inprocess user server that uses RPC to
-// connect to a remote user server.
+// Package remote implements an inprocess key server that uses RPC to
+// connect to a remote key server.
 package remote
 
 import (
@@ -22,21 +22,21 @@ type dialContext struct {
 	userName upspin.UserName
 }
 
-// remote implements upspin.User.
+// remote implements upspin.KeyServer.
 type remote struct {
 	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
 	ctx                         dialContext
-	userClient                  proto.UserClient
+	keyClient                   proto.KeyClient
 }
 
-var _ upspin.User = (*remote)(nil)
+var _ upspin.KeyServer = (*remote)(nil)
 
-// Lookup implements upspin.User.Lookup.
+// Lookup implements upspin.Key.Lookup.
 func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	req := &proto.UserLookupRequest{
+	req := &proto.KeyLookupRequest{
 		UserName: string(name),
 	}
-	resp, err := r.userClient.Lookup(gContext.Background(), req)
+	resp, err := r.keyClient.Lookup(gContext.Background(), req)
 	if err != nil {
 		return nil, nil, errors.E("Lookup", errors.IO, err)
 	}
@@ -63,7 +63,7 @@ func (r *remote) Configure(options ...string) error {
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
-	resp, err := r.userClient.Configure(gContext.Background(), req)
+	resp, err := r.keyClient.Configure(gContext.Background(), req)
 	if err != nil {
 		return errors.E("Configure", errors.IO, err)
 	}
@@ -81,8 +81,8 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		return nil, err
 	}
 	// The connection is closed when this service is released (see Bind.Release)
-	userClient := proto.NewUserClient(authClient.GRPCConn())
-	authClient.SetService(userClient)
+	keyClient := proto.NewKeyClient(authClient.GRPCConn())
+	authClient.SetService(keyClient)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 			endpoint: e,
 			userName: context.UserName(),
 		},
-		userClient: userClient,
+		keyClient: keyClient,
 	}
 
 	return r, nil
@@ -102,5 +102,5 @@ const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
-	bind.RegisterUser(transport, r)
+	bind.RegisterKeyServer(transport, r)
 }

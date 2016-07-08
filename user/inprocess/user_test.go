@@ -20,17 +20,17 @@ var (
 	userName = upspin.UserName("joe@blow.com")
 )
 
-func setup(t *testing.T) (upspin.User, upspin.Context) {
+func setup(t *testing.T) (upspin.KeyServer, upspin.Context) {
 	c := context.New().SetUserName(userName).SetPacking(upspin.DebugPack)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	u, err := bind.User(c, e)
+	u, err := bind.KeyServer(c, e)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.SetUserEndpoint(e)
+	c.SetKeyEndpoint(e)
 	c.SetStoreEndpoint(e)
 	c.SetDirEndpoint(e)
 	return u, c
@@ -38,16 +38,16 @@ func setup(t *testing.T) (upspin.User, upspin.Context) {
 
 func TestInstallAndLookup(t *testing.T) {
 	u, ctxt := setup(t)
-	testUser, ok := u.(*Service)
+	testKey, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not an inprocess User Service")
+		t.Fatal("Not an inprocess KeyServer")
 	}
 
 	dir, err := bind.DirServer(ctxt, ctxt.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = testUser.Install(userName, dir)
+	err = testKey.Install(userName, dir)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -68,13 +68,13 @@ func TestInstallAndLookup(t *testing.T) {
 
 func TestPublicKeysAndUsers(t *testing.T) {
 	u, _ := setup(t)
-	testUser, ok := u.(*Service)
+	testKey, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not an inprocess User Service")
+		t.Fatal("Not an inprocess KeyServer")
 	}
-	const testKey = "pub key1"
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{
-		upspin.PublicKey(testKey),
+	const testKeyStr = "pub key1"
+	testKey.SetPublicKeys(userName, []upspin.PublicKey{
+		upspin.PublicKey(testKeyStr),
 	})
 
 	_, keys, err := u.Lookup(userName)
@@ -84,11 +84,11 @@ func TestPublicKeysAndUsers(t *testing.T) {
 	if len(keys) != 1 {
 		t.Fatalf("Expected 1 key for user %v, got %d", userName, len(keys))
 	}
-	if string(keys[0]) != testKey {
-		t.Errorf("Expected key %s, got %s", testKey, keys[0])
+	if string(keys[0]) != testKeyStr {
+		t.Errorf("Expected key %s, got %s", testKeyStr, keys[0])
 	}
 
-	users := testUser.ListUsers()
+	users := testKey.ListUsers()
 	if len(users) != 1 {
 		t.Fatalf("Expected 1 user, got %d", len(users))
 	}
@@ -97,9 +97,9 @@ func TestPublicKeysAndUsers(t *testing.T) {
 	}
 
 	// Delete keys for user
-	testUser.SetPublicKeys(userName, nil)
+	testKey.SetPublicKeys(userName, nil)
 
-	users = testUser.ListUsers()
+	users = testKey.ListUsers()
 	if len(users) != 0 {
 		t.Fatalf("Expected 0 users, got %d", len(users))
 	}
@@ -108,13 +108,13 @@ func TestPublicKeysAndUsers(t *testing.T) {
 func TestSafety(t *testing.T) {
 	// Make sure the answers from Lookup are not aliases for the Service maps.
 	u, _ := setup(t)
-	testUser, ok := u.(*Service)
+	testKey, ok := u.(*Service)
 	if !ok {
-		t.Fatal("Not an inprocess User Service")
+		t.Fatal("Not an inprocess KeyServer")
 	}
-	const testKey = "pub key2"
-	testUser.SetPublicKeys(userName, []upspin.PublicKey{
-		upspin.PublicKey(testKey),
+	const testKeyStr = "pub key2"
+	testKey.SetPublicKeys(userName, []upspin.PublicKey{
+		upspin.PublicKey(testKeyStr),
 	})
 
 	locs, keys, err := u.Lookup(userName)

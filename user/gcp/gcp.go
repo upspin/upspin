@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements the user service upspin.User on the Google Cloud Platform (GCP).
+// Package gcp implements the user service upspin.KeyServer on the Google Cloud Platform (GCP).
 package gcp
 
 import (
@@ -21,14 +21,14 @@ import (
 	_ "upspin.io/cloud/storage/gcs"
 )
 
-// user is the implementation of the User Service on GCP.
-type user struct {
+// key is the implementation of the KeyServer Service on GCP.
+type key struct {
 	context     upspin.Context
 	endpoint    upspin.Endpoint
 	cloudClient storage.Storage
 }
 
-var _ upspin.User = (*user)(nil)
+var _ upspin.KeyServer = (*key)(nil)
 
 // userEntry stores all known information for a given user. The fields
 // are exported because JSON parsing needs access to them.
@@ -71,7 +71,7 @@ func isKeyInSlice(key upspin.PublicKey, slice []upspin.PublicKey) bool {
 // AddKey adds a new public key for a user.
 // TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
 // around for re-using later.
-func (u *user) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
+func (u *key) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
 	const AddKey = "AddKey"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
@@ -112,7 +112,7 @@ func (u *user) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
 // AddRoot adds a new root endpoint for a user.
 // TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
 // around for re-using later.
-func (u *user) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error {
+func (u *key) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error {
 	const AddRoot = "AddRoot"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
@@ -144,8 +144,8 @@ func (u *user) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error
 	return nil
 }
 
-// Lookup implements upspin.User.
-func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+// Lookup implements upspin.KeyServer.
+func (u *key) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	const Lookup = "Lookup"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
@@ -161,7 +161,7 @@ func (u *user) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.Pub
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
-func (u *user) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, error) {
+func (u *key) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, error) {
 	// Get the user entry from GCP
 	log.Printf("Going to get user entry on GCP for user %s", userName)
 	buf, err := u.cloudClient.Download(string(userName))
@@ -180,7 +180,7 @@ func (u *user) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, 
 }
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
-func (u *user) putUserEntry(op string, userName upspin.UserName, userEntry *userEntry) error {
+func (u *key) putUserEntry(op string, userName upspin.UserName, userEntry *userEntry) error {
 	if userEntry == nil {
 		return errors.E(op, errors.Invalid, userName, errors.Str("nil userEntry"))
 	}
@@ -197,7 +197,7 @@ func (u *user) putUserEntry(op string, userName upspin.UserName, userEntry *user
 
 // Configure configures an instance of the user service.
 // Required configuration options are listed at the package comments.
-func (u *user) Configure(options ...string) error {
+func (u *key) Configure(options ...string) error {
 	const Configure = "Configure"
 
 	var dialOpts []storage.DialOpts
@@ -216,12 +216,12 @@ func (u *user) Configure(options ...string) error {
 }
 
 // isServiceConfigured reports whether the user service has been configured via a Configure call.
-func (u *user) isServiceConfigured() bool {
+func (u *key) isServiceConfigured() bool {
 	return u.cloudClient != nil && u.context.UserName() != ""
 }
 
 // Dial implements upspin.Service.
-func (u *user) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (u *key) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	if e.Transport != upspin.GCP {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -243,12 +243,12 @@ func (u *user) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 }
 
 // Ping implements upspin.Service.
-func (u *user) Ping() bool {
+func (u *key) Ping() bool {
 	return true
 }
 
 // Close implements upspin.Service.
-func (u *user) Close() {
+func (u *key) Close() {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -266,16 +266,16 @@ func (u *user) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (u *user) Authenticate(upspin.Context) error {
+func (u *key) Authenticate(upspin.Context) error {
 	// Authentication is not dealt here. It happens at other layers.
 	return nil
 }
 
 // Endpoint implements upspin.Service.
-func (u *user) Endpoint() upspin.Endpoint {
+func (u *key) Endpoint() upspin.Endpoint {
 	return u.endpoint
 }
 
 func init() {
-	bind.RegisterUser(upspin.GCP, &user{})
+	bind.RegisterKeyServer(upspin.GCP, &key{})
 }

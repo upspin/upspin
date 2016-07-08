@@ -25,7 +25,7 @@ type contextImpl struct {
 	userName      upspin.UserName
 	factotum      upspin.Factotum
 	packing       upspin.Packing
-	userEndpoint  upspin.Endpoint
+	keyEndpoint   upspin.Endpoint
 	dirEndpoint   upspin.Endpoint
 	storeEndpoint upspin.Endpoint
 }
@@ -43,8 +43,8 @@ func New() upspin.Context {
 //
 // The default configuration file location is $HOME/upspin/rc.
 // If passed a non-nil io.Reader, that is used instead of the default file.
-// The upspinuser, upspindirserver, upspinstoreserver, and upspinpacking environment
-// variables specify the user, directory, store, and packing, and will override
+// The upspinkeyserver, upspindirserver, upspinstoreserver, and upspinpacking environment
+// variables specify the key, directory, and store servers and packing, and will override
 // values in the provided reader or default rc file.
 //
 // Any endpoints not set in the data for the context will be set to the
@@ -53,13 +53,13 @@ func New() upspin.Context {
 // A configuration file should be of the format
 //   # lines that begin with a hash are ignored
 //   key = value
-// where key may be one of user, directory, store, or packing.
+// where key may be one of keyserver, dirserver, storeserver, or packing.
 //
 func InitContext(r io.Reader) (upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{
 		"name":        "noone@nowhere.org",
-		"user":        "",
+		"keyserver":   "",
 		"dirserver":   "",
 		"storeserver": "",
 		"packing":     "plain"}
@@ -126,7 +126,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		return nil, err
 	}
 
-	context.userEndpoint = parseEndpoint(op, vals, "user", &err)
+	context.keyEndpoint = parseEndpoint(op, vals, "keyserver", &err)
 	context.storeEndpoint = parseEndpoint(op, vals, "storeserver", &err)
 	context.dirEndpoint = parseEndpoint(op, vals, "dirserver", &err)
 	return context, err
@@ -151,11 +151,11 @@ func parseEndpoint(op string, vals map[string]string, name string, errorp *error
 	return *ep
 }
 
-// User implements upspin.Context.
-func (ctx *contextImpl) User() upspin.User {
-	u, err := bind.User(ctx, ctx.userEndpoint)
+// KeyServer implements upspin.Context.
+func (ctx *contextImpl) KeyServer() upspin.KeyServer {
+	u, err := bind.KeyServer(ctx, ctx.keyEndpoint)
 	if err != nil {
-		u, _ = bind.User(ctx, ep0)
+		u, _ = bind.KeyServer(ctx, ep0)
 	}
 	return u
 }
@@ -180,7 +180,7 @@ func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 	if parsed.User() == ctx.userName {
 		endpoints = append(endpoints, ctx.dirEndpoint)
 	}
-	if eps, _, err := ctx.User().Lookup(parsed.User()); err == nil {
+	if eps, _, err := ctx.KeyServer().Lookup(parsed.User()); err == nil {
 		endpoints = append(endpoints, eps...)
 	}
 	for _, e := range endpoints {
@@ -195,7 +195,7 @@ func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 
 // StoreServer implements upspin.Context.
 func (ctx *contextImpl) StoreServer() upspin.StoreServer {
-	u, err := bind.StoreServer(ctx, ctx.userEndpoint)
+	u, err := bind.StoreServer(ctx, ctx.storeEndpoint)
 	if err != nil {
 		u, _ = bind.StoreServer(ctx, ep0)
 	}
@@ -235,14 +235,14 @@ func (ctx *contextImpl) SetPacking(p upspin.Packing) upspin.Context {
 	return ctx
 }
 
-// UserEndpoint implements upspin.Context.
-func (ctx *contextImpl) UserEndpoint() upspin.Endpoint {
-	return ctx.userEndpoint
+// KeyEndpoint implements upspin.Context.
+func (ctx *contextImpl) KeyEndpoint() upspin.Endpoint {
+	return ctx.keyEndpoint
 }
 
-// SetUserEndpoint implements upspin.Context.
-func (ctx *contextImpl) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.userEndpoint = e
+// SetKeyEndpoint implements upspin.Context.
+func (ctx *contextImpl) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.keyEndpoint = e
 	return ctx
 }
 

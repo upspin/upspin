@@ -100,26 +100,26 @@ service Store {
     rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
 }
 
-// The User interface.
+// The Key interface.
 
-message UserLookupRequest {
+message KeyLookupRequest {
     string UserName = 1;
 }
 
-message UserLookupResponse {
+message KeyLookupResponse {
     repeated Endpoint Endpoints = 1;
     repeated string PublicKeys = 2;
     bytes Error = 3;
 }
 
-service User {
+service Key {
     // Service methods:
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
-    rpc Lookup (UserLookupRequest) returns (UserLookupResponse) {}
+    rpc Lookup (KeyLookupRequest) returns (KeyLookupResponse) {}
 }
 
 // The DirServer interface.

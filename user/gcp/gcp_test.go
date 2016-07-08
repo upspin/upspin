@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	mockUser = "bob@foo.com"
+	mockKey = "bob@foo.com"
 )
 
 func TestInvalidUser(t *testing.T) {
-	u := newDummyUserServer()
+	u := newDummyKeyServer()
 	_, _, err := u.Lookup("a")
 	if err == nil {
 		t.Fatal("Expected an error")
@@ -29,7 +29,7 @@ func TestInvalidUser(t *testing.T) {
 }
 
 func TestAddKeyShortKey(t *testing.T) {
-	u := newDummyUserServer()
+	u := newDummyKeyServer()
 	err := u.AddKey("a@abc.com", upspin.PublicKey("1234"))
 	if err == nil {
 		t.Fatal("Expected an error")
@@ -41,8 +41,8 @@ func TestAddKeyShortKey(t *testing.T) {
 }
 
 func TestAddKeyToExistingUser(t *testing.T) {
-	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["xyz"]}`))
-	err := u.AddKey(mockUser, upspin.PublicKey("abcdefghijklmnopqrs"))
+	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["xyz"]}`))
+	err := u.AddKey(mockKey, upspin.PublicKey("abcdefghijklmnopqrs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,8 +51,8 @@ func TestAddKeyToExistingUser(t *testing.T) {
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
 		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
 	}
-	if mockGCP.PutRef[0] != mockUser {
-		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
+	if mockGCP.PutRef[0] != mockKey {
+		t.Errorf("Expected update to user %s, got user %s", mockKey, mockGCP.PutRef[0])
 	}
 	expectedPutValue := `{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs","xyz"],"Endpoints":null}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
@@ -61,8 +61,8 @@ func TestAddKeyToExistingUser(t *testing.T) {
 }
 
 func TestAddExistingKey(t *testing.T) {
-	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs"]}`))
-	err := u.AddKey(mockUser, upspin.PublicKey("abcdefghijklmnopqrs"))
+	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs"]}`))
+	err := u.AddKey(mockKey, upspin.PublicKey("abcdefghijklmnopqrs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestAddExistingKey(t *testing.T) {
 }
 
 func TestAddKeyToNewUser(t *testing.T) {
-	u, mockGCP := newUserServerWithMocking(nil)
+	u, mockGCP := newKeyServerWithMocking(nil)
 	err := u.AddKey("new@user.com", upspin.PublicKey("abcdefghijklmnopqrs"))
 	if err != nil {
 		t.Fatal(err)
@@ -95,12 +95,12 @@ func TestAddKeyToNewUser(t *testing.T) {
 }
 
 func TestAddRootToExistingUser(t *testing.T) {
-	u, mockGCP := newUserServerWithMocking([]byte(`{"User":"bob@foo.com","Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`))
+	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`))
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr("http://there.co.uk"),
 	}
-	err := u.AddRoot(mockUser, e)
+	err := u.AddRoot(mockKey, e)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,8 +109,8 @@ func TestAddRootToExistingUser(t *testing.T) {
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
 		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
 	}
-	if mockGCP.PutRef[0] != mockUser {
-		t.Errorf("Expected update to user %s, got user %s", mockUser, mockGCP.PutRef[0])
+	if mockGCP.PutRef[0] != mockKey {
+		t.Errorf("Expected update to user %s, got user %s", mockKey, mockGCP.PutRef[0])
 	}
 	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://there.co.uk"},{"Transport":2,"NetAddr":"http://here.com"}]}`
 	if string(mockGCP.PutContents[0]) != expectedPutValue {
@@ -119,7 +119,7 @@ func TestAddRootToExistingUser(t *testing.T) {
 }
 
 func TestAddRootToNewUser(t *testing.T) {
-	u, mockGCP := newUserServerWithMocking(nil)
+	u, mockGCP := newKeyServerWithMocking(nil)
 	e := upspin.Endpoint{
 		Transport: upspin.GCP,
 		NetAddr:   upspin.NetAddr("http://there.co.uk"),
@@ -145,8 +145,8 @@ func TestAddRootToNewUser(t *testing.T) {
 
 func TestGetExistingUser(t *testing.T) {
 	const storedEntry = `{"User":"bob@foo.com","Keys":["my key"],"Endpoints":[{"Transport":3,"NetAddr":"http://here.com"}]}`
-	u, _ := newUserServerWithMocking([]byte(storedEntry))
-	e, keys, err := u.Lookup(mockUser)
+	u, _ := newKeyServerWithMocking([]byte(storedEntry))
+	e, keys, err := u.Lookup(mockKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,21 +169,21 @@ func TestGetExistingUser(t *testing.T) {
 	}
 }
 
-func newDummyUserServer() *user {
-	return &user{cloudClient: &storagetest.DummyStorage{}}
+func newDummyKeyServer() *key {
+	return &key{cloudClient: &storagetest.DummyStorage{}}
 }
 
-// newUserServerWithMocking sets up a mock GCP client that expects a
-// single lookup of user mockUser and it will reply with the preset
+// newKeyServerWithMocking sets up a mock GCP client that expects a
+// single lookup of user mockKey and it will reply with the preset
 // data. It returns the user server, the mock GCP client for further
 // verification.
-func newUserServerWithMocking(data []byte) (*user, *storagetest.ExpectDownloadCapturePut) {
+func newKeyServerWithMocking(data []byte) (*key, *storagetest.ExpectDownloadCapturePut) {
 	mockGCP := &storagetest.ExpectDownloadCapturePut{
-		Ref:         []string{mockUser},
+		Ref:         []string{mockKey},
 		Data:        [][]byte{data},
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
-	u := &user{cloudClient: mockGCP}
+	u := &key{cloudClient: mockGCP}
 	return u, mockGCP
 }
