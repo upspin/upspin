@@ -64,7 +64,7 @@ func main() {
 		log.Connect(*project, serverName)
 		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
 		if err != nil {
-			log.Error.Printf("Can't start a metric saver for GCP project %q. No metrics will be saved", *project)
+			log.Fatalf("Can't start a metric saver for GCP project %q: %s", *project, err)
 		} else {
 			metric.RegisterSaver(svr)
 		}
@@ -121,7 +121,7 @@ func main() {
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe("dirserver", *httpsAddr, nil)
+	https.ListenAndServe(serverName, *httpsAddr, nil)
 }
 
 var (

@@ -20,12 +20,15 @@ import (
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
 	// Load required transports
 	_ "upspin.io/key/transports"
 )
+
+var project = flag.String("project", "", "The GCP project name, if any.")
 
 // The upspin username for this server.
 const serverName = "keyserver"
@@ -42,8 +45,14 @@ type Server struct {
 func main() {
 	flag.Parse()
 
-	if flags.LogFile != "" {
-		log.Connect("google.com:upspin", flags.LogFile)
+	if *project != "" {
+		log.Connect(*project, serverName)
+		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
+		if err != nil {
+			log.Fatalf("Can't start a metric saver for GCP project %q: %s", *project, err)
+		} else {
+			metric.RegisterSaver(svr)
+		}
 	}
 
 	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
@@ -90,6 +99,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	// TODO: this needs to be changed to keyserver. But it involves some metadata on GCP.
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
 }
 
