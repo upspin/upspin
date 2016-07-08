@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba052000_43e175d4",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-08T23:02:29Z",
+      "side": 1,
+      "message": "Makes sense. The initial idea was not to die just because of metrics, but this log entry would mostly be missed, so changed to fatal. Added error.",
+      "parentUuid": "ba052000_63a351b0",
+      "revId": "8674d86789216b8a29eadc8b001d72289df705a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba052000_a3d2790d",
         "filename": "cmd/storeserver/main.go",
         "patchSetId": 1
