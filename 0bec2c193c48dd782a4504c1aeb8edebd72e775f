@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_852788bd",
+        "filename": "user/usercache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-08T03:02:01Z",
+      "side": 1,
+      "message": "I see the issue. SetUserName returns a Context. If it didn\u0027t do that you wouldn\u0027t need this, but Go is not contravariant or covariant or whatever.\n\nIf SetUserName just Set the UserName, you could avoid these methods.",
+      "revId": "0bec2c193c48dd782a4504c1aeb8edebd72e775f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
