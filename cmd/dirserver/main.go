@@ -121,7 +121,7 @@ func main() {
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe("dirserver", *httpsAddr, nil)
+	https.ListenAndServe(serverName, *httpsAddr, nil)
 }
 
 var (
