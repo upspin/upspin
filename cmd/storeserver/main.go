@@ -28,10 +28,11 @@ import (
 )
 
 var (
-	httpsAddr    = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	config       = flag.String("config", "", "Comma-separated list of configuration options for this server")
-	logFile      = flag.String("logfile", "storeserver", "Name of the log file on GCP or empty for no GCP logging")
+	httpsAddr       = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
+	endpointFlag    = flag.String("endpoint", "inprocess", "endpoint of remote service")
+	keyEndpointFlag = flag.String("keyendpoint", "inprocess", "endpoint of remote key service")
+	config          = flag.String("config", "", "Comma-separated list of configuration options for this server")
+	logFile         = flag.String("logfile", "storeserver", "Name of the log file on GCP or empty for no GCP logging")
 )
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
@@ -55,7 +56,11 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	context := context.New().SetUserName("storeserver")
+	keyEndpoint, err := upspin.ParseEndpoint(*keyEndpointFlag)
+	if err != nil {
+		log.Fatalf("keyendpoint parse error: %v", err)
+	}
+	context := context.New().SetUserName("storeserver").SetKeyEndpoint(*keyEndpoint)
 
 	// If there are configuration options, set them now
 	if *config != "" {
