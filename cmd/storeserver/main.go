@@ -19,6 +19,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -32,8 +33,10 @@ var (
 	endpointFlag    = flag.String("endpoint", "inprocess", "endpoint of remote service")
 	keyEndpointFlag = flag.String("keyendpoint", "inprocess", "endpoint of remote key service")
 	config          = flag.String("config", "", "Comma-separated list of configuration options for this server")
-	logFile         = flag.String("logfile", "storeserver", "Name of the log file on GCP or empty for no GCP logging")
+	project         = flag.String("project", "", "The GCP project name, if any.")
 )
+
+const serverName = "storeserver"
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
@@ -46,8 +49,14 @@ type Server struct {
 func main() {
 	flag.Parse()
 
-	if *logFile != "" {
-		log.Connect("google.com:upspin", *logFile)
+	if *project != "" {
+		log.Connect(*project, serverName)
+		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
+		if err != nil {
+			log.Fatalf("Can't start a metric saver for GCP project %q: %s", *project, err)
+		} else {
+			metric.RegisterSaver(svr)
+		}
 	}
 
 	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
@@ -96,7 +105,7 @@ func main() {
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe("storeserver", *httpsAddr, nil)
+	https.ListenAndServe(serverName, *httpsAddr, nil)
 }
 
 var (
