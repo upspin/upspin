@@ -78,7 +78,7 @@ var (
 
 	userMap      = make(map[upspin.Transport]upspin.User)
 	directoryMap = make(map[upspin.Transport]upspin.DirServer)
-	storeMap     = make(map[upspin.Transport]upspin.Store)
+	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
 
 	// These caches hold <dialKey, *dialedService> for each respective service type.
 	userDialCache      = make(dialCache)
@@ -135,23 +135,23 @@ func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServ
 	return nil
 }
 
-// RegisterStore registers a Store interface for the transport.
+// RegisterStoreServer registers a StoreServer interface for the transport.
 // There must be no previous registration.
-func RegisterStore(transport upspin.Transport, store upspin.Store) error {
-	return registerStore("RegisterStore", transport, store, !allowOverwrite)
+func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
+	return registerStoreServer("RegisterStoreServer", transport, store, !allowOverwrite)
 }
 
-// ReregisterStore replaces a Store interface for the transport.
-func ReregisterStore(transport upspin.Transport, store upspin.Store) error {
-	return registerStore("ReregisterStore", transport, store, allowOverwrite)
+// ReregisterStoreServer replaces a StoreServer interface for the transport.
+func ReregisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
+	return registerStoreServer("ReregisterStoreServer", transport, store, allowOverwrite)
 }
 
-func registerStore(op string, transport upspin.Transport, store upspin.Store, allowOverwrite bool) error {
+func registerStoreServer(op string, transport upspin.Transport, store upspin.StoreServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := storeMap[transport]
 	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override Store interface: %v", transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("cannot override StoreServer interface: %v", transport))
 	}
 	storeMap[transport] = store
 	return nil
@@ -173,20 +173,20 @@ func User(cc upspin.Context, e upspin.Endpoint) (upspin.User, error) {
 	return x.(upspin.User), nil
 }
 
-// Store returns a Store interface bound to the endpoint.
-func Store(cc upspin.Context, e upspin.Endpoint) (upspin.Store, error) {
-	const Store = "Store"
+// StoreServer returns a StoreServer interface bound to the endpoint.
+func StoreServer(cc upspin.Context, e upspin.Endpoint) (upspin.StoreServer, error) {
+	const StoreServer = "StoreServer"
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(Store, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(StoreServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, Store, e, storeDialCache, s)
+	x, err := reachableService(cc, StoreServer, e, storeDialCache, s)
 	if err != nil {
 		return nil, err
 	}
-	return x.(upspin.Store), nil
+	return x.(upspin.StoreServer), nil
 }
 
 // DirServer returns a DirServer interface bound to the endpoint.
@@ -218,7 +218,7 @@ func Release(service upspin.Service) error {
 	switch service.(type) {
 	case upspin.DirServer:
 		delete(directoryDialCache, key)
-	case upspin.Store:
+	case upspin.StoreServer:
 		delete(storeDialCache, key)
 	case upspin.User:
 		delete(userDialCache, key)

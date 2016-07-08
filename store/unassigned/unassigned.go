@@ -11,26 +11,26 @@ import (
 	"upspin.io/upspin"
 )
 
-// unassigned implements upspin.Store.
+// unassigned implements upspin.StoreServer.
 type unassigned struct {
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.Store = (*unassigned)(nil)
+var _ upspin.StoreServer = (*unassigned)(nil)
 
 var unassignedErr = errors.Str("request to unassigned service")
 
-// Get implements upspin.Store.Get.
+// Get implements upspin.StoreServer.Get.
 func (*unassigned) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	return nil, nil, errors.E("Get", errors.Invalid, unassignedErr)
 }
 
-// Put implements upspin.Store.Put.
+// Put implements upspin.StoreServer.Put.
 func (*unassigned) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.E("Put", errors.Invalid, unassignedErr)
 }
 
-// Delete implements upspin.Store.Delete.
+// Delete implements upspin.StoreServer.Delete.
 func (*unassigned) Delete(ref upspin.Reference) error {
 	return errors.E("Delete", errors.Invalid, unassignedErr)
 }
@@ -71,5 +71,5 @@ func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Ser
 const transport = upspin.Unassigned
 
 func init() {
-	bind.RegisterStore(transport, &unassigned{})
+	bind.RegisterStoreServer(transport, &unassigned{})
 }

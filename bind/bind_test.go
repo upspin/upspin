@@ -23,8 +23,8 @@ func TestSwitch(t *testing.T) {
 	if err := RegisterUser(upspin.InProcess, du); err != nil {
 		t.Errorf("registerUser failed")
 	}
-	if err := RegisterStore(upspin.InProcess, &dummyStore{}); err != nil {
-		t.Errorf("registerStore failed")
+	if err := RegisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err != nil {
+		t.Errorf("RegisterStoreServer failed")
 	}
 	if err := RegisterDirServer(upspin.InProcess, &dummyDirServer{}); err != nil {
 		t.Errorf("RegisterDirServer failed")
@@ -34,8 +34,8 @@ func TestSwitch(t *testing.T) {
 	if err := RegisterUser(upspin.InProcess, &dummyUser{}); err == nil {
 		t.Errorf("registerUser should have failed")
 	}
-	if err := RegisterStore(upspin.InProcess, &dummyStore{}); err == nil {
-		t.Errorf("registerStore should have failed")
+	if err := RegisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err == nil {
+		t.Errorf("RegisterStoreServer should have failed")
 	}
 	if err := RegisterDirServer(upspin.InProcess, &dummyDirServer{}); err == nil {
 		t.Errorf("RegisterDirServer should have failed")
@@ -45,7 +45,7 @@ func TestSwitch(t *testing.T) {
 	if err := ReregisterUser(upspin.InProcess, du); err != nil {
 		t.Error(err)
 	}
-	if err := ReregisterStore(upspin.InProcess, &dummyStore{}); err != nil {
+	if err := ReregisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err != nil {
 		t.Error(err)
 	}
 	if err := ReregisterDirServer(upspin.InProcess, &dummyDirServer{}); err != nil {
@@ -53,15 +53,15 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := Store(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
-	s2, _ := Store(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
+	s1, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	s2, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
 	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := Store(ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
-		t.Errorf("expected bind.Store of undefined to fail")
+	if _, err := StoreServer(ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
+		t.Errorf("expected bind.StoreServer of undefined to fail")
 	}
 
 	// DirServer is never reachable (our dummyDirServer answers false to ping)
@@ -141,9 +141,9 @@ func TestConcurrency(t *testing.T) {
 	store := func(release bool) {
 		defer wg.Done()
 		for i := 0; i < nRuns; i++ {
-			s, err := Store(ctx, e)
+			s, err := StoreServer(ctx, e)
 			if err != nil {
-				t.Error("Store:", err)
+				t.Error("StoreServer:", err)
 				return
 			}
 			time.Sleep(time.Duration(rand.Intn(20)) * time.Millisecond)
@@ -173,8 +173,8 @@ type dummyUser struct {
 	pingCount   int
 	closeCalled int
 }
-type dummyStore struct {
-	testfixtures.DummyStore
+type dummyStoreServer struct {
+	testfixtures.DummyStoreServer
 	endpoint upspin.Endpoint
 }
 
@@ -202,18 +202,18 @@ func (d *dummyUser) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
 
-func (d *dummyStore) Ping() bool {
+func (d *dummyStoreServer) Ping() bool {
 	// Add some random delays.
 	time.Sleep(time.Duration(rand.Int31n(100)) * time.Millisecond)
 	return true
 }
 
-func (d *dummyStore) Endpoint() upspin.Endpoint {
+func (d *dummyStoreServer) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
 
-func (d *dummyStore) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	store := &dummyStore{endpoint: e}
+func (d *dummyStoreServer) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	store := &dummyStoreServer{endpoint: e}
 	return store, nil
 }
 

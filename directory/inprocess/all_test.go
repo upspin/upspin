@@ -4,7 +4,7 @@
 
 package inprocess
 
-// This test uses an in-process Store service for the underlying
+// This test uses an in-process StoreServer for the underlying
 // storage. To run this test against a GCP Store, start a GCP store
 // locally and run this test with flag
 // -use_gcp_store=http://localhost:8080. It may take up to a minute
@@ -37,7 +37,7 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspin.User, dir upspin.DirServer, store upspin.Store) {
+func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspin.User, dir upspin.DirServer, store upspin.StoreServer) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -50,7 +50,7 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 	if err != nil {
 		panic(err)
 	}
-	store, err = bind.Store(ctx, endpoint)
+	store, err = bind.StoreServer(ctx, endpoint)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +61,7 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 	return
 }
 
-func setup() (upspin.Context, upspin.User, upspin.DirServer, upspin.Store) {
+func setup() (upspin.Context, upspin.User, upspin.DirServer, upspin.StoreServer) {
 	context, user, dir, store := newContextAndServices(nextUser())
 	err := user.(*inprocess.Service).Install(context.UserName(), dir)
 	if err != nil {
@@ -113,7 +113,7 @@ func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name ups
 		},
 	}
 	cipher, packdata := packData(t, context, data, entry, packing)
-	store, err := bind.Store(context, context.StoreEndpoint())
+	store, err := bind.StoreServer(context, context.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}

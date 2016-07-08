@@ -92,7 +92,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 
 	// Store contents.
-	store, err := bind.Store(c.context, c.context.StoreEndpoint())
+	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
 	if err != nil {
 		return zeroLoc, err
 	}
@@ -197,7 +197,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	where := []upspin.Location{entry.Location}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
-		store, err := bind.Store(c.context, loc.Endpoint)
+		store, err := bind.StoreServer(c.context, loc.Endpoint)
 		if isError(err) {
 			continue
 		}

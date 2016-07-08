@@ -151,7 +151,7 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return proto.UpspinDirEntry(resp.Entry)
 }
 
-// Endpoint implements upspin.Store.Endpoint.
+// Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
 }

@@ -107,7 +107,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	locations := []upspin.Location{de.Location}
 	for i := 0; i < len(locations); i++ {
 		loc := locations[i]
-		store, err := bind.Store(n.f.context, loc.Endpoint)
+		store, err := bind.StoreServer(n.f.context, loc.Endpoint)
 		if err != nil {
 			finalErr = err
 			continue

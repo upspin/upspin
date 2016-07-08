@@ -22,16 +22,16 @@ type dialContext struct {
 	userName upspin.UserName
 }
 
-// remote implements upspin.Store.
+// remote implements upspin.StoreServer.
 type remote struct {
 	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
 	ctx                         dialContext
 	storeClient                 proto.StoreClient
 }
 
-var _ upspin.Store = (*remote)(nil)
+var _ upspin.StoreServer = (*remote)(nil)
 
-// Get implements upspin.Store.Get.
+// Get implements upspin.StoreServer.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
@@ -51,7 +51,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	return resp.Data, proto.UpspinLocations(resp.Locations), nil
 }
 
-// Put implements upspin.Store.Put.
+// Put implements upspin.StoreServer.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	gCtx, err := r.NewAuthContext()
@@ -69,7 +69,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
 }
 
-// Delete implements upspin.Store.Delete.
+// Delete implements upspin.StoreServer.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
@@ -86,7 +86,7 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	return errors.UnmarshalError(resp.Error)
 }
 
-// Endpoint implements upspin.Store.Endpoint.
+// Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
 }
@@ -132,5 +132,5 @@ const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
-	bind.RegisterStore(transport, r)
+	bind.RegisterStoreServer(transport, r)
 }

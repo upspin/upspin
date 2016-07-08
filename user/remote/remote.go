@@ -53,7 +53,7 @@ func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.Publi
 	return proto.UpspinEndpoints(resp.Endpoints), proto.UpspinPublicKeys(resp.PublicKeys), nil
 }
 
-// Endpoint implements upspin.Store.Endpoint.
+// Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
 }

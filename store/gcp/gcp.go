@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements upspin.Store using Google Cloud Platform as its storage.
+// Package gcp implements upspin.StoreServer using Google Cloud Platform as its storage.
 package gcp
 
 import (
@@ -36,16 +36,16 @@ const (
 )
 
 var (
-	errNotConfigured = errors.E(errors.Invalid, errors.Str("GCP Store service not configured"))
+	errNotConfigured = errors.E(errors.Invalid, errors.Str("GCP StoreServer not configured"))
 )
 
-// Server implements upspin.Store.
+// Server implements upspin.StoreServer.
 type server struct {
 	context  upspin.Context
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.Store = (*server)(nil)
+var _ upspin.StoreServer = (*server)(nil)
 
 var (
 	mu          sync.RWMutex // Protects fields below.
@@ -54,14 +54,14 @@ var (
 	fileCache   *cache.FileCache
 )
 
-// New returns a new, unconfigured Store bound to the user in the context.
-func New(context upspin.Context) upspin.Store {
+// New returns a new, unconfigured StoreServer bound to the user in the context.
+func New(context upspin.Context) upspin.StoreServer {
 	return &server{
 		context: context.Copy(), // Make a copy to prevent user making further changes.
 	}
 }
 
-// Put implements upspin.Store.
+// Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (upspin.Reference, error) {
 	const Put = "Put"
 	reader := bytes.NewReader(data)
@@ -98,7 +98,7 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	return upspin.Reference(ref), nil
 }
 
-// Get implements upspin.Store.
+// Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	fmt.Printf("context is %v\n", s.context)
 	file, loc, err := s.innerGet(s.context.UserName(), ref)
@@ -162,7 +162,7 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 	return
 }
 
-// Delete implements upspin.Store.
+// Delete implements upspin.StoreServer.
 func (s *server) Delete(ref upspin.Reference) error {
 	const Delete = "Delete"
 	mu.RLock()
@@ -272,5 +272,5 @@ func (s *server) Endpoint() upspin.Endpoint {
 }
 
 func init() {
-	bind.RegisterStore(upspin.GCP, New(context.New()))
+	bind.RegisterStoreServer(upspin.GCP, New(context.New()))
 }

@@ -24,7 +24,7 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
-	// Load required transports. We only use the User interface itself; we are DirServer and Store.
+	// Load required transports. We only use the User interface itself; we are DirServer and StoreServer.
 	_ "upspin.io/user/transports"
 )
 

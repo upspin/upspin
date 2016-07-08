@@ -71,7 +71,7 @@ type Endpoint struct {
 // Dial method to connect to the service.
 type NetAddr string
 
-// A Reference is the string identifying an item in a Store.
+// A Reference is the string identifying an item in a StoreServer.
 type Reference string
 
 // Signature is an ECDSA signature.
@@ -240,7 +240,7 @@ type DirServer interface {
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put has the directory service record that the specified DirEntry
-	// describes data stored in a Store service at the Location recorded
+	// describes data stored in a StorServer at the Location recorded
 	// in the DirEntry, and can thereafter be recovered using the PathName
 	// specified in the DirEntry.
 	//
@@ -285,7 +285,7 @@ type DirServer interface {
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.
-	// It does not delete the data it references; use Store.Delete for that.
+	// It does not delete the data it references; use StoreServer.Delete for that.
 	Delete(name PathName) error
 
 	// WhichAccess returns the path name of the Access file that is
@@ -342,18 +342,16 @@ const (
 	SeqBase     = 1  // Base at which valid sequence numbers start.
 )
 
-// Store service.
-
-// The Store service saves and retrieves data without interpretation.
-type Store interface {
+// The StoreServer saves and retrieves data without interpretation.
+type StoreServer interface {
 	Dialer
 	Service
 
 	// Get attempts to retrieve the data identified by the reference.
 	// Three things might happen:
-	// 1. The data is in this Store. It is returned. The Location slice
+	// 1. The data is in this StoreServer. It is returned. The Location slice
 	// and error are nil.
-	// 2. The data is not in this Store, but may be in one or more
+	// 2. The data is not in this StoreServer, but may be in one or more
 	// other locations known to the store. The slice of Locations
 	// is returned. The data slice and error are nil.
 	// 3. An error occurs. The data and Location slices are nil
@@ -431,7 +429,7 @@ type Client interface {
 // have been decrypted and verified.
 type File interface {
 	// Close releases the resources. For a writable file, it also
-	// writes the accumulated data in a Store server. After a
+	// writes the accumulated data in a StoreServer. After a
 	// Close, successful or not, all methods of File except Name
 	// will fail.
 	Close() error
@@ -454,7 +452,7 @@ type File interface {
 }
 
 // Context contains client information such as the user's keys and
-// preferred User, DirServer, and Store server endpoints.
+// preferred User, DirServer, and StoreServer endpoints.
 type Context interface {
 	// The name of the user requesting access.
 	UserName() UserName
@@ -498,22 +496,22 @@ type Context interface {
 	// event of an error binding, all subsequent calls on the User service will return errors.
 	DirServer(PathName) DirServer
 
-	// StoreEndpoint is the endpoint of the Store in which to place new data items.
+	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
 	// SetStoreEndpoint sets the StoreEndpoint.
 	SetStoreEndpoint(Endpoint) Context
 
-	// Store returns a a Store service bound to StoreEndpoint().  In the event of an
+	// StoreServer returns a a StoreServer instance bound to StoreEndpoint().  In the event of an
 	// error binding, all subsequent calls on the User service will return errors.
-	Store() Store
+	StoreServer() StoreServer
 
 	// Copy creates a copy of the receiver context.
 	Copy() Context
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
-// service type (User, DirServer, Store) implements the methods of
+// service type (User, DirServer, StoreServer) implements the methods of
 // the Dialer interface. These methods are not used directly by
 // clients. Instead, clients should use the methods of
 // the Upspin "bind" package to connect to services.

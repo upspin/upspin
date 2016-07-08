@@ -29,12 +29,12 @@ func (ctx *simpleContext) DirServer(name upspin.PathName) upspin.DirServer {
 	return nil
 }
 
-// Store implements upspin.Context.
-func (ctx *simpleContext) Store() upspin.Store {
+// StoreServer implements upspin.Context.
+func (ctx *simpleContext) StoreServer() upspin.StoreServer {
 	return nil
 }
 
-// Store implements upspin.Context.
+// UserName implements upspin.Context.
 func (ctx *simpleContext) UserName() upspin.UserName {
 	return ctx.userName
 }
