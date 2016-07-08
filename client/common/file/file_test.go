@@ -226,7 +226,7 @@ func (d *dummyClient) Create(name upspin.PathName) (upspin.File, error) {
 func (d *dummyClient) Open(name upspin.PathName) (upspin.File, error) {
 	return nil, nil
 }
-func (d *dummyClient) Directory(name upspin.PathName) (upspin.Directory, error) {
+func (d *dummyClient) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	return nil, nil
 }
 func (d *dummyClient) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {

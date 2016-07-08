@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements upspin.Directory for talking to the Google Cloud Platofrm (GCP).
+// Package gcp implements upspin.DirServer for talking to the Google Cloud Platofrm (GCP).
 package gcp
 
 import (
@@ -44,7 +44,7 @@ type directory struct {
 	dirNegCache    *cache.LRU         // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
 }
 
-var _ upspin.Directory = (*directory)(nil)
+var _ upspin.DirServer = (*directory)(nil)
 
 // gcpDir represents a name for the metric for this directory service.
 const gcpDir = "gcpDir"
@@ -57,7 +57,7 @@ const (
 
 var (
 	zeroLoc          upspin.Location
-	errNotConfigured = errors.Str("GCP Directory not configured")
+	errNotConfigured = errors.Str("GCP DirServer not configured")
 
 	confLock sync.RWMutex // protects all configuration options and the ref count below.
 	refCount uint64
@@ -86,7 +86,7 @@ func newOptsForMetric(op string) (options, *metric.Metric) {
 	return opts, m
 }
 
-// MakeDirectory implements upspin.Directory.
+// MakeDirectory implements upspin.DirServer.
 func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
 	const op = "MakeDirectory"
 
@@ -107,7 +107,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 		Name: parsed.Path(),
 		Location: upspin.Location{
 			// Reference is ignored.
-			// Endpoint for dir entries is where the Directory server is.
+			// Endpoint for dir entries where the DirServer is.
 			Endpoint: d.endpoint,
 		},
 		Metadata: upspin.Metadata{
@@ -126,7 +126,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 }
 
 // Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.
-// It implements upspin.Directory.
+// It implements upspin.DirServer.
 func (d *directory) Put(dirEntry *upspin.DirEntry) error {
 	const op = "Put"
 
@@ -272,7 +272,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	return nil
 }
 
-// Lookup implements upspin.Directory.
+// Lookup implements upspin.DirServer.
 func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Lookup"
 
@@ -701,5 +701,5 @@ func (d *directory) Endpoint() upspin.Endpoint {
 }
 
 func init() {
-	bind.RegisterDirectory(upspin.GCP, newDirectory(nil, nil, nil, nil))
+	bind.RegisterDirServer(upspin.GCP, newDirectory(nil, nil, nil, nil))
 }

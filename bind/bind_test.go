@@ -26,8 +26,8 @@ func TestSwitch(t *testing.T) {
 	if err := RegisterStore(upspin.InProcess, &dummyStore{}); err != nil {
 		t.Errorf("registerStore failed")
 	}
-	if err := RegisterDirectory(upspin.InProcess, &dummyDirectory{}); err != nil {
-		t.Errorf("registerDirectory failed")
+	if err := RegisterDirServer(upspin.InProcess, &dummyDirServer{}); err != nil {
+		t.Errorf("RegisterDirServer failed")
 	}
 
 	// These should fail.
@@ -37,8 +37,8 @@ func TestSwitch(t *testing.T) {
 	if err := RegisterStore(upspin.InProcess, &dummyStore{}); err == nil {
 		t.Errorf("registerStore should have failed")
 	}
-	if err := RegisterDirectory(upspin.InProcess, &dummyDirectory{}); err == nil {
-		t.Errorf("registerDirectory should have failed")
+	if err := RegisterDirServer(upspin.InProcess, &dummyDirServer{}); err == nil {
+		t.Errorf("RegisterDirServer should have failed")
 	}
 
 	// These should all work.
@@ -48,7 +48,7 @@ func TestSwitch(t *testing.T) {
 	if err := ReregisterStore(upspin.InProcess, &dummyStore{}); err != nil {
 		t.Error(err)
 	}
-	if err := ReregisterDirectory(upspin.InProcess, &dummyDirectory{}); err != nil {
+	if err := ReregisterDirServer(upspin.InProcess, &dummyDirServer{}); err != nil {
 		t.Error(err)
 	}
 
@@ -64,8 +64,8 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("expected bind.Store of undefined to fail")
 	}
 
-	// Directory is never reachable (our dummyDirectory answers false to ping)
-	_, err := Directory(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	// DirServer is never reachable (our dummyDirServer answers false to ping)
+	_, err := DirServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
 	if err == nil {
 		t.Error("Expected error")
 	}
@@ -178,8 +178,8 @@ type dummyStore struct {
 	endpoint upspin.Endpoint
 }
 
-type dummyDirectory struct {
-	testfixtures.DummyDirectory
+type dummyDirServer struct {
+	testfixtures.DummyDirServer
 	endpoint upspin.Endpoint
 }
 
@@ -217,14 +217,14 @@ func (d *dummyStore) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service,
 	return store, nil
 }
 
-func (d *dummyDirectory) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	dir := &dummyDirectory{endpoint: e}
+func (d *dummyDirServer) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	dir := &dummyDirServer{endpoint: e}
 	return dir, nil
 }
-func (d *dummyDirectory) Endpoint() upspin.Endpoint {
+func (d *dummyDirServer) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
-func (d *dummyDirectory) Ping() bool {
+func (d *dummyDirServer) Ping() bool {
 	// This directory is broken and never reachable.
 	return false
 }

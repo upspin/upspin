@@ -24,7 +24,7 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
-	// Load required transports. We only use the User interface itself; we are Directory and Store.
+	// Load required transports. We only use the User interface itself; we are DirServer and Store.
 	_ "upspin.io/user/transports"
 )
 
@@ -73,7 +73,7 @@ func main() {
 	proto.RegisterStoreServer(grpcServer, storeServer)
 
 	dirServer := NewDirServer(context, endpoint, grpcSecureServer)
-	proto.RegisterDirectoryServer(grpcServer, dirServer)
+	proto.RegisterDirServer(grpcServer, dirServer)
 
 	https.ListenAndServe("fileserver", *httpsAddr, nil)
 }

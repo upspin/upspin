@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package testfixtures implements dummies for Store, Directory and User services for tests.
 package testfixtures
 
 import "upspin.io/upspin"
@@ -25,8 +24,8 @@ func (ctx *simpleContext) User() upspin.User {
 	return nil
 }
 
-// Directory implements upspin.Context.
-func (ctx *simpleContext) Directory(name upspin.PathName) upspin.Directory {
+// DirServer implements upspin.Context.
+func (ctx *simpleContext) DirServer(name upspin.PathName) upspin.DirServer {
 	return nil
 }
 
@@ -75,13 +74,13 @@ func (ctx *simpleContext) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
 	return ctx
 }
 
-// DirectoryEndpoint implements upspin.Context.
-func (ctx *simpleContext) DirectoryEndpoint() upspin.Endpoint {
+// DirEndpoint implements upspin.Context.
+func (ctx *simpleContext) DirEndpoint() upspin.Endpoint {
 	return ep0
 }
 
-// SetDirectoryEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetDirectoryEndpoint(e upspin.Endpoint) upspin.Context {
+// SetEndpoint implements upspin.Context.
+func (ctx *simpleContext) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
 	return ctx
 }
 

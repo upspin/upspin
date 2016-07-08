@@ -47,7 +47,7 @@ var (
 	configFile   = flag.String("configfile", "", "Name of file with config parameters with one key=value per line")
 )
 
-// Server is a SecureServer that talks to a Directory interface and serves gRPC requests.
+// Server is a SecureServer that talks to a DirServer interface and serves gRPC requests.
 type Server struct {
 	context  upspin.Context
 	endpoint upspin.Endpoint
@@ -87,7 +87,7 @@ func main() {
 	}
 
 	// Get an instance so we can configure it and use it for authenticated connections.
-	dir, err := bind.Directory(context, *endpoint)
+	dir, err := bind.DirServer(context, *endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,8 +101,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// Now this pre-configured Directory is the one that will generate new instances.
-		err = bind.ReregisterDirectory(endpoint.Transport, dir)
+		// Now this pre-configured DirServer is the one that will generate new instances.
+		err = bind.ReregisterDirServer(endpoint.Transport, dir)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -118,7 +118,7 @@ func main() {
 		SecureServer: grpcSecureServer,
 		endpoint:     *endpoint,
 	}
-	proto.RegisterDirectoryServer(grpcSecureServer.GRPCServer(), s)
+	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
 	https.ListenAndServe("dirserver", *httpsAddr, nil)
@@ -126,8 +126,8 @@ func main() {
 
 var (
 	// Empty structs we can allocate just once.
-	putResponse       proto.DirectoryPutResponse
-	deleteResponse    proto.DirectoryDeleteResponse
+	putResponse       proto.DirPutResponse
+	deleteResponse    proto.DirDeleteResponse
 	configureResponse proto.ConfigureResponse
 )
 
@@ -153,19 +153,19 @@ func parseConfigFile(fileName string) []string {
 	return output
 }
 
-// dirFor returns a Directory service bound to the user specified in the context.
-func (s *Server) dirFor(ctx gContext.Context) (upspin.Directory, error) {
+// dirFor returns a DirServer instance bound to the user specified in the context.
+func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	context := s.context.Copy().SetUserName(session.User())
-	return bind.Directory(context, s.endpoint)
+	return bind.DirServer(context, s.endpoint)
 }
 
-// Lookup implements upspin.Directory.
-func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest) (*proto.DirectoryLookupResponse, error) {
+// Lookup implements upspin.DirServer.
+func (s *Server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.DirLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
@@ -175,26 +175,26 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest)
 	entry, err := dir.Lookup(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.Name, err)
-		return &proto.DirectoryLookupResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	b, err := entry.Marshal()
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &proto.DirectoryLookupResponse{
+	resp := &proto.DirLookupResponse{
 		Entry: b,
 	}
 	return resp, nil
 }
 
-// Put implements upspin.Directory.
-func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*proto.DirectoryPutResponse, error) {
+// Put implements upspin.DirServer.
+func (s *Server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.DirPutResponse, error) {
 	log.Printf("Put")
 
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	if err != nil {
-		return &proto.DirectoryPutResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	log.Printf("Put %q", entry.Name)
 	dir, err := s.dirFor(ctx)
@@ -204,13 +204,13 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*pro
 	err = dir.Put(entry)
 	if err != nil {
 		log.Printf("Put %q failed: %v", entry.Name, err)
-		return &proto.DirectoryPutResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &putResponse, nil
 }
 
-// MakeDirectory implements upspin.Directory.
-func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDirectoryRequest) (*proto.DirectoryMakeDirectoryResponse, error) {
+// MakeDirectory implements upspin.DirServer.
+func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectoryRequest) (*proto.DirMakeDirectoryResponse, error) {
 	log.Printf("MakeDirectory %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
@@ -220,17 +220,17 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDir
 	loc, err := dir.MakeDirectory(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
-		return &proto.DirectoryMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
 	}
 	locSlice := []upspin.Location{loc}
-	resp := &proto.DirectoryMakeDirectoryResponse{
+	resp := &proto.DirMakeDirectoryResponse{
 		Location: proto.Locations(locSlice)[0], // Clumsy but easy (and rare).
 	}
 	return resp, nil
 }
 
-// Glob implements upspin.Directory.
-func (s *Server) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*proto.DirectoryGlobResponse, error) {
+// Glob implements upspin.DirServer.
+func (s *Server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.DirGlobResponse, error) {
 	log.Printf("Glob %q", req.Pattern)
 
 	dir, err := s.dirFor(ctx)
@@ -240,17 +240,17 @@ func (s *Server) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*p
 	entries, err := dir.Glob(req.Pattern)
 	if err != nil {
 		log.Printf("Glob %q failed: %v", req.Pattern, err)
-		return &proto.DirectoryGlobResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirGlobResponse{Error: errors.MarshalError(err)}, nil
 	}
 	data, err := proto.DirEntryBytes(entries)
-	resp := &proto.DirectoryGlobResponse{
+	resp := &proto.DirGlobResponse{
 		Entries: data,
 	}
 	return resp, err
 }
 
-// Delete implements upspin.Directory.
-func (s *Server) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest) (*proto.DirectoryDeleteResponse, error) {
+// Delete implements upspin.DirServer.
+func (s *Server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.DirDeleteResponse, error) {
 	log.Printf("Delete %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
@@ -260,13 +260,13 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest)
 	err = dir.Delete(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("Delete %q failed: %v", req.Name, err)
-		return &proto.DirectoryDeleteResponse{Error: errors.MarshalError(err)}, nil
+		return &proto.DirDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &deleteResponse, nil
 }
 
-// WhichAccess implements upspin.Directory.
-func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirectoryWhichAccessRequest) (*proto.DirectoryWhichAccessResponse, error) {
+// WhichAccess implements upspin.DirServer.
+func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.DirWhichAccessResponse, error) {
 	log.Printf("WhichAccess %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
@@ -277,7 +277,7 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirectoryWhichAcce
 	if err != nil {
 		log.Printf("WhichAccess %q failed: %v", req.Name, err)
 	}
-	resp := &proto.DirectoryWhichAccessResponse{
+	resp := &proto.DirWhichAccessResponse{
 		Error: errors.MarshalError(err),
 		Name:  string(name),
 	}

@@ -229,7 +229,7 @@ func testGlobWithPattern(t *testing.T, env *e.Env) {
 func testDelete(t *testing.T, env *e.Env) {
 	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
 	log.Printf("Context: Username: %s", env.Context.UserName())
-	dir, err := bind.Directory(env.Context, env.Context.DirectoryEndpoint())
+	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,7 +390,7 @@ func deleteGCPEnv(env *e.Env) error {
 	if err != nil {
 		return err
 	}
-	dir, err := bind.Directory(env.Context, env.Context.DirectoryEndpoint())
+	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
 	if err != nil {
 		return err
 	}

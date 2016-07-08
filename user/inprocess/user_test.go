@@ -32,7 +32,7 @@ func setup(t *testing.T) (upspin.User, upspin.Context) {
 	}
 	c.SetUserEndpoint(e)
 	c.SetStoreEndpoint(e)
-	c.SetDirectoryEndpoint(e)
+	c.SetDirEndpoint(e)
 	return u, c
 }
 
@@ -43,7 +43,7 @@ func TestInstallAndLookup(t *testing.T) {
 		t.Fatal("Not an inprocess User Service")
 	}
 
-	dir, err := bind.Directory(ctxt, ctxt.DirectoryEndpoint())
+	dir, err := bind.DirServer(ctxt, ctxt.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}

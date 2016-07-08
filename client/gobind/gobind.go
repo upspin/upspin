@@ -57,7 +57,7 @@ type ClientConfig struct {
 	// StoreNetAddr is the upspin.NetAddr of an upspin.Remote Store endpoint.
 	StoreNetAddr string
 
-	// DirNetAddr is the upspin.NetAddr of an upspin.Remote Directory endpoint.
+	// DirNetAddr is the upspin.NetAddr of an upspin.Remote DirServer endpoint.
 	DirNetAddr string
 }
 
@@ -120,7 +120,7 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.DirNetAddr),
 	}
-	ctx.SetDirectoryEndpoint(de)
+	ctx.SetDirEndpoint(de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.UserNetAddr),

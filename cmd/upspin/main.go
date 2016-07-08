@@ -195,7 +195,7 @@ func link(args ...string) {
 	c, _ := newClient()
 	// We require the original to exist unless explicitly requested otherwise.
 	if !*force {
-		dir, err := c.Directory(originalPath)
+		dir, err := c.DirServer(originalPath)
 		if err != nil {
 			exit(err)
 		}
@@ -224,7 +224,7 @@ func ls(args ...string) {
 	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
-		dir, err := c.Directory(name)
+		dir, err := c.DirServer(name)
 		if err != nil {
 			exit(err)
 		}
@@ -316,7 +316,7 @@ func rm(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint())
+	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -403,7 +403,7 @@ func whichAccess(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.Directory(ctx, ctx.DirectoryEndpoint())
+	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}

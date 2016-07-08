@@ -68,7 +68,7 @@ type database struct {
 	access map[upspin.PathName]*access.Access
 }
 
-var _ upspin.Directory = (*Service)(nil)
+var _ upspin.DirServer = (*Service)(nil)
 
 func newDirEntry(context upspin.Context, name upspin.PathName) *upspin.DirEntry {
 	return &upspin.DirEntry{
@@ -139,7 +139,7 @@ func unpackDirBlob(context upspin.Context, op string, ciphertext []byte, name up
 	return unpackBlob(context, op, ciphertext, newDirEntry(context, name))
 }
 
-// Glob implements upspin.Directory.Glob.
+// Glob implements upspin.DirServer.Glob.
 // TODO: Test access control for this method.
 func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const Glob = "Glob"
@@ -271,7 +271,7 @@ func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq i
 	}
 }
 
-// MakeDirectory implements upspin.Directory.MakeDirectory.
+// MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	const MakeDirectory = "MakeDirectory"
 	log.Printf("directory/inprocess MakeDirectory %q", directoryName)
@@ -332,7 +332,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	return loc, s.put(MakeDirectory, entry, false)
 }
 
-// Put implements upspin.Directory.Put.
+// Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (s *Service) Put(entry *upspin.DirEntry) error {
 	const Put = "Put"
@@ -393,7 +393,7 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	return nil
 }
 
-// WhichAccess implements upspin.Directory.WhichAccess.
+// WhichAccess implements upspin.DirServer.WhichAccess.
 func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
 	const WhichAccess = "WhichAccess"
 	parsed, err := path.Parse(pathName)
@@ -509,7 +509,7 @@ func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
 	return data, err
 }
 
-// Delete implements upspin.Directory.Delete.
+// Delete implements upspin.DirServer.Delete.
 func (s *Service) Delete(pathName upspin.PathName) error {
 	const Delete = "Delete"
 	parsed, err := path.Parse(pathName)
@@ -556,7 +556,7 @@ func (s *Service) isEmptyDirectory(op string, entry *upspin.DirEntry) (bool, err
 	return len(data) == 0, nil
 }
 
-// Lookup implements upspin.Directory.Lookup.
+// Lookup implements upspin.DirServer.Lookup.
 func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Lookup = "Lookup"
 	parsed, err := path.Parse(pathName)
@@ -786,7 +786,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 	return ref, nil
 }
 
-// DeleteAll implements upspin.Directory.DeleteAll.
+// DeleteAll implements upspin.DirServer.DeleteAll.
 func (s *Service) DeleteAll() {
 	s.db.mu.Lock()
 	s.db.root = make(map[upspin.UserName]*upspin.DirEntry)
@@ -820,12 +820,12 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 	return &this, nil
 }
 
-// Endpoint implements upspin.Directory.Endpoint.
+// Endpoint implements upspin.DirServer.Endpoint.
 func (s *Service) Endpoint() upspin.Endpoint {
 	return s.db.endpoint
 }
 
-// Ping implements upspin.Directory.Ping.
+// Ping implements upspin.DirServer.Ping.
 func (s *Service) Ping() bool {
 	return true
 }
@@ -855,5 +855,5 @@ func init() {
 			access:     make(map[upspin.PathName]*access.Access),
 		},
 	}
-	bind.RegisterDirectory(transport, s)
+	bind.RegisterDirServer(transport, s)
 }

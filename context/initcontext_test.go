@@ -24,7 +24,7 @@ var once sync.Once
 type expectations struct {
 	userName  upspin.UserName
 	user      upspin.Endpoint
-	directory upspin.Endpoint
+	dirserver upspin.Endpoint
 	store     upspin.Endpoint
 	packing   upspin.Packing
 }
@@ -32,7 +32,7 @@ type expectations struct {
 type envs struct {
 	name      string
 	user      string
-	directory string
+	dirserver string
 	store     string
 	packing   string
 }
@@ -49,7 +49,7 @@ func TestInitContext(t *testing.T) {
 	expect := expectations{
 		userName:  "p@google.com",
 		user:      Endpoint(upspin.InProcess, ""),
-		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
 		packing:   upspin.EEPack,
 	}
@@ -60,7 +60,7 @@ func TestComments(t *testing.T) {
 	expect := expectations{
 		userName:  "p@google.com",
 		user:      Endpoint(upspin.InProcess, ""),
-		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
 		packing:   upspin.EEPack,
 	}
@@ -79,15 +79,15 @@ func TestEnv(t *testing.T) {
 	expect := expectations{
 		userName:  "p@google.com",
 		user:      Endpoint(upspin.InProcess, ""),
-		directory: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver: Endpoint(upspin.GCP, "who.knows:1234"),
 		store:     Endpoint(upspin.GCP, "who.knows:1234"),
 		packing:   upspin.EEPack,
 	}
 	config := makeConfig(&expect)
 	expect.userName = "quux"
 	os.Setenv("upspinname", string(expect.userName))
-	expect.directory = Endpoint(upspin.InProcess, "")
-	os.Setenv("upspindirectory", expect.directory.String())
+	expect.dirserver = Endpoint(upspin.InProcess, "")
+	os.Setenv("upspindirserver", expect.dirserver.String())
 	expect.store = Endpoint(upspin.GCP, "who.knows:1234")
 	os.Setenv("upspinstore", expect.store.String())
 	expect.user = Endpoint(upspin.GCP, "who.knows:1234")
@@ -109,26 +109,26 @@ func makeConfig(expect *expectations) string {
 	if expect.store != zero {
 		fmt.Fprintf(&buf, "store = %s\n", expect.store)
 	}
-	if expect.directory != zero {
-		fmt.Fprintf(&buf, "directory = %s\n", expect.directory)
+	if expect.dirserver != zero {
+		fmt.Fprintf(&buf, "dirserver = %s\n", expect.dirserver)
 	}
 	fmt.Fprintf(&buf, "packing = %s\n", pack.Lookup(expect.packing))
 	return buf.String()
 }
 
 func makeCommentedConfig(expect *expectations) string {
-	return fmt.Sprintf("# Line one is a comment\nname = %s # Ignore this.\nuser= %s\nstore = %s\n  directory =%s   \npacking=%s #Ignore this",
+	return fmt.Sprintf("# Line one is a comment\nname = %s # Ignore this.\nuser= %s\nstore = %s\n  dirserver =%s   \npacking=%s #Ignore this",
 		expect.userName,
 		expect.user,
 		expect.store,
-		expect.directory,
+		expect.dirserver,
 		pack.Lookup(expect.packing).String())
 }
 
 func saveEnvs(e *envs) {
 	e.name = os.Getenv("upspinname")
 	e.user = os.Getenv("upspinuser")
-	e.directory = os.Getenv("upspindirectory")
+	e.dirserver = os.Getenv("upspindirserver")
 	e.store = os.Getenv("upspinstore")
 	e.packing = os.Getenv("upspinpacking")
 }
@@ -136,7 +136,7 @@ func saveEnvs(e *envs) {
 func restoreEnvs(e *envs) {
 	os.Setenv("upspinname", e.name)
 	os.Setenv("upspinuser", e.user)
-	os.Setenv("upspindirectory", e.directory)
+	os.Setenv("upspindirserver", e.dirserver)
 	os.Setenv("upspinstore", e.store)
 	os.Setenv("upspinpacking", e.packing)
 }
@@ -168,7 +168,7 @@ func testConfig(t *testing.T, expect *expectations, config string) {
 		got      upspin.Endpoint
 	}{
 		{expect.user, context.UserEndpoint()},
-		{expect.directory, context.DirectoryEndpoint()},
+		{expect.dirserver, context.DirEndpoint()},
 		{expect.store, context.StoreEndpoint()},
 	}
 	for i, test := range tests {

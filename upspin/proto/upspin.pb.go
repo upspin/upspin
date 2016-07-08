@@ -28,18 +28,18 @@ It has these top-level messages:
 	StoreDeleteResponse
 	UserLookupRequest
 	UserLookupResponse
-	DirectoryLookupRequest
-	DirectoryLookupResponse
-	DirectoryPutRequest
-	DirectoryPutResponse
-	DirectoryMakeDirectoryRequest
-	DirectoryMakeDirectoryResponse
-	DirectoryGlobRequest
-	DirectoryGlobResponse
-	DirectoryDeleteRequest
-	DirectoryDeleteResponse
-	DirectoryWhichAccessRequest
-	DirectoryWhichAccessResponse
+	DirLookupRequest
+	DirLookupResponse
+	DirPutRequest
+	DirPutResponse
+	DirMakeDirectoryRequest
+	DirMakeDirectoryResponse
+	DirGlobRequest
+	DirGlobResponse
+	DirDeleteRequest
+	DirDeleteResponse
+	DirWhichAccessRequest
+	DirWhichAccessResponse
 */
 package proto
 
@@ -281,124 +281,124 @@ func (m *UserLookupResponse) GetEndpoints() []*Endpoint {
 	return nil
 }
 
-type DirectoryLookupRequest struct {
+type DirLookupRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=Name,json=name" json:"Name,omitempty"`
 }
 
-func (m *DirectoryLookupRequest) Reset()                    { *m = DirectoryLookupRequest{} }
-func (m *DirectoryLookupRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryLookupRequest) ProtoMessage()               {}
-func (*DirectoryLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (m *DirLookupRequest) Reset()                    { *m = DirLookupRequest{} }
+func (m *DirLookupRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirLookupRequest) ProtoMessage()               {}
+func (*DirLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
-type DirectoryLookupResponse struct {
+type DirLookupResponse struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=Entry,json=entry,proto3" json:"Entry,omitempty"`
 	Error []byte `protobuf:"bytes,2,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryLookupResponse) Reset()                    { *m = DirectoryLookupResponse{} }
-func (m *DirectoryLookupResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryLookupResponse) ProtoMessage()               {}
-func (*DirectoryLookupResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+func (m *DirLookupResponse) Reset()                    { *m = DirLookupResponse{} }
+func (m *DirLookupResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirLookupResponse) ProtoMessage()               {}
+func (*DirLookupResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
-type DirectoryPutRequest struct {
+type DirPutRequest struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=Entry,json=entry,proto3" json:"Entry,omitempty"`
 }
 
-func (m *DirectoryPutRequest) Reset()                    { *m = DirectoryPutRequest{} }
-func (m *DirectoryPutRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryPutRequest) ProtoMessage()               {}
-func (*DirectoryPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+func (m *DirPutRequest) Reset()                    { *m = DirPutRequest{} }
+func (m *DirPutRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirPutRequest) ProtoMessage()               {}
+func (*DirPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
-type DirectoryPutResponse struct {
+type DirPutResponse struct {
 	Error []byte `protobuf:"bytes,1,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryPutResponse) Reset()                    { *m = DirectoryPutResponse{} }
-func (m *DirectoryPutResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryPutResponse) ProtoMessage()               {}
-func (*DirectoryPutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+func (m *DirPutResponse) Reset()                    { *m = DirPutResponse{} }
+func (m *DirPutResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirPutResponse) ProtoMessage()               {}
+func (*DirPutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
-type DirectoryMakeDirectoryRequest struct {
+type DirMakeDirectoryRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=Name,json=name" json:"Name,omitempty"`
 }
 
-func (m *DirectoryMakeDirectoryRequest) Reset()                    { *m = DirectoryMakeDirectoryRequest{} }
-func (m *DirectoryMakeDirectoryRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryMakeDirectoryRequest) ProtoMessage()               {}
-func (*DirectoryMakeDirectoryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
+func (m *DirMakeDirectoryRequest) Reset()                    { *m = DirMakeDirectoryRequest{} }
+func (m *DirMakeDirectoryRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirMakeDirectoryRequest) ProtoMessage()               {}
+func (*DirMakeDirectoryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
-type DirectoryMakeDirectoryResponse struct {
+type DirMakeDirectoryResponse struct {
 	Location *Location `protobuf:"bytes,1,opt,name=Location,json=location" json:"Location,omitempty"`
 	Error    []byte    `protobuf:"bytes,2,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryMakeDirectoryResponse) Reset()                    { *m = DirectoryMakeDirectoryResponse{} }
-func (m *DirectoryMakeDirectoryResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryMakeDirectoryResponse) ProtoMessage()               {}
-func (*DirectoryMakeDirectoryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
+func (m *DirMakeDirectoryResponse) Reset()                    { *m = DirMakeDirectoryResponse{} }
+func (m *DirMakeDirectoryResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirMakeDirectoryResponse) ProtoMessage()               {}
+func (*DirMakeDirectoryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
-func (m *DirectoryMakeDirectoryResponse) GetLocation() *Location {
+func (m *DirMakeDirectoryResponse) GetLocation() *Location {
 	if m != nil {
 		return m.Location
 	}
 	return nil
 }
 
-type DirectoryGlobRequest struct {
+type DirGlobRequest struct {
 	Pattern string `protobuf:"bytes,1,opt,name=Pattern,json=pattern" json:"Pattern,omitempty"`
 }
 
-func (m *DirectoryGlobRequest) Reset()                    { *m = DirectoryGlobRequest{} }
-func (m *DirectoryGlobRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryGlobRequest) ProtoMessage()               {}
-func (*DirectoryGlobRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
+func (m *DirGlobRequest) Reset()                    { *m = DirGlobRequest{} }
+func (m *DirGlobRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirGlobRequest) ProtoMessage()               {}
+func (*DirGlobRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
-type DirectoryGlobResponse struct {
+type DirGlobResponse struct {
 	Entries [][]byte `protobuf:"bytes,1,rep,name=Entries,json=entries,proto3" json:"Entries,omitempty"`
 	Error   []byte   `protobuf:"bytes,2,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryGlobResponse) Reset()                    { *m = DirectoryGlobResponse{} }
-func (m *DirectoryGlobResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryGlobResponse) ProtoMessage()               {}
-func (*DirectoryGlobResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
+func (m *DirGlobResponse) Reset()                    { *m = DirGlobResponse{} }
+func (m *DirGlobResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirGlobResponse) ProtoMessage()               {}
+func (*DirGlobResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
-type DirectoryDeleteRequest struct {
+type DirDeleteRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=Name,json=name" json:"Name,omitempty"`
 }
 
-func (m *DirectoryDeleteRequest) Reset()                    { *m = DirectoryDeleteRequest{} }
-func (m *DirectoryDeleteRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryDeleteRequest) ProtoMessage()               {}
-func (*DirectoryDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
+func (m *DirDeleteRequest) Reset()                    { *m = DirDeleteRequest{} }
+func (m *DirDeleteRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirDeleteRequest) ProtoMessage()               {}
+func (*DirDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
 
-type DirectoryDeleteResponse struct {
+type DirDeleteResponse struct {
 	Error []byte `protobuf:"bytes,1,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryDeleteResponse) Reset()                    { *m = DirectoryDeleteResponse{} }
-func (m *DirectoryDeleteResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryDeleteResponse) ProtoMessage()               {}
-func (*DirectoryDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
+func (m *DirDeleteResponse) Reset()                    { *m = DirDeleteResponse{} }
+func (m *DirDeleteResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirDeleteResponse) ProtoMessage()               {}
+func (*DirDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
 
-type DirectoryWhichAccessRequest struct {
+type DirWhichAccessRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=Name,json=name" json:"Name,omitempty"`
 }
 
-func (m *DirectoryWhichAccessRequest) Reset()                    { *m = DirectoryWhichAccessRequest{} }
-func (m *DirectoryWhichAccessRequest) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryWhichAccessRequest) ProtoMessage()               {}
-func (*DirectoryWhichAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
+func (m *DirWhichAccessRequest) Reset()                    { *m = DirWhichAccessRequest{} }
+func (m *DirWhichAccessRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DirWhichAccessRequest) ProtoMessage()               {}
+func (*DirWhichAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
 
-type DirectoryWhichAccessResponse struct {
+type DirWhichAccessResponse struct {
 	Name  string `protobuf:"bytes,1,opt,name=Name,json=name" json:"Name,omitempty"`
 	Error []byte `protobuf:"bytes,2,opt,name=Error,json=error,proto3" json:"Error,omitempty"`
 }
 
-func (m *DirectoryWhichAccessResponse) Reset()                    { *m = DirectoryWhichAccessResponse{} }
-func (m *DirectoryWhichAccessResponse) String() string            { return proto1.CompactTextString(m) }
-func (*DirectoryWhichAccessResponse) ProtoMessage()               {}
-func (*DirectoryWhichAccessResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
+func (m *DirWhichAccessResponse) Reset()                    { *m = DirWhichAccessResponse{} }
+func (m *DirWhichAccessResponse) String() string            { return proto1.CompactTextString(m) }
+func (*DirWhichAccessResponse) ProtoMessage()               {}
+func (*DirWhichAccessResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
 
 func init() {
 	proto1.RegisterType((*Endpoint)(nil), "proto.Endpoint")
@@ -420,18 +420,18 @@ func init() {
 	proto1.RegisterType((*StoreDeleteResponse)(nil), "proto.StoreDeleteResponse")
 	proto1.RegisterType((*UserLookupRequest)(nil), "proto.UserLookupRequest")
 	proto1.RegisterType((*UserLookupResponse)(nil), "proto.UserLookupResponse")
-	proto1.RegisterType((*DirectoryLookupRequest)(nil), "proto.DirectoryLookupRequest")
-	proto1.RegisterType((*DirectoryLookupResponse)(nil), "proto.DirectoryLookupResponse")
-	proto1.RegisterType((*DirectoryPutRequest)(nil), "proto.DirectoryPutRequest")
-	proto1.RegisterType((*DirectoryPutResponse)(nil), "proto.DirectoryPutResponse")
-	proto1.RegisterType((*DirectoryMakeDirectoryRequest)(nil), "proto.DirectoryMakeDirectoryRequest")
-	proto1.RegisterType((*DirectoryMakeDirectoryResponse)(nil), "proto.DirectoryMakeDirectoryResponse")
-	proto1.RegisterType((*DirectoryGlobRequest)(nil), "proto.DirectoryGlobRequest")
-	proto1.RegisterType((*DirectoryGlobResponse)(nil), "proto.DirectoryGlobResponse")
-	proto1.RegisterType((*DirectoryDeleteRequest)(nil), "proto.DirectoryDeleteRequest")
-	proto1.RegisterType((*DirectoryDeleteResponse)(nil), "proto.DirectoryDeleteResponse")
-	proto1.RegisterType((*DirectoryWhichAccessRequest)(nil), "proto.DirectoryWhichAccessRequest")
-	proto1.RegisterType((*DirectoryWhichAccessResponse)(nil), "proto.DirectoryWhichAccessResponse")
+	proto1.RegisterType((*DirLookupRequest)(nil), "proto.DirLookupRequest")
+	proto1.RegisterType((*DirLookupResponse)(nil), "proto.DirLookupResponse")
+	proto1.RegisterType((*DirPutRequest)(nil), "proto.DirPutRequest")
+	proto1.RegisterType((*DirPutResponse)(nil), "proto.DirPutResponse")
+	proto1.RegisterType((*DirMakeDirectoryRequest)(nil), "proto.DirMakeDirectoryRequest")
+	proto1.RegisterType((*DirMakeDirectoryResponse)(nil), "proto.DirMakeDirectoryResponse")
+	proto1.RegisterType((*DirGlobRequest)(nil), "proto.DirGlobRequest")
+	proto1.RegisterType((*DirGlobResponse)(nil), "proto.DirGlobResponse")
+	proto1.RegisterType((*DirDeleteRequest)(nil), "proto.DirDeleteRequest")
+	proto1.RegisterType((*DirDeleteResponse)(nil), "proto.DirDeleteResponse")
+	proto1.RegisterType((*DirWhichAccessRequest)(nil), "proto.DirWhichAccessRequest")
+	proto1.RegisterType((*DirWhichAccessResponse)(nil), "proto.DirWhichAccessResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -904,363 +904,363 @@ var _User_serviceDesc = grpc.ServiceDesc{
 	Metadata: fileDescriptor0,
 }
 
-// Client API for Directory service
+// Client API for Dir service
 
-type DirectoryClient interface {
+type DirClient interface {
 	// Service methods:
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error)
 	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	Lookup(ctx context.Context, in *DirectoryLookupRequest, opts ...grpc.CallOption) (*DirectoryLookupResponse, error)
-	Put(ctx context.Context, in *DirectoryPutRequest, opts ...grpc.CallOption) (*DirectoryPutResponse, error)
-	MakeDirectory(ctx context.Context, in *DirectoryMakeDirectoryRequest, opts ...grpc.CallOption) (*DirectoryMakeDirectoryResponse, error)
-	Glob(ctx context.Context, in *DirectoryGlobRequest, opts ...grpc.CallOption) (*DirectoryGlobResponse, error)
-	Delete(ctx context.Context, in *DirectoryDeleteRequest, opts ...grpc.CallOption) (*DirectoryDeleteResponse, error)
-	WhichAccess(ctx context.Context, in *DirectoryWhichAccessRequest, opts ...grpc.CallOption) (*DirectoryWhichAccessResponse, error)
+	Lookup(ctx context.Context, in *DirLookupRequest, opts ...grpc.CallOption) (*DirLookupResponse, error)
+	Put(ctx context.Context, in *DirPutRequest, opts ...grpc.CallOption) (*DirPutResponse, error)
+	MakeDirectory(ctx context.Context, in *DirMakeDirectoryRequest, opts ...grpc.CallOption) (*DirMakeDirectoryResponse, error)
+	Glob(ctx context.Context, in *DirGlobRequest, opts ...grpc.CallOption) (*DirGlobResponse, error)
+	Delete(ctx context.Context, in *DirDeleteRequest, opts ...grpc.CallOption) (*DirDeleteResponse, error)
+	WhichAccess(ctx context.Context, in *DirWhichAccessRequest, opts ...grpc.CallOption) (*DirWhichAccessResponse, error)
 }
 
-type directoryClient struct {
+type dirClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewDirectoryClient(cc *grpc.ClientConn) DirectoryClient {
-	return &directoryClient{cc}
+func NewDirClient(cc *grpc.ClientConn) DirClient {
+	return &dirClient{cc}
 }
 
-func (c *directoryClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
+func (c *dirClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
 	out := new(AuthenticateResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Authenticate", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.Dir/Authenticate", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error) {
+func (c *dirClient) Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error) {
 	out := new(ConfigureResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Configure", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.Dir/Configure", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error) {
+func (c *dirClient) Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error) {
 	out := new(EndpointResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Endpoint", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.Dir/Endpoint", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
+func (c *dirClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
 	out := new(PingResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Ping", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.Dir/Ping", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Lookup(ctx context.Context, in *DirectoryLookupRequest, opts ...grpc.CallOption) (*DirectoryLookupResponse, error) {
-	out := new(DirectoryLookupResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Lookup", in, out, c.cc, opts...)
+func (c *dirClient) Lookup(ctx context.Context, in *DirLookupRequest, opts ...grpc.CallOption) (*DirLookupResponse, error) {
+	out := new(DirLookupResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/Lookup", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Put(ctx context.Context, in *DirectoryPutRequest, opts ...grpc.CallOption) (*DirectoryPutResponse, error) {
-	out := new(DirectoryPutResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Put", in, out, c.cc, opts...)
+func (c *dirClient) Put(ctx context.Context, in *DirPutRequest, opts ...grpc.CallOption) (*DirPutResponse, error) {
+	out := new(DirPutResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/Put", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) MakeDirectory(ctx context.Context, in *DirectoryMakeDirectoryRequest, opts ...grpc.CallOption) (*DirectoryMakeDirectoryResponse, error) {
-	out := new(DirectoryMakeDirectoryResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/MakeDirectory", in, out, c.cc, opts...)
+func (c *dirClient) MakeDirectory(ctx context.Context, in *DirMakeDirectoryRequest, opts ...grpc.CallOption) (*DirMakeDirectoryResponse, error) {
+	out := new(DirMakeDirectoryResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/MakeDirectory", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Glob(ctx context.Context, in *DirectoryGlobRequest, opts ...grpc.CallOption) (*DirectoryGlobResponse, error) {
-	out := new(DirectoryGlobResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Glob", in, out, c.cc, opts...)
+func (c *dirClient) Glob(ctx context.Context, in *DirGlobRequest, opts ...grpc.CallOption) (*DirGlobResponse, error) {
+	out := new(DirGlobResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/Glob", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) Delete(ctx context.Context, in *DirectoryDeleteRequest, opts ...grpc.CallOption) (*DirectoryDeleteResponse, error) {
-	out := new(DirectoryDeleteResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/Delete", in, out, c.cc, opts...)
+func (c *dirClient) Delete(ctx context.Context, in *DirDeleteRequest, opts ...grpc.CallOption) (*DirDeleteResponse, error) {
+	out := new(DirDeleteResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/Delete", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *directoryClient) WhichAccess(ctx context.Context, in *DirectoryWhichAccessRequest, opts ...grpc.CallOption) (*DirectoryWhichAccessResponse, error) {
-	out := new(DirectoryWhichAccessResponse)
-	err := grpc.Invoke(ctx, "/proto.Directory/WhichAccess", in, out, c.cc, opts...)
+func (c *dirClient) WhichAccess(ctx context.Context, in *DirWhichAccessRequest, opts ...grpc.CallOption) (*DirWhichAccessResponse, error) {
+	out := new(DirWhichAccessResponse)
+	err := grpc.Invoke(ctx, "/proto.Dir/WhichAccess", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Directory service
+// Server API for Dir service
 
-type DirectoryServer interface {
+type DirServer interface {
 	// Service methods:
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	Configure(context.Context, *ConfigureRequest) (*ConfigureResponse, error)
 	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	Lookup(context.Context, *DirectoryLookupRequest) (*DirectoryLookupResponse, error)
-	Put(context.Context, *DirectoryPutRequest) (*DirectoryPutResponse, error)
-	MakeDirectory(context.Context, *DirectoryMakeDirectoryRequest) (*DirectoryMakeDirectoryResponse, error)
-	Glob(context.Context, *DirectoryGlobRequest) (*DirectoryGlobResponse, error)
-	Delete(context.Context, *DirectoryDeleteRequest) (*DirectoryDeleteResponse, error)
-	WhichAccess(context.Context, *DirectoryWhichAccessRequest) (*DirectoryWhichAccessResponse, error)
+	Lookup(context.Context, *DirLookupRequest) (*DirLookupResponse, error)
+	Put(context.Context, *DirPutRequest) (*DirPutResponse, error)
+	MakeDirectory(context.Context, *DirMakeDirectoryRequest) (*DirMakeDirectoryResponse, error)
+	Glob(context.Context, *DirGlobRequest) (*DirGlobResponse, error)
+	Delete(context.Context, *DirDeleteRequest) (*DirDeleteResponse, error)
+	WhichAccess(context.Context, *DirWhichAccessRequest) (*DirWhichAccessResponse, error)
 }
 
-func RegisterDirectoryServer(s *grpc.Server, srv DirectoryServer) {
-	s.RegisterService(&_Directory_serviceDesc, srv)
+func RegisterDirServer(s *grpc.Server, srv DirServer) {
+	s.RegisterService(&_Dir_serviceDesc, srv)
 }
 
-func _Directory_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Dir_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Authenticate(ctx, in)
+		return srv.(DirServer).Authenticate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Authenticate",
+		FullMethod: "/proto.Dir/Authenticate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Authenticate(ctx, req.(*AuthenticateRequest))
+		return srv.(DirServer).Authenticate(ctx, req.(*AuthenticateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Configure_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Dir_Configure_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConfigureRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Configure(ctx, in)
+		return srv.(DirServer).Configure(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Configure",
+		FullMethod: "/proto.Dir/Configure",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Configure(ctx, req.(*ConfigureRequest))
+		return srv.(DirServer).Configure(ctx, req.(*ConfigureRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Endpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Dir_Endpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EndpointRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Endpoint(ctx, in)
+		return srv.(DirServer).Endpoint(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Endpoint",
+		FullMethod: "/proto.Dir/Endpoint",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Endpoint(ctx, req.(*EndpointRequest))
+		return srv.(DirServer).Endpoint(ctx, req.(*EndpointRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Dir_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Ping(ctx, in)
+		return srv.(DirServer).Ping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Ping",
+		FullMethod: "/proto.Dir/Ping",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Ping(ctx, req.(*PingRequest))
+		return srv.(DirServer).Ping(ctx, req.(*PingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryLookupRequest)
+func _Dir_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirLookupRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Lookup(ctx, in)
+		return srv.(DirServer).Lookup(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Lookup",
+		FullMethod: "/proto.Dir/Lookup",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Lookup(ctx, req.(*DirectoryLookupRequest))
+		return srv.(DirServer).Lookup(ctx, req.(*DirLookupRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryPutRequest)
+func _Dir_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirPutRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Put(ctx, in)
+		return srv.(DirServer).Put(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Put",
+		FullMethod: "/proto.Dir/Put",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Put(ctx, req.(*DirectoryPutRequest))
+		return srv.(DirServer).Put(ctx, req.(*DirPutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_MakeDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryMakeDirectoryRequest)
+func _Dir_MakeDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirMakeDirectoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).MakeDirectory(ctx, in)
+		return srv.(DirServer).MakeDirectory(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/MakeDirectory",
+		FullMethod: "/proto.Dir/MakeDirectory",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).MakeDirectory(ctx, req.(*DirectoryMakeDirectoryRequest))
+		return srv.(DirServer).MakeDirectory(ctx, req.(*DirMakeDirectoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Glob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryGlobRequest)
+func _Dir_Glob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirGlobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Glob(ctx, in)
+		return srv.(DirServer).Glob(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Glob",
+		FullMethod: "/proto.Dir/Glob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Glob(ctx, req.(*DirectoryGlobRequest))
+		return srv.(DirServer).Glob(ctx, req.(*DirGlobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryDeleteRequest)
+func _Dir_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).Delete(ctx, in)
+		return srv.(DirServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/Delete",
+		FullMethod: "/proto.Dir/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).Delete(ctx, req.(*DirectoryDeleteRequest))
+		return srv.(DirServer).Delete(ctx, req.(*DirDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Directory_WhichAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirectoryWhichAccessRequest)
+func _Dir_WhichAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirWhichAccessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DirectoryServer).WhichAccess(ctx, in)
+		return srv.(DirServer).WhichAccess(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Directory/WhichAccess",
+		FullMethod: "/proto.Dir/WhichAccess",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirectoryServer).WhichAccess(ctx, req.(*DirectoryWhichAccessRequest))
+		return srv.(DirServer).WhichAccess(ctx, req.(*DirWhichAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Directory_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Directory",
-	HandlerType: (*DirectoryServer)(nil),
+var _Dir_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.Dir",
+	HandlerType: (*DirServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Authenticate",
-			Handler:    _Directory_Authenticate_Handler,
+			Handler:    _Dir_Authenticate_Handler,
 		},
 		{
 			MethodName: "Configure",
-			Handler:    _Directory_Configure_Handler,
+			Handler:    _Dir_Configure_Handler,
 		},
 		{
 			MethodName: "Endpoint",
-			Handler:    _Directory_Endpoint_Handler,
+			Handler:    _Dir_Endpoint_Handler,
 		},
 		{
 			MethodName: "Ping",
-			Handler:    _Directory_Ping_Handler,
+			Handler:    _Dir_Ping_Handler,
 		},
 		{
 			MethodName: "Lookup",
-			Handler:    _Directory_Lookup_Handler,
+			Handler:    _Dir_Lookup_Handler,
 		},
 		{
 			MethodName: "Put",
-			Handler:    _Directory_Put_Handler,
+			Handler:    _Dir_Put_Handler,
 		},
 		{
 			MethodName: "MakeDirectory",
-			Handler:    _Directory_MakeDirectory_Handler,
+			Handler:    _Dir_MakeDirectory_Handler,
 		},
 		{
 			MethodName: "Glob",
-			Handler:    _Directory_Glob_Handler,
+			Handler:    _Dir_Glob_Handler,
 		},
 		{
 			MethodName: "Delete",
-			Handler:    _Directory_Delete_Handler,
+			Handler:    _Dir_Delete_Handler,
 		},
 		{
 			MethodName: "WhichAccess",
-			Handler:    _Directory_WhichAccess_Handler,
+			Handler:    _Dir_WhichAccess_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1270,64 +1270,64 @@ var _Directory_serviceDesc = grpc.ServiceDesc{
 func init() { proto1.RegisterFile("upspin.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 943 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe4, 0x56, 0x5f, 0x6f, 0xdb, 0x36,
-	0x10, 0xaf, 0x6a, 0x3b, 0xb6, 0x2e, 0x2e, 0xe2, 0x30, 0x59, 0xe3, 0x28, 0x69, 0x10, 0xb0, 0x2b,
-	0xd6, 0x21, 0x69, 0xb2, 0x3a, 0x2f, 0x7b, 0x19, 0xba, 0x2c, 0xcd, 0xb2, 0x62, 0xdd, 0x60, 0x28,
-	0x08, 0xb6, 0xa7, 0x05, 0x8a, 0xcc, 0x3a, 0x82, 0x5d, 0x52, 0xa3, 0x28, 0x0c, 0xfe, 0x70, 0x7b,
-	0xdd, 0xf7, 0xd8, 0x37, 0x19, 0x28, 0x52, 0x14, 0x25, 0x4b, 0x5e, 0xfb, 0x9c, 0x27, 0x8b, 0xc7,
-	0xfb, 0xc7, 0xdf, 0xfd, 0xee, 0xce, 0xd0, 0x4f, 0xe3, 0x24, 0x8e, 0xe8, 0x49, 0xcc, 0x99, 0x60,
-	0xa8, 0x93, 0xfd, 0xe0, 0x0b, 0xe8, 0x5d, 0xd2, 0x49, 0xcc, 0x22, 0x2a, 0xd0, 0x3e, 0xb8, 0x82,
-	0x07, 0x34, 0x89, 0x19, 0x17, 0x43, 0xe7, 0xd0, 0x79, 0xd9, 0xf1, 0x0b, 0x01, 0xda, 0x85, 0x1e,
-	0x25, 0xe2, 0x36, 0x98, 0x4c, 0xf8, 0xf0, 0xf1, 0xa1, 0xf3, 0xd2, 0xf5, 0xbb, 0x94, 0x88, 0xf3,
-	0xc9, 0x84, 0xe3, 0x1b, 0xe8, 0xbd, 0x67, 0x61, 0x20, 0x22, 0x46, 0xd1, 0x11, 0xf4, 0x88, 0x76,
-	0x98, 0xf9, 0x58, 0x1f, 0x6d, 0xa8, 0x88, 0x27, 0x79, 0x1c, 0xdf, 0x28, 0xc8, 0x88, 0x9c, 0x7c,
-	0x20, 0x9c, 0xd0, 0x90, 0x68, 0xa7, 0x85, 0x00, 0x0b, 0xd8, 0x3a, 0x4f, 0xc5, 0x3d, 0xa1, 0x22,
-	0x0a, 0x03, 0x41, 0x7c, 0xf2, 0x67, 0x4a, 0x12, 0x81, 0xf6, 0xc0, 0x4d, 0x13, 0xc2, 0x6f, 0x69,
-	0xf0, 0x91, 0x64, 0x21, 0x5c, 0xbf, 0x27, 0x05, 0xbf, 0x06, 0x1f, 0x09, 0x1a, 0x40, 0x8b, 0xb2,
-	0xbf, 0xb4, 0x2f, 0xf9, 0x89, 0x4e, 0xc0, 0x4d, 0xa2, 0x29, 0x0d, 0x44, 0xca, 0xc9, 0xb0, 0x95,
-	0x65, 0x34, 0xd0, 0x19, 0x5d, 0xe7, 0x72, 0xbf, 0x50, 0xc1, 0x5f, 0x81, 0x6b, 0xe4, 0xa8, 0x0f,
-	0x0e, 0xd7, 0x31, 0x1c, 0x2e, 0x4f, 0x89, 0x76, 0xed, 0x24, 0xf8, 0x07, 0xd8, 0x2e, 0xa7, 0x97,
-	0xc4, 0x8c, 0x26, 0x04, 0x6d, 0x43, 0x47, 0xb0, 0x19, 0xa1, 0xda, 0x4e, 0x1d, 0xa4, 0xf4, 0x92,
-	0x73, 0xa6, 0xb0, 0xeb, 0xfb, 0x1d, 0x22, 0x0f, 0xf8, 0x18, 0x06, 0x17, 0x8c, 0x7e, 0x88, 0xa6,
-	0x32, 0x09, 0xfd, 0xbe, 0x21, 0x74, 0x59, 0x2c, 0xb1, 0x4c, 0x86, 0xce, 0x61, 0x4b, 0xe2, 0xac,
-	0x8f, 0xf8, 0x6b, 0xd8, 0xb4, 0xb4, 0x8b, 0x70, 0xca, 0xb1, 0x63, 0x3b, 0xde, 0x84, 0x0d, 0x83,
-	0xb7, 0xf2, 0x8b, 0xdf, 0xc0, 0xa0, 0x10, 0x69, 0xe3, 0xcf, 0xa9, 0x16, 0x1e, 0xc1, 0xfa, 0x38,
-	0xa2, 0xd3, 0x3c, 0xcf, 0xe7, 0xf0, 0x24, 0x8e, 0xe8, 0xf4, 0x36, 0x91, 0x67, 0x59, 0x40, 0x45,
-	0x99, 0xbe, 0x14, 0x5e, 0x6b, 0x19, 0x3e, 0x83, 0xbe, 0xb2, 0xd1, 0x01, 0x3f, 0xc9, 0xe8, 0x14,
-	0x36, 0xae, 0x05, 0xe3, 0xe4, 0x8a, 0xe4, 0xc9, 0x97, 0x99, 0xe2, 0x54, 0x99, 0x32, 0x83, 0x41,
-	0x61, 0xa0, 0x23, 0x21, 0x68, 0x4f, 0x02, 0x11, 0x68, 0x58, 0xb2, 0x6f, 0xf4, 0x0a, 0xdc, 0xb9,
-	0x26, 0xaa, 0x2c, 0x64, 0xcb, 0x7a, 0x6f, 0x4e, 0x60, 0xbf, 0xd0, 0x28, 0xa0, 0x6d, 0xd9, 0xd0,
-	0xbe, 0xd0, 0xd9, 0x8d, 0x53, 0x93, 0x5d, 0x4d, 0x2c, 0xfc, 0xa3, 0xce, 0x29, 0x53, 0xd3, 0x39,
-	0xad, 0x7c, 0x45, 0x03, 0x45, 0x46, 0x80, 0x32, 0x3f, 0x6f, 0xc9, 0x9c, 0x14, 0x4d, 0xb0, 0x1a,
-	0x8f, 0x23, 0xd8, 0x2a, 0xd9, 0xac, 0xa4, 0xca, 0x29, 0x6c, 0xde, 0x24, 0x84, 0xbf, 0x67, 0x6c,
-	0x96, 0xc6, 0xb9, 0x7f, 0x0f, 0x7a, 0x37, 0xba, 0xa7, 0xaa, 0x3d, 0x86, 0x17, 0x80, 0x6c, 0x03,
-	0xed, 0xfc, 0x15, 0xb8, 0x39, 0x67, 0x14, 0x71, 0x6b, 0xb8, 0xe4, 0xe6, 0x5c, 0x4a, 0xd0, 0x01,
-	0xc0, 0x38, 0xbd, 0x9b, 0x47, 0xe1, 0xcf, 0x64, 0xa1, 0x6a, 0xe1, 0xfa, 0x10, 0x1b, 0x49, 0x03,
-	0xf6, 0xc7, 0xf0, 0xf4, 0x6d, 0xc4, 0x49, 0x28, 0x18, 0x5f, 0x94, 0x13, 0x46, 0xd0, 0xb6, 0x92,
-	0x6d, 0xcb, 0xe1, 0x80, 0x2f, 0x61, 0x67, 0x49, 0xdb, 0x82, 0x82, 0x0a, 0xbe, 0x30, 0x50, 0xc8,
-	0x43, 0x43, 0x05, 0x8e, 0x60, 0xcb, 0xb8, 0xb1, 0x8a, 0x5e, 0xeb, 0x02, 0x1f, 0xc3, 0x76, 0x59,
-	0x79, 0x25, 0xf6, 0x67, 0xf0, 0xcc, 0x68, 0xff, 0x12, 0xcc, 0x88, 0x39, 0xac, 0x7a, 0x56, 0x08,
-	0x07, 0x4d, 0x46, 0x45, 0x5b, 0xe7, 0x7c, 0xae, 0xb4, 0xb5, 0xa1, 0x79, 0x2f, 0xa7, 0x79, 0xc3,
-	0xa3, 0xbf, 0xb1, 0xde, 0x71, 0x35, 0x67, 0x77, 0xd6, 0x74, 0x1a, 0x07, 0x42, 0x10, 0x9e, 0xcf,
-	0xb7, 0x6e, 0xac, 0x8e, 0xf8, 0x0a, 0xbe, 0xa8, 0x58, 0xe8, 0x6c, 0x86, 0xd0, 0x95, 0x40, 0x45,
-	0x44, 0xf1, 0xa2, 0xef, 0x77, 0x89, 0x3a, 0x36, 0x0e, 0xc5, 0xa2, 0xc8, 0x65, 0xd6, 0xd7, 0xa1,
-	0x71, 0x6a, 0x15, 0xf9, 0x93, 0xf8, 0xfe, 0x1a, 0xf6, 0x8c, 0xc1, 0x6f, 0xf7, 0x51, 0x78, 0x7f,
-	0x1e, 0x86, 0x24, 0x49, 0x56, 0xc5, 0xf8, 0x09, 0xf6, 0xeb, 0x4d, 0x8a, 0x59, 0x53, 0xb5, 0xa9,
-	0x7f, 0xdb, 0xe8, 0xef, 0x16, 0x74, 0xb2, 0xd6, 0x44, 0xef, 0xa0, 0x6f, 0xaf, 0x0f, 0xe4, 0xe9,
-	0x0a, 0xd5, 0xac, 0x3c, 0x6f, 0xaf, 0xf6, 0x4e, 0x05, 0xc7, 0x8f, 0xd0, 0xf7, 0xe0, 0x9a, 0xbd,
-	0x80, 0x76, 0xb4, 0x6e, 0x75, 0xaf, 0x78, 0xc3, 0xe5, 0x0b, 0xe3, 0xe1, 0x3b, 0xeb, 0x6f, 0xc0,
-	0xd3, 0x6a, 0xd7, 0x6a, 0xfb, 0x9d, 0x25, 0xb9, 0x31, 0x7f, 0x0d, 0x6d, 0x39, 0xe5, 0x11, 0xd2,
-	0x2a, 0xd6, 0x9a, 0xf0, 0xb6, 0x4a, 0x32, 0x63, 0xf2, 0x2d, 0xb4, 0xae, 0x48, 0x11, 0xac, 0x32,
-	0xef, 0x4d, 0xb0, 0xea, 0x58, 0x57, 0x96, 0xe3, 0xb4, 0x62, 0x59, 0xb4, 0x65, 0xd9, 0xd2, 0xea,
-	0x40, 0xfc, 0x08, 0x9d, 0xc3, 0x9a, 0x62, 0x08, 0xda, 0xb5, 0x95, 0x4a, 0x1c, 0xf3, 0xbc, 0xba,
-	0xab, 0xdc, 0xc5, 0xe8, 0x9f, 0xc7, 0xd0, 0x96, 0xc3, 0xef, 0xa1, 0x97, 0xef, 0x0d, 0xac, 0xa9,
-	0x89, 0x8a, 0xf2, 0xbc, 0x96, 0x76, 0x88, 0xb7, 0x5b, 0x73, 0x63, 0x80, 0xfc, 0xb7, 0x03, 0xae,
-	0xe9, 0xa9, 0x87, 0x8e, 0xe6, 0x3b, 0x83, 0xe6, 0x33, 0xad, 0x50, 0xbf, 0xe5, 0xbc, 0x83, 0xa6,
-	0x6b, 0xeb, 0xf9, 0x59, 0x77, 0x78, 0x55, 0x45, 0xab, 0x43, 0xf6, 0x6a, 0xef, 0x8c, 0x87, 0x3f,
-	0xe0, 0x49, 0x69, 0xab, 0xa0, 0x2f, 0xab, 0xfa, 0x75, 0x9b, 0xca, 0x7b, 0xf1, 0x3f, 0x5a, 0xc6,
-	0xff, 0x05, 0xb4, 0xe5, 0x7a, 0x40, 0x4b, 0x69, 0x58, 0x6b, 0xc6, 0xdb, 0xaf, 0xbf, 0xb4, 0x11,
-	0xd3, 0xad, 0xbc, 0x84, 0x58, 0xb9, 0x9d, 0x0f, 0x9a, 0xae, 0x8d, 0xab, 0xdf, 0x61, 0xdd, 0x9a,
-	0xe9, 0x08, 0x57, 0x0d, 0x96, 0x77, 0x84, 0xf7, 0x7c, 0xa5, 0x4e, 0xee, 0xf9, 0x6e, 0x2d, 0xd3,
-	0x3a, 0xfb, 0x2f, 0x00, 0x00, 0xff, 0xff, 0x7f, 0x13, 0x3a, 0x42, 0x7a, 0x0d, 0x00, 0x00,
+	// 942 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe4, 0x55, 0xdd, 0x6e, 0xdb, 0x36,
+	0x14, 0x8e, 0x6a, 0x3b, 0xb6, 0x4e, 0x9c, 0xc5, 0x61, 0xd2, 0x44, 0x51, 0xbb, 0x2e, 0xe0, 0xd0,
+	0xae, 0x5d, 0x96, 0x14, 0x73, 0x07, 0x6c, 0x37, 0x45, 0xe6, 0xd6, 0x5d, 0x30, 0x2c, 0x1b, 0x0c,
+	0x05, 0xc1, 0xae, 0x86, 0x40, 0xb1, 0xd9, 0x84, 0x48, 0x4a, 0x6a, 0x14, 0x85, 0xc1, 0xcf, 0xb1,
+	0xe7, 0xd9, 0xed, 0x9e, 0x6b, 0xa0, 0x48, 0x51, 0x94, 0x2c, 0x1b, 0xdd, 0x75, 0xaf, 0x24, 0x1e,
+	0x9e, 0x9f, 0x8f, 0x1f, 0xbf, 0x73, 0x08, 0xfd, 0x2c, 0x49, 0x13, 0xca, 0x4e, 0x12, 0xc1, 0x25,
+	0x47, 0x9d, 0xfc, 0x83, 0xdf, 0x42, 0xef, 0x1d, 0x9b, 0x25, 0x9c, 0x32, 0x89, 0x1e, 0x83, 0x2f,
+	0x45, 0xcc, 0xd2, 0x84, 0x0b, 0x19, 0x78, 0x87, 0xde, 0xf3, 0x4e, 0x54, 0x1a, 0xd0, 0x01, 0xf4,
+	0x18, 0x91, 0x57, 0xf1, 0x6c, 0x26, 0x82, 0x07, 0x87, 0xde, 0x73, 0x3f, 0xea, 0x32, 0x22, 0x47,
+	0xb3, 0x99, 0xc0, 0x97, 0xd0, 0x3b, 0xe7, 0xd3, 0x58, 0x52, 0xce, 0xd0, 0x11, 0xf4, 0x88, 0x49,
+	0x98, 0xe7, 0xd8, 0x18, 0x6e, 0xe9, 0x8a, 0x27, 0x45, 0x9d, 0xc8, 0x3a, 0xa8, 0x8a, 0x82, 0xbc,
+	0x27, 0x82, 0xb0, 0x29, 0x31, 0x49, 0x4b, 0x03, 0x96, 0xb0, 0x33, 0xca, 0xe4, 0x2d, 0x61, 0x92,
+	0x4e, 0x63, 0x49, 0x22, 0xf2, 0x67, 0x46, 0x52, 0x89, 0x1e, 0x81, 0x9f, 0xa5, 0x44, 0x5c, 0xb1,
+	0xf8, 0x03, 0xc9, 0x4b, 0xf8, 0x51, 0x4f, 0x19, 0x7e, 0x8b, 0x3f, 0x10, 0x34, 0x80, 0x16, 0xe3,
+	0x7f, 0x99, 0x5c, 0xea, 0x17, 0x9d, 0x80, 0x9f, 0xd2, 0x1b, 0x16, 0xcb, 0x4c, 0x90, 0xa0, 0x95,
+	0x23, 0x1a, 0x18, 0x44, 0x17, 0x85, 0x3d, 0x2a, 0x5d, 0xf0, 0x57, 0xe0, 0x5b, 0x3b, 0xea, 0x83,
+	0x27, 0x4c, 0x0d, 0x4f, 0xa8, 0x55, 0x6a, 0x52, 0x7b, 0x29, 0x7e, 0x03, 0xbb, 0x55, 0x78, 0x69,
+	0xc2, 0x59, 0x4a, 0xd0, 0x2e, 0x74, 0x24, 0xbf, 0x23, 0xcc, 0xc4, 0xe9, 0x85, 0xb2, 0xbe, 0x13,
+	0x82, 0x6b, 0xee, 0xfa, 0x51, 0x87, 0xa8, 0x05, 0xfe, 0x06, 0x06, 0x6f, 0x39, 0x7b, 0x4f, 0x6f,
+	0x14, 0x08, 0x73, 0xbe, 0x00, 0xba, 0x3c, 0x51, 0x5c, 0xa6, 0x81, 0x77, 0xd8, 0x52, 0x3c, 0x9b,
+	0x25, 0x7e, 0x01, 0xdb, 0x8e, 0x77, 0x59, 0x4e, 0x27, 0xf6, 0xdc, 0xc4, 0xdb, 0xb0, 0x65, 0xf9,
+	0xd6, 0x79, 0xf1, 0x29, 0x0c, 0x4a, 0x93, 0x09, 0xfe, 0x3f, 0xb7, 0x85, 0x87, 0xb0, 0x31, 0xa1,
+	0xec, 0xa6, 0xc0, 0xf9, 0x25, 0x6c, 0x26, 0x94, 0xdd, 0x5c, 0xa5, 0x6a, 0xad, 0x2e, 0x50, 0x4b,
+	0xa6, 0xaf, 0x8c, 0x17, 0xc6, 0x86, 0x5f, 0x41, 0x5f, 0xc7, 0x98, 0x82, 0x1f, 0x15, 0xf4, 0x12,
+	0xb6, 0x2e, 0x24, 0x17, 0xe4, 0x8c, 0x14, 0xe0, 0xab, 0x4a, 0xf1, 0xea, 0x4a, 0xb9, 0x83, 0x41,
+	0x19, 0x60, 0x2a, 0x21, 0x68, 0xcf, 0x62, 0x19, 0x1b, 0x5a, 0xf2, 0x7f, 0x74, 0x0c, 0xfe, 0xbd,
+	0x11, 0xaa, 0xba, 0xc8, 0x96, 0x73, 0xde, 0x42, 0xc0, 0x51, 0xe9, 0x51, 0x52, 0xdb, 0x72, 0xa9,
+	0x7d, 0x6a, 0xd0, 0x4d, 0x32, 0x8b, 0xae, 0xa1, 0x16, 0xfe, 0xc9, 0x60, 0xca, 0xdd, 0x0c, 0xa6,
+	0x95, 0xa7, 0x58, 0x22, 0x91, 0x21, 0xa0, 0x3c, 0xcf, 0x98, 0xdc, 0x93, 0xb2, 0x09, 0x56, 0xf3,
+	0x71, 0x04, 0x3b, 0x95, 0x98, 0x95, 0x52, 0x79, 0x09, 0xdb, 0x97, 0x29, 0x11, 0xe7, 0x9c, 0xdf,
+	0x65, 0x49, 0x91, 0x3f, 0x84, 0xde, 0xa5, 0xe9, 0xa9, 0x7a, 0x8f, 0xe1, 0x39, 0x20, 0x37, 0xc0,
+	0x24, 0x3f, 0x06, 0xbf, 0xd0, 0x8c, 0x16, 0x6e, 0x83, 0x96, 0xfc, 0x42, 0x4b, 0x29, 0x7a, 0x02,
+	0x30, 0xc9, 0xae, 0xef, 0xe9, 0xf4, 0x17, 0x32, 0xd7, 0x77, 0xe1, 0x47, 0x90, 0x58, 0xcb, 0x12,
+	0xee, 0x9f, 0xc1, 0x60, 0x4c, 0x6b, 0x50, 0x11, 0xb4, 0x1d, 0x98, 0x6d, 0x35, 0x16, 0xf0, 0x29,
+	0x6c, 0x3b, 0x7e, 0xce, 0xf1, 0x99, 0x14, 0x73, 0x7b, 0x7c, 0xb5, 0x58, 0xc2, 0xfa, 0x53, 0xd8,
+	0x1c, 0x53, 0xe1, 0x5c, 0x71, 0x63, 0x30, 0x7e, 0x06, 0x9f, 0x15, 0x6e, 0x2b, 0x39, 0x3e, 0x86,
+	0xfd, 0x31, 0x15, 0xbf, 0xc6, 0x77, 0x64, 0x4c, 0x05, 0x99, 0x4a, 0x2e, 0xe6, 0xab, 0xe0, 0xff,
+	0x01, 0xc1, 0xa2, 0x7b, 0xd9, 0xb2, 0x85, 0x56, 0x6b, 0x2d, 0x6b, 0x25, 0xdc, 0x2b, 0x24, 0xbc,
+	0xe4, 0x70, 0x5f, 0xe7, 0xa8, 0xcf, 0xee, 0xf9, 0xb5, 0x33, 0x73, 0x26, 0xb1, 0x94, 0x44, 0x14,
+	0x53, 0xab, 0x9b, 0xe8, 0x25, 0x1e, 0xc1, 0x96, 0xf5, 0x35, 0x08, 0x02, 0xe8, 0x2a, 0x2a, 0x28,
+	0xd1, 0xf7, 0xdc, 0x8f, 0xba, 0x44, 0x2f, 0x97, 0x94, 0xd3, 0x97, 0x56, 0xd5, 0x6f, 0xd3, 0xa9,
+	0x5f, 0xe4, 0x97, 0xf6, 0x51, 0x9a, 0x3d, 0x82, 0x87, 0x63, 0x2a, 0x7e, 0xbf, 0xa5, 0xd3, 0xdb,
+	0xd1, 0x74, 0x4a, 0xd2, 0x74, 0x55, 0xde, 0x37, 0xb0, 0x57, 0x77, 0x2e, 0x67, 0x44, 0xdd, 0xbb,
+	0xf9, 0x0c, 0xc3, 0x7f, 0x5a, 0xd0, 0xc9, 0x5b, 0x0a, 0xfd, 0x0c, 0x7d, 0x77, 0xec, 0xa3, 0xd0,
+	0xb0, 0xdf, 0xf0, 0x54, 0x85, 0x8f, 0x1a, 0xf7, 0x74, 0x71, 0xbc, 0x86, 0x7e, 0x04, 0xdf, 0xce,
+	0x73, 0xb4, 0x6f, 0x7c, 0xeb, 0xef, 0x41, 0x18, 0x2c, 0x6e, 0xd8, 0x0c, 0xaf, 0x9d, 0xe7, 0x7b,
+	0xaf, 0xde, 0x6d, 0x26, 0x7e, 0x7f, 0xc1, 0x6e, 0xc3, 0xbf, 0x85, 0xb6, 0x9a, 0xce, 0x08, 0x19,
+	0x17, 0x67, 0xbc, 0x87, 0x3b, 0x15, 0x9b, 0x0d, 0xf9, 0x01, 0x5a, 0x67, 0xa4, 0x2c, 0x56, 0x9b,
+	0xd3, 0xb6, 0x58, 0x7d, 0x1c, 0xeb, 0xc8, 0x49, 0x56, 0x8b, 0x2c, 0x1b, 0xac, 0x1a, 0xe9, 0x74,
+	0x14, 0x5e, 0x43, 0x23, 0x58, 0xd7, 0xaa, 0x40, 0x07, 0xae, 0x53, 0x45, 0x51, 0x61, 0xd8, 0xb4,
+	0x55, 0xa4, 0x18, 0xfe, 0xfb, 0x00, 0xda, 0x6a, 0x68, 0x7d, 0xea, 0xd7, 0x77, 0x0a, 0xeb, 0x7a,
+	0x2a, 0xa2, 0x02, 0xd7, 0xc2, 0xec, 0x0f, 0x0f, 0x1a, 0x76, 0x2c, 0x91, 0x7f, 0x77, 0xa0, 0x35,
+	0xa6, 0x9f, 0x3c, 0x8f, 0xaf, 0x2d, 0x8f, 0x45, 0xde, 0xfa, 0xbb, 0x64, 0x01, 0x2f, 0x3c, 0x44,
+	0x78, 0x0d, 0x7d, 0xa7, 0x7b, 0x61, 0xb7, 0x74, 0x71, 0x3a, 0xe1, 0x61, 0xcd, 0x6a, 0xa3, 0x22,
+	0xd8, 0xac, 0xbc, 0x09, 0xe8, 0x49, 0xe9, 0xd9, 0xf4, 0xb6, 0x84, 0x5f, 0x2c, 0xdd, 0xb7, 0x39,
+	0xbf, 0x87, 0xb6, 0x1a, 0xee, 0xc8, 0x29, 0xea, 0x3c, 0x0c, 0xe1, 0x5e, 0xdd, 0xec, 0x32, 0x60,
+	0x9a, 0xd2, 0x61, 0xa0, 0xda, 0x92, 0xc1, 0xe2, 0x86, 0x0d, 0x3f, 0x87, 0x0d, 0x67, 0x22, 0xa3,
+	0xc7, 0xa5, 0xeb, 0xe2, 0x54, 0x0f, 0x3f, 0x5f, 0xb2, 0x5b, 0x64, 0xbb, 0x5e, 0xcf, 0xf7, 0x5f,
+	0xfd, 0x17, 0x00, 0x00, 0xff, 0xff, 0x0e, 0xc7, 0x13, 0x04, 0xe4, 0x0c, 0x00, 0x00,
 }

@@ -19,7 +19,7 @@ import (
 	gContext "golang.org/x/net/context"
 )
 
-// DirServer is a SecureServer that serves the local file system's directory structure as an upspin.Directory gRPC server.
+// DirServer is a SecureServer that serves the local file system's directory structure as an upspin.DirServer gRPC server.
 type DirServer struct {
 	context  upspin.Context
 	endpoint upspin.Endpoint
@@ -29,8 +29,8 @@ type DirServer struct {
 
 var (
 	// Empty structs we can allocate just once.
-	putResponse       proto.DirectoryPutResponse
-	deleteResponse    proto.DirectoryDeleteResponse
+	putResponse       proto.DirPutResponse
+	deleteResponse    proto.DirDeleteResponse
 	configureResponse proto.ConfigureResponse
 )
 
@@ -43,8 +43,8 @@ func NewDirServer(context upspin.Context, endpoint upspin.Endpoint, server grpca
 	return s
 }
 
-// Lookup implements upspin.Directory.
-func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirectoryLookupRequest) (*proto.DirectoryLookupResponse, error) {
+// Lookup implements upspin.DirServer.
+func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.DirLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
 
 	parsed, err := path.Parse(upspin.PathName(req.Name))
@@ -60,14 +60,14 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirectoryLookupReque
 	if err != nil {
 		return s.errLookup(err)
 	}
-	return &proto.DirectoryLookupResponse{
+	return &proto.DirLookupResponse{
 		Entry: data,
 	}, nil
 }
 
 // errLookup returns an error for a Lookup.
-func (s *DirServer) errLookup(err error) (*proto.DirectoryLookupResponse, error) {
-	return &proto.DirectoryLookupResponse{
+func (s *DirServer) errLookup(err error) (*proto.DirLookupResponse, error) {
+	return &proto.DirLookupResponse{
 		Error: errors.MarshalError(err),
 	}, nil
 }
@@ -104,35 +104,35 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 	return entry.Marshal()
 }
 
-// Put implements upspin.Directory.
-func (s *DirServer) Put(ctx gContext.Context, req *proto.DirectoryPutRequest) (*proto.DirectoryPutResponse, error) {
+// Put implements upspin.DirServer.
+func (s *DirServer) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.DirPutResponse, error) {
 	var entry upspin.DirEntry
 	_, err := entry.Unmarshal(req.Entry)
 	if err != nil {
-		return &proto.DirectoryPutResponse{
+		return &proto.DirPutResponse{
 			Error: errors.MarshalError(errors.E("Put", err)),
 		}, nil
 	}
 	log.Printf("Put %s", entry.Name)
 
 	err = errors.E("Put", errors.Permission, errors.Str("read-only name space"))
-	return &proto.DirectoryPutResponse{
+	return &proto.DirPutResponse{
 		Error: errors.MarshalError(err),
 	}, nil
 }
 
-// MakeDirectory implements upspin.Directory.
-func (s *DirServer) MakeDirectory(ctx gContext.Context, req *proto.DirectoryMakeDirectoryRequest) (*proto.DirectoryMakeDirectoryResponse, error) {
+// MakeDirectory implements upspin.DirServer.
+func (s *DirServer) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectoryRequest) (*proto.DirMakeDirectoryResponse, error) {
 	log.Printf("MakeDirectory %q", req.Name)
 
 	err := errors.E("MakeDirectory", errors.Permission, errors.Str("read-only name space"))
-	return &proto.DirectoryMakeDirectoryResponse{
+	return &proto.DirMakeDirectoryResponse{
 		Error: errors.MarshalError(err),
 	}, nil
 }
 
-// Glob implements upspin.Directory.
-func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) (*proto.DirectoryGlobResponse, error) {
+// Glob implements upspin.DirServer.
+func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.DirGlobResponse, error) {
 	log.Printf("Glob %q", req.Pattern)
 
 	parsed, err := path.Parse(upspin.PathName(req.Pattern))
@@ -155,34 +155,34 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirectoryGlobRequest) 
 			return errGlob(err)
 		}
 	}
-	return &proto.DirectoryGlobResponse{
+	return &proto.DirGlobResponse{
 		Entries: entries,
 	}, nil
 }
 
 // errGlob returns an error for a Glob.
-func errGlob(err error) (*proto.DirectoryGlobResponse, error) {
-	return &proto.DirectoryGlobResponse{
+func errGlob(err error) (*proto.DirGlobResponse, error) {
+	return &proto.DirGlobResponse{
 		Error: errors.MarshalError(errors.E("Get", err)),
 	}, nil
 }
 
-// Delete implements upspin.Directory.
-func (s *DirServer) Delete(ctx gContext.Context, req *proto.DirectoryDeleteRequest) (*proto.DirectoryDeleteResponse, error) {
+// Delete implements upspin.DirServer.
+func (s *DirServer) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.DirDeleteResponse, error) {
 	log.Printf("Delete %q", req.Name)
 
 	err := errors.E("Delete", errors.Permission, errors.Str("read-only name space"))
-	return &proto.DirectoryDeleteResponse{
+	return &proto.DirDeleteResponse{
 		Error: errors.MarshalError(err),
 	}, nil
 }
 
-// WhichAccess implements upspin.Directory.
-func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirectoryWhichAccessRequest) (*proto.DirectoryWhichAccessResponse, error) {
+// WhichAccess implements upspin.DirServer.
+func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.DirWhichAccessResponse, error) {
 	log.Printf("WhichAccess %q", req.Name)
 
 	err := errors.E("WhichAccess", errors.Invalid, errors.Str("unimplemented"))
-	return &proto.DirectoryWhichAccessResponse{
+	return &proto.DirWhichAccessResponse{
 		Error: errors.MarshalError(err),
 	}, nil
 }
