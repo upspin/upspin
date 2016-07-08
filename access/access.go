@@ -157,6 +157,13 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 	if s.Err() != nil {
 		return nil, s.Err()
 	}
+
+	// owner has all rights, even if not explicitly listed
+	for i, _ := range a.list {
+		own, _ := path.Parse(upspin.PathName(a.owner) + "/") // TODO Is there some easier way to do the cast?
+		a.list[i] = mergeUser(a.list[i], own)
+	}
+
 	// Sort the lists.
 	for _, r := range a.list {
 		sort.Sort(sliceOfParsed(r))
@@ -669,6 +676,16 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 			}
 		}
 	}
+}
+
+// mergeUser adds src into dst if not already there and returns the updated dst.
+func mergeUser(dst []path.Parsed, src path.Parsed) []path.Parsed {
+	for _, d := range dst {
+		if d.String() == src.String() {
+			return dst
+		}
+	}
+	return append(dst, src)
 }
 
 // mergeUsers merges src into dst skipping duplicates and returns the updated dst.
