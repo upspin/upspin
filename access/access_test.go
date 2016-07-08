@@ -265,9 +265,7 @@ func TestHasAccessWithGroups(t *testing.T) {
 		groupText = "# My family\n sister@me.com, brother@me.com\n"
 	)
 
-	loaded := false
 	loadTest := func(name upspin.PathName) ([]byte, error) {
-		loaded = true
 		switch name {
 		case "me@here.com/Group/family":
 			return []byte("# My family\n sister@me.com, brother@me.com\n"), nil
