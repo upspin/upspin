@@ -18,19 +18,13 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
 	// Load required transports
 	_ "upspin.io/user/transports"
-)
-
-var (
-	httpsAddr    = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	config       = flag.String("config", "", "Comma-separated list of configuration options (key=value) for this server")
-	logFile      = flag.String("logfile", "userserver", "Name of the log file on GCP or empty for no GCP logging")
 )
 
 // The upspin username for this server.
@@ -48,11 +42,11 @@ type Server struct {
 func main() {
 	flag.Parse()
 
-	if *logFile != "" {
-		log.Connect("google.com:upspin", *logFile)
+	if flags.LogFile != "" {
+		log.Connect("google.com:upspin", flags.LogFile)
 	}
 
-	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
+	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
@@ -67,8 +61,8 @@ func main() {
 	}
 
 	// If there are configuration options, set them now
-	if *config != "" {
-		opts := strings.Split(*config, ",")
+	if flags.Config != "" {
+		opts := strings.Split(flags.Config, ",")
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
 		err = user.Configure(opts...)
@@ -96,7 +90,7 @@ func main() {
 	proto.RegisterUserServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe("userserver", *httpsAddr, nil)
+	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
 }
 
 func (s *Server) internalLookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
