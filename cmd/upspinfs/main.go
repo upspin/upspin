@@ -65,20 +65,20 @@ func main() {
 
 	// Hack for testing
 	if *testFlag != "" {
-		user, err := bind.User(context, context.UserEndpoint())
+		key, err := bind.KeyServer(context, context.KeyEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
-		testUser, ok := user.(*inprocess.Service)
+		testKey, ok := key.(*inprocess.Service)
 		if !ok {
-			log.Debug.Fatal("Not a inprocess.Service")
+			log.Debug.Fatal("key server not a inprocess.Service")
 		}
 
 		dir, err := bind.DirServer(context, context.DirEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
-		if err := testUser.Install(upspin.UserName(*testFlag), dir); err != nil {
+		if err := testKey.Install(upspin.UserName(*testFlag), dir); err != nil {
 			log.Debug.Print(err)
 		}
 	}

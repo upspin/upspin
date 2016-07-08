@@ -19,9 +19,9 @@ func TestSwitch(t *testing.T) {
 	ctx := testfixtures.NewSimpleContext()
 
 	// These should succeed.
-	du := &dummyUser{}
-	if err := RegisterUser(upspin.InProcess, du); err != nil {
-		t.Errorf("registerUser failed")
+	du := &dummyKey{}
+	if err := RegisterKeyServer(upspin.InProcess, du); err != nil {
+		t.Errorf("RegisterKeyServer failed")
 	}
 	if err := RegisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err != nil {
 		t.Errorf("RegisterStoreServer failed")
@@ -31,8 +31,8 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should fail.
-	if err := RegisterUser(upspin.InProcess, &dummyUser{}); err == nil {
-		t.Errorf("registerUser should have failed")
+	if err := RegisterKeyServer(upspin.InProcess, &dummyKey{}); err == nil {
+		t.Errorf("RegisterKeyServer should have failed")
 	}
 	if err := RegisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err == nil {
 		t.Errorf("RegisterStoreServer should have failed")
@@ -42,7 +42,7 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should all work.
-	if err := ReregisterUser(upspin.InProcess, du); err != nil {
+	if err := ReregisterKeyServer(upspin.InProcess, du); err != nil {
 		t.Error(err)
 	}
 	if err := ReregisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err != nil {
@@ -74,13 +74,13 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("Expected %q error, got %q", expectedError, err)
 	}
 
-	// Test caching. dummyUser has a dial count.
+	// Test caching. dummyKey has a dial count.
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"}
-	u1, err := User(ctx, e) // Dials once.
+	u1, err := KeyServer(ctx, e) // Dials once.
 	if err != nil {
 		t.Fatal(err)
 	}
-	u2, err := User(ctx, e) // Does not dial; hits the cache.
+	u2, err := KeyServer(ctx, e) // Does not dial; hits the cache.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,14 +92,14 @@ func TestSwitch(t *testing.T) {
 	}
 	// But a different context forces a new dial.
 	ctx2 := testfixtures.NewSimpleContext().SetUserName(upspin.UserName("bob@foo.com"))
-	u3, err := User(ctx2, e) // Dials again,
+	u3, err := KeyServer(ctx2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
 	if du.dialed != 2 {
 		t.Errorf("Expected two dials. Got %d", du.dialed)
 	}
-	if u1.(*dummyUser).pingCount != 1 {
+	if u1.(*dummyKey).pingCount != 1 {
 		t.Errorf("Expected only one ping. Got %d", du.pingCount)
 	}
 
@@ -121,10 +121,10 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("Expected only no user service in the cache.")
 	}
 
-	if u1.(*dummyUser).closeCalled != 1 {
+	if u1.(*dummyKey).closeCalled != 1 {
 		t.Errorf("Expected close to be called once on u1")
 	}
-	if u3.(*dummyUser).closeCalled != 1 {
+	if u3.(*dummyKey).closeCalled != 1 {
 		t.Errorf("Expected close to be called once on u3")
 	}
 }
@@ -166,8 +166,8 @@ func TestConcurrency(t *testing.T) {
 }
 
 // Some dummy interfaces.
-type dummyUser struct {
-	testfixtures.DummyUser
+type dummyKey struct {
+	testfixtures.DummyKey
 	endpoint    upspin.Endpoint
 	dialed      int
 	pingCount   int
@@ -183,22 +183,22 @@ type dummyDirServer struct {
 	endpoint upspin.Endpoint
 }
 
-func (d *dummyUser) Ping() bool {
+func (d *dummyKey) Ping() bool {
 	d.pingCount++
 	return true
 }
 
-func (d *dummyUser) Close() {
+func (d *dummyKey) Close() {
 	d.closeCalled++
 }
 
-func (d *dummyUser) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	user := &dummyUser{endpoint: e}
+func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	user := &dummyKey{endpoint: e}
 	d.dialed++
 	return user, nil
 }
 
-func (d *dummyUser) Endpoint() upspin.Endpoint {
+func (d *dummyKey) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
 

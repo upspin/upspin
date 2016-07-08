@@ -19,8 +19,8 @@ func NewSimpleContext() upspin.Context {
 	}
 }
 
-// User implements upspin.Context.
-func (ctx *simpleContext) User() upspin.User {
+// KeyServer implements upspin.Context.
+func (ctx *simpleContext) KeyServer() upspin.KeyServer {
 	return nil
 }
 
@@ -65,12 +65,12 @@ func (ctx *simpleContext) SetPacking(p upspin.Packing) upspin.Context {
 }
 
 // UserEndpoint implements upspin.Context.
-func (ctx *simpleContext) UserEndpoint() upspin.Endpoint {
+func (ctx *simpleContext) KeyEndpoint() upspin.Endpoint {
 	return ep0
 }
 
 // SetUserEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetUserEndpoint(e upspin.Endpoint) upspin.Context {
+func (ctx *simpleContext) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
 	return ctx
 }
 

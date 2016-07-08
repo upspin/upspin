@@ -214,10 +214,8 @@ const (
 	EEPack Packing = 20
 )
 
-// User service.
-
-// The User interface provides access to public information about users.
-type User interface {
+// The KeyServer interface provides access to public information about users.
+type KeyServer interface {
 	Dialer
 	Service
 
@@ -228,7 +226,7 @@ type User interface {
 	Lookup(userName UserName) ([]Endpoint, []PublicKey, error)
 }
 
-// A PublicKey can be given to anyone and used for authenticating a User.
+// A PublicKey can be given to anyone and used for authenticating a user.
 type PublicKey string
 
 // DirServer manages the name space for one or more users.
@@ -452,7 +450,7 @@ type File interface {
 }
 
 // Context contains client information such as the user's keys and
-// preferred User, DirServer, and StoreServer endpoints.
+// preferred KeyServer, DirServer, and StoreServer endpoints.
 type Context interface {
 	// The name of the user requesting access.
 	UserName() UserName
@@ -474,15 +472,15 @@ type Context interface {
 	// SetPacking sets the Packing.
 	SetPacking(Packing) Context
 
-	// UserEndpoint is the endpoint of the User service to contact to evaluate names.
-	UserEndpoint() Endpoint
+	// KeyEndpoint is the endpoint of the KeyServer to contact to retrieve keys.
+	KeyEndpoint() Endpoint
 
-	// SetUserEndpoint sets the UserEndpoint.
-	SetUserEndpoint(Endpoint) Context
+	// SetKeyEndpoint sets the KeyEndpoint.
+	SetKeyEndpoint(Endpoint) Context
 
-	// User returns a a User service bound to UserEndpoint().  In the event of an
-	// error binding, all subsequent calls on the User service will return errors.
-	User() User
+	// KeyServer returns a KeyServer instance bound to KeyEndpoint.  In the event of an
+	// error binding, all subsequent calls on the KeyServer will return errors.
+	KeyServer() KeyServer
 
 	// DirEndpoint is the endpoint of the DirServer in which to place new data items.  It is
 	// usually the location of the user's root.
@@ -493,7 +491,7 @@ type Context interface {
 
 	// DirServer returns a DirServer instance responsible for the path. If the path is
 	// empty, it will return a DirServer service bound to DirEndpoint. In the
-	// event of an error binding, all subsequent calls on the User service will return errors.
+	// event of an error binding, all subsequent calls on the DirServer will return errors.
 	DirServer(PathName) DirServer
 
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
@@ -502,8 +500,8 @@ type Context interface {
 	// SetStoreEndpoint sets the StoreEndpoint.
 	SetStoreEndpoint(Endpoint) Context
 
-	// StoreServer returns a a StoreServer instance bound to StoreEndpoint().  In the event of an
-	// error binding, all subsequent calls on the User service will return errors.
+	// StoreServer returns a a StoreServer instance bound to StoreEndpoint.  In the event of an
+	// error binding, all subsequent calls on the StoreServer will return errors.
 	StoreServer() StoreServer
 
 	// Copy creates a copy of the receiver context.
@@ -511,7 +509,7 @@ type Context interface {
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
-// service type (User, DirServer, StoreServer) implements the methods of
+// service type (KeyServer, DirServer, StoreServer) implements the methods of
 // the Dialer interface. These methods are not used directly by
 // clients. Instead, clients should use the methods of
 // the Upspin "bind" package to connect to services.

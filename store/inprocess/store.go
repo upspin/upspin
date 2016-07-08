@@ -111,9 +111,9 @@ func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 		s.data.endpoint = e
 		s.data.serviceOwner = context.UserName()
 	}
-	thisUser := *s // Make a copy.
-	thisUser.userName = context.UserName()
-	return &thisUser, nil
+	thisStore := *s // Make a copy.
+	thisStore.userName = context.UserName()
+	return &thisStore, nil
 }
 
 // Ping implements upspin.Service.

@@ -51,8 +51,8 @@ type ClientConfig struct {
 	// PrivateKey is the user's private key.
 	PrivateKey string
 
-	// UserNetAddr is the upspin.NetAddr of an upspin.Remote User endpoint.
-	UserNetAddr string
+	// KeyNetAddr is the upspin.NetAddr of an upspin.Remote KeyServer endpoint.
+	KeyNetAddr string
 
 	// StoreNetAddr is the upspin.NetAddr of an upspin.Remote StoreServer endpoint.
 	StoreNetAddr string
@@ -123,9 +123,9 @@ func NewClient(config *ClientConfig) (*Client, error) {
 	ctx.SetDirEndpoint(de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(config.UserNetAddr),
+		NetAddr:   upspin.NetAddr(config.KeyNetAddr),
 	}
-	ctx.SetUserEndpoint(ue)
+	ctx.SetKeyEndpoint(ue)
 	return &Client{
 		c: client.New(ctx),
 	}, nil

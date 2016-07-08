@@ -11,16 +11,16 @@ import (
 	"upspin.io/upspin"
 )
 
-// unassigned implements upspin.User.
+// unassigned implements upspin.KeyServer.
 type unassigned struct {
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.User = (*unassigned)(nil)
+var _ upspin.KeyServer = (*unassigned)(nil)
 
 var unassignedErr = errors.Str("request to unassigned service")
 
-// Lookup implements upspin.User.Lookup.
+// Lookup implements upspin.KeysServer.Lookup.
 func (*unassigned) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
 	return nil, nil, errors.E("Lookup", errors.Invalid, unassignedErr)
 }
@@ -61,5 +61,5 @@ func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Ser
 const transport = upspin.Unassigned
 
 func init() {
-	bind.RegisterUser(transport, &unassigned{})
+	bind.RegisterKeyServer(transport, &unassigned{})
 }
