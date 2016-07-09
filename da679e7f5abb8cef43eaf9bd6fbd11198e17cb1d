@@ -16,6 +16,24 @@
       "revId": "da679e7f5abb8cef43eaf9bd6fbd11198e17cb1d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba052000_86ae6b96",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-09T00:43:43Z",
+      "side": 1,
+      "message": "Because it\u0027s a bit cumbersome to pull it out of config. Config is pushed straight into the server transport. It\u0027s only present if it\u0027s GCP. Someone could use a GCE instance (therefore a \"project\") and use an inprocess endpoint or something else that does not require a config or does not use GCP (say, if we stored data on a DB somewhere else).\n\nOne possible \"fix\" to this duplication is to construct part of config with this flag, if it\u0027s present and config does not override it. But it\u0027s also cumbersome.\n\nWe need to re-think our configs and deploy scripts. None of this is simple and intuitive and today\u0027s migration shows that it\u0027s not only this or that flag that is the problem. The whole thing needs more thought.",
+      "parentUuid": "3a405042_709a1030",
+      "revId": "da679e7f5abb8cef43eaf9bd6fbd11198e17cb1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
