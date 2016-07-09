@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba052000_468f433e",
+        "filename": "key/usercache/cache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-09T00:37:09Z",
+      "side": 1,
+      "message": "Delete or use t.Logf please.",
+      "revId": "ba122a57cb7da3f52c8285edda01cc7a8f3ab2af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
