@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a405042_709a1030",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-09T00:28:32Z",
+      "side": 1,
+      "message": "why are we adding a new flag when -config already includes this information?",
+      "revId": "da679e7f5abb8cef43eaf9bd6fbd11198e17cb1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
