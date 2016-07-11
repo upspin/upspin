@@ -9,6 +9,8 @@ package storagetest
 import (
 	"errors"
 
+	"io"
+
 	"upspin.io/cloud/storage"
 )
 
@@ -20,6 +22,11 @@ var _ storage.Storage = (*DummyStorage)(nil)
 
 // PutLocalFile implements storage.Storage.
 func (m *DummyStorage) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
+	return "", nil
+}
+
+// PutFromReader implements storage.Storage.
+func (m *DummyStorage) PutFromReader(r io.Reader, ref string) (refLink string, error error) {
 	return "", nil
 }
 

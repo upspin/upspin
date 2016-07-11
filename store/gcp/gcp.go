@@ -98,6 +98,17 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	return upspin.Reference(ref), nil
 }
 
+// PutFile implements upspin.StoreServer.
+func (s *server) PutFile(file upspin.File) (upspin.Reference, error) {
+	const PutFile = "PutFile"
+	// TODO: check that userName has permission to write to this store server.
+	mu.RLock()
+	if !s.isConfigured() {
+		return "", errors.E(PutFile, errNotConfigured)
+	}
+	return "", nil
+}
+
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	fmt.Printf("context is %v\n", s.context)

@@ -86,6 +86,11 @@ func (d *DummyStoreServer) Put(data []byte) (upspin.Reference, error) {
 	return "", nil
 }
 
+// PutFile implements upspin.StoreServer.
+func (d *DummyStoreServer) PutFile(file upspin.File) (upspin.Reference, error) {
+	return "", nil
+}
+
 // Delete implements upspin.StoreServer.
 func (d *DummyStoreServer) Delete(ref upspin.Reference) error {
 	return nil

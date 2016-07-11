@@ -7,6 +7,7 @@ package gcs
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -61,16 +62,21 @@ var _ storage.Storage = (*gcsImpl)(nil)
 
 // PutLocalFile implements Storage.
 func (gcs *gcsImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	// Insert an object into a bucket.
-	object := &gcsBE.Object{Name: ref}
 	file, err := os.Open(srcLocalFilename)
 	if err != nil {
 		log.Printf("Error opening: %v", err)
 		return "", err
 	}
 	defer file.Close()
+	return gcs.PutFromReader(file, ref)
+}
+
+// PutFromReader implements Storage.
+func (gcs *gcsImpl) PutFromReader(reader io.Reader, ref string) (refLink string, error error) {
+	// Insert an object into a bucket.
+	object := &gcsBE.Object{Name: ref}
 	acl := string(gcs.defaultWriteACL)
-	res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(file).PredefinedAcl(acl).Do()
+	res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(reader).PredefinedAcl(acl).Do()
 	if err == nil {
 		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
 	} else {
