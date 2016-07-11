@@ -110,6 +110,11 @@ func (s *Store) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.E("Put", errors.Str("not implemented"))
 }
 
+// PutStream implements StoreServer.
+func (s *Store) PutStream(r io.Reader) (upspin.Reference, error) {
+	return "", errors.E("PutStream", errors.Str("not implemented"))
+}
+
 // Delete implements StoreServer.
 func (s *Store) Delete(ref upspin.Reference) error {
 	return errors.E("Delete", errors.Str("not implemented"))

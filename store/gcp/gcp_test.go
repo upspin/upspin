@@ -6,6 +6,7 @@ package gcp
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -85,6 +86,27 @@ func TestGetFromLocalCache(t *testing.T) {
 	}
 	if string(data) != contents {
 		t.Errorf("Expected contents %q, got %q", contents, data)
+	}
+}
+
+func TestPutStream(t *testing.T) {
+	s := newStoreServer()
+	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+
+	_, err := s.server.PutStream(bytes.NewBufferString("some random data"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Verify backend was called.
+	newRef := cloudClient.(*testGCP).renamedTo
+	putRef := cloudClient.(*testGCP).putReaderRef
+
+	shaOfContents := "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+	if newRef != shaOfContents {
+		t.Errorf("Expected new ref to be %q, got %q", shaOfContents, newRef)
+	}
+	if !strings.Contains(putRef, "tmp:") {
+		t.Errorf("Expected put ref to have 'tmp:' prefix, got %q", putRef)
 	}
 }
 
@@ -226,11 +248,13 @@ type storeTestServer struct {
 
 type testGCP struct {
 	storagetest.ExpectGet
-	ch         chan bool
-	deletedRef string
+	ch           chan bool
+	deletedRef   string
+	putReaderRef string
+	renamedTo    string
 }
 
-// PutLocalFile implements GCP.
+// PutLocalFile implements storage.Storage.
 func (t *testGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	go func() {
 		time.Sleep(50 * time.Millisecond) // Allow time for the cache purge to happen.
@@ -240,8 +264,20 @@ func (t *testGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink str
 	return "", nil
 }
 
-// Delete implements GCP.
+// Delete implements storage.Storage.
 func (t *testGCP) Delete(ref string) error {
 	t.deletedRef = ref // Capture the ref
 	return nil
+}
+
+// PutFromReader implements storage.Storage.
+func (t *testGCP) PutFromReader(r io.Reader, ref string) (refLink string, error error) {
+	t.putReaderRef = ref
+	return "", nil
+}
+
+// Rename implements storage.Storage.
+func (t *testGCP) Rename(oldRef, newRef string) (refLink string, error error) {
+	t.renamedTo = newRef
+	return "", nil
 }

@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"io"
+
 	"upspin.io/cloud/storage"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -158,6 +160,11 @@ var _ storage.Storage = (*gcpMock)(nil)
 
 // PutLocalFile implements storage.Storage.
 func (g *gcpMock) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
+	panic("not used")
+}
+
+// PutFromReader implements storage.Storage.
+func (g *gcpMock) PutFromReader(r io.Reader, ref string) (refLink string, error error) {
 	panic("not used")
 }
 

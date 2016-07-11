@@ -24,6 +24,8 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
+	"io"
+
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
 )
@@ -164,6 +166,43 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 		Reference: string(ref),
 	}
 	return resp, nil
+}
+
+// PutStream implements upspin.StoreServer.
+func (s *Server) PutStream(stream proto.Store_PutStreamServer) error {
+	store, err := s.storeFor(stream.Context())
+	if err != nil {
+		return err
+	}
+
+	f := NewBufferedChannel(8 * 1024 * 1024)
+	go func() {
+		for {
+			req, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				// TODO: Ideally, we would call f.SetError(err) here.
+				log.Error.Printf("Error receiving stream: %s", err)
+				return
+			}
+			_, err = f.Write(req.Data)
+			if err != nil {
+				// This only happens if the file is closed. If there are new failure modes,
+				// the reader will notice the error as well.
+				log.Error.Printf("Error writing to buffered channel file: %s", err)
+				return
+			}
+		}
+		f.Close()
+	}()
+	ref, err := store.PutStream(f)
+	if err != nil {
+		log.Printf("PutFile failed: %v", err)
+		return stream.SendAndClose(&proto.StorePutResponse{Error: errors.MarshalError(err)})
+	}
+	return stream.SendAndClose(&proto.StorePutResponse{Reference: string(ref)})
 }
 
 // Delete implements upspin.StoreServer.

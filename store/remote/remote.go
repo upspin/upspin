@@ -9,6 +9,8 @@ package remote
 import (
 	gContext "golang.org/x/net/context"
 
+	"io"
+
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -52,7 +54,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 }
 
 // Put implements upspin.StoreServer.Put.
-// Directories are created with MakeDirectory.
+// Directories are created with DirServer.MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
@@ -66,6 +68,53 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 		return "", errors.E("Put", errors.IO, err)
 	}
 	r.LastActivity()
+	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
+}
+
+// PutStream implements upspin.StoreServer.PutStream.
+func (r *remote) PutStream(reader io.Reader) (upspin.Reference, error) {
+	const PutFile = "PutFile"
+	gCtx, err := r.NewAuthContext()
+	if err != nil {
+		return "", err
+	}
+	stream, err := r.storeClient.PutStream(gCtx)
+	if err != nil {
+		return "", errors.E(PutFile, errors.IO, err)
+	}
+
+	// Send 8MB at a time.
+	buf := make([]byte, 8*1024*1024)
+	firstRead := true
+	for {
+		n, readErr := reader.Read(buf)
+		// We handle n > 0 before checking for errors, as recommended by the io.Reader interface.
+		if n >= 0 {
+			// Allow sending zero-byte files, but only during the first read, and particularly not
+			// at the end when the file might be EOF.
+			if n > 0 || n == 0 && firstRead {
+				req := &proto.StorePutRequest{
+					Data: buf[:n],
+				}
+				err := stream.Send(req)
+				if err != nil {
+					return "", errors.E(PutFile, errors.IO, err)
+				}
+			}
+			firstRead = false
+		}
+		if readErr == io.EOF {
+			break
+		}
+		if readErr != nil {
+			return "", errors.E(PutFile, errors.IO, err)
+		}
+	}
+	r.LastActivity()
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		return "", errors.E(PutFile, errors.IO, err)
+	}
 	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
 }
 

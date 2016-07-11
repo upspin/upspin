@@ -6,6 +6,7 @@ package upspin
 
 import (
 	"crypto/elliptic"
+	"io"
 	"math/big"
 )
 
@@ -359,6 +360,11 @@ type StoreServer interface {
 	// Put puts the data into the store and returns the reference
 	// to be used to retrieve it.
 	Put(data []byte) (Reference, error)
+
+	// PutStream puts the contents of r into the store and returns the reference
+	// to be used to retrieve it. It is equivalent to Put without the need to have
+	// all the data in memory.
+	PutStream(r io.Reader) (Reference, error)
 
 	// Delete permanently removes all storage space associated
 	// with the reference. After a successful Delete, calls to Get with the

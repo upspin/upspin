@@ -97,6 +97,7 @@ service Store {
 
     rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
     rpc Put (StorePutRequest) returns (StorePutResponse) {}
+    rpc PutStream (stream StorePutRequest) returns (StorePutResponse) {}
     rpc Delete (StoreDeleteRequest) returns (StoreDeleteResponse) {}
 }
 

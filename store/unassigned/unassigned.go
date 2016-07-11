@@ -6,6 +6,8 @@
 package unassigned
 
 import (
+	"io"
+
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -28,6 +30,11 @@ func (*unassigned) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) 
 // Put implements upspin.StoreServer.Put.
 func (*unassigned) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.E("Put", errors.Invalid, unassignedErr)
+}
+
+// PutStream implements upspin.StoreServer.PutStream.
+func (*unassigned) PutStream(r io.Reader) (upspin.Reference, error) {
+	return "", errors.E("PutStream", errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.StoreServer.Delete.

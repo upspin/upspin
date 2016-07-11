@@ -96,7 +96,9 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	if err != nil {
 		return zeroLoc, err
 	}
-	ref, err := store.Put(cipher)
+	// TODO: this is just a hack to test PutFile. It's still using memory.
+	f := file.Readable(c, name, cipher)
+	ref, err := store.PutStream(f)
 	if err != nil {
 		return zeroLoc, err
 	}

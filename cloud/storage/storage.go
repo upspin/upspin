@@ -7,12 +7,17 @@
 package storage
 
 import (
+	"io"
 	"strings"
 	"time"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
+
+// TODO: this interface will be broken up into two in the next CL:
+// storage.Blob - for Store; just a simple GCS-like blob storage interface
+// storage.Hierarchical - for Dir; a more elaborate API for storing dir entries.
 
 // Storage is a low-level storage interface for services to store their data permanently.
 type Storage interface {
@@ -21,6 +26,16 @@ type Storage interface {
 	// from the storage backend, or empty if the backend does not offer
 	// direct links into it.
 	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
+
+	// PutFromReader reads the contents from an io.Reader and puts them using ref
+	// as the name. It may return a direct link for downloading the contents
+	// from the storage backend, or empty if the backend does not offer
+	// direct links into it.
+	PutFromReader(reader io.Reader, ref string) (refLink string, error error)
+
+	// Rename renames oldRef to newRef and optionally returns a new refLink for downloading
+	// from the backend.
+	Rename(oldRef, newRef string) (newRefLink string, error error)
 
 	// Get returns a link for downloading ref from the storage backend,
 	// if the ref is publicly readable and the backend offers direct links.

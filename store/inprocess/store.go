@@ -6,6 +6,7 @@
 package inprocess
 
 import (
+	"io"
 	"sync"
 
 	"upspin.io/bind"
@@ -56,6 +57,11 @@ func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 	s.data.blob[ref] = ciphertext
 	s.data.mu.Unlock()
 	return ref, nil
+}
+
+// PutStream implements upspin.StoreServer
+func (s *service) PutStream(r io.Reader) (upspin.Reference, error) {
+	return "", errors.E("PutStream", errors.Invalid, errors.Str("not implemented"))
 }
 
 // Delete implements upspin.StoreServer
