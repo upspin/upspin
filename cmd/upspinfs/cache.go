@@ -42,7 +42,7 @@ type cachedFile struct {
 	inStore bool   // True if this is a cached version of something in the store.
 	dirty   bool   // True if it needs to be written back on close.
 
-	file *os.File           // The in the clear cached file.
+	file *File              // The in the clear cached file.
 	de   []*upspin.DirEntry // If this is a directory, its contents.
 }
 
@@ -58,7 +58,7 @@ func newCache(context upspin.Context, dir string) *cache {
 	return c
 }
 
-// mkTemp returns the name of a new emporary file.
+// mkTemp returns the name of a new temporary file.
 func (c *cache) mkTemp() string {
 	c.Lock()
 	next := c.next
@@ -76,7 +76,7 @@ func (c *cache) create(h *handle) error {
 	cf := &cachedFile{c: c, dirty: true}
 	cf.fname = c.mkTemp()
 	var err error
-	if cf.file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+	if cf.file, err = OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 		return err
 	}
 	h.n.cf = cf
@@ -120,7 +120,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		// be reused.
 		if de.Metadata.Packing() != upspin.PlainPack {
 			// Look for a dirty cached version.
-			cf.file, err = os.OpenFile(cf.fname, os.O_RDWR, 0700)
+			cf.file, err = OpenFile(cf.fname, os.O_RDWR, 0700)
 			if err == nil {
 				h.flags = flags
 				if info, err := cf.file.Stat(); err == nil {
@@ -167,14 +167,14 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		}
 		cleartext = cleartext[:rlen]
 		// Save a copy of the cleartext in the local file system.
-		var file *os.File
-		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+		var file *File
+		if file, err = OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 			os.Mkdir(cdir, 0777)
-			if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+			if file, err = OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 				return err
 			}
 		}
-		if wlen, err := file.Write(cleartext); err != nil || rlen != wlen {
+		if wlen, err := file.WriteAt(cleartext, 0); err != nil || rlen != wlen {
 			file.Close()
 			return err
 		}
@@ -190,9 +190,11 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 // close is called when the last handle for a node has been closed.
 // Called with node locked.
 func (cf *cachedFile) close() {
-	if cf != nil && cf.file != nil {
-		cf.file.Close()
+	if cf == nil || cf.file == nil {
+		return
 	}
+	log.Debug.Printf("closing %s\n", cf.fname)
+	cf.file.Close()
 }
 
 // makeDirty writes the cached file to the store if it is dirty. Called with node locked.
@@ -210,7 +212,7 @@ func (cf *cachedFile) markDirty() error {
 
 	// Need to rename it since it no longer represents what's in the store.
 	fname := cf.c.mkTemp()
-	err := os.Rename(cf.fname, fname)
+	err := Rename(cf.fname, fname)
 	if err != nil {
 		return err
 	}
@@ -280,9 +282,9 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	// Rename it to reflect the actual reference in the store so that new
 	// opens will find the cached version.
 	cdir, fname := cf.c.cacheName(loc, n.uname)
-	if err := os.Rename(cf.fname, fname); err != nil {
+	if err := Rename(cf.fname, fname); err != nil {
 		os.Mkdir(cdir, 0700)
-		if err := os.Rename(cf.fname, fname); err != nil {
+		if err := Rename(cf.fname, fname); err != nil {
 			return err
 		}
 	}
