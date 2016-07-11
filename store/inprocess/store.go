@@ -58,6 +58,11 @@ func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
 	return ref, nil
 }
 
+// PutFile implements upspin.StoreServer
+func (s *service) PutFile(file upspin.File) (upspin.Reference, error) {
+	return "", errors.E("PutFile", errors.Invalid, errors.Str("not implemented"))
+}
+
 // Delete implements upspin.StoreServer
 func (s *service) Delete(ref upspin.Reference) error {
 	s.data.mu.Lock()

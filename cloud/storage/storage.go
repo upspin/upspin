@@ -7,6 +7,7 @@
 package storage
 
 import (
+	"io"
 	"strings"
 	"time"
 
@@ -21,6 +22,12 @@ type Storage interface {
 	// from the storage backend, or empty if the backend does not offer
 	// direct links into it.
 	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
+
+	// PutFromReader reads the contents from an io.Reader and puts them using ref
+	// as the name. It may return a direct link for downloading the contents
+	// from the storage backend, or empty if the backend does not offer
+	// direct links into it.
+	PutFromReader(reader io.Reader, ref string) (refLink string, error error)
 
 	// Get returns a link for downloading ref from the storage backend,
 	// if the ref is publicly readable and the backend offers direct links.

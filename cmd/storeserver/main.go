@@ -166,6 +166,14 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	return resp, nil
 }
 
+// PutFile implements upspin.StoreServer.
+func (s *Server) PutFile(stream proto.Store_PutFileServer) error {
+	//
+	for {
+		//		req, err := stream.Recv()
+	}
+}
+
 // Delete implements upspin.StoreServer.
 func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)

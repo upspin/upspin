@@ -13,6 +13,8 @@ import (
 	// Required when importing this package.
 	_ "github.com/lib/pq"
 
+	"io"
+
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -73,6 +75,11 @@ func (p *postgres) Put(ref string, contents []byte) (refLink string, error error
 		return "", errors.E(Put, errors.IO, errors.Errorf("spurious updates in SQL DB, expected 1, got %d", n))
 	}
 	return "", nil
+}
+
+// PutFromReader implements storage.Storage.
+func (p *postgres) PutFromReader(r io.Reader, ref string) (refLink string, error error) {
+	return "", errors.E("Postgres.PutFromReader", errors.Syntax, errors.Str("PutFromReader not implemented for postgres"))
 }
 
 // ListPrefix implements storage.Storage.

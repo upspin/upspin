@@ -1172,6 +1172,9 @@ func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error
 func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 	panic("unimplemented")
 }
+func (d *dummyStore) PutFile(file upspin.File) (upspin.Reference, error) {
+	panic("unimplemented")
+}
 func (d *dummyStore) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	panic("unimplemented")
 }
