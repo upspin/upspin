@@ -7,7 +7,6 @@ package main
 import (
 	"crypto/sha1"
 	"fmt"
-	"os"
 	filepath "path"
 	"strings"
 	"sync"
@@ -18,6 +17,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client"
+	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -42,7 +42,7 @@ type cachedFile struct {
 	inStore bool   // True if this is a cached version of something in the store.
 	dirty   bool   // True if it needs to be written back on close.
 
-	file *os.File           // The in the clear cached file.
+	file *os.File           // The cached file.
 	de   []*upspin.DirEntry // If this is a directory, its contents.
 }
 
@@ -58,7 +58,7 @@ func newCache(context upspin.Context, dir string) *cache {
 	return c
 }
 
-// mkTemp returns the name of a new emporary file.
+// mkTemp returns the name of a new temporary file.
 func (c *cache) mkTemp() string {
 	c.Lock()
 	next := c.next
@@ -174,7 +174,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 				return err
 			}
 		}
-		if wlen, err := file.Write(cleartext); err != nil || rlen != wlen {
+		if wlen, err := file.WriteAt(cleartext, 0); err != nil || rlen != wlen {
 			file.Close()
 			return err
 		}
@@ -190,9 +190,10 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 // close is called when the last handle for a node has been closed.
 // Called with node locked.
 func (cf *cachedFile) close() {
-	if cf != nil && cf.file != nil {
-		cf.file.Close()
+	if cf == nil || cf.file == nil {
+		return
 	}
+	cf.file.Close()
 }
 
 // makeDirty writes the cached file to the store if it is dirty. Called with node locked.
@@ -314,7 +315,7 @@ func (c *cache) putRedirect(n *node, target string) error {
 			return nil
 		}
 	}
-	if _, err := file.Write([]byte(target)); err != nil {
+	if _, err := file.WriteAt([]byte(target), 0); err != nil {
 		os.Remove(fname)
 	}
 	file.Close()
