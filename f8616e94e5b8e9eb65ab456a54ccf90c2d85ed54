@@ -46,6 +46,30 @@
       "revId": "f8616e94e5b8e9eb65ab456a54ccf90c2d85ed54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_280d4f90",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-11T22:37:05Z",
+      "side": 1,
+      "message": "It was my concern but perhaps I\u0027m just being silly.  I would have been happy with the log level being an integer but that boat has sailed I guess.",
+      "parentUuid": "7acc887d_c8c2233c",
+      "range": {
+        "startLine": 183,
+        "startChar": 6,
+        "endLine": 183,
+        "endChar": 24
+      },
+      "revId": "f8616e94e5b8e9eb65ab456a54ccf90c2d85ed54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
