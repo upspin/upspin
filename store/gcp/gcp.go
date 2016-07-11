@@ -7,6 +7,7 @@ package gcp
 
 import (
 	"bytes"
+	"crypto/rand"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -98,9 +99,38 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	return upspin.Reference(ref), nil
 }
 
+// PutFile implements upspin.StoreServer.
+func (s *server) PutFile(file upspin.File) (upspin.Reference, error) {
+	const PutFile = "PutFile"
+	// TODO: check that userName has permission to write to this store server.
+	mu.RLock()
+	defer mu.RUnlock()
+	if !s.isConfigured() {
+		return "", errors.E(PutFile, errNotConfigured)
+	}
+	sha := sha256key.NewShaReader(file)
+	var buf [32]byte
+	n, err := rand.Read(buf[:])
+	if n != len(buf) {
+		return "", errors.E(PutFile, errors.IO, errors.Str("can't generate temporary name"))
+	}
+	if err != nil {
+		return "", errors.E(PutFile, errors.IO, err)
+	}
+	tempRef := fmt.Sprintf("tmp:%X", buf[:])
+	_, err = cloudClient.PutFromReader(sha, tempRef)
+	if err != nil {
+		// TODO: remove partial file if error?
+		return "", errors.E(PutFile, errors.IO, err)
+	}
+	// Now rename to the permanent ref:
+	ref := sha.EncodedSum()
+	_, err = cloudClient.Rename(tempRef, ref)
+	return upspin.Reference(ref), err
+}
+
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	fmt.Printf("context is %v\n", s.context)
 	file, loc, err := s.innerGet(s.context.UserName(), ref)
 	if err != nil {
 		return nil, nil, err

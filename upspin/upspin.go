@@ -360,6 +360,11 @@ type StoreServer interface {
 	// to be used to retrieve it.
 	Put(data []byte) (Reference, error)
 
+	// PutFile puts the contents of a file into the store and returns the reference
+	// to be used to retrieve it. It is equivalent to Put without the need to have
+	// all the data in memory.
+	PutFile(File) (Reference, error)
+
 	// Delete permanently removes all storage space associated
 	// with the reference. After a successful Delete, calls to Get with the
 	// same key will fail. If a key is not found, an error is
