@@ -11,6 +11,8 @@ import (
 	// Required when importing this package.
 	_ "github.com/go-sql-driver/mysql"
 
+	"io"
+
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -50,6 +52,11 @@ func (p *mysql) Download(ref string) ([]byte, error) {
 	return []byte(data), nil
 }
 
+// Rename implements Storage.
+func (p *mysql) Rename(oldRef, newRef string) (newRefLink string, error error) {
+	return "", errors.E("Rename", errors.Syntax, errors.Str("not implemented"))
+}
+
 // Put implements storage.Storage.
 func (p *mysql) Put(ref string, contents []byte) (refLink string, error error) {
 	const Put = "SQL.Put"
@@ -69,6 +76,11 @@ func (p *mysql) Put(ref string, contents []byte) (refLink string, error error) {
 		return "", errors.E(Put, errors.IO, errors.Errorf("spurious updates in DB: %d, but [1-2] expected", n))
 	}
 	return "", nil
+}
+
+// PutFromReader implements storage.Storage.
+func (p *mysql) PutFromReader(r io.Reader, ref string) (refLink string, error error) {
+	return "", errors.E("PutFromReader", errors.Syntax, errors.Str("PutFromReader not implemented for mysql"))
 }
 
 // ListPrefix implements storage.Storage.

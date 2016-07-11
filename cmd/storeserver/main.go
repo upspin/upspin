@@ -24,6 +24,8 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
+	"io"
+
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
 )
@@ -158,6 +160,41 @@ func (s *Server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	ref, err := store.Put(req.Data)
 	if err != nil {
 		log.Printf("Put %.30q failed: %v", req.Data, err)
+		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
+	}
+	resp := &proto.StorePutResponse{
+		Reference: string(ref),
+	}
+	return resp, nil
+}
+
+// PutFile implements upspin.StoreServer.
+func (s *Server) PutFile(stream proto.Store_PutFileServer) error {
+	store, err := s.storeFor(stream.Context())
+	if err != nil {
+		return nil, err
+	}
+
+	f := NewBufferedChannelFile("does not matter", 8*1024*1024)
+	go func() {
+		for {
+			req, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				return err
+			}
+			_, err = f.Write(req.Data)
+			if err != nil {
+				return err
+			}
+		}
+		f.Close()
+	}()
+	ref, err := store.PutFile(f)
+	if err != nil {
+		log.Printf("PutFile failed: %v", err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StorePutResponse{

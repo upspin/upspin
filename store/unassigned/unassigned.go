@@ -30,6 +30,11 @@ func (*unassigned) Put(data []byte) (upspin.Reference, error) {
 	return "", errors.E("Put", errors.Invalid, unassignedErr)
 }
 
+// PutFile implements upspin.StoreServer.PutFile.
+func (*unassigned) PutFile(file upspin.File) (upspin.Reference, error) {
+	return "", errors.E("PutFile", errors.Invalid, unassignedErr)
+}
+
 // Delete implements upspin.StoreServer.Delete.
 func (*unassigned) Delete(ref upspin.Reference) error {
 	return errors.E("Delete", errors.Invalid, unassignedErr)

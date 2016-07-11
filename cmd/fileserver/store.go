@@ -87,6 +87,11 @@ func (s *StoreServer) Put(ctx gContext.Context, req *proto.StorePutRequest) (*pr
 	}, nil
 }
 
+// PutFile implements upspin.StoreServer.
+func (s *StoreServer) PutFile(stream proto.Store_PutFileServer) error {
+	return errors.E("PutFile", errors.Syntax, errors.Str("PutFile not implemented in fileserver"))
+}
+
 // Delete implements upspin.StoreServer.
 func (s *StoreServer) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	log.Printf("Delete %q", req.Reference)
