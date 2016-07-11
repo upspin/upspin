@@ -22,6 +22,30 @@
       "revId": "f8616e94e5b8e9eb65ab456a54ccf90c2d85ed54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_c8c2233c",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-11T22:31:56Z",
+      "side": 1,
+      "message": "Maybe not, but it\u0027s the safest. Unless we document that after the first call to log it can\u0027t be changed unless one uses log.SetLevel explicitly. It seems unclean. Are you concerned about performance? I wouldn\u0027t log in places where performance is critical anyway.",
+      "parentUuid": "7acc887d_65f06001",
+      "range": {
+        "startLine": 183,
+        "startChar": 6,
+        "endLine": 183,
+        "endChar": 24
+      },
+      "revId": "f8616e94e5b8e9eb65ab456a54ccf90c2d85ed54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
