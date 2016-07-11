@@ -182,6 +182,7 @@ func (h *handle) freeNoLock() {
 	n := h.n
 	delete(n.handles, h)
 	if len(n.handles) == 0 {
+		log.Debug.Printf("closing cachefile for %s", n.uname)
 		n.cf.close()
 		n.cf = nil
 	}
