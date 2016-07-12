@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7acc887d_f6ab4898",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-12T01:18:28Z",
+      "side": 1,
+      "message": "I would instead create a flag whose value is of type log.Level or else one whose call to the Set method set the default logging level.",
+      "revId": "f8616e94e5b8e9eb65ab456a54ccf90c2d85ed54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7acc887d_65f06001",
         "filename": "log/log.go",
         "patchSetId": 4
