@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7acc887d_2ee38cab",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "Document?\n\nAlso, I\u0027d add a var _ upspin.File \u003d (*File)(nil) so this must implement the upspin File interface. It might come in handy later, I think. But then, you\u0027re missing Seek. I\u0027d just return an error saying it\u0027s not implemented yet.",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_2efc6c3e",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "// OpenFile opens a file...",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_4e9a902f",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "// Rename renames...\n\n(and others below).",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_6e9f541e",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "// Close implements upspin.File",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_aec23cf4",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "Should this be panic?",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7acc887d_ceb6a09b",
+        "filename": "cmd/upspinfs/ose.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-13T00:30:04Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "f02cf7720b924c4ad6618620d0289fae58b50d85",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
