@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	testProjectID  = "upspin"
-	testBucketName = "upspin-test"
+	testProjectID  = "upspin-test"
+	testBucketName = "upspin-test-scratch"
 )
 
 var (
