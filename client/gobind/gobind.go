@@ -102,6 +102,15 @@ func (c *Client) Get(path string) ([]byte, error) {
 	return c.c.Get(upspin.PathName(path))
 }
 
+// Put puts the data as the contents of name and returns its reference in the default location (at the default store).
+func (c *Client) Put(name string, data []byte) (string, error) {
+	loc, err := c.c.Put(upspin.PathName(name), data)
+	if err != nil {
+		return "", err
+	}
+	return string(loc.Reference), nil
+}
+
 // NewClient returns a new Client for a given user's configuration.
 func NewClient(config *ClientConfig) (*Client, error) {
 	ctx := context.New().SetUserName(upspin.UserName(config.UserName)).SetPacking(upspin.EEPack)
