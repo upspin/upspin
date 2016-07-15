@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad7287f_f04bd848",
+        "filename": "log/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-15T00:38:13Z",
+      "side": 0,
+      "message": "I think we should keep the log.Level type; we don\u0027t want users of it to import flag.\nJust write\n\nconst (\n  Ldebug \u003d flags.LogDebug\n  ...\n)",
+      "revId": "dda042ee33dc7693dca988417d0f8ee618b55b1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
