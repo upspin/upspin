@@ -16,6 +16,24 @@
       "revId": "dda042ee33dc7693dca988417d0f8ee618b55b1e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_906ffcaa",
+        "filename": "log/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-15T00:38:43Z",
+      "side": 0,
+      "message": "Sorry, I meant \"level constants\". the type can go",
+      "parentUuid": "7ad7287f_f04bd848",
+      "revId": "dda042ee33dc7693dca988417d0f8ee618b55b1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
