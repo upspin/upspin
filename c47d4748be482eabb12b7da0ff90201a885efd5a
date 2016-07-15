@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_8474dae1",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_70152840",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_30045010",
         "filename": "flags/flags.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-15T00:38:13Z",
       "side": 1,
       "message": "Maybe LogLevelFlag ?",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_a463de27",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "N/A",
+      "parentUuid": "7ad7287f_30045010",
       "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_e45dd663",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "That\u0027s too similar to log.Info, log.Debug, etc. Plus, they\u0027re now in package log, so it would read log.LogInfo.",
+      "parentUuid": "7ad7287f_10014c00",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_b018406f",
         "filename": "flags/flags.go",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2016-07-15T00:38:13Z",
       "side": 1,
       "message": "this needs to be a method on a pointer, or \"l \u003d\" has no effect\nfunc (l *LogLevelFlag) ...",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_24508e49",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_b018406f",
       "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_c4c7f21f",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_901d3c5f",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_d017b43a",
         "filename": "flags/flags.go",
         "patchSetId": 6
@@ -98,6 +188,24 @@
       "writtenOn": "2016-07-15T00:38:13Z",
       "side": 1,
       "message": "%q\nit also doesn\u0027t matter that we can\u0027t use upspin.errors, only the flag package will complain and that\u0027ll happen at program startup. there\u0027s no context",
+      "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_04d2aadd",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-15T17:12:29Z",
+      "side": 1,
+      "message": "Done. \n\nI\u0027m justifying using Errorf, which has been banned except in these types of situation.",
+      "parentUuid": "7ad7287f_d017b43a",
       "revId": "c47d4748be482eabb12b7da0ff90201a885efd5a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
