@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_1988573a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-15T16:42:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_d3185e25",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_730892d2",
         "filename": "cmd/upspinfs/ose/ose.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-15T02:41:33Z",
       "side": 1,
       "message": "needs a package comment. i don\u0027t even know what it might mean from this name.\n\nalso i think it doesn\u0027t belong in the cmd directory, which should be where commands go. either this is a package that belongs on the other side of the house so others can use it (no one should be importing cmd packages) or if not, it should be an internal (cmd/upspinfs/internal/ose) so no one else can import it.",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_5982cf1b",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-15T16:42:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_730892d2",
       "revId": "04962bd6c05a79348263311919c3885061417050",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_c47ff2f0",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-15T16:42:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_19edf7f6",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_9337068a",
         "filename": "cmd/upspinfs/ose/ose.go",
         "patchSetId": 7
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_a4847e24",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-15T16:42:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad7287f_9337068a",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_33273a5b",
         "filename": "cmd/upspinfs/ose/ose.go",
         "patchSetId": 7
@@ -81,6 +153,24 @@
       "writtenOn": "2016-07-15T02:41:33Z",
       "side": 1,
       "message": "at the top of the file, just write\n\nvar mapping \u003d map[string]*File{}\n\nbut: why is this ose.mapping? does this file even compile?",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_048aaa2e",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-15T16:42:29Z",
+      "side": 1,
+      "message": "You misunderstand.  ose here is not the package, it is the global struct in the package (at the top of the file).\n\nI renamed to reduce misunderstandings. I also added an initializer to the struct to get rid of the init().",
+      "parentUuid": "7ad7287f_33273a5b",
       "revId": "04962bd6c05a79348263311919c3885061417050",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
