@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad7287f_d3185e25",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-15T02:41:33Z",
+      "side": 1,
+      "message": "nice typo but s/upspingfs/upspinfs/",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_730892d2",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-15T02:41:33Z",
+      "side": 1,
+      "message": "needs a package comment. i don\u0027t even know what it might mean from this name.\n\nalso i think it doesn\u0027t belong in the cmd directory, which should be where commands go. either this is a package that belongs on the other side of the house so others can use it (no one should be importing cmd packages) or if not, it should be an internal (cmd/upspinfs/internal/ose) so no one else can import it.",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_9337068a",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-15T02:41:33Z",
+      "side": 1,
+      "message": "you don\u0027t need the \u0027int\u0027s here. (they\u0027re not needed in package os either)",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_33273a5b",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-15T02:41:33Z",
+      "side": 1,
+      "message": "at the top of the file, just write\n\nvar mapping \u003d map[string]*File{}\n\nbut: why is this ose.mapping? does this file even compile?",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
