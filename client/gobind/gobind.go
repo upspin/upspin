@@ -1,5 +1,5 @@
 // Package gobind provides experimental Go bindings for a simplified
-// Upspin Client and related data structures in a such a way that languages
+// Upspin Client and related data structures in such a way that languages
 // such as Java and Objective-C can handle and gomobile can export.
 // Currently, gomobile cannot export slices other than byte, so slices are
 // converted to linked lists when necessary. Unsigned types are not supported
@@ -100,6 +100,15 @@ func (c *Client) Glob(pattern string) (*DirEntry, error) {
 // Get returns the contents of a path.
 func (c *Client) Get(path string) ([]byte, error) {
 	return c.c.Get(upspin.PathName(path))
+}
+
+// Put puts the data as the contents of name and returns its reference in the default location (at the default store).
+func (c *Client) Put(name string, data []byte) (string, error) {
+	loc, err := c.c.Put(upspin.PathName(name), data)
+	if err != nil {
+		return "", err
+	}
+	return string(loc.Reference), nil
 }
 
 // NewClient returns a new Client for a given user's configuration.
