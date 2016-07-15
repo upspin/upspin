@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "7ad7287f_19edf7f6",
+        "filename": "cmd/upspinfs/ose/ose.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-15T16:26:13Z",
+      "side": 1,
+      "message": "s/\\.$/ but no integrity protection.\\\n\\\nThis package is intended to help people who do not use\\\nOS-level disk encryption but may lose their device. It\\\nis not a general purpose file encryption package./",
+      "revId": "04962bd6c05a79348263311919c3885061417050",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_9337068a",
         "filename": "cmd/upspinfs/ose/ose.go",
         "patchSetId": 7
