@@ -44,10 +44,6 @@ var state = struct {
 	mapping map[string]*File
 }{mapping: make(map[string]*File)}
 
-func init() {
-	state.mapping = make(map[string]*File)
-}
-
 // File represents an encrypted file.
 type File struct {
 	name string
