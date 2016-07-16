@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad7287f_cac7f81f",
+        "filename": "flags/flags.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-16T00:14:25Z",
+      "side": 1,
+      "message": "\"the logging level\"\n(no need to say \u0027sets\u0027)",
+      "revId": "56636e5e9dca2f2c5602e22e86769bb1cd5cbd5c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad7287f_ca32589b",
+        "filename": "log/log.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-16T00:14:25Z",
+      "side": 1,
+      "message": "this is too complicated and hard to use.\n\nthe const values below are never used anywhere in the clients, so let\u0027s lose them.\nthe type has no purpose outside this package, so lose it.\ni also don\u0027t like CurrentLevel as a function name, and no one uses it either.\n\ni therefore propose:\n\n1) func Default() Logger\nreturns the default (globally-set) logging level, as a Logger.\n\n2) add String() string as a method in the Logger interface so we print the level by printing the Logger, and log.Default() when printed prints the default log level.\n\n3) the global functions all log at default level\n\n4) func SetDefault(string) error\nsets the default logger, defined by the argument string\n\n5) func At(string) Logger\nreturns the logger for the level, defined by the argument string (use a map, and have the nil value be log.Error, that his, have the nil logger be equivalent to Error)\n\nthen in the flags package, there is no log.Level, it just calls SetDefault with the string from the command line.\n\nalmost all use of the logs will be one of these:\n\nlog.Printf() // logs at default level, set by the flags package.\nlog.Infof() // logs at info level.\nlog.At(\"debug\").Printf() // logs at debug level. This will be rare.",
+      "revId": "56636e5e9dca2f2c5602e22e86769bb1cd5cbd5c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
