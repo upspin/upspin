@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"upspin.io/cache"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
 type entry struct {
 	expires time.Time // when the information expires.
-	eps     []upspin.Endpoint
-	pub     []upspin.PublicKey
+	user    *upspin.User
 }
 
 type userCacheContext struct {
@@ -63,30 +63,34 @@ func Global(context upspin.Context) upspin.Context {
 }
 
 // Lookup implements upspin.KeyServer.Lookup.
-func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	v, ok := c.cache.entries.Get(name)
 
 	// If we have an unexpired binding, use it.
 	if ok {
 		if !time.Now().After(v.(*entry).expires) {
 			e := v.(*entry)
-			return e.eps, e.pub, nil
+			return e.user, nil
 		}
 		c.cache.entries.Remove(name)
 	}
 
 	// Not found, look it up.
-	eps, pub, err := c.Context.KeyServer().Lookup(name)
+	u, err := c.Context.KeyServer().Lookup(name)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	e := &entry{
 		expires: time.Now().Add(c.cache.duration),
-		eps:     eps,
-		pub:     pub,
+		user:    u,
 	}
 	c.cache.entries.Add(name, e)
-	return eps, pub, nil
+	return u, nil
+}
+
+// Put implements upspin.KeyServer.Put.
+func (c *userCacheContext) Put(user *upspin.User) error {
+	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
 }
 
 // Dial implements upspin.Service.

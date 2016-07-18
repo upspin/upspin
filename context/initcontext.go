@@ -180,8 +180,8 @@ func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 	if parsed.User() == ctx.userName {
 		endpoints = append(endpoints, ctx.dirEndpoint)
 	}
-	if eps, _, err := ctx.KeyServer().Lookup(parsed.User()); err == nil {
-		endpoints = append(endpoints, eps...)
+	if u, err := ctx.KeyServer().Lookup(parsed.User()); err == nil {
+		endpoints = append(endpoints, u.Dirs...)
 	}
 	for _, e := range endpoints {
 		d, _ := bind.DirServer(ctx, e)
