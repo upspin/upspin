@@ -6,6 +6,7 @@ package main
 
 import (
 	"os"
+	goPath "path"
 	"path/filepath"
 	"strings"
 
@@ -43,6 +44,14 @@ func NewDirServer(context upspin.Context, endpoint upspin.Endpoint, server grpca
 	return s
 }
 
+// verifyUserRoot checks that the user name in the path is the owner of this root.
+func (s *DirServer) verifyUserRoot(parsed path.Parsed) error {
+	if parsed.User() != s.context.UserName() {
+		return errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+	}
+	return nil
+}
+
 // Lookup implements upspin.DirServer.
 func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.DirLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
@@ -51,9 +60,8 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*
 	if err != nil {
 		return s.errLookup(err)
 	}
-	// Verify that the user name in the path is the owner of this root.
-	if parsed.User() != s.context.UserName() {
-		err = errors.E("Lookup", errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+	err = s.verifyUserRoot(parsed)
+	if err != nil {
 		return s.errLookup(err)
 	}
 	data, err := s.entryBytes(*root + parsed.FilePath())
@@ -68,7 +76,7 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*
 // errLookup returns an error for a Lookup.
 func (s *DirServer) errLookup(err error) (*proto.DirLookupResponse, error) {
 	return &proto.DirLookupResponse{
-		Error: errors.MarshalError(err),
+		Error: errors.MarshalError(errors.E("Lookup", err)),
 	}, nil
 }
 
@@ -163,7 +171,7 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 // errGlob returns an error for a Glob.
 func errGlob(err error) (*proto.DirGlobResponse, error) {
 	return &proto.DirGlobResponse{
-		Error: errors.MarshalError(errors.E("Get", err)),
+		Error: errors.MarshalError(errors.E("Glob", err)),
 	}, nil
 }
 
@@ -181,9 +189,59 @@ func (s *DirServer) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*
 func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.DirWhichAccessResponse, error) {
 	log.Printf("WhichAccess %q", req.Name)
 
-	err := errors.E("WhichAccess", errors.Invalid, errors.Str("unimplemented"))
+	parsed, err := path.Parse(upspin.PathName(req.Name))
+	if err != nil {
+		return errWhichAccess(err)
+	}
+	err = s.verifyUserRoot(parsed)
+	if err != nil {
+		return errWhichAccess(err)
+	}
+	accessPath, err := whichAccess(parsed)
+	if err != nil {
+		return errWhichAccess(err)
+	}
+
 	return &proto.DirWhichAccessResponse{
-		Error: errors.MarshalError(err),
+		Name: string(accessPath),
+	}, nil
+}
+
+// whichAccess is the core of the WhichAccess method, factored out so
+// it can be called from other locations.
+func whichAccess(parsed path.Parsed) (upspin.PathName, error) {
+	// Look for Access file starting at end of local path.
+	for i := 0; i < parsed.NElem(); i++ {
+		name := filepath.Join(*root, filepath.FromSlash(parsed.Drop(i).FilePath()), "Access")
+		fi, err := os.Stat(name)
+		// Must exist and be a plain file.
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return "", err
+		}
+		// File exists. Is it a regular file?
+		accessFile := goPath.Join(parsed.Drop(i).String(), "Access")
+		if !fi.Mode().IsRegular() {
+			return "", errors.Errorf("%q is not a regular file", accessFile)
+		}
+		fd, err := os.Open(name)
+		if err != nil {
+			// File exists but cannot be read.
+			return "", err
+		}
+		fd.Close()
+		return upspin.PathName(accessFile), nil
+
+	}
+	return "", nil
+}
+
+// errWhichAccess returns an error for a WhichAccess.
+func errWhichAccess(err error) (*proto.DirWhichAccessResponse, error) {
+	return &proto.DirWhichAccessResponse{
+		Error: errors.MarshalError(errors.E("WhichAccess", err)),
 	}, nil
 }
 
