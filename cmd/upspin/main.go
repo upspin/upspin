@@ -339,19 +339,17 @@ func user(args ...string) {
 		exit(err)
 	}
 	for i := 0; i < fs.NArg(); i++ {
-		endpoints, keys, err := user.Lookup(upspin.UserName(fs.Arg(i)))
+		u, err := user.Lookup(upspin.UserName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
 		}
 		fmt.Printf("%s:\n", fs.Arg(i))
 		fmt.Printf("endpoints:\n")
-		for _, e := range endpoints {
+		for _, e := range u.Dirs {
 			fmt.Println(e)
 		}
-		fmt.Printf("keys:\n")
-		for _, k := range keys {
-			fmt.Println(k)
-		}
+		fmt.Printf("key:\n")
+		fmt.Println(u.PublicKey)
 	}
 }
 

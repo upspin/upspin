@@ -53,9 +53,8 @@ type sharer struct {
 	// users caches per-directory user lists computed from Access files.
 	users map[upspin.PathName][]upspin.UserName
 
-	// userKeys holds the keys we've looked up for each user. We remember
-	// only the zeroth element of each key returned by User.Lookup.
-	userKeys map[upspin.UserName][]upspin.PublicKey
+	// userKeys holds the keys we've looked up for each user.
+	userKeys map[upspin.UserName]upspin.PublicKey
 
 	// userByHash maps the SHA-256 hashes of each user's key to the user name.
 	userByHash map[[sha256.Size]byte]upspin.UserName
@@ -101,7 +100,7 @@ func (s *sharer) do() {
 		s.addAccess(e)
 	}
 
-	s.userKeys = make(map[upspin.UserName][]upspin.PublicKey)
+	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
 	s.userByHash = make(map[[sha256.Size]byte]upspin.UserName)
 
 	// Now we're ready. First show the state if asked.
@@ -385,13 +384,10 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
 	for _, user := range users {
-		userKeys := s.lookupKey(user)
-		for _, key := range userKeys {
-			if len(key) > 0 {
-				// TODO: Make this general. This works now only because we are always using ee.
-				keys = append(keys, key)
-				break
-			}
+		userKey := s.lookupKey(user)
+		if len(userKey) > 0 {
+			// TODO: Make this general. This works now only because we are always using ee.
+			keys = append(keys, userKey)
 		}
 		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
 		s.exitCode = 1
@@ -411,32 +407,31 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 }
 
 // lookupKey returns the public key for the user.
-func (s *sharer) lookupKey(user upspin.UserName) []upspin.PublicKey {
-	keys, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
+func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
+	key, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
 	if ok {
-		return keys
+		return key
 	}
 	userService, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
 	if err != nil {
 		exit(err)
 	}
-	_, keys, err = userService.Lookup(user)
+	u, err := userService.Lookup(user)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
 		s.exitCode = 1
-		s.userKeys[user] = nil
-		return nil
+		s.userKeys[user] = ""
+		return ""
 	}
 	// Remember the lookup, failed or otherwise.
-	if len(keys) == 0 {
+	if len(u.PublicKey) == 0 {
 		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
 		s.exitCode = 1
-		s.userKeys[user] = nil
-		return nil
+		s.userKeys[user] = ""
+		return ""
 	}
-	s.userKeys[user] = keys
-	for _, key := range keys {
-		s.userByHash[sha256.Sum256([]byte(key))] = user
-	}
-	return keys
+
+	s.userKeys[user] = key
+	s.userByHash[sha256.Sum256([]byte(key))] = user
+	return key
 }

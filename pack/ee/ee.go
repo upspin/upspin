@@ -168,15 +168,16 @@ func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.Di
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
-		_, ownerKeys, err := userConn.Lookup(owner)
+		u, err := userConn.Lookup(owner)
 		if err != nil {
 			return 0, errors.E(Pack, owner, err)
 		}
-		if ownerKeys[0] == ctx.Factotum().PublicKey() {
+		ownerKey := u.PublicKey
+		if ownerKey == ctx.Factotum().PublicKey() {
 			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName())
 			wrap = wrap[:1]
 		} else {
-			p, _, err = factotum.ParsePublicKey(ownerKeys[0])
+			p, _, err = factotum.ParsePublicKey(ownerKey)
 			if err != nil {
 				return 0, errors.E(Pack, d.Name, err)
 			}
@@ -704,12 +705,12 @@ func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, erro
 	if err != nil {
 		return "", err
 	}
-	_, keys, err := userService.Lookup(user)
+	u, err := userService.Lookup(user)
 	if err != nil {
 		return "", err
 	}
-	if len(keys) < 1 {
+	if len(u.PublicKey) == 0 {
 		return "", errors.E(user, errors.NotExist, errNoKnownKeysForUser)
 	}
-	return keys[0], nil
+	return u.PublicKey, nil
 }

@@ -9,7 +9,7 @@ import (
 	"math/big"
 )
 
-// A UserName is just a string representing a user.
+// A UserName is just an e-mail address representing a user.
 // It is given a unique type so the API is clear.
 // Example: gopher@google.com
 type UserName string
@@ -214,16 +214,35 @@ const (
 	EEPack Packing = 20
 )
 
+// User represents all the public information about an Upspin user as returned by KeyServer.
+type User struct {
+	// Name represents the user's name as an e-mail address, such as joe@smith.com.
+	Name UserName
+
+	// Dirs is a slice of DirServer endpoints where the user's root directory may be located.
+	// TODO: Provide full documentation.
+	Dirs []Endpoint
+
+	// Stores is a slice of StoreServer endpoints where the user's data is primarily written to.
+	// TODO: Provide full documentation.
+	Stores []Endpoint
+
+	// PublicKey is the user's current public key.
+	PublicKey PublicKey
+}
+
 // The KeyServer interface provides access to public information about users.
 type KeyServer interface {
 	Dialer
 	Service
 
-	// Lookup returns a list (slice) of Endpoints of DirServers
-	// that may hold the root directory for the named
-	// user and a list (slice) of public keys for that user. Those
-	// earlier in the lists are better places to look.
-	Lookup(userName UserName) ([]Endpoint, []PublicKey, error)
+	// Lookup returns all public information about a user.
+	Lookup(userName UserName) (*User, error)
+
+	// Put sets or updates information about a user. The user's name must
+	// match the authenticated user.
+	// TODO: Provide full documentation.
+	Put(user *User) error
 }
 
 // A PublicKey can be given to anyone and used for authenticating a user.

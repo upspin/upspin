@@ -145,19 +145,29 @@ func (u *key) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error 
 }
 
 // Lookup implements upspin.KeyServer.
-func (u *key) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (u *key) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	const Lookup = "Lookup"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
 	if err != nil {
-		return nil, nil, errors.E(Lookup, userName, errInvalidUserName)
+		return nil, errors.E(Lookup, userName, errInvalidUserName)
 	}
 	// Get the user entry from GCP.
 	ue, err := u.fetchUserEntry(Lookup, userName)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return ue.Endpoints, ue.Keys, nil
+	user := &upspin.User{
+		Name:      userName,
+		Dirs:      ue.Endpoints,
+		PublicKey: ue.Keys[0],
+	}
+	return user, nil
+}
+
+// Put implements upspin.KeyServer.
+func (u *key) Put(user *upspin.User) error {
+	return errors.E("Put", errors.IO, errors.Str("not implemented"))
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
