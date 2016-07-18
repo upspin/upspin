@@ -6,7 +6,6 @@ package auth
 
 import (
 	"crypto/tls"
-	"log"
 	"os"
 	"time"
 
@@ -19,7 +18,7 @@ import (
 // Config holds the configuration parameters for instantiating a server (HTTP or gRPC).
 type Config struct {
 	// Lookup looks up user keys.
-	Lookup func(userName upspin.UserName) ([]upspin.PublicKey, error)
+	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
 
 	// AllowUnauthenticatedConnections allows unauthenticated connections, making it the caller's
 	// responsibility to check Handler.IsAuthenticated.
@@ -70,16 +69,14 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 
 // PublicUserKeyService returns a Lookup function that looks up user's public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
-func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) ([]upspin.PublicKey, error) {
+func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) (upspin.PublicKey, error) {
 	ctx = usercache.Global(ctx)
-	return func(userName upspin.UserName) ([]upspin.PublicKey, error) {
-		log.Printf("Calling KeyServer.Lookup for user %s", userName)
-		_, keys, err := ctx.KeyServer().Lookup(userName)
-		log.Printf("Lookup answered: %v, %v", keys, err)
+	return func(userName upspin.UserName) (upspin.PublicKey, error) {
+		u, err := ctx.KeyServer().Lookup(userName)
 		if err != nil {
-			return nil, errors.E("PublicUserKeyService", err)
+			return "", errors.E("PublicUserKeyService", err)
 		}
-		return keys, nil
+		return u.PublicKey, nil
 	}
 }
 

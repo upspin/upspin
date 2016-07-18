@@ -107,9 +107,22 @@ message KeyLookupRequest {
 }
 
 message KeyLookupResponse {
-    repeated Endpoint Endpoints = 1;
-    repeated string PublicKeys = 2;
-    bytes Error = 3;
+    string UserName = 1;
+    repeated Endpoint Dirs = 2;
+    repeated Endpoint Stores = 3;
+    string PublicKey = 4;
+    bytes Error = 5;
+}
+
+message KeyPutRequest {
+    string UserName = 1;
+    repeated Endpoint Dirs = 2;
+    repeated Endpoint Stores = 3;
+    string PublicKey = 4;
+}
+
+message KeyPutResponse {
+    bytes Error = 1;
 }
 
 service Key {
@@ -120,6 +133,7 @@ service Key {
     rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Lookup (KeyLookupRequest) returns (KeyLookupResponse) {}
+    rpc Put(KeyPutRequest) returns (KeyPutResponse) {}
 }
 
 // The DirServer interface.

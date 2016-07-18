@@ -51,12 +51,14 @@ func TestInstallAndLookup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	eRecv, keys, err := u.Lookup(userName)
+	user, err := u.Lookup(userName)
+	eRecv := user.Dirs
+	key := user.PublicKey
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	if len(keys) != 0 {
-		t.Errorf("Expected no keys for user %v, got %d", userName, len(keys))
+	if key != "" {
+		t.Errorf("Expected no keys for user %v, got %q", userName, key)
 	}
 	if len(eRecv) != 1 {
 		t.Fatalf("Expected 1 endpoint, got %d", len(eRecv))
@@ -77,15 +79,15 @@ func TestPublicKeysAndUsers(t *testing.T) {
 		upspin.PublicKey(testKeyStr),
 	})
 
-	_, keys, err := u.Lookup(userName)
+	user, err := u.Lookup(userName)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	if len(keys) != 1 {
-		t.Fatalf("Expected 1 key for user %v, got %d", userName, len(keys))
+	if user.PublicKey == "" {
+		t.Fatalf("Expected key for user %v, got nothing", userName)
 	}
-	if string(keys[0]) != testKeyStr {
-		t.Errorf("Expected key %s, got %s", testKeyStr, keys[0])
+	if string(user.PublicKey) != testKeyStr {
+		t.Errorf("Expected key %s, got %s", testKeyStr, user.PublicKey)
 	}
 
 	users := testKey.ListUsers()
@@ -117,32 +119,32 @@ func TestSafety(t *testing.T) {
 		upspin.PublicKey(testKeyStr),
 	})
 
-	locs, keys, err := u.Lookup(userName)
+	user0, err := u.Lookup(userName)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	if len(locs) != 1 || len(keys) != 1 {
-		t.Fatal("Extra locs or keys")
+	if len(user0.Dirs) != 1 || user0.PublicKey == "" {
+		t.Fatal("Extra locs or missing key")
 	}
 
 	// Save and then modify the two.
-	loc0 := locs[0]
-	locs[0].Transport++
-	key0 := keys[0]
-	keys[0] += "gotcha"
+	loc0 := user0.Dirs[0]
+	user0.Dirs[0].Transport++
+	key0 := user0.PublicKey
+	user0.PublicKey += "gotcha"
 
 	// Fetch again, expect the original results.
-	locs1, keys1, err := u.Lookup(userName)
+	user1, err := u.Lookup(userName)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	if len(locs1) != 1 || len(keys1) != 1 {
-		t.Fatal("Extra locs or keys (1)")
+	if len(user1.Dirs) != 1 || user1.PublicKey == "" {
+		t.Fatal("Extra locs or missing key (1)")
 	}
-	if locs1[0] != loc0 {
+	if user1.Dirs[0] != loc0 {
 		t.Error("loc was modified")
 	}
-	if keys1[0] != key0 {
+	if user1.PublicKey != key0 {
 		t.Error("key was modified")
 	}
 }
