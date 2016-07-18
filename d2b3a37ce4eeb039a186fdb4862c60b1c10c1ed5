@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "4a6533f4_49e3e1a1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:36:52Z",
+      "side": 1,
+      "message": "// Name represents the user\u0027s name as an e-mail address, such as joe@smith.com.",
+      "revId": "d2b3a37ce4eeb039a186fdb4862c60b1c10c1ed5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_698585b1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:36:52Z",
+      "side": 1,
+      "message": "// TODO: Provide full documentation.",
+      "revId": "d2b3a37ce4eeb039a186fdb4862c60b1c10c1ed5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_498ac1c3",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:36:52Z",
+      "side": 1,
+      "message": "// TODO: Provide full documentation.",
+      "revId": "d2b3a37ce4eeb039a186fdb4862c60b1c10c1ed5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ad7287f_4142c600",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -13,6 +64,23 @@
       "writtenOn": "2016-07-18T22:52:57Z",
       "side": 1,
       "message": "s/Publick/Public/",
+      "revId": "d2b3a37ce4eeb039a186fdb4862c60b1c10c1ed5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_a9eb7d74",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:36:52Z",
+      "side": 1,
+      "message": "// TODO: Provide full documentation.",
       "revId": "d2b3a37ce4eeb039a186fdb4862c60b1c10c1ed5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
