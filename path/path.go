@@ -84,7 +84,7 @@ func (p Parsed) NElem() int {
 }
 
 // FilePath returns just the path under the root directory part of the
-// pathname, without the leading user name.
+// pathname, without the leading user name or slash.
 func (p Parsed) FilePath() string {
 	str := string(p.path)
 	return str[strings.IndexByte(str, '/')+1:]
