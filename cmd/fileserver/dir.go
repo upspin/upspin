@@ -55,7 +55,7 @@ func (s *DirServer) verifyUserRoot(parsed path.Parsed) error {
 
 // can reports whether the user associated with the given context has
 // the given right to access the given path.
-func (s *DirServer) can(ctx gContext.Context, right access.Right, parsed path.Parsed) (bool, error) {
+func can(s grpcauth.SecureServer, ctx gContext.Context, right access.Right, parsed path.Parsed) (bool, error) {
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -91,7 +91,7 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*
 	if err := s.verifyUserRoot(parsed); err != nil {
 		return errLookup(err)
 	}
-	if ok, err := s.can(ctx, access.List, parsed); err != nil {
+	if ok, err := can(s, ctx, access.List, parsed); err != nil {
 		return errLookup(err)
 	} else if !ok {
 		return errLookup(access.ErrPermissionDenied)
@@ -212,13 +212,14 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 				if err != nil {
 					return errGlob(err)
 				}
-				if ok, err := s.can(ctx, access.List, parsed); err != nil {
+				if ok, err := can(s, ctx, access.List, parsed); err != nil {
 					return errGlob(err)
 				} else if !ok {
 					continue
 				}
 			}
 			names, err := filepath.Glob(filepath.Join(match, elem))
+			// TODO(r): remove this error check
 			if err != nil {
 				return errGlob(err)
 			}
@@ -237,7 +238,7 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 		if err != nil {
 			return errGlob(err)
 		}
-		if ok, err := s.can(ctx, access.Read, parsed); err != nil {
+		if ok, err := can(s, ctx, access.Read, parsed); err != nil {
 			return errGlob(err)
 		} else if !ok {
 			e.Location = upspin.Location{}
@@ -303,7 +304,13 @@ func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessR
 func whichAccess(parsed path.Parsed) (upspin.PathName, error) {
 	// Look for Access file starting at end of local path.
 	for i := 0; i <= parsed.NElem(); i++ {
-		name := filepath.Join(*root, filepath.FromSlash(parsed.Drop(i).FilePath()), "Access")
+		dir := filepath.Join(*root, filepath.FromSlash(parsed.Drop(i).FilePath()))
+		if fi, err := os.Stat(dir); err != nil {
+			return "", err
+		} else if !fi.IsDir() {
+			continue
+		}
+		name := filepath.Join(dir, "Access")
 		fi, err := os.Stat(name)
 		// Must exist and be a plain file.
 		if os.IsNotExist(err) {

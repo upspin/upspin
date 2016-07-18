@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"upspin.io/access"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -50,6 +51,12 @@ func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*pr
 		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
 		return errGet(err)
 	}
+	// Verify that the requesting user can access this file.
+	if ok, err := can(s, ctx, access.Read, parsed); err != nil {
+		return errGet(err)
+	} else if !ok {
+		return errGet(errors.E(parsed.Path(), access.ErrPermissionDenied))
+	}
 
 	data, err := readFile(ref)
 	if err != nil {
@@ -73,7 +80,14 @@ func readFile(name upspin.PathName) ([]byte, error) {
 	if info.IsDir() {
 		return nil, errors.E(errors.IsDir, name)
 	}
-	// Symlinks are OK. TODO?
+	// Require world-readability on the local file system
+	// to prevent accidental information leakage (e.g. $HOME/.ssh).
+	// TODO(r,adg): find a less conservative policy for this.
+	if info.Mode()&04 == 0 {
+		return nil, errors.E(errors.Permission, errors.Str("not world-readable"), name)
+	}
+
+	// TODO(r, adg): think about symbolic links.
 	return ioutil.ReadFile(localName)
 }
 
