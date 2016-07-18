@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad7287f_8132fefd",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-18T22:30:00Z",
+      "side": 1,
+      "message": "How does this compile?  debug isn\u0027t exported by log...",
+      "range": {
+        "startLine": 51,
+        "startChar": 6,
+        "endLine": 51,
+        "endChar": 14
+      },
+      "revId": "f00713851ce7e9ce78a70e4d7a2c6161f4cc8e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
