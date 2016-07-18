@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"upspin.io/cache"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
 type entry struct {
 	expires time.Time // when the information expires.
-	eps     []upspin.Endpoint
-	pub     []upspin.PublicKey
+	user    *upspin.User
 }
 
 type userCacheContext struct {
@@ -63,30 +63,34 @@ func Global(context upspin.Context) upspin.Context {
 }
 
 // Lookup implements upspin.KeyServer.Lookup.
-func (c *userCacheContext) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	v, ok := c.cache.entries.Get(name)
 
 	// If we have an unexpired binding, use it.
 	if ok {
 		if !time.Now().After(v.(*entry).expires) {
 			e := v.(*entry)
-			return e.eps, e.pub, nil
+			return e.user, nil
 		}
 		c.cache.entries.Remove(name)
 	}
 
 	// Not found, look it up.
-	eps, pub, err := c.Context.KeyServer().Lookup(name)
+	u, err := c.Context.KeyServer().Lookup(name)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	e := &entry{
 		expires: time.Now().Add(c.cache.duration),
-		eps:     eps,
-		pub:     pub,
+		user:    u,
 	}
 	c.cache.entries.Add(name, e)
-	return eps, pub, nil
+	return u, nil
+}
+
+// Put implements upspin.KeyServer.Put.
+func (c *userCacheContext) Put(user *upspin.User) error {
+	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
 }
 
 // Dial implements upspin.Service.
@@ -120,60 +124,60 @@ func (c *userCacheContext) Authenticate(upspin.Context) error {
 }
 
 // KeyServer implements upspin.Context. It returns a pointer to the caching user service.
-func (ctx *userCacheContext) KeyServer() upspin.KeyServer {
-	return ctx
+func (c *userCacheContext) KeyServer() upspin.KeyServer {
+	return c
 }
 
 // SetUserName implements upspin.Context.
-func (ctx *userCacheContext) SetUserName(u upspin.UserName) upspin.Context {
-	ctx.Context.SetUserName(u)
-	return ctx
+func (c *userCacheContext) SetUserName(u upspin.UserName) upspin.Context {
+	c.Context.SetUserName(u)
+	return c
 }
 
 // SetFactotum implements upspin.Context.
-func (ctx *userCacheContext) SetFactotum(f upspin.Factotum) upspin.Context {
-	ctx.Context.SetFactotum(f)
-	return ctx
+func (c *userCacheContext) SetFactotum(f upspin.Factotum) upspin.Context {
+	c.Context.SetFactotum(f)
+	return c
 }
 
 // Packing implements upspin.Context.
-func (ctx *userCacheContext) Packing() upspin.Packing {
-	return ctx.Context.Packing()
+func (c *userCacheContext) Packing() upspin.Packing {
+	return c.Context.Packing()
 }
 
 // SetPacking implements upspin.Context.
-func (ctx *userCacheContext) SetPacking(p upspin.Packing) upspin.Context {
-	ctx.Context.SetPacking(p)
-	return ctx
+func (c *userCacheContext) SetPacking(p upspin.Packing) upspin.Context {
+	c.Context.SetPacking(p)
+	return c
 }
 
 // SetKeyEndpoint implements upspin.Context.
-func (ctx *userCacheContext) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.Context.SetKeyEndpoint(e)
-	return ctx
+func (c *userCacheContext) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
+	c.Context.SetKeyEndpoint(e)
+	return c
 }
 
 // SetDirEndpoint implements upspin.Context.
-func (ctx *userCacheContext) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.Context.SetDirEndpoint(e)
-	return ctx
+func (c *userCacheContext) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
+	c.Context.SetDirEndpoint(e)
+	return c
 }
 
 // StoreEndpoint implements upspin.Context.
-func (ctx *userCacheContext) StoreEndpoint() upspin.Endpoint {
-	return ctx.Context.StoreEndpoint()
+func (c *userCacheContext) StoreEndpoint() upspin.Endpoint {
+	return c.Context.StoreEndpoint()
 }
 
 // SetStoreEndpoint implements upspin.Context.
-func (ctx *userCacheContext) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
-	ctx.Context.SetStoreEndpoint(e)
-	return ctx
+func (c *userCacheContext) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
+	c.Context.SetStoreEndpoint(e)
+	return c
 }
 
 // Copy implements upspin.Context. We are actually copying the underlying context but
 // still pointing to the same LRU cache.
-func (ctx *userCacheContext) Copy() upspin.Context {
-	c := *ctx
-	c.Context = ctx.Context.Copy()
-	return &c
+func (c *userCacheContext) Copy() upspin.Context {
+	newC := *c
+	newC.Context = c.Context.Copy()
+	return &newC
 }
