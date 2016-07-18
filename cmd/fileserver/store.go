@@ -5,9 +5,6 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
-
 	"upspin.io/access"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/errors"
@@ -65,30 +62,6 @@ func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*pr
 	return &proto.StoreGetResponse{
 		Data: data,
 	}, nil
-}
-
-func readFile(name upspin.PathName) ([]byte, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	localName := *root + parsed.FilePath()
-	info, err := os.Stat(localName)
-	if err != nil {
-		return nil, err
-	}
-	if info.IsDir() {
-		return nil, errors.E(errors.IsDir, name)
-	}
-	// Require world-readability on the local file system
-	// to prevent accidental information leakage (e.g. $HOME/.ssh).
-	// TODO(r,adg): find a less conservative policy for this.
-	if info.Mode()&04 == 0 {
-		return nil, errors.E(errors.Permission, errors.Str("not world-readable"), name)
-	}
-
-	// TODO(r, adg): think about symbolic links.
-	return ioutil.ReadFile(localName)
 }
 
 // errGet returns an error for a Get.
