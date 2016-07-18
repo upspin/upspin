@@ -14,6 +14,34 @@ import (
 	"upspin.io/upspin"
 )
 
+// Blob is a low-level blob storage interface for services to store their data permanently.
+type Blob interface {
+	// GetDownloadLink returns a link for downloading ref from the storage backend,
+	// if the ref is publicly readable and the backend offers direct links.
+	GetDownloadLink(ref string) (link string, error error)
+
+	// Download retrieves the bytes associated with a ref.
+	Download(ref string) ([]byte, error)
+
+	// Put stores the contents given as ref on the storage backend.
+	// It may return a direct link for retrieving data directly from
+	// the backend, if it provides direct links.
+	Put(ref string, contents []byte) (link string, error error)
+
+	// Delete permanently removes all storage space associated
+	// with a ref.
+	Delete(ref string) error
+
+	// Dial dials the storage backend with servers and options as given by opts.
+	// It is called only once, but not directly, use DialBlob instead.
+	Dial(opts *Opts) error
+
+	// Close closes the the connection to the storage backend and releases all resources used.
+	// It must be called only once and only after DialBlob has succeeded.
+	Close()
+}
+
+// TODO: this is changing.
 // Storage is a low-level storage interface for services to store their data permanently.
 type Storage interface {
 	// PutLocalFile copies a local file to storage using ref as its
@@ -55,7 +83,10 @@ type Storage interface {
 	Close()
 }
 
-var registration = make(map[string]Storage)
+var (
+	registration     = make(map[string]Storage)
+	blobRegistration = make(map[string]Blob)
+)
 
 // Opts holds configuration options for the storage backend.
 // It is meant to be used by implementations of Storage.
@@ -74,6 +105,16 @@ func Register(name string, storage Storage) error {
 		return errors.E("Register", errors.Exist)
 	}
 	registration[name] = storage
+	return nil
+}
+
+// RegisterBlob registers a new Blob under a case-insensitive name. It is typically used in init functions.
+func RegisterBlob(name string, storage Storage) error {
+	lcName := strings.ToLower(name)
+	if _, exists := blobRegistration[lcName]; exists {
+		return errors.E("Register", errors.Exist)
+	}
+	blobRegistration[lcName] = storage
 	return nil
 }
 
@@ -124,6 +165,28 @@ func Dial(name string, opts ...DialOpts) (Storage, error) {
 	s, found := registration[name]
 	if !found {
 		return nil, errors.E("Dial", errors.NotExist, errors.Str("storage backend type not registered"))
+	}
+	dOpts := &Opts{
+		Opts: make(map[string]string),
+	}
+	var err error
+	for _, o := range opts {
+		if o != nil {
+			err = o(dOpts)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return s, s.Dial(dOpts)
+}
+
+// DialBlob dials the named blob storage backend using the dial options opts.
+func DialBlob(name string, opts ...DialOpts) (Storage, error) {
+	lcName := strings.ToLower(name)
+	s, found := blobRegistration[lcName]
+	if !found {
+		return nil, errors.E("Dial", errors.NotExist, errors.Errorf("blob storage backend type %q not registered", lcName))
 	}
 	dOpts := &Opts{
 		Opts: make(map[string]string),
