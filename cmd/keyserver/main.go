@@ -103,43 +103,78 @@ func main() {
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
 }
 
-func (s *Server) internalLookup(userName upspin.UserName) ([]upspin.PublicKey, error) {
-	_, keys, err := s.key.Lookup(userName)
-	return keys, err
+func (s *Server) internalLookup(userName upspin.UserName) (upspin.PublicKey, error) {
+	user, err := s.key.Lookup(userName)
+	return user.PublicKey, err
 }
 
-// keyServerFor returns a KeyServer bound to the user specified in the context.
-func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
+// keyServerFor returns a KeyServer bound to the user specified in the context and the username authenticated.
+func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, upspin.UserName, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	context := s.context.Copy().SetUserName(session.User())
-	return bind.KeyServer(context, s.endpoint)
+	key, err := bind.KeyServer(context, s.endpoint)
+	return key, session.User(), err
 }
 
 // Lookup implements upspin.KeyServer, and does not do any authentication.
 func (s *Server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*proto.KeyLookupResponse, error) {
 	log.Printf("Lookup %q", req.UserName)
 
-	endpoints, publicKeys, err := s.key.Lookup(upspin.UserName(req.UserName))
+	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		log.Printf("Lookup %q failed: %v", req.UserName, err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.KeyLookupResponse{
-		Endpoints:  proto.Endpoints(endpoints),
-		PublicKeys: proto.PublicKeys(publicKeys),
+		UserName:  string(user.Name),
+		Dirs:      proto.Endpoints(user.Dirs),
+		Stores:    proto.Endpoints(user.Stores),
+		PublicKey: string(user.PublicKey),
 	}
 	return resp, nil
+}
+
+// Put implements upspin.KeyServer.
+func (s *Server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
+	log.Printf("Put %v", req)
+
+	key, userName, err := s.keyServerFor(ctx)
+	if err != nil {
+		log.Printf("Put %q authentication failed: %v", req.UserName, err)
+		return &proto.KeyPutResponse{Error: errors.MarshalError(err)}, nil
+
+	}
+	user := &upspin.User{
+		Name:      upspin.UserName(req.UserName),
+		Dirs:      proto.UpspinEndpoints(req.Dirs),
+		Stores:    proto.UpspinEndpoints(req.Stores),
+		PublicKey: upspin.PublicKey(req.PublicKey),
+	}
+	// If the user is editing someone else's entry, it must be an admin.
+	if userName != user.Name {
+		// TODO: check if userName is an admin.
+		err := errors.E("Put", errors.Permission, errors.Errorf("%q not authorized to edit %q data", userName, req.UserName))
+		log.Error.Printf("Put: %v", err)
+		return &proto.KeyPutResponse{Error: errors.MarshalError(err)}, nil
+	}
+
+	err = key.Put(user)
+	if err != nil {
+		log.Printf("Put %q failed: %v", req.UserName, err)
+		return &proto.KeyPutResponse{Error: errors.MarshalError(err)}, nil
+	}
+	return &proto.KeyPutResponse{}, nil
 }
 
 // Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 
-	key, err := s.keyServerFor(ctx)
+	key, _, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +190,7 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 
-	key, err := s.keyServerFor(ctx)
+	key, _, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}

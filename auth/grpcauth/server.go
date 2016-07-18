@@ -134,7 +134,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 
 	// Get user's public keys.
 	log.Printf("Authenticate: Looking up keys for user %q", parsed.User())
-	keys, err := s.config.Lookup(parsed.User())
+	key, err := s.config.Lookup(parsed.User())
 	log.Printf("Authenticate: Done looking for keys. Error: %v", err)
 	if err != nil {
 		return nil, errors.E(Authenticate, err)
@@ -152,7 +152,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	}
 
 	// Validate signature.
-	err = verifySignature(keys, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
+	err = verifySignature(key, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
 		log.Error.Printf("Invalid signature for user %s: %s", req.UserName, err)
 		return nil, errors.E(Authenticate, err)
@@ -250,15 +250,13 @@ func (s *secureServerImpl) GRPCServer() *grpc.Server {
 }
 
 // verifySignature verifies that the hash was signed by one of the user's keys.
-func verifySignature(keys []upspin.PublicKey, hash []byte, r, s *big.Int) error {
-	for _, k := range keys {
-		ecdsaPubKey, _, err := factotum.ParsePublicKey(k)
-		if err != nil {
-			return err
-		}
-		if ecdsa.Verify(ecdsaPubKey, hash, r, s) {
-			return nil
-		}
+func verifySignature(key upspin.PublicKey, hash []byte, r, s *big.Int) error {
+	ecdsaPubKey, _, err := factotum.ParsePublicKey(key)
+	if err != nil {
+		return err
+	}
+	if ecdsa.Verify(ecdsaPubKey, hash, r, s) {
+		return nil
 	}
 	return errors.Str("no keys verified signature")
 }
