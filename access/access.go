@@ -523,7 +523,9 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 
 // Can reports whether the requesting user can access the file
 // using the specified right according to the rules of the Access
-// file.
+// file. It also interprets the rules that the owner can always
+// Read and List, and only the owner can create or modify
+// Access and Group files.
 //
 // The rights are applied to the path itself. For instance, for Create
 // the question is whether the user can create the named file, not
