@@ -29,7 +29,7 @@ type database struct {
 	// mu protects the fields below.
 	mu       sync.RWMutex
 	root     map[upspin.UserName][]upspin.Endpoint
-	keystore map[upspin.UserName][]upspin.PublicKey
+	keystore map[upspin.UserName]upspin.PublicKey
 }
 
 var _ upspin.KeyServer = (*Service)(nil)
@@ -39,14 +39,18 @@ var db *database
 // Lookup reports the set of locations the user's directory might be,
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
-func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (s *Service) Lookup(name upspin.UserName) (*upspin.User, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	// Return copies so the caller can't modify our data structures.
 
-	roots := append([]upspin.Endpoint{}, db.root[name]...)
-	keys := append([]upspin.PublicKey{}, db.keystore[name]...)
-	return roots, keys, nil
+	u := &upspin.User{
+		Name:      name,
+		Dirs:      append([]upspin.Endpoint{}, db.root[name]...),
+		PublicKey: db.keystore[name],
+		Stores:    []upspin.Endpoint{},
+	}
+	return u, nil
 }
 
 // SetPublicKeys sets a slice of public keys to the keystore for a
