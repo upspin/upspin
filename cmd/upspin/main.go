@@ -80,7 +80,7 @@ func main() {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of upspin:\n")
-	fmt.Fprintf(os.Stderr, "\tupspin [flags] <mkdir|put|get|glob|ls|rm|share|user|whichaccess> <path>\n")
+	fmt.Fprintf(os.Stderr, "\tupspin [flags] <mkdir|put|get|glob|link|ls|rm|share|user|whichaccess> <path>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
