@@ -50,24 +50,31 @@ func (s *StoreServer) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*pr
 		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
 		return errGet(err)
 	}
-	// Is it a directory?
-	localName := *root + parsed.FilePath()
-	info, err := os.Stat(localName)
-	if err != nil {
-		return errGet(err)
-	}
-	if info.IsDir() {
-		return errGet(errors.E(errors.IsDir, parsed.Path()))
-	}
-	// Symlinks are OK. TODO?
 
-	data, err := ioutil.ReadFile(localName)
+	data, err := readFile(ref)
 	if err != nil {
 		return errGet(err)
 	}
 	return &proto.StoreGetResponse{
 		Data: data,
 	}, nil
+}
+
+func readFile(name upspin.PathName) ([]byte, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	localName := *root + parsed.FilePath()
+	info, err := os.Stat(localName)
+	if err != nil {
+		return nil, err
+	}
+	if info.IsDir() {
+		return nil, errors.E(errors.IsDir, name)
+	}
+	// Symlinks are OK. TODO?
+	return ioutil.ReadFile(localName)
 }
 
 // errGet returns an error for a Get.

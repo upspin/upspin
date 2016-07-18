@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"upspin.io/access"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -52,21 +53,54 @@ func (s *DirServer) verifyUserRoot(parsed path.Parsed) error {
 	return nil
 }
 
+func (s *DirServer) can(ctx gContext.Context, right access.Right, parsed path.Parsed) (bool, error) {
+	session, err := s.GetSessionFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	log.Println("session.User:", session.User())
+
+	a := defaultAccess
+	afn, err := whichAccess(parsed)
+	if err != nil {
+		return false, err
+	}
+	if afn != "" {
+		log.Println("afn not empty")
+		data, err := readFile(afn)
+		if err != nil {
+			return false, err
+		}
+		log.Printf("afn content:\n%s", data)
+		a, err = access.Parse(afn, data)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return a.Can(session.User(), right, parsed.Path(), readFile)
+}
+
 // Lookup implements upspin.DirServer.
 func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.DirLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
 
 	parsed, err := path.Parse(upspin.PathName(req.Name))
 	if err != nil {
-		return s.errLookup(err)
+		return errLookup(err)
 	}
-	err = s.verifyUserRoot(parsed)
-	if err != nil {
-		return s.errLookup(err)
+	if err := s.verifyUserRoot(parsed); err != nil {
+		return errLookup(err)
 	}
+	if ok, err := s.can(ctx, access.List, parsed); err != nil {
+		return errLookup(err)
+	} else if !ok {
+		return errLookup(access.ErrPermissionDenied)
+	}
+
 	data, err := s.entryBytes(*root + parsed.FilePath())
 	if err != nil {
-		return s.errLookup(err)
+		return errLookup(err)
 	}
 	return &proto.DirLookupResponse{
 		Entry: data,
@@ -74,14 +108,14 @@ func (s *DirServer) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*
 }
 
 // errLookup returns an error for a Lookup.
-func (s *DirServer) errLookup(err error) (*proto.DirLookupResponse, error) {
+func errLookup(err error) (*proto.DirLookupResponse, error) {
 	return &proto.DirLookupResponse{
 		Error: errors.MarshalError(errors.E("Lookup", err)),
 	}, nil
 }
 
-// entryBytes returns the marshaled DirEntry for the named local file name.
-func (s *DirServer) entryBytes(file string) ([]byte, error) {
+// entry returns the marshaled DirEntry for the named local file name.
+func (s *DirServer) entry(file string) (*upspin.DirEntry, error) {
 	info, err := os.Stat(file)
 	if err != nil {
 		return nil, err
@@ -93,10 +127,9 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 	if !strings.HasPrefix(file, *root) {
 		return nil, errors.Str("internal error: not in root")
 	}
-	file = file[len(*root):]
-	name := string(s.context.UserName()) + "/" + file
+	name := s.upspinPathFromLocal(file)
 	entry := upspin.DirEntry{
-		Name: upspin.PathName(name),
+		Name: name,
 		Location: upspin.Location{
 			Endpoint:  s.endpoint,
 			Reference: upspin.Reference(name),
@@ -109,7 +142,20 @@ func (s *DirServer) entryBytes(file string) ([]byte, error) {
 			Packdata: []byte{byte(upspin.PlainPack)},
 		},
 	}
-	return entry.Marshal()
+	return &entry, nil
+}
+
+func (s *DirServer) entryBytes(file string) ([]byte, error) {
+	e, err := s.entry(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.Marshal()
+}
+
+func (s *DirServer) upspinPathFromLocal(local string) upspin.PathName {
+	return upspin.PathName(s.context.UserName()) + "/" + upspin.PathName(local[len(*root):])
 }
 
 // Put implements upspin.DirServer.
@@ -147,18 +193,55 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 	if err != nil {
 		return errGlob(err)
 	}
-	// Verify that the user name in the path is the owner of this root.
-	if parsed.User() != s.context.UserName() {
-		err = errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+	if err := s.verifyUserRoot(parsed); err != nil {
 		return errGlob(err)
 	}
-	matches, err := filepath.Glob(*root + parsed.FilePath())
-	if err != nil {
-		return errGlob(err)
+
+	var (
+		matches []string
+		next    = []string{*root}
+	)
+	for i := 0; i < parsed.NElem(); i++ {
+		elem := parsed.Elem(i)
+		matches, next = next, matches[:0]
+		for _, match := range matches {
+			if isGlobPattern(elem) || i == parsed.NElem()-1 {
+				parsed, err := path.Parse(s.upspinPathFromLocal(match))
+				if err != nil {
+					return errGlob(err)
+				}
+				if ok, err := s.can(ctx, access.List, parsed); err != nil {
+					return errGlob(err)
+				} else if !ok {
+					continue
+				}
+			}
+			names, err := filepath.Glob(filepath.Join(match, elem))
+			if err != nil {
+				return errGlob(err)
+			}
+			next = append(next, names...)
+		}
 	}
+	matches = next
+
 	entries := make([][]byte, len(matches))
 	for i, match := range matches {
-		entries[i], err = s.entryBytes(match)
+		e, err := s.entry(match)
+		if err != nil {
+			return errGlob(err)
+		}
+		parsed, err := path.Parse(upspin.PathName(s.upspinPathFromLocal(match)))
+		if err != nil {
+			return errGlob(err)
+		}
+		if ok, err := s.can(ctx, access.Read, parsed); err != nil {
+			return errGlob(err)
+		} else if !ok {
+			e.Location = upspin.Location{}
+			e.Metadata.Packdata = nil
+		}
+		entries[i], err = e.Marshal()
 		if err != nil {
 			return errGlob(err)
 		}
@@ -166,6 +249,10 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 	return &proto.DirGlobResponse{
 		Entries: entries,
 	}, nil
+}
+
+func isGlobPattern(elem string) bool {
+	return strings.ContainsAny(elem, `*?[]`)
 }
 
 // errGlob returns an error for a Glob.
@@ -211,8 +298,9 @@ func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessR
 // it can be called from other locations.
 func whichAccess(parsed path.Parsed) (upspin.PathName, error) {
 	// Look for Access file starting at end of local path.
-	for i := 0; i < parsed.NElem(); i++ {
+	for i := 0; i <= parsed.NElem(); i++ {
 		name := filepath.Join(*root, filepath.FromSlash(parsed.Drop(i).FilePath()), "Access")
+		log.Println("name", name)
 		fi, err := os.Stat(name)
 		// Must exist and be a plain file.
 		if os.IsNotExist(err) {
