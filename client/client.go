@@ -346,7 +346,7 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 	// Get the destination upspin.DirServer.
 	newDir := oldDir
 	if oldParsed.User() != newParsed.User() {
-		newDir, err = c.DirServer(oldName)
+		newDir, err = c.DirServer(newName)
 		if err != nil {
 			return nil, err
 		}
