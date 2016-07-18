@@ -21,8 +21,13 @@ var _ upspin.KeyServer = (*unassigned)(nil)
 var unassignedErr = errors.Str("request to unassigned service")
 
 // Lookup implements upspin.KeysServer.Lookup.
-func (*unassigned) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	return nil, nil, errors.E("Lookup", errors.Invalid, unassignedErr)
+func (*unassigned) Lookup(name upspin.UserName) (*upspin.User, error) {
+	return nil, errors.E("Lookup", errors.Invalid, unassignedErr)
+}
+
+// Put implements upspin.KeysServer.Put.
+func (*unassigned) Put(name upspin.UserName) error {
+	return errors.E("Lookup", errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.

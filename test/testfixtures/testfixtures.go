@@ -72,8 +72,13 @@ func (d *dummyService) Ping() bool {
 }
 
 // Lookup implements upspin.KeyServer.
-func (d *DummyKey) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
-	return nil, nil, nil
+func (d *DummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
+	return nil, nil
+}
+
+// Put implements upspin.KeyServer.
+func (d *DummyKey) Put(user *upspin.User) error {
+	return nil
 }
 
 // Get implements upspin.StoreServer.
