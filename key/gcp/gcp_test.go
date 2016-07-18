@@ -18,7 +18,7 @@ const (
 
 func TestInvalidUser(t *testing.T) {
 	u := newDummyKeyServer()
-	_, _, err := u.Lookup("a")
+	_, err := u.Lookup("a")
 	if err == nil {
 		t.Fatal("Expected an error")
 	}
@@ -146,26 +146,26 @@ func TestAddRootToNewUser(t *testing.T) {
 func TestGetExistingUser(t *testing.T) {
 	const storedEntry = `{"User":"bob@foo.com","Keys":["my key"],"Endpoints":[{"Transport":3,"NetAddr":"http://here.com"}]}`
 	u, _ := newKeyServerWithMocking([]byte(storedEntry))
-	e, keys, err := u.Lookup(mockKey)
+	user, err := u.Lookup(mockKey)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(keys) != 1 {
-		t.Fatalf("Expected 1 key, got %d", len(keys))
+	if user.PublicKey == "" {
+		t.Fatal("Expected 1 key, got nothing")
 	}
 	expectedKey := "my key"
-	if string(keys[0]) != expectedKey {
-		t.Errorf("Expected key %q, got %q", expectedKey, keys[0])
+	if string(user.PublicKey) != expectedKey {
+		t.Errorf("Expected key %q, got %q", expectedKey, user.PublicKey)
 	}
-	if len(e) != 1 {
-		t.Fatalf("Expected one endpoint, got %d", len(e))
+	if len(user.Dirs) != 1 {
+		t.Fatalf("Expected one directory endpoint, got %d", len(user.Dirs))
 	}
 	expectedEndpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr("http://here.com"),
 	}
-	if e[0] != expectedEndpoint {
-		t.Errorf("Expected endpoint %v, got %v", expectedEndpoint, e[0])
+	if user.Dirs[0] != expectedEndpoint {
+		t.Errorf("Expected endpoint %v, got %v", expectedEndpoint, user.Dirs[0])
 	}
 }
 

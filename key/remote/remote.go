@@ -32,25 +32,25 @@ type remote struct {
 var _ upspin.KeyServer = (*remote)(nil)
 
 // Lookup implements upspin.Key.Lookup.
-func (r *remote) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),
 	}
 	resp, err := r.keyClient.Lookup(gContext.Background(), req)
 	if err != nil {
-		return nil, nil, errors.E("Lookup", errors.IO, err)
+		return nil, errors.E("Lookup", errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
-		return nil, nil, errors.UnmarshalError(resp.Error)
+		return nil, errors.UnmarshalError(resp.Error)
 	}
-	if len(resp.Endpoints) == 0 {
-		resp.Endpoints = nil
-	}
-	if len(resp.PublicKeys) == 0 {
-		resp.PublicKeys = nil
-	}
-	return proto.UpspinEndpoints(resp.Endpoints), proto.UpspinPublicKeys(resp.PublicKeys), nil
+	return proto.UpspinUser(resp.User), nil
+}
+
+// Put implements upspin.Key.Put.
+func (r *remote) Put(user *upspin.User) error {
+	// TODO
+	panic("Key.Put not implemented")
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
