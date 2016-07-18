@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a6533f4_c9591195",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:34:25Z",
+      "side": 1,
+      "message": "this should be initialized to the initial value of the logging level as reported by the log package. i think you want that rather than the call to Set below, but it\u0027s not a big deal.",
+      "revId": "c484f848e8c5b8b7d1bacd0a125c4420c83771bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_a966dd52",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:34:25Z",
+      "side": 1,
+      "message": "you should also implement flag.Getter (historical accident)",
+      "revId": "c484f848e8c5b8b7d1bacd0a125c4420c83771bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_094f29c2",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:34:25Z",
+      "side": 1,
+      "message": "see above. the question is, who sets the default? my argument is that log already has a default, so let it decide",
+      "revId": "c484f848e8c5b8b7d1bacd0a125c4420c83771bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_e943b598",
+        "filename": "log/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-18T23:34:25Z",
+      "side": 1,
+      "message": "// Level returns the current logging level.",
+      "revId": "c484f848e8c5b8b7d1bacd0a125c4420c83771bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
