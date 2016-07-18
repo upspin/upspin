@@ -238,7 +238,7 @@ func (testPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upsp
 	return nil
 }
 
-// getKey returns the first user key for the user in name.
+// getKey returns the user key for the user in name.
 func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -248,14 +248,14 @@ func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) 
 	if err != nil {
 		return "", err
 	}
-	_, keys, err := user.Lookup(parsed.User())
+	u, err := user.Lookup(parsed.User())
 	if err != nil {
 		return "", err
 	}
-	if len(keys) == 0 {
-		return "", errors.Str("no keys for signing")
+	if u.PublicKey == "" {
+		return "", errors.Str("no key for signing")
 	}
-	return keys[0], nil
+	return u.PublicKey, nil
 }
 
 // putPath adds (or replaces) the path in the packdata.

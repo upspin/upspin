@@ -29,7 +29,7 @@ type database struct {
 	// mu protects the fields below.
 	mu       sync.RWMutex
 	root     map[upspin.UserName][]upspin.Endpoint
-	keystore map[upspin.UserName][]upspin.PublicKey
+	keystore map[upspin.UserName]upspin.PublicKey
 }
 
 var _ upspin.KeyServer = (*Service)(nil)
@@ -39,16 +39,26 @@ var db *database
 // Lookup reports the set of locations the user's directory might be,
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
-func (s *Service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (s *Service) Lookup(name upspin.UserName) (*upspin.User, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	// Return copies so the caller can't modify our data structures.
 
-	roots := append([]upspin.Endpoint{}, db.root[name]...)
-	keys := append([]upspin.PublicKey{}, db.keystore[name]...)
-	return roots, keys, nil
+	u := &upspin.User{
+		Name:      name,
+		Dirs:      append([]upspin.Endpoint{}, db.root[name]...),
+		PublicKey: db.keystore[name],
+		Stores:    []upspin.Endpoint{},
+	}
+	return u, nil
 }
 
+// Put implements upspin.KeyServer.
+func (s *Service) Put(user *upspin.User) error {
+	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
+}
+
+// TODO: remove and use Put everywhere instead.
 // SetPublicKeys sets a slice of public keys to the keystore for a
 // given user name. Previously-known keys for that user are
 // forgotten. To add keys to the existing set, Lookup and append to
@@ -59,7 +69,7 @@ func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
 	if keys == nil {
 		delete(db.keystore, name)
 	} else {
-		db.keystore[name] = keys
+		db.keystore[name] = keys[0]
 	}
 }
 
@@ -111,6 +121,7 @@ func (s *Service) addRoot(userName upspin.UserName, endpoint upspin.Endpoint) {
 	db.mu.Unlock()
 }
 
+// TODO: remove and use Put everywhere instead.
 // AddRoot adds an endpoint as the user's.db.root endpoint.
 func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error {
 	// Verify that it is a valid name.
@@ -161,7 +172,7 @@ func (s *Service) Authenticate(upspin.Context) error {
 func init() {
 	db = &database{
 		root:     make(map[upspin.UserName][]upspin.Endpoint),
-		keystore: make(map[upspin.UserName][]upspin.PublicKey),
+		keystore: make(map[upspin.UserName]upspin.PublicKey),
 	}
 
 	bind.RegisterKeyServer(upspin.InProcess, &Service{})
