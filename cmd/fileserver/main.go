@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"upspin.io/access"
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
@@ -34,6 +35,8 @@ var (
 	root      = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
 )
 
+var defaultAccess *access.Access
+
 func main() {
 	flag.Parse()
 
@@ -51,6 +54,11 @@ func main() {
 	}
 	defer ctxfd.Close()
 	context, err := context.InitContext(ctxfd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defaultAccess, err = access.New(upspin.PathName(context.UserName()) + "/Access")
 	if err != nil {
 		log.Fatal(err)
 	}
