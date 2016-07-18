@@ -132,6 +132,28 @@ func PublicKeys(upk []upspin.PublicKey) []string {
 	return s
 }
 
+// UpspinUser converts a proto.User to upspin.User.
+func UpspinUser(user *User) *upspin.User {
+	return &upspin.User{
+		Name:      upspin.UserName(user.Name),
+		Dirs:      UpspinEndpoints(user.Dirs),
+		Stores:    UpspinEndpoints(user.Stores),
+		PublicKey: upspin.PublicKey(user.PublicKey),
+		// TODO: other fields?
+	}
+}
+
+// UserPB converts an upspin.User to proto.User.
+func UserPB(user *upspin.User) *User {
+	return &User{
+		Name:      string(user.Name),
+		Dirs:      Endpoints(user.Dirs),
+		Stores:    Endpoints(user.Stores),
+		PublicKey: string(user.PublicKey),
+		// TODO: other fields?
+	}
+}
+
 // UpspinDirEntries converts from slices of bytes to upspin's *DirEntries.
 func UpspinDirEntries(b [][]byte) ([]*upspin.DirEntry, error) {
 	if len(b) == 0 {

@@ -142,14 +142,14 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
 	for _, r := range readers {
-		_, pubkeys, err := c.context.KeyServer().Lookup(r)
-		if err != nil || len(pubkeys) < 1 {
+		u, err := c.context.KeyServer().Lookup(r)
+		if err != nil || len(u.PublicKey) == 0 {
 			// TODO warn that we can't process one of the readers?
 			continue
 		}
-		if pubkeys[0] != readersPublicKey[0] { // don't duplicate self
+		if u.PublicKey != readersPublicKey[0] { // don't duplicate self
 			// TODO(ehg) maybe should check for other duplicates?
-			readersPublicKey[n] = pubkeys[0]
+			readersPublicKey[n] = u.PublicKey
 			n++
 		}
 	}
@@ -276,8 +276,8 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	if parsed.User() == c.context.UserName() {
 		endpoints = append(endpoints, c.context.DirEndpoint())
 	}
-	if eps, _, err := c.context.KeyServer().Lookup(parsed.User()); err == nil {
-		endpoints = append(endpoints, eps...)
+	if u, err := c.context.KeyServer().Lookup(parsed.User()); err == nil {
+		endpoints = append(endpoints, u.Dirs...)
 	}
 	var dir upspin.DirServer
 	for _, e := range endpoints {

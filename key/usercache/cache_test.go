@@ -21,15 +21,10 @@ import (
 	_ "upspin.io/store/inprocess"
 )
 
-type testEntry struct {
-	eps []upspin.Endpoint
-	pks []upspin.PublicKey
-}
-
 // service is a KeyServer implementation that counts lookups.
 type service struct {
 	lookups int
-	entries map[string]testEntry
+	entries map[string]*upspin.User
 
 	context  upspin.Context
 	endpoint upspin.Endpoint
@@ -45,7 +40,7 @@ func setup(t *testing.T, d time.Duration, user string) (upspin.Context, upspin.C
 	}
 
 	s := &service{
-		entries:  make(map[string]testEntry),
+		entries:  make(map[string]*upspin.User),
 		endpoint: e,
 		context:  c.Copy(),
 	}
@@ -138,13 +133,14 @@ func TestExpiration(t *testing.T) {
 // try looks up a name through the cached and uncached KeyServers and
 // compares the results.
 func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
-	seps, spks, serr := unc.KeyServer().Lookup(upspin.UserName(name))
-	ceps, cpks, cerr := c.KeyServer().Lookup(upspin.UserName(name))
-	if !reflect.DeepEqual(seps, ceps) {
-		t.Errorf("for %s got %v expect %v", name, ceps, seps)
+	su, serr := unc.KeyServer().Lookup(upspin.UserName(name))
+	cu, cerr := c.KeyServer().Lookup(upspin.UserName(name))
+
+	if !reflect.DeepEqual(su.Dirs, cu.Dirs) {
+		t.Errorf("for %s got %v expect %v", name, cu.Dirs, su.Dirs)
 	}
-	if !reflect.DeepEqual(spks, cpks) {
-		t.Errorf("for %s got %v expect %v", name, cpks, spks)
+	if cu.PublicKey != su.PublicKey {
+		t.Errorf("for %s got %q expect %q", name, cu.PublicKey, su.PublicKey)
 	}
 	if !reflect.DeepEqual(serr, cerr) {
 		t.Errorf("for %s got %v expect %v", name, cerr, serr)
@@ -152,27 +148,31 @@ func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
 }
 
 func (s *service) add(name string) {
-	var e testEntry
+	u := &upspin.User{
+		Name: upspin.UserName(name),
+	}
 	for i := 0; i < 3; i++ {
 		ep := upspin.Endpoint{
 			Transport: upspin.InProcess,
 			NetAddr:   upspin.NetAddr(fmt.Sprintf("%s%d", name, i)),
 		}
-		e.eps = append(e.eps, ep)
+		u.Dirs = append(u.Dirs, ep)
 	}
-	for i := 0; i < 3; i++ {
-		pk := upspin.PublicKey(fmt.Sprintf("%s%d", name, i))
-		e.pks = append(e.pks, pk)
-	}
-	s.entries[name] = e
+	u.PublicKey = upspin.PublicKey(name + ".key")
+
+	s.entries[name] = u
 }
 
-func (s *service) Lookup(name upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (s *service) Lookup(name upspin.UserName) (*upspin.User, error) {
 	s.lookups++
-	if e, ok := s.entries[string(name)]; ok {
-		return e.eps, e.pks, nil
+	if u, ok := s.entries[string(name)]; ok {
+		return u, nil
 	}
-	return nil, nil, errors.E("Lookup", name, errors.NotExist)
+	return nil, errors.E("Lookup", name, errors.NotExist)
+}
+
+func (s *service) Put(user *upspin.User) error {
+	panic("userCacheTest.Service.Put not implemented")
 }
 
 func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {

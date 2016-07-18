@@ -312,9 +312,9 @@ func setup(name upspin.UserName, curveName string) (upspin.Context, upspin.Packe
 		panic("ecdsa.GenerateKey failed")
 		// return ctx, packer
 	}
-	kPublic := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
-	kPrivate := fmt.Sprintf("%s\n", priv.D.String())
-	f, err := factotum.New(kPublic, kPrivate)
+	public := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
+	private := fmt.Sprintf("%s\n", priv.D.String())
+	f, err := factotum.New(public, private)
 	if err != nil {
 		panic("NewFactotum failed")
 	}
@@ -333,14 +333,18 @@ type dummyKey struct {
 
 var _ upspin.KeyServer = (*dummyKey)(nil)
 
-func (d *dummyKey) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (d *dummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	for i, u := range d.userToMatch {
 		if u == userName {
 			d.returnedKeys++
-			return nil, []upspin.PublicKey{d.keyToReturn[i]}, nil
+			user := &upspin.User{
+				Name:      userName,
+				PublicKey: d.keyToReturn[i],
+			}
+			return user, nil
 		}
 	}
-	return nil, nil, errors.E("Lookup", userName, errors.NotExist, errors.Str("user not found"))
+	return nil, errors.E("Lookup", userName, errors.NotExist, errors.Str("user not found"))
 }
 func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
