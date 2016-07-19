@@ -108,6 +108,7 @@ func runAllTests(t *testing.T, packing upspin.Packing) {
 	testPutGetTopLevelFile(t, env)
 	testFileSequentialAccess(t, env)
 	testReadAccess(t, packing)
+	testWhichAccess(t, packing)
 }
 
 func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {

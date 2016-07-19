@@ -349,26 +349,23 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 	mu.Lock()
 	defer mu.Unlock()
 
-	accessPath, acc, err := d.whichAccess(op, &parsed, opts)
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-
 	user := d.context.UserName()
 
-	// Must check whether the user has sufficient rights to List the requested path.
-	canRead, err := d.checkRights(user, access.Read, parsed.Path(), acc, opts)
-	if err != nil {
-		log.Printf("WhichAccess error Read: %s", err)
-		return "", errors.E(op, err)
-	}
-	canList, err := d.checkRights(user, access.List, parsed.Path(), acc, opts)
+	// Check ACLs before attempting to look up the Access file to avoid leaking information about the existence of paths.
+	//TODO: Use the "any" right once it's created.
+	canList, err := d.hasRight(op, user, access.List, &parsed, opts)
 	if err != nil {
 		log.Printf("WhichAccess error List: %s", err)
-		return "", errors.E(op, err)
+		return "", errors.E(op, user, err)
 	}
-	if !canRead && !canList {
+	// If the user has no rights, we're done.
+	if !canList {
 		return "", errors.E(op, parsed.Path(), errors.Permission)
+	}
+
+	accessPath, _, err := d.whichAccess(op, &parsed, opts)
+	if err != nil {
+		return "", errors.E(op, user, err)
 	}
 	return accessPath, nil
 }
