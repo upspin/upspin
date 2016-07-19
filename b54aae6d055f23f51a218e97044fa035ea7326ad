@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a6533f4_98f36105",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "you do this several times; could use a helper.",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_f8ec9d28",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "use helper",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_f8a5bdfa",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "// TODO: other fields.",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_d8a2f9f0",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "it\u0027s not Syntax. maybe Invalid or even IO",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_58972994",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "use helper",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_d8bb1927",
+        "filename": "key/remote/remote.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "see comments in upspin.proto. there should be helpers for this.",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_98c5a1a5",
+        "filename": "key/remote/remote.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "Key/remote.Put not implemented\n\nor some such",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_38b59536",
+        "filename": "key/usercache/cache_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "usercache.service.Put not implemented",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_986ec1c3",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 11
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "it seems to me that there should be a User message and KeyLookupResponse and KeyPutRequest just have that as one field.\nthen in proto.go write transcoders from this User to upspin.User",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_387eb57c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T19:41:51Z",
+      "side": 1,
+      "message": "e-mail\n\nto be consistent with usage below",
+      "revId": "b54aae6d055f23f51a218e97044fa035ea7326ad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
