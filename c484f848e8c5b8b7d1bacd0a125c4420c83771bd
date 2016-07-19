@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_0cddf7d9",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-19T00:51:15Z",
+      "side": 1,
+      "message": "It\u0027s not necessary, but in case someone later wants to read the flag values through the interface, we might as well make it work now.",
+      "parentUuid": "4a6533f4_a9aedd93",
+      "revId": "c484f848e8c5b8b7d1bacd0a125c4420c83771bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_094f29c2",
         "filename": "flags/flags.go",
         "patchSetId": 11
