@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_3eed7df5",
+        "filename": "flags/flags.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T21:47:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_b8850506",
+      "revId": "805b7f6b5c6f707331b36ba69e439dc8b534c741",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_78b1cdfa",
         "filename": "flags/flags.go",
         "patchSetId": 14
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-19T20:03:36Z",
       "side": 1,
       "message": "how about calling this flag just \u0027log\u0027, so we write\n\n-log\u003ddebug\n\nthat seems clear and shorter than \u0027loglevel\u0027.",
+      "revId": "805b7f6b5c6f707331b36ba69e439dc8b534c741",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_1ef2b9d5",
+        "filename": "flags/flags.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T21:47:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_78b1cdfa",
       "revId": "805b7f6b5c6f707331b36ba69e439dc8b534c741",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
