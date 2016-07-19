@@ -400,6 +400,14 @@ func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error)
 	if err != nil {
 		return "", errors.E(WhichAccess, err)
 	}
+	// WhichAccess requires list permisison.
+	canAccess, err := s.can(access.List, parsed)
+	if err != nil {
+		return "", errors.E(WhichAccess, err)
+	}
+	if !canAccess {
+		return "", errors.E(WhichAccess, pathName, access.ErrPermissionDenied)
+	}
 	accessFile := s.whichAccess(parsed)
 	if accessFile == nil {
 		return "", nil

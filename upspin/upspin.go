@@ -288,6 +288,8 @@ type DirServer interface {
 
 	// WhichAccess returns the path name of the Access file that is
 	// responsible for the access rights defined for the named item.
+	// WhichAccess requires that the calling user have List rights
+	// (see the access package) for the argument name.
 	// If there is no such file, that is, there are no Access files that
 	// apply, it returns the empty string.
 	WhichAccess(name PathName) (PathName, error)
