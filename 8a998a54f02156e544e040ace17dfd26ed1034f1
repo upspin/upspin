@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_f22b99e4",
+        "filename": "client/benchmark_test.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T22:00:49Z",
+      "side": 1,
+      "message": "Doh! It got undone after Patch Set #14. Not sure how, but fixed.",
+      "parentUuid": "4a6533f4_92a69da9",
+      "revId": "8a998a54f02156e544e040ace17dfd26ed1034f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_72ab2973",
         "filename": "dir/gcp/race_test.go",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_d238953c",
+        "filename": "dir/gcp/race_test.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T22:00:49Z",
+      "side": 1,
+      "message": "Fixed again.",
+      "parentUuid": "4a6533f4_72ab2973",
+      "revId": "8a998a54f02156e544e040ace17dfd26ed1034f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_92cd7d65",
         "filename": "flags/flags.go",
         "patchSetId": 15
@@ -47,6 +83,24 @@
       "writtenOn": "2016-07-19T21:56:12Z",
       "side": 1,
       "message": "level of logging; values are info, debug, .... whatever",
+      "revId": "8a998a54f02156e544e040ace17dfd26ed1034f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_b2352143",
+        "filename": "flags/flags.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T22:00:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_92cd7d65",
       "revId": "8a998a54f02156e544e040ace17dfd26ed1034f1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
