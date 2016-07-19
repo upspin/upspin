@@ -42,6 +42,22 @@ func (r *runner) read(user upspin.UserName, file upspin.PathName, shouldSucceed 
 	r.check("Get", user, file, err, shouldSucceed)
 }
 
+func (r *runner) whichAccess(user upspin.UserName, file upspin.PathName, shouldSucceed bool) {
+	file = path.Join(upspin.PathName(r.owner), string(file))
+	var err error
+	client := r.env.Client
+	if user != r.owner {
+		client = r.userClient
+	}
+	dir, err := client.DirServer(file)
+	if err != nil {
+		r.Errorf("WhichAccess: cannot get DirServer for file %q: %v", file, err)
+		return
+	}
+	_, err = dir.WhichAccess(file)
+	r.check("WhichAccess", user, file, err, shouldSucceed)
+}
+
 func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, err error, shouldSucceed bool) {
 	if shouldSucceed {
 		if err != nil {
@@ -209,4 +225,85 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, privateDir, false)
 	r.read(user, publicDir, false)
 	r.read(user, publicFile, false)
+}
+
+func testWhichAccess(t *testing.T, packing upspin.Packing) {
+	var (
+		user  = newUserName()
+		owner = newUserName()
+	)
+	const (
+		publicDir        = "public"
+		privateDir       = "private"
+		publicFile       = publicDir + "/public.txt"
+		privateFile      = privateDir + "/private.txt"
+		contentsOfPublic = "public file"
+	)
+	key := ownersKey
+	// TODO  try different key types
+	testSetup := &testenv.Setup{
+		OwnerName: upspin.UserName(owner),
+		Packing:   packing,
+		Transport: upspin.InProcess,
+		Keys:      key,
+		Tree: testenv.Tree{
+			testenv.E(publicDir+"/", ""),
+			testenv.E(publicFile, contentsOfPublic),
+			testenv.E(privateDir+"/", ""),
+			testenv.E(privateFile, "private"),
+		},
+	}
+
+	env, err := testenv.New(testSetup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userClient, _, err := env.NewUser(user, nil)
+	if err != nil {
+		t.Fatalf("NewUser: %v", err)
+	}
+
+	r := runner{
+		env:        env,
+		owner:      owner,
+		userClient: userClient,
+		t:          t,
+	}
+
+	// With no access files, every item is seen by owner.
+	r.state = "No Access files"
+	r.whichAccess(owner, "", true)
+	r.whichAccess(owner, privateDir, true)
+	r.whichAccess(owner, privateDir, true)
+	r.whichAccess(owner, publicDir, true)
+	r.whichAccess(owner, publicFile, true)
+
+	// With no access files, no item is seen by user.
+	r.whichAccess(user, "", false)
+	r.whichAccess(user, privateDir, false)
+	r.whichAccess(user, privateDir, false)
+	r.whichAccess(user, publicDir, false)
+	r.whichAccess(user, publicFile, false)
+
+	// Add /public/Access, granting List to user.
+	const accessFile = "/public/Access"
+	var (
+		accessText = fmt.Sprintf("list:%s\nw:%s", user, owner)
+	)
+	r.state = "With Access file"
+	r.write(owner, accessFile, accessText, true)
+
+	// With Access file, every item is seen by owner.
+	r.whichAccess(owner, "", true)
+	r.whichAccess(owner, privateDir, true)
+	r.whichAccess(owner, privateDir, true)
+	r.whichAccess(owner, publicDir, true)
+	r.whichAccess(owner, publicFile, true)
+
+	// With Access file, only public items are seen by user.
+	r.whichAccess(user, "", false)
+	r.whichAccess(user, privateDir, false)
+	r.whichAccess(user, privateDir, false)
+	r.whichAccess(user, publicDir, true)
 }
