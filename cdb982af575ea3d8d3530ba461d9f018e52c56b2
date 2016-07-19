@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_d2ee5a86",
+        "filename": "client/benchmark_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "My bad again. Dave caught something like this earlier and I ran go build ./... but I might have been in a subdirectory. Fixed all of them now and re-ran ALL unit tests.",
+      "parentUuid": "4a6533f4_cceebf86",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_6c8593b1",
         "filename": "dir/gcp/race_test.go",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-19T00:51:15Z",
       "side": 1,
       "message": "\"error\" ?",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_b2ebe674",
+        "filename": "dir/gcp/race_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_6c8593b1",
       "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_528a6ac3",
+        "filename": "log/log.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "Makes sense. The latter is even simpler but it\u0027s important for SetLevel to catch the error, I think. Done the former.",
+      "parentUuid": "4a6533f4_2c8f9bd3",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_cc759fdc",
         "filename": "log/log_test.go",
         "patchSetId": 13
@@ -81,6 +135,24 @@
       "writtenOn": "2016-07-19T00:51:15Z",
       "side": 1,
       "message": "could be a const",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_d2753adc",
+        "filename": "log/log_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_cc759fdc",
       "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_927fc2ba",
+        "filename": "log/log_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_ac826ba2",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_4cb1af91",
         "filename": "log/log_test.go",
         "patchSetId": 13
@@ -115,6 +205,24 @@
       "writtenOn": "2016-07-19T00:51:15Z",
       "side": 1,
       "message": "isn\u0027t this a fake, not a mock?",
+      "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_d29c1a06",
+        "filename": "log/log_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-19T15:51:58Z",
+      "side": 1,
+      "message": "Correct. I just call them all mocks because the distinction doesn\u0027t help me in any way. Maybe it helps others, so fixed.",
+      "parentUuid": "4a6533f4_4cb1af91",
       "revId": "cdb982af575ea3d8d3530ba461d9f018e52c56b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
