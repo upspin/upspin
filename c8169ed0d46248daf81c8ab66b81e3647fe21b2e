@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8af56b93_ab504908",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T18:20:12Z",
+      "side": 1,
+      "message": "you first need to verify that all fields are present and correct syntactically.",
+      "revId": "c8169ed0d46248daf81c8ab66b81e3647fe21b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8af56b93_0b3b5dd5",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T18:20:12Z",
+      "side": 1,
+      "message": "What if an admin wants to update his/her keys or packing? If you do this, none of us can use \"upspin user -put\" to update our keys.",
+      "revId": "c8169ed0d46248daf81c8ab66b81e3647fe21b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
