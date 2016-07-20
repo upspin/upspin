@@ -34,19 +34,24 @@ var (
 	LogFile = ""
 
 	// LogLevel sets the level of logging.
-	Log = logFlag("info")
+	Log logFlag
 )
 
 type logFlag string
 
 // String implements flag.Value.
 func (l *logFlag) String() string {
-	return log.Level()
+	return string(*l)
 }
 
 // Set implements flag.Value.
 func (l *logFlag) Set(level string) error {
-	return log.SetLevel(level)
+	err := log.SetLevel(level)
+	if err != nil {
+		return err
+	}
+	*l = logFlag(log.Level())
+	return nil
 }
 
 // Get implements flag.Getter.
@@ -58,7 +63,8 @@ func init() {
 	flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
 	flag.StringVar(&Context, "context", Context, "context file")
 	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
-	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "laddress for incoming network connections")
+	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "address for incoming network connections")
 	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
-	flag.Var(&Log, "log", "level of logging: debug, info, error, disabled")
+	Log.Set("info")
+	flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
 }
