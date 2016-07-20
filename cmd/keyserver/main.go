@@ -108,16 +108,16 @@ func (s *Server) internalLookup(userName upspin.UserName) (upspin.PublicKey, err
 	return user.PublicKey, err
 }
 
-// keyServerFor returns a KeyServer bound to the user specified in the context and the username authenticated.
-func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, upspin.UserName, error) {
+// keyServerFor returns a KeyServer bound to the user specified in the context.
+func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 	context := s.context.Copy().SetUserName(session.User())
 	key, err := bind.KeyServer(context, s.endpoint)
-	return key, session.User(), err
+	return key, err
 }
 
 // Lookup implements upspin.KeyServer, and does not do any authentication.
@@ -141,21 +141,13 @@ func keyPutError(err error) *proto.KeyPutResponse {
 func (s *Server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
 	log.Printf("Put %v", req)
 
-	key, userName, err := s.keyServerFor(ctx)
+	key, err := s.keyServerFor(ctx)
 	if err != nil {
 		log.Printf("Put %q authentication failed: %v", req.User.Name, err)
 		return keyPutError(err), nil
 
 	}
 	user := proto.UpspinUser(req.User)
-	// If the user is editing someone else's entry, it must be an admin.
-	if userName != user.Name {
-		// TODO: check if userName is an admin.
-		err := errors.E("Put", errors.Permission, errors.Errorf("%q not authorized to edit %q data", userName, user.Name))
-		log.Error.Printf("Put: %v", err)
-		return keyPutError(err), nil
-	}
-
 	err = key.Put(user)
 	if err != nil {
 		log.Printf("Put %q failed: %v", user.Name, err)
@@ -168,7 +160,7 @@ func (s *Server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.Key
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
 	log.Printf("Configure %q", req.Options)
 
-	key, _, err := s.keyServerFor(ctx)
+	key, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +176,7 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 
-	key, _, err := s.keyServerFor(ctx)
+	key, err := s.keyServerFor(ctx)
 	if err != nil {
 		return nil, err
 	}

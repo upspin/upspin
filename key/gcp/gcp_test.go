@@ -8,13 +8,15 @@ import (
 	"strings"
 	"testing"
 
+	"reflect"
+
+	"gopkg.in/square/go-jose.v1/json"
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/context"
 	"upspin.io/upspin"
 )
 
-const (
-	mockKey = "bob@foo.com"
-)
+const isAdmin = true
 
 func TestInvalidUser(t *testing.T) {
 	u := newDummyKeyServer()
@@ -28,162 +30,209 @@ func TestInvalidUser(t *testing.T) {
 	}
 }
 
-func TestAddKeyShortKey(t *testing.T) {
-	u := newDummyKeyServer()
-	err := u.AddKey("a@abc.com", upspin.PublicKey("1234"))
+func TestPutOtherUserNotAdmin(t *testing.T) {
+	const (
+		myName    = "cool@dude.com"
+		otherUser = "uncool@buddy.com"
+	)
+
+	// Pre-existing user: myName, who *is not* an admin.
+	user := &upspin.User{
+		Name: myName,
+	}
+	buf := marshalUser(t, user, !isAdmin)
+
+	// Create a server authenticated with myName and with a pre-existing User entry for myName.
+	u, mockGCP := newKeyServerWithMocking(myName, myName, buf)
+
+	// myName now attempts to write somebody else's information.
+	otherU := &upspin.User{
+		Name:      otherUser,
+		PublicKey: upspin.PublicKey("going to change your key, haha"),
+	}
+	err := u.Put(otherU)
 	if err == nil {
-		t.Fatal("Expected an error")
+		t.Fatal("Expected error, got none")
 	}
-	expected := "key length too short"
-	if !strings.Contains(err.Error(), expected) {
-		t.Errorf("Expected %q, got %q", expected, err)
+	if !strings.Contains(err.Error(), "permission denied") {
+		t.Errorf("Expected permission denied, got %q", err)
+	}
+	// Check that indeed we did not write to GCP.
+	if len(mockGCP.PutRef) != 0 {
+		t.Errorf("Expected no writes, got %d", len(mockGCP.PutRef))
 	}
 }
 
-func TestAddKeyToExistingUser(t *testing.T) {
-	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["xyz"]}`))
-	err := u.AddKey(mockKey, upspin.PublicKey("abcdefghijklmnopqrs"))
+func TestPutOtherUserIsAdmin(t *testing.T) {
+	const (
+		myName    = "cool@dude.com"
+		otherUser = "uncool@buddy.com"
+	)
+
+	// Pre-existing user: myName, who *is* an admin.
+	user := &upspin.User{
+		Name: myName,
+	}
+	buf := marshalUser(t, user, isAdmin)
+
+	// Create a server authenticated with myName and with a pre-existing User entry for myName.
+	u, mockGCP := newKeyServerWithMocking(myName, myName, buf)
+
+	// myName now attempts to write somebody else's information.
+	otherU := &upspin.User{
+		Name:      otherUser,
+		PublicKey: upspin.PublicKey("going to change your key, because I can"),
+	}
+	err := u.Put(otherU)
+	if err != nil {
+		t.Fatal("Expected no error")
+	}
+	// Check new user was written to GCP
+	if len(mockGCP.PutRef) != 1 {
+		t.Fatalf("Expected one write, got %d", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != otherUser {
+		t.Errorf("Expected write to user %q, wrote to %q", otherUser, mockGCP.PutRef[0])
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *otherU) {
+		t.Errorf("Expected Put to store User %v, but it stored %v", otherU, savedUser)
+	}
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
+	}
+}
+
+func TestPutNewUserSelf(t *testing.T) {
+	const myName = "cool@dude.com"
+
+	// New server for myName.
+	u, mockGCP := newKeyServerWithMocking(myName, "", nil)
+
+	user := &upspin.User{
+		Name: myName,
+		Dirs: []upspin.Endpoint{
+			upspin.Endpoint{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("there.co.uk"),
+			},
+		},
+		Stores: []upspin.Endpoint{
+			upspin.Endpoint{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("down-under.au"),
+			},
+		},
+		PublicKey: upspin.PublicKey("my key"),
+	}
+	err := u.Put(user)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Verify that GCP tried to Put the added key back.
+	// Verify that GCP received the Put.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
 		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
 	}
-	if mockGCP.PutRef[0] != mockKey {
-		t.Errorf("Expected update to user %s, got user %s", mockKey, mockGCP.PutRef[0])
+	if mockGCP.PutRef[0] != myName {
+		t.Errorf("Expected write to %q, wrote to %q", myName, mockGCP.PutRef)
 	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs","xyz"],"Endpoints":null}`
-	if string(mockGCP.PutContents[0]) != expectedPutValue {
-		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *user) {
+		t.Errorf("Expected Put to store User %v, but it stored %v", user, savedUser)
 	}
-}
-
-func TestAddExistingKey(t *testing.T) {
-	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Keys":["abcdefghijklmnopqrs"]}`))
-	err := u.AddKey(mockKey, upspin.PublicKey("abcdefghijklmnopqrs"))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Verify that GCP did not try to Put the repeated key back.
-	if len(mockGCP.PutRef) != 0 || len(mockGCP.PutContents) != 0 {
-		t.Fatalf("Expected no call to GCP.Put, got %d", len(mockGCP.PutRef))
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
 	}
 }
 
-func TestAddKeyToNewUser(t *testing.T) {
-	u, mockGCP := newKeyServerWithMocking(nil)
-	err := u.AddKey("new@user.com", upspin.PublicKey("abcdefghijklmnopqrs"))
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestPutNewUserSelfIsAdmin(t *testing.T) {
+	const myName = "cool@dude.com"
 
-	// Verify that GCP tried to Put the added key back.
-	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
-		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
+	user := &upspin.User{
+		Name: myName,
+		Stores: []upspin.Endpoint{
+			upspin.Endpoint{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("some.place:443"),
+			},
+		},
+		PublicKey: upspin.PublicKey("super secure"),
 	}
-	newUser := "new@user.com"
-	if mockGCP.PutRef[0] != newUser {
-		t.Errorf("Expected update to user %s, got user %s", newUser, mockGCP.PutRef[0])
-	}
-	expectedPutValue := `{"User":"new@user.com","Keys":["abcdefghijklmnopqrs"],"Endpoints":null}`
-	if string(mockGCP.PutContents[0]) != expectedPutValue {
-		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
-	}
-}
+	buf := marshalUser(t, user, isAdmin)
 
-func TestAddRootToExistingUser(t *testing.T) {
-	u, mockGCP := newKeyServerWithMocking([]byte(`{"User":"bob@foo.com","Endpoints":[{"Transport":2,"NetAddr":"http://here.com"}]}`))
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr("http://there.co.uk"),
-	}
-	err := u.AddRoot(mockKey, e)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// New server for myName.
+	u, mockGCP := newKeyServerWithMocking(myName, myName, buf)
 
-	// Verify that GCP tried to Put the added key back.
-	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
-		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
-	}
-	if mockGCP.PutRef[0] != mockKey {
-		t.Errorf("Expected update to user %s, got user %s", mockKey, mockGCP.PutRef[0])
-	}
-	expectedPutValue := `{"User":"bob@foo.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://there.co.uk"},{"Transport":2,"NetAddr":"http://here.com"}]}`
-	if string(mockGCP.PutContents[0]) != expectedPutValue {
-		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
-	}
-}
-
-func TestAddRootToNewUser(t *testing.T) {
-	u, mockGCP := newKeyServerWithMocking(nil)
-	e := upspin.Endpoint{
-		Transport: upspin.GCP,
-		NetAddr:   upspin.NetAddr("http://there.co.uk"),
-	}
-	err := u.AddRoot("new@user.com", e)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Verify that GCP tried to Put the added key back.
-	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
-		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
-	}
-	newUser := "new@user.com"
-	if mockGCP.PutRef[0] != newUser {
-		t.Errorf("Expected update to user %s, got user %s", newUser, mockGCP.PutRef[0])
-	}
-	expectedPutValue := `{"User":"new@user.com","Keys":null,"Endpoints":[{"Transport":2,"NetAddr":"http://there.co.uk"}]}`
-	if string(mockGCP.PutContents[0]) != expectedPutValue {
-		t.Errorf("Expected put value %s, got %s", expectedPutValue, mockGCP.PutContents[0])
-	}
-}
-
-func TestGetExistingUser(t *testing.T) {
-	const storedEntry = `{"User":"bob@foo.com","Keys":["my key"],"Endpoints":[{"Transport":3,"NetAddr":"http://here.com"}]}`
-	u, _ := newKeyServerWithMocking([]byte(storedEntry))
-	user, err := u.Lookup(mockKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if user.PublicKey == "" {
-		t.Fatal("Expected 1 key, got nothing")
-	}
-	expectedKey := "my key"
-	if string(user.PublicKey) != expectedKey {
-		t.Errorf("Expected key %q, got %q", expectedKey, user.PublicKey)
-	}
-	if len(user.Dirs) != 1 {
-		t.Fatalf("Expected one directory endpoint, got %d", len(user.Dirs))
-	}
-	expectedEndpoint := upspin.Endpoint{
+	// Changing my user info to include a root dir.
+	user.Dirs = append(user.Dirs, upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr("http://here.com"),
+		NetAddr:   upspin.NetAddr("my-root-dir:443"),
+	})
+	// Change my information.
+	err := u.Put(user)
+	if err != nil {
+		t.Fatal(err)
 	}
-	if user.Dirs[0] != expectedEndpoint {
-		t.Errorf("Expected endpoint %v, got %v", expectedEndpoint, user.Dirs[0])
+
+	// Verify that GCP received the Put.
+	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
+		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != myName {
+		t.Errorf("Expected write to %q, wrote to %q", myName, mockGCP.PutRef)
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *user) {
+		t.Errorf("Expected Put to store User %v, but it stored %v", user, savedUser)
+	}
+	if !isAdmin {
+		t.Error("Expected user to be an admin")
 	}
 }
 
+// marshalUser marshals the user struct and whether the user is an admin into JSON bytes.
+func marshalUser(t *testing.T, user *upspin.User, isAdmin bool) []byte {
+	ue := userEntry{
+		User:    *user,
+		IsAdmin: isAdmin,
+	}
+	buf, err := json.Marshal(ue)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return buf
+}
+
+// unmarshalUser unmarshals JSON bytes into the user struct, along with whether the user is an admin.
+func unmarshalUser(t *testing.T, buf []byte) (*upspin.User, bool) {
+	var ue userEntry
+	err := json.Unmarshal(buf, &ue)
+	if err != nil {
+		t.Fatalf("Wrote invalid bytes: %q: %v", buf, err)
+	}
+	return &ue.User, ue.IsAdmin
+}
+
+// newDummyKeyServer creates a new keyserver.
 func newDummyKeyServer() *key {
 	return &key{cloudClient: &storagetest.DummyStorage{}}
 }
 
-// newKeyServerWithMocking sets up a mock GCP client that expects a
+// newKeyServerWithMocking sets up a mock GCP client for a user and expects a
 // single lookup of user mockKey and it will reply with the preset
 // data. It returns the user server, the mock GCP client for further
 // verification.
-func newKeyServerWithMocking(data []byte) (*key, *storagetest.ExpectDownloadCapturePut) {
+func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*key, *storagetest.ExpectDownloadCapturePut) {
 	mockGCP := &storagetest.ExpectDownloadCapturePut{
-		Ref:         []string{mockKey},
+		Ref:         []string{ref},
 		Data:        [][]byte{data},
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
-	u := &key{cloudClient: mockGCP}
+	u := &key{
+		cloudClient: mockGCP,
+		context:     context.New().SetUserName(user),
+	}
 	return u, mockGCP
 }
