@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_66024712",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-20T20:59:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_ab78085a",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_8b1544f6",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-20T05:16:04Z",
       "side": 1,
       "message": "this contradicts the comment on Can, which states it\u0027s about the Access file\u0027s rules.\nso you need to update that.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_a636ffea",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-20T20:59:42Z",
+      "side": 1,
+      "message": "I\u0027m confused. The comment on Can does say that it applies the rules of the Access file as well as the implicit rule that owner can always Read and List.  Maybe you meant that I should copy that to the comment for usersNoGroupLoad and Users?  Done.",
+      "parentUuid": "4a6533f4_8b1544f6",
       "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "4a6533f4_06470b57",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 663,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-20T20:59:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a6533f4_2b241866",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_cb7b3c56",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "8af56b93_f1aec094",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-20T20:59:42Z",
+      "side": 1,
+      "message": "Added some tests but maybe not enough yet.",
+      "parentUuid": "4a6533f4_cb7b3c56",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6533f4_8b6e649a",
         "filename": "upspin/upspin.go",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2016-07-20T05:16:04Z",
       "side": 1,
       "message": "This is unrelated. It should probably go in a separate CL but it\u0027s not worth it for something this small. Just please check that your CLs have only the relevant pieces.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_a65ddf26",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-20T20:59:42Z",
+      "side": 1,
+      "message": "Ok, will leave the buggy comment in and will try to remember to fix it some other time.",
+      "parentUuid": "4a6533f4_8b6e649a",
       "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
