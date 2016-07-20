@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8af56b93_6e030fdd",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T19:37:38Z",
+      "side": 1,
+      "message": "s/\\. S/, s/",
+      "revId": "3de213297b35a703e699fcd2c74b7ed407adbfe5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8af56b93_cef32304",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T19:37:38Z",
+      "side": 1,
+      "message": "return errors.E(Put, u.context.UserName(), errors.Permission, errors.Str(\"not an administrator\"))",
+      "revId": "3de213297b35a703e699fcd2c74b7ed407adbfe5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8af56b93_2e92a7a4",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T19:37:38Z",
+      "side": 1,
+      "message": "this comment is out of date regarding IsAdmin",
+      "revId": "3de213297b35a703e699fcd2c74b7ed407adbfe5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
