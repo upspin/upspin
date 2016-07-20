@@ -6,6 +6,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +16,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
+	"upspin.io/factotum"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -279,20 +281,7 @@ func put(args ...string) {
 		os.Exit(2)
 	}
 	c, _ := newClient()
-	var input *os.File
-	if *inFile == "" {
-		input = os.Stdin
-	} else {
-		input, err = os.Open(*inFile)
-		if err != nil {
-			exit(err)
-		}
-		defer input.Close()
-	}
-	data, err := ioutil.ReadAll(input)
-	if err != nil {
-		exit(err)
-	}
+	data := readAll(*inFile)
 	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		exit(err)
@@ -325,31 +314,79 @@ func rm(args ...string) {
 
 func user(args ...string) {
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "user username...")
+	put := fs.Bool("put", false, "write new user record")
+	inFile := fs.String("in", "", "input file (default standard input)")
+	force := fs.Bool("force", false, "force writing user record even if key is empty")
+	// TODO: the username is not accepted with -put. We may need two lines to fix this (like 'man printf').
+	fs.Usage = subUsage(fs, "user [-put [-in=inputfile] [-force]] [username...]")
 	err := fs.Parse(args)
 	if err != nil {
 		exit(err)
 	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
 	_, ctx := newClient()
-	user, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		exit(err)
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		u, err := user.Lookup(upspin.UserName(fs.Arg(i)))
+	if *put {
+		if fs.NArg() != 0 {
+			exitf("extraneous arguments for 'user -put'")
+		}
+		putUser(keyServer, *inFile, *force)
+		return
+	}
+	if *inFile != "" {
+		exitf("-in only available with -put")
+	}
+	if *force {
+		exitf("-force only available with -put")
+	}
+	var userNames []upspin.UserName
+	if fs.NArg() == 0 {
+		userNames = append(userNames, ctx.UserName())
+	} else {
+		for i := 0; i < fs.NArg(); i++ {
+			userNames = append(userNames, upspin.UserName(fs.Arg(i)))
+		}
+	}
+	for _, name := range userNames {
+		u, err := keyServer.Lookup(name)
 		if err != nil {
 			exit(err)
 		}
-		fmt.Printf("%s:\n", fs.Arg(i))
-		fmt.Printf("endpoints:\n")
-		for _, e := range u.Dirs {
-			fmt.Println(e)
+		blob, err := json.MarshalIndent(u, "", "\t")
+		if err != nil {
+			// TODO(adg): better error message?
+			exit(err)
 		}
-		fmt.Printf("key:\n")
-		fmt.Println(u.PublicKey)
+		fmt.Printf("%s\n", blob)
+	}
+}
+
+func putUser(keyServer upspin.KeyServer, inFile string, force bool) {
+	data := readAll(inFile)
+	user := new(upspin.User)
+	err := json.Unmarshal(data, user)
+	if err != nil {
+		// TODO(adg): better error message?
+		exit(err)
+	}
+	// Validate public key.
+	if user.PublicKey == "" && !force {
+		exitf("An empty public key will prevent user from accessing services. To override use -force.")
+	}
+	_, _, err = factotum.ParsePublicKey(user.PublicKey)
+	if err != nil && !force {
+		exitf("Invalid public key, to override use -force: %s", err.Error())
+	}
+	// Validate username
+	_, _, err = path.UserAndDomain(user.Name)
+	if err != nil {
+		exit(err)
+	}
+	err = keyServer.Put(user)
+	if err != nil {
+		exit(err)
 	}
 }
 
@@ -472,6 +509,28 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 			e.Name,
 			redirect)
 	}
+}
+
+// readAll reads all contents from an input file name or from stdin if
+// the input file name is empty
+func readAll(fileName string) []byte {
+	var input *os.File
+	var err error
+	if fileName == "" {
+		input = os.Stdin
+	} else {
+		input, err = os.Open(fileName)
+		if err != nil {
+			exit(err)
+		}
+		defer input.Close()
+	}
+
+	data, err := ioutil.ReadAll(input)
+	if err != nil {
+		exit(err)
+	}
+	return data
 }
 
 func newClient() (upspin.Client, upspin.Context) {
