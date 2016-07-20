@@ -30,12 +30,11 @@ type key struct {
 
 var _ upspin.KeyServer = (*key)(nil)
 
-// userEntry stores all known information for a given user. The fields
-// are exported because JSON parsing needs access to them.
+// userEntry is the on-disk representation of upspin.User, further annotated with
+// non-public information, such as whether the user is an admin.
 type userEntry struct {
-	User      upspin.UserName    // User's email address (e.g. bob@bar.com).
-	Keys      []upspin.PublicKey // Known keys for the user.
-	Endpoints []upspin.Endpoint  // Known endpoints for the user's directory entry.
+	User    upspin.User
+	IsAdmin bool
 }
 
 const (
@@ -68,96 +67,46 @@ func isKeyInSlice(key upspin.PublicKey, slice []upspin.PublicKey) bool {
 	return false
 }
 
-// AddKey adds a new public key for a user.
-// TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
-// around for re-using later.
-func (u *key) AddKey(userName upspin.UserName, key upspin.PublicKey) error {
-	const AddKey = "AddKey"
-	// Validate user name
-	_, err := path.Parse(upspin.PathName(userName) + "/")
-	if err != nil {
-		return errors.E(AddKey, userName, errInvalidUserName)
-	}
-	if len(key) < minKeyLen {
-		return errors.E(AddKey, userName, errKeyTooShort)
-	}
-
-	// Appends to the current user entry, if any.
-	ue, err := u.fetchUserEntry(AddKey, userName)
-	if err != nil {
-		// If this is a Not Found error, then allocate a new userEntry and continue.
-		if isNotFound(err) {
-			log.Printf("User %q not found on GCP, adding new one", userName)
-			ue = &userEntry{
-				User: upspin.UserName(userName),
-				Keys: make([]upspin.PublicKey, 0, 1),
-			}
-		} else {
-			return err
-		}
-	}
-	// Check that the key is not already there.
-	if !isKeyInSlice(key, ue.Keys) {
-		// Place key at head of slice to indicate higher priority.
-		ue.Keys = append([]upspin.PublicKey{key}, ue.Keys...)
-		err = u.putUserEntry(AddKey, userName, ue)
-		if err != nil {
-			return err
-		}
-	}
-	log.Printf("Added key %s for user %v\n", key, userName)
-	return nil
-}
-
-// AddRoot adds a new root endpoint for a user.
-// TODO: this is not used yet, but useful in the future and was supported by the HTTP RESTful user server, so keeping it
-// around for re-using later.
-func (u *key) AddRoot(userName upspin.UserName, endpoint upspin.Endpoint) error {
-	const AddRoot = "AddRoot"
-	// Validate user name
-	_, err := path.Parse(upspin.PathName(userName) + "/")
-	if err != nil {
-		return errors.E(AddRoot, userName, errInvalidUserName)
-	}
-
-	// Get the user entry from GCP.
-	ue, err := u.fetchUserEntry(AddRoot, userName)
-	if err != nil {
-		// If this is a Not Found error, then allocate a new userEntry and continue.
-		if isNotFound(err) {
-			log.Printf("User %q not found on GCP, adding new one", userName)
-			ue = &userEntry{
-				User:      upspin.UserName(userName),
-				Endpoints: make([]upspin.Endpoint, 0, 1),
-			}
-		} else {
-			return err
-		}
-	}
-	// Place the endpoint at the head of the slice to indicate higher priority.
-	ue.Endpoints = append([]upspin.Endpoint{endpoint}, ue.Endpoints...)
-	err = u.putUserEntry(AddRoot, userName, ue)
-	if err != nil {
-		return err
-	}
-	log.Printf("Added root %v for user %v", endpoint, userName)
-	return nil
-}
-
 // Lookup implements upspin.KeyServer.
-func (u *key) Lookup(userName upspin.UserName) ([]upspin.Endpoint, []upspin.PublicKey, error) {
+func (u *key) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	const Lookup = "Lookup"
 	// Validate user name
 	_, err := path.Parse(upspin.PathName(userName) + "/")
 	if err != nil {
-		return nil, nil, errors.E(Lookup, userName, errInvalidUserName)
+		return nil, errors.E(Lookup, userName, errInvalidUserName)
 	}
 	// Get the user entry from GCP.
 	ue, err := u.fetchUserEntry(Lookup, userName)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return ue.Endpoints, ue.Keys, nil
+	return &ue.User, nil
+}
+
+// Put implements upspin.KeyServer.
+func (u *key) Put(user *upspin.User) error {
+	const Put = "Key.Put"
+	// Validate the user name in user.
+	_, err := path.Parse(upspin.PathName(user.Name) + "/")
+	if err != nil {
+		return errors.E(Put, errInvalidUserName)
+	}
+	// Is the user operating on his/her own record?
+	if user.Name != u.context.UserName() {
+		// Not operating on own record. So we need to ensure u.context.UserName is an admin.
+		// First, retrieve the user entry for the context user.
+		ue, err := u.fetchUserEntry(Put, u.context.UserName())
+		if err != nil {
+			return err
+		}
+		if !ue.IsAdmin {
+			return errors.E(Put, errors.Permission)
+		}
+		// Is admin. Proceed.
+	}
+	// Put puts, it does not update, so we simply overwrite what's there if it exists.
+	// Explicitly set IsAdmin to false. The only way to create an admin is offline.
+	return u.putUserEntry(Put, &userEntry{User: *user, IsAdmin: false})
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
@@ -180,17 +129,18 @@ func (u *key) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, e
 }
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
-func (u *key) putUserEntry(op string, userName upspin.UserName, userEntry *userEntry) error {
+func (u *key) putUserEntry(op string, userEntry *userEntry) error {
+	log.Printf("PutUserEntry %v", userEntry)
 	if userEntry == nil {
-		return errors.E(op, errors.Invalid, userName, errors.Str("nil userEntry"))
+		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
 	}
 	jsonBuf, err := json.Marshal(userEntry)
 	if err != nil {
-		return errors.E(op, errors.Invalid, userName, errors.Errorf("conversion to JSON failed: %v", err))
+		return errors.E(op, errors.Invalid, errors.Errorf("conversion to JSON failed: %v", err))
 	}
-	_, err = u.cloudClient.Put(string(userName), jsonBuf)
+	_, err = u.cloudClient.Put(string(userEntry.User.Name), jsonBuf)
 	if err != nil {
-		return errors.E(op, userName, err)
+		return errors.E(op, errors.IO, err)
 	}
 	return nil
 }
