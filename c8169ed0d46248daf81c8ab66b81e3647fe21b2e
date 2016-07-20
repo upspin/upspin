@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8af56b93_4b972542",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-20T18:46:26Z",
+      "side": 1,
+      "message": "Discussed in person. Summary:\n\nOnly the user name needs to be checked. Whoever puts together the User struct has already validated what they\u0027re doing. We can have empty endpoints and empty key (though, empty key is a bad idea and other layers should warn or prevent).",
+      "parentUuid": "8af56b93_ab504908",
+      "revId": "c8169ed0d46248daf81c8ab66b81e3647fe21b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8af56b93_0b3b5dd5",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-20T18:20:12Z",
       "side": 1,
       "message": "What if an admin wants to update his/her keys or packing? If you do this, none of us can use \"upspin user -put\" to update our keys.",
+      "revId": "c8169ed0d46248daf81c8ab66b81e3647fe21b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8af56b93_2e7f4713",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-20T18:46:26Z",
+      "side": 1,
+      "message": "Good catch. I\u0027m now checking the bit before putting it. Added a test case for this.",
+      "parentUuid": "8af56b93_0b3b5dd5",
       "revId": "c8169ed0d46248daf81c8ab66b81e3647fe21b2e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
