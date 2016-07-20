@@ -62,6 +62,12 @@ function build {
                 serviceaccountkey.json
             "
             ;;
+        keyserver)
+            envfiles="
+                serviceaccountkey.json
+            "
+            ;;
+
     esac
     for f in $envfiles; do
        src="$HOME/upspin/deploy/$project/$f"
