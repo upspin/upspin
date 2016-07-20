@@ -49,8 +49,22 @@ func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.Key.Put.
 func (r *remote) Put(user *upspin.User) error {
-	// TODO
-	panic("Key.Put not implemented")
+	gCtx, err := r.NewAuthContext()
+	if err != nil {
+		return err
+	}
+	req := &proto.KeyPutRequest{
+		User: proto.UserProto(user),
+	}
+	resp, err := r.keyClient.Put(gCtx, req)
+	if err != nil {
+		return errors.E("Put", errors.IO, err)
+	}
+	r.LastActivity()
+	if len(resp.Error) != 0 {
+		return errors.UnmarshalError(resp.Error)
+	}
+	return nil
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
