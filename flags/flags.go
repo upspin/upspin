@@ -34,7 +34,7 @@ var (
 	LogFile = ""
 
 	// LogLevel sets the level of logging.
-	Log = logFlag("info")
+	Log = logFlag("information")
 )
 
 type logFlag string
