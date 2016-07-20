@@ -33,7 +33,7 @@ message Signature {
 
 message AuthenticateResponse {
     string token = 1;
-    bytes Error = 2;
+    bytes error = 2;
 }
 
 message ConfigureRequest {
@@ -41,7 +41,7 @@ message ConfigureRequest {
 }
 
 message ConfigureResponse {
-    bytes Error = 1;
+    bytes error = 1;
 }
 
 message EndpointRequest {
@@ -68,7 +68,7 @@ message StoreGetRequest {
 message StoreGetResponse {
     bytes data = 1;
     repeated Location locations = 2;
-    bytes Error = 3;
+    bytes error = 3;
 }
 
 message StorePutRequest {
@@ -77,7 +77,7 @@ message StorePutRequest {
 
 message StorePutResponse {
     string reference = 1;
-    bytes Error = 2;
+    bytes error = 2;
 }
 
 message StoreDeleteRequest {
@@ -85,7 +85,7 @@ message StoreDeleteRequest {
 }
 
 message StoreDeleteResponse {
-    bytes Error = 1;
+    bytes error = 1;
 }
 
 service Store {
@@ -103,27 +103,27 @@ service Store {
 // The Key interface.
 
 message User {
-    string Name = 1;
-    repeated Endpoint Dirs = 2;
-    repeated Endpoint Stores = 3;
-    string PublicKey = 4;
+    string name = 1;
+    repeated Endpoint dirs = 2;
+    repeated Endpoint stores = 3;
+    string public_key = 4;
 }
 
 message KeyLookupRequest {
-    string UserName = 1;
+    string user_name = 1;
 }
 
 message KeyLookupResponse {
-    User User = 1;
-    bytes Error = 2;
+    User user = 1;
+    bytes error = 2;
 }
 
 message KeyPutRequest {
-    User User = 1;
+    User user = 1;
 }
 
 message KeyPutResponse {
-    bytes Error = 1;
+    bytes error = 1;
 }
 
 service Key {
@@ -144,55 +144,55 @@ service Key {
 // from one struct to the other, which is needless busywork.)
 
 message DirLookupRequest {
-    string Name = 1;
+    string name = 1;
 }
 
 message DirLookupResponse {
-    bytes Entry = 1;
-    bytes Error = 2;
+    bytes entry = 1;
+    bytes error = 2;
 }
 
 message DirPutRequest {
-    bytes Entry = 1;
+    bytes entry = 1;
 }
 
 message DirPutResponse {
-    bytes Error = 1;
+    bytes error = 1;
 }
 
 message DirMakeDirectoryRequest {
-    string Name = 1;
+    string name = 1;
 }
 
 message DirMakeDirectoryResponse {
-    Location Location = 1;
-    bytes Error = 2;
+    Location location = 1;
+    bytes error = 2;
 }
 
 message DirGlobRequest {
-    string Pattern = 1;
+    string pattern = 1;
 }
 
 message DirGlobResponse {
-    repeated bytes Entries = 1;
-    bytes Error = 2;
+    repeated bytes entries = 1;
+    bytes error = 2;
 }
 
 message DirDeleteRequest {
-    string Name = 1;
+    string name = 1;
 }
 
 message DirDeleteResponse {
-    bytes Error = 1;
+    bytes error = 1;
 }
 
 message DirWhichAccessRequest {
-    string Name = 1;
+    string name = 1;
 }
 
 message DirWhichAccessResponse {
-    string Name = 1;
-    bytes Error = 2;
+    string name = 1;
+    bytes error = 2;
 }
 
 service Dir{
