@@ -5,12 +5,11 @@
 package gcp
 
 import (
+	"encoding/json"
+	"reflect"
 	"strings"
 	"testing"
 
-	"reflect"
-
-	"gopkg.in/square/go-jose.v1/json"
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/context"
 	"upspin.io/upspin"
