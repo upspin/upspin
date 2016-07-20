@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a6533f4_ab78085a",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T05:16:04Z",
+      "side": 1,
+      "message": "one space after period",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_8b1544f6",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T05:16:04Z",
+      "side": 1,
+      "message": "this contradicts the comment on Can, which states it\u0027s about the Access file\u0027s rules.\nso you need to update that.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_2b241866",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 663,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T05:16:04Z",
+      "side": 1,
+      "message": "need to say it also adds owner if appropriate.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_cb7b3c56",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T05:16:04Z",
+      "side": 1,
+      "message": "i\u0027m not sure i trust this code in all the corner cases.\nit needs some good tests.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a6533f4_8b6e649a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-20T05:16:04Z",
+      "side": 1,
+      "message": "This is unrelated. It should probably go in a separate CL but it\u0027s not worth it for something this small. Just please check that your CLs have only the relevant pieces.",
+      "revId": "cbfefacdf746cb0e9c0bd677cd06ef33b2c7879b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
