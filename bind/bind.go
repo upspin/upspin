@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -260,9 +259,7 @@ func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dia
 		if wait {
 			// This call is waiting for a concurrent dial to complete
 			// and will use its result.
-			log.Printf("Bind: waiting for dial for key: %v", key)
 			dial.Wait()
-			log.Printf("Bind: dial completed for key: %v", key)
 			if dial.err != nil {
 				return nil, errors.E(op, dial.err)
 			}
@@ -280,7 +277,6 @@ func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dia
 			return ds.service, nil
 		}
 		// It's dead; release it and try again.
-		log.Printf("Bind: server is dead for key: %v. Trying again.", key)
 		if err := Release(ds.service); err != nil {
 			return nil, errors.E(op, errors.IO, errors.Errorf("Releasing cached service: %v", err))
 		}
