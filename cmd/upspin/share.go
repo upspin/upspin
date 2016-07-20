@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Share is a utility for checking and updating wrapped keys for encrypted items.
 package main
+
+// Share has utility functions for checking and updating wrapped keys for encrypted items.
 
 import (
 	"crypto/sha256"

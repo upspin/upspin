@@ -7,7 +7,6 @@ package gcp
 
 import (
 	"encoding/json"
-	"strings"
 	"sync"
 
 	"upspin.io/bind"
@@ -37,12 +36,7 @@ type userEntry struct {
 	IsAdmin bool
 }
 
-const (
-	minKeyLen = 12
-)
-
 var (
-	errKeyTooShort     = errors.E(errors.Invalid, errors.Str("key length too short"))
 	errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name format"))
 )
 
@@ -50,22 +44,6 @@ var (
 	mu       sync.Mutex // protects fields below
 	refCount uint64
 )
-
-func isNotFound(err error) bool {
-	if err == nil {
-		return false
-	}
-	return strings.Contains(strings.ToLower(err.Error()), "not found")
-}
-
-func isKeyInSlice(key upspin.PublicKey, slice []upspin.PublicKey) bool {
-	for _, k := range slice {
-		if key == k {
-			return true
-		}
-	}
-	return false
-}
 
 // Lookup implements upspin.KeyServer.
 func (u *key) Lookup(userName upspin.UserName) (*upspin.User, error) {
