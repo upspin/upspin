@@ -8,7 +8,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -279,20 +278,7 @@ func put(args ...string) {
 		os.Exit(2)
 	}
 	c, _ := newClient()
-	var input *os.File
-	if *inFile == "" {
-		input = os.Stdin
-	} else {
-		input, err = os.Open(*inFile)
-		if err != nil {
-			exit(err)
-		}
-		defer input.Close()
-	}
-	data, err := ioutil.ReadAll(input)
-	if err != nil {
-		exit(err)
-	}
+	data := readAllFromInput(*inFile)
 	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		exit(err)
@@ -325,31 +311,68 @@ func rm(args ...string) {
 
 func user(args ...string) {
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "user username...")
+	put := fs.Bool("put", false, "write new user record")
+	inFile := fs.String("in", "", "input file (default standard input)")
+	fs.Usage = subUsage(fs, "user [-put [-in=inputfile]] [username]")
 	err := fs.Parse(args)
 	if err != nil {
 		exit(err)
 	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
 	_, ctx := newClient()
-	user, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		exit(err)
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		u, err := user.Lookup(upspin.UserName(fs.Arg(i)))
+	if *put {
+		if fs.NArg() != 0 {
+			exitf("No arguments needed for user -put")
+		}
+		putUser(keyServer, *inFile)
+		return
+	}
+	if *inFile != "" {
+		exitf("-infile only available with -put")
+	}
+	userNames := make([]upspin.UserName, 0, fs.NArg()+1)
+	if fs.NArg() == 0 {
+		userNames = append(userNames, ctx.UserName())
+	} else {
+		for i := 0; i < fs.NArg(); i++ {
+			userNames = append(userNames, upspin.UserName(fs.Arg(i)))
+		}
+	}
+
+	for _, name := range userNames {
+		u, err := keyServer.Lookup(name)
 		if err != nil {
 			exit(err)
 		}
-		fmt.Printf("%s:\n", fs.Arg(i))
-		fmt.Printf("endpoints:\n")
+		fmt.Println(name)
+		fmt.Println("dirs {")
 		for _, e := range u.Dirs {
-			fmt.Println(e)
+			fmt.Println("\t" + e.String())
 		}
-		fmt.Printf("key:\n")
+		fmt.Println("}")
+		fmt.Println("stores {")
+		for _, e := range u.Stores {
+			fmt.Println("\t" + e.String())
+		}
+		fmt.Println("}")
+		fmt.Println("key {")
 		fmt.Println(u.PublicKey)
+		fmt.Println("}")
+	}
+}
+
+func putUser(keyServer upspin.KeyServer, inFile string) {
+	data := readAllFromInput(inFile)
+	user, err := parseUser(data)
+	if err != nil {
+		exit(err)
+	}
+	err = keyServer.Put(user)
+	if err != nil {
+		exit(err)
 	}
 }
 
