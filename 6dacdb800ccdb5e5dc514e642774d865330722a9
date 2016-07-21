@@ -161,6 +161,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_6dbab1bf",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:29:09Z",
+      "side": 1,
+      "message": "I agree that \u0027easy to read\u0027 is subjective, but please compare:\n  userNames :\u003d make([]upspin.UserName, 0, fs.NArg()+1)\nvs\n  var userNames []upspin.UserName\nDo you still argue that the former is just as easy to scan as the latter?\nAlso, when I see a make() with a capacity, I think \"Is there some specific reason to preallocate this slice? Is there a performance concern?\" This is needless mental overhead in this context.\n\nThe performance issue is not subjective. There is no meaningful performance impact here. If you believe otherwise, please demonstrate it.\n\nGo has meaningful zero values. We should use them. It\u0027s one of the language\u0027s nicest features.\n\nI agree that where performance matters we should preallocate. In my other change, I carefully chose only the situations where performance is irrelevant.\n\nFurthermore, Go\u0027s garbage collector is extremely efficient at reusing blocks of a certain size. Append is tuned to allocate slices that fit within those blocks. There is no benefit at all to allocating a few bytes less than that block size, as the memory allocator will reserve a block of that size anyway.",
+      "parentUuid": "0a0b3baa_8a826b5e",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_e7ab6222",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -366,6 +384,24 @@
       "side": 1,
       "message": "I agree. That was my line of though as well. \n\nI\u0027ll let you take it up with Rob because I don\u0027t want to go back and forth on this if he disagrees. Hopefully there will be consensus before I leave this afternoon.\n\nThe good news is that converting this to use JSON is easy. The unittest will be a bit more work to fix but I likely won\u0027t even need one.\n\nThe bad news is that this kind of comment later in the process is very disruptive for the team and for me in particular because it\u0027s now happened to me 3 times in a row that I throw large chunks of code out. \n\nThrowing it out is easy. I\u0027m not attached to code. The less, the better. But I can\u0027t help but notice there\u0027s lot of wasted effort in throwing code away week after week. \n\nI\u0027ve mentioned before that better communication is the way to fix this. \n\nAnd we tried. Rob and I had an initial conversation however informal it was and we agreed on this (at least I thought so). But not every single decision needs everyone in the room. If you want to be the guardian of all CLs, you will need to be in the room all the time, even when it\u0027s something as simple as this. And that\u0027s not practical.\n\nWhat do you suggest we do to speed things along while keeping a decent high bar on code quality?",
       "parentUuid": "0a0b3baa_4af9131f",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_0ddfb5ff",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:29:09Z",
+      "side": 1,
+      "message": "I agree there is a process issue here. We should talk about how to resolve this in today\u0027s meeting.",
+      "parentUuid": "0a0b3baa_aad9af80",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
