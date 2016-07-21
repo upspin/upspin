@@ -143,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_cd575d32",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-21T17:46:39Z",
+      "side": 1,
+      "message": "Yes, but I couldn\u0027t find a way to use it because the slice to be sorted is []upspin.UserName, not []string.",
+      "parentUuid": "0a0b3baa_2d671952",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_aa352f8f",
         "filename": "access/access.go",
         "patchSetId": 6
@@ -243,6 +261,24 @@
       "side": 1,
       "message": "That should be \u003d\u003d not !\u003d in my code snippet",
       "parentUuid": "0a0b3baa_4d2c8dfd",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_ad5c2957",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-07-21T17:46:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0b3baa_8d772505",
       "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
