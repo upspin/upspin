@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "0a0b3baa_ad6789bb",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 1,
+      "message": "I agree with this one.",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_6d82b130",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 1,
+      "message": "Agreed.",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_4d7fed44",
+        "filename": "key/keyloader/keyloader.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 1,
+      "message": "Fine by me.",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_8dc5e508",
         "filename": "metric/metric.go",
         "patchSetId": 2
@@ -31,6 +82,41 @@
       "side": 1,
       "message": "Generally I\u0027d prefer to profile the code to find out whether this matters or not, and also whether 16 is the right size.\n\nIf Eduardo also agrees this particular change should be reverted, I\u0027ll revert it.",
       "parentUuid": "0a0b3baa_8dc5e508",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_0d79f55d",
+        "filename": "metric/metric.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 1,
+      "message": "I think this is a step back.",
+      "parentUuid": "0a0b3baa_0d80d599",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_cd199d31",
+        "filename": "store/https/nettest/mockhttpclient.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 1,
+      "message": "Fine.",
       "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
