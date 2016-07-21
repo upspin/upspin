@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_e79122a1",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "Undone. Sorry, the error is used in testing.",
+      "parentUuid": "6a84b724_703bc882",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a84b724_4dfc6d63",
         "filename": "cmd/upspin/userparser.go",
         "patchSetId": 4
