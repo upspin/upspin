@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a84b724_4d738d1a",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "exitf(\"extraneous arguments for \u0027user -put\u0027\")",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_2d6e5933",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "exit(err) is sufficient. open returns an os.PathError",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_0d69952a",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "exit(err) will suffice.\nthis top-level command doesn\u0027t need the errors package.",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_edc7e139",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "don\u0027t put a comment here; only one package comment across all files in the package.\n\nyou can add a blank line in between; that will suffice.\n\nalso this isn\u0027t a utility as usually meant, so how about\n\n// This file contains routines to parse and verify user records as printed by the \"upspin user\" subcommand.",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_ad2b29e5",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "instead of returning error, you could just call exit or exitf. this is a command that will just stop if there is any problem",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_4dfc6d63",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "yes, please warn. if you write an empty key you can\u0027t talk to anyone!",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_ad1249ad",
+        "filename": "cmd/upspin/userparser_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T00:44:27Z",
+      "side": 1,
+      "message": "weird formatting",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
