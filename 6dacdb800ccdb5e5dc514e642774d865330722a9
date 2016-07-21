@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0b3baa_4776aee8",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "rather than having this flag, why don\u0027t we just always read from standard input?\nit\u0027s shorter to write\n\nupspin -put adg@google.com \u003c data.json\nthan\nupspin -put -file data.json adg@google.com",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_2783baaa",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "s/infile/in/\nshould also check -force",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_0780b699",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "var names []upspin.UserName\n\nwe *really* overuse make() in this codebase.\nthese preallocations are almost always premature optimizations",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_e7ab6222",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "names \u003d []upspin.UserName{ctx.UserName()}",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_c7b05e91",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "what is this format? I haven\u0027t seen it before",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_879386fd",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "I think \u0027readAll\u0027 is a reasonable name for this. \u0027FromInput\u0027 doesn\u0027t add anything (the argument is sufficient documentation). The argument should probably be \u0027filename\u0027.",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_6779b2d8",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_a7a56a4d",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T13:57:22Z",
+      "side": 1,
+      "message": "Why are we inventing a whole new file format when we could just use JSON?",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
