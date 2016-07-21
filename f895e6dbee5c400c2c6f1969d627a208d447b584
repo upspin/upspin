@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_4d5a4d8a",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 657,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:33:44Z",
+      "side": 1,
+      "message": "ok no worries",
+      "parentUuid": "0a0b3baa_6ade1737",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_6a0977da",
         "filename": "access/access.go",
         "patchSetId": 6
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "i don\u0027t see it",
       "parentUuid": "0a0b3baa_cab503e8",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_2d671952",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:33:44Z",
+      "side": 1,
+      "message": "doesn\u0027t go have its own built in strings.Compare ?",
+      "parentUuid": "0a0b3baa_4de5adcf",
       "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +225,24 @@
       "side": 1,
       "message": "i find adg\u0027s easier to understand. append is efficient.",
       "parentUuid": "0a0b3baa_8da4c59f",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_8d772505",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:33:44Z",
+      "side": 1,
+      "message": "That should be \u003d\u003d not !\u003d in my code snippet",
+      "parentUuid": "0a0b3baa_4d2c8dfd",
       "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
