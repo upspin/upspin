@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0b3baa_2a137f0c",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 657,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:09:52Z",
+      "side": 1,
+      "message": "userNameSlice",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_6a0977da",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:09:52Z",
+      "side": 1,
+      "message": "return s[i] \u003c s[j]",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_aa352f8f",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:09:52Z",
+      "side": 1,
+      "message": "What\u0027s the invariant at the top of this loop?\nWhy should the call to a.usersNoGroupLoad do something different?\nMaybe a comment after the \"if neededgroups \u003d\u003d nil\" block would help clarify.",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_aaec0ff9",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:09:52Z",
+      "side": 1,
+      "message": "Easier to follow, perhaps:\n\nfor i :\u003d 0; i \u003c len(userNames)-1; {\n  if userNames[i] !\u003d userNames[i+1] {\n    userNames \u003d append(userNames[:i], userNames[i+1:]...)\n    continue\n  }\n  i++\n}",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
