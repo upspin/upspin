@@ -106,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_4da24dab",
+        "filename": "metric/metric.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T18:20:32Z",
+      "side": 1,
+      "message": "Reverted.",
+      "parentUuid": "0a0b3baa_0d79f55d",
+      "revId": "13ef40ddb673405635616358c58280c2f6fc08cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_cd199d31",
         "filename": "store/https/nettest/mockhttpclient.go",
         "patchSetId": 2
