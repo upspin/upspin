@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_6a4e1795",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T16:40:01Z",
+      "side": 1,
+      "message": "OK, I see it in cmd/upspin. Seems good.",
+      "parentUuid": "0a0b3baa_67fc1211",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_2783baaa",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "If I know the size ahead of time, it\u0027s better to pre-allocate. Leaving as is.",
       "parentUuid": "0a0b3baa_0780b699",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_2a481f84",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T16:40:01Z",
+      "side": 1,
+      "message": "Better by what metric?\nIt makes the code harder to scan and is totally irrelevant, performance-wise.",
+      "parentUuid": "0a0b3baa_c713be5e",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -276,6 +312,24 @@
       "side": 1,
       "message": "It\u0027s less verbose than JSON. Also, Rob mentioned that if we just used JSON, then this wouldn\u0027t be any better than gsutil cp.",
       "parentUuid": "0a0b3baa_a7a56a4d",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_4af9131f",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T16:40:01Z",
+      "side": 1,
+      "message": "My objections:\n\nIt is not easier to parse, because you had to write a parser when you could have used json.Unmarshal.\n\nIt is not easier to emit, because you had to write an ad-hoc emitter for it.\n\nIt is not specified or documented anywhere.\n\nOther programs cannot easily read and write this format.\n\nIt *is* much better than \u0027gsutil cp\u0027 because it does validation, authentication, and access control.\n\nIf the worry is not having a template to work from, we could have a \u0027upspin user -template\u0027 that spits out an indented (see json.MarshalIndent) JSON user record with all the fields blank.\n\nI am strongly against adding 200 lines of code for an ad hoc configuration format. I am willing to be convinced otherwise, but I currently don\u0027t see a sound rationale for adding this complexity.",
+      "parentUuid": "0a0b3baa_876b86c0",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
