@@ -423,6 +423,24 @@
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_f668ae28",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-07-21T20:57:26Z",
+      "side": 1,
+      "message": "If I want a user friendly interface, I\u0027d just use one that prompts and error corrects (e.g. counting bits in keys, checking user names for reasonableness, ...)  However if the intent is an output format that can also be used as an input to upspin I\u0027d be thrilled with JSON.  I\u0027m not sure I\u0027d be less likely to screw up form other than JSON.\n\nI would like a -example kind of flag that would get it to print out an JSON struct with nonsense that you you could replace.  I find that more useful than a template because it shows how to fill it in.",
+      "parentUuid": "0a0b3baa_ad49c9be",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
