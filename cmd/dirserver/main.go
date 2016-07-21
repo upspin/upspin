@@ -133,24 +133,21 @@ var (
 
 // parseConfigFile reads fileName's contents and splits it in lines, removing
 // empty lines and leading and trailing spaces on each line.
-func parseConfigFile(fileName string) []string {
-	log.Error.Printf("$HOME=%q", os.Getenv("HOME"))
+func parseConfigFile(fileName string) (out []string) {
+	log.Debug.Printf("$HOME=%q", os.Getenv("HOME"))
 	buf, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		log.Error.Printf("Can't read config file %s", fileName)
 		return nil
 	}
-	s := strings.TrimSpace(string(buf))
-	lines := strings.Split(s, "\n")
-	output := make([]string, 0, len(lines))
-	for _, l := range lines {
+	for _, l := range strings.Split(string(buf), "\n") {
 		l = strings.TrimSpace(l)
 		if len(l) == 0 {
 			continue
 		}
-		output = append(output, l)
+		out = append(out, l)
 	}
-	return output
+	return out
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the context.

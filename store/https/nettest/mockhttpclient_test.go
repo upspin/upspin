@@ -214,7 +214,6 @@ var _ TestingInterface = (*mockTesting)(nil)
 func newMockTesting(t *testing.T) *mockTesting {
 	return &mockTesting{
 		RealTesting: t,
-		LogMessages: make([]string, 0, 3),
 		Fatal:       false,
 	}
 }

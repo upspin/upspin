@@ -81,10 +81,6 @@ func RegisterSaver(saver Saver) {
 func (m *Metric) StartSpan(name string) *Span {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	// Lazily allocate the spans slice.
-	if m.spans == nil {
-		m.spans = make([]*Span, 0, 16)
-	}
 	s := &Span{
 		name:      fmt.Sprintf("%s.%s", m.name, name),
 		startTime: time.Now(),
