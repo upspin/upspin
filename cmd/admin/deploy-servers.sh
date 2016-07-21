@@ -186,6 +186,8 @@ function main {
 
     echo "Going to work the following servers: ${serverlist[@]}"
 
+    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/upspin/deploy/$project/serviceaccountkey.json"
+    gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
     gcloud config set project "$project"
     # TODO(adg): make the zone configurable
     gcloud config set compute/zone us-central1-c
