@@ -34,6 +34,24 @@
       "revId": "fc789f71dd86f6f6ca5dbedf93f3bc7a95baa484",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_cd407df3",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T18:15:57Z",
+      "side": 0,
+      "message": "I know the size.",
+      "parentUuid": "0a0b3baa_6da0713a",
+      "revId": "fc789f71dd86f6f6ca5dbedf93f3bc7a95baa484",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
