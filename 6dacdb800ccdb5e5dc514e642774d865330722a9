@@ -441,6 +441,24 @@
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_76cb9e1c",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T21:07:05Z",
+      "side": 1,
+      "message": "To come to a middle ground and a consensus, I implemented a PDF printer that will output a PDF file to stdout or you can redirect it with --output_to_this_file \n\nAlso, alternatively, if you don\u0027t like PDF I\u0027ve added a flag --output_as_xml which outputs it in a nicely-formatted XML.\n\nLots of options now. \n\nPTAL.",
+      "parentUuid": "0a0b3baa_f668ae28",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
