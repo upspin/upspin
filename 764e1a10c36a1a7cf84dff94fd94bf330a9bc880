@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0b3baa_4d136db4",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T17:35:15Z",
+      "side": 1,
+      "message": "i\u0027m with adg here. this is a command-line tool and performance doesn\u0027t matter at all.\nmy fight over allocations was in things like path.Parse and access.Parse, which are used all over the code and in servers.",
+      "revId": "764e1a10c36a1a7cf84dff94fd94bf330a9bc880",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
