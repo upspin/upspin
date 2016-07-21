@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_67fc1211",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "The flag existed before. It\u0027s standard practice.",
+      "parentUuid": "0a0b3baa_4776aee8",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_2783baaa",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-21T13:57:22Z",
       "side": 1,
       "message": "s/infile/in/\nshould also check -force",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_07f3163f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0b3baa_2783baaa",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_c713be5e",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "If I know the size ahead of time, it\u0027s better to pre-allocate. Leaving as is.",
+      "parentUuid": "0a0b3baa_0780b699",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_e7ab6222",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-07-21T13:57:22Z",
       "side": 1,
       "message": "names \u003d []upspin.UserName{ctx.UserName()}",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_a718ca7b",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "see above.",
+      "parentUuid": "0a0b3baa_e7ab6222",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_6723f2af",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "Discussed with Rob. Easier to parse, less verbose than JSON.",
+      "parentUuid": "0a0b3baa_c7b05e91",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_879386fd",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2016-07-21T13:57:22Z",
       "side": 1,
       "message": "I think \u0027readAll\u0027 is a reasonable name for this. \u0027FromInput\u0027 doesn\u0027t add anything (the argument is sufficient documentation). The argument should probably be \u0027filename\u0027.",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_4720eea0",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0b3baa_879386fd",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_674ad261",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0b3baa_6779b2d8",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_a7a56a4d",
         "filename": "cmd/upspin/userparser.go",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2016-07-21T13:57:22Z",
       "side": 1,
       "message": "Why are we inventing a whole new file format when we could just use JSON?",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_876b86c0",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T15:28:13Z",
+      "side": 1,
+      "message": "It\u0027s less verbose than JSON. Also, Rob mentioned that if we just used JSON, then this wouldn\u0027t be any better than gsutil cp.",
+      "parentUuid": "0a0b3baa_a7a56a4d",
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
