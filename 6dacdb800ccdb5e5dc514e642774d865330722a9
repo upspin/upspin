@@ -405,6 +405,24 @@
       "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_ad49c9be",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-21T17:35:15Z",
+      "side": 1,
+      "message": "JSON is not user-friendly but it is a standard. It is not in my DNA the way it is with you two, and I have screwed up my keys multiple times by mishandling JSON in an editor. This tool is meant for plain people who have never seen a JSON blob in their lives.\n\nIn effect, this is a tool to turn plain text into JSON.\n\nBut if you want JSON, use it and I will cope. It\u0027s easy to change later.",
+      "parentUuid": "0a0b3baa_0ddfb5ff",
+      "revId": "6dacdb800ccdb5e5dc514e642774d865330722a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
