@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0b3baa_f652ee43",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "the usage message seems to indicate that [username] is okay (or at least optional) with put. not sure how to resolve this. TODO?",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_d657ea31",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "these need only be exit, not exitf",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_76671e23",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "I usually do fmt.Printf(\"%s\\n\", blob) because fmt can output a string without having to convert it. But this is fine",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_764efe94",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "add a TODO(adg) here to make this error more informative",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_564bfa82",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "again, these can be exit",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_f620aeb7",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "add a TODO to use this in func put",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a0b3baa_d625aac5",
+        "filename": "key/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T21:16:46Z",
+      "side": 1,
+      "message": "What\u0027s this for?",
+      "revId": "90268e3c4c7223a04d8f2ba7bfc0d8f3cd4be45d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
