@@ -161,6 +161,24 @@
     },
     {
       "key": {
+        "uuid": "0a0b3baa_cd0cfd47",
+        "filename": "access/access.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-21T17:50:45Z",
+      "side": 1,
+      "message": "right, what I meant was that in this  method you can use \u003c instead of strings.Compare. The doc comment in https://golang.org/pkg/strings/#Compare even suggests this.",
+      "parentUuid": "0a0b3baa_cd575d32",
+      "revId": "f895e6dbee5c400c2c6f1969d627a208d447b584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a0b3baa_aa352f8f",
         "filename": "access/access.go",
         "patchSetId": 6
