@@ -130,7 +130,6 @@ func (gcs *gcsImpl) ListPrefix(prefix string, depth int) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		innerNames := make([]string, 0, len(objs.Items))
 		for _, o := range objs.Items {
 			// Only append o.Name if it doesn't violate depth.
 			objDepth := strings.Count(o.Name, "/")
@@ -140,10 +139,9 @@ func (gcs *gcsImpl) ListPrefix(prefix string, depth int) ([]string, error) {
 				continue
 			}
 			if netDepth <= depth {
-				innerNames = append(innerNames, o.Name)
+				names = append(names, o.Name)
 			}
 		}
-		names = append(names, innerNames...)
 		if objs.NextPageToken == "" {
 			break
 		}
@@ -161,11 +159,9 @@ func (gcs *gcsImpl) ListDir(dir string) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		innerNames := make([]string, len(objs.Items))
-		for i, o := range objs.Items {
-			innerNames[i] = o.Name
+		for _, o := range objs.Items {
+			names = append(names, o.Name)
 		}
-		names = append(names, innerNames...)
 		if objs.NextPageToken == "" {
 			break
 		}
