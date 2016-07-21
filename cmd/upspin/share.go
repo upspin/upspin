@@ -384,13 +384,14 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
 	for _, user := range users {
-		userKey := s.lookupKey(user)
-		if len(userKey) > 0 {
+		if k := s.lookupKey(user); len(k) > 0 {
 			// TODO: Make this general. This works now only because we are always using ee.
-			keys = append(keys, userKey)
+			keys = append(keys, k)
+			continue
 		}
 		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
 		s.exitCode = 1
+		return
 	}
 	packdatas := []*[]byte{&entry.Metadata.Packdata}
 	packer.Share(s.context, keys, packdatas)

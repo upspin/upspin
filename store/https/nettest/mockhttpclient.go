@@ -50,13 +50,10 @@ const (
 // modifications after creation are not reflected in the mock.
 func NewMockHTTPClient(responsesToSend []MockHTTPResponse, requestsExpected []*http.Request) *MockHTTPClient {
 	mock := MockHTTPClient{
-		requestsReceived: make([]*http.Request, 0, len(requestsExpected)),
-		requestsExpected: make([]*http.Request, len(requestsExpected)),
-		responses:        make([]MockHTTPResponse, len(responsesToSend)),
+		// Make copies as slices may be manipulated later by callers.
+		requestsExpected: append([]*http.Request{}, requestsExpected...),
+		responses:        append([]MockHTTPResponse{}, responsesToSend...),
 	}
-	// We make copies to avoid bugs with subsequent slice manipulation by callers.
-	copy(mock.requestsExpected, requestsExpected)
-	copy(mock.responses, responsesToSend)
 	return &mock
 }
 

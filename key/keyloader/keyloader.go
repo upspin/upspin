@@ -6,9 +6,9 @@
 package keyloader
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -72,8 +72,7 @@ func privateKey(op string) (upspin.PublicKey, string, error) {
 	if err != nil {
 		return zeroPubKey, zeroPrivKey, errors.Errorf(keyloaderErr, err)
 	}
-	buf = buf[:n]
-	buf = []byte(strings.TrimSpace(string(buf)))
+	buf = bytes.TrimSpace(buf[:n])
 	pubkey, err := publicKey(op)
 	if err != nil {
 		return zeroPubKey, zeroPrivKey, err
