@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6a84b724_10152cf4",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a84b724_4d738d1a",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a84b724_2d6e5933",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-21T00:44:27Z",
       "side": 1,
       "message": "exit(err) is sufficient. open returns an os.PathError",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_301a3025",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a84b724_2d6e5933",
       "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6a84b724_501fa413",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a84b724_0d69952a",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a84b724_edc7e139",
         "filename": "cmd/upspin/userparser.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-07-21T00:44:27Z",
       "side": 1,
       "message": "don\u0027t put a comment here; only one package comment across all files in the package.\n\nyou can add a blank line in between; that will suffice.\n\nalso this isn\u0027t a utility as usually meant, so how about\n\n// This file contains routines to parse and verify user records as printed by the \"upspin user\" subcommand.",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_304150f5",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "The reason why I keep doing this is because I keep seeing it being done. In this case, I copied the comments from share.go in this directory. We need to be consistent. I\u0027m fixing share.go here then.",
+      "parentUuid": "6a84b724_edc7e139",
       "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "6a84b724_703bc882",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a84b724_ad2b29e5",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a84b724_4dfc6d63",
         "filename": "cmd/upspin/userparser.go",
         "patchSetId": 4
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "6a84b724_f026d862",
+        "filename": "cmd/upspin/userparser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "Done. But not here. I recall we talked about a -force option.",
+      "parentUuid": "6a84b724_4dfc6d63",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a84b724_ad1249ad",
         "filename": "cmd/upspin/userparser_test.go",
         "patchSetId": 4
@@ -115,6 +223,24 @@
       "writtenOn": "2016-07-21T00:44:27Z",
       "side": 1,
       "message": "weird formatting",
+      "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a84b724_30e870e5",
+        "filename": "cmd/upspin/userparser_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T04:04:17Z",
+      "side": 1,
+      "message": "It\u0027s intentional, to check for spaces and tabs, etc.",
+      "parentUuid": "6a84b724_ad1249ad",
       "revId": "81a9aa7c0f4ed32bd081b1d0235fd5ce37b0dfbe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
