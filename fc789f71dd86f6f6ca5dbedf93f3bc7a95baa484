@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a0b3baa_aa91af4f",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-21T17:20:08Z",
+      "side": 0,
+      "message": "No, if we know the length, it should be pre-allocated. Please don\u0027t do this. See other CL.",
+      "revId": "fc789f71dd86f6f6ca5dbedf93f3bc7a95baa484",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
