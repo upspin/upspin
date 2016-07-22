@@ -82,7 +82,7 @@ type Signature struct {
 // Factotum implements an agent, potentially remote, to handle private key operations.
 // Implementations typically provide NewFactotum() to set the key.
 type Factotum interface {
-	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEp256Pack and similar.
+	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEPack and similar.
 	FileSign(n PathName, t Time, dkey, hash []byte) (Signature, error)
 
 	// ScalarMult is the bare private key operator, used in unwrapping packed data.

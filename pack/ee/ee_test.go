@@ -56,13 +56,6 @@ func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspi
 	return clear[:m]
 }
 
-// shareBlob updates the packdata of a blob such that the public keys given are readers of the blob.
-func shareBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
-	pd := make([]*[]byte, 1)
-	pd[0] = packdata
-	packer.Share(ctx, readers, pd)
-}
-
 func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{}
@@ -166,19 +159,30 @@ func BenchmarkPackUnpack256_1Mbyte(b *testing.B) {
 	benchmarkPack(b, "p256", 1024*1024, unpack)
 }
 
+// shareBlob updates the packdata of a blob such that the public keys given are readers of the blob.
+func shareBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
+	pd := make([]*[]byte, 1)
+	pd[0] = packdata
+	packer.Share(ctx, readers, pd)
+}
+
 func TestSharing(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
-		dudesUserName upspin.UserName = "dude@google.com"
-		packing                       = upspin.EEPack
-		pathName                      = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
-		bobsUserName  upspin.UserName = "bob@foo.com"
-		text                          = "bob, here's the secret file. Sincerely, The Dude."
+		dudesUserName  upspin.UserName = "dude@google.com"
+		packing                        = upspin.EEPack
+		pathName                       = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
+		bobsUserName   upspin.UserName = "bob@foo.com"
+		carlasUserName upspin.UserName = "carla@baz.edu"
+		text                           = "bob, here's the secret file. Sincerely, The Dude."
 	)
 	dudesPublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	dudesPrivate := "82201047360680847258309465671292633303992565667422607675215625927005262185934\n"
 	bobsPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 	bobsPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
+	carlasPublic := upspin.PublicKey("p384\n26172614276096813357206176213406982397222536659671409755310805362042028026922579207014531049688734331134000100158544\n17028658482487767962568267600820350664652897469525797908053707470805274016916949610485516295521856564391853226932191\n")
+	carlasPrivate := "30201512592735536590793019705840595870765268847836648868491872481691553233567108528485588759694229643034052691415730"
+	// Carla's keys can be regenerated with "keygen -secretseed vutus-pohud-kagaf-tugag.kumal-hoduz-duzin-pafip".
 
 	// Set up Dude as the creator/owner.
 	ctx, packer := setup(dudesUserName, "p256")
@@ -200,20 +204,21 @@ func TestSharing(t *testing.T) {
 	}
 	d.Metadata.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
-	// Share with Bob
-	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic}, &d.Metadata.Packdata)
+	// Share with Bob and Carla.
+	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic, carlasPublic}, &d.Metadata.Packdata)
 
 	readers, err := packer.ReaderHashes(d.Metadata.Packdata)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(readers) != 2 {
-		t.Errorf("Expected 2 readerhashes, got %d", len(readers))
+	if len(readers) != 3 {
+		t.Errorf("Expected 3 readerhashes, got %d", len(readers))
 	}
 	hash0 := factotum.KeyHash(dudesPublic)
 	hash1 := factotum.KeyHash(bobsPublic)
-	if !bytes.Equal(readers[0], hash0) || !bytes.Equal(readers[1], hash1) {
-		t.Errorf("text: expected %q; got %q", [][]byte{hash0, hash1}, readers)
+	hash2 := factotum.KeyHash(carlasPublic)
+	if !bytes.Equal(readers[0], hash0) || !bytes.Equal(readers[1], hash1) || !bytes.Equal(readers[2], hash2) {
+		t.Errorf("text: expected %q; got %q", [][]byte{hash0, hash1, hash2}, readers)
 	}
 
 	// Now load Bob as the current user.
@@ -232,6 +237,19 @@ func TestSharing(t *testing.T) {
 	// Finally, check that unpack looked up Dude's public key, to verify the signature.
 	if mockKey.returnedKeys != 1 {
 		t.Fatal("Packer failed to request dude's public key")
+	}
+
+	// Load Carla as the current user.
+	ctx.SetUserName(carlasUserName)
+	f, err = factotum.New(carlasPublic, carlasPrivate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.SetFactotum(f)
+
+	clear = unpackBlob(t, ctx, packer, d, cipher)
+	if string(clear) != text {
+		t.Errorf("Expected %s, got %s", text, clear)
 	}
 }
 
