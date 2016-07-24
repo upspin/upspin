@@ -1,0 +1,7 @@
+Code-Review+2: Andrew Gerrand <adg@google.com>
+Code-Review+2: Rob Pike <r@google.com>
+Submitted-by: Rob Pike <r@google.com>
+Submitted-at: Sun, 24 Jul 2016 08:25:50 +0000
+Reviewed-on: https://upspin-review.googlesource.com/2700
+Project: upspin
+Branch: refs/heads/master
