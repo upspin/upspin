@@ -41,10 +41,6 @@ func (plainPack) Share(context upspin.Context, readers []upspin.PublicKey, packd
 
 func (p plainPack) Pack(context upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Pack = "Pack"
-	meta := &dirEntry.Metadata
-	if err := pack.CheckPackMeta(p, meta); err != nil {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, err)
-	}
 	if len(ciphertext) < len(cleartext) {
 		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errTooShort)
 	}
@@ -53,8 +49,7 @@ func (p plainPack) Pack(context upspin.Context, ciphertext, cleartext []byte, di
 
 func (p plainPack) Unpack(context upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
 	const Unpack = "Unpack"
-	meta := &dirEntry.Metadata
-	if err := pack.CheckUnpackMeta(p, meta); err != nil {
+	if err := pack.CheckPacking(p, dirEntry); err != nil {
 		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
 	}
 	if len(cleartext) < len(ciphertext) {
@@ -77,21 +72,15 @@ func (p plainPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName u
 	return nil
 }
 
-func (p plainPack) PackLen(context upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
-	meta := &dirEntry.Metadata
-	if err := pack.CheckPackMeta(p, meta); err != nil {
+func (p plainPack) PackLen(context upspin.Context, cleartext []byte, entry *upspin.DirEntry) int {
+	if err := pack.CheckPacking(p, entry); err != nil {
 		return -1
-	}
-	// Add packing to packmeta if not already there
-	if meta != nil && len(meta.Packdata) == 0 {
-		meta.Packdata = []byte{byte(upspin.PlainPack)}
 	}
 	return len(cleartext)
 }
 
-func (p plainPack) UnpackLen(context upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
-	meta := &dirEntry.Metadata
-	if err := pack.CheckUnpackMeta(p, meta); err != nil {
+func (p plainPack) UnpackLen(context upspin.Context, ciphertext []byte, entry *upspin.DirEntry) int {
+	if err := pack.CheckPacking(p, entry); err != nil {
 		return -1
 	}
 	return len(ciphertext)

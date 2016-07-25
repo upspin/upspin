@@ -15,7 +15,6 @@ import (
 
 var (
 	globalContext = context.New()
-	meta          = &upspin.Metadata{Packdata: []byte{byte(upspin.PlainPack)}}
 )
 
 func TestRegister(t *testing.T) {
