@@ -15,7 +15,7 @@ import (
 	"upspin.io/pack"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/ee"
+	// TODO _ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 )
 
@@ -51,7 +51,7 @@ func TestInitContext(t *testing.T) {
 		keyserver:   Endpoint(upspin.InProcess, ""),
 		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
 		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:     upspin.EEPack,
+		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -62,7 +62,7 @@ func TestComments(t *testing.T) {
 		keyserver:   Endpoint(upspin.InProcess, ""),
 		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
 		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:     upspin.EEPack,
+		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	testConfig(t, &expect, makeCommentedConfig(&expect))
 }
@@ -81,7 +81,7 @@ func TestEnv(t *testing.T) {
 		keyserver:   Endpoint(upspin.InProcess, ""),
 		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
 		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
-		packing:     upspin.EEPack,
+		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	config := makeConfig(&expect)
 	expect.userName = "quux"
