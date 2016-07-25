@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a67bba0_e7bb428b",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-25T04:25:48Z",
+      "side": 1,
+      "message": ", just like the built-in append function.",
+      "revId": "a329638402046e474f3d0e8adad3b5f38d8f5e6f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a67bba0_87c046f9",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-25T04:25:48Z",
+      "side": 1,
+      "message": "why capital N?",
+      "revId": "a329638402046e474f3d0e8adad3b5f38d8f5e6f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
