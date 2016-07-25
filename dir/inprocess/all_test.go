@@ -24,7 +24,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/debug"
+	// TODO _ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
 
@@ -44,7 +44,9 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 	}
 
 	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
+	// TODO: Restore DebugPack when new Packer API is updated.
+	// ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
+	ctx = context.New().SetUserName(name).SetPacking(upspin.PlainPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
 	var err error
 	user, err = bind.KeyServer(ctx, endpoint)
 	if err != nil {

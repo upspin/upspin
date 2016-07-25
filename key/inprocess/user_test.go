@@ -12,7 +12,7 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/pack/debug"
+	// TODO _ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
 
@@ -21,7 +21,9 @@ var (
 )
 
 func setup(t *testing.T) (upspin.KeyServer, upspin.Context) {
-	c := context.New().SetUserName(userName).SetPacking(upspin.DebugPack)
+	// TODO: Restore DebugPack when new Packer API is updated.
+	// ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
+	ctx = context.New().SetUserName(name).SetPacking(upspin.PlainPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
 	e := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
