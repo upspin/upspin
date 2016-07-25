@@ -15,15 +15,10 @@ import (
 	"upspin.io/upspin"
 )
 
-const (
-	keyloaderErr = "keyloader: %v"
-)
-
 var (
-	errNoKeysFound = errors.Str("no keys found")
-	errNilContext  = errors.Str("nil context")
-	zeroPrivKey    string
-	zeroPubKey     upspin.PublicKey
+	errNilContext = errors.Str("nil context")
+	zeroPrivKey   string
+	zeroPubKey    upspin.PublicKey
 )
 
 // Load reads a key pair from the user's .ssh directory and loads
@@ -48,14 +43,17 @@ func Load(context upspin.Context) error {
 // publicKey returns the public key of the current user by reading from $HOME/.ssh/.
 func publicKey(op string) (upspin.PublicKey, error) {
 	f, err := os.Open(filepath.Join(sshdir(), "public.upspinkey"))
+	if os.IsNotExist(err) {
+		return zeroPubKey, errors.E(op, errors.NotExist, err)
+	}
 	if err != nil {
-		return zeroPubKey, errors.E(op, errors.NotExist, errNoKeysFound)
+		return zeroPubKey, errors.E(op, errors.IO, err)
 	}
 	defer f.Close()
 	buf := make([]byte, 400) // enough for p521
 	n, err := f.Read(buf)
 	if err != nil {
-		return zeroPubKey, errors.Errorf(keyloaderErr, err)
+		return zeroPubKey, errors.E(op, errors.IO, err)
 	}
 	return upspin.PublicKey(string(buf[:n])), nil
 }
@@ -63,14 +61,17 @@ func publicKey(op string) (upspin.PublicKey, error) {
 // privateKey returns the private key of the current user by reading from $HOME/.ssh/.
 func privateKey(op string) (upspin.PublicKey, string, error) {
 	f, err := os.Open(filepath.Join(sshdir(), "secret.upspinkey"))
+	if os.IsNotExist(err) {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.NotExist, err)
+	}
 	if err != nil {
-		return zeroPubKey, zeroPrivKey, errors.E(op, errors.NotExist, errNoKeysFound)
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
 	}
 	defer f.Close()
 	buf := make([]byte, 200) // enough for p521
 	n, err := f.Read(buf)
 	if err != nil {
-		return zeroPubKey, zeroPrivKey, errors.Errorf(keyloaderErr, err)
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
 	}
 	buf = bytes.TrimSpace(buf[:n])
 	pubkey, err := publicKey(op)
