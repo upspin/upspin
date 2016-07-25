@@ -23,7 +23,6 @@ func TestTime(t *testing.T) {
 	}
 	// Do one by hand.
 	goTime := time.Date(2001, 3, 15, 17, 39, 12, 0, time.UTC)
-	t.Log(goTime)
 	theTime := TimeFromGo(goTime)
 	const theDate = "2001-03-15T17:39:12 UTC"
 	str = theTime.String()
