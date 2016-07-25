@@ -16,6 +16,24 @@
       "revId": "605413f5a49df2265e3823575fd84bf1a99276ca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a67bba0_4779eed7",
+        "filename": "pack/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-25T05:19:21Z",
+      "side": 1,
+      "message": "why? it\u0027s checking an important invariant.\nsure, you could check it yourself but why not do it in one place?",
+      "parentUuid": "0a67bba0_878e06d4",
+      "revId": "605413f5a49df2265e3823575fd84bf1a99276ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
