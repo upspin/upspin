@@ -98,12 +98,6 @@ type Factotum interface {
 	PublicKey() PublicKey
 }
 
-// Packdata stores the encoded information used to pack the data in an
-// item, such as decryption keys. The first byte identifies the Packing
-// used to store the information; the rest of the slice is the data
-// itself.
-type Packdata []byte
-
 // A Packing identifies the technique for turning the data pointed to by
 // a key into the user's data. This may involve checksum verification,
 // decrypting, signature checking, or nothing at all.
@@ -114,6 +108,8 @@ type Packing uint8
 
 // Packer provides the implementation of a Packing. The pack package binds
 // Packing values to the concrete implementations of this interface.
+// TODO: Fix all comments.
+// TODO: Redesign for new DirEntry struct.
 type Packer interface {
 	// Packing returns the integer identifier of this Packing algorithm.
 	Packing() Packing
@@ -321,9 +317,27 @@ type Time int64
 
 // DirEntry represents the directory information for a file.
 type DirEntry struct {
-	Name     PathName // The full path name of the file.
-	Location Location // The location of the file.
-	Metadata Metadata
+	// Fields contributing to the signature.
+	Name        PathName   // The full path name of the file.
+	Packing     Packing    // Packing used for every block in file.
+	Time        Time       // Time associated with file; might be when it was last written.
+	Blocks      []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
+	WrappedKeys []byte     // The file's AES key, wrapped for each reader of file.
+
+	Signature []byte // Signs: fields Name, Packing, Time, plus the file's AES key and all block signatures.
+
+	// Fields not included in the signature.
+	Attr     FileAttributes // File attributes.
+	Sequence int64          // The sequence (version) number of the item.
+	Writer   UserName       // Writer of the file, often the same as owner.
+}
+
+// DirBlock describes a block of data representing a contiguous section of a file.
+type DirBlock struct {
+	Location  Location // Location of data in store.
+	Offset    int64    // Byte offset of start of block's data in file.
+	Size      int64    // Length of block data in bytes.
+	Signature []byte   // Signs: Size, Offset, file AES key, hash(block ciphertext).
 }
 
 // FileAttributes define the attributes for a DirEntry.
@@ -343,17 +357,6 @@ const (
 	// containing the full Upspin path name of the target.
 	AttrLink = FileAttributes(1 << 1)
 )
-
-// Metadata stores (among other things) the keys that enable the
-// file to be decrypted by the appropriate recipient.
-type Metadata struct {
-	Attr     FileAttributes // File attributes.
-	Sequence int64          // The sequence (version) number of the item.
-	Size     uint64         // Length of file in bytes.
-	Time     Time           // Time associated with file; might be when it was last written.
-	Writer   UserName       // Writer of the file, often the same as owner.
-	Packdata []byte         // Packing-specific metadata stored in directory.
-}
 
 // Special Sequence numbers.
 const (
