@@ -98,14 +98,14 @@ func (ee ee) Packing() upspin.Packing {
 }
 
 func (ee ee) PackLen(ctx upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
-	if err := pack.CheckPackMeta(ee, &d.Metadata); err != nil {
+	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
 func (ee ee) UnpackLen(ctx upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
-	if err := pack.CheckUnpackMeta(ee, &d.Metadata); err != nil {
+	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
 	return len(ciphertext)
@@ -115,50 +115,37 @@ func (ee ee) String() string {
 	return "ee"
 }
 
-func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.DirEntry) (int, error) {
+func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const Pack = "Pack"
-	if err := pack.CheckPackMeta(ee, &d.Metadata); err != nil {
-		return 0, errors.E(Pack, errors.Invalid, d.Name, err)
+	if err := pack.CheckPacking(ee, d); err != nil {
+		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
 	}
-	if len(ciphertext) < len(cleartext) {
-		return 0, errors.E(Pack, errors.Invalid, d.Name, errTooShort)
-	}
-	ciphertext = ciphertext[:len(cleartext)]
+	// TODO(adg): support append; for now assume a new file.
 
 	// Pick fresh file encryption key.
 	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
-	}
-	cipherLen, err := ee.encrypt(ciphertext, cleartext, dkey)
-	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
-	}
-	b := sha256.Sum256(ciphertext)
-	cipherSum := b[:]
-
-	// Sign ciphertext.
-	sig, err := ctx.Factotum().FileSign(path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
-	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
+		return nil, errors.E(Pack, d.Name, err)
 	}
 
-	// Wrap for myself.
+	// Wrap keys.
 	wrap := make([]wrappedKey, 2)
+
+	// First, wrap for myself.
 	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey())
 	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
+		return nil, errors.E(Pack, d.Name, err)
 	}
 	wrap[0], err = ee.aesWrap(p, dkey)
 	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
+		return nil, errors.E(Pack, d.Name, err)
 	}
 
 	// Also wrap for owner, if different.
 	parsed, err := path.Parse(d.Name)
 	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
+		return nil, errors.E(Pack, d.Name, err)
 	}
 	owner := parsed.User()
 	if owner == ctx.UserName() {
@@ -166,11 +153,11 @@ func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.Di
 	} else {
 		userConn, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {
-			return 0, errors.E(Pack, owner, err)
+			return nil, errors.E(Pack, owner, err)
 		}
 		u, err := userConn.Lookup(owner)
 		if err != nil {
-			return 0, errors.E(Pack, owner, err)
+			return nil, errors.E(Pack, owner, err)
 		}
 		ownerKey := u.PublicKey
 		if ownerKey == ctx.Factotum().PublicKey() {
@@ -179,26 +166,162 @@ func (ee ee) Pack(ctx upspin.Context, ciphertext, cleartext []byte, d *upspin.Di
 		} else {
 			p, _, err = factotum.ParsePublicKey(ownerKey)
 			if err != nil {
-				return 0, errors.E(Pack, d.Name, err)
+				return nil, errors.E(Pack, d.Name, err)
 			}
 			wrap[1], err = ee.aesWrap(p, dkey)
 			if err != nil {
-				return 0, errors.E(Pack, d.Name, err)
+				return nil, errors.E(Pack, d.Name, err)
 			}
 		}
 	}
 
-	// Serialize packer metadata.
-	err = ee.pdMarshal(&d.Metadata.Packdata, sig, sig0, wrap, cipherSum)
-	if err != nil {
-		return 0, errors.E(Pack, d.Name, err)
+	d.WrappedKeys = marshalWrappedKeys(wrap)
+
+	// Set up the stream cipher.
+	if len(dkey) != aesKeyLen {
+		return nil, errors.E(Pack, errKeyLength)
 	}
-	return cipherLen, err
+	block, err := aes.NewCipher(dkey)
+	if err != nil {
+		return nil, errors.E(Pack, err)
+	}
+	iv := make([]byte, aes.BlockSize)
+	// iv=0 is ok because we're CERTAIN that dkey is random and not reused
+	stream := cipher.NewCTR(block, iv)
+
+	return &blockPacker{
+		ctx:    ctx,
+		entry:  d,
+		dkey:   dkey,
+		cipher: stream,
+	}, nil
 }
 
-func (ee ee) Unpack(ctx upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
+type blockPacker struct {
+	ctx    upspin.Context
+	entry  *upspin.DirEntry
+	dkey   []byte
+	cipher cipher.Stream
+
+	buf []byte // re-used by Pack
+}
+
+func (bp *blockPacker) checkPreviousLocation() error {
+	if bs := bp.entry.Blocks; len(bs) > 0 {
+		if i := len(bs) - 1; bs[i].Location == (upspin.Location{}) {
+			return errors.E("Pack", bp.entry.Name, errors.Errorf("location not set for block %v", i))
+		}
+	}
+	return nil
+}
+
+func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	if err := bp.checkPreviousLocation(); err != nil {
+		return nil, err
+	}
+
+	// (re-)allocate shared buffer if necessary.
+	if bp.buf == nil || len(bp.buf) < len(cleartext) {
+		bp.buf = make([]byte, len(cleartext))
+	}
+	ciphertext = bp.buf[:len(cleartext)]
+
+	// Encrypt.
+	bp.cipher.XORKeyStream(ciphertext, cleartext)
+
+	// Compute size and offset.
+	size := int64(len(ciphertext))
+	offs := int64(0)
+	if bs := bp.entry.Blocks; len(bs) > 0 {
+		offs = bs[len(bs)-1].Offset + size
+	}
+
+	// Sign.
+	b := sha256.Sum256(ciphertext)
+	cipherSum := b[:]
+	// TODO(adg): update Factotum interface to provide a BlockSign method.
+	// We MUST sign against the block Offset and Size,
+	// but leave this as-is to make forward progress.
+	sig, err := bp.ctx.Factotum().FileSign(path.Clean(bp.entry.Name), bp.entry.Time, bp.dkey, cipherSum)
+	if err != nil {
+		return nil, errors.E("Pack", err)
+	}
+
+	// Create and append new DirBlock record.
+	block := upspin.DirBlock{
+		Size:      size,
+		Offset:    offs,
+		Signature: marshalSignature(sig),
+	}
+	bp.entry.Blocks = append(bp.entry.Blocks, block)
+
+	return ciphertext, nil
+}
+
+func marshalSignature(sig upspin.Signature) []byte {
+	b := make([]byte, 1+2*marshalBufLen)
+	b[0] = byte(upspin.EEPack)
+	n := 1
+	n += pdPutBytes(b[n:], sig.R.Bytes())
+	n += pdPutBytes(b[n:], sig.S.Bytes())
+	return b[:n]
+}
+
+func marshalWrappedKeys(keys []wrappedKey) []byte {
+	b := make([]byte, 1+(1+5*len(keys))*binary.MaxVarintLen64+
+		len(keys)*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*marshalBufLen))
+	b[0] = byte(upspin.EEPack)
+	n := 1
+	n += binary.PutVarint(b[n:], int64(len(keys)))
+	for _, k := range keys {
+		n += pdPutBytes(b[n:], k.keyHash)
+		n += pdPutBytes(b[n:], k.dkey)
+		n += pdPutBytes(b[n:], k.nonce)
+		n += pdPutBytes(b[n:], k.ephemeral.X.Bytes())
+		n += pdPutBytes(b[n:], k.ephemeral.Y.Bytes())
+	}
+	return b[:n]
+}
+
+func (bp *blockPacker) SetLocation(l upspin.Location) {
+	bs := bp.entry.Blocks
+	if len(bs) == 0 {
+		panic("setting location for empty block set")
+	}
+	bs[len(bs)-1].Location = l
+}
+
+func (bp *blockPacker) Close() error {
+	if err := bp.checkPreviousLocation(); err != nil {
+		return err
+	}
+
+	// Compute hash of all block signatures.
+	hash := sha256.New()
+	bs := bp.entry.Blocks
+	for i := range bs {
+		hash.Write(bs[i].Signature)
+	}
+	blockSum := hash.Sum(nil)
+
+	// Compute entry signature.
+	sig, err := bp.ctx.Factotum().FileSign(path.Clean(bp.entry.Name), bp.entry.Time, bp.dkey, blockSum)
+	if err != nil {
+		return errors.E("Pack", err)
+	}
+
+	bp.entry.Signature = marshalSignature(sig)
+
+	return nil
+}
+
+func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+	return nil, nil
+}
+
+func (ee ee) oldUnpack(ctx upspin.Context, cleartext, ciphertext []byte, d *upspin.DirEntry) (int, error) {
 	const Unpack = "Unpack"
-	if err := pack.CheckUnpackMeta(ee, &d.Metadata); err != nil {
+	if err := pack.CheckPacking(ee, d); err != nil {
 		return 0, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
 	if len(cleartext) < len(ciphertext) {
@@ -208,12 +331,12 @@ func (ee ee) Unpack(ctx upspin.Context, cleartext, ciphertext []byte, d *upspin.
 
 	// Retrieve file decryption key.
 	dkey := make([]byte, aesKeyLen)
-	sig, sig2, wrap, _, err := ee.pdUnmarshal(d.Metadata.Packdata)
+	sig, sig2, wrap, _, err := ee.pdUnmarshal(d.Signature)
 	if err != nil {
 		return 0, errors.E(Unpack, d.Name, err)
 	}
 
-	writer := d.Metadata.Writer
+	writer := d.Writer
 	if len(writer) == 0 {
 		return 0, errors.E(Unpack, d.Name, errWriter)
 	}
@@ -248,7 +371,7 @@ func (ee ee) Unpack(ctx upspin.Context, cleartext, ciphertext []byte, d *upspin.
 			return 0, errors.E(Unpack, d.Name, err)
 		}
 		// Verify that this was signed with the writer's old or new public key.
-		vhash := factotum.VerHash(writerCurveName, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+		vhash := factotum.VerHash(writerCurveName, path.Clean(d.Name), d.Time, dkey, cipherSum)
 		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
@@ -368,12 +491,12 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	if d.IsDir() {
 		return errors.E(Name, d.Name, errors.IsDir, "cannot rename directory")
 	}
-	if err := pack.CheckUnpackMeta(ee, &d.Metadata); err != nil {
+	if err := pack.CheckPacking(ee, d); err != nil {
 		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
 
 	dkey := make([]byte, aesKeyLen)
-	sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(d.Metadata.Packdata)
+	sig, sig2, wrap, cipherSum, err := ee.pdUnmarshal(d.Signature)
 	if err != nil {
 		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
@@ -428,7 +551,7 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.Name), d.Metadata.Time, dkey, cipherSum)
+	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.Name), d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
@@ -447,14 +570,14 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 
 	// Compute new signature.
-	sig, err = ctx.Factotum().FileSign(newName, d.Metadata.Time, dkey, cipherSum)
+	sig, err = ctx.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
 	if err != nil {
 		return errors.E(Name, d.Name, err)
 	}
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
-	if err := ee.pdMarshal(&d.Metadata.Packdata, sig, sig0, wrap, cipherSum); err != nil {
+	if err := ee.pdMarshal(&d.Signature, sig, sig0, wrap, cipherSum); err != nil {
 		return errors.E(Name, d.Name, err)
 	}
 	d.Name = newName

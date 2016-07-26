@@ -106,6 +106,30 @@ type Factotum interface {
 // called packdata.
 type Packing uint8
 
+// BlockPacker operates on a DirEntry, packing and signing DirBlocks.
+type BlockPacker interface {
+	// Pack takes cleartext data returns the packed ciphertext,
+	// appending a DirBlock to the DirEntry.
+	Pack(cleartext []byte) (ciphertext []byte, err error)
+
+	// SetLocation updates the Location field of the last-Packed DirBlock.
+	SetLocation(Location)
+
+	// Close updates the Signature for the DirEntry.
+	Close() error
+}
+
+// BlockUnpacker operates on a DirEntry, unpacking and verifying its DirBlocks.
+type BlockUnpacker interface {
+	// NextBlock returns the next DirBlock
+	NextBlock() (DirBlock, bool)
+
+	// UnpackBlock takes ciphertext data and decodes it into the cleartext slice.
+	// If appropriate, the result is verified as correct according to the
+	// block's Signature and the entry's Signature and WrappedKeys.
+	Unpack(ciphertext []byte) (cleartext []byte, err error)
+}
+
 // Packer provides the implementation of a Packing. The pack package binds
 // Packing values to the concrete implementations of this interface.
 // TODO: Fix all comments.
@@ -117,32 +141,9 @@ type Packer interface {
 	// String returns the name of this packer.
 	String() string
 
-	// Pack takes cleartext data and encodes it
-	// into the ciphertext slice. The ciphertext and cleartext slices
-	// must not overlap. Pack might update the entry's Metadata, which
-	// must not be nil but might have a nil Packdata field. If the
-	// Packdata has length>0, the first byte must be the correct value
-	// of Packing. Upon return the Packdata will be updated with the
-	// correct information to unpack the ciphertext.
-	// The ciphertext slice must be large enough to hold  the result;
-	// the PackLen method may be used to find a suitable size to
-	// allocate.
-	// The returned count is the written length of the ciphertext.
-	Pack(context Context, ciphertext, cleartext []byte, entry *DirEntry) (int, error)
-
-	// Unpack takes ciphertext data and stores the cleartext version
-	// in the cleartext slice, which must be large enough, using the
-	// Packdata field of the Metadata in the DirEntry to recover
-	// keys and other necessary information.
-	// If appropriate, the result is verified as correct according
-	// to items such as the path name and time stamp in the Metadata.
-	// The ciphertext and cleartext slices must not overlap.
-	// Unpack might update the Metadata field of the DirEntry using
-	// data recovered from the Packdata. The incoming Packdata must
-	// must have the correct Packing value already present in its
-	// first byte.
-	// Unpack returns the number of bytes written to the slice.
-	Unpack(context Context, cleartext, ciphertext []byte, entry *DirEntry) (int, error)
+	// TODO(adg): documentation
+	Pack(Context, *DirEntry) (BlockPacker, error)
+	Unpack(Context, *DirEntry) (BlockUnpacker, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
