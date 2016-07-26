@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// TODO(adg): write tests for entries with multiple blocks.
+
 package ee
 
 import (
@@ -38,29 +40,43 @@ func TestRegister(t *testing.T) {
 
 // packBlob packs text according to the parameters and returns the cipher.
 func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
-	cipher := make([]byte, packer.PackLen(ctx, text, d))
-	m, err := packer.Pack(ctx, cipher, text, d)
+	d.Packing = packer.Packing()
+	bp, err := packer.Pack(ctx, d)
 	if err != nil {
-		t.Fatal("Pack: ", err)
+		t.Fatal("packBlob:", err)
 	}
-	return cipher[:m]
+	cipher, err := bp.Pack(text)
+	if err != nil {
+		t.Fatal("packBlob:", err)
+	}
+	bp.SetLocation(upspin.Location{Reference: "dummy"})
+	if err := bp.Close(); err != nil {
+		t.Fatal("packBlob:", err)
+	}
+	return cipher
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
 func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
-	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
-	m, err := packer.Unpack(ctx, clear, cipher, d)
+	bp, err := packer.Unpack(ctx, d)
 	if err != nil {
-		t.Fatal("Unpack: ", err)
+		t.Fatal("unpackBlob:", err)
 	}
-	return clear[:m]
+	if _, ok := bp.NextBlock(); !ok {
+		t.Fatal("unpackBlob: no next block")
+	}
+	text, err := bp.Unpack(cipher)
+	if err != nil {
+		t.Fatal("unpackBlob:", err)
+	}
+	return text
 }
 
 func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
-	d.Metadata.Writer = ctx.UserName()
+	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
@@ -75,7 +91,7 @@ func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packe
 	// First pack.
 	d := &upspin.DirEntry{}
 	d.Name = name
-	d.Metadata.Writer = ctx.UserName()
+	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Name to newName.
@@ -130,20 +146,38 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	ctx, packer := setup(user, curveName)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
-			Name: name,
+			Name:    name,
+			Packing: packer.Packing(),
 		}
-		cipher := make([]byte, packer.PackLen(ctx, data, d))
-		m, err := packer.Pack(ctx, cipher, data, d)
+		bp, err := packer.Pack(ctx, d)
 		if err != nil {
+			b.Fatal(err)
+		}
+		cipher, err := bp.Pack(data)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if err := bp.Close(); err != nil {
 			b.Fatal(err)
 		}
 		if !unpack {
 			continue
 		}
-		cipher = cipher[:m]
-		clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
-		m, _ = packer.Unpack(ctx, clear, cipher, d)
-		clear = clear[:m]
+		//jm, _ = packer.Unpack(ctx, clear, cipher, d)
+		bup, err := packer.Unpack(ctx, d)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if _, ok := bup.NextBlock(); !ok {
+			b.Fatal("no next block")
+		}
+		clear, err := bup.Unpack(cipher)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !bytes.Equal(clear, data) {
+			b.Fatal("cleartext mismatch")
+		}
 	}
 }
 
@@ -170,7 +204,6 @@ func TestSharing(t *testing.T) {
 	// dude@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
 		dudesUserName  upspin.UserName = "dude@google.com"
-		packing                        = upspin.EEPack
 		pathName                       = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
 		bobsUserName   upspin.UserName = "bob@foo.com"
 		carlasUserName upspin.UserName = "carla@baz.edu"
@@ -202,12 +235,12 @@ func TestSharing(t *testing.T) {
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
-	d.Metadata.Writer = ctx.UserName()
+	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob and Carla.
-	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic, carlasPublic}, &d.Metadata.Packdata)
+	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic, carlasPublic}, &d.Packdata)
 
-	readers, err := packer.ReaderHashes(d.Metadata.Packdata)
+	readers, err := packer.ReaderHashes(d.Packdata)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,7 +290,6 @@ func TestBadSharing(t *testing.T) {
 	// dudette@google.com is the owner of a file that is attempting to be shared with mia@foo.com, but share wasn't called.
 	const (
 		dudettesUserName upspin.UserName = "dudette@google.com"
-		packing                          = upspin.EEPack
 		pathName                         = upspin.PathName(dudettesUserName + "/secret_file_shared_with_mia")
 		miasUserName     upspin.UserName = "mia@foo.com"
 		text                             = "mia, here's the secret file. sincerely, dudette."
@@ -285,8 +317,8 @@ func TestBadSharing(t *testing.T) {
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
-	d.Metadata.Writer = ctx.UserName()
-	cipher := packBlob(t, ctx, packer, d, []byte(text))
+	d.Writer = ctx.UserName()
+	packBlob(t, ctx, packer, d, []byte(text))
 
 	// Don't share with Mia (do nothing).
 
@@ -299,12 +331,11 @@ func TestBadSharing(t *testing.T) {
 	ctx.SetFactotum(f)
 
 	// Mia can't unpack.
-	clear := make([]byte, packer.UnpackLen(ctx, cipher, d))
-	_, err = packer.Unpack(ctx, clear, cipher, d)
+	_, err = packer.Unpack(ctx, d)
 	if err == nil {
 		t.Fatal("Expected error, got none.")
 	}
-	if !strings.Contains(err.Error(), "no wrapped key for me") {
+	if !strings.Contains(err.Error(), "could not find wrapped key") {
 		t.Fatalf("Expected no key error, got %s", err)
 	}
 }
