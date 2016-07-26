@@ -5,8 +5,15 @@
 // Package inprocess implements a simple, non-persistent, in-memory directory service.
 package inprocess
 
+// The implementation uses a Merkle tree to represent the directory tree.
+// For simplicity, a directory's data is always stored as a single block.
+// (The files it stores may have any number of blocks.)
+// Even empty directories contain a single zero-sized block.
+// For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
+
 import (
 	goPath "path"
+
 	"sort"
 	"strings"
 	"sync"
@@ -14,27 +21,27 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	// Imported because it's used to pack dir entries.
+	// Imported because it's used to pack directory entries.
 	_ "upspin.io/pack/plain"
 )
 
 // Used to store directory entries.
-// All directories are encoded with this packing; the user-created
-// blobs are packed according to the arguments to Put.
+// All directories are encoded with this packing.
 var (
 	dirPacking = upspin.PlainPack
+	dirPacker  = pack.Lookup(dirPacking)
 )
 
 var (
-	loc0 upspin.Location
+	loc0 upspin.Location // Declared for ease of use in MakeDirectory, whose return type should change anyway.
 )
 
-// Service implements directories and file-level I/O.
+// Service implements the upspin.DirServer interface. It is a multiplexed
+// by user onto a database.
 type Service struct {
 	upspin.NoConfiguration
 	// context holds the context that created the call.
@@ -42,6 +49,7 @@ type Service struct {
 	db      *database
 }
 
+// database represents the shared state of the directory forest.
 type database struct {
 	endpoint upspin.Endpoint
 
@@ -53,8 +61,8 @@ type database struct {
 	// so it's not _too_ bad.
 	mu sync.RWMutex
 
-	// serviceOwner identifies the user running the user service. TODO: unused.
-	serviceOwner upspin.UserName
+	// dialed reports whether the service has its first Dialed connection.
+	dialed bool
 
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
@@ -70,211 +78,75 @@ type database struct {
 
 var _ upspin.DirServer = (*Service)(nil)
 
-func newDirEntry(context upspin.Context, name upspin.PathName) *upspin.DirEntry {
-	return &upspin.DirEntry{
-		Name: name,
-		Location: upspin.Location{
-			Endpoint: context.StoreEndpoint(),
-		},
-		Metadata: upspin.Metadata{
-			Packdata: upspin.Packdata{byte(dirPacking)},
-		},
+// newDirEntry returns a new DirEntry holding the provided directory data.
+// It is the general form of the method that follows, used in the tests.
+func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, data []byte, ref upspin.Reference, attr upspin.FileAttributes, seq int64) (*upspin.DirEntry, error) {
+	entry := &upspin.DirEntry{
+		Name:     name,
+		Packing:  packing,
+		Time:     upspin.Now(),
+		Attr:     attr,
+		Sequence: seq,
+		Writer:   context.UserName(),
 	}
-}
-
-func (db *database) packDirBlob(op string, cleartext []byte, name upspin.PathName) ([]byte, *upspin.Metadata, error) {
-	return packBlob(db.dirContext, op, cleartext, newDirEntry(db.dirContext, name))
-}
-
-func getPacker(packdata upspin.Packdata) (upspin.Packer, error) {
-	if len(packdata) == 0 {
-		return nil, errors.Str("no packdata")
-	}
-	packer := pack.Lookup(upspin.Packing(packdata[0]))
+	packer := pack.Lookup(packing)
 	if packer == nil {
-		return nil, errors.Errorf("no packing %#x registered", packdata[0])
+		return nil, errors.Errorf("no packing %#x registered", packing)
 	}
-	return packer, nil
-}
-
-// packBlob packs an arbitrary blob and its metadata.
-func packBlob(context upspin.Context, op string, cleartext []byte, entry *upspin.DirEntry) ([]byte, *upspin.Metadata, error) {
-	packer, err := getPacker(entry.Metadata.Packdata)
+	bp, err := packer.Pack(context, entry)
 	if err != nil {
-		return nil, nil, errors.E(op, entry.Name, errors.Invalid, err)
+		return nil, err
 	}
-	cipherLen := packer.PackLen(context, cleartext, entry)
-	if cipherLen < 0 {
-		return nil, nil, errors.E(op, err)
-	}
-	ciphertext := make([]byte, cipherLen)
-	n, err := packer.Pack(context, ciphertext, cleartext, entry)
+	ciphertext, err := bp.Pack(data)
 	if err != nil {
-		return nil, nil, errors.E(op, err)
+		return nil, err
 	}
-	return ciphertext[:n], &entry.Metadata, nil
-}
-
-// unpackBlob unpacks a blob.
-// Other than from unpackDirBlob, only used in tests.
-func unpackBlob(context upspin.Context, op string, ciphertext []byte, entry *upspin.DirEntry) ([]byte, error) {
-	packer, err := getPacker(entry.Metadata.Packdata)
+	store, err := bind.StoreServer(context, context.StoreEndpoint())
 	if err != nil {
-		return nil, errors.E(op, entry.Name, errors.Invalid, err)
+		return nil, err
 	}
-	clearLen := packer.UnpackLen(context, ciphertext, entry)
-	if clearLen < 0 {
-		return nil, errors.E(op, err)
-	}
-	cleartext := make([]byte, clearLen)
-	n, err := packer.Unpack(context, cleartext, ciphertext, entry)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	return cleartext[:n], nil
-}
-
-// unpackDirBlob unpacks a blob that is known to be a directory record.
-func unpackDirBlob(context upspin.Context, op string, ciphertext []byte, name upspin.PathName) ([]byte, error) {
-	return unpackBlob(context, op, ciphertext, newDirEntry(context, name))
-}
-
-// Glob implements upspin.DirServer.Glob.
-// TODO: Test access control for this method.
-func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const Glob = "Glob"
-	parsed, err := path.Parse(upspin.PathName(pattern))
-	if err != nil {
-		return nil, errors.E(Glob, err)
-	}
-	s.db.mu.RLock()
-	dirEntry, ok := s.db.root[parsed.User()]
-	s.db.mu.RUnlock()
-	if !ok {
-		return nil, errors.E(Glob, upspin.PathName(pattern), errors.NotExist, "no such user")
-	}
-	// Check if pattern is a valid go path pattern
-	_, err = goPath.Match(parsed.FilePath(), "")
-	if err != nil {
-		return nil, errors.E(Glob, upspin.PathName(pattern), errors.Syntax, err)
-	}
-
-	dirRef := dirEntry.Location.Reference
-	// Loop elementwise along the path, growing the list of candidates breadth-first.
-	this := make([]*upspin.DirEntry, 0, 100)
-	next := make([]*upspin.DirEntry, 1, 100)
-	next[0] = &upspin.DirEntry{
-		Name: parsed.First(0).Path(), // The root.
-		Location: upspin.Location{
-			Reference: dirRef,
-			Endpoint:  s.context.StoreEndpoint(),
-		},
-		Metadata: upspin.Metadata{
-			Attr: upspin.AttrDirectory,
-		},
-	}
-	for i := 0; i < parsed.NElem(); i++ {
-		elem := parsed.Elem(i)
-		// Need to check List permission. Permission check is done for any
-		// intermediate step (directory) if it's matched by a pattern, and for the final
-		// entry always.
-		if isGlobPattern(elem) || i == parsed.NElem()-1 {
-			ok, err := s.can(access.List, parsed.First(i))
-			if err != nil {
-				return nil, errors.E(Glob, upspin.PathName(pattern), err)
-			}
-			if !ok {
-				return nil, errors.E(Glob, upspin.PathName(pattern), access.ErrPermissionDenied)
-			}
-		}
-		this, next = next, this[:0]
-		for _, ent := range this {
-			// ent must refer to a directory.
-			if !ent.IsDir() {
-				continue
-			}
-			s.db.mu.RLock()
-			payload, err := s.fetchDir(Glob, ent.Location.Reference, ent.Name)
-			s.db.mu.RUnlock()
-			if err != nil {
-				return nil, errors.E(Glob, ent.Name, errors.Str("internal error: invalid reference: "+err.Error()))
-			}
-			for len(payload) > 0 {
-				var nextEntry upspin.DirEntry
-				remaining, err := nextEntry.Unmarshal(payload)
-				if err != nil {
-					return nil, errors.E(Glob, ent.Name, err)
-				}
-				payload = remaining
-				parsed, err := path.Parse(nextEntry.Name)
-				if err != nil {
-					return nil, errors.E(Glob, ent.Name, err)
-				}
-				// No need to check error; pattern is validated above.
-				if matched, _ := goPath.Match(elem, parsed.Elem(parsed.NElem()-1)); !matched {
-					continue
-				}
-				next = append(next, &nextEntry)
-			}
+	if ref == "" {
+		ref, err = store.Put(ciphertext)
+		if err != nil {
+			return nil, err
 		}
 	}
-	var checked, canRead bool
-	for _, entry := range next {
-		// Need a / on the root if it's matched.
-		if entry.Name == upspin.PathName(parsed.User()) {
-			entry.Name += "/"
-		}
-		// Clear out the location information if we can't read this.
-		// All will be in the same directory so we only need to check one.
-		if !checked {
-			parsed, err := path.Parse(entry.Name)
-			if err != nil {
-				canRead, _ = s.can(access.Read, parsed)
-			}
-			checked = true
-		}
-		if !canRead {
-			entry.Location = loc0
-			entry.Metadata.Packdata = nil
-		}
-	}
-	sort.Sort(dirEntrySlice(next))
-
-	return next, nil
-}
-
-func isGlobPattern(elem string) bool {
-	return strings.ContainsAny(elem, `*?[]`)
-}
-
-// For sorting.
-type dirEntrySlice []*upspin.DirEntry
-
-func (d dirEntrySlice) Len() int           { return len(d) }
-func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
-func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
-
-func (s *Service) rootDirEntry(user upspin.UserName, ref upspin.Reference, seq int64) *upspin.DirEntry {
-	return &upspin.DirEntry{
-		Name: upspin.PathName(user + "/"),
-		Location: upspin.Location{
-			Endpoint:  s.context.StoreEndpoint(),
+	bp.SetLocation(
+		upspin.Location{
+			Endpoint:  context.StoreEndpoint(),
 			Reference: ref,
 		},
-		Metadata: upspin.Metadata{
-			Attr:     upspin.AttrDirectory,
-			Sequence: seq,
-			Size:     0,
-			Time:     upspin.Now(),
-			Packdata: upspin.Packdata{byte(dirPacking)},
+	)
+	if err := bp.Close(); err != nil {
+		return nil, err
+	}
+	return entry, nil
+}
+
+// newDirEntry returns a new DirEntry holding the provided directory data.
+// It is called for directories only.
+// If the ref is empty, it stores the data in the Store.
+func (s *Service) newDirEntry(name upspin.PathName, data []byte, ref upspin.Reference, seq int64) (*upspin.DirEntry, error) {
+	return newDirEntry(s.db.dirContext, dirPacking, name, data, ref, upspin.AttrDirectory, seq)
+}
+
+// dirBlock constructs an upspin.DirBlock with the appropriate fields.
+// TODO: It should update packdata.
+func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
+	return upspin.DirBlock{
+		Location: upspin.Location{
+			Endpoint:  context.StoreEndpoint(),
+			Reference: ref,
 		},
+		Offset:   offset,
+		Size:     int64(len(blob)),
+		Packdata: nil, // TODO
 	}
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
 	const MakeDirectory = "MakeDirectory"
-	log.Printf("directory/inprocess MakeDirectory %q", directoryName)
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
 	parsed, err := path.Parse(directoryName)
@@ -294,10 +166,6 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
-	if err != nil {
-		return loc0, errors.E(MakeDirectory, directoryName, err)
-	}
 	if parsed.IsRoot() {
 		// Creating a root: easy!
 		// Only the onwer can create the root, but the check above is sufficient since a
@@ -305,31 +173,20 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		if _, present := s.db.root[parsed.User()]; present {
 			return loc0, errors.E("MakeDirectory", directoryName, errors.Exist)
 		}
-		blob, _, err := s.db.packDirBlob(MakeDirectory, nil, pathName) // TODO: Ignoring metadata (but using PlainPack).
+		// We will have a zero-sized block here, which is odd but necessary to have
+		// a place to store the directory's Reference.
+		entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), []byte{}, "", 0)
 		if err != nil {
 			return loc0, err
 		}
-		ref, err := store.Put(blob)
-		if err != nil {
-			return loc0, errors.E(MakeDirectory, directoryName, err)
-		}
-		dirEntry := s.rootDirEntry(parsed.User(), ref, 0)
-		s.db.root[parsed.User()] = dirEntry
-		return dirEntry.Location, nil
+		s.db.root[parsed.User()] = entry
+		return entry.Blocks[0].Location, nil
 	}
-	// Use parsed.Path() rather than directoryName so it's canonicalized.
-	ref, err := store.Put([]byte{}) // Nothing to store, but we need a reference.
+	entry, err := s.newDirEntry(parsed.Path(), []byte{}, "", 0)
 	if err != nil {
-		return loc0, errors.E(MakeDirectory, directoryName, err)
+		return loc0, err
 	}
-	loc := upspin.Location{
-		Endpoint:  s.context.StoreEndpoint(),
-		Reference: ref,
-	}
-	entry := newDirEntry(s.context, parsed.Path())
-	entry.SetDir()
-	entry.Location = loc
-	return loc, s.put(MakeDirectory, entry, false)
+	return entry.Blocks[0].Location, s.put(MakeDirectory, entry, false)
 }
 
 // Put implements upspin.DirServer.Put.
@@ -364,7 +221,7 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
-		if entry.Metadata.Packing() != upspin.PlainPack {
+		if entry.Packing != upspin.PlainPack {
 			return errors.E(Put, entry.Name, errors.Str("Access or Group file must use plain packing"))
 		}
 	}
@@ -390,6 +247,73 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 			s.db.access[path.DropPath(entry.Name, 1)] = accessFile
 		}
 	}
+	return nil
+}
+
+// put is the underlying implementation of Put and MakeDirectory.
+// If deleting, we expect the entry to already be present and skip it on the rewrite.
+// TODO add Share?
+func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
+	parsed, err := path.Parse(entry.Name)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	pathName := parsed.Path()
+	if parsed.IsRoot() {
+		return errors.E(op, pathName, errors.Errorf("cannot create root %s with Put; use MakeDirectory", parsed))
+	}
+	dirEntry, ok := s.db.root[parsed.User()]
+	if !ok {
+		// Cannot create user root with Put.
+		return errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
+	}
+	dirRef := dirEntry.Blocks[0].Location.Reference
+	// Iterate along the path up to but not past the last element.
+	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
+	// Invariant: dirRef refers to a directory.
+	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
+	entries = append(entries, dirEntry)
+	for i := 0; i < parsed.NElem()-1; i++ {
+		e, err := s.fetchEntry(op, parsed.First(i).Path(), dirRef, parsed.Elem(i))
+		if err != nil {
+			return err
+		}
+		if !e.IsDir() {
+			return errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
+		}
+		entries = append(entries, e)
+		dirRef = e.Blocks[0].Location.Reference
+	}
+	var dirBlob []byte
+	dirRef, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), dirRef, entry, deleting, false)
+	if err != nil {
+		// TODO: System is now inconsistent.
+		return err
+	}
+	// Rewrite the tree up to the root.
+	// Invariant: dirRef identifies the directory that has just been updated,
+	// and its payload is in dirBlob.
+	// i indicates the directory that needs to be updated to store the new dirRef.
+	for i := len(entries) - 2; i >= 0; i-- {
+		// Install into the ith directory the (i+1)th entry.
+		dirEntry, err := s.newDirEntry(entries[i+1].Name, dirBlob, dirRef, entries[i+1].Sequence)
+		if err != nil {
+			return err
+		}
+		dirRef, dirBlob, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Blocks[0].Location.Reference, dirEntry, false, true)
+		if err != nil {
+			// TODO: System is now inconsistent.
+			return err
+		}
+	}
+	// Update the root.
+	seq := s.db.root[parsed.User()].Sequence
+	rootEntry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), dirBlob, dirRef, seq+1)
+	if err != nil {
+		return err
+	}
+	s.db.root[parsed.User()] = rootEntry
+
 	return nil
 }
 
@@ -434,87 +358,30 @@ func (s *Service) whichAccess(parsed path.Parsed) *access.Access {
 	}
 }
 
-// put is the underlying implementation of Put and MakeDirectory.
-// If deleting, we expect the entry to already be present and skip it on the rewrite.
-// TODO add Share?
-func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
-	parsed, err := path.Parse(entry.Name)
-	if err != nil {
-		return errors.E(op, err)
-	}
-	pathName := parsed.Path()
-	if parsed.IsRoot() {
-		return errors.E(op, pathName, errors.Str("cannot create root with Put; use MakeDirectory"))
-	}
-	dirEntry, ok := s.db.root[parsed.User()]
-	if !ok {
-		// Cannot create user root with Put.
-		return errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
-	}
-	dirRef := dirEntry.Location.Reference
-	// Iterate along the path up to but not past the last element.
-	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
-	// Invariant: dirRef refers to a directory.
-	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
-	entries = append(entries, dirEntry)
-	for i := 0; i < parsed.NElem()-1; i++ {
-		e, err := s.fetchEntry(op, parsed.First(i).Path(), dirRef, parsed.Elem(i))
-		if err != nil {
-			return err
-		}
-		if !e.IsDir() {
-			return errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
-		}
-		entries = append(entries, e)
-		dirRef = e.Location.Reference
-	}
-	dirRef, err = s.installEntry(op, path.DropPath(pathName, 1), dirRef, entry, deleting, false)
-	if err != nil {
-		// TODO: System is now inconsistent.
-		return err
-	}
-	// Rewrite the tree up to the root.
-	// Invariant: dirRef identifies the directory that has just been updated.
-	// i indicates the directory that needs to be updated to store the new dirRef.
-	for i := len(entries) - 2; i >= 0; i-- {
-		// Install into the ith directory the (i+1)th entry.
-		dirEntry := &upspin.DirEntry{
-			Name: entries[i+1].Name,
-			Location: upspin.Location{
-				Endpoint:  s.context.StoreEndpoint(),
-				Reference: dirRef,
-			},
-			Metadata: upspin.Metadata{
-				Attr:     upspin.AttrDirectory,
-				Sequence: entries[i+1].Metadata.Sequence,
-				Packdata: upspin.Packdata{byte(dirPacking)},
-			},
-		}
-		dirRef, err = s.installEntry(op, parsed.First(i).Path(), entries[i].Location.Reference, dirEntry, false, true)
-		if err != nil {
-			// TODO: System is now inconsistent.
-			return err
-		}
-	}
-	// Update the root.
-	seq := s.db.root[parsed.User()].Metadata.Sequence
-	s.db.root[parsed.User()] = s.rootDirEntry(parsed.User(), dirRef, seq+1)
-
-	return nil
-}
-
 // getData retrieves the data for the entry. s.db.mu is held for write.
 func (s *Service) getData(entry *upspin.DirEntry) ([]byte, error) {
-	store, err := bind.StoreServer(s.context, entry.Location.Endpoint)
-	if err != nil {
-		return nil, err
+	var data []byte
+	for i := 0; i < len(entry.Blocks); i++ {
+		store, err := bind.StoreServer(s.context, entry.Blocks[i].Location.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		d, locs, err := store.Get(entry.Blocks[i].Location.Reference)
+		if err != nil {
+			// TODO: Should handle redirection.
+			return nil, err
+		}
+		if locs != nil { // TODO
+			return nil, errors.Str("dir/inprocess: redirection not implemented")
+		}
+		if len(entry.Blocks) == 1 {
+			// We have all the data; don't bother copying.
+			data = d
+			break
+		}
+		data = append(data, d...)
 	}
-	data, _, err := store.Get(entry.Location.Reference)
-	if err != nil {
-		// TODO: Should handle redirection.
-		return nil, err
-	}
-	return data, err
+	return data, nil
 }
 
 // Delete implements upspin.DirServer.Delete.
@@ -544,11 +411,7 @@ func (s *Service) Delete(pathName upspin.PathName) error {
 	defer s.db.mu.Unlock()
 	// If it is a directory, it must be empty.
 	if entry.IsDir() {
-		empty, err := s.isEmptyDirectory(Delete, entry)
-		if err != nil {
-			return errors.E(Delete, err)
-		}
-		if !empty {
+		if !s.isEmptyDirectory(Delete, entry) {
 			return errors.E(Delete, pathName, errors.NotEmpty)
 		}
 	}
@@ -556,12 +419,15 @@ func (s *Service) Delete(pathName upspin.PathName) error {
 	return s.put(Delete, entry, true)
 }
 
-func (s *Service) isEmptyDirectory(op string, entry *upspin.DirEntry) (bool, error) {
-	data, err := s.fetchDir(op, entry.Location.Reference, entry.Name)
-	if err != nil {
-		return false, err
+func (s *Service) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
+	if !entry.IsDir() {
+		return false
 	}
-	return len(data) == 0, nil
+	size, err := entry.Size()
+	if err != nil {
+		panic(err)
+	}
+	return size == 0
 }
 
 // Lookup implements upspin.DirServer.Lookup.
@@ -596,7 +462,7 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 	if parsed.IsRoot() {
 		return dirEntry, nil
 	}
-	dirRef := dirEntry.Location.Reference
+	dirRef := dirEntry.Blocks[0].Location.Reference
 	// Iterate along the path up to but not past the last element.
 	// Invariant: dirRef refers to a directory.
 	for i := 0; i < parsed.NElem()-1; i++ {
@@ -607,7 +473,7 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 		if !entry.IsDir() {
 			return nil, errors.E(op, parsed.Path(), errors.NotDir)
 		}
-		dirRef = entry.Location.Reference
+		dirRef = entry.Blocks[0].Location.Reference
 	}
 	lastElem := parsed.Elem(parsed.NElem() - 1)
 	// Destination must exist. If so we need to update the parent directory record.
@@ -617,6 +483,116 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 	}
 	return entry, nil
 }
+
+// Glob implements upspin.DirServer.Glob.
+// TODO: Test access control for this method.
+func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	const Glob = "Glob"
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		return nil, errors.E(Glob, err)
+	}
+	s.db.mu.RLock()
+	dirEntry, ok := s.db.root[parsed.User()]
+	s.db.mu.RUnlock()
+	if !ok {
+		return nil, errors.E(Glob, upspin.PathName(pattern), errors.NotExist, "no such user")
+	}
+	// Check if pattern is a valid go path pattern
+	_, err = goPath.Match(parsed.FilePath(), "")
+	if err != nil {
+		return nil, errors.E(Glob, upspin.PathName(pattern), errors.Syntax, err)
+	}
+
+	dirRef := dirEntry.Blocks[0].Location.Reference
+	// Loop elementwise along the path, growing the list of candidates breadth-first.
+	this := make([]*upspin.DirEntry, 0, 100)
+	next := make([]*upspin.DirEntry, 1, 100)
+	// Make placeholder entry for the root to bootstrap the loop. It doesn't need the block data.
+	next[0], err = s.newDirEntry(parsed.First(0).Path(), nil, dirRef, 0)
+	if err != nil {
+		return nil, errors.E(Glob, upspin.PathName(pattern), err)
+	}
+	for i := 0; i < parsed.NElem(); i++ {
+		elem := parsed.Elem(i)
+		// Need to check List permission. Permission check is done for any
+		// intermediate step (directory) if it's matched by a pattern, and for the final
+		// entry always.
+		if isGlobPattern(elem) || i == parsed.NElem()-1 {
+			ok, err := s.can(access.List, parsed.First(i))
+			if err != nil {
+				return nil, errors.E(Glob, upspin.PathName(pattern), err)
+			}
+			if !ok {
+				return nil, errors.E(Glob, upspin.PathName(pattern), access.ErrPermissionDenied)
+			}
+		}
+		this, next = next, this[:0]
+		for _, ent := range this {
+			// ent must refer to a directory.
+			if !ent.IsDir() {
+				continue
+			}
+			s.db.mu.RLock()
+			payload, err := s.fetchDir(Glob, ent.Blocks[0].Location.Reference, ent.Name)
+			s.db.mu.RUnlock()
+			if err != nil {
+				return nil, errors.E(Glob, ent.Name, errors.Str("internal error: invalid reference: "+err.Error()))
+			}
+			for len(payload) > 0 {
+				var nextEntry upspin.DirEntry
+				remaining, err := nextEntry.Unmarshal(payload)
+				if err != nil {
+					return nil, errors.E(Glob, ent.Name, err)
+				}
+				payload = remaining
+				parsed, err := path.Parse(nextEntry.Name)
+				if err != nil {
+					return nil, errors.E(Glob, ent.Name, err)
+				}
+				// No need to check error; pattern is validated above.
+				if matched, _ := goPath.Match(elem, parsed.Elem(parsed.NElem()-1)); !matched {
+					continue
+				}
+				next = append(next, &nextEntry)
+			}
+		}
+	}
+	var checked, canRead bool
+	for _, entry := range next {
+		// Need a / on the root if it's matched.
+		if entry.Name == upspin.PathName(parsed.User()) {
+			entry.Name += "/"
+		}
+		// Clear out the location information if we can't read this.
+		// All will be in the same directory so we only need to check one.
+		if !checked {
+			parsed, err := path.Parse(entry.Name)
+			if err != nil {
+				canRead, _ = s.can(access.Read, parsed)
+			}
+			checked = true
+		}
+		if !canRead {
+			entry.Blocks = nil
+			entry.Packdata = nil
+		}
+	}
+	sort.Sort(dirEntrySlice(next))
+
+	return next, nil
+}
+
+func isGlobPattern(elem string) bool {
+	return strings.ContainsAny(elem, `*?[]`)
+}
+
+// For sorting.
+type dirEntrySlice []*upspin.DirEntry
+
+func (d dirEntrySlice) Len() int           { return len(d) }
+func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
+func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // can reports whether the calling user (defined by s.context.UserName()) has the
 // access right for this file or directory.
@@ -671,6 +647,7 @@ func (s *Service) fetchEntry(op string, name upspin.PathName, dirRef upspin.Refe
 }
 
 // fetchDir returns the decrypted directory data associated with the reference.
+// TODO: This can only work with plain packing.
 func (s *Service) fetchDir(op string, dirRef upspin.Reference, name upspin.PathName) ([]byte, error) {
 	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
 	if err != nil {
@@ -687,8 +664,16 @@ func (s *Service) fetchDir(op string, dirRef upspin.Reference, name upspin.PathN
 			return nil, errors.E(op, err)
 		}
 	}
-	payload, err := unpackDirBlob(s.db.dirContext, op, ciphertext, name)
-	return payload, err
+	// TODO: This is a horrible hack.
+	entry := &upspin.DirEntry{
+		Name:    "TODO",
+		Packing: dirPacking,
+	}
+	u, err := dirPacker.Unpack(s.db.dirContext, entry)
+	if err != nil {
+		return nil, err
+	}
+	return u.Unpack(ciphertext)
 }
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
@@ -717,14 +702,14 @@ Loop:
 var errSeq = errors.Str("sequence mismatch")
 
 // installEntry installs the new entry in the directory referenced by dirLeu, appending or overwriting the
-// entry as required. It returns the ref for the updated directory.
-func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (upspin.Reference, error) {
+// entry as required. It returns the ref for the updated directory and the blob itself..
+func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin.Reference, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (upspin.Reference, []byte, error) {
 	if dirRef == "" {
-		panic("nothing")
+		panic("empty reference in installEntry")
 	}
 	dirData, err := s.fetchDir(op, dirRef, dirName)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	found := false
 	var nextEntry upspin.DirEntry
@@ -733,7 +718,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		start := len(dirData) - len(payload)
 		remaining, err := nextEntry.Unmarshal(payload)
 		if err != nil {
-			return "", errors.E(op, err)
+			return "", nil, errors.E(op, err)
 		}
 		length := len(payload) - len(remaining)
 		payload = remaining
@@ -744,12 +729,12 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		found = true
 		if !deleting {
 			// If it's already there and the sequence number is SeqNotExist, this is an error.
-			if newEntry.Metadata.Sequence == upspin.SeqNotExist {
-				return "", errors.E(op, newEntry.Name, errors.Exist)
+			if newEntry.Sequence == upspin.SeqNotExist {
+				return "", nil, errors.E(op, newEntry.Name, errors.Exist)
 			}
 			// If it's already there and is not expected to be a directory, this is an error.
 			if nextEntry.IsDir() && !dirOverwriteOK {
-				return "", errors.E(op, errors.IsDir, dirName, errors.Str("cannot overwrite directory"))
+				return "", nil, errors.E(op, errors.IsDir, dirName, errors.Str("cannot overwrite directory"))
 			}
 		}
 		// Drop this entry so we can append the updated one (or skip it, if we're deleting).
@@ -759,39 +744,33 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirRef upspin
 		dirData = dirData[:len(dirData)-length]
 		if !deleting {
 			// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
-			if newEntry.Metadata.Sequence != upspin.SeqIgnore {
-				if newEntry.Metadata.Sequence != nextEntry.Metadata.Sequence {
-					return "", errors.E(op, newEntry.Name, errSeq)
+			if newEntry.Sequence != upspin.SeqIgnore {
+				if newEntry.Sequence != nextEntry.Sequence {
+					return "", nil, errors.E(op, newEntry.Name, errSeq)
 				}
 			}
-			newEntry.Metadata.Sequence = nextEntry.Metadata.Sequence + 1
+			newEntry.Sequence = nextEntry.Sequence + 1
 		}
 		break
 	}
 	if deleting {
 		// Must exist.
 		if !found {
-			return "", errors.E(op, newEntry.Name, errors.NotExist)
+			return "", nil, errors.E(op, newEntry.Name, errors.NotExist)
 		}
 	} else {
 		// Add new entry to directory.
 		data, err := newEntry.Marshal()
 		if err != nil {
-			return "", errors.E(op, err)
+			return "", nil, errors.E(op, err)
 		}
 		dirData = append(dirData, data...)
 	}
-	blob, _, err := s.db.packDirBlob(op, dirData, dirName) // TODO: Ignoring metadata (but using PlainPack).
-	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
+	entry, err := s.newDirEntry(dirName, dirData, "", 0)
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", nil, errors.E(op, err)
 	}
-	ref, err := store.Put(blob)
-	if err != nil {
-		// TODO: System is now inconsistent.
-		return "", errors.E(op, err)
-	}
-	return ref, nil
+	return entry.Blocks[0].Location.Reference, dirData, nil
 }
 
 // DeleteAll implements upspin.DirServer.DeleteAll.
@@ -814,14 +793,14 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	if s.db.serviceOwner == "" {
+	if !s.db.dialed {
 		if context.UserName() == "" {
 			return nil, errors.E(Dial, errors.Invalid, errors.Str("no user name"))
 		}
 		// This is the first call; set the owner and endpoint.
 		s.db.endpoint = e
 		s.db.dirContext = context
-		s.db.serviceOwner = context.UserName()
+		s.db.dialed = true
 	}
 	this := *s // Make a copy.
 	this.context = context
