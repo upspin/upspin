@@ -46,39 +46,44 @@ func TestPackLen(t *testing.T) {
 	// First pack.
 	data := []byte(text)
 	de := &upspin.DirEntry{
-		Name: name,
+		Name:    name,
+		Packing: packer.Packing(),
 	}
 	n := packer.PackLen(globalContext, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
-	cipher := make([]byte, n)
-	m, err := packer.Pack(globalContext, cipher, data, de)
+	bp, err := packer.Pack(globalContext, de)
 	if err != nil {
-		t.Fatal("Pack: ", err)
+		t.Fatal("Pack:", err)
 	}
-	if n != m {
-		t.Fatalf("Pack returned %d; PackLen returned %d", m, n)
+	cipher, err := bp.Pack(data)
+	if err != nil {
+		t.Fatal("Pack:", err)
 	}
-	cipher = cipher[:m] // Already true, but be thorough.
+	bp.SetLocation(upspin.Location{Reference: "dummy"})
+	if err := bp.Close(); err != nil {
+		t.Fatal("Pack:", err)
+	}
 
 	// Now unpack.
 	n = packer.UnpackLen(globalContext, cipher, de)
 	if n < 0 {
 		t.Fatal("UnpackLen failed")
 	}
-	clear := make([]byte, n)
-	m, err = packer.Unpack(globalContext, clear, cipher, de)
+	bu, err := packer.Unpack(globalContext, de)
 	if err != nil {
-		t.Fatal("Unpack: ", err)
+		t.Fatal("Unpack:", err)
 	}
-	if n != m {
-		t.Fatalf("Unpack returned %d; UnpackLen returned %d", m, n)
+	if _, ok := bu.NextBlock(); !ok {
+		t.Fatal("NextBlock returned false")
 	}
-	clear = clear[:m] // Already true, but be thorough.
-	str := string(clear[:m])
-	if str != text {
-		t.Errorf("text: expected %q; got %q", text, str)
+	clear, err := bu.Unpack(cipher)
+	if err != nil {
+		t.Fatal("Unpack:", err)
+	}
+	if got := string(clear); got != text {
+		t.Errorf("text: got %q; want %q", got, text)
 	}
 }
 
@@ -89,30 +94,41 @@ func TestPack(t *testing.T) {
 
 	// First pack.
 	data := []byte(text)
-	cipher := make([]byte, 1024)
 	de := &upspin.DirEntry{
-		Name: name,
+		Name:    name,
+		Packing: packer.Packing(),
 	}
 	n := packer.PackLen(globalContext, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
-	m, err := packer.Pack(globalContext, cipher, data, de)
+	bp, err := packer.Pack(globalContext, de)
 	if err != nil {
-		t.Fatal("Pack: ", err)
+		t.Fatal("Pack:", err)
 	}
-	cipher = cipher[:m]
+	cipher, err := bp.Pack(data)
+	if err != nil {
+		t.Fatal("Pack:", err)
+	}
+	bp.SetLocation(upspin.Location{Reference: "dummy"})
+	if err := bp.Close(); err != nil {
+		t.Fatal("Pack:", err)
+	}
 
 	// Now unpack.
-	clear := make([]byte, 1024)
-	m, err = packer.Unpack(globalContext, clear, cipher, de)
+	bu, err := packer.Unpack(globalContext, de)
 	if err != nil {
-		t.Fatal("Unpack: ", err)
+		t.Fatal("Unpack:", err)
 	}
-	clear = clear[:m]
-	str := string(clear[:m])
-	if str != text {
-		t.Errorf("text: expected %q; got %q", text, str)
+	if _, ok := bu.NextBlock(); !ok {
+		t.Fatal("NextBlock returned false")
+	}
+	clear, err := bu.Unpack(cipher)
+	if err != nil {
+		t.Fatal("Unpack:", err)
+	}
+	if got := string(clear); got != text {
+		t.Errorf("text: got %q; want %q", got, text)
 	}
 }
 

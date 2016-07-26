@@ -39,23 +39,94 @@ func (plainPack) Share(context upspin.Context, readers []upspin.PublicKey, packd
 	// Nothing to do.
 }
 
-func (p plainPack) Pack(context upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
-	const Pack = "Pack"
-	if len(ciphertext) < len(cleartext) {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errTooShort)
+func (p plainPack) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+	if err := pack.CheckPacking(p, d); err != nil {
+		return nil, errors.E("Pack", errors.Invalid, d.Name, err)
 	}
-	return copy(ciphertext, cleartext), nil
+	return &blockPacker{
+		ctx:   ctx,
+		entry: d,
+	}, nil
 }
 
-func (p plainPack) Unpack(context upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+type blockPacker struct {
+	ctx   upspin.Context
+	entry *upspin.DirEntry
+
+	buf []byte // re-used by Pack
+}
+
+func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	// (re-)allocate shared buffer if necessary.
+	if bp.buf == nil || len(bp.buf) < len(cleartext) {
+		bp.buf = make([]byte, len(cleartext))
+	}
+	ciphertext = append(bp.buf[:0], cleartext...)
+
+	size := int64(len(ciphertext))
+	offs := int64(0)
+	if bs := bp.entry.Blocks; len(bs) > 0 {
+		offs = bs[len(bs)-1].Offset + size
+	}
+
+	block := upspin.DirBlock{
+		Size:   size,
+		Offset: offs,
+	}
+	bp.entry.Blocks = append(bp.entry.Blocks, block)
+
+	return
+}
+
+func (bp *blockPacker) SetLocation(l upspin.Location) {
+	bs := bp.entry.Blocks
+	if len(bs) == 0 {
+		panic("setting location for empty block set")
+	}
+	bs[len(bs)-1].Location = l
+}
+
+func (bp *blockPacker) Close() error {
+	return nil
+}
+
+func (p plainPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const Unpack = "Unpack"
-	if err := pack.CheckPacking(p, dirEntry); err != nil {
-		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
+	if err := pack.CheckPacking(p, d); err != nil {
+		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
-	if len(cleartext) < len(ciphertext) {
-		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, errTooShort)
+	return &blockUnpacker{
+		ctx:   ctx,
+		entry: d,
+		block: -1,
+	}, nil
+}
+
+type blockUnpacker struct {
+	ctx   upspin.Context
+	entry *upspin.DirEntry
+	block int // index into entry.Blocks
+
+	buf []byte // re-used by Unpack
+}
+
+func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
+	bp.block++
+	bs := bp.entry.Blocks
+	if bp.block >= len(bs) {
+		return upspin.DirBlock{}, false
 	}
-	return copy(cleartext, ciphertext), nil
+	b := bs[bp.block]
+	return b, true
+}
+
+func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
+	// (re-)allocate shared buffer if necessary.
+	if bp.buf == nil || len(bp.buf) < len(ciphertext) {
+		bp.buf = make([]byte, len(ciphertext))
+	}
+	cleartext = append(bp.buf[:0], ciphertext...)
+	return
 }
 
 // Name implements upspin.Name.
