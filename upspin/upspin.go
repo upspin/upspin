@@ -318,13 +318,11 @@ type Time int64
 // DirEntry represents the directory information for a file.
 type DirEntry struct {
 	// Fields contributing to the signature.
-	Name        PathName   // The full path name of the file.
-	Packing     Packing    // Packing used for every block in file.
-	Time        Time       // Time associated with file; might be when it was last written.
-	Blocks      []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
-	WrappedKeys []byte     // The file's AES key, wrapped for each reader of file.
-
-	Signature []byte // Signs: fields Name, Packing, Time, plus the file's AES key and all block signatures.
+	Name     PathName   // The full path name of the file.
+	Packing  Packing    // Packing used for every block in file.
+	Time     Time       // Time associated with file; might be when it was last written.
+	Blocks   []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
+	Packdata []byte     // Information maintained by the packing algorithm.
 
 	// Fields not included in the signature.
 	Attr     FileAttributes // File attributes.
@@ -334,10 +332,10 @@ type DirEntry struct {
 
 // DirBlock describes a block of data representing a contiguous section of a file.
 type DirBlock struct {
-	Location  Location // Location of data in store.
-	Offset    int64    // Byte offset of start of block's data in file.
-	Size      int64    // Length of block data in bytes.
-	Signature []byte   // Signs: Size, Offset, file AES key, hash(block ciphertext).
+	Location Location // Location of data in store.
+	Offset   int64    // Byte offset of start of block's data in file.
+	Size     int64    // Length of block data in bytes.
+	Packdata []byte   // Information maintained by the packing algorithm.
 }
 
 // FileAttributes define the attributes for a DirEntry.
