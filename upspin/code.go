@@ -58,8 +58,8 @@ func (d *DirBlock) MarshalAppend(b []byte) ([]byte, error) {
 	n = binary.PutVarint(tmp[:], d.Size)
 	b = append(b, tmp[:n]...)
 
-	// Signature
-	b = appendBytes(b, d.Signature)
+	// Packdata
+	b = appendBytes(b, d.Packdata)
 
 	return b, nil
 }
@@ -107,14 +107,14 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 	d.Size = size
 	b = b[n:]
 
-	// Must copy signature - can't return buffer's own contents.
+	// Must copy Packdata - can't return buffer's own contents.
 	// (All the other slices are turned into strings, so are intrinsically copied.)
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort
 	}
-	d.Signature = make([]byte, len(bytes))
-	copy(d.Signature, bytes)
+	d.Packdata = make([]byte, len(bytes))
+	copy(d.Packdata, bytes)
 
 	return b, nil
 }
@@ -155,11 +155,8 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 		}
 	}
 
-	// WrappedKeys.
-	b = appendBytes(b, d.WrappedKeys)
-
-	// Signature.
-	b = appendBytes(b, d.Signature)
+	// Packdata.
+	b = appendBytes(b, d.Packdata)
 
 	// Attr: One byte.
 	b = append(b, byte(d.Attr))
@@ -231,23 +228,15 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		}
 	}
 
-	// WrappedKeys.
+	// Packdata.
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort
 	}
-	// Must copy the data for WrappedKeys and Signature - can't return buffer's own contents.
+	// Must copy the data for Packdata - can't return buffer's own contents.
 	// (Most other slices are turned into strings, so are intrinsically copied.)
-	d.WrappedKeys = make([]byte, len(bytes))
-	copy(d.WrappedKeys, bytes)
-
-	// Signature.
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
-	d.Signature = make([]byte, len(bytes))
-	copy(d.Signature, bytes)
+	d.Packdata = make([]byte, len(bytes))
+	copy(d.Packdata, bytes)
 
 	// Attr: One byte.
 	if len(b) < 1 {

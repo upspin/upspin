@@ -17,11 +17,10 @@ var dirEnt = DirEntry{
 		dirBlock1,
 		dirBlock2,
 	},
-	WrappedKeys: []byte{1, 2, 3, 4},
-	Signature:   []byte{5, 6, 7, 8, 9},
-	Attr:        AttrDirectory, // Just so it's not zero; this is not a semantically valid entry.
-	Sequence:    1234,
-	Writer:      "u@foo.com",
+	Packdata: []byte{1, 2, 3, 4},
+	Attr:     AttrDirectory, // Just so it's not zero; this is not a semantically valid entry.
+	Sequence: 1234,
+	Writer:   "u@foo.com",
 }
 
 var dirBlock1 = DirBlock{
@@ -32,9 +31,9 @@ var dirBlock1 = DirBlock{
 		},
 		Reference: "Cinder",
 	},
-	Offset:    0,
-	Size:      1024,
-	Signature: []byte("sign"),
+	Offset:   0,
+	Size:     1024,
+	Packdata: []byte("sign"),
 }
 
 var dirBlock2 = DirBlock{
@@ -45,9 +44,9 @@ var dirBlock2 = DirBlock{
 		},
 		Reference: "Ice",
 	},
-	Offset:    1024,
-	Size:      4096,
-	Signature: []byte("nature"),
+	Offset:   1024,
+	Size:     4096,
+	Packdata: []byte("nature"),
 }
 
 func TestDirEntMarshal(t *testing.T) {
