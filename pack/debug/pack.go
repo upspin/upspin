@@ -10,8 +10,8 @@ package debugpack
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/binary"
-	"io"
 	"math/rand"
 
 	"upspin.io/bind"
@@ -31,7 +31,7 @@ func init() {
 
 var (
 	errTooShort    = errors.Str("destination slice too short")
-	errBadMetadata = errors.Str("bad metadata")
+	errBadPackdata = errors.Str("bad packdata")
 )
 
 func (testPack) Packing() upspin.Packing {
@@ -64,118 +64,201 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 // Metadata is {DebugPack, cryptByte, signatureByte, N, path[N]}.
 // The next two functions update the metadata's Packdata.
 
-func cryptByte(meta *upspin.Metadata, packing bool) (byte, error) {
-	switch len(meta.Packdata) {
+func cryptByte(d *upspin.DirEntry, packing bool) (byte, error) {
+	switch len(d.Packdata) {
 	case 0:
-		return 0, errBadMetadata
+		return 0, errBadPackdata
 	case 1:
 		if !packing {
 			// cryptByte must be present to unpack.
-			return 0, errBadMetadata
+			return 0, errBadPackdata
 		}
 		// Add the crypt byte to the Packdata.
 		cb := byte(rand.Int31())
-		meta.Packdata = append(meta.Packdata, cb)
-		return meta.Packdata[1], nil
+		d.Packdata = append(d.Packdata, cb)
+		return d.Packdata[1], nil
 	default:
-		return meta.Packdata[1], nil
+		return d.Packdata[1], nil
 	}
 }
 
-func addSignature(meta *upspin.Metadata, signature byte) error {
-	switch len(meta.Packdata) {
+func addSignature(d *upspin.DirEntry, signature byte) error {
+	switch len(d.Packdata) {
 	case 0, 1:
-		return errBadMetadata
+		return errBadPackdata
 	case 2:
-		meta.Packdata = append(meta.Packdata, signature)
+		d.Packdata = append(d.Packdata, signature)
 		return nil
 	default:
-		meta.Packdata[2] = signature
+		d.Packdata[2] = signature
 		return nil
 	}
 }
 
-func (p testPack) Pack(context upspin.Context, ciphertext, cleartext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func (p testPack) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const Pack = "Pack"
-	meta := &dirEntry.Metadata
-	if err := pack.CheckPackMeta(p, meta); err != nil {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, err)
+	if err := pack.CheckPacking(p, d); err != nil {
+		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
 	}
-	name := dirEntry.Name
-	if len(name) > 64*1024 {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errors.Str("name too long"))
+	if len(d.Name) > 64*1024 {
+		return nil, errors.E(Pack, errors.Invalid, d.Name, errors.Str("name too long"))
 	}
+	cb, err := cryptByte(d, true)
+	if err != nil {
+		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
+	}
+	return &blockPacker{
+		ctx:       ctx,
+		entry:     d,
+		cryptByte: cb,
+	}, nil
+}
+
+type blockPacker struct {
+	ctx       upspin.Context
+	entry     *upspin.DirEntry
+	cryptByte byte
+
+	buf []byte // re-used by Pack
+}
+
+func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	const Pack = "Pack"
+
 	if len(cleartext) > 1024*1024*1024 {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errors.Str("cleartext too long"))
+		return nil, errors.E(Pack, errors.Invalid, bp.entry.Name, errors.Str("cleartext too long"))
 	}
-	if len(ciphertext) < len(cleartext) {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, errTooShort)
+
+	// (re-)allocate shared buffer if necessary.
+	if bp.buf == nil || len(bp.buf) < len(cleartext) {
+		bp.buf = make([]byte, len(cleartext))
 	}
-	ciphertext = ciphertext[:len(cleartext)]
-	cb, err := cryptByte(meta, true)
-	if err != nil {
-		return 0, errors.E(Pack, errors.Invalid, dirEntry.Name, err)
+	ciphertext = bp.buf[:len(cleartext)]
+
+	crypt(bp.cryptByte, ciphertext, cleartext)
+
+	// Compute size, offset, and checksum.
+	size := int64(len(ciphertext))
+	offs := int64(0)
+	if bs := bp.entry.Blocks; len(bs) > 0 {
+		offs = bs[len(bs)-1].Offset + size
 	}
-	addSignature(meta, sign(context, cleartext, dirEntry.Name))
-	putPath(meta, dirEntry.Name)
-	for i, c := range cleartext {
-		ciphertext[i] = byte(c) ^ cb
+	b := sha256.Sum256(ciphertext)
+	sum := b[:]
+
+	// Create and append new DirBlock record.
+	block := upspin.DirBlock{
+		Size:   size,
+		Offset: offs,
+		// TODO(adg): add a Packer ID prefix?
+		Packdata: sum,
 	}
-	return len(ciphertext), nil
+	bp.entry.Blocks = append(bp.entry.Blocks, block)
+
+	return ciphertext, nil
 }
 
-func (p testPack) Unpack(context upspin.Context, cleartext, ciphertext []byte, dirEntry *upspin.DirEntry) (int, error) {
+func crypt(b byte, out, in []byte) {
+	if len(out) != len(in) {
+		panic("input and output slice of different lengths")
+	}
+	for i, c := range in {
+		out[i] = byte(c) ^ b
+	}
+}
+
+func (bp *blockPacker) SetLocation(l upspin.Location) {
+	bs := bp.entry.Blocks
+	if len(bs) == 0 {
+		panic("setting location for empty block set")
+	}
+	bs[len(bs)-1].Location = l
+}
+
+func (bp *blockPacker) Close() error {
+	putPath(bp.entry)
+	addSignature(bp.entry, sign(bp.ctx, blockSum(bp.entry.Blocks), bp.entry.Name))
+	return nil
+}
+
+func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const Unpack = "Unpack"
-	meta := &dirEntry.Metadata
-	if err := pack.CheckUnpackMeta(p, meta); err != nil {
-		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
+	if err := pack.CheckPacking(p, d); err != nil {
+		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
-	if len(ciphertext) > 64*1024+1024*1024*1024 {
-		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, errors.Str("ciphertext too long"))
-	}
-	cb, err := cryptByte(meta, false)
+	cb, err := cryptByte(d, false)
 	if err != nil {
-		return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, err)
+		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
-	br := bytes.NewReader(ciphertext)
-	cr := cryptByteReader{cb, br}
-	var i int
-	for i = 0; ; i++ {
-		c, err := cr.ReadByte()
-		if err == io.EOF {
-			break
-		}
-		if i >= len(cleartext) {
-			return 0, errors.E(Unpack, errors.Invalid, dirEntry.Name, errTooShort)
-		}
-		cleartext[i] = c
-	}
-	signature := sign(context, cleartext[:i], dirEntry.Name)
-	if len(meta.Packdata) < 3 || signature != meta.Packdata[2] {
-		return 0, errors.E("Unpack", dirEntry.Name, errors.Invalid, errors.Str("signature validation failed"))
-	}
-	return i, nil
+	return &blockUnpacker{
+		ctx:       ctx,
+		entry:     d,
+		cryptByte: cb,
+		block:     -1,
+	}, nil
 }
 
-func (p testPack) PackLen(context upspin.Context, cleartext []byte, dirEntry *upspin.DirEntry) int {
-	meta := &dirEntry.Metadata
-	if err := pack.CheckPackMeta(p, meta); err != nil {
+type blockUnpacker struct {
+	ctx       upspin.Context
+	entry     *upspin.DirEntry
+	block     int // index into entry.Blocks
+	cryptByte byte
+
+	buf []byte // re-used by Unpack
+}
+
+func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
+	bp.block++
+	bs := bp.entry.Blocks
+	if bp.block >= len(bs) {
+		return upspin.DirBlock{}, false
+	}
+	b := bs[bp.block]
+	return b, true
+}
+
+func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
+	const Unpack = "Unpack"
+
+	if len(ciphertext) > 64*1024+1024*1024*1024 {
+		return nil, errors.E(Unpack, errors.Invalid, bp.entry.Name, errors.Str("ciphertext too long"))
+	}
+
+	// Validate checksum.
+	b := sha256.Sum256(ciphertext)
+	sum := b[:]
+	if got, want := sum, bp.entry.Blocks[bp.block].Packdata; !bytes.Equal(got, want) {
+		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
+	}
+
+	// (re-)allocate shared buffer if necessary.
+	if bp.buf == nil || len(bp.buf) < len(ciphertext) {
+		bp.buf = make([]byte, len(ciphertext))
+	}
+	cleartext = bp.buf[:len(ciphertext)]
+
+	crypt(bp.cryptByte, cleartext, ciphertext)
+
+	return cleartext, nil
+}
+
+func (p testPack) PackLen(context upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
+	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
 	}
 	// Add packing to packmeta if not already there
-	if meta != nil && len(meta.Packdata) == 0 {
-		meta.Packdata = []byte{byte(upspin.DebugPack)}
+	if d != nil && len(d.Packdata) == 0 {
+		d.Packdata = []byte{byte(upspin.DebugPack)}
 	}
-	_, err := cryptByte(meta, true)
+	_, err := cryptByte(d, true)
 	if err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (p testPack) UnpackLen(context upspin.Context, ciphertext []byte, dirEntry *upspin.DirEntry) int {
-	meta := &dirEntry.Metadata
-	if err := pack.CheckUnpackMeta(p, meta); err != nil {
+func (p testPack) UnpackLen(context upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
+	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
 	}
 	return len(ciphertext)
@@ -197,28 +280,27 @@ func sign(ctx upspin.Context, data []byte, name upspin.PathName) byte {
 }
 
 // Name implements upspin.Pack.Name.
-func (testPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
 	const Name = "Name"
-	if dirEntry.IsDir() {
-		return errors.E(Name, errors.IsDir, dirEntry.Name, "cannot rename directory")
+	if d.IsDir() {
+		return errors.E(Name, errors.IsDir, d.Name, "cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
 	if err != nil {
 		return errors.E(Name, err)
 	}
-	meta := &dirEntry.Metadata
 
 	// Update directory entry and metadata with new name.
 	name := parsed.Path()
-	dirEntry.Name = name
-	oldName, err := getPath(meta)
+	d.Name = name
+	oldName, err := getPath(d)
 	if err != nil {
-		return errors.E(Name, errors.Invalid, dirEntry.Name, err)
+		return errors.E(Name, errors.Invalid, d.Name, err)
 	}
-	putPath(meta, name)
+	putPath(d)
 
 	// Remove old name from signature.
-	signature := meta.Packdata[2]
+	signature := d.Packdata[2]
 	key, err := getKey(ctx, oldName)
 	if err != nil {
 		panic(err)
@@ -233,7 +315,7 @@ func (testPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upsp
 	for i, c := range []byte(name) {
 		signature ^= c ^ key[i%len(key)]
 	}
-	meta.Packdata[2] = signature
+	d.Packdata[2] = signature
 
 	return nil
 }
@@ -259,26 +341,34 @@ func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) 
 }
 
 // putPath adds (or replaces) the path in the packdata.
-func putPath(meta *upspin.Metadata, path upspin.PathName) {
-	meta.Packdata = meta.Packdata[:3]
+func putPath(d *upspin.DirEntry) {
+	d.Packdata = d.Packdata[:3]
 	var buf [16]byte
-	n := binary.PutUvarint(buf[:], uint64(len(path)))
-	meta.Packdata = append(meta.Packdata, buf[:n]...)
-	meta.Packdata = append(meta.Packdata, path...)
+	n := binary.PutUvarint(buf[:], uint64(len(d.Name)))
+	d.Packdata = append(d.Packdata, buf[:n]...)
+	d.Packdata = append(d.Packdata, d.Name...)
 }
 
 // getPath returns the path from the packdata.
-func getPath(meta *upspin.Metadata) (upspin.PathName, error) {
-	if len(meta.Packdata) < 4 {
-		return "", errBadMetadata
+func getPath(d *upspin.DirEntry) (upspin.PathName, error) {
+	if len(d.Packdata) < 4 {
+		return "", errBadPackdata
 	}
-	m, n := binary.Uvarint(meta.Packdata[3:])
+	m, n := binary.Uvarint(d.Packdata[3:])
 	if n < 0 {
-		return "", errBadMetadata
+		return "", errBadPackdata
 	}
-	buf := meta.Packdata[3+int(n):]
+	buf := d.Packdata[3+int(n):]
 	if len(buf) != int(m) {
-		return "", errBadMetadata
+		return "", errBadPackdata
 	}
 	return upspin.PathName(buf), nil
+}
+
+func blockSum(bs []upspin.DirBlock) []byte {
+	hash := sha256.New()
+	for i := range bs {
+		hash.Write(bs[i].Packdata)
+	}
+	return hash.Sum(nil)
 }

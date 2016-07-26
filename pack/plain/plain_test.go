@@ -47,31 +47,36 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 	de := &upspin.DirEntry{
 		Name: name,
 	}
-	n := packer.PackLen(globalContext, data, de)
-	if n < 0 {
-		t.Fatal("PackLen failed")
-	}
-	cipher := make([]byte, n)
-	m, err := packer.Pack(globalContext, cipher, data, de)
+	bp, err := packer.Pack(globalContext, de)
 	if err != nil {
-		t.Fatal("Pack: ", err)
+		t.Fatal("doPack:", err)
 	}
-	return cipher[:m], de
+	cipher, err := bp.Pack(data)
+	if err != nil {
+		t.Fatal("doPack:", err)
+	}
+	bp.SetLocation(upspin.Location{Reference: "dummy"})
+	if err := bp.Close(); err != nil {
+		t.Fatal("doPack:", err)
+	}
+	return cipher, de
 }
 
 // doUnpack unpacks cipher for a dir entry and returns the clear text.
 func doUnpack(t testing.TB, cipher []byte, de *upspin.DirEntry) []byte {
 	packer := plainPack{}
-	n := packer.UnpackLen(globalContext, cipher, de)
-	if n < 1 {
-		t.Fatalf("UnpackLen failed with size %d", n)
-	}
-	clear := make([]byte, n)
-	m, err := packer.Unpack(globalContext, clear, cipher, de)
+	bp, err := packer.Unpack(globalContext, de)
 	if err != nil {
-		t.Fatal("Unpack: ", err)
+		t.Fatal("doUnpack:", err)
 	}
-	return clear[:m]
+	if _, ok := bp.NextBlock(); !ok {
+		t.Fatal("doUnpack: no next block")
+	}
+	text, err := bp.Unpack(cipher)
+	if err != nil {
+		t.Fatal("doUnpack:", err)
+	}
+	return text
 }
 
 func benchmarkPlainPack(b *testing.B, fileSize int) {
