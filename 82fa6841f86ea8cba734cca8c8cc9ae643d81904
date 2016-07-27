@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f04654d_7acaa870",
+        "filename": "pack/internal/blocksum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-27T04:38:55Z",
+      "side": 1,
+      "message": "Why is DirBlock called bs?",
+      "revId": "82fa6841f86ea8cba734cca8c8cc9ae643d81904",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
