@@ -17,6 +17,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/pack"
+	"upspin.io/pack/internal"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -121,7 +122,7 @@ type blockPacker struct {
 	entry     *upspin.DirEntry
 	cryptByte byte
 
-	buf []byte // re-used by Pack
+	buf internal.LazyBuffer
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
@@ -132,10 +133,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	}
 
 	// (re-)allocate shared buffer if necessary.
-	if bp.buf == nil || len(bp.buf) < len(cleartext) {
-		bp.buf = make([]byte, len(cleartext))
-	}
-	ciphertext = bp.buf[:len(cleartext)]
+	ciphertext = bp.buf.Bytes(len(cleartext))
 
 	crypt(bp.cryptByte, ciphertext, cleartext)
 
@@ -202,7 +200,7 @@ type blockUnpacker struct {
 	block     int // index into entry.Blocks
 	cryptByte byte
 
-	buf []byte // re-used by Unpack
+	buf internal.LazyBuffer
 }
 
 func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
@@ -229,11 +227,7 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 
-	// (re-)allocate shared buffer if necessary.
-	if bp.buf == nil || len(bp.buf) < len(ciphertext) {
-		bp.buf = make([]byte, len(ciphertext))
-	}
-	cleartext = bp.buf[:len(ciphertext)]
+	cleartext = bp.buf.Bytes(len(ciphertext))
 
 	crypt(bp.cryptByte, cleartext, ciphertext)
 
