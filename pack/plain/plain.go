@@ -91,6 +91,10 @@ func (p plainPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockU
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
+	// Call Size to check that the block Offsets and Sizes are consistent.
+	if _, err := d.Size(); err != nil {
+		return nil, errors.E(Unpack, d.Name, err)
+	}
 	return &blockUnpacker{
 		ctx:          ctx,
 		entry:        d,
