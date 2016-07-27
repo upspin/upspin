@@ -344,6 +344,16 @@ type DirBlock struct {
 	Packdata []byte   // Information maintained by the packing algorithm.
 }
 
+// Size returns the total length of the data underlying the DirEntry.
+func (d *DirEntry) Size() int64 {
+	bs := d.Blocks
+	if len(bs) == 0 {
+		return 0
+	}
+	last := bs[len(bs)-1]
+	return last.Offset + last.Size
+}
+
 // FileAttributes define the attributes for a DirEntry.
 type FileAttributes byte
 
