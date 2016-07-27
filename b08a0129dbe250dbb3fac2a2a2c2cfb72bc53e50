@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f698de4_7aac3589",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-27T06:48:08Z",
+      "side": 1,
+      "message": "I\u0027ve been calling these \u0027bp\u0027 for block packer",
+      "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_1aa17990",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-27T06:48:08Z",
+      "side": 1,
+      "message": "check the error; this method can do a ton of stuff",
+      "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_5aa7f1a7",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-27T06:48:08Z",
+      "side": 1,
+      "message": "should probably error out when locs is non-nil, if you\u0027re not going to handle it.",
+      "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
