@@ -11,9 +11,10 @@ import (
 	"sync"
 	"time"
 
+	gContext "golang.org/x/net/context"
+
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	xcontext "golang.org/x/net/context"
 
 	"upspin.io/client"
 	"upspin.io/errors"
@@ -188,14 +189,14 @@ func (h *handle) freeNoLock() {
 }
 
 // Attr implements fs.Node.Attr.
-func (n *node) Attr(addscontext xcontext.Context, attr *fuse.Attr) error {
+func (n *node) Attr(addscontext gContext.Context, attr *fuse.Attr) error {
 	log.Debug.Printf("Attr %s", n)
 	*attr = n.attr
 	return nil
 }
 
 // Access implements fs.NodeAccesser.Access.
-func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
+func (n *node) Access(context gContext.Context, req *fuse.AccessRequest) error {
 	// Allow all access.
 	return nil
 }
@@ -203,7 +204,7 @@ func (n *node) Access(context xcontext.Context, req *fuse.AccessRequest) error {
 // Create implements fs.NodeCreator.Create. Creates and opens a file.
 // Every created file is initially backed by a clear text local file which is
 // Put in an upspin DirServer on close.  It is assumed that 'n' is a directory.
-func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
+func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
 	const op = "Fuse Create"
 	n.Lock()
 	defer n.Unlock()
@@ -242,7 +243,7 @@ func (n *node) Create(context xcontext.Context, req *fuse.CreateRequest, resp *f
 
 // Mkdir implements fs.NodeMkdirer.Mkdir.
 // Creates a directory without opening it.
-func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node, error) {
+func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node, error) {
 	const op = "Fuse Mkdir"
 	n.Lock()
 	defer n.Unlock()
@@ -264,7 +265,7 @@ func (n *node) Mkdir(context xcontext.Context, req *fuse.MkdirRequest) (fs.Node,
 
 // Open implements fs.NodeOpener.Open.  Pertains to files and directories.
 // For both, we read the contents on open.
-func (n *node) Open(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
+func (n *node) Open(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	if req.Dir {
 		return n.openDir(context, req, resp)
 	}
@@ -272,7 +273,7 @@ func (n *node) Open(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.
 }
 
 // openDir opens the directory and reads its contents.
-func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
+func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	const op = "Fuse Open"
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, e2e(errors.E(op, errors.NotDir, n.uname))
@@ -308,7 +309,7 @@ func (n *node) openDir(context xcontext.Context, req *fuse.OpenRequest, resp *fu
 }
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
-func (n *node) openFile(context xcontext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
+func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	const op = "Fuse Open"
 	n.Lock()
 	defer n.Unlock()
@@ -362,7 +363,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 
 // Remove implements fs.NodeRemover.  'n' is the directory in which the file
 // req.Name resides.  req.Dir flags this as an rmdir.
-func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
+func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	const op = "Fuse Remove"
 	n.Lock()
 	defer n.Unlock()
@@ -411,7 +412,7 @@ func (n *node) Remove(context xcontext.Context, req *fuse.RemoveRequest) error {
 
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
-func (n *node) Lookup(context xcontext.Context, name string) (fs.Node, error) {
+func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	const op = "Fuse Lookup"
 	n.Lock()
 	defer n.Unlock()
@@ -479,7 +480,7 @@ func (n *node) Forget() {
 // Setattr implements fs.NodeSetattrer.Setattr.
 //
 // Files are only truncated by Setattr calls.
-func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
+func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
 	const op = "Fuse Setattr"
 	if req.Valid.Size() {
 		// Truncate.  Lots of cases:
@@ -533,12 +534,12 @@ func (n *node) Setattr(context xcontext.Context, req *fuse.SetattrRequest, resp 
 // Flush implements fs.HandleFlusher.Flush.  Called when a file is closed.  We can't
 // really do anything here because if it takes any significant time something in
 // the kernel or git times out the flush and we get errors.
-func (h *handle) Flush(context xcontext.Context, req *fuse.FlushRequest) error {
+func (h *handle) Flush(context gContext.Context, req *fuse.FlushRequest) error {
 	return nil
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
-func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
+func (h *handle) ReadDirAll(context gContext.Context) ([]fuse.Dirent, error) {
 	h.n.Lock()
 	defer h.n.Unlock()
 	var fde []fuse.Dirent
@@ -554,7 +555,7 @@ func (h *handle) ReadDirAll(context xcontext.Context) ([]fuse.Dirent, error) {
 }
 
 // Read implements fs.HandleReader.Read.
-func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
+func (h *handle) Read(context gContext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
 	const op = "Fuse Read"
 	h.n.Lock()
 	defer h.n.Unlock()
@@ -574,7 +575,7 @@ func (h *handle) Read(context xcontext.Context, req *fuse.ReadRequest, resp *fus
 
 // Write implements fs.HandleWriter.Write.  We lock the node for the extent of the write to serialize
 // changes to the node.
-func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
+func (h *handle) Write(context gContext.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
 	const op = "Fuse Write"
 	h.n.Lock()
 	defer h.n.Unlock()
@@ -593,7 +594,7 @@ func (h *handle) Write(context xcontext.Context, req *fuse.WriteRequest, resp *f
 // Release implements fs.HandleWriter.Release.  This corresponds to a user close and, if the file is dirty,
 // it is written back to the store.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
-func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) error {
+func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) error {
 	const op = "Fuse Release"
 
 	// Write back to upspin.
@@ -611,13 +612,13 @@ func (h *handle) Release(context xcontext.Context, req *fuse.ReleaseRequest) err
 }
 
 // Fsync implements fs.NodeFsyncer.Fsync.
-func (n *node) Fsync(ctx xcontext.Context, req *fuse.FsyncRequest) error {
+func (n *node) Fsync(ctx gContext.Context, req *fuse.FsyncRequest) error {
 	return nil
 }
 
 // Link implements fs.NodeLinker.Link. It creates a new node in directory n that points to the same
 // reference as old.
-func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
+func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	const op = "Fuse Link"
 	n.Lock()
 	defer n.Unlock()
@@ -633,7 +634,7 @@ func (n *node) Link(ctx xcontext.Context, req *fuse.LinkRequest, old fs.Node) (f
 }
 
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
-func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
+func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
 	const op = "Rename"
 	n.Lock()
 	defer n.Unlock()
@@ -668,27 +669,27 @@ func (n *node) Rename(ctx xcontext.Context, req *fuse.RenameRequest, newDir fs.N
 // the MacOS kernel will constantly look for ._ files.
 
 // Getxattr implements fs.NodeGetxattrer.Getxattr.
-func (n *node) Getxattr(ctx xcontext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
+func (n *node) Getxattr(ctx gContext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
 	return fuse.ErrNoXattr
 }
 
 // Listxattr implements fs.NodeListxattrer.Listxattr.
-func (n *node) Listxattr(ctx xcontext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
+func (n *node) Listxattr(ctx gContext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
 	return nil
 }
 
 // Setxattr implements fs.NodeSetxattrer.Setxattr.
-func (n *node) Setxattr(ctx xcontext.Context, req *fuse.SetxattrRequest) error {
+func (n *node) Setxattr(ctx gContext.Context, req *fuse.SetxattrRequest) error {
 	return nil
 }
 
 // Removexattr implements fs.NodeRemovexattrer.Removexattr.
-func (n *node) Removexattr(ctx xcontext.Context, req *fuse.RemovexattrRequest) error {
+func (n *node) Removexattr(ctx gContext.Context, req *fuse.RemovexattrRequest) error {
 	return nil
 }
 
 // Symlink implements fs.Symlink.
-func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
+func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
 	const op = "Fuse Symlink"
 	n.Lock()
 	defer n.Unlock()
@@ -702,7 +703,7 @@ func (n *node) Symlink(ctx xcontext.Context, req *fuse.SymlinkRequest) (fs.Node,
 }
 
 // Symlink implements fs.NodeReadlinker.Readlink.
-func (n *node) Readlink(ctx xcontext.Context, req *fuse.ReadlinkRequest) (string, error) {
+func (n *node) Readlink(ctx gContext.Context, req *fuse.ReadlinkRequest) (string, error) {
 	const op = "Fuse Readlink"
 	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
 	if err != nil {
