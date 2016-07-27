@@ -127,6 +127,9 @@ type blockPacker struct {
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	const Pack = "Pack"
+	if err := internal.CheckLocationSet(bp.entry); err != nil {
+		return nil, err
+	}
 
 	if len(cleartext) > 1024*1024*1024 {
 		return nil, errors.E(Pack, errors.Invalid, bp.entry.Name, errors.Str("cleartext too long"))
@@ -172,6 +175,9 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 }
 
 func (bp *blockPacker) Close() error {
+	if err := internal.CheckLocationSet(bp.entry); err != nil {
+		return err
+	}
 	putPath(bp.entry)
 	addSignature(bp.entry, sign(bp.ctx, blockSum(bp.entry.Blocks), bp.entry.Name))
 	return nil
