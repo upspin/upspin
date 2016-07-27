@@ -176,7 +176,7 @@ func (bp *blockPacker) Close() error {
 		return err
 	}
 	putPath(bp.entry)
-	addSignature(bp.entry, sign(bp.ctx, blockSum(bp.entry.Blocks), bp.entry.Name))
+	addSignature(bp.entry, sign(bp.ctx, internal.BlockSum(bp.entry.Blocks), bp.entry.Name))
 	return nil
 }
 
@@ -358,12 +358,4 @@ func getPath(d *upspin.DirEntry) (upspin.PathName, error) {
 		return "", errBadPackdata
 	}
 	return upspin.PathName(buf), nil
-}
-
-func blockSum(bs []upspin.DirBlock) []byte {
-	hash := sha256.New()
-	for i := range bs {
-		hash.Write(bs[i].Packdata)
-	}
-	return hash.Sum(nil)
 }

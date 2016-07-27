@@ -252,7 +252,7 @@ func (bp *blockPacker) Close() error {
 	}
 
 	// Compute checksum of block hashes.
-	sum := blockSum(bp.entry.Blocks)
+	sum := internal.BlockSum(bp.entry.Blocks)
 
 	// Compute entry signature.
 	sig, err := ctx.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)
@@ -261,14 +261,6 @@ func (bp *blockPacker) Close() error {
 	}
 
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
-}
-
-func blockSum(bs []upspin.DirBlock) []byte {
-	hash := sha256.New()
-	for i := range bs {
-		hash.Write(bs[i].Packdata)
-	}
-	return hash.Sum(nil)
 }
 
 func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
@@ -283,7 +275,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 	}
 
 	// Check that our stored+signed block checksum matches the sum of the actual blocks.
-	if got, want := blockSum(d.Blocks), hash; !bytes.Equal(got, want) {
+	if got, want := internal.BlockSum(d.Blocks), hash; !bytes.Equal(got, want) {
 		return nil, errors.E(Unpack, d.Name, errors.Str("checksum mismatch"))
 	}
 
