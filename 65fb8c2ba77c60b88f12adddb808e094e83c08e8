@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f698de4_77e77017",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T04:39:21Z",
+      "side": 1,
+      "message": "maybe this should verify that the offsets match and panic if they don\u0027t.\nhere is what i had\n\n\nfunc entrySize(entry *upspin.DirEntry) int64 {\n\tvar size int64\n\tfor i :\u003d range entry.Blocks {\n\t\tif size !\u003d entry.Blocks[i].Offset {\n\t\t\tpanic(\"inconsistent offsets\")\n\t\t}\n\t\tsz :\u003d entry.Blocks[i].Size\n\t\tif sz \u003c 0 {\n\t\t\tpanic(\"negative-sized block\")\n\t\t}\n\t\tsize +\u003d sz\n\t}\n\treturn size\n}",
+      "revId": "65fb8c2ba77c60b88f12adddb808e094e83c08e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
