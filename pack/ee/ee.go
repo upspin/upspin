@@ -161,19 +161,8 @@ type blockPacker struct {
 	buf internal.LazyBuffer
 }
 
-// checkPreviousLocation checks whether the previous block's Location field
-// was set, to prevent misuse of the API.
-func (bp *blockPacker) checkPreviousLocation() error {
-	if bs := bp.entry.Blocks; len(bs) > 0 {
-		if i := len(bs) - 1; bs[i].Location == (upspin.Location{}) {
-			return errors.E("Pack", bp.entry.Name, errors.Errorf("location not set for block %v", i))
-		}
-	}
-	return nil
-}
-
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
-	if err := bp.checkPreviousLocation(); err != nil {
+	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
 
@@ -209,7 +198,7 @@ func (bp *blockPacker) Close() error {
 	defer zeroSlice(&bp.dkey)
 
 	const Pack = "Pack"
-	if err := bp.checkPreviousLocation(); err != nil {
+	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return err
 	}
 

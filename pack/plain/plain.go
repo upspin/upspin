@@ -9,6 +9,7 @@ package plain
 import (
 	"upspin.io/errors"
 	"upspin.io/pack"
+	"upspin.io/pack/internal"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -55,6 +56,10 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	if err := internal.CheckLocationSet(bp.entry); err != nil {
+		return nil, err
+	}
+
 	ciphertext = cleartext
 
 	size := int64(len(ciphertext))
@@ -75,7 +80,7 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 }
 
 func (bp *blockPacker) Close() error {
-	return nil
+	return internal.CheckLocationSet(bp.entry)
 }
 
 func (p plainPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
