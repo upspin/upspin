@@ -335,39 +335,29 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 		stream := cipher.NewCTR(block, iv)
 		// We're OK to start decrypting blocks.
 		return &blockUnpacker{
-			ctx:    ctx,
-			entry:  d,
-			cipher: stream,
-			block:  -1,
+			ctx:          ctx,
+			entry:        d,
+			BlockTracker: internal.NewBlockTracker(d.Blocks),
+			cipher:       stream,
 		}, nil
 	}
 	return nil, errors.E(Unpack, d.Name, me, errors.Str("could not find wrapped key"))
 }
 
 type blockUnpacker struct {
-	ctx    upspin.Context
-	entry  *upspin.DirEntry
-	block  int // index into entry.Blocks
-	cipher cipher.Stream
+	ctx                   upspin.Context
+	entry                 *upspin.DirEntry
+	internal.BlockTracker // provides NextBlock method and Block field
+	cipher                cipher.Stream
 
 	buf internal.LazyBuffer
-}
-
-func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
-	bp.block++
-	bs := bp.entry.Blocks
-	if bp.block >= len(bs) {
-		return upspin.DirBlock{}, false
-	}
-	b := bs[bp.block]
-	return b, true
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
-	if got, want := sum, bp.entry.Blocks[bp.block].Packdata; !bytes.Equal(got, want) {
+	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
 		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 

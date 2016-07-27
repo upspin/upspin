@@ -193,30 +193,20 @@ func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUn
 		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
 	return &blockUnpacker{
-		ctx:       ctx,
-		entry:     d,
-		cryptByte: cb,
-		block:     -1,
+		ctx:          ctx,
+		entry:        d,
+		BlockTracker: internal.NewBlockTracker(d.Blocks),
+		cryptByte:    cb,
 	}, nil
 }
 
 type blockUnpacker struct {
-	ctx       upspin.Context
-	entry     *upspin.DirEntry
-	block     int // index into entry.Blocks
-	cryptByte byte
+	ctx                   upspin.Context
+	entry                 *upspin.DirEntry
+	internal.BlockTracker // provides NextBlock method and Block field
+	cryptByte             byte
 
 	buf internal.LazyBuffer
-}
-
-func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
-	bp.block++
-	bs := bp.entry.Blocks
-	if bp.block >= len(bs) {
-		return upspin.DirBlock{}, false
-	}
-	b := bs[bp.block]
-	return b, true
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
@@ -229,7 +219,7 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
-	if got, want := sum, bp.entry.Blocks[bp.block].Packdata; !bytes.Equal(got, want) {
+	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
 		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 
