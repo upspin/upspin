@@ -31,6 +31,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
+	"upspin.io/pack/internal"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -157,7 +158,7 @@ type blockPacker struct {
 	dkey   []byte
 	cipher cipher.Stream
 
-	buf []byte // re-used by Pack
+	buf internal.LazyBuffer
 }
 
 // checkPreviousLocation checks whether the previous block's Location field
@@ -176,11 +177,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 		return nil, err
 	}
 
-	// (re-)allocate shared buffer if necessary.
-	if bp.buf == nil || len(bp.buf) < len(cleartext) {
-		bp.buf = make([]byte, len(cleartext))
-	}
-	ciphertext = bp.buf[:len(cleartext)]
+	ciphertext = bp.buf.Bytes(len(cleartext))
 
 	// Encrypt.
 	bp.cipher.XORKeyStream(ciphertext, cleartext)
@@ -372,7 +369,7 @@ type blockUnpacker struct {
 	block  int // index into entry.Blocks
 	cipher cipher.Stream
 
-	buf []byte // re-used by Unpack
+	buf internal.LazyBuffer
 }
 
 func (bp *blockUnpacker) NextBlock() (upspin.DirBlock, bool) {
@@ -393,11 +390,7 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 
-	// (re-)allocate shared buffer if necessary.
-	if bp.buf == nil || len(bp.buf) < len(ciphertext) {
-		bp.buf = make([]byte, len(ciphertext))
-	}
-	cleartext = bp.buf[:len(ciphertext)]
+	cleartext = bp.buf.Bytes(len(ciphertext))
 
 	// Decrypt.
 	bp.cipher.XORKeyStream(cleartext, ciphertext)
