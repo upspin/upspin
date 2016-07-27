@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "0f698de4_9ab4a9d0",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T06:59:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f698de4_1aa17990",
+      "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0f698de4_5aa7f1a7",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 3
@@ -47,6 +65,24 @@
       "writtenOn": "2016-07-27T06:48:08Z",
       "side": 1,
       "message": "should probably error out when locs is non-nil, if you\u0027re not going to handle it.",
+      "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_bab16ddf",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T06:59:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f698de4_5aa7f1a7",
       "revId": "b08a0129dbe250dbb3fac2a2a2c2cfb72bc53e50",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
