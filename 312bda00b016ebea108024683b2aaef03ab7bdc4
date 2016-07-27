@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f698de4_576fcc96",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T03:50:51Z",
+      "side": 1,
+      "message": "no need to keep the zeroth byte as the packing. that\u0027s a dreg.",
+      "revId": "312bda00b016ebea108024683b2aaef03ab7bdc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_7774506c",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T03:50:51Z",
+      "side": 1,
+      "message": "toss or mark TODO to toss",
+      "revId": "312bda00b016ebea108024683b2aaef03ab7bdc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_d7599c04",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T03:50:51Z",
+      "side": 1,
+      "message": "why? just return cleartext.\nor are you worried that you must make a copy?\ni don\u0027t think it should be necessary, although perhaps we should document in\nupspin.go that plainpack can return the argument",
+      "revId": "312bda00b016ebea108024683b2aaef03ab7bdc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_976324b5",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T03:50:51Z",
+      "side": 1,
+      "message": "worth bothering?",
+      "revId": "312bda00b016ebea108024683b2aaef03ab7bdc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_b760a8a8",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-27T03:50:51Z",
+      "side": 1,
+      "message": "ditto, in reverse",
+      "revId": "312bda00b016ebea108024683b2aaef03ab7bdc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
