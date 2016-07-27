@@ -344,6 +344,23 @@ type DirBlock struct {
 	Packdata []byte   // Information maintained by the packing algorithm.
 }
 
+// Size returns the total length of the data underlying the DirEntry
+// and validates the block offsets and sizes.
+func (d *DirEntry) Size() int64 {
+	var size int64
+	for i := range d.Blocks {
+		if size != d.Blocks[i].Offset {
+			panic("inconsistent offsets")
+		}
+		sz := d.Blocks[i].Size
+		if sz < 0 {
+			panic("negative-sized block")
+		}
+		size += sz
+	}
+	return size
+}
+
 // FileAttributes define the attributes for a DirEntry.
 type FileAttributes byte
 

@@ -63,10 +63,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	ciphertext = cleartext
 
 	size := int64(len(ciphertext))
-	offs := int64(0)
-	if bs := bp.entry.Blocks; len(bs) > 0 {
-		offs = bs[len(bs)-1].Offset + size
-	}
+	offs := bp.entry.Size()
 
 	block := upspin.DirBlock{
 		Size:   size,
