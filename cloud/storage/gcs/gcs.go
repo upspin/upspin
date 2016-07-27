@@ -12,7 +12,8 @@ import (
 	"os"
 	"strings"
 
-	"golang.org/x/net/context"
+	gContext "golang.org/x/net/context"
+
 	"golang.org/x/oauth2/google"
 	gcsBE "google.golang.org/api/storage/v1"
 
@@ -242,7 +243,7 @@ func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
 
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
-	client, err := google.DefaultClient(context.Background(), scope)
+	client, err := google.DefaultClient(gContext.Background(), scope)
 	if err != nil {
 		return errors.E(Dial, errors.IO, errors.Errorf("Unable to get default client: %s", err))
 	}

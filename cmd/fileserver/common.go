@@ -5,11 +5,12 @@
 package main
 
 import (
-	gContext "context"
 	"io/ioutil"
 	"os"
 	gPath "path"
 	"path/filepath"
+
+	gContext "golang.org/x/net/context"
 
 	"upspin.io/access"
 	"upspin.io/auth/grpcauth"
