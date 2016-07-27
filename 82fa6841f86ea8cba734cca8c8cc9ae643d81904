@@ -16,6 +16,24 @@
       "revId": "82fa6841f86ea8cba734cca8c8cc9ae643d81904",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f698de4_b7fc28a6",
+        "filename": "pack/internal/blocksum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-27T04:47:48Z",
+      "side": 1,
+      "message": "plural Blocks",
+      "parentUuid": "4f04654d_7acaa870",
+      "revId": "82fa6841f86ea8cba734cca8c8cc9ae643d81904",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
