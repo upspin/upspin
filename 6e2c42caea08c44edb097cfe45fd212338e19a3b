@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f698de4_b7e9887c",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-27T06:48:08Z",
+      "side": 1,
+      "message": "this func has entry and dirEntry in it, but i\u0027m not sure the distinction",
+      "revId": "6e2c42caea08c44edb097cfe45fd212338e19a3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
