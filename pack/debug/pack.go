@@ -142,9 +142,9 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 
 	// Compute size, offset, and checksum.
 	size := int64(len(ciphertext))
-	offs := int64(0)
-	if bs := bp.entry.Blocks; len(bs) > 0 {
-		offs = bs[len(bs)-1].Offset + size
+	offs, err := bp.entry.Size()
+	if err != nil {
+		return nil, errors.E("Pack", errors.Invalid, err)
 	}
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
