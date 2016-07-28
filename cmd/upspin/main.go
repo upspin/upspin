@@ -464,11 +464,11 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 	seqWidth := 2
 	sizeWidth := 2
 	for _, e := range de {
-		s := fmt.Sprintf("%d", e.Metadata.Sequence)
+		s := fmt.Sprintf("%d", e.Sequence)
 		if seqWidth < len(s) {
 			seqWidth = len(s)
 		}
-		s = fmt.Sprintf("%d", e.Metadata.Size)
+		s = fmt.Sprintf("%d", sizeOf(e))
 		if sizeWidth < len(s) {
 			sizeWidth = len(s)
 		}
@@ -493,7 +493,13 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 			}
 
 		}
-		endpt := e.Location.Endpoint.String()
+		endpt := ""
+		for i := range e.Blocks {
+			if i > 0 {
+				endpt += ","
+			}
+			endpt += e.Blocks[i].Location.Endpoint.String()
+		}
 		packStr := "?"
 		packer := lookupPacker(e)
 		if packer != nil {
@@ -502,13 +508,21 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 		fmt.Printf("%c %-6s %*d %*d %s [%s]\t%s%s\n",
 			attrChar,
 			packStr,
-			seqWidth, e.Metadata.Sequence,
-			sizeWidth, e.Metadata.Size,
-			e.Metadata.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
+			seqWidth, e.Sequence,
+			sizeWidth, sizeOf(e),
+			e.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
 			endpt,
 			e.Name,
 			redirect)
 	}
+}
+
+func sizeOf(e *upspin.DirEntry) int64 {
+	size, err := e.Size()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%q: %s\n", e.Name, err)
+	}
+	return size
 }
 
 // readAll reads all contents from an input file name or from stdin if
