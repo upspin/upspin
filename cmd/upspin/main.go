@@ -6,7 +6,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -33,6 +32,7 @@ import (
 
 	// Load flags
 
+	"gopkg.in/square/go-jose.v1/json"
 	_ "upspin.io/flags"
 )
 
