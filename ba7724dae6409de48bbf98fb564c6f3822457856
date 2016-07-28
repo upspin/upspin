@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f0f05e3_198fab1e",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T21:01:43Z",
+      "side": 1,
+      "message": "So instead of doing all this stuff in the upspin command, you can have Endpoint implement MarshalJSON and UnmarshalJSON:\n\nhttps://golang.org/pkg/encoding/json/#Marshaler\nhttps://golang.org/pkg/encoding/json/#Unmarshaler\n\nThen you get the same behavior with much less code.",
+      "revId": "ba7724dae6409de48bbf98fb564c6f3822457856",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
