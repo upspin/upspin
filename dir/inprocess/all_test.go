@@ -116,7 +116,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 
 	entry1 := storeData(t, context, []byte(text), fileName)
 	if len(entry1.Blocks) != 1 {
-		t.Fatalf("internal error: expected one block, found %d", fileName, len(entry1.Blocks))
+		t.Fatalf("internal error: %v: expected one block, found %d", fileName, len(entry1.Blocks))
 	}
 	err := directory.Put(entry1)
 	if err != nil {

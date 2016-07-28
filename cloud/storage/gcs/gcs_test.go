@@ -294,7 +294,7 @@ func TestMain(m *testing.M) {
 	// Clean up.
 	const verbose = true
 	if err := client.(*gcsImpl).EmptyBucket(verbose); err != nil {
-		log.Print("cloud/storage/gcs: EmptyBucket failed: %v", err)
+		log.Printf("cloud/storage/gcs: EmptyBucket failed: %v", err)
 	}
 
 	os.Exit(code)
