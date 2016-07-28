@@ -62,16 +62,12 @@ func (cr cryptByteReader) ReadByte() (byte, error) {
 	return c ^ cr.crypt, err
 }
 
-// Metadata is {DebugPack, cryptByte, signatureByte, N, path[N]}.
-// The next two functions update the metadata's Packdata.
-
-// TODO(adg): drop DebugPack from the packdata, it's now in DirEntry.Packing.
+// Packdata is {cryptByte, signatureByte, N, path[N]}.
+// The next two functions update the Packdata.
 
 func cryptByte(d *upspin.DirEntry, packing bool) (byte, error) {
 	switch len(d.Packdata) {
 	case 0:
-		return 0, errBadPackdata
-	case 1:
 		if !packing {
 			// cryptByte must be present to unpack.
 			return 0, errBadPackdata
@@ -79,21 +75,21 @@ func cryptByte(d *upspin.DirEntry, packing bool) (byte, error) {
 		// Add the crypt byte to the Packdata.
 		cb := byte(rand.Int31())
 		d.Packdata = append(d.Packdata, cb)
-		return d.Packdata[1], nil
+		return d.Packdata[0], nil
 	default:
-		return d.Packdata[1], nil
+		return d.Packdata[0], nil
 	}
 }
 
 func addSignature(d *upspin.DirEntry, signature byte) error {
 	switch len(d.Packdata) {
-	case 0, 1:
+	case 0:
 		return errBadPackdata
-	case 2:
+	case 1:
 		d.Packdata = append(d.Packdata, signature)
 		return nil
 	default:
-		d.Packdata[2] = signature
+		d.Packdata[1] = signature
 		return nil
 	}
 }
@@ -234,10 +230,6 @@ func (p testPack) PackLen(context upspin.Context, cleartext []byte, d *upspin.Di
 	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
 	}
-	// Add packing to packmeta if not already there
-	if d != nil && len(d.Packdata) == 0 {
-		d.Packdata = []byte{byte(upspin.DebugPack)}
-	}
 	_, err := cryptByte(d, true)
 	if err != nil {
 		return -1
@@ -288,7 +280,7 @@ func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.Path
 	putPath(d)
 
 	// Remove old name from signature.
-	signature := d.Packdata[2]
+	signature := d.Packdata[1]
 	key, err := getKey(ctx, oldName)
 	if err != nil {
 		panic(err)
@@ -303,7 +295,7 @@ func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.Path
 	for i, c := range []byte(name) {
 		signature ^= c ^ key[i%len(key)]
 	}
-	d.Packdata[2] = signature
+	d.Packdata[1] = signature
 
 	return nil
 }
@@ -330,7 +322,7 @@ func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) 
 
 // putPath adds (or replaces) the path in the packdata.
 func putPath(d *upspin.DirEntry) {
-	d.Packdata = d.Packdata[:3]
+	d.Packdata = d.Packdata[:2]
 	var buf [16]byte
 	n := binary.PutUvarint(buf[:], uint64(len(d.Name)))
 	d.Packdata = append(d.Packdata, buf[:n]...)
@@ -339,14 +331,14 @@ func putPath(d *upspin.DirEntry) {
 
 // getPath returns the path from the packdata.
 func getPath(d *upspin.DirEntry) (upspin.PathName, error) {
-	if len(d.Packdata) < 4 {
+	if len(d.Packdata) < 3 {
 		return "", errBadPackdata
 	}
 	m, n := binary.Uvarint(d.Packdata[3:])
 	if n < 0 {
 		return "", errBadPackdata
 	}
-	buf := d.Packdata[3+int(n):]
+	buf := d.Packdata[2+int(n):]
 	if len(buf) != int(m) {
 		return "", errBadPackdata
 	}
