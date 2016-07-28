@@ -110,7 +110,7 @@ func (s *DirServer) entry(file string) (*upspin.DirEntry, error) {
 		block := upspin.DirBlock{
 			Location: upspin.Location{
 				Endpoint:  s.endpoint,
-				Reference: upspin.Reference(name),
+				Reference: upspin.Reference(file),
 			},
 			Offset: 0,
 			Size:   info.Size(),
