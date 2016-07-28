@@ -147,7 +147,7 @@ func (s *sharer) do() {
 		if packer.Packing() == upspin.PlainPack {
 			continue
 		}
-		hashes, err := packer.ReaderHashes(entry.Metadata.Packdata)
+		hashes, err := packer.ReaderHashes(entry.Packdata)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
@@ -289,13 +289,9 @@ func lookupPacker(entry *upspin.DirEntry) upspin.Packer {
 		// Directories are not packed.
 		return nil
 	}
-	if len(entry.Metadata.Packdata) == 0 {
-		fmt.Fprintf(os.Stderr, "%q has no packdata\n", entry.Name)
-	}
-	packing := upspin.Packing(entry.Metadata.Packdata[0])
-	packer := pack.Lookup(packing)
+	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		fmt.Fprintf(os.Stderr, "%q has no registered packer for %d; ignoring\n", entry.Name, packing)
+		fmt.Fprintf(os.Stderr, "%q has no registered packer for %d; ignoring\n", entry.Name, entry.Packing)
 	}
 	return packer
 }
@@ -368,10 +364,6 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	if entry.IsDir() {
 		exitf("internal error: fixShare called on directory %q", name)
 	}
-	if len(entry.Metadata.Packdata) == 0 {
-		fmt.Fprintf(os.Stderr, "%q has no packdata; ignoring\n", name)
-		return
-	}
 	packer := lookupPacker(entry) // Won't be nil.
 	switch packer.Packing() {
 	case upspin.EEPack:
@@ -394,7 +386,7 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		s.exitCode = 1
 		return
 	}
-	packdatas := []*[]byte{&entry.Metadata.Packdata}
+	packdatas := []*[]byte{&entry.Packdata}
 	packer.Share(s.context, keys, packdatas)
 	if packdatas[0] == nil {
 		fmt.Fprintf(os.Stderr, "packing skipped for %q\n", entry.Name)
