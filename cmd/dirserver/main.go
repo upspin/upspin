@@ -29,8 +29,8 @@ import (
 	// TODO: Which of these are actually needed?
 
 	// Load useful packers
-	// TODO _ "upspin.io/pack/debug"
-	// TODO _ "upspin.io/pack/ee"
+	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
