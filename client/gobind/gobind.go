@@ -80,12 +80,16 @@ func (c *Client) Glob(pattern string) (*DirEntry, error) {
 	var first *DirEntry
 	var last *DirEntry
 	for _, de := range des {
+		size, err := de.Size()
+		if err != nil {
+			return nil, err
+		}
 		dirEntry := &DirEntry{
 			Name:         string(de.Name),
 			IsDir:        de.IsDir(),
-			Size:         int64(de.Metadata.Size),
-			LastModified: int64(de.Metadata.Time),
-			Writer:       string(de.Metadata.Writer),
+			Size:         size,
+			LastModified: int64(de.Time),
+			Writer:       string(de.Writer),
 		}
 		if last != nil {
 			last.Next = dirEntry
