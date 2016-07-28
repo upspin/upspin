@@ -31,20 +31,20 @@ const (
 var (
 	timeFunc = func() upspin.Time { return upspin.Time(17) }
 	dir      = upspin.DirEntry{
-		Name: upspin.PathName(pathName),
-		Location: upspin.Location{
-			Reference: upspin.Reference("1234"),
-			Endpoint: upspin.Endpoint{
-				Transport: upspin.GCP,
-				NetAddr:   "https://store-server.com",
+		Name:     upspin.PathName(pathName),
+		Attr:     upspin.AttrNone,
+		Time:     upspin.Now(),
+		Packdata: []byte("12345"),
+		Blocks: []upspin.DirBlock{{
+			Size: 32,
+			Location: upspin.Location{
+				Reference: upspin.Reference("1234"),
+				Endpoint: upspin.Endpoint{
+					Transport: upspin.GCP,
+					NetAddr:   "https://store-server.com",
+				},
 			},
-		},
-		Metadata: upspin.Metadata{
-			Attr:     upspin.AttrNone,
-			Size:     32,
-			Time:     upspin.Now(),
-			Packdata: []byte("12345"),
-		},
+		}},
 	}
 	serviceEndpoint = upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -52,22 +52,20 @@ var (
 	}
 	dirParent = upspin.DirEntry{
 		Name: upspin.PathName(parentPathName),
-		Metadata: upspin.Metadata{
-			Attr: upspin.AttrDirectory,
-		},
+		Attr: upspin.AttrDirectory,
 	}
 	defaultAccess, _ = access.New(rootAccessFile)
 	userRoot         = root{
 		dirEntry: upspin.DirEntry{
 			Name: rootPath,
-			Location: upspin.Location{
-				// Reference is empty for the root.
-				Endpoint: serviceEndpoint,
-			},
-			Metadata: upspin.Metadata{
-				Attr: upspin.AttrDirectory,
-				Time: 1234,
-			},
+			Attr: upspin.AttrDirectory,
+			Time: 1234,
+			Blocks: []upspin.DirBlock{{
+				Location: upspin.Location{
+					// Reference is empty for the root.
+					Endpoint: serviceEndpoint,
+				},
+			}},
 		},
 		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
@@ -129,19 +127,11 @@ func TestPutErrorParseUser(t *testing.T) {
 	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir, "no user name in path")
 }
 
-func makeValidMeta() upspin.Metadata {
-	return upspin.Metadata{
-		Attr:     upspin.AttrDirectory,
-		Sequence: 0,
-	}
-}
-
 func TestPutErrorInvalidSequenceNumber(t *testing.T) {
-	meta := makeValidMeta()
-	meta.Sequence = upspin.SeqNotExist - 1
 	dir := upspin.DirEntry{
 		Name:     upspin.PathName("fred@bob.com/myroot/myfile"),
-		Metadata: meta,
+		Attr:     upspin.AttrDirectory,
+		Sequence: upspin.SeqNotExist - 1,
 	}
 	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir,
 		"fred@bob.com/myroot/myfile: Put: invalid operation: invalid sequence number")
@@ -170,8 +160,8 @@ func TestGlobBadPath(t *testing.T) {
 
 func TestPutErrorFileNoParentDir(t *testing.T) {
 	dir := upspin.DirEntry{
-		Name:     upspin.PathName("test@foo.com/myroot/myfile"),
-		Metadata: makeValidMeta(),
+		Name: upspin.PathName("test@foo.com/myroot/myfile"),
+		Attr: upspin.AttrDirectory,
 	}
 	rootJSON := toRootJSON(t, &userRoot)
 	egcp := &storagetest.ExpectDownloadCapturePut{
@@ -203,17 +193,17 @@ func TestLookupRoot(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
 	expectedDirEntry := upspin.DirEntry{
-		Name: upspin.PathName("test@foo.com/"),
-		Location: upspin.Location{
-			Endpoint:  serviceEndpoint,
-			Reference: "",
-		},
-		Metadata: upspin.Metadata{
-			Attr:     upspin.AttrDirectory,
-			Sequence: 0,
-			Size:     0,
-			Time:     1234,
-		},
+		Name:     upspin.PathName("test@foo.com/"),
+		Attr:     upspin.AttrDirectory,
+		Sequence: 0,
+		Time:     1234,
+		Blocks: []upspin.DirBlock{{
+			Size: 0,
+			Location: upspin.Location{
+				Endpoint:  serviceEndpoint,
+				Reference: "",
+			},
+		}},
 	}
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
@@ -236,9 +226,10 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	dirJSON := toJSON(t, dir)
 
 	// Default, zero Location is the expected answer.
-	expectedDirEntry := dir                       // copy
-	expectedDirEntry.Location = upspin.Location{} // Zero location
-	expectedDirEntry.Metadata.Packdata = nil      // No pack data either
+	expectedDirEntry := dir                                                 // copy
+	expectedDirEntry.Blocks = append([]upspin.DirBlock(nil), dir.Blocks...) // copy
+	expectedDirEntry.Blocks[0].Location = upspin.Location{}                 // Zero location
+	expectedDirEntry.Packdata = nil                                         // No pack data either
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
@@ -313,23 +304,23 @@ func TestGlobSimple(t *testing.T) {
 	// All files belong to the owner (userName) and hence no special Access files are needed, just the default one
 	// at the root.
 	dir1 := upspin.DirEntry{
-		Name: userName + "/subdir/a.pdf",
-		Location: upspin.Location{
-			Reference: upspin.Reference("xxxx"),
-		},
-		Metadata: upspin.Metadata{
-			Packdata: []byte("blah"),
-		},
+		Name:     userName + "/subdir/a.pdf",
+		Packdata: []byte("blah"),
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: upspin.Reference("xxxx"),
+			},
+		}},
 	}
 	dir1JSON := toJSON(t, dir1)
 	dir2 := upspin.DirEntry{
-		Name: userName + "/subdir/b.pdf",
-		Location: upspin.Location{
-			Reference: upspin.Reference("yyyy"),
-		},
-		Metadata: upspin.Metadata{
-			Packdata: []byte("bleh"),
-		},
+		Name:     userName + "/subdir/b.pdf",
+		Packdata: []byte("bleh"),
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: upspin.Reference("yyyy"),
+			},
+		}},
 	}
 	dir2JSON := toJSON(t, dir2)
 
@@ -372,10 +363,10 @@ func TestGlobSimple(t *testing.T) {
 	// same list, but without the location in them.
 	ds.context.SetUserName("listerdude@me.com")
 	// Location and Packdata are anonymized.
-	dir1.Location = upspin.Location{}
-	dir2.Location = upspin.Location{}
-	dir1.Metadata.Packdata = nil
-	dir2.Metadata.Packdata = nil
+	dir1.Blocks[0].Location = upspin.Location{}
+	dir2.Blocks[0].Location = upspin.Location{}
+	dir1.Packdata = nil
+	dir2.Packdata = nil
 	expectedDirEntries = []*upspin.DirEntry{&dir1, &dir2} // new expected response does not have Location.
 
 	de, err = ds.Glob(userName + "/subdir/*.pdf")
@@ -385,7 +376,7 @@ func TestGlobSimple(t *testing.T) {
 func TestPutParentNotDir(t *testing.T) {
 	// The DirEntry of the parent, converted to JSON.
 	notDirParent := dirParent
-	notDirParent.Metadata.Attr = upspin.AttrNone // Parent is not dir!
+	notDirParent.Attr = upspin.AttrNone // Parent is not dir!
 	dirParentJSON := toJSON(t, notDirParent)
 
 	rootJSON := toRootJSON(t, &userRoot)
@@ -484,7 +475,7 @@ func TestPut(t *testing.T) {
 
 	// Check that the parent Sequence number was updated...
 	updatedParent := dirParent
-	updatedParent.Metadata.Sequence++
+	updatedParent.Sequence++
 	updatedParentJSON := toJSON(t, updatedParent)
 
 	updatedDir := dir
@@ -509,7 +500,7 @@ func TestPut(t *testing.T) {
 
 	// Check that a second put with SeqNotExist fails.
 	ndir := dir
-	ndir.Metadata.Sequence = upspin.SeqNotExist
+	ndir.Sequence = upspin.SeqNotExist
 	err = ds.Put(&ndir)
 	if err == nil {
 		t.Fatal("Put with SeqNotExist should have failed")
@@ -521,8 +512,8 @@ func TestPut(t *testing.T) {
 
 func TestMakeRoot(t *testing.T) {
 	// rootJSON is what the server puts to GCP.
-	userRootSavedNow := userRoot                         // copy
-	userRootSavedNow.dirEntry.Metadata.Time = timeFunc() // time of creation is now.
+	userRootSavedNow := userRoot                // copy
+	userRootSavedNow.dirEntry.Time = timeFunc() // time of creation is now.
 	rootJSON := toRootJSON(t, &userRootSavedNow)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
@@ -577,13 +568,15 @@ func TestPutAccessFile(t *testing.T) {
 	// The DirEntry we're trying to Put, converted to JSON.
 	dir := upspin.DirEntry{
 		Name: upspin.PathName(accessPath),
-		Location: upspin.Location{
-			Reference: "1234",
-			Endpoint: upspin.Endpoint{
-				Transport: upspin.GCP,
-				NetAddr:   upspin.NetAddr("https://store-server.upspin.io"),
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: "1234",
+				Endpoint: upspin.Endpoint{
+					Transport: upspin.GCP,
+					NetAddr:   upspin.NetAddr("https://store-server.upspin.io"),
+				},
 			},
-		},
+		}},
 	}
 
 	// The DirEntry of the root.
@@ -592,9 +585,7 @@ func TestPutAccessFile(t *testing.T) {
 	// The DirEntry of the parent
 	dirParent := upspin.DirEntry{
 		Name: upspin.PathName(parentDir),
-		Metadata: upspin.Metadata{
-			Attr: upspin.AttrDirectory,
-		},
+		Attr: upspin.AttrDirectory,
 	}
 	dirParentJSON := toJSON(t, dirParent)
 
@@ -665,25 +656,26 @@ func TestGroupAccessFile(t *testing.T) {
 	refOfGroupFile := "sha-256 of Group/family"
 	groupDir := upspin.DirEntry{
 		Name: upspin.PathName(userName + "/Group/family"),
-		Location: upspin.Location{
-			Reference: upspin.Reference(refOfGroupFile),
-			Endpoint:  dir.Location.Endpoint, // Same endpoint as the dir entry itself.
-		},
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: upspin.Reference(refOfGroupFile),
+				Endpoint:  dir.Blocks[0].Location.Endpoint, // Same endpoint as the dir entry itself.
+			},
+		}},
 	}
 	groupDirJSON := toJSON(t, groupDir)
 
 	groupParentDir := upspin.DirEntry{
 		Name: upspin.PathName(userName + "/Group"),
-		Metadata: upspin.Metadata{
-			Attr: upspin.AttrDirectory,
-		},
+		Attr: upspin.AttrDirectory,
 	}
 	groupParentDirJSON := toJSON(t, &groupParentDir)
 
 	// newGroupDir is where the new group file will go when the user puts it. Just the reference changes.
 	newRefOfGroupFile := "new sha-256 of newly-put Group/family"
 	newGroupDir := groupDir
-	newGroupDir.Location.Reference = upspin.Reference(newRefOfGroupFile)
+	newGroupDir.Blocks = append([]upspin.DirBlock(nil), groupDir.Blocks...)
+	newGroupDir.Blocks[0].Location.Reference = upspin.Reference(newRefOfGroupFile)
 	newGroupDirJSON := toJSON(t, &newGroupDir)
 
 	contentsOfFamilyGroup := broUserName
@@ -758,9 +750,7 @@ func TestMarshalRoot(t *testing.T) {
 	root := &root{
 		dirEntry: upspin.DirEntry{
 			Name: upspin.PathName("me@here.com/"),
-			Metadata: upspin.Metadata{
-				Attr: upspin.AttrDirectory,
-			},
+			Attr: upspin.AttrDirectory,
 		},
 		accessFiles: accessFileDB{accessRoot: acc1, accessRestricted: acc2},
 	}
@@ -925,9 +915,11 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 func TestDeleteAccessFile(t *testing.T) {
 	accessDir := upspin.DirEntry{
 		Name: rootAccessFile,
-		Location: upspin.Location{
-			Reference: "some place in store", // We don't need this, but just for completion.
-		},
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: "some place in store", // We don't need this, but just for completion.
+			},
+		}},
 	}
 	accessDirJSON := toJSON(t, accessDir)
 	// Let's pretend we had a non-default Access file for the root dir.
@@ -986,10 +978,12 @@ func TestDeleteGroupFile(t *testing.T) {
 	refOfGroupFile := "sha-256 of Group/family"
 	groupDir := upspin.DirEntry{
 		Name: groupPathName,
-		Location: upspin.Location{
-			Reference: upspin.Reference(refOfGroupFile),
-			Endpoint:  dir.Location.Endpoint, // Same endpoint as the dir entry itself.
-		},
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				Reference: upspin.Reference(refOfGroupFile),
+				Endpoint:  dir.Blocks[0].Location.Endpoint, // Same endpoint as the dir entry itself.
+			},
+		}},
 	}
 	groupDirJSON := toJSON(t, groupDir)
 
