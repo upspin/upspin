@@ -10,6 +10,7 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/pack"
+	"upspin.io/pack/internal"
 	"upspin.io/upspin"
 )
 
@@ -97,3 +98,12 @@ func benchmarkPlainPack(b *testing.B, fileSize int) {
 func BenchmarkPlainPack_1byte(b *testing.B)  { benchmarkPlainPack(b, 1) }
 func BenchmarkPlainPack_1kbyte(b *testing.B) { benchmarkPlainPack(b, 1024) }
 func BenchmarkPlainPack_1Mbyte(b *testing.B) { benchmarkPlainPack(b, 1024*1024) }
+
+func TestMultiBlockRoundTrip(t *testing.T) {
+	p := pack.Lookup(upspin.PlainPack)
+	if p == nil {
+		t.Fatal("Lookup failed")
+	}
+	const userName = upspin.UserName("ken@google.com")
+	internal.TestMultiBlockRoundTrip(t, globalContext, p, userName)
+}

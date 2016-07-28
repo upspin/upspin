@@ -13,6 +13,7 @@ import (
 	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/pack"
+	"upspin.io/pack/internal"
 	"upspin.io/upspin"
 )
 
@@ -179,4 +180,12 @@ func TestPackdata(t *testing.T) {
 	if p != path {
 		t.Error("bad path: got %q, want %q", p, path)
 	}
+}
+
+func TestMultiBlockRoundTrip(t *testing.T) {
+	p := pack.Lookup(upspin.DebugPack)
+	if p == nil {
+		t.Fatal("Lookup failed")
+	}
+	internal.TestMultiBlockRoundTrip(t, globalContext, p, userName)
 }
