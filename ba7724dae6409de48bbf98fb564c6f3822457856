@@ -16,6 +16,24 @@
       "revId": "ba7724dae6409de48bbf98fb564c6f3822457856",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f71c556_d27d9a18",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T21:48:39Z",
+      "side": 1,
+      "message": "Ah, yeah. I\u0027ve used this before in path. I keep forgetting about these handy interfaces.\n\nDone.",
+      "parentUuid": "4f0f05e3_198fab1e",
+      "revId": "ba7724dae6409de48bbf98fb564c6f3822457856",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
