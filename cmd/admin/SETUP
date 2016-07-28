@@ -88,6 +88,18 @@ TODO(adg): automate this.
 
     $ echo a.b.c.d > $HOME/upspin/deploy/$PROJECT/ip/dirserver
 
+
+- Create a MySQL database on the Google Cloud SQL dashboard:
+  - Create a single instance to serve both projects (the $PROJECTs) or one for each,
+    depending on the expected traffic.
+  - Create a DB for upspin_prod and upspin_test (on their respective projects or on
+    the only instance according to the step above):
+
+      $ mysql --host=<ip address of instance> --password=<from $HOME/upspin/deploy/$PROJECT> \
+              --user=root
+      > CREATE DATABASE upspin_prod;
+      > CREATE DATABASE upspin_test;
+
 - Build and upload the Docker base image to the project container registry:
 
     $ cd $GOPATH/src/upspin.io/cloud/docker/base
