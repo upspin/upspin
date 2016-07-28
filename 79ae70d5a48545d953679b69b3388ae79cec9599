@@ -50,6 +50,23 @@
       "revId": "79ae70d5a48545d953679b69b3388ae79cec9599",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_d9f373a1",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:16:38Z",
+      "side": 1,
+      "message": "use four space indent",
+      "revId": "79ae70d5a48545d953679b69b3388ae79cec9599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
