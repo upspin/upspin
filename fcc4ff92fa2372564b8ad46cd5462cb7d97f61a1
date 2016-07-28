@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f0f05e3_79ca2746",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:15:22Z",
+      "side": 1,
+      "message": "it\u0027s actually unknown transport\nrather than having an error return, i\u0027d rather just add this case:\n\ndefault:\n  s :\u003d \"unknown\"\n  if ep.NetAddr !\u003d \"\" {\n    s +\u003d \",\"+ep.NetAddr\n  return s\n\nand then once you\u0027re not using an error return, this can become the String method again.",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_19bdebaa",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:15:22Z",
+      "side": 1,
+      "message": "You don\u0027t want to remove this. It\u0027s useful in error messages and debugging, at least.",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_99f9fb85",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:15:22Z",
+      "side": 1,
+      "message": "this becomes json.Marshal(ep.String())",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_b9f4bf8d",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:15:22Z",
+      "side": 1,
+      "message": "s/str/s/ ?",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_59c7633c",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T22:15:22Z",
+      "side": 1,
+      "message": "s/newEndPt/parsed/",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
