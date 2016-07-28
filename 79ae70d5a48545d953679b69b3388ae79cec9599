@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f0f05e3_59b2c3e3",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T22:00:24Z",
+      "side": 1,
+      "message": "s/.$/:/ for consistency",
+      "revId": "79ae70d5a48545d953679b69b3388ae79cec9599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_b9cb1f4e",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T22:00:24Z",
+      "side": 1,
+      "message": "final phrase isn\u0027t grammatical. s/whether //?",
+      "revId": "79ae70d5a48545d953679b69b3388ae79cec9599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_99d0dbfd",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T22:00:24Z",
+      "side": 1,
+      "message": "s/instance/\u0026,/ i think",
+      "revId": "79ae70d5a48545d953679b69b3388ae79cec9599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
