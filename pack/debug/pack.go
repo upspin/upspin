@@ -175,8 +175,7 @@ func (bp *blockPacker) Close() error {
 		return err
 	}
 	putPath(bp.entry)
-	addSignature(bp.entry, sign(bp.ctx, internal.BlockSum(bp.entry.Blocks), bp.entry.Name))
-	return nil
+	return addSignature(bp.entry, sign(bp.ctx, internal.BlockSum(bp.entry.Blocks), bp.entry.Name))
 }
 
 func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
@@ -184,6 +183,13 @@ func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUn
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
 	}
+
+	// Validate signature.
+	sig := sign(ctx, internal.BlockSum(d.Blocks), d.Name)
+	if len(d.Packdata) < 2 || d.Packdata[1] != sig {
+		return nil, errors.E(Unpack, errors.Invalid, d.Name, errors.Str("signature mismatch"))
+	}
+
 	cb, err := cryptByte(d, false)
 	if err != nil {
 		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
@@ -334,7 +340,7 @@ func getPath(d *upspin.DirEntry) (upspin.PathName, error) {
 	if len(d.Packdata) < 3 {
 		return "", errBadPackdata
 	}
-	m, n := binary.Uvarint(d.Packdata[3:])
+	m, n := binary.Uvarint(d.Packdata[2:])
 	if n < 0 {
 		return "", errBadPackdata
 	}

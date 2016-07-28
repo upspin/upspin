@@ -144,3 +144,39 @@ func TestMain(m *testing.M) {
 	testkey.SetPublicKeys(userName, []upspin.PublicKey{"a key"})
 	os.Exit(m.Run())
 }
+
+func TestPackdata(t *testing.T) {
+	const (
+		path = "foo@example.com/file"
+		sig  = 42
+	)
+	d := &upspin.DirEntry{Name: path}
+
+	// Construct the Packdata.
+	cb, err := cryptByte(d, true)
+	if err != nil {
+		t.Fatal("cryptByte:", err)
+	}
+	if err := addSignature(d, sig); err != nil {
+		t.Fatal("addSignature:", err)
+	}
+	putPath(d)
+
+	// Now deconstruct it.
+	if len(d.Packdata) < 3 {
+		t.Fatal("bad packdata")
+	}
+	if got := d.Packdata[0]; got != cb {
+		t.Errorf("bad crypt byte: got %v, want %v", got, cb)
+	}
+	if got := d.Packdata[1]; got != sig {
+		t.Error("bad signature: got %v, want %v", got, sig)
+	}
+	p, err := getPath(d)
+	if err != nil {
+		t.Error("getPath:", err)
+	}
+	if p != path {
+		t.Error("bad path: got %q, want %q", p, path)
+	}
+}
