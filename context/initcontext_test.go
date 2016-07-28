@@ -15,7 +15,7 @@ import (
 	"upspin.io/pack"
 	"upspin.io/upspin"
 
-	// TODO _ "upspin.io/pack/ee"
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 )
 

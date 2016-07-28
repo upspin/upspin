@@ -8,7 +8,7 @@
 package transports
 
 import (
-	// TODO _ "upspin.io/dir/gcp"
+	_ "upspin.io/dir/gcp"
 	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/dir/remote"
 	_ "upspin.io/dir/unassigned"

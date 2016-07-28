@@ -25,7 +25,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	// TODO _ "upspin.io/pack/debug"
+	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
 
