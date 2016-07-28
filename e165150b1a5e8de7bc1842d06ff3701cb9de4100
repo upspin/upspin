@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfa935a8_fd19c7e0",
+        "filename": "pack/debug/pack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T00:25:10Z",
+      "side": 0,
+      "message": "It worked before because the tests called PackLen before calling Pack, and these lines of code were present before.\n\nNow that they\u0027re removed, PackLen no longer modifies the Packdata, and so it should be the same whether you call Pack with or without calling PackLen first.",
+      "revId": "e165150b1a5e8de7bc1842d06ff3701cb9de4100",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
