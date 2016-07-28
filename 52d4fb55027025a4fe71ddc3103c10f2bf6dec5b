@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfa935a8_bd4a1faf",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:42:36Z",
+      "side": 1,
+      "message": "The packing could be plain, in which case Packdata will be empty. I think you can remove this check now.",
+      "revId": "52d4fb55027025a4fe71ddc3103c10f2bf6dec5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_9d4f63bf",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:42:36Z",
+      "side": 1,
+      "message": "same deal here",
+      "revId": "52d4fb55027025a4fe71ddc3103c10f2bf6dec5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
