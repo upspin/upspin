@@ -85,7 +85,7 @@ func errLookup(err error) (*proto.DirLookupResponse, error) {
 	}, nil
 }
 
-// entry returns the DirEntry for the named local file name.
+// entry returns the DirEntry for the named local file or directory.
 func (s *DirServer) entry(file string) (*upspin.DirEntry, error) {
 	info, err := os.Stat(file)
 	if err != nil {
@@ -98,20 +98,24 @@ func (s *DirServer) entry(file string) (*upspin.DirEntry, error) {
 	if !strings.HasPrefix(file, *root) {
 		return nil, errors.Str("internal error: not in root")
 	}
-	name := s.upspinPathFromLocal(file)
 	entry := upspin.DirEntry{
-		Name: name,
-		Location: upspin.Location{
-			Endpoint:  s.endpoint,
-			Reference: upspin.Reference(name),
-		},
-		Metadata: upspin.Metadata{
-			Attr:     attr,
-			Sequence: 0,
-			Size:     uint64(info.Size()),
-			Time:     upspin.TimeFromGo(info.ModTime()),
-			Packdata: []byte{byte(upspin.PlainPack)},
-		},
+		Name:     s.upspinPathFromLocal(file),
+		Packing:  upspin.PlainPack,
+		Time:     upspin.TimeFromGo(info.ModTime()),
+		Attr:     attr,
+		Sequence: 0,
+		Writer:   s.context.UserName(), // TODO: Is there a better answer?
+	}
+	if !info.IsDir() {
+		block := upspin.DirBlock{
+			Location: upspin.Location{
+				Endpoint:  s.endpoint,
+				Reference: upspin.Reference(name),
+			},
+			Offset: 0,
+			Size:   info.Size(),
+		}
+		entry.Blocks = []upspin.DirBlock{block}
 	}
 	return &entry, nil
 }
@@ -213,8 +217,8 @@ func (s *DirServer) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*prot
 		if ok, err := can(s, ctx, access.Read, parsed); err != nil {
 			return errGlob(err)
 		} else if !ok {
-			e.Location = upspin.Location{}
-			e.Metadata.Packdata = nil
+			e.Blocks = nil
+			e.Packdata = nil
 		}
 		entries[i], err = e.Marshal()
 		if err != nil {
