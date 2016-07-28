@@ -10,8 +10,9 @@ import (
 )
 
 func TestParseAndString(t *testing.T) {
-	assertParsesAndEncodes(t, "gcp,https://localhost:8080")
-	assertParsesAndEncodes(t, "remote,https://localhost:8080")
+	assertParsesAndEncodes(t, "gcp,localhost:8080")
+	assertParsesAndEncodes(t, "remote,localhost:8080")
+	assertParsesAndEncodes(t, "https,https://localhost:8080")
 	assertParsesAndEncodes(t, "inprocess")
 }
 
@@ -19,6 +20,7 @@ func TestErrorCases(t *testing.T) {
 	assertError(t, "remote", "requires a netaddr")
 	assertError(t, "supersonic,https://supersonic.com", "unknown transport type")
 	assertError(t, "gcp", "requires a netaddr")
+	assertError(t, "https", "requires a netaddr")
 }
 
 // Test printing of an erroneous endpoint. Mostly to protect
@@ -28,7 +30,7 @@ func TestErroneousString(t *testing.T) {
 	const expect = "unknown endpoint {127, whatnot}"
 	got := e.String()
 	if got != expect {
-		t.Fatal("expected %q; got %q", expect, got)
+		t.Fatalf("expected %q; got %q", expect, got)
 	}
 }
 

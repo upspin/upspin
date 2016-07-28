@@ -25,9 +25,15 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 			return nil, fmt.Errorf("remote endpoint %q requires a netaddr", v)
 		}
 		return &Endpoint{Transport: Remote, NetAddr: NetAddr(elems[1])}, nil
+	case "https":
+		if len(elems) < 2 {
+			return nil, fmt.Errorf("https endpoint %q requires a netaddr", v)
+		}
+		return &Endpoint{Transport: HTTPS, NetAddr: NetAddr(elems[1])}, nil
 	case "unassigned":
 		return &Endpoint{Transport: Unassigned}, nil
 	}
+
 	return nil, fmt.Errorf("unknown transport type in endpoint %q", v)
 }
 
@@ -40,6 +46,8 @@ func (ep Endpoint) String() string {
 		return "inprocess"
 	case Remote:
 		return fmt.Sprintf("remote,%s", string(ep.NetAddr))
+	case HTTPS:
+		return fmt.Sprintf("https,%s", string(ep.NetAddr))
 	case Unassigned:
 		return "unassigned"
 	}

@@ -6,7 +6,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -354,7 +353,7 @@ func user(args ...string) {
 		if err != nil {
 			exit(err)
 		}
-		blob, err := json.MarshalIndent(u, "", "\t")
+		blob, err := userMarshalJSON(u)
 		if err != nil {
 			// TODO(adg): better error message?
 			exit(err)
@@ -365,8 +364,7 @@ func user(args ...string) {
 
 func putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	data := readAll(inFile)
-	user := new(upspin.User)
-	err := json.Unmarshal(data, user)
+	user, err := userUnmarshalJSON(data)
 	if err != nil {
 		// TODO(adg): better error message?
 		exit(err)
