@@ -10,8 +10,9 @@ import (
 )
 
 func TestParseAndString(t *testing.T) {
-	assertParsesAndEncodes(t, "gcp,https://localhost:8080")
-	assertParsesAndEncodes(t, "remote,https://localhost:8080")
+	assertParsesAndEncodes(t, "gcp,localhost:8080")
+	assertParsesAndEncodes(t, "remote,localhost:8080")
+	assertParsesAndEncodes(t, "https,https://localhost:8080")
 	assertParsesAndEncodes(t, "inprocess")
 }
 
@@ -19,6 +20,7 @@ func TestErrorCases(t *testing.T) {
 	assertError(t, "remote", "requires a netaddr")
 	assertError(t, "supersonic,https://supersonic.com", "unknown transport type")
 	assertError(t, "gcp", "requires a netaddr")
+	assertError(t, "https", "requires a netaddr")
 }
 
 // Test printing of an erroneous endpoint. Mostly to protect
@@ -29,6 +31,22 @@ func TestErroneousString(t *testing.T) {
 	got := e.String()
 	if got != expect {
 		t.Fatalf("expected %q; got %q", expect, got)
+	}
+}
+
+func TestJSON(t *testing.T) {
+	e := Endpoint{Transport: GCP, NetAddr: "whatnot"}
+	buf, err := e.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	newE := new(Endpoint)
+	err = newE.UnmarshalJSON(buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e != *newE {
+		t.Errorf("Expected %q, got %q", e, newE)
 	}
 }
 
