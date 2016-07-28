@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cf769583_9519a4e2",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T23:03:22Z",
+      "side": 1,
+      "message": "If you do this, you invalidate what I\u0027m trying to accomplish here which is not to let the JSON encoding/decoding proceed if the transport is unknown.",
+      "parentUuid": "4f0f05e3_79ca2746",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f0f05e3_19bdebaa",
         "filename": "upspin/endpoint.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-28T22:15:22Z",
       "side": 1,
       "message": "You don\u0027t want to remove this. It\u0027s useful in error messages and debugging, at least.",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf769583_d5eebcb7",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T23:03:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f0f05e3_19bdebaa",
       "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "cf769583_152e74f6",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T23:03:22Z",
+      "side": 1,
+      "message": "No, we want the error. See above.",
+      "parentUuid": "4f0f05e3_99f9fb85",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f0f05e3_b9f4bf8d",
         "filename": "upspin/endpoint.go",
         "patchSetId": 4
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "cf769583_5538ec39",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T23:03:22Z",
+      "side": 1,
+      "message": "I use str consistently. (mostly :-))",
+      "parentUuid": "4f0f05e3_b9f4bf8d",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f0f05e3_59c7633c",
         "filename": "upspin/endpoint.go",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2016-07-28T22:15:22Z",
       "side": 1,
       "message": "s/newEndPt/parsed/",
+      "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf769583_f501f85c",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-28T23:03:22Z",
+      "side": 1,
+      "message": "Changed to parsedEndPt.",
+      "parentUuid": "4f0f05e3_59c7633c",
       "revId": "fcc4ff92fa2372564b8ad46cd5462cb7d97f61a1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
