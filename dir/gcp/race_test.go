@@ -129,9 +129,7 @@ func startDir(t *testing.T) *directory {
 
 	root := &upspin.DirEntry{
 		Name: userName,
-		Metadata: upspin.Metadata{
-			Attr: upspin.AttrDirectory,
-		},
+		Attr: upspin.AttrDirectory,
 	}
 	err := d.Put(root)
 	if err != nil {

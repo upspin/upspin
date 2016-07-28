@@ -70,10 +70,10 @@ type options struct {
 	// Add other things below (for example, some healthz monitoring stats)
 }
 
-// verifyMetadata checks that the metadata is minimally valid.
-func verifyMetadata(op string, path upspin.PathName, meta upspin.Metadata) error {
-	if meta.Sequence < upspin.SeqNotExist {
-		return errors.E(op, path, errors.Invalid, errors.Str("invalid sequence number"))
+// verifyDirEntry checks that the DirEntry is minimally valid.
+func verifyDirEntry(op string, d *upspin.DirEntry) error {
+	if d.Sequence < upspin.SeqNotExist {
+		return errors.E(op, d.Name, errors.Invalid, errors.Str("invalid sequence number"))
 	}
 	return nil
 }
@@ -104,25 +104,27 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 	}
 	// Prepares a dir entry for storage.
 	dirEntry := upspin.DirEntry{
-		Name: parsed.Path(),
-		Location: upspin.Location{
-			// Reference is ignored.
-			// Endpoint for dir entries where the DirServer is.
-			Endpoint: d.endpoint,
-		},
-		Metadata: upspin.Metadata{
-			Attr:     upspin.AttrDirectory,
-			Sequence: 0, // don't care?
-			Size:     0, // Being explicit that dir entries have zero size.
-			Time:     d.timeNow(),
-			Packdata: nil,
-		},
+		Name:     parsed.Path(),
+		Attr:     upspin.AttrDirectory,
+		Sequence: 0, // don't care?
+		Time:     d.timeNow(),
+		Packdata: nil,
+		Packing:  upspin.PlainPack,
+		Blocks: []upspin.DirBlock{{
+			Location: upspin.Location{
+				// Reference is ignored.
+				// Endpoint for dir entries where the DirServer is.
+				Endpoint: d.endpoint,
+			},
+			Size:   0, // Being explicit that dir entries have zero size.
+			Offset: 0,
+		}},
 	}
 	err = d.put(op, &dirEntry, opts)
 	if err != nil {
 		return zeroLoc, err
 	}
-	return dirEntry.Location, nil
+	return dirEntry.Blocks[0].Location, nil
 }
 
 // Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.
@@ -173,7 +175,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 	mu.Lock()
 	defer mu.Unlock()
 
-	if err := verifyMetadata(op, dirEntry.Name, dirEntry.Metadata); err != nil {
+	if err := verifyDirEntry(op, dirEntry); err != nil {
 		return err
 	}
 
@@ -212,16 +214,16 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		if dirEntry.IsDir() {
 			return errors.E(op, canonicalPath, errors.NotDir, errors.Str("overwriting file with directory"))
 		}
-		if dirEntry.Metadata.Sequence == upspin.SeqNotExist {
+		if dirEntry.Sequence == upspin.SeqNotExist {
 			return errors.E(op, canonicalPath, errors.Exist, errors.Str("file already exists"))
 		}
-		if dirEntry.Metadata.Sequence > upspin.SeqIgnore && dirEntry.Metadata.Sequence != existingDirEntry.Metadata.Sequence {
+		if dirEntry.Sequence > upspin.SeqIgnore && dirEntry.Sequence != existingDirEntry.Sequence {
 			return errors.E(op, canonicalPath, errors.Invalid, errors.Str("sequence mismatch"))
 		}
-		dirEntry.Metadata.Sequence = existingDirEntry.Metadata.Sequence + 1
+		dirEntry.Sequence = existingDirEntry.Sequence + 1
 	}
-	if dirEntry.Metadata.Sequence < upspin.SeqBase {
-		dirEntry.Metadata.Sequence = upspin.SeqBase
+	if dirEntry.Sequence < upspin.SeqBase {
+		dirEntry.Sequence = upspin.SeqBase
 	}
 
 	// Canonicalize path.
@@ -241,7 +243,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		log.Error.Printf("Bad inconsistency: %s", err)
 		return err
 	}
-	parentDirEntry.Metadata.Sequence++
+	parentDirEntry.Sequence++
 	if parentParsedPath.IsRoot() {
 		err = d.putRoot(parentParsedPath.User(), root, opts...)
 	} else {
@@ -256,7 +258,11 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 
 	// If this is an Access file or Group file, we have some extra work to do.
 	if access.IsAccessFile(canonicalPath) {
-		err = d.updateAccess(&parsed, &dirEntry.Location, opts...)
+		loc := &upspin.Location{}
+		if len(dirEntry.Blocks) > 0 {
+			loc = &dirEntry.Blocks[0].Location
+		}
+		err = d.updateAccess(&parsed, loc, opts...)
 		if err != nil {
 			return err
 		}
@@ -323,8 +329,8 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
 		log.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
-		dirEntry.Location = upspin.Location{}
-		dirEntry.Metadata.Packdata = nil
+		dirEntry.Blocks[0].Location = upspin.Location{}
+		dirEntry.Packdata = nil
 	}
 	log.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
 	return dirEntry, nil
@@ -460,8 +466,10 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			}
 			// If the user can't read a path, clear out its Location.
 			if !canRead {
-				de.Location = upspin.Location{}
-				de.Metadata.Packdata = nil
+				if len(de.Blocks) > 0 {
+					de.Blocks[0].Location = upspin.Location{}
+				}
+				de.Packdata = nil
 			}
 			dirEntries = append(dirEntries, de)
 		}

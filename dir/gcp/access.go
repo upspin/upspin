@@ -132,5 +132,5 @@ func (d *directory) load(pathName upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return d.storeGet(&dirEntry.Location)
+	return d.storeGet(&dirEntry.Blocks[0].Location)
 }
