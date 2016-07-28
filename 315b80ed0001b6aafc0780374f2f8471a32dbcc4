@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfa935a8_7dca5718",
+        "filename": "pack/internal/blocktest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T02:16:26Z",
+      "side": 1,
+      "message": "this should normally be block_test.go but i understand it can\u0027t be.\nneeds a comment explaining why.\n\nbut i don\u0027t like the consequence of this CL, which is that every program in upspin now depends at least formally on the testing package. that\u0027s a mistake.\nneeds a rethink",
+      "revId": "315b80ed0001b6aafc0780374f2f8471a32dbcc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_5dc79b0e",
+        "filename": "pack/internal/blocktest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T02:16:26Z",
+      "side": 1,
+      "message": "break not return or delete line 129",
+      "revId": "315b80ed0001b6aafc0780374f2f8471a32dbcc4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
