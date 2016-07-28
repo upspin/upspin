@@ -77,15 +77,23 @@ func (c *Client) Glob(pattern string) (*DirEntry, error) {
 	if err != nil {
 		return nil, err
 	}
+	size := func(de *upspin.DirEntry) int64 {
+		var size int64
+		size, err = de.Size()
+		if err != nil {
+			return -1
+		}
+		return size
+	}
 	var first *DirEntry
 	var last *DirEntry
 	for _, de := range des {
 		dirEntry := &DirEntry{
 			Name:         string(de.Name),
 			IsDir:        de.IsDir(),
-			Size:         int64(de.Metadata.Size),
-			LastModified: int64(de.Metadata.Time),
-			Writer:       string(de.Metadata.Writer),
+			Size:         size(de),
+			LastModified: int64(de.Time),
+			Writer:       string(de.Writer),
 		}
 		if last != nil {
 			last.Next = dirEntry
@@ -94,7 +102,7 @@ func (c *Client) Glob(pattern string) (*DirEntry, error) {
 		}
 		last = dirEntry
 	}
-	return first, nil
+	return first, err
 }
 
 // Get returns the contents of a path.
