@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f0f05e3_d9da5319",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-28T22:02:07Z",
+      "side": 1,
+      "message": "why not use the errors package here? (it\u0027s not used anywhere).\nbut this is fine for now.",
+      "revId": "c93f6cc060470a7033fb06dfbab6f6b4f0dff50f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
