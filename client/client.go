@@ -31,6 +31,8 @@ var (
 	zeroLoc upspin.Location
 )
 
+const maxBlockSize = 1024 * 1024
+
 // New creates a Client. The client finds the servers according to the given Context.
 func New(context upspin.Context) upspin.Client {
 	return &Client{
@@ -58,57 +60,62 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
 		packer = pack.Lookup(c.context.Packing())
 		if packer == nil {
-			return zeroLoc, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing, name)
+			return zeroLoc, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing(), name)
 		}
 	}
 
 	de := &upspin.DirEntry{
-		Name: name,
-		Metadata: upspin.Metadata{
-			Time:     upspin.Now(),
-			Sequence: 0, // Don't care for now.
-			Size:     uint64(len(data)),
-			Writer:   c.context.UserName(),
-		},
+		Name:     name,
+		Packing:  packer.Packing(),
+		Time:     upspin.Now(),
+		Sequence: 0, // Don't care for now.
+		Writer:   c.context.UserName(),
 	}
 
-	var cipher []byte
-
-	// Get a buffer big enough for this data
-	cipherLen := packer.PackLen(c.context, data, de)
-	if cipherLen < 0 {
-		return zeroLoc, errors.Errorf("PackLen failed for %q", name)
-	}
-	cipher = make([]byte, cipherLen)
-	n, err := packer.Pack(c.context, cipher, data, de)
-	if err != nil {
-		return zeroLoc, err
-	}
-	cipher = cipher[:n]
-
-	// Add other readers from the access file.
-	if err := c.addReaders(de, name, packer); err != nil {
-		return zeroLoc, err
-	}
-
-	// Store contents.
+	// Start the I/O.
 	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
 	if err != nil {
 		return zeroLoc, err
 	}
-	ref, err := store.Put(cipher)
+	bp, err := packer.Pack(c.context, de)
 	if err != nil {
 		return zeroLoc, err
 	}
-	de.Location = upspin.Location{
-		Endpoint:  c.context.StoreEndpoint(),
-		Reference: ref,
+	for len(data) > 0 {
+		n := len(data)
+		if n > maxBlockSize {
+			n = maxBlockSize
+		}
+		cipher, err := bp.Pack(data[:n])
+		if err != nil {
+			return zeroLoc, errors.E("Put", err)
+		}
+		data = data[n:]
+		ref, err := store.Put(cipher)
+		if err != nil {
+			return zeroLoc, errors.E("Put", err)
+		}
+		bp.SetLocation(
+			upspin.Location{
+				Endpoint:  c.context.StoreEndpoint(),
+				Reference: ref,
+			},
+		)
+	}
+	bp.Close()
+
+	// Add other readers from the access file.
+	if err := c.addReaders(de, name, packer); err != nil {
+		return zeroLoc, errors.E("Put", err)
 	}
 
 	// Record directory entry.
 	err = dir.Put(de)
+	if err != nil {
+		return zeroLoc, errors.E("Put", err)
+	}
 
-	return de.Location, err
+	return de.Blocks[0].Location, err
 }
 
 func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
@@ -155,7 +162,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	}
 	readersPublicKey = readersPublicKey[:n]
 	packdata := make([]*[]byte, 1)
-	packdata[0] = &de.Metadata.Packdata
+	packdata[0] = &de.Packdata
 	packer.Share(c.context, readersPublicKey, packdata)
 	return nil
 }
@@ -193,53 +200,62 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		return true
 	}
 
-	// where is the list of locations to examine. It is updated in the loop.
-	where := []upspin.Location{entry.Location}
-	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
-		loc := where[i]
-		store, err := bind.StoreServer(c.context, loc.Endpoint)
-		if isError(err) {
-			continue
+	var data []byte
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return nil, errors.Errorf("client: unrecognized Packing %d for %q", entry.Packing, name)
+	}
+	bu, err := packer.Unpack(c.context, entry)
+	if err != nil {
+		return nil, err // Showstopper.
+	}
+Blocks:
+	for b := 0; ; b++ {
+		block, ok := bu.NextBlock()
+		if !ok {
+			break // EOF
 		}
-		cipher, locs, err := store.Get(loc.Reference)
-		if isError(err) {
-			continue // locs guaranteed to be nil.
-		}
-		if locs == nil && err == nil {
-			// Encrypted data was found. Need to unpack it.
-			// TODO(p,edpin): change when GCP makes the indirected reference
-			// have the correct packing info.
-			packer := pack.Lookup(entry.Metadata.Packing())
-			if packer == nil {
-				return nil, errors.Errorf("client: unrecognized Packing %d for %q", entry.Metadata.Packing(), name)
+		// Get the data for this block.
+		// where is the list of locations to examine. It is updated in the loop.
+		where := []upspin.Location{block.Location}
+		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
+			loc := where[i]
+			store, err := bind.StoreServer(c.context, loc.Endpoint)
+			if isError(err) {
+				continue
 			}
-			clearLen := packer.UnpackLen(c.context, cipher, entry)
-			if clearLen < 0 {
-				return nil, errors.Errorf("client: UnpackLen failed for %q", name)
+			cipher, locs, err := store.Get(loc.Reference)
+			if isError(err) {
+				continue // locs guaranteed to be nil.
 			}
-			cleartext := make([]byte, clearLen)
-			n, err := packer.Unpack(c.context, cleartext, cipher, entry)
-			if err != nil {
-				return nil, err // Showstopper.
-			}
-			return cleartext[:n], nil
-		}
-		// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
-	outer:
-		for _, newLoc := range locs {
-			for _, oldLoc := range where {
-				if oldLoc == newLoc {
-					continue outer
+			if locs == nil && err == nil {
+				// Found the data. Unpack it.
+				clear, err := bu.Unpack(cipher)
+				if err != nil {
+					return nil, err // Showstopper.
 				}
+				data = append(data, clear...) // TODO: Could avoid a copy if only one block.
+				continue Blocks
 			}
-			where = append(where, newLoc)
+			// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
+		outer:
+			for _, newLoc := range locs {
+				for _, oldLoc := range where {
+					if oldLoc == newLoc {
+						continue outer
+					}
+				}
+				where = append(where, newLoc)
+			}
 		}
+		// If we arrive here, we have failed to find a block.
+		// TODO: custom error types.
+		if firstError != nil {
+			return nil, firstError
+		}
+		return nil, errors.Errorf("client: data for block %d in %q not found on any store server", b, name)
 	}
-	// TODO: custom error types.
-	if firstError != nil {
-		return nil, firstError
-	}
-	return nil, errors.Errorf("client: %q not found on any store server", name)
+	return data, nil
 }
 
 // Glob implements upspin.Client.
@@ -326,12 +342,12 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		return nil, errors.Errorf("cannot link or rename directories")
 	}
 
-	packer := pack.Lookup(entry.Metadata.Packing())
+	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing, oldName)
+		return nil, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing(), oldName)
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
-		if entry.Metadata.Packing() != upspin.PlainPack {
+		if entry.Packing != upspin.PlainPack {
 			return nil, errors.Errorf("can only link plain packed files to access or group files")
 		}
 	}
@@ -356,9 +372,9 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 	// If we are linking, the new file must not exist.
 	// TODO: Should it also not exist on a rename?
 	if rename {
-		entry.Metadata.Sequence = upspin.SeqIgnore
+		entry.Sequence = upspin.SeqIgnore
 	} else {
-		entry.Metadata.Sequence = upspin.SeqNotExist
+		entry.Sequence = upspin.SeqNotExist
 	}
 	if err := packer.Name(c.context, entry, newName); err != nil {
 		return nil, err
