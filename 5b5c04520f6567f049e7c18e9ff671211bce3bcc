@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfa935a8_1d0eb387",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:41:21Z",
+      "side": 1,
+      "message": "errors.E here and elsewhere",
+      "revId": "5b5c04520f6567f049e7c18e9ff671211bce3bcc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_3d116fab",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:41:21Z",
+      "side": 1,
+      "message": "errors.E",
+      "revId": "5b5c04520f6567f049e7c18e9ff671211bce3bcc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_fd678755",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:41:21Z",
+      "side": 1,
+      "message": "check error",
+      "revId": "5b5c04520f6567f049e7c18e9ff671211bce3bcc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_dd6ccb3a",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:41:21Z",
+      "side": 1,
+      "message": "I think this dies if len(data) \u003d\u003d 0",
+      "revId": "5b5c04520f6567f049e7c18e9ff671211bce3bcc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfa935a8_9d764309",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T01:41:21Z",
+      "side": 1,
+      "message": "errors.E, here and elsewhre",
+      "revId": "5b5c04520f6567f049e7c18e9ff671211bce3bcc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
