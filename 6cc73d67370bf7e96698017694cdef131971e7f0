@@ -16,6 +16,24 @@
       "revId": "6cc73d67370bf7e96698017694cdef131971e7f0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f0f05e3_99abbb71",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-07-28T21:10:07Z",
+      "side": 1,
+      "message": "the error should definitely be checked here. if size returns an error something is very wrong with the block data.",
+      "parentUuid": "4f0f05e3_59992368",
+      "revId": "6cc73d67370bf7e96698017694cdef131971e7f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
