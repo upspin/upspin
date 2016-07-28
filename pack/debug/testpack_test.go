@@ -171,14 +171,14 @@ func TestPackdata(t *testing.T) {
 		t.Errorf("bad crypt byte: got %v, want %v", got, cb)
 	}
 	if got := d.Packdata[1]; got != sig {
-		t.Error("bad signature: got %v, want %v", got, sig)
+		t.Errorf("bad signature: got %v, want %v", got, sig)
 	}
 	p, err := getPath(d)
 	if err != nil {
 		t.Error("getPath:", err)
 	}
 	if p != path {
-		t.Error("bad path: got %q, want %q", p, path)
+		t.Errorf("bad path: got %q, want %q", p, path)
 	}
 }
 

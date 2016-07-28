@@ -127,5 +127,4 @@ func unpackEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *
 			return err
 		}
 	}
-	return nil
 }

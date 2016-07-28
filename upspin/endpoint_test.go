@@ -28,7 +28,7 @@ func TestErroneousString(t *testing.T) {
 	const expect = "unknown endpoint {127, whatnot}"
 	got := e.String()
 	if got != expect {
-		t.Fatal("expected %q; got %q", expect, got)
+		t.Fatalf("expected %q; got %q", expect, got)
 	}
 }
 

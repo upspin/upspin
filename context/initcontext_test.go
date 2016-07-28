@@ -158,10 +158,10 @@ func TestMain(m *testing.M) {
 func testConfig(t *testing.T, expect *expectations, config string) {
 	context, err := InitContext(bytes.NewBufferString(config))
 	if err != nil {
-		t.Fatalf("could not parse config %s: %s", config, err)
+		t.Fatalf("could not parse config %v: %v", config, err)
 	}
 	if context.UserName() != expect.userName {
-		t.Errorf("name: got %s expected %s", context.UserName(), expect.userName)
+		t.Errorf("name: got %v expected %v", context.UserName(), expect.userName)
 	}
 	tests := []struct {
 		expected upspin.Endpoint
@@ -173,10 +173,10 @@ func testConfig(t *testing.T, expect *expectations, config string) {
 	}
 	for i, test := range tests {
 		if test.expected != test.got {
-			t.Errorf("%d: got %s expected %s", i, test.got, test.expected)
+			t.Errorf("%d: got %s expected %v", i, test.got, test.expected)
 		}
 	}
 	if context.Packing() != expect.packing {
-		t.Errorf("got %s expected %s", context.Packing, expect.packing)
+		t.Errorf("got %v expected %v", context.Packing(), expect.packing)
 	}
 }
