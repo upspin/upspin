@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf769583_de8c1986",
+        "filename": "dir/gcp/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-07-29T05:38:36Z",
+      "side": 1,
+      "message": "Should I take care of this? I lost track of how this happened or whether it\u0027s still relevant.",
+      "revId": "1b90617577b7db4fb800e44eec7ee8417b9f8e4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
