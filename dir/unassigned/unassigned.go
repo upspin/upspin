@@ -26,8 +26,8 @@ func (*unassigned) Glob(pattern string) ([]*upspin.DirEntry, error) {
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (*unassigned) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
-	return upspin.Location{}, errors.E("MakeDirectory", errors.Invalid, unassignedErr)
+func (*unassigned) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errors.E("MakeDirectory", errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.DirServer.Put.

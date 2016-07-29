@@ -36,10 +36,6 @@ var (
 	dirPacker  = pack.Lookup(dirPacking)
 )
 
-var (
-	loc0 upspin.Location // Declared for ease of use in MakeDirectory, whose return type should change anyway.
-)
-
 // Service implements the upspin.DirServer interface. It is a multiplexed
 // by user onto a database.
 type Service struct {
@@ -145,24 +141,24 @@ func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob [
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
+func (s *Service) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
 	const MakeDirectory = "MakeDirectory"
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
 	parsed, err := path.Parse(directoryName)
 	if err != nil {
-		return loc0, errors.E(MakeDirectory, err)
+		return nil, errors.E(MakeDirectory, err)
 	}
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
-		return loc0, errors.E(MakeDirectory, err)
+		return nil, errors.E(MakeDirectory, err)
 	}
 	if !canCreate {
-		return loc0, errors.E(MakeDirectory, directoryName, access.ErrPermissionDenied)
+		return nil, errors.E(MakeDirectory, directoryName, access.ErrPermissionDenied)
 	}
 	pathName := parsed.Path()
 	if access.IsAccessFile(pathName) || access.IsGroupFile(pathName) {
-		return loc0, errors.E(MakeDirectory, directoryName, errors.Str("cannot create directory named Access or Group"))
+		return nil, errors.E(MakeDirectory, directoryName, errors.Str("cannot create directory named Access or Group"))
 	}
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
@@ -171,22 +167,22 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (upspin.Location,
 		// Only the onwer can create the root, but the check above is sufficient since a
 		// non-existent root has no Access file yet.
 		if _, present := s.db.root[parsed.User()]; present {
-			return loc0, errors.E("MakeDirectory", directoryName, errors.Exist)
+			return nil, errors.E("MakeDirectory", directoryName, errors.Exist)
 		}
 		// We will have a zero-sized block here, which is odd but necessary to have
 		// a place to store the directory's Reference.
 		entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), []byte{}, "", 0)
 		if err != nil {
-			return loc0, err
+			return nil, err
 		}
 		s.db.root[parsed.User()] = entry
-		return entry.Blocks[0].Location, nil
+		return entry, nil
 	}
 	entry, err := s.newDirEntry(parsed.Path(), []byte{}, "", 0)
 	if err != nil {
-		return loc0, err
+		return nil, err
 	}
-	return entry.Blocks[0].Location, s.put(MakeDirectory, entry, false)
+	return entry, s.put(MakeDirectory, entry, false)
 }
 
 // Put implements upspin.DirServer.Put.

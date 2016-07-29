@@ -292,7 +292,7 @@ type DirServer interface {
 	// must not already exist. All but the last element of the path
 	// name must already exist and be directories.
 	// TODO: Make multiple elems?
-	MakeDirectory(dirName PathName) (Location, error)
+	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full
 	// rooted tree. That is, the pattern must look like a full path
@@ -432,13 +432,13 @@ type Client interface {
 	// stored with that name, it is replaced with the new data.
 	// Like Get, it is not the usual access method. The file-like API
 	// is preferred.
-	Put(name PathName, data []byte) (Location, error)
+	Put(name PathName, data []byte) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
 	// must already exist and be directories.
 	// TODO: Make multiple elems?
-	MakeDirectory(dirName PathName) (Location, error)
+	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full rooted tree.
 	// That is, the pattern must look like a full path name, but elements of the

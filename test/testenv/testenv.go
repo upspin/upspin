@@ -127,13 +127,13 @@ func New(setup *Setup) (*Env, error) {
 			}
 		} else {
 			name := path.Join(upspin.PathName(setup.OwnerName), e.P)
-			loc, err := client.Put(name, []byte(e.C))
+			entry, err := client.Put(name, []byte(e.C))
 			if err != nil {
 				log.Printf("Error creating file %s: %s", name, err)
 				return nil, errors.E("New", err)
 			}
 			if setup.Verbose {
-				log.Printf("Tree: Created file %s at %v", name, loc)
+				log.Printf("Tree: Created file %s at %v", name, entry.Blocks)
 			}
 		}
 	}

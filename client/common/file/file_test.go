@@ -12,8 +12,6 @@ import (
 	"upspin.io/upspin"
 )
 
-var _ upspin.Client = (*dummyClient)(nil)
-
 func create(name upspin.PathName) upspin.File {
 	return Writable(&dummyClient{}, name)
 }
@@ -206,16 +204,18 @@ type dummyClient struct {
 	putData []byte
 }
 
+var _ upspin.Client = (*dummyClient)(nil)
+
 func (d *dummyClient) Get(name upspin.PathName) ([]byte, error) {
 	return nil, nil
 }
-func (d *dummyClient) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+func (d *dummyClient) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
 	d.putData = make([]byte, len(data))
 	copy(d.putData, data)
-	return loc0, nil
+	return nil, nil
 }
-func (d *dummyClient) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return loc0, nil
+func (d *dummyClient) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
 }
 func (d *dummyClient) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, nil
