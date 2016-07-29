@@ -165,7 +165,7 @@ message DirMakeDirectoryRequest {
 }
 
 message DirMakeDirectoryResponse {
-    Location location = 1;
+    bytes entry = 1;
     bytes error = 2;
 }
 

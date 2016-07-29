@@ -260,11 +260,10 @@ func mkdir(args ...string) {
 	}
 	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
-		loc, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
+		_, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
 		}
-		fmt.Fprintf(os.Stderr, "%s: %+v\n", fs.Arg(0), loc)
 	}
 }
 
@@ -282,11 +281,10 @@ func put(args ...string) {
 	}
 	c, _ := newClient()
 	data := readAll(*inFile)
-	loc, err := c.Put(upspin.PathName(fs.Arg(0)), data)
+	_, err := c.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		exit(err)
 	}
-	fmt.Fprintf(os.Stderr, "%s: %+v\n", fs.Arg(0), loc)
 }
 
 func rm(args ...string) {
