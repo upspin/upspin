@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cf24d597_45ca0a46",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-29T00:52:03Z",
+      "side": 1,
+      "message": "d.put has the wrong return type.",
+      "parentUuid": "cf24d597_05c01226",
+      "revId": "87c6c63db333735c5383b8d4043f87588969c24a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_c5d51aec",
         "filename": "key/inprocess/user.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "cf24d597_85f4028e",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-29T00:52:03Z",
+      "side": 1,
+      "message": "I think they\u0027re falling away now, largely as a result of this change.\nThe location of the first block is useless in general: how do we find the rest of the file? This is why I\u0027m arguing for DirEntries.",
+      "parentUuid": "cf24d597_c5d51aec",
+      "revId": "87c6c63db333735c5383b8d4043f87588969c24a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_a5d01efd",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-07-29T00:42:47Z",
       "side": 1,
       "message": "How about\n(\"Tree: Created file %#v\", entry)",
+      "revId": "87c6c63db333735c5383b8d4043f87588969c24a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf24d597_65c7063d",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-07-29T00:52:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf24d597_a5d01efd",
       "revId": "87c6c63db333735c5383b8d4043f87588969c24a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
