@@ -323,6 +323,8 @@ type DirServer interface {
 type Time int64
 
 // DirEntry represents the directory information for a file.
+// The blocks of a file represent contiguous data. There are no
+// holes and no overlaps and the first block always has offset 0.
 type DirEntry struct {
 	// Fields contributing to the signature.
 	Name     PathName   // The full path name of the file.
@@ -338,6 +340,7 @@ type DirEntry struct {
 }
 
 // DirBlock describes a block of data representing a contiguous section of a file.
+// The block may be of any size, including zero bytes.
 type DirBlock struct {
 	Location Location // Location of data in store.
 	Offset   int64    // Byte offset of start of block's data in file.
