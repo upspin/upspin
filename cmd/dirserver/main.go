@@ -214,14 +214,17 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectory
 	if err != nil {
 		return nil, err
 	}
-	loc, err := dir.MakeDirectory(upspin.PathName(req.Name))
+	entry, err := dir.MakeDirectory(upspin.PathName(req.Name))
 	if err != nil {
 		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
 		return &proto.DirMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
 	}
-	locSlice := []upspin.Location{loc}
+	b, err := entry.Marshal()
+	if err != nil {
+		return nil, err
+	}
 	resp := &proto.DirMakeDirectoryResponse{
-		Location: proto.Locations(locSlice)[0], // Clumsy but easy (and rare).
+		Entry: b,
 	}
 	return resp, nil
 }

@@ -27,10 +27,6 @@ type Client struct {
 
 var _ upspin.Client = (*Client)(nil)
 
-var (
-	zeroLoc upspin.Location
-)
-
 const maxBlockSize = 1024 * 1024
 
 // New creates a Client. The client finds the servers according to the given Context.
@@ -41,16 +37,16 @@ func New(context upspin.Context) upspin.Client {
 }
 
 // Put implements upspin.Client.
-func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error) {
+func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
 	const op = "Put"
 	dir, err := c.DirServer(name)
 	if err != nil {
-		return zeroLoc, errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	_, err = path.Parse(name)
 	if err != nil {
-		return zeroLoc, errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	var packer upspin.Packer
@@ -61,7 +57,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
 		packer = pack.Lookup(c.context.Packing())
 		if packer == nil {
-			return zeroLoc, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
+			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
 		}
 	}
 
@@ -76,11 +72,11 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	// Start the I/O.
 	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
 	if err != nil {
-		return zeroLoc, err
+		return nil, err
 	}
 	bp, err := packer.Pack(c.context, de)
 	if err != nil {
-		return zeroLoc, err
+		return nil, err
 	}
 	for len(data) > 0 {
 		n := len(data)
@@ -89,12 +85,12 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 		}
 		cipher, err := bp.Pack(data[:n])
 		if err != nil {
-			return zeroLoc, errors.E(op, err)
+			return nil, errors.E(op, err)
 		}
 		data = data[n:]
 		ref, err := store.Put(cipher)
 		if err != nil {
-			return zeroLoc, errors.E(op, err)
+			return nil, errors.E(op, err)
 		}
 		bp.SetLocation(
 			upspin.Location{
@@ -105,25 +101,21 @@ func (c *Client) Put(name upspin.PathName, data []byte) (upspin.Location, error)
 	}
 	err = bp.Close()
 	if err != nil {
-		return zeroLoc, errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	// Add other readers from the access file.
 	if err := c.addReaders(de, name, packer); err != nil {
-		return zeroLoc, errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	// Record directory entry.
 	err = dir.Put(de)
 	if err != nil {
-		return zeroLoc, errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
-	// TODO: What to do Blocks has zero length?
-	if len(de.Blocks) == 0 {
-		return zeroLoc, nil
-	}
-	return de.Blocks[0].Location, nil
+	return de, nil
 }
 
 func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
@@ -176,10 +168,10 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 }
 
 // MakeDirectory implements upspin.Client.
-func (c *Client) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
+func (c *Client) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	dir, err := c.DirServer(dirName)
 	if err != nil {
-		return zeroLoc, err
+		return nil, err
 	}
 	return dir.MakeDirectory(dirName)
 }

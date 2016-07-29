@@ -115,7 +115,7 @@ func New(setup *Setup) (*Env, error) {
 				return nil, errors.E("New", errors.NotEmpty, errors.Str("directory entry must not have contents"))
 			}
 			dir := path.Join(upspin.PathName(setup.OwnerName), e.P)
-			loc, err := client.MakeDirectory(dir)
+			entry, err := client.MakeDirectory(dir)
 			if err != nil {
 				if !setup.IgnoreExistingDirectories {
 					log.Printf("Tree: Error creating directory %s: %s", dir, err)
@@ -123,17 +123,17 @@ func New(setup *Setup) (*Env, error) {
 				}
 			}
 			if setup.Verbose {
-				log.Printf("Tree: Created dir %s at %v", dir, loc)
+				log.Printf("Tree: Created directory %#v", entry)
 			}
 		} else {
 			name := path.Join(upspin.PathName(setup.OwnerName), e.P)
-			loc, err := client.Put(name, []byte(e.C))
+			entry, err := client.Put(name, []byte(e.C))
 			if err != nil {
 				log.Printf("Error creating file %s: %s", name, err)
 				return nil, errors.E("New", err)
 			}
 			if setup.Verbose {
-				log.Printf("Tree: Created file %s at %v", name, loc)
+				log.Printf("Tree: Created file %#v", entry)
 			}
 		}
 	}

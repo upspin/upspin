@@ -106,11 +106,14 @@ func (s *Service) Install(name upspin.UserName, dir upspin.DirServer) error {
 	if err != nil {
 		return err
 	}
-	loc, err := dir.MakeDirectory(upspin.PathName(parsed.User() + "/"))
+	entry, err := dir.MakeDirectory(upspin.PathName(parsed.User() + "/"))
 	if err != nil {
 		return err
 	}
-	s.addRoot(parsed.User(), loc.Endpoint)
+	if len(entry.Blocks) == 0 {
+		return errors.E("Install", name, errors.Str("Directory has no location"))
+	}
+	s.addRoot(parsed.User(), entry.Blocks[0].Location.Endpoint)
 	return nil
 }
 

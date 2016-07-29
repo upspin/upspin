@@ -107,8 +107,8 @@ func (d *DummyDirServer) Put(entry *upspin.DirEntry) error {
 }
 
 // MakeDirectory implements upspin.DirServer.
-func (d *DummyDirServer) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
-	return upspin.Location{}, nil
+func (d *DummyDirServer) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
 }
 
 // Glob implements upspin.DirServer.

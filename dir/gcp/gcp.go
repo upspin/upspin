@@ -56,7 +56,6 @@ const (
 )
 
 var (
-	zeroLoc          upspin.Location
 	errNotConfigured = errors.Str("GCP DirServer not configured")
 
 	confLock sync.RWMutex // protects all configuration options and the ref count below.
@@ -87,23 +86,23 @@ func newOptsForMetric(op string) (options, *metric.Metric) {
 }
 
 // MakeDirectory implements upspin.DirServer.
-func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, error) {
+func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "MakeDirectory"
 
 	confLock.RLock()
 	defer confLock.RUnlock()
 	if !d.isConfigured() {
-		return zeroLoc, errNotConfigured
+		return nil, errNotConfigured
 	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 
 	parsed, err := path.Parse(dirName)
 	if err != nil {
-		return zeroLoc, errors.E(op, err) // path.Parse already populates the path name.
+		return nil, errors.E(op, err) // path.Parse already populates the path name.
 	}
 	// Prepares a dir entry for storage.
-	dirEntry := upspin.DirEntry{
+	dirEntry := &upspin.DirEntry{
 		Name:     parsed.Path(),
 		Attr:     upspin.AttrDirectory,
 		Sequence: 0, // don't care?
@@ -120,11 +119,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (upspin.Location, err
 			Offset: 0,
 		}},
 	}
-	err = d.put(op, &dirEntry, opts)
-	if err != nil {
-		return zeroLoc, err
-	}
-	return dirEntry.Blocks[0].Location, nil
+	return d.put(op, dirEntry, opts)
 }
 
 // Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.

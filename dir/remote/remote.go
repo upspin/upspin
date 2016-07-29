@@ -59,20 +59,23 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (r *remote) MakeDirectory(directoryName upspin.PathName) (upspin.Location, error) {
+func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return upspin.Location{}, err
+		return nil, err
 	}
 	req := &proto.DirMakeDirectoryRequest{
 		Name: string(directoryName),
 	}
 	resp, err := r.dirClient.MakeDirectory(gCtx, req)
 	if err != nil {
-		return upspin.Location{}, errors.E("MakeDirectory", errors.IO, err)
+		return nil, errors.E("MakeDirectory", errors.IO, err)
 	}
 	r.LastActivity()
-	return proto.UpspinLocation(resp.Location), errors.UnmarshalError(resp.Error)
+	if len(resp.Error) != 0 {
+		return nil, errors.UnmarshalError(resp.Error)
+	}
+	return proto.UpspinDirEntry(resp.Entry)
 }
 
 // Put implements upspin.DirServer.Put.
