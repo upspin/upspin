@@ -522,6 +522,9 @@ func TestMakeRoot(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	_, err := ds.MakeDirectory(userRoot.dirEntry.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
 	/*
 		TODO: Update; broken by DirEntry change.
 		expectedLocation := upspin.Location{

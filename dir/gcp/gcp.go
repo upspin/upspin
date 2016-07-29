@@ -109,17 +109,23 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, er
 		Time:     d.timeNow(),
 		Packdata: nil,
 		Packing:  upspin.PlainPack,
-		Blocks: []upspin.DirBlock{{
-			Location: upspin.Location{
-				// Reference is ignored.
-				// Endpoint for dir entries where the DirServer is.
-				Endpoint: d.endpoint,
+		Blocks: []upspin.DirBlock{
+			{
+				Location: upspin.Location{
+					// Reference is ignored.
+					// Endpoint for dir entries where the DirServer is.
+					Endpoint: d.endpoint,
+				},
+				Size:   0, // Being explicit that dir entries have zero size.
+				Offset: 0,
 			},
-			Size:   0, // Being explicit that dir entries have zero size.
-			Offset: 0,
-		}},
+		},
 	}
-	return d.put(op, dirEntry, opts)
+	err = d.put(op, dirEntry, opts)
+	if err != nil {
+		return nil, err
+	}
+	return dirEntry, nil
 }
 
 // Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.
