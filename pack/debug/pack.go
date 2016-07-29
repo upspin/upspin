@@ -5,6 +5,7 @@
 // Package debugpack contains a trivial implementation of the Packer interface useful in tests.
 // It encrypts the data with a randomly-chosen byte that is recorded in the Packdata.
 // It does a trivial digital signature of the data and stores that in the Packdata as well.
+// The key for that signature is just the user name; this package does not access the key server.
 // It claims the upspin.DebugPack Packing code.
 package debugpack
 
@@ -14,7 +15,6 @@ import (
 	"encoding/binary"
 	"math/rand"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/pack/internal"
@@ -191,7 +191,10 @@ func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUn
 
 	// Validate signature.
 	sig := sign(ctx, internal.BlockSum(d.Blocks), d.Name)
-	if len(d.Packdata) < 2 || d.Packdata[1] != sig {
+	if len(d.Packdata) < 2 {
+		return nil, errors.E(Unpack, errors.Invalid, d.Name, errors.Str("incomplete signature"))
+	}
+	if d.Packdata[1] != sig {
 		return nil, errors.E(Unpack, errors.Invalid, d.Name, errors.Str("signature mismatch"))
 	}
 
@@ -312,23 +315,14 @@ func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.Path
 }
 
 // getKey returns the user key for the user in name.
+// Actually it just returns the user name as a key: this is not a secure
+// packing. Its purpose is to test the flow of packdata, and this is sufficient.
 func getKey(ctx upspin.Context, name upspin.PathName) (upspin.PublicKey, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return "", err
 	}
-	user, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-	if err != nil {
-		return "", err
-	}
-	u, err := user.Lookup(parsed.User())
-	if err != nil {
-		return "", err
-	}
-	if u.PublicKey == "" {
-		return "", errors.Str("no key for signing")
-	}
-	return u.PublicKey, nil
+	return upspin.PublicKey(parsed.User()), nil
 }
 
 // putPath adds (or replaces) the path in the packdata.
