@@ -7,6 +7,7 @@ package upspin
 import (
 	"encoding/binary"
 	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"fmt"
 	"time"
 )
 
@@ -117,6 +118,23 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 	copy(d.Packdata, bytes)
 
 	return b, nil
+}
+
+// Size returns the total length of the data underlying the DirEntry
+// and validates the block offsets and sizes.
+func (d *DirEntry) Size() (int64, error) {
+	var size int64
+	for i := range d.Blocks {
+		if size != d.Blocks[i].Offset {
+			return 0, fmt.Errorf("Size: %v: inconsistent offsets", d.Name)
+		}
+		sz := d.Blocks[i].Size
+		if sz < 0 {
+			return 0, fmt.Errorf("Size: %v: negative size", d.Name)
+		}
+		size += sz
+	}
+	return size, nil
 }
 
 // Marshal packs the DirEntry into a new byte slice for transport.

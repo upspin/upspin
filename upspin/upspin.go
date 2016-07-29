@@ -6,7 +6,6 @@ package upspin
 
 import (
 	"crypto/elliptic"
-	"fmt"
 	"math/big"
 )
 
@@ -346,23 +345,6 @@ type DirBlock struct {
 	Offset   int64    // Byte offset of start of block's data in file.
 	Size     int64    // Length of block data in bytes.
 	Packdata []byte   // Information maintained by the packing algorithm.
-}
-
-// Size returns the total length of the data underlying the DirEntry
-// and validates the block offsets and sizes.
-func (d *DirEntry) Size() (int64, error) {
-	var size int64
-	for i := range d.Blocks {
-		if size != d.Blocks[i].Offset {
-			return 0, fmt.Errorf("Size: %v: inconsistent offsets", d.Name)
-		}
-		sz := d.Blocks[i].Size
-		if sz < 0 {
-			return 0, fmt.Errorf("Size: %v: negative size", d.Name)
-		}
-		size += sz
-	}
-	return size, nil
 }
 
 // FileAttributes define the attributes for a DirEntry.
