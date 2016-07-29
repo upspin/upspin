@@ -83,15 +83,6 @@ func assertError(t *testing.T, expectedError string, err error) {
 	}
 }
 
-func assertLocation(t *testing.T, expectedLocation upspin.Location, loc upspin.Location, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
-	if loc != expectedLocation {
-		t.Errorf("Expected location %v, got %v", expectedLocation, loc)
-	}
-}
-
 func assertDirEntries(t *testing.T, exectedDirEntries []*upspin.DirEntry, de []*upspin.DirEntry, err error) {
 	if err != nil {
 		t.Fatal(err)
@@ -521,18 +512,8 @@ func TestMakeRoot(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	_, err := ds.MakeDirectory(userRoot.dirEntry.Name)
-	if err != nil {
-		t.Fatal(err)
-	}
-	/*
-		TODO: Update; broken by DirEntry change.
-		expectedLocation := upspin.Location{
-			Reference: "",
-			Endpoint:  serviceEndpoint,
-		}
-		assertLocation(t, expectedLocation, loc, err)
-	*/
+	de, err := ds.MakeDirectory(userRoot.dirEntry.Name)
+	assertDirEntry(t, &userRootSavedNow.dirEntry, de, err)
 
 	if len(egcp.PutContents) != 1 {
 		t.Fatalf("Expected put to write 1 dir entry, got %d", len(egcp.PutContents))
