@@ -532,7 +532,7 @@ type Context interface {
 	// SetStoreEndpoint sets the StoreEndpoint.
 	SetStoreEndpoint(Endpoint) Context
 
-	// StoreServer returns a a StoreServer instance bound to StoreEndpoint.  In the event of an
+	// StoreServer returns a StoreServer instance bound to StoreEndpoint.  In the event of an
 	// error binding, all subsequent calls on the StoreServer will return errors.
 	StoreServer() StoreServer
 
