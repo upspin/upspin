@@ -20,7 +20,6 @@ import (
 	"upspin.io/client"
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
@@ -51,10 +50,9 @@ func newCache(context upspin.Context, dir string) *cache {
 	c := &cache{dir: dir, client: client.New(context)}
 	os.Mkdir(dir, 0700)
 
-	// Clean out any temporary files.
-	temp := filepath.Join(dir, "temp")
-	os.RemoveAll(temp)
-	os.Mkdir(temp, 0700)
+	// Clean out all cache files.
+	os.RemoveAll(dir)
+	os.MkdirAll(filepath.Join(dir, "tmp"), 0700)
 
 	return c
 }
@@ -78,7 +76,7 @@ func (c *cache) mkTemp() string {
 	next := c.next
 	c.next++
 	c.Unlock()
-	return filepath.Join(c.dir, fmt.Sprintf("temp/%d", next))
+	return filepath.Join(c.dir, fmt.Sprintf("tmp/%d", next))
 }
 
 // create creates a file in the cache.
@@ -142,9 +140,8 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	// If we have a cached version, just return it.
 	//
 	// We assume that plain pack files are mutable and not conpletely
-	// under our control. Only encrypted files are immutable and can
-	// be reused.
-	cf := &cachedFile{c: c, inStore: true}
+	// under our control. They are reread whenever opened.
+	cf := &cachedFile{c: c}
 	cdir, fname := c.cacheName(entry)
 	if entry.Packing != upspin.PlainPack {
 		// Look for a dirty cached version.
@@ -154,20 +151,19 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			if info, err := cf.file.Stat(); err == nil {
 				n.cf = cf
 				n.attr.Size = uint64(info.Size())
+				cf.fname = fname
 				return nil
 			}
 		}
-		cf.fname = fname
 	}
 
-	// No cached version.  Fetch and cache.
+	// Read into a temporary file. We don't want to use it as cached on store file
+	// until the read completes.
+	tmpName := c.mkTemp()
 	var file *os.File // The open cache file.
 	var at int64      // The write offset into the cache file.
-	if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-		os.Mkdir(cdir, 0777)
-		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-			return err
-		}
+	if file, err = os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+		return err
 	}
 Blocks:
 	for b := 0; ; b++ {
@@ -177,7 +173,7 @@ Blocks:
 		}
 		if block.Offset != at {
 			file.Close()
-			os.Remove(cf.fname)
+			os.Remove(tmpName)
 			return errors.E(op, name, errors.Str("inconsistent block offset")) // Showstopper.
 		}
 		// Get the data for this block.
@@ -198,14 +194,14 @@ Blocks:
 				clear, err := bu.Unpack(cipher)
 				if err != nil {
 					file.Close()
-					os.Remove(cf.fname)
+					os.Remove(tmpName)
 					return errors.E(op, name, err) // Showstopper.
 				}
 				// Write it to the local cache file.
 				n, err := file.WriteAt(clear, at)
 				if err != nil {
 					file.Close()
-					os.Remove(cf.fname)
+					os.Remove(tmpName)
 					return errors.E(op, name, err) // Showstopper.
 				}
 				at += int64(n)
@@ -226,13 +222,24 @@ Blocks:
 		// TODO: custom error types.
 		if firstError != nil {
 			file.Close()
-			os.Remove(cf.fname)
+			os.Remove(tmpName)
 			return errors.E(op, name, firstError)
 		}
 		return errors.Errorf("client: data for block %d in %q not found on any store server", b, name)
 	}
 
-	// Remember cached file.
+	// Rename to indicate it is in the store.
+	if err := os.Rename(tmpName, fname); err != nil {
+		os.Mkdir(cdir, 0700)
+		if err := os.Rename(tmpName, fname); err != nil {
+			file.Close()
+			os.Remove(tmpName)
+		}
+	}
+
+	// Set its properties and point the node at it.
+	cf.inStore = true
+	cf.fname = fname
 	cf.file = file
 	h.flags = flags
 	n.attr.Size = uint64(at)
@@ -259,18 +266,21 @@ func (cf *cachedFile) clone(size int64) error {
 	}
 	buf := make([]byte, 128*1024)
 	for at := int64(0); size < 0 || at < size; {
-		_, err := cf.file.ReadAt(buf, at)
-		if err != nil {
-			if err == io.EOF {
+
+		rn, rerr := cf.file.ReadAt(buf, at)
+		if rerr != nil {
+			if rerr != io.EOF {
+				file.Close()
+				return rerr
+			}
+			if rn == 0 {
 				break
 			}
-			file.Close()
-			return err
 		}
-		wn, err := file.WriteAt(buf, at)
-		if err != nil {
+		wn, werr := file.WriteAt(buf[:rn], at)
+		if werr != nil {
 			file.Close()
-			return err
+			return werr
 		}
 		at += int64(wn)
 	}
@@ -286,11 +296,10 @@ func (cf *cachedFile) clone(size int64) error {
 // copy it rather than truncating in place.
 func (cf *cachedFile) truncate(n *node, size int64) error {
 	// This is the easy case.
-	if !cf.inStore {
+	if cf.dirty {
 		if err := os.Truncate(cf.fname, size); err != nil {
 			return err
 		}
-		cf.dirty = true
 		return nil
 	}
 
@@ -304,15 +313,8 @@ func (cf *cachedFile) markDirty() error {
 	if cf.dirty {
 		return nil
 	}
-	cf.dirty = true
-
-	// If it isn't in the store, marking it is enough.
-	if !cf.inStore {
-		return nil
-	}
-
-	// Need to copy it since it no longer represents what's in the store.
-	return cf.clone(0)
+	// Copy on write, sort of.
+	return cf.clone(-1)
 }
 
 // readAt reads from a cache file.
@@ -323,7 +325,8 @@ func (cf *cachedFile) readAt(buf []byte, offset int64) (int, error) {
 // writeAt writes to a cache file.
 func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 	cf.markDirty()
-	return cf.file.WriteAt(buf, offset)
+	rv, err := cf.file.WriteAt(buf, offset)
+	return rv, err
 }
 
 // writeBack writes the cached file to the store if it is dirty. Called with node locked.
@@ -336,7 +339,6 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	}
 
 	// Read the whole file into memory. Hope it fits.
-	log.Debug.Printf("writeBack %q, %s opened", n, cf.fname)
 	info, err := cf.file.Stat()
 	if err != nil {
 		return err
@@ -345,10 +347,13 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	var sofar int64
 	for sofar != info.Size() {
 		len, err := cf.file.ReadAt(cleartext[sofar:], sofar)
-		if err != nil {
+		if err != nil && err != io.EOF {
 			return err
 		}
 		sofar += int64(len)
+		if err == io.EOF {
+			break
+		}
 	}
 
 	// Hack because zero length access files don't work.
@@ -356,12 +361,10 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	if len(cleartext) == 0 && access.IsAccessFile(n.uname) {
 		cleartext = []byte("\n")
 	}
-	log.Debug.Printf("writeBack %q, %s read", n, cf.fname)
 
 	// Use the client library to write it back.  Try multiple times on error.
 	var de *upspin.DirEntry
 	for tries := 0; ; tries++ {
-		log.Debug.Printf("Put %q", n)
 		de, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
 			break
@@ -371,44 +374,56 @@ func (cf *cachedFile) writeBack(h *handle) error {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	log.Debug.Printf("done Put %q", n)
-	cf.dirty = false
 
 	// Rename it to reflect the actual reference in the store so that new
-	// opens will find the cached version.  Assume a single block.
+	// opens will find the cached version.  Assume a single block.  Don't rename
+	// zero length files, not worth it.
 	// TODO(p): what if it isn't a single block?
+	if size, err := de.Size(); err != nil || size == 0 {
+		return nil
+	}
 	cdir, fname := cf.c.cacheName(de)
 	if err := os.Rename(cf.fname, fname); err != nil {
+		// Otherwise rename to the common name.
 		os.Mkdir(cdir, 0700)
 		if err := os.Rename(cf.fname, fname); err != nil {
 			return err
 		}
 	}
 	cf.fname = fname
+	cf.dirty = false
+	cf.inStore = true
 	return nil
 }
 
 // putRedirect assumes that the target fits in a single block.
 func (c *cache) putRedirect(n *node, target string) error {
 	// Use the client library to write it.
-	de, err := c.client.Put(n.uname, []byte(target))
+	_, err := c.client.PutLink(n.uname, []byte(target))
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
-	// Save it in the cache. If we can't, that's fine.
-	cdir, fname := c.cacheName(de)
-	file, err := os.Create(fname)
-	if err != nil {
-		os.Mkdir(cdir, 0700)
-		file, err = os.Create(fname)
-		if err != nil {
-			return nil
+func (cf *cachedFile) sum() string {
+	var sum int64
+	buf := make([]byte, 128*1024)
+	at := int64(0)
+	for {
+		rn, err := cf.file.ReadAt(buf, at)
+		if err != nil && err != io.EOF {
+			return fmt.Sprintf("???/%d", at)
+		}
+		at += int64(rn)
+		for _, c := range buf[:rn] {
+			sum = sum*13 + 7
+			sum ^= int64(c)
+			sum &= int64(0xfffffff)
+		}
+		if err == io.EOF {
+			break
 		}
 	}
-	if _, err := file.WriteAt([]byte(target), 0); err != nil {
-		os.Remove(fname)
-	}
-	file.Close()
-	return nil
+	return fmt.Sprintf("%x/%d", sum, at)
 }

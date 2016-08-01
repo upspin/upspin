@@ -415,6 +415,12 @@ type Client interface {
 	// is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
+	// PutLink stores the data at the given name with the given attribute.
+	// If something is already stored with that name, it is replaced with the new data.
+	// Like Get, it is not the usual access method. The file-like API
+	// is preferred.
+	PutLink(name PathName, data []byte) (*DirEntry, error)
+
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
 	// must already exist and be directories.

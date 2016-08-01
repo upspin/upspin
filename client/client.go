@@ -38,6 +38,15 @@ func New(context upspin.Context) upspin.Client {
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	return c.put(name, data, upspin.AttrNone)
+}
+
+// PutLink implements upspin.Client.
+func (c *Client) PutLink(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	return c.put(name, data, upspin.AttrLink)
+}
+
+func (c *Client) put(name upspin.PathName, data []byte, attr upspin.FileAttributes) (*upspin.DirEntry, error) {
 	const op = "Put"
 	dir, err := c.DirServer(name)
 	if err != nil {
@@ -67,6 +76,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		Time:     upspin.Now(),
 		Sequence: 0, // Don't care for now.
 		Writer:   c.context.UserName(),
+		Attr:     attr,
 	}
 
 	// Start the I/O.
