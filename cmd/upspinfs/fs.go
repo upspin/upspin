@@ -628,7 +628,7 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	defer n.Unlock()
 	oldPath := old.(*node).uname
 	newPath := path.Join(n.uname, req.NewName)
-	de, err := n.f.client.Link(oldPath, newPath)
+	de, err := n.f.client.PutDuplicate(oldPath, newPath)
 	if err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}

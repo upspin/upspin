@@ -214,6 +214,12 @@ func (d *dummyClient) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, 
 	copy(d.putData, data)
 	return nil, nil
 }
+func (d *dummyClient) PutLink(oleName, newName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
+}
+func (d *dummyClient) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
+}
 func (d *dummyClient) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
 }
@@ -227,9 +233,6 @@ func (d *dummyClient) Open(name upspin.PathName) (upspin.File, error) {
 	return nil, nil
 }
 func (d *dummyClient) DirServer(name upspin.PathName) (upspin.DirServer, error) {
-	return nil, nil
-}
-func (d *dummyClient) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
 }
 func (d *dummyClient) Rename(oldName, newName upspin.PathName) error {

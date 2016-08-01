@@ -415,6 +415,10 @@ type Client interface {
 	// is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
+	// PutLink creates a symbolic link from the new name to the old name.
+	// If something is already stored with that name, it is replaced with the new data.
+	PutLink(oldName, newName PathName) (*DirEntry, error)
+
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
 	// must already exist and be directories.
@@ -438,11 +442,12 @@ type Client interface {
 	// DirServer returns an error or a reachable bound DirServer for the user.
 	DirServer(name PathName) (DirServer, error)
 
-	// Link creates a new name for the reference referred to by the old name,
-	// thereby defining the new name as a link to the old.
-	// There must be no existing item with the new name.
-	// The old name is still a valid name for the reference.
-	Link(oldName, newName PathName) (*DirEntry, error)
+	// PutDuplicate creates a new name for the references
+	// referred to by the old name. Subsequent Puts
+	// to either name do not effect the contents referred
+	// to by the other. There must be no existing item with
+	// the new name.
+	PutDuplicate(oldName, newName PathName) (*DirEntry, error)
 
 	// Rename renames oldName to newName. The old name is no longer valid.
 	Rename(oldName, newName PathName) error
