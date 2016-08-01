@@ -135,6 +135,11 @@ func RemoveAll(subtree string) error {
 	return os.RemoveAll(subtree)
 }
 
+// Truncate shortens a file.
+func Truncate(name string, size int64) error {
+	return os.Truncate(name, size)
+}
+
 // Close closes a file. If the ref count goes to zero, the file is removed.
 func (file *File) Close() error {
 	state.Lock()

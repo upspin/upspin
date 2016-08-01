@@ -252,6 +252,7 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
 	dir := n.f.dirLookup(nn.user)
+	log.Debug.Printf("Mkdir %s %v", nn.uname, dir)
 	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
 		// TODO(p): remove from directory cache and retry?
 		return nil, e2e(errors.E(op, err, nn.uname))
@@ -283,7 +284,7 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 		n.f.Lock()
 		var de []*upspin.DirEntry
 		for u := range n.f.userDirs {
-			de = append(de, &upspin.DirEntry{Name: upspin.PathName(u), Metadata: upspin.Metadata{Attr: upspin.AttrDirectory}})
+			de = append(de, &upspin.DirEntry{Name: upspin.PathName(u), Attr: upspin.AttrDirectory})
 		}
 		n.f.Unlock()
 		n.Lock()
@@ -343,7 +344,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 		if kind == errors.Permission {
 			// We act like a permission error didn't happen in the hopes that
 			// a later longer path will succeed.
-			de = &upspin.DirEntry{Name: uname, Metadata: upspin.Metadata{Attr: upspin.AttrDirectory}}
+			de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
 			return dir, de, nil
 		}
 		if kind != errors.IO {
@@ -440,7 +441,11 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	if de.IsLink() {
 		mode |= os.ModeSymlink
 	}
-	nn := n.f.allocNode(n, name, mode, de.Metadata.Size, de.Metadata.Time.Go())
+	var size uint64
+	for _, b := range de.Blocks {
+		size += uint64(b.Size)
+	}
+	nn := n.f.allocNode(n, name, mode, size, de.Time.Go())
 
 	// If this is the root, add an entry for this user directory so ReadDirAll will work.
 	if n.t == rootNode {
@@ -493,8 +498,7 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 		//    a cached file, truncate, and write back to dir/store.
 		n.Lock()
 		if len(n.handles) > 0 {
-			n.cf.markDirty()
-			if err := os.Truncate(n.cf.fname, int64(req.Size)); err != nil {
+			if err := n.cf.truncate(n, int64(req.Size)); err != nil {
 				n.Unlock()
 				return e2e(errors.E(op, n.uname, err))
 			}
@@ -515,7 +519,7 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 				n.Unlock()
 				return e2e(errors.E(op, n.uname, err))
 			}
-			if err := os.Truncate(n.cf.fname, int64(req.Size)); err != nil {
+			if err := n.cf.truncate(n, int64(req.Size)); err != nil {
 				h.freeNoLock()
 				n.Unlock()
 				return e2e(errors.E(op, n.uname, err))
@@ -628,7 +632,11 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	if err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
-	nn := n.f.allocNode(n, req.NewName, 0700, de.Metadata.Size, time.Unix(int64(de.Metadata.Time), 0))
+	var size uint64
+	for _, b := range de.Blocks {
+		size += uint64(b.Size)
+	}
+	nn := n.f.allocNode(n, req.NewName, 0700, size, time.Unix(int64(de.Time), 0))
 	nn.exists()
 	return nn, nil
 }
