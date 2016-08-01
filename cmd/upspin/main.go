@@ -281,7 +281,7 @@ func put(args ...string) {
 	}
 	c, _ := newClient()
 	data := readAll(*inFile)
-	_, err := c.Put(upspin.PathName(fs.Arg(0)), data)
+	_, err = c.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		exit(err)
 	}
