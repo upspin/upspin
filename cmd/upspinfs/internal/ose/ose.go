@@ -9,7 +9,7 @@ random access of the file. Each 32 byte block of the file is encrypted by xoring
 the contents with the AES encryption of the block number. Keys are per file and
 kept in memory.
 
-This enryption provides  secrecy for files on lost machines but no integrity since
+This encryption provides secrecy for files on lost machines but no integrity since
 any contents can be changed with impunity.
 
 The arguments to exported functions are the same as the equivalent os pkg functions.
@@ -125,8 +125,14 @@ func Mkdir(name string, mode os.FileMode) error {
 	return os.Mkdir(name, mode)
 }
 
+// MkdirAll creates the named directory and all path elements leading to it.
+func MkdirAll(name string, mode os.FileMode) error {
+	return os.MkdirAll(name, mode)
+}
+
 // Remove removes the named file.
 func Remove(name string) error {
+	delete(state.mapping, name)
 	return os.Remove(name)
 }
 
@@ -148,7 +154,6 @@ func (file *File) Close() error {
 	if file.refs != 0 {
 		return nil
 	}
-	delete(state.mapping, file.name)
 	os.Remove(file.name)
 	return file.f.Close()
 }
@@ -162,14 +167,17 @@ func (file *File) Stat() (os.FileInfo, error) {
 // decrypted content.
 func (file *File) ReadAt(b []byte, off int64) (int, error) {
 	n, err := file.f.ReadAt(b, off)
+	if n != 0 {
+		file.xor(b[:n], off)
+	}
 	if err != nil {
 		return n, err
 	}
-	file.xor(b, off)
 	return n, nil
 }
 
 // WriteAt encrypts the content and writes it to the file.
+// Unlile os.WriteAt, this changes the contents of b.
 func (file *File) WriteAt(b []byte, off int64) (int, error) {
 	file.xor(b, off)
 	return file.f.WriteAt(b, off)
@@ -195,19 +203,16 @@ func (file *File) xor(b []byte, off int64) {
 	bsize := int64(file.benc.BlockSize())
 	mask := make([]byte, bsize)
 	maskInput := make([]byte, bsize)
-	end := off + int64(len(b))
-	sofar := int64(0)
 	if off%bsize != 0 {
 		binary.PutVarint(maskInput, off/bsize)
 		file.benc.Encrypt(mask, maskInput)
 	}
-	for off+sofar < end {
-		x := (off + sofar) % bsize
+	for i := range b {
+		x := (off + int64(i)) % bsize
 		if x == 0 {
-			binary.PutVarint(maskInput, (off+sofar)/bsize)
+			binary.PutVarint(maskInput, (off+int64(i))/bsize)
 			file.benc.Encrypt(mask, maskInput)
 		}
-		b[sofar] ^= mask[x]
-		sofar++
+		b[i] ^= mask[x]
 	}
 }
