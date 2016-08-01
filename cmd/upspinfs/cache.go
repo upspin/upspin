@@ -5,8 +5,9 @@
 package main
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
+	"io"
 	filepath "path"
 	"strings"
 	"sync"
@@ -25,7 +26,7 @@ import (
 )
 
 // Names of cache files are:
-//   <cache dir>/<sha1(reference)> - for files representing what is in the store.
+//   <cache dir>/<sha256(references)> - for files representing what is in the store.
 //   <cachedir>/temp/<number> - for files representing something not yet in the store or
 //     a copy in progress from the store.
 
@@ -58,6 +59,19 @@ func newCache(context upspin.Context, dir string) *cache {
 	return c
 }
 
+// cacheName builds a path to the local cachefile from all the Locations making up the file.
+// It returns paths to both the containing directory and the file itself.
+func (c *cache) cacheName(de *upspin.DirEntry) (string, string) {
+	x := ""
+	for _, b := range de.Blocks {
+		x = x + string(b.Location.Reference)
+	}
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(x)))
+	dir := c.dir + "/" + hash[:2]
+	file := dir + "/" + hash
+	return dir, file
+}
+
 // mkTemp returns the name of a new temporary file.
 func (c *cache) mkTemp() string {
 	c.Lock()
@@ -86,7 +100,9 @@ func (c *cache) create(h *handle) error {
 // open opens the cached version of a file.  If it isn't cached, first retrieve it from the store.
 // The corresponding node should be locked.
 func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
+	op := "open"
 	n := h.n
+	name := n.uname
 	if n.cf != nil {
 		// We already have a cached version open.
 		h.flags = flags
@@ -95,96 +111,133 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 
 	// At this point we may have the reference cached but we first need to look in
 	// the directory to see what the reference is.
-	cf := &cachedFile{c: c, inStore: true}
 	dir := n.f.dirLookup(n.user)
-	de, err := dir.Lookup(n.uname)
+	entry, err := dir.Lookup(name)
 	if err != nil {
 		return err
 	}
 
-	// Loop following redirects from the store.
-	var finalErr error
-	locations := []upspin.Location{de.Location}
-	for i := 0; i < len(locations); i++ {
-		loc := locations[i]
-		store, err := bind.StoreServer(n.f.context, loc.Endpoint)
-		if err != nil {
-			finalErr = err
-			continue
+	// firstError remembers the first error we saw. If we fail completely we return it.
+	var firstError error
+	// isError reports whether err is non-nil and remembers it if it is.
+	isError := func(err error) bool {
+		if err == nil {
+			return false
 		}
-		var cdir string
-		cdir, cf.fname = c.cacheName(loc, n.uname)
+		if firstError == nil {
+			firstError = err
+		}
+		return true
+	}
 
-		// We assume that plain pack files are mutable and not conpletely
-		// under our control.  Only encrypted files are immutable and can
-		// be reused.
-		if de.Metadata.Packing() != upspin.PlainPack {
-			// Look for a dirty cached version.
-			cf.file, err = os.OpenFile(cf.fname, os.O_RDWR, 0700)
-			if err == nil {
-				h.flags = flags
-				if info, err := cf.file.Stat(); err == nil {
-					n.cf = cf
-					n.attr.Size = uint64(info.Size())
-					return nil
-				}
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
+	}
+	bu, err := packer.Unpack(n.f.context, entry)
+	if err != nil {
+		return errors.E(op, name, err) // Showstopper.
+	}
+
+	// If we have a cached version, just return it.
+	//
+	// We assume that plain pack files are mutable and not conpletely
+	// under our control. Only encrypted files are immutable and can
+	// be reused.
+	cf := &cachedFile{c: c, inStore: true}
+	cdir, fname := c.cacheName(entry)
+	if entry.Packing != upspin.PlainPack {
+		// Look for a dirty cached version.
+		cf.file, err = os.OpenFile(fname, os.O_RDWR, 0700)
+		if err == nil {
+			h.flags = flags
+			if info, err := cf.file.Stat(); err == nil {
+				n.cf = cf
+				n.attr.Size = uint64(info.Size())
+				return nil
 			}
 		}
-		var data []byte
-		var locs []upspin.Location
-		if data, locs, err = store.Get(loc.Reference); err != nil {
-			finalErr = err
-			continue
+		cf.fname = fname
+	}
+
+	// No cached version.  Fetch and cache.
+	var file *os.File // The open cache file.
+	var at int64      // The write offset into the cache file.
+	if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+		os.Mkdir(cdir, 0777)
+		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+			return err
 		}
-		if len(locs) > 0 {
-			log.Debug.Printf("%v redirects to %v", loc, locs)
+	}
+Blocks:
+	for b := 0; ; b++ {
+		block, ok := bu.NextBlock()
+		if !ok {
+			break // EOF
+		}
+		if block.Offset != at {
+			file.Close()
+			os.Remove(cf.fname)
+			return errors.E(op, name, errors.Str("inconsistent block offset")) // Showstopper.
+		}
+		// Get the data for this block.
+		// where is the list of locations to examine. It is updated in the loop.
+		where := []upspin.Location{block.Location}
+		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
+			loc := where[i]
+			store, err := bind.StoreServer(n.f.context, loc.Endpoint)
+			if isError(err) {
+				continue
+			}
+			cipher, locs, err := store.Get(loc.Reference)
+			if isError(err) {
+				continue // locs guaranteed to be nil.
+			}
+			if locs == nil && err == nil {
+				// Found the data. Unpack it.
+				clear, err := bu.Unpack(cipher)
+				if err != nil {
+					file.Close()
+					os.Remove(cf.fname)
+					return errors.E(op, name, err) // Showstopper.
+				}
+				// Write it to the local cache file.
+				n, err := file.WriteAt(clear, at)
+				if err != nil {
+					file.Close()
+					os.Remove(cf.fname)
+					return errors.E(op, name, err) // Showstopper.
+				}
+				at += int64(n)
+				continue Blocks
+			}
+			// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
 		outer:
 			for _, newLoc := range locs {
-				for _, oldLoc := range locations {
+				for _, oldLoc := range where {
 					if oldLoc == newLoc {
 						continue outer
 					}
 				}
-				locations = append(locations, newLoc)
-			}
-			continue
-		}
-		packer := pack.Lookup(de.Metadata.Packing())
-		if packer == nil {
-			finalErr = errors.E(errors.IO, errors.Str("no packer found"))
-			continue
-		}
-		clearLen := packer.UnpackLen(n.f.context, data, de)
-		if clearLen < 0 {
-			finalErr = errors.E(errors.IO, errors.Str("unpack len < 0"))
-			continue
-		}
-		cleartext := make([]byte, clearLen)
-		rlen, err := packer.Unpack(n.f.context, cleartext, data, de)
-		if err != nil {
-			finalErr = err
-			continue
-		}
-		cleartext = cleartext[:rlen]
-		// Save a copy of the cleartext in the local file system.
-		var file *os.File
-		if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-			os.Mkdir(cdir, 0777)
-			if file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-				return err
+				where = append(where, newLoc)
 			}
 		}
-		if wlen, err := file.WriteAt(cleartext, 0); err != nil || rlen != wlen {
+		// If we arrive here, we have failed to find a block.
+		// TODO: custom error types.
+		if firstError != nil {
 			file.Close()
-			return err
+			os.Remove(cf.fname)
+			return errors.E(op, name, firstError)
 		}
-		cf.file = file
-		h.flags = flags
-		n.attr.Size = uint64(rlen)
-		n.cf = cf
-		return nil
+		return errors.Errorf("client: data for block %d in %q not found on any store server", b, name)
 	}
-	return finalErr
+
+	// Remember cached file.
+	cf.file = file
+	h.flags = flags
+	n.attr.Size = uint64(at)
+	n.cf = cf
+	return nil
 }
 
 // close is called when the last handle for a node has been closed.
@@ -194,6 +247,55 @@ func (cf *cachedFile) close() {
 		return
 	}
 	cf.file.Close()
+}
+
+// clone copies the first size bytes of the old cf.file into a new temp file that replaces it.
+func (cf *cachedFile) clone(size int64) error {
+	fname := cf.c.mkTemp()
+	var err error
+	file, err := os.OpenFile(fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700)
+	if err != nil {
+		return err
+	}
+	buf := make([]byte, 128*1024)
+	for at := int64(0); size < 0 || at < size; {
+		_, err := cf.file.ReadAt(buf, at)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			file.Close()
+			return err
+		}
+		wn, err := file.WriteAt(buf, at)
+		if err != nil {
+			file.Close()
+			return err
+		}
+		at += int64(wn)
+	}
+	cf.file.Close()
+	cf.fname = fname
+	cf.file = file
+	cf.dirty = true
+	cf.inStore = false
+	return nil
+}
+
+// truncate truncates a currently open cached file.  If it represents a reference in the store,
+// copy it rather than truncating in place.
+func (cf *cachedFile) truncate(n *node, size int64) error {
+	// This is the easy case.
+	if !cf.inStore {
+		if err := os.Truncate(cf.fname, size); err != nil {
+			return err
+		}
+		cf.dirty = true
+		return nil
+	}
+
+	// This represents an unmodified reference from the store.  Copy it truncating as you go.
+	return cf.clone(size)
 }
 
 // makeDirty writes the cached file to the store if it is dirty. Called with node locked.
@@ -209,14 +311,8 @@ func (cf *cachedFile) markDirty() error {
 		return nil
 	}
 
-	// Need to rename it since it no longer represents what's in the store.
-	fname := cf.c.mkTemp()
-	err := os.Rename(cf.fname, fname)
-	if err != nil {
-		return err
-	}
-	cf.fname = fname
-	return nil
+	// Need to copy it since it no longer represents what's in the store.
+	return cf.clone(0)
 }
 
 // readAt reads from a cache file.
@@ -263,10 +359,10 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	log.Debug.Printf("writeBack %q, %s read", n, cf.fname)
 
 	// Use the client library to write it back.  Try multiple times on error.
-	var loc upspin.Location
+	var de *upspin.DirEntry
 	for tries := 0; ; tries++ {
 		log.Debug.Printf("Put %q", n)
-		loc, err = cf.c.client.Put(n.uname, cleartext)
+		de, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
 			break
 		}
@@ -279,8 +375,9 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	cf.dirty = false
 
 	// Rename it to reflect the actual reference in the store so that new
-	// opens will find the cached version.
-	cdir, fname := cf.c.cacheName(loc, n.uname)
+	// opens will find the cached version.  Assume a single block.
+	// TODO(p): what if it isn't a single block?
+	cdir, fname := cf.c.cacheName(de)
 	if err := os.Rename(cf.fname, fname); err != nil {
 		os.Mkdir(cdir, 0700)
 		if err := os.Rename(cf.fname, fname); err != nil {
@@ -291,22 +388,16 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	return nil
 }
 
-func (c *cache) cacheName(loc upspin.Location, uname upspin.PathName) (string, string) {
-	hash := fmt.Sprintf("%x", sha1.Sum([]byte(string(loc.Reference)+"!"+string(uname))))
-	dir := c.dir + "/" + hash[:2]
-	file := dir + "/" + hash
-	return dir, file
-}
-
+// putRedirect assumes that the target fits in a single block.
 func (c *cache) putRedirect(n *node, target string) error {
 	// Use the client library to write it.
-	loc, err := c.client.Put(n.uname, []byte(target))
+	de, err := c.client.Put(n.uname, []byte(target))
 	if err != nil {
 		return err
 	}
 
 	// Save it in the cache. If we can't, that's fine.
-	cdir, fname := c.cacheName(loc, n.uname)
+	cdir, fname := c.cacheName(de)
 	file, err := os.Create(fname)
 	if err != nil {
 		os.Mkdir(cdir, 0700)
