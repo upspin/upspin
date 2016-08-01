@@ -415,6 +415,10 @@ type Client interface {
 	// is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
+	// PutLink stores the data at the given name with the AttrLink attribute.
+	// If something is already stored with that name, it is replaced with the new data.
+	PutLink(name PathName, data []byte) (*DirEntry, error)
+
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path name
 	// must already exist and be directories.
@@ -438,11 +442,11 @@ type Client interface {
 	// DirServer returns an error or a reachable bound DirServer for the user.
 	DirServer(name PathName) (DirServer, error)
 
-	// Link creates a new name for the reference referred to by the old name,
-	// thereby defining the new name as a link to the old.
-	// There must be no existing item with the new name.
-	// The old name is still a valid name for the reference.
-	Link(oldName, newName PathName) (*DirEntry, error)
+	// PutCopyingReferences creates a new name for the references
+	// referred to by the old name.  The old name is still a valid
+	// name for the references. There must be no existing item with
+	// the new name.
+	PutCopyingReferences(oldName, newName PathName) (*DirEntry, error)
 
 	// Rename renames oldName to newName. The old name is no longer valid.
 	Rename(oldName, newName PathName) error

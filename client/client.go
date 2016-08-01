@@ -38,6 +38,15 @@ func New(context upspin.Context) upspin.Client {
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	return c.put(name, data, upspin.AttrNone)
+}
+
+// PutLink implements upspin.Client.
+func (c *Client) PutLink(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	return c.put(name, data, upspin.AttrLink)
+}
+
+func (c *Client) put(name upspin.PathName, data []byte, attr upspin.FileAttributes) (*upspin.DirEntry, error) {
 	const op = "Put"
 	dir, err := c.DirServer(name)
 	if err != nil {
@@ -67,6 +76,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		Time:     upspin.Now(),
 		Sequence: 0, // Don't care for now.
 		Writer:   c.context.UserName(),
+		Attr:     attr,
 	}
 
 	// Start the I/O.
@@ -309,9 +319,9 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	return nil, err
 }
 
-// Link implements upspin.Link. This is more a copy on write than a Unix style Link. As soon as
+// PutCopyingReferences implements upspin.Link. This is more a copy on write than a Unix style Link. As soon as
 // one of the two files is written, then will diverge.
-func (c *Client) Link(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
+func (c *Client) PutCopyingReferences(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	return c.linkOrRename(oldName, newName, false)
 }
 

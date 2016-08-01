@@ -339,7 +339,7 @@ func TestGlob(t *testing.T) {
 	checkPaths("multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt")
 }
 
-func TestLinkAndRename(t *testing.T) {
+func TestPutCopyingReferencesAndRename(t *testing.T) {
 	const user = "link@a.com"
 	client := New(setup(user, ""))
 	original := upspin.PathName(fmt.Sprintf("%s/original", user))
@@ -350,7 +350,7 @@ func TestLinkAndRename(t *testing.T) {
 
 	// Link a new file to the same reference.
 	linked := upspin.PathName(fmt.Sprintf("%s/link", user))
-	entry, err := client.Link(original, linked)
+	entry, err := client.PutCopyingReferences(original, linked)
 	if err != nil {
 		t.Fatal("link file:", err)
 	}
