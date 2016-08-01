@@ -204,7 +204,7 @@ func link(args ...string) {
 			exit(err)
 		}
 	}
-	_, err = c.Link(originalPath, newPath)
+	_, err = c.PutDuplicate(originalPath, newPath)
 	if err != nil {
 		exit(err)
 	}
