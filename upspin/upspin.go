@@ -152,18 +152,14 @@ type Packer interface {
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
-	// PackLen might update the entry's Metadata.Packdata field, which
-	// must not be nil but might have a nil Packdata field. If it has
-	// length greather than 0,  the first byte must be the correct
-	// value of Packing.
+	// PackLen might update the entry's Packdata field.
 	// PackLen returns -1 if there is an error.
 	PackLen(context Context, cleartext []byte, entry *DirEntry) int
 
 	// UnpackLen returns an upper bound on the number of bytes
-	// required to store the unpacked cleartext.  UnpackLen might
-	// update the entry's Metadata, which must have the correct Packing
-	// value already present in Packdata[0].
-	// UnpackLen eturns -1 if there is an error.
+	// required to store the unpacked cleartext.
+	// UnpackLen might update the entry's Packdata field.
+	// UnpackLen returns -1 if there is an error.
 	UnpackLen(context Context, ciphertext []byte, entry *DirEntry) int
 
 	// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
@@ -259,18 +255,16 @@ type DirServer interface {
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put has the directory service record that the specified DirEntry
-	// describes data stored in a StorServer at the Location recorded
+	// describes data stored in a StoreServer at the Location recorded
 	// in the DirEntry, and can thereafter be recovered using the PathName
 	// specified in the DirEntry.
 	//
 	// Before calling Put, the data must be packed using the same
-	// Metadata object, which the Packer might update. That is,
-	// after calling Pack, the Metadata should not be modified
+	// Packdata, which the Packer might update. That is,
+	// after calling Pack, the Packdata should not be modified
 	// before calling Put.
 	//
-	// Within the Metadata, several fields have special properties.
-	// Size represents the size of the original, unpacked data as
-	// seen by the client. It is advisory only and is unchecked.
+	// Within the DirEntry, several fields have special properties.
 	// Time represents a timestamp for the item. It is advisory only
 	// but is included in the packing signature and so should usually
 	// be set to a non-zero value.
@@ -332,10 +326,12 @@ type DirEntry struct {
 	Blocks   []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
 	Packdata []byte     // Information maintained by the packing algorithm.
 
+	// Field determining the key used for the signature, hence also tamper-resistant.
+	Writer UserName // Writer of the file, often the same as owner.
+
 	// Fields not included in the signature.
 	Attr     FileAttributes // File attributes.
 	Sequence int64          // The sequence (version) number of the item.
-	Writer   UserName       // Writer of the file, often the same as owner.
 }
 
 // DirBlock describes a block of data representing a contiguous section of a file.
@@ -430,7 +426,6 @@ type Client interface {
 	// path may contain metacharacters. Matching is done using Go's path.Match
 	// elementwise. The user name must be present in the pattern and is treated as
 	// a literal even if it contains metacharacters.
-	// The Metadata contains no key information.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// File-like methods similar to Go's os.File API.
