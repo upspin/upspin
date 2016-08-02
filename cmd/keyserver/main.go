@@ -105,7 +105,10 @@ func main() {
 
 func (s *Server) internalLookup(userName upspin.UserName) (upspin.PublicKey, error) {
 	user, err := s.key.Lookup(userName)
-	return user.PublicKey, err
+	if err != nil {
+		return "", err
+	}
+	return user.PublicKey, nil
 }
 
 // keyServerFor returns a KeyServer bound to the user specified in the context.
