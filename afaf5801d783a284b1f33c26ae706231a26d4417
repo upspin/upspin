@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d450ee1d_dab9d12e",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf24d597_88509766",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_a8555355",
         "filename": "cmd/upspinfs/cache.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-01T21:37:11Z",
       "side": 1,
       "message": "sha1 not sha256? it\u0027s your call.",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d450ee1d_fad5ad3e",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "I was going for shorter but since we are using sha256 elsewhere, what the heck, I changed it.",
+      "parentUuid": "cf24d597_a8555355",
       "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "d450ee1d_bacf35af",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf24d597_c84a8fb0",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_28424397",
         "filename": "cmd/upspinfs/cache.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-01T21:37:11Z",
       "side": 1,
       "message": "defer file.Close() and then you don\u0027t need to do that below.\nhowever, this means you\u0027re not checking the error on file.Close, which you\u0027re not doing anyway.\ni suggest:\n\ndefer file.Close() // TODO: Should check error.",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d450ee1d_3a66a5c3",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "I only close on errors.  It stays open otherwise.  In the case of Errors, I really don\u0027t care what the return is.  I guess I could check it but I\u0027m already returning and logging (elsewhere) the error on the write or read or whatever.",
+      "parentUuid": "cf24d597_28424397",
       "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "d450ee1d_1a264972",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf24d597_e84f4bbd",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_0845879e",
         "filename": "cmd/upspinfs/cache.go",
         "patchSetId": 1
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "d450ee1d_1ac2c951",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "It is only closed on errors.  On success we close the old one and remember the new one.",
+      "parentUuid": "cf24d597_0845879e",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf24d597_68635b45",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 1
@@ -115,6 +223,24 @@
       "writtenOn": "2016-08-01T21:37:11Z",
       "side": 1,
       "message": "DirEntry has a method for this. It also checks consistency (offset matches Sizes)",
+      "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d450ee1d_3a94653b",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-02T02:27:32Z",
+      "side": 1,
+      "message": "Cool, thanks.  Done.",
+      "parentUuid": "cf24d597_68635b45",
       "revId": "afaf5801d783a284b1f33c26ae706231a26d4417",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
