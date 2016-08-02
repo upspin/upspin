@@ -73,8 +73,10 @@ func (u *key) Put(user *upspin.User) error {
 	isAdmin := false
 	ue, err := u.fetchUserEntry(Put, user.Name)
 	if err != nil {
-		if err.(*errors.Error).Kind != errors.NotExist {
-			return err
+		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
+			// OK; adding new user.
+		} else {
+			return errors.E(Put, err)
 		}
 	} else {
 		isAdmin = ue.IsAdmin
@@ -86,7 +88,7 @@ func (u *key) Put(user *upspin.User) error {
 		// First, retrieve the user entry for the context user.
 		ue, err := u.fetchUserEntry(Put, u.context.UserName())
 		if err != nil {
-			return err
+			return errors.E(Put, err)
 		}
 		if !ue.IsAdmin {
 			return errors.E(Put, errors.Permission, errors.Str("not an administrator"))
