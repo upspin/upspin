@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9474b6be_36c7b66b",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-02T21:18:23Z",
+      "side": 1,
+      "message": "I don\u0027t see anything in here that makes this a Merkle tree. I\u0027m not even sure what this interface is abstracting; it is an odd mix of I/O and tree building, no walking.",
+      "revId": "1973b7c2a49364162bc54ada4cd1f81ca870683c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
