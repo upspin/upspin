@@ -71,7 +71,11 @@ func (ep *Endpoint) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(str)
+	b, err := json.Marshal(str)
+	if err != nil {
+		return nil, fmt.Errorf("Endpoint: %v %#v", err, ep)
+	}
+	return b, nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -79,7 +83,7 @@ func (ep *Endpoint) UnmarshalJSON(data []byte) error {
 	var str string
 	err := json.Unmarshal(data, &str)
 	if err != nil {
-		return err
+		return fmt.Errorf("Endpoint: %v %#v", err, ep)
 	}
 	p, err := ParseEndpoint(str)
 	if err != nil {
