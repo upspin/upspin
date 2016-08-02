@@ -16,6 +16,24 @@
       "revId": "1973b7c2a49364162bc54ada4cd1f81ca870683c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b477fabf_5a0a952e",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-02T21:46:59Z",
+      "side": 1,
+      "message": "Fair comment, but did you look at the example? \n\nI think the walking does not matter for the dir server. Load will load the entry you need and internally, it will walk the tree for sure (node will have the walking methods). I can expose the walking, but I\u0027m not sure more than Load/Add/Remove is needed for the DirServer.\n\nRE: what makes this a Merkle, it\u0027s there (Add/Remove). If you really want a CheckSum method I can add one, but our merkle tree has hashes computed by the Store, so we can\u0027t know before we flush it. I originally had a hash function passed to New but we can\u0027t necessarily know how each Store will compute them, as per our definition of a StoreServer. Add/Remove should be enough for making this any kind of N-ary tree. Note that Add is given a parent and N is not a property of the interface. And in our case, N is unlimited anyway. So, Add/Remove make it an unbalanced, infinite degree Merkle Tree.\n\nThat said, I can do something like this:\n\nMerkleTree {\n    Root *Node\n}\n\nNode {\n   DirEntry *DirEntry\n   Children []*Node\n}\n\nfunc (n *Node) Child(n int) *Node\n\netc.\n\nWould this be better?",
+      "parentUuid": "9474b6be_36c7b66b",
+      "revId": "1973b7c2a49364162bc54ada4cd1f81ca870683c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
