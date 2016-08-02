@@ -9,7 +9,7 @@ package client
 import (
 	"upspin.io/access"
 	"upspin.io/bind"
-	"upspin.io/client/common/file"
+	"upspin.io/client/file"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/pack"
