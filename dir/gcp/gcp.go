@@ -359,15 +359,14 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 	user := d.context.UserName()
 
 	// Check ACLs before attempting to look up the Access file to avoid leaking information about the existence of paths.
-	//TODO: Use the "any" right once it's created.
-	canList, err := d.hasRight(op, user, access.List, &parsed, opts)
+	canKnow, err := d.hasRight(op, user, access.AnyRight, &parsed, opts)
 	if err != nil {
 		log.Printf("WhichAccess error List: %s", err)
 		return "", errors.E(op, user, err)
 	}
-	// If the user has no rights, we're done.
-	if !canList {
-		return "", errors.E(op, parsed.Path(), errors.Permission)
+	// If the user has no rights, we're done, but don't tell user the path is valid.
+	if !canKnow {
+		return "", errors.E(op, parsed.Path(), errors.NotExist)
 	}
 
 	accessPath, _, err := d.whichAccess(op, &parsed, opts)
