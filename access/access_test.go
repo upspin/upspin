@@ -147,8 +147,8 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 23 {
-		t.Fatal("expected 23 allocations, got ", allocs)
+	if allocs != 24 {
+		t.Fatal("expected 24 allocations, got ", allocs)
 	}
 }
 
@@ -228,6 +228,13 @@ func TestHasAccessNoGroups(t *testing.T) {
 	check(owner, Delete, "me@here.com/foo/bar", false)
 	check("writer@foo.bar", Delete, "me@here.com/foo/bar", false)
 
+	// The "AnyRight" right check also works for everyone.
+	check(owner, AnyRight, "me@here.com/foo/bar", true)
+	check("writer@foo.bar", AnyRight, "me@here.com/foo/bar", true)
+	check("reader@foo.bar", AnyRight, "me@here.com/foo/bar", true)
+	check("writer@foo.bar", AnyRight, "me@here.com/foo/bar", true)
+	check("not@a.person", AnyRight, "me@here.com/foo/bar", false)
+
 	// Wildcard that should match.
 	check("joe@nsa.gov", Read, "me@here.com/foo/bar", true)
 
@@ -305,6 +312,9 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 	// The owner of a group is a member of the group.
 	check("me@here.com", Delete, "me@here.com/foo/bar", true)
+
+	// AnyRight works for groups.
+	check("sister@me.com", AnyRight, "me@here.com/foo/bar", true)
 
 	err = RemoveGroup("me@here.com/Group/family")
 	if err != nil {
@@ -567,16 +577,16 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
-func usersCheck(t *testing.T, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
+func usersCheck(t *testing.T, right Right, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
 	acc, err := Parse(file, data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, err := acc.Users(Read, load)
+	list, err := acc.Users(right, load)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}
-	expectEqual(t, expected, listFromUserName(readersList))
+	expectEqual(t, expected, listFromUserName(list))
 }
 
 func TestUsers(t *testing.T) {
@@ -591,7 +601,7 @@ func TestUsers(t *testing.T) {
 		}
 	}
 
-	usersCheck(t, loadTest, "bob@foo.com/Access",
+	usersCheck(t, Read, loadTest, "bob@foo.com/Access",
 		[]byte("r: bob@foo.com, sue@foo.com, tommy@foo.com, joe@foo.com, friends"),
 		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"})
 	if !loaded {
@@ -599,19 +609,24 @@ func TestUsers(t *testing.T) {
 	}
 
 	// Retry with owner left out of Access.
-	usersCheck(t, loadTest, "bob@foo.com/Access",
+	usersCheck(t, Read, loadTest, "bob@foo.com/Access",
 		[]byte("r: sue@foo.com, tommy@foo.com, joe@foo.com, friends"),
 		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com", "nancy@foo.com", "anna@foo.com"})
 
 	// Retry with repeated readers and no group.
-	usersCheck(t, loadTest, "bob@foo.com/Access",
+	usersCheck(t, Read, loadTest, "bob@foo.com/Access",
 		[]byte("r: al@foo.com, sue@foo.com, bob@foo.com, tommy@foo.com, al@foo.com"),
 		[]string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "al@foo.com"})
 
 	// Retry with empty Access.
-	usersCheck(t, loadTest, "bob@foo.com/Access",
+	usersCheck(t, Read, loadTest, "bob@foo.com/Access",
 		[]byte(""),
 		[]string{"bob@foo.com"})
+
+	// Check that everyone is in the "AnyRight" list.
+	usersCheck(t, AnyRight, loadTest, "bob@foo.com/Access",
+		[]byte("r: al@foo.com, sue@foo.com, bob@foo.com, tommy@foo.com bob@foo.com/Group/friends"),
+		[]string{"al@foo.com", "anna@foo.com", "bob@foo.com", "nancy@foo.com", "sue@foo.com", "tommy@foo.com"})
 
 }
 
