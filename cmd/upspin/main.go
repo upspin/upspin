@@ -36,6 +36,19 @@ import (
 	_ "upspin.io/flags"
 )
 
+var commands = map[string]func(...string){
+	"get":         get,
+	"glob":        glob,
+	"link":        link,
+	"ls":          ls,
+	"mkdir":       mkdir,
+	"put":         put,
+	"rm":          rm,
+	"share":       share,
+	"user":        user,
+	"whichaccess": whichAccess,
+}
+
 var op string // The subcommand we are running.
 
 func main() {
@@ -48,37 +61,22 @@ func main() {
 
 	args := flag.Args()[1:]
 	op = flag.Arg(0)
-	switch strings.ToLower(op) {
-	case "get":
-		get(args...)
-	case "glob":
-		glob(args...)
-	case "link":
-		link(args...)
-	case "ls":
-		ls(args...)
-	case "mkdir":
-		mkdir(args...)
-	case "put":
-		put(args...)
-	case "rm":
-		rm(args...)
-	case "share":
-		share(args...)
-	case "user":
-		user(args...)
-	case "whichaccess":
-		whichAccess(args...)
-	default:
-		fmt.Fprintf(os.Stderr, "Can't understand command: %v\n", flag.Arg(0))
+	fn := commands[strings.ToLower(op)]
+	if fn == nil {
+		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", flag.Arg(0))
 		usage()
 	}
+	fn(args...)
 }
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of upspin:\n")
-	fmt.Fprintf(os.Stderr, "\tupspin [flags] <mkdir|put|get|glob|link|ls|rm|share|user|whichaccess> <path>\n")
-	fmt.Fprintf(os.Stderr, "Flags:\n")
+	fmt.Fprintf(os.Stderr, "\tupspin [globalflags] <command> [flags] <path>\n")
+	fmt.Fprintf(os.Stderr, "Commands:\n")
+	for cmd := range commands {
+		fmt.Fprintf(os.Stderr, "\t%s\n", cmd)
+	}
+	fmt.Fprintf(os.Stderr, "Global flags:\n")
 	flag.PrintDefaults()
 	os.Exit(2)
 }
@@ -99,7 +97,7 @@ func exit(err error) {
 
 func subUsage(fs *flag.FlagSet, msg string) func() {
 	return func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s\n", msg)
+		fmt.Fprintf(os.Stderr, "Usage: upspin %s\n", msg)
 		// How many flags?
 		n := 0
 		fs.VisitAll(func(*flag.Flag) { n++ })
@@ -401,7 +399,7 @@ func share(args ...string) {
 		exit(err)
 	}
 	if fs.NArg() != 1 {
-		usage()
+		fs.Usage()
 	}
 	if *recur {
 		*isDir = true
