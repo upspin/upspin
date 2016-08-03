@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54d87e08_c0422865",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T03:15:20Z",
+      "side": 1,
+      "message": "I\u0027d be happy to move this up, in this CL if you like.",
+      "revId": "40122893eae2b661338aee20d5aa69ac6757ab70",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
