@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f476d249_8ed85b22",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:46:35Z",
+      "side": 1,
+      "message": "I still don\u0027t see the state of the server reflected in this API. Maybe that\u0027s deliberate, but it does now contain interfaces for the logs, so there is some server state acknowledged.\n\nA server holds a forest of trees, possibly for multiple users but we can decide it\u0027s just for one. The trees represent the state of the system at intervals over time. This was represented in the server interface in my mail yesterday.\n\nA server needs to coordinate with other servers, using (perhaps variants of) the same API, to keep them all in sync. The central thing that must be built is that synchronization idea, and I don\u0027t see it represented fully enough here.\n\nI see a collection of little pieces, some of which seem important, some of which are very minor. I\u0027m not seeing the high-level view of your system\u0027s design.\n\nMaybe we should talk about this in a higher bandwidth medium.",
+      "revId": "8f2bba3b3d89f6aa47c7797b809841cbb5ea4828",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
