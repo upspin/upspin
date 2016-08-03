@@ -34,6 +34,23 @@
       "revId": "d5990d2281e9c4e17f3ed292b522282e0222d5d8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_4eb833c3",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 0,
+      "message": "you deleted my test! merge issue?",
+      "revId": "d5990d2281e9c4e17f3ed292b522282e0222d5d8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
