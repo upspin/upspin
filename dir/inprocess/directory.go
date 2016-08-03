@@ -309,13 +309,14 @@ func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error)
 	if err != nil {
 		return "", errors.E(WhichAccess, err)
 	}
-	// WhichAccess requires list permisison. TODO: Use the "any" right once it's created.
-	canAccess, err := s.can(access.List, parsed)
+	// If the user has any right for this file, we can show the relevant Access file.
+	canAccess, err := s.can(access.AnyRight, parsed)
 	if err != nil {
 		return "", errors.E(WhichAccess, err)
 	}
 	if !canAccess {
-		return "", errors.E(WhichAccess, pathName, access.ErrPermissionDenied)
+		// Don't tell the user this path exists.
+		return "", errors.E(WhichAccess, pathName, errors.NotExist)
 	}
 	accessFile := s.whichAccess(parsed)
 	if accessFile == nil {

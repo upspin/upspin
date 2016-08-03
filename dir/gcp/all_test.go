@@ -1053,7 +1053,7 @@ func TestWhichAccess(t *testing.T) {
 func TestWhichAccessPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: WhichAccess: permission denied"
+	expectedError := "test@foo.com/mydir/myfile.txt: WhichAccess: item does not exist"
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
