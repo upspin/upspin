@@ -19,6 +19,182 @@
     },
     {
       "key": {
+        "uuid": "f476d249_aea2f793",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "on windows it\u0027s \u0027userprofile\u0027 so check for both.\n\nthis function should return an error and it should be handled in InitContext. it\u0027s poor user experience to just exit with the string \"no home directory\".",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_ee81dff7",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "delete these",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_4e911341",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "priv, err :\u003d ioutil.ReadFile(filepath.Join(...))",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_ce7c231d",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "return \"\", \"\", ...",
+      "range": {
+        "startLine": 84,
+        "startChar": 21,
+        "endLine": 84,
+        "endChar": 32
+      },
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_0e9b0b63",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "delete all this",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_6e8e4f26",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "priv \u003d bytes.TrimSpace(priv)",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_2e984763",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "pub, err :\u003d ioutil.ReadAll(filepath.Join(...)",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_cea3c39b",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "delete...",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_eea8ff79",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "pub \u003d bytes.TrimSpace(pub)",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_8e9dbb52",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T22:54:25Z",
+      "side": 1,
+      "message": "return upspin.PublicKey(pub), string(priv), nil",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "54887e72_f1fa2876",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 2
