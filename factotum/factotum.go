@@ -12,7 +12,10 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"io/ioutil"
 	"math/big"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/errors"
@@ -38,8 +41,19 @@ type Factotum struct {
 	curveName    string
 }
 
-// New returns a new Factotum providing all needed private key operations.
-func New(public upspin.PublicKey, private string) (*Factotum, error) {
+// New returns a new Factotum providing all needed private key operations,
+// loading private keys from dir/*.upspinkey.
+func New(dir string) (*Factotum, error) {
+	pub, priv, err := readKeys(dir)
+	if err != nil {
+		return nil, err
+	}
+	return DeprecatedNew(pub, priv)
+}
+
+// DeprecatedNew returns a new Factotum providing all needed private key operations.
+// TODO(ehg)  Replace all uses of DeprecatedNew by New.
+func DeprecatedNew(public upspin.PublicKey, private string) (*Factotum, error) {
 	ePublicKey, curveName, err := ParsePublicKey(public)
 	if err != nil {
 		return nil, err
@@ -56,6 +70,30 @@ func New(public upspin.PublicKey, private string) (*Factotum, error) {
 		curveName:    curveName,
 	}
 	return f, nil
+}
+
+// readKeys returns the contents of dir/secret.upspinkey and dir/public.upspinkey.
+func readKeys(dir string) (upspin.PublicKey, string, error) {
+	op := "readKeys"
+	priv, err := ioutil.ReadFile(filepath.Join(dir, "secret.upspinkey"))
+	if os.IsNotExist(err) {
+		return "", "", errors.E(op, errors.NotExist, err)
+	}
+	if err != nil {
+		return "", "", errors.E(op, errors.IO, err)
+	}
+	priv = bytes.TrimSpace(priv)
+
+	pub, err := ioutil.ReadFile(filepath.Join(dir, "public.upspinkey"))
+	if os.IsNotExist(err) {
+		return "", "", errors.E(op, errors.NotExist, err)
+	}
+	if err != nil {
+		return "", "", errors.E(op, errors.IO, err)
+	}
+	// TODO Test forbids this; I don't know why.   pub = bytes.TrimSpace(pub)
+	return upspin.PublicKey(pub), string(priv), nil
+	// TODO sanity check that Private is consistent with Public
 }
 
 // FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.

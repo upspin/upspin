@@ -10,11 +10,12 @@ import (
 	"io"
 	"os"
 	ospath "path"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/key/keyloader"
+	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -67,7 +68,10 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	if r == nil {
 		home := os.Getenv("HOME")
 		if len(home) == 0 {
-			log.Fatal("no home directory")
+			home = os.Getenv("userprofile")
+			if len(home) == 0 {
+				return nil, errors.Errorf("unable to load keys, since unable to locate home directory or userprofile")
+			}
 		}
 		if f, err := os.Open(ospath.Join(home, "upspin/rc")); err == nil {
 			r = f
@@ -115,21 +119,26 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 	context.packing = packer.Packing()
 
-	// Implicitly load the user's keys from $HOME/.ssh.
-	// This must be done before bind so that keys are ready for authenticating to servers.
-	// TODO(edpin): fix this by re-checking keys when they're needed.
-	// TODO(ehg): remove loading of private key
-	var err error
-	err = keyloader.Load(context)
+	f, err := factotum.New(sshdir()) // TODO Allow RC to override?
 	if err != nil {
 		log.Error.Print(err)
 		return nil, err
 	}
+	context.SetFactotum(f)
+	// This must be done before bind so that keys are ready for authenticating to servers.
 
 	context.keyEndpoint = parseEndpoint(op, vals, "keyserver", &err)
 	context.storeEndpoint = parseEndpoint(op, vals, "storeserver", &err)
 	context.dirEndpoint = parseEndpoint(op, vals, "dirserver", &err)
 	return context, err
+}
+
+func sshdir() string {
+	home := os.Getenv("HOME")
+	if len(home) == 0 {
+		log.Fatal("no home directory")
+	}
+	return filepath.Join(home, ".ssh")
 }
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.

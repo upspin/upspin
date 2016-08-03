@@ -20,16 +20,16 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
 var (
-	p256Public  = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	p256Private = "82201047360680847258309465671292633303992565667422607675215625927005262185934"
-	user        = upspin.UserName("joe@blow.com")
-	grpcServer  SecureServer
-	srv         *server
-	cli         *client
+	joePublic  = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
+	user       = upspin.UserName("joe@blow.com")
+	grpcServer SecureServer
+	srv        *server
+	cli        *client
 )
 
 type server struct {
@@ -41,7 +41,7 @@ type server struct {
 
 func lookup(userName upspin.UserName) (upspin.PublicKey, error) {
 	if userName == user {
-		return upspin.PublicKey(p256Public), nil
+		return upspin.PublicKey(joePublic), nil
 	}
 	return "", errors.Str("No user here")
 }
@@ -124,7 +124,7 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 }
 
 func startClient(port string) {
-	f, err := factotum.New(p256Public, p256Private)
+	f, err := factotum.New(testutil.Repo("key/testdata/joe"))
 	if err != nil {
 		log.Fatal(err)
 	}
