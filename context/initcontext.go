@@ -21,6 +21,8 @@ import (
 	"upspin.io/upspin"
 )
 
+var inTest = false // Generate errors instead of logs for certain problems.
+
 type contextImpl struct {
 	userName      upspin.UserName
 	factotum      upspin.Factotum
@@ -37,6 +39,15 @@ func New() upspin.Context {
 		packing:  upspin.PlainPack,
 	}
 }
+
+// Known keys. All others are treated as errors.
+const (
+	username    = "username"
+	keyserver   = "keyserver"
+	dirserver   = "dirserver"
+	storeserver = "storeserver"
+	packing     = "packing"
+)
 
 // InitContext returns a context generated from a configuration file and/or
 // environment variables.
@@ -58,11 +69,11 @@ func New() upspin.Context {
 func InitContext(r io.Reader) (upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{
-		"username":    "noone@nowhere.org",
-		"keyserver":   "",
-		"dirserver":   "",
-		"storeserver": "",
-		"packing":     "plain"}
+		username:    "noone@nowhere.org",
+		keyserver:   "",
+		dirserver:   "",
+		storeserver: "",
+		packing:     "plain"}
 
 	if r == nil {
 		home := os.Getenv("HOME")
@@ -91,19 +102,40 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 			}
 			val := strings.TrimSpace(tokens[1])
 			attr := strings.TrimSpace(tokens[0])
-			if _, ok := vals[attr]; ok {
-				vals[attr] = val
+			if _, ok := vals[attr]; !ok {
+				return nil, errors.E("context:", errors.Invalid, errors.Errorf("unrecognized key %q", attr))
 			}
+			vals[attr] = val
 		}
 		if err := scanner.Err(); err != nil {
 			return nil, err
 		}
 	}
 
-	// Environment variables trump the RC file.
-	for k := range vals {
-		if v := os.Getenv("upspin" + k); len(v) != 0 {
-			vals[k] = v
+	// Environment variables trump the RC file. Look for any "upspin" values and
+	// warn about them - don't give errors though as they may be inconsequential.
+	// (We do generate an error when testing.)
+	for _, v := range os.Environ() {
+		if !strings.HasPrefix(v, "upspin") {
+			continue
+		}
+		// Variables we care about look like upspinkey=value.
+		kv := strings.SplitN(v, "=", 2)
+		if len(kv) != 2 {
+			continue
+		}
+		attr := kv[0][len("upspin"):]
+		val := kv[1]
+		if _, ok := vals[attr]; !ok {
+			if inTest {
+				return nil, errors.E("context:", errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
+			} else {
+				log.Printf("context: unrecognized environment variable %q ignored", v)
+			}
+			continue
+		}
+		if val != "" {
+			vals[attr] = val
 		}
 	}
 
@@ -126,9 +158,9 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		return nil, err
 	}
 
-	context.keyEndpoint = parseEndpoint(op, vals, "keyserver", &err)
-	context.storeEndpoint = parseEndpoint(op, vals, "storeserver", &err)
-	context.dirEndpoint = parseEndpoint(op, vals, "dirserver", &err)
+	context.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
+	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
+	context.dirEndpoint = parseEndpoint(op, vals, dirserver, &err)
 	return context, err
 }
 

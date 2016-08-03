@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 
@@ -18,6 +19,10 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 )
+
+func init() {
+	inTest = true
+}
 
 var once sync.Once
 
@@ -75,6 +80,22 @@ func TestDefaults(t *testing.T) {
 	testConfig(t, &expect, makeConfig(&expect))
 }
 
+func TestBadKey(t *testing.T) {
+	// "name=" should be "username=".
+	const config = `name=p@google.com
+packing=ee
+keyserver=inprocess
+dirserver=inprocess
+storeserver=inprocess`
+	_, err := InitContext(strings.NewReader(config))
+	if err == nil {
+		t.Fatalf("expected error, got none")
+	}
+	if !strings.Contains(err.Error(), "unrecognized key") {
+		t.Fatalf("expected bad key error; got %q", err)
+	}
+}
+
 func TestEnv(t *testing.T) {
 	expect := expectations{
 		userName:    "p@google.com",
@@ -95,6 +116,25 @@ func TestEnv(t *testing.T) {
 	expect.packing = upspin.PlainPack
 	os.Setenv("upspinpacking", pack.Lookup(expect.packing).String())
 	testConfig(t, &expect, config)
+}
+
+func TestBadEnv(t *testing.T) {
+	expect := expectations{
+		userName:    "p@google.com",
+		keyserver:   Endpoint(upspin.InProcess, ""),
+		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
+		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
+		packing:     upspin.PlainPack, // TODO upspin.EEPack,
+	}
+	config := makeConfig(&expect)
+	os.Setenv("upspinuser", string(expect.userName)) // Should be upspinusername.
+	_, err := InitContext(strings.NewReader(config))
+	if err == nil {
+		t.Fatalf("expected error, got none")
+	}
+	if !strings.Contains(err.Error(), "unrecognized environment variable") {
+		t.Fatalf("expected bad env var error; got %q", err)
+	}
 }
 
 func makeConfig(expect *expectations) string {
@@ -126,7 +166,7 @@ func makeCommentedConfig(expect *expectations) string {
 }
 
 func saveEnvs(e *envs) {
-	e.name = os.Getenv("upspinname")
+	e.name = os.Getenv("upspinusername")
 	e.keyserver = os.Getenv("upspinkeyserver")
 	e.dirserver = os.Getenv("upspindirserver")
 	e.storeserver = os.Getenv("upspinstoreserver")
@@ -134,7 +174,7 @@ func saveEnvs(e *envs) {
 }
 
 func restoreEnvs(e *envs) {
-	os.Setenv("upspinname", e.name)
+	os.Setenv("upspinusername", e.name)
 	os.Setenv("upspinkeyserver", e.keyserver)
 	os.Setenv("upspindirserver", e.dirserver)
 	os.Setenv("upspinstoreserver", e.storeserver)
@@ -156,7 +196,7 @@ func TestMain(m *testing.M) {
 }
 
 func testConfig(t *testing.T, expect *expectations, config string) {
-	context, err := InitContext(bytes.NewBufferString(config))
+	context, err := InitContext(strings.NewReader(config))
 	if err != nil {
 		t.Fatalf("could not parse config %v: %v", config, err)
 	}
