@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4cb7a93_14ca1447",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:54:15Z",
+      "side": 1,
+      "message": "i was baffled by this. please // for Windows.",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4cb7a93_f4f55886",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:54:15Z",
+      "side": 1,
+      "message": "s/home/$HOME/",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d4d2ae43_d5813cf8",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:54:15Z",
+      "side": 1,
+      "message": "forbids it how?",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_6ec08f27",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:54:15Z",
+      "side": 1,
+      "message": "see comments in testutil. you don\u0027t need this helper.",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f476d249_4ec35335",
+        "filename": "test/testutil/testutil.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T23:54:15Z",
+      "side": 1,
+      "message": "please no \"util\" or \"testutil\". these packages becomes piles of unrelated stuff because their names do not inform the design.\n\nin any case i don\u0027t see the need for this. the test runs in the source directory of the test, so you can just open \"testdata/file\" to open the thing you need.",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
