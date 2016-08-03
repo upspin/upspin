@@ -372,16 +372,24 @@ func which(right []byte) Right {
 	return Invalid
 }
 
-// IsAccessFile reports whether the pathName contains a file named Access, which is special.
+// IsAccessFile reports whether the pathName ends in a file named Access, which is special.
 func IsAccessFile(pathName upspin.PathName) bool {
-	return strings.HasSuffix(string(pathName), accessFile)
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return false
+	}
+	// Must end "/Access".
+	return parsed.NElem() >= 1 && parsed.Elem(parsed.NElem()-1) == "Access"
 }
 
 // IsGroupFile reports whether the pathName contains a directory in the root named Group, which is special.
 func IsGroupFile(pathName upspin.PathName) bool {
-	path := string(pathName)
-	slash := strings.IndexByte(path, '/')
-	return slash > 0 && slash == strings.Index(path, "/Group/")
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return false
+	}
+	// Need "a@b.c/Group/file".
+	return parsed.NElem() >= 2 && parsed.Elem(0) == "Group"
 }
 
 // AddGroup installs a group with the specified name and textual contents,
