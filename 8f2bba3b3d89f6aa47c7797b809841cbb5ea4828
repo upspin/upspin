@@ -16,6 +16,24 @@
       "revId": "8f2bba3b3d89f6aa47c7797b809841cbb5ea4828",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_d1e04402",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-03T23:53:55Z",
+      "side": 1,
+      "message": "I think the main discrepancy is that you might be considering this to be The Server. \n\nThat is not my intention. Tree is just one tree of DirEntries for one user. There\u0027s no forest in this CL.\n\nI have not gotten to the DirServer yet at all. \n\nI\u0027m ready to talk over a high bandwidth medium now. Ping when you\u0027re available.",
+      "parentUuid": "f476d249_8ed85b22",
+      "revId": "8f2bba3b3d89f6aa47c7797b809841cbb5ea4828",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
