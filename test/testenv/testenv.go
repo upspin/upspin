@@ -8,6 +8,8 @@ package testenv
 
 import (
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/bind"
@@ -291,9 +293,9 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 	}
 	// Set the public key for the registered user.
 	testKey.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
-	f, err := factotum.New(keyPair.Public, keyPair.Private)
+	f, err := factotum.DeprecatedNew(keyPair.Public, keyPair.Private)
 	if err != nil {
-		panic("NewFactotum failed")
+		panic("DeprecatedNewFactotum failed")
 	}
 	context.SetFactotum(f)
 	return context, nil
@@ -330,4 +332,13 @@ func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoin
 	context.SetStoreEndpoint(store)
 	context.SetDirEndpoint(dir)
 	context.SetKeyEndpoint(user)
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
