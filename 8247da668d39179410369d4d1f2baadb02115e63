@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_31e750ab",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Working on it, fighting import cycles.   Please show me a better way than what I did.",
+      "parentUuid": "54887e72_11e48cd4",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f476d249_aea2f793",
         "filename": "context/initcontext.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-03T22:54:25Z",
       "side": 1,
       "message": "on windows it\u0027s \u0027userprofile\u0027 so check for both.\n\nthis function should return an error and it should be handled in InitContext. it\u0027s poor user experience to just exit with the string \"no home directory\".",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_31f670f4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done, but not tested on Windows so very possibly wrong.",
+      "parentUuid": "f476d249_aea2f793",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_517bf4cf",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_ee81dff7",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f476d249_4e911341",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-03T22:54:25Z",
       "side": 1,
       "message": "priv, err :\u003d ioutil.ReadFile(filepath.Join(...))",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_5165341a",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_4e911341",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +165,30 @@
     },
     {
       "key": {
+        "uuid": "54887e72_316c3005",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_ce7c231d",
+      "range": {
+        "startLine": 84,
+        "startChar": 21,
+        "endLine": 84,
+        "endChar": 32
+      },
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f476d249_0e9b0b63",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -104,6 +200,24 @@
       "writtenOn": "2016-08-03T22:54:25Z",
       "side": 1,
       "message": "delete all this",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_514c549c",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_0e9b0b63",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -127,6 +241,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_3143d06b",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_6e8e4f26",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f476d249_2e984763",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -138,6 +270,24 @@
       "writtenOn": "2016-08-03T22:54:25Z",
       "side": 1,
       "message": "pub, err :\u003d ioutil.ReadAll(filepath.Join(...)",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_b1310009",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_2e984763",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -161,6 +311,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_51177456",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_cea3c39b",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f476d249_eea8ff79",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -172,6 +340,24 @@
       "writtenOn": "2016-08-03T22:54:25Z",
       "side": 1,
       "message": "pub \u003d bytes.TrimSpace(pub)",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_7114f850",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Seems sensible to me, but the tests someone wrote forbids it.  I\u0027ll study more later.",
+      "parentUuid": "f476d249_eea8ff79",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -195,6 +381,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_91039c16",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f476d249_8e9dbb52",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "54887e72_f1fa2876",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 2
@@ -206,6 +410,24 @@
       "writtenOn": "2016-08-03T22:47:54Z",
       "side": 1,
       "message": "Needs to be Repo now. :-(",
+      "revId": "8247da668d39179410369d4d1f2baadb02115e63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_f156a85c",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T23:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54887e72_f1fa2876",
       "revId": "8247da668d39179410369d4d1f2baadb02115e63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
