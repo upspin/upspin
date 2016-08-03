@@ -705,12 +705,54 @@ func differenceString(a, b *Access) string {
 }
 
 func TestIsAccessFile(t *testing.T) {
-	expectState(t, true, upspin.PathName("a@b.com/Access"))
-	expectState(t, true, upspin.PathName("a@b.com/dir/subdir/Access"))
-	expectState(t, false, upspin.PathName("a@b.com/dir/subdir/access"))
-	expectState(t, false, upspin.PathName("a@b.com/dir/subdir/Access/")) // weird, but maybe ok?
-	expectState(t, true, upspin.PathName("booboo/dir/subdir/Access"))    // more parsing is necessary
-	expectState(t, false, upspin.PathName("not a path"))
+	tests := []struct {
+		name     upspin.PathName
+		isAccess bool
+	}{
+		{"a@b.com/Access", true},
+		{"a@b.com/foo/bar/Access", true},
+		{"a@b.com/NotAccess", false},
+		{"a@b.com//Access/", true},     // Extra slashes don't matter.
+		{"a@b.com//Access/foo", false}, //Access is not a directory.
+		{"/Access/foo", false},         // No user.
+	}
+	for _, test := range tests {
+		isAccess := IsAccessFile(test.name)
+		if isAccess == test.isAccess {
+			continue
+		}
+		if isAccess {
+			t.Errorf("%q is not an access file; IsAccessFile says it is", test.name)
+		}
+		if !isAccess {
+			t.Errorf("%q is an access file; IsAccessFile says not", test.name)
+		}
+	}
+}
+
+func TestIsGroupFile(t *testing.T) {
+	tests := []struct {
+		name    upspin.PathName
+		isGroup bool
+	}{
+		{"a@b.com/Group/foo", true},
+		{"a@b.com/Group/foo/bar", true},
+		{"a@b.com//Group/", false},   // No file.
+		{"a@b.com//Group/foo", true}, // Extra slashes don't matter.
+		{"/Group/foo", false},        // No user.
+	}
+	for _, test := range tests {
+		isGroup := IsGroupFile(test.name)
+		if isGroup == test.isGroup {
+			continue
+		}
+		if isGroup {
+			t.Errorf("%q is not a group file; IsGroupFile says it is", test.name)
+		}
+		if !isGroup {
+			t.Errorf("%q is a group file; IsGroupFile says not", test.name)
+		}
+	}
 }
 
 // match requires the two slices to be equivalent, assuming no duplicates.
