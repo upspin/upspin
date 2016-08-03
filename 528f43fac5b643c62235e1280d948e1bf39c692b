@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f48172c9_a4b5c097",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-03T03:05:47Z",
+      "side": 1,
+      "message": "I\u0027m not even sure this can happen. If it does happen, it probably has nothing to do with us and we probably don\u0027t care, but should the unrecognized environment variable check trigger?",
+      "revId": "528f43fac5b643c62235e1280d948e1bf39c692b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
