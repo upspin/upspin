@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "140b66aa_c7e05e99",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T21:34:50Z",
+      "side": 1,
+      "message": "Not quite;  repo uses GOPATH and sshdir uses HOME.\nBut I agree the two can be together in some utility file.",
+      "parentUuid": "140b66aa_27373a4a",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "140b66aa_87f4a687",
         "filename": "factotum/factotum.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "140b66aa_87aca63a",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T21:34:50Z",
+      "side": 1,
+      "message": "Will do.\n\nIt\u0027s intended to be going away soon anyway.",
+      "parentUuid": "140b66aa_87f4a687",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "140b66aa_a7220a0d",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-03T21:21:30Z",
       "side": 1,
       "message": "You repeat repo at least some three times. Why not put it in key/repo.go?",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "140b66aa_c7273ece",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-03T21:34:50Z",
+      "side": 1,
+      "message": "Because it is only used in test;  I wasn\u0027t sure about the conventions for shared test-only code.\n\nAlso, the mix of filepath.Join and explicit / in strings strikes me as wrong but maybe good enough for test.",
+      "parentUuid": "140b66aa_a7220a0d",
       "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
