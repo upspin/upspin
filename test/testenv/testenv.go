@@ -291,9 +291,9 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveN
 	}
 	// Set the public key for the registered user.
 	testKey.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
-	f, err := factotum.New(keyPair.Public, keyPair.Private)
+	f, err := factotum.Old(keyPair.Public, keyPair.Private)
 	if err != nil {
-		panic("NewFactotum failed")
+		panic("OldFactotum failed")
 	}
 	context.SetFactotum(f)
 	return context, nil

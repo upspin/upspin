@@ -10,6 +10,9 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -209,22 +212,18 @@ func TestSharing(t *testing.T) {
 		carlasUserName upspin.UserName = "carla@baz.edu"
 		text                           = "bob, here's the secret file. Sincerely, The Dude."
 	)
-	dudesPublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	dudesPrivate := "82201047360680847258309465671292633303992565667422607675215625927005262185934\n"
-	bobsPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
-	bobsPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
-	carlasPublic := upspin.PublicKey("p384\n26172614276096813357206176213406982397222536659671409755310805362042028026922579207014531049688734331134000100158544\n17028658482487767962568267600820350664652897469525797908053707470805274016916949610485516295521856564391853226932191\n")
-	carlasPrivate := "30201512592735536590793019705840595870765268847836648868491872481691553233567108528485588759694229643034052691415730"
-	// Carla's keys can be regenerated with "keygen -secretseed vutus-pohud-kagaf-tugag.kumal-hoduz-duzin-pafip".
+	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
+	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
+	carlaPublic := upspin.PublicKey("p384\n26172614276096813357206176213406982397222536659671409755310805362042028026922579207014531049688734331134000100158544\n17028658482487767962568267600820350664652897469525797908053707470805274016916949610485516295521856564391853226932191\n")
 
 	// Set up Dude as the creator/owner.
 	ctx, packer := setup(dudesUserName, "p256")
 	// Set up a mock user service that knows about Dude's public keys (for checking signature during unpack).
 	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{dudesUserName},
-		keyToReturn: []upspin.PublicKey{dudesPublic},
+		keyToReturn: []upspin.PublicKey{joePublic},
 	}
-	f, err := factotum.New(dudesPublic, dudesPrivate)
+	f, err := factotum.New(repo("key/data/joe"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -238,7 +237,7 @@ func TestSharing(t *testing.T) {
 	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, []byte(text))
 	// Share with Bob and Carla.
-	shareBlob(t, ctx, packer, []upspin.PublicKey{dudesPublic, bobsPublic, carlasPublic}, &d.Packdata)
+	shareBlob(t, ctx, packer, []upspin.PublicKey{joePublic, bobPublic, carlaPublic}, &d.Packdata)
 
 	readers, err := packer.ReaderHashes(d.Packdata)
 	if err != nil {
@@ -247,16 +246,16 @@ func TestSharing(t *testing.T) {
 	if len(readers) != 3 {
 		t.Errorf("Expected 3 readerhashes, got %d", len(readers))
 	}
-	hash0 := factotum.KeyHash(dudesPublic)
-	hash1 := factotum.KeyHash(bobsPublic)
-	hash2 := factotum.KeyHash(carlasPublic)
+	hash0 := factotum.KeyHash(joePublic)
+	hash1 := factotum.KeyHash(bobPublic)
+	hash2 := factotum.KeyHash(carlaPublic)
 	if !bytes.Equal(readers[0], hash0) || !bytes.Equal(readers[1], hash1) || !bytes.Equal(readers[2], hash2) {
 		t.Errorf("text: expected %q; got %q", [][]byte{hash0, hash1, hash2}, readers)
 	}
 
 	// Now load Bob as the current user.
 	ctx.SetUserName(bobsUserName)
-	f, err = factotum.New(bobsPublic, bobsPrivate)
+	f, err = factotum.New(repo("key/data/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -274,7 +273,7 @@ func TestSharing(t *testing.T) {
 
 	// Load Carla as the current user.
 	ctx.SetUserName(carlasUserName)
-	f, err = factotum.New(carlasPublic, carlasPrivate)
+	f, err = factotum.New(repo("key/data/carla"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -289,22 +288,20 @@ func TestSharing(t *testing.T) {
 func TestBadSharing(t *testing.T) {
 	// dudette@google.com is the owner of a file that is attempting to be shared with mia@foo.com, but share wasn't called.
 	const (
-		dudettesUserName upspin.UserName = "dudette@google.com"
+		dudettesUserName upspin.UserName = "dudette@google.com" // shares key with joe
 		pathName                         = upspin.PathName(dudettesUserName + "/secret_file_shared_with_mia")
-		miasUserName     upspin.UserName = "mia@foo.com"
+		miasUserName     upspin.UserName = "mia@foo.com" // shares key with bob
 		text                             = "mia, here's the secret file. sincerely, dudette."
 	)
-	dudettesPublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	dudettesPrivate := "82201047360680847258309465671292633303992565667422607675215625927005262185934"
-	miasPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
-	miasPrivate := "93177533964096447201034856864549483929260757048490326880916443359483929789924"
+	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
+	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 
 	ctx, packer := setup(dudettesUserName, "p256")
 	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
-		keyToReturn: []upspin.PublicKey{miasPublic, dudettesPublic},
+		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
 	}
-	f, err := factotum.New(dudettesPublic, dudettesPrivate) // Override setup to prevent reading keys from .ssh/
+	f, err := factotum.New(repo("key/data/joe"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -324,7 +321,7 @@ func TestBadSharing(t *testing.T) {
 
 	// Now load Mia as the current user.
 	ctx.SetUserName(miasUserName)
-	f, err = factotum.New(miasPublic, miasPrivate)
+	f, err = factotum.New(repo("key/data/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -363,9 +360,9 @@ func setup(name upspin.UserName, curveName string) (upspin.Context, upspin.Packe
 	}
 	public := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
 	private := fmt.Sprintf("%s\n", priv.D.String())
-	f, err := factotum.New(public, private)
+	f, err := factotum.Old(public, private)
 	if err != nil {
-		panic("NewFactotum failed")
+		panic("OldFactotum failed")
 	}
 	ctx.SetFactotum(f)
 	return ctx, packer
@@ -403,4 +400,13 @@ func TestMultiBlockRoundTrip(t *testing.T) {
 	const userName = upspin.UserName("ken@google.com")
 	ctx, packer := setup(userName, "p256")
 	packtest.TestMultiBlockRoundTrip(t, ctx, packer, userName)
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

@@ -582,7 +582,7 @@ func TestPutAccessFile(t *testing.T) {
 	}
 
 	// Setup the directory's store client to return the contents of the access file.
-	f, err := factotum.New(serverPublic, serverPrivate)
+	f, err := factotum.Old(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -687,7 +687,7 @@ func TestGroupAccessFile(t *testing.T) {
 		ref:      upspin.Reference(newRefOfGroupFile),
 		contents: []byte(newContentsOfFamilyGroup),
 	}
-	f, err := factotum.New(serverPublic, serverPrivate)
+	f, err := factotum.Old(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1091,7 +1091,7 @@ func makeAccess(t *testing.T, path upspin.PathName, accessFileContents string) *
 }
 
 func newTestDirServer(t *testing.T, gcp storage.Storage) *directory {
-	f, err := factotum.New(serverPublic, serverPrivate)
+	f, err := factotum.Old(serverPublic, serverPrivate)
 	if err != nil {
 		t.Fatal(err)
 	}

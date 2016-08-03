@@ -13,6 +13,8 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math/big"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/errors"
@@ -38,8 +40,19 @@ type Factotum struct {
 	curveName    string
 }
 
-// New returns a new Factotum providing all needed private key operations.
-func New(public upspin.PublicKey, private string) (*Factotum, error) {
+// New returns a new Factotum providing all needed private key operations,
+// loading private keys from dir/*.upspinkey.
+func New(dir string) (*Factotum, error) {
+	pub, priv, err := readKeys(dir)
+	if err != nil {
+		return nil, err
+	}
+	return Old(pub, priv)
+}
+
+// Old returns a new Factotum providing all needed private key operations.
+// TODO(ehg)  Replace all uses of Old by New.
+func Old(public upspin.PublicKey, private string) (*Factotum, error) {
 	ePublicKey, curveName, err := ParsePublicKey(public)
 	if err != nil {
 		return nil, err
@@ -56,6 +69,47 @@ func New(public upspin.PublicKey, private string) (*Factotum, error) {
 		curveName:    curveName,
 	}
 	return f, nil
+}
+
+var (
+	zeroPrivKey string
+	zeroPubKey  upspin.PublicKey
+)
+
+// readKeys returns the contents of dir/secret.upspinkey and dir/public.upspinkey.
+func readKeys(dir string) (upspin.PublicKey, string, error) {
+	op := "NewFactotum"
+	f, err := os.Open(filepath.Join(dir, "secret.upspinkey"))
+	if os.IsNotExist(err) {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.NotExist, err)
+	}
+	if err != nil {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
+	}
+	defer f.Close()
+	priv := make([]byte, 200) // enough for p521
+	n, err := f.Read(priv)
+	if err != nil {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
+	}
+	priv = bytes.TrimSpace(priv[:n])
+
+	f, err = os.Open(filepath.Join(dir, "public.upspinkey"))
+	if os.IsNotExist(err) {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.NotExist, err)
+	}
+	if err != nil {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
+	}
+	defer f.Close()
+	pub := make([]byte, 400) // enough for p521
+	n, err = f.Read(pub)
+	if err != nil {
+		return zeroPubKey, zeroPrivKey, errors.E(op, errors.IO, err)
+	}
+	pubkey := upspin.PublicKey(string(pub[:n]))
+	return pubkey, string(priv), nil
+	// TODO sanity check that Private is consistent with Public
 }
 
 // FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.

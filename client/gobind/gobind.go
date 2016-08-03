@@ -121,7 +121,7 @@ func (c *Client) Put(name string, data []byte) (string, error) {
 // NewClient returns a new Client for a given user's configuration.
 func NewClient(config *ClientConfig) (*Client, error) {
 	ctx := context.New().SetUserName(upspin.UserName(config.UserName)).SetPacking(upspin.EEPack)
-	f, err := factotum.New(upspin.PublicKey(config.PublicKey), config.PrivateKey)
+	f, err := factotum.Old(upspin.PublicKey(config.PublicKey), config.PrivateKey)
 	if err != nil {
 		log.Error.Printf("Error creating factotum: %s", err)
 		return nil, err
