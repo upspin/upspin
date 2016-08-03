@@ -50,7 +50,8 @@ const (
 	Create
 	Delete
 	numRights
-	AllRights // The superset, written as '*'.
+	AllRights // The superset of rights, written as '*'.
+	AnyRight  // All users holding any right, used from WhichAccess.
 )
 
 // rightNames are the names of the rights, in order (and missing invalid).
@@ -64,6 +65,9 @@ var rightNames = [][]byte{
 
 // String returns a textual representation of the right.
 func (r Right) String() string {
+	if r == AnyRight {
+		return "any"
+	}
 	if r < 0 || numRights <= r {
 		return "invalidRight"
 	}
@@ -96,6 +100,11 @@ type Access struct {
 	// It is indexed by a right. Each list is stored in sorted
 	// order, mostly so Equal can be efficient.
 	list [numRights][]path.Parsed
+
+	// All the lists are concatenated into this single slice, for easy evaluation of the
+	// "Any" right. That is, the lists above are all subslices of this list.
+	// Note that this list will be neither sorted nor deduplicated.
+	allUsers []path.Parsed
 }
 
 // Path returns the full path name of the file that was parsed.
@@ -157,9 +166,17 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 	if s.Err() != nil {
 		return nil, s.Err()
 	}
-	// Sort the lists.
+	// How many users in all? Allocate the a.allUsers list in one go.
+	numUsers := 0
 	for _, r := range a.list {
+		numUsers += len(r)
+	}
+	a.allUsers = make([]path.Parsed, 0, numUsers)
+	// Sort the lists, then repack them into the "all" users list.
+	for i, r := range a.list {
 		sort.Sort(sliceOfParsed(r))
+		a.list[i] = a.allUsers[len(a.allUsers) : len(a.allUsers)+len(r)]
+		a.allUsers = append(a.allUsers, r...)
 	}
 	return a, nil
 }
@@ -477,10 +494,10 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 		return false, nil, err
 	}
 	isOwner := requester == a.owner
-	// If user is the owner and the request is for read access, access is granted.
+	// If user is the owner and the request is for read, list, or any access, access is granted.
 	if isOwner {
 		switch right {
-		case Read, List:
+		case Read, List, AnyRight:
 			// Owner can always read or list anything in the owner's tree.
 			return true, nil, nil
 		}
@@ -489,7 +506,7 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 	// can write it.
 	if IsAccessFile(pathName) || IsGroupFile(pathName) {
 		switch right {
-		case Write, Create, Delete:
+		case Write, Create, Delete, AnyRight:
 			return isOwner, nil, nil
 		}
 	}
@@ -618,6 +635,8 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 	switch right {
 	case Read, Write, List, Create, Delete:
 		return a.list[right], nil
+	case AnyRight:
+		return a.allUsers, nil
 	default:
 		return nil, errors.Errorf("unrecognized right value %d", right)
 	}
