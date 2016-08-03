@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9474b6be_c2ad5c9b",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-03T04:07:28Z",
+      "side": 1,
+      "message": "I\u0027d really rather not; it is of no concern to anyone except the test. This kind of pattern is used in Go sometimes. I admit it\u0027s not great but I believe it\u0027s better than your suggestion.\n\nIf you find it totally objectionable, I\u0027d rather just make it a permanent error and deal with that issue.",
+      "parentUuid": "b477fabf_6e0a332f",
+      "revId": "528f43fac5b643c62235e1280d948e1bf39c692b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f48172c9_a4b5c097",
         "filename": "context/initcontext.go",
         "patchSetId": 1
