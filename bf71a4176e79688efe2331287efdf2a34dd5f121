@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "140b66aa_27373a4a",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-03T21:21:30Z",
+      "side": 1,
+      "message": "I\u0027d also move this into key/repo.go (see my other comment). It could simply be:\n\nfunc sshdir() string {\n    return repo(\".ssh\")\n}",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "140b66aa_87f4a687",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-03T21:21:30Z",
+      "side": 1,
+      "message": "Old seems strange. How about DeprecatedNew or something like that?",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "140b66aa_a7220a0d",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-03T21:21:30Z",
+      "side": 1,
+      "message": "You repeat repo at least some three times. Why not put it in key/repo.go?",
+      "revId": "bf71a4176e79688efe2331287efdf2a34dd5f121",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
