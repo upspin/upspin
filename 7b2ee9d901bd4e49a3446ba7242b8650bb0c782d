@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_f48a167c",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-04T00:34:45Z",
+      "side": 1,
+      "message": "will do, and will also try running on Windows before next patch.",
+      "parentUuid": "b4cb7a93_14ca1447",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4cb7a93_f4f55886",
         "filename": "context/initcontext.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_5453e212",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-04T00:34:45Z",
+      "side": 1,
+      "message": "will do",
+      "parentUuid": "b4cb7a93_f4f55886",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d4d2ae43_d5813cf8",
         "filename": "factotum/factotum.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-03T23:54:15Z",
       "side": 1,
       "message": "forbids it how?",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_547a0285",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-04T00:34:45Z",
+      "side": 1,
+      "message": "The test insists on finding some specific spacing.   I\u0027ll debug before the next patch.",
+      "parentUuid": "d4d2ae43_d5813cf8",
       "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -81,6 +135,24 @@
       "writtenOn": "2016-08-03T23:54:15Z",
       "side": 1,
       "message": "please no \"util\" or \"testutil\". these packages becomes piles of unrelated stuff because their names do not inform the design.\n\nin any case i don\u0027t see the need for this. the test runs in the source directory of the test, so you can just open \"testdata/file\" to open the thing you need.",
+      "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_942dca98",
+        "filename": "test/testutil/testutil.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-04T00:34:45Z",
+      "side": 1,
+      "message": "I agree, this is too ugly to accept.\n\nHaving unsuccessfully tried a few other ways of doing it, I will put the code inline and let someone else more expert in Go try to make it look nicer.",
+      "parentUuid": "f476d249_4ec35335",
       "revId": "7b2ee9d901bd4e49a3446ba7242b8650bb0c782d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
