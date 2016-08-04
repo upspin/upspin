@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_2bd0354b",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-04T21:11:35Z",
+      "side": 1,
+      "message": "\u003e s/conpletely/completely",
+      "parentUuid": "54887e72_60f5fcb8",
+      "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "54887e72_ab90a5f0",
         "filename": "cmd/upspinfs/internal/ose/ose.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-04T17:38:25Z",
       "side": 1,
       "message": "s/enryption/encryption",
+      "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_eb446d21",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-04T21:11:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54887e72_ab90a5f0",
       "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -64,6 +100,42 @@
       "writtenOn": "2016-08-04T17:38:25Z",
       "side": 1,
       "message": "Maybe name this PutSymlink and give an example of data?",
+      "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_6bef1d1e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-04T21:11:35Z",
+      "side": 1,
+      "message": "Good point.  client.Link is badly named and confusing since it implies two types of links.  In reality its not a link since it has copy on write semantics.  I\u0027m going to rename it client.PutCopyingReferences.  Crappy sounding name but removes a source of confusion.",
+      "parentUuid": "54887e72_802fc03b",
+      "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_0b8c51de",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-04T21:11:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54887e72_60dc1c3b",
       "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
