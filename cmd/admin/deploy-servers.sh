@@ -81,6 +81,11 @@ function build {
 
     pushd "$root/cmd/$server" >/dev/null
     sed 's/PROJECT/'"$project"'/g' Dockerfile > "$dir"/Dockerfile
+    # TODO(adg): remove this awful special case
+    if [[ "$project" == "upspin-test" ]]; then
+	    sed 's/upspin.io/test.upspin.io/g' "$dir"/Dockerfile > "$dir"/Dockerfile.new
+	    mv "$dir"/Dockerfile.new "$dir"/Dockerfile
+    fi
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "$dir/$server"
     popd >/dev/null
 
