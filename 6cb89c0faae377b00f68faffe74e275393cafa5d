@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14ec463b_ffd8df22",
+        "filename": "dir/merkle/example_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-04T04:00:22Z",
+      "side": 1,
+      "message": "i would leave this out of the CL. it\u0027s not really helping yet.",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14ec463b_dfdd1b11",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-04T04:00:22Z",
+      "side": 1,
+      "message": "s/may/will/?",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14ec463b_3fc36736",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-04T04:00:22Z",
+      "side": 1,
+      "message": "you can\u0027t truncate the log until readers have read it.",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
