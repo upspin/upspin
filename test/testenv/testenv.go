@@ -99,6 +99,7 @@ func New(setup *Setup) (*Env, error) {
 	if err != nil {
 		return nil, err
 	}
+	context.SetPacking(setup.Packing)
 	err = makeRoot(context)
 	if err != nil {
 		return nil, err
