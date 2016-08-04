@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_ba1b1574",
+        "filename": "dir/merkle/example_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T04:27:45Z",
+      "side": 1,
+      "message": "Removed. It was meant to ease the discussion we were having. I\u0027ll bring it back later.",
+      "parentUuid": "14ec463b_ffd8df22",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14ec463b_dfdd1b11",
         "filename": "dir/merkle/merkle.go",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "54887e72_5a21c9a6",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T04:27:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14ec463b_dfdd1b11",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14ec463b_3fc36736",
         "filename": "dir/merkle/merkle.go",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-04T04:00:22Z",
       "side": 1,
       "message": "you can\u0027t truncate the log until readers have read it.",
+      "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54887e72_3a288589",
+        "filename": "dir/merkle/merkle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T04:27:45Z",
+      "side": 1,
+      "message": "Removed. (The meaning I\u0027m searching for here is \"rotates/truncates/moves pointers in the current log of pending writes\"). Leaving it without any mention of log for now. I\u0027m sure log will come back later, maybe as an accessor in the tree.",
+      "parentUuid": "14ec463b_3fc36736",
       "revId": "6cb89c0faae377b00f68faffe74e275393cafa5d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
