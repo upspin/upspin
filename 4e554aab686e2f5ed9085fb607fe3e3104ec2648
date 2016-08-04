@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "744bc246_f5fe5257",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T21:52:14Z",
+      "side": 1,
+      "message": "Yes. I\u0027ll clarify in the next version.",
+      "parentUuid": "744bc246_72f6f8f4",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 36
+      },
+      "revId": "4e554aab686e2f5ed9085fb607fe3e3104ec2648",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "744bc246_b2e6a041",
         "filename": "dir/server/merkle/merkle.go",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2016-08-04T21:25:48Z",
       "side": 1,
       "message": "Shouldn\u0027t this be a logEntry and shouldn\u0027t that be exportable?",
+      "range": {
+        "startLine": 51,
+        "startChar": 11,
+        "endLine": 51,
+        "endChar": 18
+      },
+      "revId": "4e554aab686e2f5ed9085fb607fe3e3104ec2648",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "744bc246_155f5678",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T21:52:14Z",
+      "side": 1,
+      "message": "I\u0027m thinking it\u0027s not. The logEntry will be allocated internally. But maybe I\u0027m off because I have not been thinking much about a LogReader. To me, it will read logEntry privately and export DirEntry. Let\u0027s see when I get there.",
+      "parentUuid": "744bc246_b2e6a041",
       "range": {
         "startLine": 51,
         "startChar": 11,
