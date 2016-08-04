@@ -140,7 +140,7 @@ func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 	if err != nil {
 		return nil, errors.E(Pack, err)
 	}
-	iv := make([]byte, aes.BlockSize)
+	iv := make([]byte, block.BlockSize())
 	// iv=0 is ok because we're certain that dkey is random and not reused
 	stream := cipher.NewCTR(block, iv)
 
