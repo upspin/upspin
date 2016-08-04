@@ -16,6 +16,24 @@
       "revId": "ed4e1adcf3bcbf978fbcc724c35ab6bb25edb851",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14ec463b_df27db1b",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-04T05:27:39Z",
+      "side": 1,
+      "message": "It\u0027s just that cipher.NewCTR expects a cipher.Block and a []byte that of the cipher\u0027s block size. It just seemed more fluent to me to create a byte slice of the cipher\u0027s block size, rather than specifically of the aes block size. (If we switch to another cipher, this should still work?)\n\nI think if we switch to another cipher, we\u0027d need to think about iv again regardless. I don\u0027t think this change affects that reasoning, does it?",
+      "parentUuid": "54887e72_7a77ed99",
+      "revId": "ed4e1adcf3bcbf978fbcc724c35ab6bb25edb851",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
