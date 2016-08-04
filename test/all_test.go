@@ -58,6 +58,7 @@ var (
 )
 
 func TestAllInProcess(t *testing.T) {
+	// Here that we try to run the tests against each packing type:
 	for _, packing := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEPack} {
 		runAllTests(t, packing)
 	}
@@ -105,6 +106,14 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 
 func runAllTests(t *testing.T, packing upspin.Packing) {
 	env := newEnv(t, packing)
+	// But if we do this:
+	got, want := env.Context.Packing(), packing
+	t.Logf("Got packing %v, want packing %v: equal? %v", got, want, got == want)
+	// without the change in this cl, we get these log messages:
+	// 	all_test.go:111: Got packing 20, want packing 1: equal? false
+	// 	all_test.go:111: Got packing 20, want packing 0: equal? false
+	// 	all_test.go:111: Got packing 20, want packing 20: equal? true
+
 	testPutGetTopLevelFile(t, env)
 	testFileSequentialAccess(t, env)
 	testReadAccess(t, packing)
