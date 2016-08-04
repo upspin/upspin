@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54887e72_60dc1c3b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-04T17:14:15Z",
+      "side": 1,
+      "message": "What given attribute?\n\nMaybe this should be called PutWithAttr and the attribute be given? Or perhaps, instead just create a ChangeAttr(name, attr)?\n\nDo you envision any limitation to what \u0027data\u0027 can contain? Or is it up to higher layers to decide?",
+      "revId": "e97c71ab355240fd9379382e3f0b4b2f5d9a6eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
