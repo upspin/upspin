@@ -690,6 +690,9 @@ func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, ciphe
 }
 
 func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
+	if len(pd) == 0 {
+		return sig0, sig0, nil, nil, errors.Str("nil packdata")
+	}
 	if pd[0] != byte(upspin.EEPack) {
 		return sig0, sig0, nil, nil, errors.Errorf("expected packing %d, got %d", upspin.EEPack, pd[0])
 	}
