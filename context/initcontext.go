@@ -9,7 +9,7 @@ import (
 	"bufio"
 	"io"
 	"os"
-	ospath "path"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -74,20 +74,21 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		keyserver:   "",
 		dirserver:   "",
 		storeserver: "",
-		packing:     "plain"}
+		packing:     "plain",
+	}
 
+	// If the provided reader is nil, try $HOME/upspin/rc.
 	if r == nil {
-		home := os.Getenv("HOME") // for *nix
-		if len(home) == 0 {
-			home = os.Getenv("userprofile") // for Windows
-			if len(home) == 0 {
-				return nil, errors.Errorf("unable to load keys, since unable to locate $HOME or %%userprofile%%")
-			}
+		home, err := homedir()
+		if err != nil {
+			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
 		}
-		if f, err := os.Open(ospath.Join(home, "upspin/rc")); err == nil {
-			r = f
-			defer f.Close()
+		f, err := os.Open(filepath.Join(home, "upspin/rc"))
+		if err != nil {
+			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
 		}
+		r = f
+		defer f.Close()
 	}
 
 	// First source of truth is the RC file.
@@ -133,7 +134,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		val := kv[1]
 		if _, ok := vals[attr]; !ok {
 			if inTest {
-				return nil, errors.E("context:", errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
 			} else {
 				log.Printf("context: unrecognized environment variable %q ignored", v)
 			}
@@ -148,14 +149,17 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	context.userName = upspin.UserName(vals["username"])
 	packer := pack.LookupByName(vals["packing"])
 	if packer == nil {
-		return nil, errors.Errorf("unknown packing %s", vals["packing"])
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown packing %s", vals["packing"]))
 	}
 	context.packing = packer.Packing()
 
-	f, err := factotum.New(sshdir()) // TODO Allow RC to override?
+	dir, err := sshdir()
 	if err != nil {
-		log.Error.Print(err)
-		return nil, err
+		return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+	}
+	f, err := factotum.New(dir) // TODO Allow RC to override?
+	if err != nil {
+		return nil, errors.E(op, err)
 	}
 	context.SetFactotum(f)
 	// This must be done before bind so that keys are ready for authenticating to servers.
@@ -164,14 +168,6 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
 	context.dirEndpoint = parseEndpoint(op, vals, dirserver, &err)
 	return context, err
-}
-
-func sshdir() string {
-	home := os.Getenv("HOME")
-	if len(home) == 0 {
-		log.Fatal("no home directory")
-	}
-	return filepath.Join(home, ".ssh")
 }
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
@@ -314,4 +310,42 @@ func (ctx *contextImpl) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
 func (ctx *contextImpl) Copy() upspin.Context {
 	c := *ctx
 	return &c
+}
+
+func homedir() (string, error) {
+	u, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	h := u.HomeDir
+	if h == "" {
+		return "", errors.E(errors.NotExist, errors.Str("user home directory not found"))
+	}
+	if err := isDir(h); err != nil {
+		return "", err
+	}
+	return h, nil
+}
+
+func sshdir() (string, error) {
+	h, err := homedir()
+	if err != nil {
+		return "", err
+	}
+	p := filepath.Join(h, ".ssh")
+	if err := isDir(p); err != nil {
+		return "", err
+	}
+	return p, nil
+}
+
+func isDir(p string) error {
+	fi, err := os.Stat(p)
+	if err != nil {
+		return errors.E(errors.IO, err)
+	}
+	if !fi.IsDir() {
+		return errors.E(errors.NotDir, errors.Str(p))
+	}
+	return nil
 }
