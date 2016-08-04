@@ -10,11 +10,17 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/access"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
+)
+
+// Arguments for errStr in helpers.
+const (
+	success    = ""
+	permission = "permission denied"
+	notExist   = "does not exist"
 )
 
 var (
@@ -31,7 +37,7 @@ type runner struct {
 	t          *testing.T
 }
 
-func (r *runner) read(user upspin.UserName, file upspin.PathName, shouldSucceed bool) {
+func (r *runner) read(user upspin.UserName, file upspin.PathName, errStr string) {
 	file = path.Join(upspin.PathName(r.owner), string(file))
 	var err error
 	client := r.env.Client
@@ -39,10 +45,10 @@ func (r *runner) read(user upspin.UserName, file upspin.PathName, shouldSucceed 
 		client = r.userClient
 	}
 	_, err = client.Get(file)
-	r.check("Get", user, file, err, shouldSucceed)
+	r.check("Get", user, file, err, errStr)
 }
 
-func (r *runner) whichAccess(user upspin.UserName, file upspin.PathName, shouldSucceed bool) {
+func (r *runner) whichAccess(user upspin.UserName, file upspin.PathName, errStr string) {
 	file = path.Join(upspin.PathName(r.owner), string(file))
 	var err error
 	client := r.env.Client
@@ -55,20 +61,18 @@ func (r *runner) whichAccess(user upspin.UserName, file upspin.PathName, shouldS
 		return
 	}
 	_, err = dir.WhichAccess(file)
-	r.check("WhichAccess", user, file, err, shouldSucceed)
+	r.check("WhichAccess", user, file, err, errStr)
 }
 
-func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, err error, shouldSucceed bool) {
-	if shouldSucceed {
+func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, err error, errStr string) {
+	if errStr == "" {
 		if err != nil {
 			r.Errorf("%s: %s %q for user %q failed incorrectly: %v", r.state, op, file, user, err)
 		}
-	} else {
-		if err == nil {
-			r.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
-		} else if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-			r.Errorf("%s: %s %q for user %q failed with wrong error: %v", r.state, op, file, user, err)
-		}
+	} else if err == nil {
+		r.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
+	} else if s := err.Error(); !strings.Contains(s, errStr) {
+		r.Errorf("%s: %s %q for user %q failed with error: %q, want error %q", r.state, op, file, user, err, errStr)
 	}
 }
 
@@ -83,7 +87,7 @@ func (r *runner) Errorf(format string, args ...interface{}) {
 	r.t.Errorf(format, args...)
 }
 
-func (r *runner) write(user upspin.UserName, file upspin.PathName, contents string, shouldSucceed bool) {
+func (r *runner) write(user upspin.UserName, file upspin.PathName, contents string, errStr string) {
 	file = path.Join(upspin.PathName(r.owner), string(file))
 	var err error
 	client := r.env.Client
@@ -91,7 +95,7 @@ func (r *runner) write(user upspin.UserName, file upspin.PathName, contents stri
 		client = r.userClient
 	}
 	_, err = client.Put(file, []byte(contents))
-	r.check("Put", user, file, err, shouldSucceed)
+	r.check("Put", user, file, err, errStr)
 }
 
 func testReadAccess(t *testing.T, packing upspin.Packing) {
@@ -115,10 +119,10 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		Transport: upspin.InProcess,
 		Keys:      key,
 		Tree: testenv.Tree{
-			testenv.E(groupDir+"/", ""),
-			testenv.E(publicDir+"/", ""),
+			testenv.E(groupDir+"/", success),
+			testenv.E(publicDir+"/", success),
 			testenv.E(publicFile, contentsOfPublic),
-			testenv.E(privateDir+"/", ""),
+			testenv.E(privateDir+"/", success),
 			testenv.E(privateFile, "private"),
 		},
 	}
@@ -142,18 +146,18 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 
 	// With no access files, every item is readable by owner.
 	r.state = "No Access files"
-	r.read(owner, "", true)
-	r.read(owner, privateDir, true)
-	r.read(owner, privateDir, true)
-	r.read(owner, publicDir, true)
-	r.read(owner, publicFile, true)
+	r.read(owner, "", success)
+	r.read(owner, privateDir, success)
+	r.read(owner, privateDir, success)
+	r.read(owner, publicDir, success)
+	r.read(owner, publicFile, success)
 
 	// With no access files, no item is readable by user.
-	r.read(user, "", false)
-	r.read(user, privateDir, false)
-	r.read(user, privateDir, false)
-	r.read(user, publicDir, false)
-	r.read(user, publicFile, false)
+	r.read(user, "", permission)
+	r.read(user, privateDir, permission)
+	r.read(user, privateDir, permission)
+	r.read(user, publicDir, permission)
+	r.read(user, publicFile, permission)
 
 	// Add /public/Access, granting Read to user and write to owner.
 	const accessFile = "/public/Access"
@@ -161,39 +165,39 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		accessText = fmt.Sprintf("r:%s\nw:%s", user, owner)
 	)
 	r.state = "With Access file"
-	r.write(owner, accessFile, accessText, true)
+	r.write(owner, accessFile, accessText, success)
 
 	// With Access file, every item is still readable by owner.
-	r.read(owner, "", true)
-	r.read(owner, privateDir, true)
-	r.read(owner, privateDir, true)
-	r.read(owner, publicDir, true)
-	r.read(owner, publicFile, true)
+	r.read(owner, "", success)
+	r.read(owner, privateDir, success)
+	r.read(owner, privateDir, success)
+	r.read(owner, publicDir, success)
+	r.read(owner, publicFile, success)
 
 	// With Access file, only public items are readable by user.
-	r.read(user, "", false)
-	r.read(user, privateDir, false)
-	r.read(user, privateDir, false)
-	r.read(user, publicDir, true)
+	r.read(user, "", permission)
+	r.read(user, privateDir, permission)
+	r.read(user, privateDir, permission)
+	r.read(user, publicDir, success)
 
 	// The only way to update the keys for the file using the Client interface is to use Put,
 	// which will call packer.Share. That also stores the file again, which is unnecessary. TODO.
-	r.write(owner, publicFile, contentsOfPublic, true)
-	r.read(user, publicFile, true)
+	r.write(owner, publicFile, contentsOfPublic, success)
+	r.read(user, publicFile, success)
 
 	// Change Access file to disable again.
 	const (
 		noUserAccessText = "r: someoneElse@test.com\n"
 	)
 	r.state = "With no user in Access file"
-	r.write(owner, accessFile, noUserAccessText, true)
+	r.write(owner, accessFile, noUserAccessText, success)
 
-	r.read(user, "", false)
-	r.read(user, privateDir, false)
-	r.read(user, privateDir, false)
-	r.read(user, publicDir, false)
-	r.read(user, publicFile, false)
-	r.write(user, publicFile, "will not succeed", false)
+	r.read(user, "", permission)
+	r.read(user, privateDir, permission)
+	r.read(user, privateDir, permission)
+	r.read(user, publicDir, permission)
+	r.read(user, publicFile, permission)
+	r.write(user, publicFile, "will not succeed", notExist)
 
 	// Now create a group and put user in it and make owner a writer.
 	const groupFile = "/Group/mygroup"
@@ -202,29 +206,29 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		groupText       = fmt.Sprintf("%s\n", user)
 	)
 	r.state = "With user in Group file"
-	r.write(owner, accessFile, groupAccessText, true)
-	r.write(owner, groupFile, groupText, true)
+	r.write(owner, accessFile, groupAccessText, success)
+	r.write(owner, groupFile, groupText, success)
 
-	r.read(user, "", false)
-	r.read(user, privateDir, false)
-	r.read(user, privateDir, false)
-	r.read(user, publicDir, true)
+	r.read(user, "", permission)
+	r.read(user, privateDir, permission)
+	r.read(user, privateDir, permission)
+	r.read(user, publicDir, success)
 
-	r.write(owner, publicFile, contentsOfPublic, true) // Put file again to trigger sharing.
-	r.read(user, publicFile, true)
+	r.write(owner, publicFile, contentsOfPublic, success) // Put file again to trigger sharing.
+	r.read(user, publicFile, success)
 
 	// Take user out of the group.
 	const (
 		noUserGroupText = "someoneElse@test.com\n"
 	)
 	r.state = "With no user in Group file"
-	r.write(owner, groupFile, noUserGroupText, true)
+	r.write(owner, groupFile, noUserGroupText, success)
 
-	r.read(user, "", false)
-	r.read(user, privateDir, false)
-	r.read(user, privateDir, false)
-	r.read(user, publicDir, false)
-	r.read(user, publicFile, false)
+	r.read(user, "", permission)
+	r.read(user, privateDir, permission)
+	r.read(user, privateDir, permission)
+	r.read(user, publicDir, permission)
+	r.read(user, publicFile, permission)
 }
 
 func testWhichAccess(t *testing.T, packing upspin.Packing) {
@@ -247,9 +251,9 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		Transport: upspin.InProcess,
 		Keys:      key,
 		Tree: testenv.Tree{
-			testenv.E(publicDir+"/", ""),
+			testenv.E(publicDir+"/", success),
 			testenv.E(publicFile, contentsOfPublic),
-			testenv.E(privateDir+"/", ""),
+			testenv.E(privateDir+"/", success),
 			testenv.E(privateFile, "private"),
 		},
 	}
@@ -273,18 +277,18 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 
 	// With no access files, every item is seen by owner.
 	r.state = "No Access files"
-	r.whichAccess(owner, "", true)
-	r.whichAccess(owner, privateDir, true)
-	r.whichAccess(owner, privateDir, true)
-	r.whichAccess(owner, publicDir, true)
-	r.whichAccess(owner, publicFile, true)
+	r.whichAccess(owner, "", success)
+	r.whichAccess(owner, privateDir, success)
+	r.whichAccess(owner, privateDir, success)
+	r.whichAccess(owner, publicDir, success)
+	r.whichAccess(owner, publicFile, success)
 
 	// With no access files, no item is seen by user.
-	r.whichAccess(user, "", false)
-	r.whichAccess(user, privateDir, false)
-	r.whichAccess(user, privateDir, false)
-	r.whichAccess(user, publicDir, false)
-	r.whichAccess(user, publicFile, false)
+	r.whichAccess(user, "", notExist)
+	r.whichAccess(user, privateDir, notExist)
+	r.whichAccess(user, privateDir, notExist)
+	r.whichAccess(user, publicDir, notExist)
+	r.whichAccess(user, publicFile, notExist)
 
 	// Add /public/Access, granting List to user.
 	const accessFile = "/public/Access"
@@ -292,18 +296,18 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		accessText = fmt.Sprintf("list:%s\nw:%s", user, owner)
 	)
 	r.state = "With Access file"
-	r.write(owner, accessFile, accessText, true)
+	r.write(owner, accessFile, accessText, success)
 
 	// With Access file, every item is seen by owner.
-	r.whichAccess(owner, "", true)
-	r.whichAccess(owner, privateDir, true)
-	r.whichAccess(owner, privateDir, true)
-	r.whichAccess(owner, publicDir, true)
-	r.whichAccess(owner, publicFile, true)
+	r.whichAccess(owner, "", success)
+	r.whichAccess(owner, privateDir, success)
+	r.whichAccess(owner, privateDir, success)
+	r.whichAccess(owner, publicDir, success)
+	r.whichAccess(owner, publicFile, success)
 
 	// With Access file, only public items are seen by user.
-	r.whichAccess(user, "", false)
-	r.whichAccess(user, privateDir, false)
-	r.whichAccess(user, privateDir, false)
-	r.whichAccess(user, publicDir, true)
+	r.whichAccess(user, "", notExist)
+	r.whichAccess(user, privateDir, notExist)
+	r.whichAccess(user, privateDir, notExist)
+	r.whichAccess(user, publicDir, success)
 }
