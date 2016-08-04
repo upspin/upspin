@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54887e72_7a77ed99",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-04T04:41:59Z",
+      "side": 1,
+      "message": "I\u0027m not adamantly opposed; it is not an immediate problem you installed this.\n\nBut for my edification, why is this an improvement?  You figure that block will someday switch to a yet-to-be-invented cipher other than AES, and you\u0027re sure in that case iv\u003d0 is ok?\n\nMaybe there is some type error with the old version that I don\u0027t understand?",
+      "revId": "ed4e1adcf3bcbf978fbcc724c35ab6bb25edb851",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
