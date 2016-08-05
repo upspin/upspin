@@ -23,9 +23,9 @@ const (
 )
 
 var (
-	ownersKey    = keyStore[ownersName]["p256"]
-	readersKey   = keyStore[readersName]["p256"]
-	ownersKey521 = keyStore[ownersName]["p521"]
+	ownerKey    = keyStore[ownerName]["p256"]
+	readerKey   = keyStore[readerName]["p256"]
+	ownerKey521 = keyStore[ownerName]["p521"]
 )
 
 type runner struct {
@@ -110,7 +110,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
-	key := ownersKey
+	key := ownerKey
 	// TODO  try different key types
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
@@ -242,7 +242,7 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
-	key := ownersKey
+	key := ownerKey
 	// TODO  try different key types
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),

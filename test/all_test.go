@@ -23,15 +23,15 @@ import (
 // These variables and consts are used by access_test and integration_test. Don't change them here without updating
 // their use there. Also, the keys are registered in the public User service.
 const (
-	ownersName  = "upspin-test@google.com"
-	readersName = "upspin-friend-test@google.com"
+	ownerName  = "upspin-test@google.com"
+	readerName = "upspin-friend-test@google.com"
 )
 
 var (
 	keyStore = map[upspin.UserName]map[string]testenv.KeyPair{
 		// These keys belong to a fictitious user called upspin-test@google.com. If they're changed here, please upload
 		// the public ones to the keyserver on upspin.io:5582
-		upspin.UserName(ownersName): {
+		upspin.UserName(ownerName): {
 			"p256": testenv.KeyPair{
 				Public:  upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n"),
 				Private: "82201047360680847258309465671292633303992565667422607675215625927005262185934",
@@ -43,7 +43,7 @@ var (
 		},
 		// These keys belong to a fictitious user called upspin-friend-test@google.com. If they're changed here, please upload
 		// the public ones to the keyserver on upspin.io:5582
-		upspin.UserName(readersName): {
+		upspin.UserName(readerName): {
 			"p256": testenv.KeyPair{
 				Public:  upspin.PublicKey("p256\n71924488370379946818987229050653820040970171638729570985826507440590282890744\n98209510739612452175889722244428941929387851511059412496741067489708636153322\n"),
 				Private: "12667847114690182845907216480350218830765432137334449282204959715092837120411",
