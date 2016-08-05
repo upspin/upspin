@@ -4,15 +4,15 @@
 
 // Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
 // which contain the private and public parts of a keypair.
-
-// Eventually we'll offer something like ssh-agent, but we need
-// to start with a usable and safe standalone tool.
+// Existing keypairs are appended to ~/.ssh/secret2.upspinkey.
+// Someday we hope to integrate with ssh-agent.
 package main
 
 import (
 	"encoding/binary"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -85,6 +85,42 @@ func createKeys() {
 	}
 }
 
+func saveKeys() {
+	private, err := os.Open(filepath.Join(keydir(), "secret.upspinkey"))
+	if os.IsNotExist(err) {
+		return // There is nothing we need to save.
+	}
+	priv, err := ioutil.ReadAll(private)
+	if err != nil {
+		log.Fatal(err)
+	}
+	public, err := os.Open(filepath.Join(keydir(), "public.upspinkey"))
+	if err != nil {
+		log.Fatal(err) // Halt. Existing files are corrupted and need manual attention.
+	}
+	pub, err := ioutil.ReadAll(public)
+	if err != nil {
+		log.Fatal(err)
+	}
+	archive, err := os.OpenFile(filepath.Join(keydir(), "secret2.upspinkey"),
+		os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+	if err != nil {
+		log.Fatal(err) // We don't have permission to archive old keys?
+	}
+	_, err = archive.Write([]byte("# EE \n")) // TODO(ehg) add file date
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = archive.Write(pub)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = archive.Write(priv)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("keygen: ")
@@ -109,6 +145,7 @@ func main() {
 	if packer == nil {
 		log.Fatal("unrecognized packing ee")
 	}
+	saveKeys()
 	createKeys()
 }
 

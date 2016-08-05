@@ -22,12 +22,6 @@ const (
 	notExist   = "does not exist"
 )
 
-var (
-	ownerKey    = keyStore[ownerName]["p256"]
-	readerKey   = keyStore[readerName]["p256"]
-	ownerKey521 = keyStore[ownerName]["p521"]
-)
-
 type runner struct {
 	state      string
 	env        *testenv.Env
@@ -110,13 +104,10 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
-	key := ownerKey
-	// TODO  try different key types
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
 		Packing:   packing,
 		Transport: upspin.InProcess,
-		Keys:      key,
 		Tree: testenv.Tree{
 			testenv.E(groupDir+"/", success),
 			testenv.E(publicDir+"/", success),
@@ -131,7 +122,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		t.Fatal(err)
 	}
 
-	userClient, _, err := env.NewUser(user, nil)
+	userClient, _, err := env.NewUser(user)
 	if err != nil {
 		t.Fatalf("NewUser: %v", err)
 	}
@@ -242,13 +233,10 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
-	key := ownerKey
-	// TODO  try different key types
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
 		Packing:   packing,
 		Transport: upspin.InProcess,
-		Keys:      key,
 		Tree: testenv.Tree{
 			testenv.E(publicDir+"/", success),
 			testenv.E(publicFile, contentsOfPublic),
@@ -262,7 +250,7 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		t.Fatal(err)
 	}
 
-	userClient, _, err := env.NewUser(user, nil)
+	userClient, _, err := env.NewUser(user)
 	if err != nil {
 		t.Fatalf("NewUser: %v", err)
 	}

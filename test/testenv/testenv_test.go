@@ -22,7 +22,6 @@ func TestInProcess(t *testing.T) {
 	testSetup := &Setup{
 		OwnerName: upspin.UserName(userName),
 		Packing:   upspin.EEPack,
-		KeyKind:   "p256",
 		Transport: upspin.InProcess,
 		Tree: Tree{
 			E("Dir1/", ""),

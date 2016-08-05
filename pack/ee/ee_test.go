@@ -6,8 +6,6 @@ package ee
 
 import (
 	"bytes"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
 	"log"
@@ -114,27 +112,27 @@ func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packe
 
 func TestPack256(t *testing.T) {
 	const (
-		user upspin.UserName = "user@google.com"
+		user upspin.UserName = "joe@upspin.io"
 		name                 = upspin.PathName(user + "/file/of/user.256")
 		text                 = "this is some text 256"
 	)
-	ctx, packer := setup(user, "p256")
+	ctx, packer := setup(user)
 	testPackAndUnpack(t, ctx, packer, name, []byte(text))
 }
 
 func TestName256(t *testing.T) {
 	const (
-		user    upspin.UserName = "user@google.com"
+		user    upspin.UserName = "joe@upspin.io"
 		name                    = upspin.PathName(user + "/file/of/user.256")
 		newName                 = upspin.PathName(user + "/file/of/user.256.2")
 		text                    = "this is some text 256"
 	)
-	ctx, packer := setup(user, "p256")
+	ctx, packer := setup(user)
 	testPackNameAndUnpack(t, ctx, packer, name, newName, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
-	const user upspin.UserName = "user@google.com"
+	const user upspin.UserName = "joe@upspin.io"
 	data := make([]byte, fileSize)
 	n, err := rand.Read(data)
 	if err != nil {
@@ -145,7 +143,7 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	}
 	data = data[:n]
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
-	ctx, packer := setup(user, curveName)
+	ctx, packer := setup(user)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
 			Name:    name,
@@ -204,40 +202,35 @@ func shareBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, readers [
 }
 
 func TestSharing(t *testing.T) {
-	// dude@google.com is the owner of a file that is shared with bob@foo.com.
+	// joe@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
-		dudesUserName  upspin.UserName = "dude@google.com"
-		pathName                       = upspin.PathName(dudesUserName + "/secret_file_shared_with_bob")
+		joesUserName   upspin.UserName = "joe@google.com"
+		pathName                       = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
 		bobsUserName   upspin.UserName = "bob@foo.com"
 		carlasUserName upspin.UserName = "carla@baz.edu"
-		text                           = "bob, here's the secret file. Sincerely, The Dude."
+		text                           = "bob, here's the secret file. Sincerely, The Joe."
 	)
 	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 	carlaPublic := upspin.PublicKey("p384\n26172614276096813357206176213406982397222536659671409755310805362042028026922579207014531049688734331134000100158544\n17028658482487767962568267600820350664652897469525797908053707470805274016916949610485516295521856564391853226932191\n")
 
-	// Set up Dude as the creator/owner.
-	ctx, packer := setup(dudesUserName, "p256")
-	// Set up a mock user service that knows about Dude's public keys (for checking signature during unpack).
+	// Set up Joe as the creator/owner.
+	joectx, packer := setup(joesUserName)
+	// Set up a mock user service that knows about Joe's public keys (for checking signature during unpack).
 	mockKey := &dummyKey{
-		userToMatch: []upspin.UserName{dudesUserName},
-		keyToReturn: []upspin.PublicKey{joePublic},
+		userToMatch: []upspin.UserName{joesUserName},
+		keyToReturn: []upspin.PublicKey{joectx.Factotum().PublicKey()},
 	}
-	f, err := factotum.New(repo("key/testdata/joe"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	ctx.SetFactotum(f) // Override setup to prevent reading keys from .ssh/
 	bind.ReregisterKeyServer(upspin.InProcess, mockKey)
-	ctx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	joectx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
 	}
-	d.Writer = ctx.UserName()
-	cipher := packBlob(t, ctx, packer, d, []byte(text))
+	d.Writer = joectx.UserName()
+	cipher := packBlob(t, joectx, packer, d, []byte(text))
 	// Share with Bob and Carla.
-	shareBlob(t, ctx, packer, []upspin.PublicKey{joePublic, bobPublic, carlaPublic}, &d.Packdata)
+	shareBlob(t, joectx, packer, []upspin.PublicKey{joePublic, bobPublic, carlaPublic}, &d.Packdata)
 
 	readers, err := packer.ReaderHashes(d.Packdata)
 	if err != nil {
@@ -254,51 +247,41 @@ func TestSharing(t *testing.T) {
 	}
 
 	// Now load Bob as the current user.
-	ctx.SetUserName(bobsUserName)
-	f, err = factotum.New(repo("key/testdata/bob"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	ctx.SetFactotum(f)
-
-	clear := unpackBlob(t, ctx, packer, d, cipher)
+	bobctx, packer := setup(bobsUserName)
+	bobctx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	clear := unpackBlob(t, bobctx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
 
-	// Finally, check that unpack looked up Dude's public key, to verify the signature.
+	// Finally, check that unpack looked up Joe's public key, to verify the signature.
 	if mockKey.returnedKeys != 1 {
 		t.Fatal("Packer failed to request dude's public key")
 	}
 
 	// Load Carla as the current user.
-	ctx.SetUserName(carlasUserName)
-	f, err = factotum.New(repo("key/testdata/carla"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	ctx.SetFactotum(f)
-
-	clear = unpackBlob(t, ctx, packer, d, cipher)
+	carlactx, packer := setup(carlasUserName)
+	carlactx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	clear = unpackBlob(t, carlactx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
 }
 
 func TestBadSharing(t *testing.T) {
-	// dudette@google.com is the owner of a file that is attempting to be shared with mia@foo.com, but share wasn't called.
+	// joe@google.com is the owner of a file that is attempting to be shared with bob@foo.com, but share wasn't called.
 	const (
-		dudettesUserName upspin.UserName = "dudette@google.com" // shares key with joe
-		pathName                         = upspin.PathName(dudettesUserName + "/secret_file_shared_with_mia")
-		miasUserName     upspin.UserName = "mia@foo.com" // shares key with bob
-		text                             = "mia, here's the secret file. sincerely, dudette."
+		joesUserName upspin.UserName = "joe@google.com"
+		pathName                     = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
+		bobsUserName upspin.UserName = "bob@foo.com"
+		text                         = "bob, here's the secret file. sincerely, joe."
 	)
 	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 
-	ctx, packer := setup(dudettesUserName, "p256")
+	ctx, packer := setup(joesUserName)
 	mockKey := &dummyKey{
-		userToMatch: []upspin.UserName{miasUserName, dudettesUserName},
+		userToMatch: []upspin.UserName{bobsUserName, joesUserName},
 		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
 	}
 	f, err := factotum.New(repo("key/testdata/joe"))
@@ -317,17 +300,17 @@ func TestBadSharing(t *testing.T) {
 	d.Writer = ctx.UserName()
 	packBlob(t, ctx, packer, d, []byte(text))
 
-	// Don't share with Mia (do nothing).
+	// Don't share with Bob (do nothing).
 
-	// Now load Mia as the current user.
-	ctx.SetUserName(miasUserName)
+	// Now load Bob as the current user.
+	ctx.SetUserName(bobsUserName)
 	f, err = factotum.New(repo("key/testdata/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	ctx.SetFactotum(f)
 
-	// Mia can't unpack.
+	// Bob can't unpack.
 	_, err = packer.Unpack(ctx, d)
 	if err == nil {
 		t.Fatal("Expected error, got none.")
@@ -337,32 +320,16 @@ func TestBadSharing(t *testing.T) {
 	}
 }
 
-func setup(name upspin.UserName, curveName string) (upspin.Context, upspin.Packer) {
-	var curve elliptic.Curve
-	switch curveName {
-	case "p256":
-		curve = elliptic.P256()
-	case "p384":
-		curve = elliptic.P384()
-	case "p521":
-		curve = elliptic.P521()
-	default:
-		errors.E("setup", curveName, errors.NotExist, errors.Str("unknown curve"))
-	}
-
+func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	ctx := context.New().SetUserName(name)
 	packer := pack.Lookup(packing)
-	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
-	if err != nil {
-		// would be nice to t.Fatal but then can't call from Benchmark?
-		panic("ecdsa.GenerateKey failed")
-		// return ctx, packer
+	j := strings.IndexByte(string(name), '@')
+	if j < 0 {
+		log.Fatal("malformed username %s", name)
 	}
-	public := upspin.PublicKey(fmt.Sprintf("p256\n%s\n%s\n", priv.X.String(), priv.Y.String()))
-	private := fmt.Sprintf("%s\n", priv.D.String())
-	f, err := factotum.DeprecatedNew(public, private)
+	f, err := factotum.New(repo("key/testdata/" + string(name[:j])))
 	if err != nil {
-		panic("DeprecatedNewFactotum failed")
+		log.Fatal("unable to initialize factotum for %s", string(name[:j]))
 	}
 	ctx.SetFactotum(f)
 	return ctx, packer
@@ -397,8 +364,8 @@ func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, e
 }
 
 func TestMultiBlockRoundTrip(t *testing.T) {
-	const userName = upspin.UserName("ken@google.com")
-	ctx, packer := setup(userName, "p256")
+	const userName = upspin.UserName("aly@upspin.io")
+	ctx, packer := setup(userName)
 	packtest.TestMultiBlockRoundTrip(t, ctx, packer, userName)
 }
 
