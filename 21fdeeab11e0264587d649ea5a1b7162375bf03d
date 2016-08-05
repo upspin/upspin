@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "19f47f40_1f9503e0",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:34:02Z",
+      "side": 1,
+      "message": "I don\u0027t think this is desirable. In most contexts where these are printed, we don\u0027t want to have spaces. maybe it should be \"packing(%x)\" ?",
+      "parentUuid": "19f47f40_7f864fc3",
+      "revId": "21fdeeab11e0264587d649ea5a1b7162375bf03d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19f47f40_5f8b8bc7",
         "filename": "upspin/code.go",
         "patchSetId": 1
