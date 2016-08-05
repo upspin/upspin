@@ -197,7 +197,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, privateDir, permission)
 	r.read(user, publicDir, permission)
 	r.read(user, publicFile, permission)
-	r.write(user, publicFile, "will not succeed", notExist)
+	r.write(user, publicFile, "will not succeed", permission)
 
 	// Now create a group and put user in it and make owner a writer.
 	const groupFile = "/Group/mygroup"

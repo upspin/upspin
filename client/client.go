@@ -104,9 +104,12 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 
-	// Add other readers from the access file.
-	if err := c.addReaders(de, name, packer); err != nil {
-		return nil, errors.E(op, err)
+	if packer.Packing() == upspin.EEPack {
+		// For EE, update the packing for the other
+		// readers as specified by the Access file.
+		if err := c.addReaders(de, name, packer); err != nil {
+			return nil, errors.E(op, err)
+		}
 	}
 
 	// Record directory entry.
@@ -119,9 +122,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 }
 
 func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
-	if packer.String() != "ee" {
-		return nil
-	}
 	directory, err := bind.DirServer(c.context, c.context.DirEndpoint())
 	if err != nil {
 		return err
@@ -131,6 +131,16 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	// We do this before "Store contents", so an error return wastes little.
 	accessName, err := directory.WhichAccess(name)
 	if err != nil {
+		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
+			// If WhichAccess returns a "not found" error then
+			// either the destination directory doesn't exist or we don't
+			// have permission to probe that name space.
+			// Either way, we don't have permission to write here
+			// so return a permission error.
+			// This tweak guarantees that the error message from
+			// Put is independent of the packing.
+			e.Kind = errors.Permission
+		}
 		return err
 	}
 	var readers []upspin.UserName
