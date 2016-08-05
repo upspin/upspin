@@ -349,3 +349,16 @@ func (d *DirEntry) SetLink() error {
 	d.Attr = AttrLink
 	return nil
 }
+
+func (p Packing) String() string {
+	switch p {
+	case PlainPack:
+		return "plain"
+	case DebugPack:
+		return "debug"
+	case EEPack:
+		return "ee"
+	default:
+		return fmt.Sprintf("unknown(%x)", p)
+	}
+}
