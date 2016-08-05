@@ -95,7 +95,10 @@ type Factotum interface {
 	UserSign(hash []byte) (Signature, error)
 
 	// PublicKey returns the user's public key in canonical string format.
-	PublicKey() PublicKey
+	// If keyHash is nil or empty, the current key is returned; otherwise,
+	// the PublicKey with the given hash is returned, or the empty string
+	// if there is no matching key.
+	PublicKey(keyHash []byte) PublicKey
 }
 
 // A Packing identifies the technique for turning the data pointed to by

@@ -166,7 +166,7 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		readers, err = acc.Users(access.Read, c.Get)
 	}
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-	readersPublicKey[0] = c.context.Factotum().PublicKey()
+	readersPublicKey[0] = c.context.Factotum().PublicKey(nil)
 	n := 1
 	for _, r := range readers {
 		u, err := c.context.KeyServer().Lookup(r)
