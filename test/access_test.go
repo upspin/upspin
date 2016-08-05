@@ -81,7 +81,7 @@ func (r *runner) Errorf(format string, args ...interface{}) {
 		if slash := strings.LastIndexByte(file, '/'); slash >= 0 {
 			file = file[slash+1:]
 		}
-		format = fmt.Sprintf("%s:%d with %v packing: ", file, line, r.env.Context.Packing()) + format
+		format = fmt.Sprintf("%s:%d: ", file, line) + format
 	}
 	r.t.Errorf(format, args...)
 }
