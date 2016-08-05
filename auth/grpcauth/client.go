@@ -104,7 +104,6 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 // keepAlive loops forever pinging the server every keepAliveInterval. It skips pings if there has been network
 // activity more recently than the keep alive interval. It must run on a separate go routine.
 func (ac *AuthClientService) keepAlive() {
-	log.Debug.Printf("Starting keep alive client")
 	sleepFor := ac.keepAliveInterval
 	for {
 		select {
@@ -188,7 +187,6 @@ func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
 	if err != nil {
 		return err
 	}
-	log.Debug.Printf("Authenticate: got authtoken for user %s: %s", req.UserName, resp.Token)
 	ac.authToken = resp.Token
 	now := time.Now()
 	ac.lastTokenRefresh = now
@@ -226,7 +224,6 @@ func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 			return nil, err
 		}
 	}
-	log.Debug.Printf("SetAuthContext: set auth token: %s", ac.authToken)
 	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
 }
 

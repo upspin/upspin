@@ -229,7 +229,6 @@ func testGlobWithPattern(t *testing.T, env *e.Env) {
 
 func testDelete(t *testing.T, env *e.Env) {
 	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
-	log.Printf("Context: Username: %s", env.Context.UserName())
 	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
@@ -413,7 +412,7 @@ func cleanup(env *e.Env) error {
 			if firstErr == nil {
 				firstErr = err
 			}
-			log.Printf("Error deleting %s: %s", name, err)
+			log.Printf("cleanup: error deleting %q: %v", name, err)
 		}
 	}
 	// First, delete all Access files, so we don't lock ourselves out if our tests above remove delete rights.
@@ -423,7 +422,6 @@ func cleanup(env *e.Env) error {
 		}
 	}
 	for _, entry := range entries {
-		log.Printf("Deleting %s", entry.Name)
 		deleteNow(entry.Name)
 	}
 	return firstErr

@@ -68,11 +68,8 @@ var userNameCounter = 0
 // newEnv configures a test environment using a packing.
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 	log.Printf("===== Using packing: %d", packing)
-
-	userName := newUserName()
-
 	s := &testenv.Setup{
-		OwnerName: userName,
+		OwnerName: newUserName(),
 		Transport: upspin.InProcess,
 		Packing:   packing,
 		KeyKind:   "p256",

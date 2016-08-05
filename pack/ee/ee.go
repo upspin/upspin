@@ -455,9 +455,6 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 				if err != nil {
 					continue
 				}
-				v := w.ephemeral
-				log.Printf("Wrap for %x [%d %d]", hash[i], v.X, v.Y)
-				// TODO(ehg) Save to a separate log and provide post-analysis.
 				pw = &w
 			} // else reuse the existing wrapped dkey.
 			wrap[nwrap] = *pw
@@ -784,7 +781,6 @@ func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, erro
 	// In form 2, there is an Curve field in the struct that plays that role.
 	// Form 3, used only in keygen.go, is simply 128 bits of entropy.
 
-	log.Debug.Printf("Getting pub key for user: %s", user) // TODO(ehg) Log no longer needed?
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName()) {
 		return ctx.Factotum().PublicKey(), nil
