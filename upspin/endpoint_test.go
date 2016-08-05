@@ -27,7 +27,7 @@ func TestErrorCases(t *testing.T) {
 // against an error found by vet and fixed.
 func TestErroneousString(t *testing.T) {
 	e := Endpoint{Transport: 127, NetAddr: "whatnot"}
-	const expect = "unknown transport {127, whatnot}"
+	const expect = "unknown transport {transport(127), whatnot}"
 	got := e.String()
 	if got != expect {
 		t.Fatalf("expected %q; got %q", expect, got)

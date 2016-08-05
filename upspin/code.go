@@ -361,7 +361,7 @@ func (p Packing) String() string {
 	case EEPack:
 		return "ee"
 	default:
-		return fmt.Sprintf("packing(%x)", p)
+		return fmt.Sprintf("packing(%d)", int(p))
 	}
 }
 
@@ -378,6 +378,6 @@ func (t Transport) String() string {
 	case HTTPS:
 		return "https"
 	default:
-		return fmt.Sprintf("transport(%x)", t)
+		return fmt.Sprintf("transport(%d)", int(t))
 	}
 }
