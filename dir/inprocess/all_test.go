@@ -603,4 +603,17 @@ func TestWhichAccess(t *testing.T) {
 	if accessName != accessFileName {
 		t.Errorf("expected %q, got %q", accessFileName, accessName)
 	}
+	// Remove Access file from dir1.
+	err = dir.Delete(entry.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// No access file exists (again). Should get root.
+	accessName, err = dir.WhichAccess(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessName != "" {
+		t.Errorf("expected no Access file, got %q", accessName)
+	}
 }
