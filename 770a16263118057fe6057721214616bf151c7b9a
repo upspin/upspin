@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "744bc246_fbe00327",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-05T00:43:37Z",
+      "side": 1,
+      "message": "I see. Yeah, I think something was yanked when we dropped EE256Pack and EE521Pack, etc in favor of just plain EEPack. The code I pointed out below ensures we use one of the keys that matches the packing, but if it\u0027s using a packing that does not do signatures (debug and plain), then it\u0027s not setting the packing.",
+      "revId": "770a16263118057fe6057721214616bf151c7b9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
