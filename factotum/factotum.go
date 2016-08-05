@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -100,7 +99,6 @@ func readKeys(dir string) (upspin.PublicKey, string, error) {
 
 // FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.
 func (f Factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
-	log.Debug.Printf("factotum.fileSign %s %s %d %x\n", f.curveName, n, t, hash)
 	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, VerHash(f.curveName, n, t, dkey, hash))
 	if err != nil {
 		return sig0, err
@@ -110,7 +108,6 @@ func (f Factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) 
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
 func (f Factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
-	log.Debug.Printf("factotum.scalarMult %x %d %d\n", keyHash, x, y)
 	if !bytes.Equal(f.keyHash, keyHash) {
 		err = errors.E("scalarMult", errors.Errorf("no such key %x!=%x", f.keyHash, keyHash))
 	} else {
