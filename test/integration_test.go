@@ -53,7 +53,7 @@ const (
 )
 
 var (
-	setup = testenv.Setup{
+	setupTemplate = testenv.Setup{
 		Tree: testenv.Tree{
 			testenv.E("/dir1/", ""),
 			testenv.E("/dir2/", ""),
@@ -62,7 +62,6 @@ var (
 			testenv.E("/dir2/file3.pdf", contentsOfFile3),
 		},
 		OwnerName:                 ownersName,
-		Transport:                 upspin.GCP,
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   cleanup,
 	}
@@ -103,32 +102,21 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 	if len(dirs) != 1 {
 		t.Fatalf("Expected 1 entry, got %d", len(dirs))
 	}
-	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), !hasLocation, len(contentsOfFile1))
+	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), !hasLocation, 0)
 
 	// Ensure we can't read the data.
 	_, err = readerClient.Get(upspin.PathName(file))
 	if err == nil {
-		t.Errorf("Expected error, got none")
+		t.Errorf("Get(%q) succeeded, expected permission denied", file)
 	}
-	/* TODO: Understand what this is trying to do and fix it or delete it.
-	// An empty reference by default points to an unassigned service, which is what we expect if
-	// we can't read it, but can list.
-	expectedError := "request to unassigned service"
-	if !strings.Contains(err.Error(), expectedError) {
-		t.Errorf("Expected error contains %s, got %s", expectedError, err)
+	if !strings.Contains(err.Error(), "permission") {
+		t.Errorf("Get(%q) returned error %q, expected permission denied", file, err)
 	}
-	*/
 }
 
 func testAllowReadAccess(t *testing.T, env *testenv.Env) {
-	// Owner has no delete permission.
-	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("r:"+readersName+"\nc,w,l,r:"+ownersName))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Must Put the file again.
-	// TODO: remove this from here when Update is ready.
-	_, err = env.Client.Put(ownersName+"/dir1/file1.txt", []byte(contentsOfFile1))
+	// Owner has no delete permission (assumption tested in testDelete).
+	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l,r:"+readersName+"\nc,w,l,r:"+ownersName))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,23 +167,68 @@ func testCreateAndOpen(t *testing.T, env *testenv.Env) {
 }
 
 func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
+	dir1Pat := ownersName + "/dir1/*.txt"
+	dir2Pat := ownersName + "/dir2/*.txt"
+	bothPat := ownersName + "/dir*/*.txt"
+
+	checkDirs := func(context, pat string, dirs []*upspin.DirEntry, want int) {
+		got := len(dirs)
+		if got == want {
+			return
+		}
+		for _, d := range dirs {
+			t.Log("got:", d.Name)
+		}
+		t.Fatalf("%v globbing %v saw %v dirs, want %v", context, pat, got, want)
+	}
+
 	// Owner sees both files.
-	pattern := ownersName + "/dir*/*.txt"
-	dirs, err := env.Client.Glob(pattern)
+	dirs, err := env.Client.Glob(bothPat)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(dirs) != 2 {
-		t.Fatalf("Expected 2 dirs, got %d", len(dirs))
-	}
+	checkDirs("owner", bothPat, dirs, 2)
 	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 	checkDirEntry(t, dirs[1], upspin.PathName(ownersName+"/dir2/file2.txt"), hasLocation, len(contentsOfFile2))
 
-	// readerClient should only be able to see contents of dir1 not dir2.
-	dirs, err = readerClient.Glob(pattern)
-	if len(dirs) != 1 {
-		t.Fatalf("Expected 2 dirs, got %d", len(dirs))
+	// readerClient should be able to see /dir1/
+	dirs, err = readerClient.Glob(dir1Pat)
+	if err != nil {
+		t.Fatal(err)
 	}
+	checkDirs("reader", dir1Pat, dirs, 1)
+	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+
+	// but not /dir2/
+	dirs, err = readerClient.Glob(dir2Pat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkDirs("reader", dir2Pat, dirs, 0)
+
+	// Without list access to the root, the reader can't glob /dir*.
+	dirs, err = readerClient.Glob(bothPat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkDirs("reader", bothPat, dirs, 0)
+
+	// Give the reader list access to the root.
+	_, err = env.Client.Put(ownersName+"/Access", []byte("l:"+readersName+"\n*:"+ownersName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// But don't give them any access to /dir2/.
+	_, err = env.Client.Put(ownersName+"/dir2/Access", []byte("*:"+ownersName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Then try globbing the root again
+	dirs, err = readerClient.Glob(bothPat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkDirs("reader after access", bothPat, dirs, 1)
 	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 }
 
@@ -239,8 +272,8 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), "not found") {
-		t.Errorf("Expected error contains not found, got %s", err)
+	if !strings.Contains(err.Error(), "not exist") {
+		t.Errorf("Expected error contains not exist, got %s", err)
 	}
 	// But I can't delete files in dir1, since I lack permission.
 	pathName = upspin.PathName(ownersName + "/dir1/file1.txt")
@@ -313,19 +346,18 @@ func testSharing(t *testing.T, env *testenv.Env) {
 	}
 }
 
-func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
-	setup.KeyKind = curveName
-	var readersKey testenv.KeyPair
+func testAllOnePacking(t *testing.T, setup testenv.Setup) {
+	var readerKey testenv.KeyPair
 	// Keys are needed with any packing type (even Plain) for auth purposes.
-	setup.Keys = keyStore[setup.OwnerName][curveName]
-	readersKey = keyStore[readersName][curveName]
+	setup.Keys = keyStore[setup.OwnerName][setup.KeyKind]
+	readerKey = keyStore[readersName][setup.KeyKind]
 
 	env, err := testenv.New(&setup)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	readerClient, _, err = env.NewUser(readersName, &readersKey)
+	readerClient, _, err = env.NewUser(readersName, &readerKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -353,18 +385,25 @@ func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 }
 
 func TestIntegration(t *testing.T) {
-	type testSetup struct {
-		packing upspin.Packing
-		curve   string
-	}
-	for _, p := range []testSetup{
-		{packing: upspin.PlainPack, curve: "p256"},
-		{packing: upspin.EEPack, curve: "p256"},
-		//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
-		{packing: upspin.DebugPack, curve: "p256"},
-	} {
-		t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
-			testAllOnePacking(t, p.packing, p.curve)
+	for _, transport := range []upspin.Transport{upspin.InProcess, upspin.GCP} {
+		t.Run(fmt.Sprintf("transport=%v", transport), func(t *testing.T) {
+			setup := setupTemplate
+			setup.Transport = transport
+			for _, p := range []struct {
+				packing upspin.Packing
+				curve   string
+			}{
+				{packing: upspin.PlainPack, curve: "p256"},
+				{packing: upspin.DebugPack, curve: "p256"},
+				{packing: upspin.EEPack, curve: "p256"},
+				//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
+			} {
+				setup.Packing = p.packing
+				setup.KeyKind = p.curve
+				t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
+					testAllOnePacking(t, setup)
+				})
+			}
 		})
 	}
 }
@@ -376,19 +415,19 @@ func checkDirEntry(t *testing.T, dirEntry *upspin.DirEntry, name upspin.PathName
 	}
 	if loc := locationOf(dirEntry); loc == (upspin.Location{}) {
 		if hasLocation {
-			t.Errorf("Expected %s to have location", name)
+			t.Errorf("%s has no location, expected one", name)
 		}
 	} else {
 		if !hasLocation {
-			t.Errorf("Expected %s not to have location, got %v", name, loc)
+			t.Errorf("%s has location %v, want none", name, loc)
 		}
 	}
 	dSize, err := dirEntry.Size()
 	if err != nil {
 		t.Errorf("Size error: %s: %v", name, err)
 	}
-	if size != 0 && dSize != int64(size) {
-		t.Errorf("Expected %s has size %d, got %d", name, size, dSize)
+	if got, want := int(dSize), size; got != want {
+		t.Errorf("%s has size %d, want %d", name, got, want)
 	}
 }
 
@@ -400,15 +439,16 @@ func locationOf(entry *upspin.DirEntry) upspin.Location {
 }
 
 func cleanup(env *testenv.Env) error {
-	fileSet1, err := env.Client.Glob(ownersName + "/*/*")
-	if err != nil {
-		return err
-	}
-	fileSet2, err := env.Client.Glob(ownersName + "/*")
-	if err != nil {
-		return err
-	}
 	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
+	if err != nil {
+		return err
+	}
+
+	fileSet1, err := dir.Glob(ownersName + "/*/*")
+	if err != nil {
+		return err
+	}
+	fileSet2, err := dir.Glob(ownersName + "/*")
 	if err != nil {
 		return err
 	}
@@ -423,14 +463,17 @@ func cleanup(env *testenv.Env) error {
 			log.Printf("cleanup: error deleting %q: %v", name, err)
 		}
 	}
-	// First, delete all Access files, so we don't lock ourselves out if our tests above remove delete rights.
+	// First, delete all Access files,
+	// so we don't lock ourselves out if our tests above remove delete rights.
 	for _, entry := range entries {
-		if strings.HasSuffix(string(entry.Name), "Access") {
+		if access.IsAccessFile(entry.Name) {
 			deleteNow(entry.Name)
 		}
 	}
 	for _, entry := range entries {
-		deleteNow(entry.Name)
+		if !access.IsAccessFile(entry.Name) {
+			deleteNow(entry.Name)
+		}
 	}
 	return firstErr
 }
