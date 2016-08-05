@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "19f47f40_dfc43b0e",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f47f40_5f582b88",
+      "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19f47f40_7f53ef6f",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-05T07:12:19Z",
       "side": 1,
       "message": "formatting",
+      "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19f47f40_bfd177ca",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f47f40_7f53ef6f",
       "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "19f47f40_5fe26ba1",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:19:49Z",
+      "side": 1,
+      "message": "deleted",
+      "parentUuid": "19f47f40_7fb40f9b",
+      "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19f47f40_3fbe8779",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "19f47f40_7fdd2fd9",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f47f40_3fbe8779",
+      "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19f47f40_1fc3c307",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-08-05T07:12:19Z",
       "side": 1,
       "message": "if you drop the stuff above, you can do parsed.IsRoot()",
+      "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19f47f40_9fceb328",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T07:19:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f47f40_1fc3c307",
       "revId": "3ee3a716195d7a45a0937e6a8bc8705a9424a4ed",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
