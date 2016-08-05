@@ -54,7 +54,7 @@ func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.D
 	// Not in cache. Is it in the negative cache?
 	if _, ok := d.dirNegCache.Get(path); ok {
 		// It *is* in the *negative* cache, so we know it's not found.
-		return nil, errors.E(path, errors.NotExist, errors.Str("file not found"))
+		return nil, errors.E(path, errors.NotExist)
 	}
 	var savedDirEntry upspin.DirEntry
 
