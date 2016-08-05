@@ -5,12 +5,7 @@
 // Package merkle implements a Merkle tree whose nodes are DirEntry entries.
 package merkle
 
-import (
-	"sync"
-	"time"
-
-	"upspin.io/upspin"
-)
+import "upspin.io/upspin"
 
 // Tree is a representation of a directory tree composed of DirEntries.
 type Tree interface {
@@ -59,21 +54,27 @@ type Log interface {
 
 	// Drop deletes the entries up to (but not including) the index.
 	Drop(index int)
+
+	// Root returns the location of the user's root.
+	Root() upspin.Location
+
+	// SetRoot sets the user's root.
+	SetRoot(upspin.Location)
 }
 
 // Config configures the behavior of the Tree.
 type Config struct {
-	// Store is where the Tree stores its blocks permanently.
-	Store upspin.StoreServer
+	// StoreEndpoint is where the Tree stores its blocks permanently.
+	StoreEndpoint upspin.Endpoint
+
+	// Factotum is the Tree's private key, for authenticating with the Store.
+	Factotum upspin.Factotum
+
+	// ServerName is the Tree's user name for authenticating with the Store.
+	ServerName upspin.UserName
 
 	// Log manipulates the log on behalf of the tree.
 	Log Log
-}
-
-// New creates an empty Tree for a user.
-func New(user upspin.UserName, config *Config) Tree {
-	// TODO
-	return nil
 }
 
 // Load loads a tree from its root's location.
@@ -92,55 +93,3 @@ func NewLog( /* TBD ... */ ) Log {
 func OpenLogs( /* TBD ... */ ) []Log {
 	return nil
 }
-
-// TODO: the rest of this file should live in another file or in an internal package.
-// It's here for now just for the initial check-in and then it will be moved, to keep this clean.
-
-// operation specifies the operation that caused a log entry to be appended.
-type operation int
-
-const (
-	add operation = iota
-	remove
-)
-
-// logEntry represents an entry in the log.
-type logEntry struct {
-	dirEntry upspin.DirEntry
-	op       operation
-	mTime    time.Time
-}
-
-// node is an internal representation of a node in the tree.
-type node struct {
-	// mu protects all fields.
-	mu sync.Mutex
-
-	// dirEntry is the DirEntry this node represents.
-	dirEntry *upspin.DirEntry
-
-	// children maps a fragment of a path name to the dir entries that represent them.
-	// It is empty if this node's dirEntry represents a file; if it represents a directory,
-	// children holds the memory-loaded subdir nodes (not all subdir nodes may be memory-loaded
-	// at a given time).
-	children map[string]*node
-
-	// dirty indicates whether this node's DirEntry has been modified.
-	dirty bool
-}
-
-// tree implements Tree.
-type tree struct {
-	user upspin.UserName
-	root *node
-	// TBD
-}
-
-// get implements the main logic behind Tree.Peek and Tree.Get. It returns the dirEntry if found or an error.
-// If the entry is found its dirty status is returned indicating whether its internal references are not
-// up-to-date until a flush to permanent storage happens.
-func (t *tree) get(path upspin.PathName) (de *upspin.DirEntry, mustFlush bool, err error) {
-	return nil, false, nil
-}
-
-// TODO
