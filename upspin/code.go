@@ -361,6 +361,23 @@ func (p Packing) String() string {
 	case EEPack:
 		return "ee"
 	default:
-		return fmt.Sprintf("unknown(%x)", p)
+		return fmt.Sprintf("packing(%x)", p)
+	}
+}
+
+func (t Transport) String() string {
+	switch t {
+	case Unassigned:
+		return "unassigned"
+	case InProcess:
+		return "inprocess"
+	case GCP:
+		return "gcp"
+	case Remote:
+		return "remote"
+	case HTTPS:
+		return "https"
+	default:
+		return fmt.Sprintf("transport(%x)", t)
 	}
 }
