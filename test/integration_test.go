@@ -30,7 +30,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/path"
-	e "upspin.io/test/testenv"
+	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/transports"
@@ -53,13 +53,13 @@ const (
 )
 
 var (
-	setup = e.Setup{
-		Tree: e.Tree{
-			e.E("/dir1/", ""),
-			e.E("/dir2/", ""),
-			e.E("/dir1/file1.txt", contentsOfFile1),
-			e.E("/dir2/file2.txt", contentsOfFile2),
-			e.E("/dir2/file3.pdf", contentsOfFile3),
+	setup = testenv.Setup{
+		Tree: testenv.Tree{
+			testenv.E("/dir1/", ""),
+			testenv.E("/dir2/", ""),
+			testenv.E("/dir1/file1.txt", contentsOfFile1),
+			testenv.E("/dir2/file2.txt", contentsOfFile2),
+			testenv.E("/dir2/file3.pdf", contentsOfFile3),
 		},
 		OwnerName:                 ownersName,
 		Transport:                 upspin.GCP,
@@ -69,7 +69,7 @@ var (
 	readerClient upspin.Client
 )
 
-func testNoReadersAllowed(t *testing.T, env *e.Env) {
+func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
 	var err error
 	fileName := upspin.PathName(ownersName + "/dir1/file1.txt")
 	_, err = readerClient.Get(fileName)
@@ -89,7 +89,7 @@ func testNoReadersAllowed(t *testing.T, env *e.Env) {
 	}
 }
 
-func testAllowListAccess(t *testing.T, env *e.Env) {
+func testAllowListAccess(t *testing.T, env *testenv.Env) {
 	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l:"+readersName))
 	if err != nil {
 		t.Fatal(err)
@@ -120,7 +120,7 @@ func testAllowListAccess(t *testing.T, env *e.Env) {
 	*/
 }
 
-func testAllowReadAccess(t *testing.T, env *e.Env) {
+func testAllowReadAccess(t *testing.T, env *testenv.Env) {
 	// Owner has no delete permission.
 	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("r:"+readersName+"\nc,w,l,r:"+ownersName))
 	if err != nil {
@@ -141,7 +141,7 @@ func testAllowReadAccess(t *testing.T, env *e.Env) {
 	}
 }
 
-func testCreateAndOpen(t *testing.T, env *e.Env) {
+func testCreateAndOpen(t *testing.T, env *testenv.Env) {
 	filePath := upspin.PathName(path.Join(ownersName, "myotherfile.txt"))
 	c := env.Client
 
@@ -178,7 +178,7 @@ func testCreateAndOpen(t *testing.T, env *e.Env) {
 	}
 }
 
-func testGlobWithLimitedAccess(t *testing.T, env *e.Env) {
+func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 	// Owner sees both files.
 	pattern := ownersName + "/dir*/*.txt"
 	dirs, err := env.Client.Glob(pattern)
@@ -199,7 +199,7 @@ func testGlobWithLimitedAccess(t *testing.T, env *e.Env) {
 	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 }
 
-func testGlobWithPattern(t *testing.T, env *e.Env) {
+func testGlobWithPattern(t *testing.T, env *testenv.Env) {
 	c := env.Client
 
 	for i := 0; i <= 10; i++ {
@@ -227,7 +227,7 @@ func testGlobWithPattern(t *testing.T, env *e.Env) {
 	}
 }
 
-func testDelete(t *testing.T, env *e.Env) {
+func testDelete(t *testing.T, env *testenv.Env) {
 	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
 	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
 	if err != nil {
@@ -264,7 +264,7 @@ func testDelete(t *testing.T, env *e.Env) {
 	}
 }
 
-func testSharing(t *testing.T, env *e.Env) {
+func testSharing(t *testing.T, env *testenv.Env) {
 	const (
 		sharedContent = "Hey man, whatup?"
 	)
@@ -315,12 +315,12 @@ func testSharing(t *testing.T, env *e.Env) {
 
 func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 	setup.KeyKind = curveName
-	var readersKey e.KeyPair
+	var readersKey testenv.KeyPair
 	// Keys are needed with any packing type (even Plain) for auth purposes.
 	setup.Keys = keyStore[setup.OwnerName][curveName]
 	readersKey = keyStore[readersName][curveName]
 
-	env, err := e.New(&setup)
+	env, err := testenv.New(&setup)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -333,7 +333,7 @@ func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 	// The ordering here is important as each test adds state to the tree.
 	for _, test := range []struct {
 		name string
-		fn   func(*testing.T, *e.Env)
+		fn   func(*testing.T, *testenv.Env)
 	}{
 		{"NoReadersAllowed", testNoReadersAllowed},
 		{"AllowListAccess", testAllowListAccess},
@@ -399,7 +399,7 @@ func locationOf(entry *upspin.DirEntry) upspin.Location {
 	return entry.Blocks[0].Location
 }
 
-func cleanup(env *e.Env) error {
+func cleanup(env *testenv.Env) error {
 	fileSet1, err := env.Client.Glob(ownersName + "/*/*")
 	if err != nil {
 		return err
