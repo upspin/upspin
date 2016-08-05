@@ -61,7 +61,7 @@ var (
 			testenv.E("/dir2/file2.txt", contentsOfFile2),
 			testenv.E("/dir2/file3.pdf", contentsOfFile3),
 		},
-		OwnerName:                 ownersName,
+		OwnerName:                 ownerName,
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   cleanup,
 	}
@@ -70,7 +70,7 @@ var (
 
 func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
 	var err error
-	fileName := upspin.PathName(ownersName + "/dir1/file1.txt")
+	fileName := upspin.PathName(ownerName + "/dir1/file1.txt")
 	_, err = readerClient.Get(fileName)
 	if err == nil {
 		t.Fatal("Expected error")
@@ -89,12 +89,12 @@ func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
 }
 
 func testAllowListAccess(t *testing.T, env *testenv.Env) {
-	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l:"+readersName))
+	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l:"+readerName))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Now check that readerClient can list file1, but can't read and therefore the Location is zeroed out.
-	file := ownersName + "/dir1/file1.txt"
+	file := ownerName + "/dir1/file1.txt"
 	dirs, err := readerClient.Glob(file)
 	if err != nil {
 		t.Fatal(err)
@@ -102,7 +102,7 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 	if len(dirs) != 1 {
 		t.Fatalf("Expected 1 entry, got %d", len(dirs))
 	}
-	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), !hasLocation, 0)
+	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), !hasLocation, 0)
 
 	// Ensure we can't read the data.
 	_, err = readerClient.Get(upspin.PathName(file))
@@ -116,11 +116,11 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 
 func testAllowReadAccess(t *testing.T, env *testenv.Env) {
 	// Owner has no delete permission (assumption tested in testDelete).
-	_, err := env.Client.Put(ownersName+"/dir1/Access", []byte("l,r:"+readersName+"\nc,w,l,r:"+ownersName))
+	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l,r:"+readerName+"\nc,w,l,r:"+ownerName))
 	if err != nil {
 		t.Fatal(err)
 	}
-	data, err := readerClient.Get(upspin.PathName(ownersName + "/dir1/file1.txt"))
+	data, err := readerClient.Get(upspin.PathName(ownerName + "/dir1/file1.txt"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func testAllowReadAccess(t *testing.T, env *testenv.Env) {
 }
 
 func testCreateAndOpen(t *testing.T, env *testenv.Env) {
-	filePath := upspin.PathName(path.Join(ownersName, "myotherfile.txt"))
+	filePath := upspin.PathName(path.Join(ownerName, "myotherfile.txt"))
 	c := env.Client
 
 	f, err := c.Create(filePath)
@@ -167,9 +167,9 @@ func testCreateAndOpen(t *testing.T, env *testenv.Env) {
 }
 
 func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
-	dir1Pat := ownersName + "/dir1/*.txt"
-	dir2Pat := ownersName + "/dir2/*.txt"
-	bothPat := ownersName + "/dir*/*.txt"
+	dir1Pat := ownerName + "/dir1/*.txt"
+	dir2Pat := ownerName + "/dir2/*.txt"
+	bothPat := ownerName + "/dir*/*.txt"
 
 	checkDirs := func(context, pat string, dirs []*upspin.DirEntry, want int) {
 		got := len(dirs)
@@ -188,8 +188,8 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 		t.Fatal(err)
 	}
 	checkDirs("owner", bothPat, dirs, 2)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
-	checkDirEntry(t, dirs[1], upspin.PathName(ownersName+"/dir2/file2.txt"), hasLocation, len(contentsOfFile2))
+	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	checkDirEntry(t, dirs[1], upspin.PathName(ownerName+"/dir2/file2.txt"), hasLocation, len(contentsOfFile2))
 
 	// readerClient should be able to see /dir1/
 	dirs, err = readerClient.Glob(dir1Pat)
@@ -197,7 +197,7 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 		t.Fatal(err)
 	}
 	checkDirs("reader", dir1Pat, dirs, 1)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 
 	// but not /dir2/
 	dirs, err = readerClient.Glob(dir2Pat)
@@ -214,12 +214,12 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 	checkDirs("reader", bothPat, dirs, 0)
 
 	// Give the reader list access to the root.
-	_, err = env.Client.Put(ownersName+"/Access", []byte("l:"+readersName+"\n*:"+ownersName))
+	_, err = env.Client.Put(ownerName+"/Access", []byte("l:"+readerName+"\n*:"+ownerName))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// But don't give any access to /dir2/.
-	_, err = env.Client.Put(ownersName+"/dir2/Access", []byte("*:"+ownersName))
+	_, err = env.Client.Put(ownerName+"/dir2/Access", []byte("*:"+ownerName))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,39 +229,39 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 		t.Fatal(err)
 	}
 	checkDirs("reader after access", bothPat, dirs, 1)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownersName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 }
 
 func testGlobWithPattern(t *testing.T, env *testenv.Env) {
 	c := env.Client
 
 	for i := 0; i <= 10; i++ {
-		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", ownersName, i))
+		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", ownerName, i))
 		_, err := c.MakeDirectory(dirPath)
 		if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
 			t.Fatal(err)
 		}
 	}
-	dirEntries, err := c.Glob(ownersName + "/mydir[0-1]*")
+	dirEntries, err := c.Glob(ownerName + "/mydir[0-1]*")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(dirEntries) != 3 {
 		t.Fatalf("Expected 3 paths, got %d", len(dirEntries))
 	}
-	if string(dirEntries[0].Name) != ownersName+"/mydir0" {
+	if string(dirEntries[0].Name) != ownerName+"/mydir0" {
 		t.Errorf("Expected mydir0, got %s", dirEntries[0].Name)
 	}
-	if string(dirEntries[1].Name) != ownersName+"/mydir1" {
+	if string(dirEntries[1].Name) != ownerName+"/mydir1" {
 		t.Errorf("Expected mydir1, got %s", dirEntries[1].Name)
 	}
-	if string(dirEntries[2].Name) != ownersName+"/mydir10" {
+	if string(dirEntries[2].Name) != ownerName+"/mydir10" {
 		t.Errorf("Expected mydir10, got %s", dirEntries[2].Name)
 	}
 }
 
 func testDelete(t *testing.T, env *testenv.Env) {
-	pathName := upspin.PathName(ownersName + "/dir2/file3.pdf")
+	pathName := upspin.PathName(ownerName + "/dir2/file3.pdf")
 	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
@@ -276,7 +276,7 @@ func testDelete(t *testing.T, env *testenv.Env) {
 		t.Errorf("Expected error contains not exist, got %s", err)
 	}
 	// But I can't delete files in dir1, since I lack permission.
-	pathName = upspin.PathName(ownersName + "/dir1/file1.txt")
+	pathName = upspin.PathName(ownerName + "/dir1/file1.txt")
 	err = dir.Delete(pathName)
 	if err == nil {
 		t.Fatal("Expected error, got none")
@@ -285,7 +285,7 @@ func testDelete(t *testing.T, env *testenv.Env) {
 		t.Errorf("Expected error %s, got %s", access.ErrPermissionDenied, err)
 	}
 	// But we can always remove the Access file.
-	accessPathName := upspin.PathName(ownersName + "/dir1/Access")
+	accessPathName := upspin.PathName(ownerName + "/dir1/Access")
 	err = dir.Delete(accessPathName)
 	if err != nil {
 		t.Fatal(err)
@@ -302,13 +302,13 @@ func testSharing(t *testing.T, env *testenv.Env) {
 		sharedContent = "Hey man, whatup?"
 	)
 	var (
-		sharedDir      = path.Join(ownersName, "mydir")
+		sharedDir      = path.Join(ownerName, "mydir")
 		sharedFilePath = path.Join(sharedDir, "sharedfile")
 	)
 	c := env.Client
 
 	// Put an Access file where no one has access (this forces updating the parent dir with no access).
-	accessFile := "r,c,w,d,l:" + ownersName // all rights to the owner.
+	accessFile := "r,c,w,d,l:" + ownerName // all rights to the owner.
 	_, err := c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
 	if err != nil {
 		t.Fatal(err)
@@ -325,7 +325,7 @@ func testSharing(t *testing.T, env *testenv.Env) {
 	}
 
 	// Put an Access file first, giving our friend read access. The owner retains all rights.
-	accessFile = fmt.Sprintf("r: %s\nr,c,w,d,l:%s", readersName, ownersName)
+	accessFile = fmt.Sprintf("r: %s\nr,c,w,d,l:%s", readerName, ownerName)
 	_, err = c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
 	if err != nil {
 		t.Fatal(err)
@@ -350,14 +350,14 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 	var readerKey testenv.KeyPair
 	// Keys are needed with any packing type (even Plain) for auth purposes.
 	setup.Keys = keyStore[setup.OwnerName][setup.KeyKind]
-	readerKey = keyStore[readersName][setup.KeyKind]
+	readerKey = keyStore[readerName][setup.KeyKind]
 
 	env, err := testenv.New(&setup)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	readerClient, _, err = env.NewUser(readersName, &readerKey)
+	readerClient, _, err = env.NewUser(readerName, &readerKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -444,11 +444,11 @@ func cleanup(env *testenv.Env) error {
 		return err
 	}
 
-	fileSet1, err := dir.Glob(ownersName + "/*/*")
+	fileSet1, err := dir.Glob(ownerName + "/*/*")
 	if err != nil {
 		return err
 	}
-	fileSet2, err := dir.Glob(ownersName + "/*")
+	fileSet2, err := dir.Glob(ownerName + "/*")
 	if err != nil {
 		return err
 	}
