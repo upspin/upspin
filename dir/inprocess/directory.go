@@ -490,7 +490,7 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(Glob, err)
 	}
 	s.db.mu.RLock()
-	dirEntry, ok := s.db.root[parsed.User()]
+	rootEntry, ok := s.db.root[parsed.User()]
 	s.db.mu.RUnlock()
 	if !ok {
 		return nil, errors.E(Glob, upspin.PathName(pattern), errors.NotExist, "no such user")
@@ -506,28 +506,29 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	next := make([]*upspin.DirEntry, 1, 100)
 	// Make placeholder entry for the root to bootstrap the loop. It doesn't need the block data.
 	// Make a copy of the entry so we don't overwrite the root if we wipe the data before returning.
-	e := *dirEntry
+	e := *rootEntry
 	next[0] = &e
 	for i := 0; i < parsed.NElem(); i++ {
 		elem := parsed.Elem(i)
-		// Need to check List permission. Permission check is done for any
-		// intermediate step (directory) if it's matched by a pattern, and for the final
-		// entry always.
-		if isGlobPattern(elem) || i == parsed.NElem()-1 {
-			ok, err := s.can(access.List, parsed.First(i))
-			if err != nil {
-				return nil, errors.E(Glob, upspin.PathName(pattern), err)
-			}
-			if !ok {
-				return nil, errors.E(Glob, upspin.PathName(pattern), access.ErrPermissionDenied)
-			}
-		}
 		this, next = next, this[:0]
 		for _, ent := range this {
 			// ent must refer to a directory.
 			if !ent.IsDir() {
 				continue
 			}
+			// Need to check List permission.
+			// Permission check is done for any intermediate step
+			// (directory) if it's matched by a pattern,
+			// and for the final entry always.
+			if isGlobPattern(elem) || i == parsed.NElem()-1 {
+				p, _ := path.Parse(ent.Name) // should always succeed
+				if ok, err := s.can(access.List, p); err != nil {
+					return nil, errors.E(Glob, upspin.PathName(pattern), err)
+				} else if !ok {
+					continue
+				}
+			}
+			// Fetch the directory's contents.
 			payload, err := s.readAll(s.db.dirContext, ent)
 			if err != nil {
 				return nil, errors.E(Glob, ent.Name, errors.Str("internal error: invalid reference: "+err.Error()))
@@ -539,31 +540,36 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					return nil, errors.E(Glob, ent.Name, err)
 				}
 				payload = remaining
-				parsed, err := path.Parse(nextEntry.Name)
+				nextParsed, err := path.Parse(nextEntry.Name)
 				if err != nil {
 					return nil, errors.E(Glob, ent.Name, err)
 				}
 				// No need to check error; pattern is validated above.
-				if matched, _ := goPath.Match(elem, parsed.Elem(parsed.NElem()-1)); !matched {
+				if matched, _ := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1)); !matched {
 					continue
 				}
 				next = append(next, &nextEntry)
 			}
 		}
 	}
+
+	// Now iterate over the parsed entries and clear out the location
+	// information for entries we can't read.
+	// We only need do the check once per directory.
+
+	// checked and canRead apply to all files in checkedPrefix.
 	var checked, canRead bool
+	var checkedPrefix upspin.PathName
+
+	sort.Sort(dirEntrySlice(next))
 	for _, entry := range next {
-		// Need a / on the root if it's matched.
-		if entry.Name == upspin.PathName(parsed.User()) {
-			entry.Name += "/"
+		parsed, _ := path.Parse(entry.Name) // should always work
+		if parent := parsed.Drop(1).Path(); !parsed.IsRoot() && checkedPrefix != parent {
+			checkedPrefix = parent
+			checked = false
 		}
-		// Clear out the location information if we can't read this.
-		// All will be in the same directory so we only need to check one.
 		if !checked {
-			parsed, err := path.Parse(entry.Name)
-			if err != nil {
-				canRead, _ = s.can(access.Read, parsed)
-			}
+			canRead, _ = s.can(access.Read, parsed)
 			checked = true
 		}
 		if !canRead {
@@ -571,7 +577,6 @@ func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			entry.Packdata = nil
 		}
 	}
-	sort.Sort(dirEntrySlice(next))
 
 	return next, nil
 }
