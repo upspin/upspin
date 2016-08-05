@@ -6,7 +6,6 @@
 package factotum
 
 import (
-	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -22,6 +21,23 @@ import (
 	"upspin.io/upspin"
 )
 
+type factotumKey struct {
+	keyHash      []byte
+	public       upspin.PublicKey
+	private      string
+	ecdsaKeyPair ecdsa.PrivateKey // ecdsa form of key pair
+	curveName    string
+}
+
+type keyHashArray [sha256.Size]byte
+
+type factotum struct {
+	current keyHashArray
+	keys    map[keyHashArray]factotumKey
+}
+
+var _ upspin.Factotum = factotum{}
+
 var sig0 upspin.Signature // for returning nil
 
 // KeyHash returns the hash of a key, given in string format.
@@ -30,76 +46,97 @@ func KeyHash(p upspin.PublicKey) []byte {
 	return keyHash[:]
 }
 
-var _ upspin.Factotum = Factotum{}
-
-type Factotum struct {
-	keyHash      []byte
-	public       upspin.PublicKey
-	private      string
-	ecdsaKeyPair ecdsa.PrivateKey // ecdsa form of key pair
-	curveName    string
-}
-
 // New returns a new Factotum providing all needed private key operations,
-// loading private keys from dir/*.upspinkey.
-func New(dir string) (*Factotum, error) {
-	pub, priv, err := readKeys(dir)
+// loading keys from dir/*.upspinkey.
+// Our desired end state is that Factotum is implemented on each platform by the
+// best local means of protecting private keys.  Please do not break the abstraction
+// by hand coding direct generation or use of private keys.
+func New(dir string) (upspin.Factotum, error) {
+	op := "NewFactotum"
+	privBytes, err := readFile(op, dir, "secret.upspinkey")
 	if err != nil {
 		return nil, err
 	}
-	return DeprecatedNew(pub, priv)
+	pubBytes, err := readFile(op, dir, "public.upspinkey")
+	if err != nil {
+		return nil, err
+	}
+	pfk, err := makeKey(upspin.PublicKey(pubBytes), string(privBytes))
+	if err != nil {
+		return nil, err
+	}
+	fm := make(map[keyHashArray]factotumKey)
+	var h keyHashArray
+	copy(h[:], pfk.keyHash)
+	fm[h] = *pfk
+	f := &factotum{
+		current: h,
+		keys:    fm,
+	}
+
+	// Read older key pairs.
+	// Current file format is "# EE date" concatenated with old public.upspinkey
+	// then old secret.upspinkey, and repeat.  This should be cleaned up someday
+	// when we have a better idea of what other kinds of keys we need to save.
+	// For now, it is cavalier about bailing out at first little mistake.
+	s2, err := readFile(op, dir, "secret2.upspinkey")
+	if err != nil {
+		return f, nil
+	}
+	lines := strings.Split(string(s2), "\n")
+	for {
+		if len(lines) < 5 {
+			break // This is not enough for a complete key pair.
+		}
+		if lines[0] != "# EE " {
+			break // This is not a kind of key we recognize.
+		}
+		// lines[0] "# EE "     Joe's key
+		// lines[1] "p256"
+		// lines[2] "1042...6334" public X
+		// lines[3] "2694...192"  public Y
+		// lines[4] "8220...5934" private D
+		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4])
+		if err != nil {
+			break
+		}
+		var h keyHashArray
+		copy(h[:], pfk.keyHash)
+		_, ok := f.keys[h]
+		if ok { // Duplicate.
+			continue // TODO Should we warn?
+		}
+		f.keys[h] = *pfk
+		lines = lines[5:]
+	}
+	return f, err
 }
 
-// DeprecatedNew returns a new Factotum providing all needed private key operations.
-// TODO(ehg)  Replace all uses of DeprecatedNew by New.
-func DeprecatedNew(public upspin.PublicKey, private string) (*Factotum, error) {
-	ePublicKey, curveName, err := ParsePublicKey(public)
+// makeKey creates a factotumKey by filling in the derived fields.
+func makeKey(pub upspin.PublicKey, priv string) (*factotumKey, error) {
+	ePublicKey, curveName, err := ParsePublicKey(pub)
+	// TODO(ehg) sanity check that priv is consistent with pub
 	if err != nil {
 		return nil, err
 	}
-	ecdsaKeyPair, err := parsePrivateKey(ePublicKey, private)
+	ecdsaKeyPair, err := parsePrivateKey(ePublicKey, priv)
 	if err != nil {
 		return nil, err
 	}
-	f := &Factotum{
-		keyHash:      KeyHash(public),
-		public:       public,
-		private:      private,
+	fk := factotumKey{
+		keyHash:      KeyHash(pub),
+		public:       pub,
+		private:      priv,
 		ecdsaKeyPair: *ecdsaKeyPair,
 		curveName:    curveName,
 	}
-	return f, nil
-}
-
-// readKeys returns the contents of dir/secret.upspinkey and dir/public.upspinkey.
-func readKeys(dir string) (upspin.PublicKey, string, error) {
-	op := "readKeys"
-	priv, err := ioutil.ReadFile(filepath.Join(dir, "secret.upspinkey"))
-	if os.IsNotExist(err) {
-		return "", "", errors.E(op, errors.NotExist, err)
-	}
-	if err != nil {
-		return "", "", errors.E(op, errors.IO, err)
-	}
-	priv = bytes.TrimSpace(priv)
-	// TrimSpace(priv) is required because big Int UnmarshalText forbids trailing newline.
-
-	pub, err := ioutil.ReadFile(filepath.Join(dir, "public.upspinkey"))
-	if os.IsNotExist(err) {
-		return "", "", errors.E(op, errors.NotExist, err)
-	}
-	if err != nil {
-		return "", "", errors.E(op, errors.IO, err)
-	}
-	// TrimSpace(pub) is forbidden because signature hash requires trailing newline.
-
-	return upspin.PublicKey(pub), string(priv), nil
-	// TODO sanity check that Private is consistent with Public
+	return &fk, nil
 }
 
 // FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.
-func (f Factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
-	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, VerHash(f.curveName, n, t, dkey, hash))
+func (f factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
+	fk := f.keys[f.current]
+	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, VerHash(fk.curveName, n, t, dkey, hash))
 	if err != nil {
 		return sig0, err
 	}
@@ -107,28 +144,46 @@ func (f Factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) 
 }
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
-func (f Factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
-	if !bytes.Equal(f.keyHash, keyHash) {
-		err = errors.E("scalarMult", errors.Errorf("no such key %x!=%x", f.keyHash, keyHash))
+func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
+	var h keyHashArray
+	copy(h[:], keyHash)
+	fk, ok := f.keys[h]
+	if !ok {
+		err = errors.E("scalarMult", errors.Errorf("no such key %x", keyHash))
 	} else {
-		sx, sy = curve.ScalarMult(x, y, f.ecdsaKeyPair.D.Bytes())
+		sx, sy = curve.ScalarMult(x, y, fk.ecdsaKeyPair.D.Bytes())
 	}
 	return
 }
 
 // UserSign assists in authenticating to Upspin servers.
-func (f Factotum) UserSign(hash []byte) (upspin.Signature, error) {
-	// no logging or constraining hash, because will change soon to TokenBinding anyway
-	r, s, err := ecdsa.Sign(rand.Reader, &f.ecdsaKeyPair, hash)
+func (f factotum) UserSign(hash []byte) (upspin.Signature, error) {
+	// no logging or constraining hash, because will change to TokenBinding anyway
+	fk := f.keys[f.current]
+	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
 	if err != nil {
 		return sig0, err
 	}
 	return upspin.Signature{R: r, S: s}, nil
 }
 
-// PublicKey returns the user's public key as loaded by the Factotum.
-func (f Factotum) PublicKey() upspin.PublicKey {
-	return upspin.PublicKey(f.public)
+// PublicKey returns the user's latest public key.
+func (f factotum) PublicKey() upspin.PublicKey {
+	return f.keys[f.current].public
+}
+
+// PublicKeyFromHash returns the user's public key with matching keyHash.
+func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
+	if keyHash == nil || len(keyHash) == 0 {
+		return "", errors.Errorf("invalid keyHash")
+	}
+	var h keyHashArray
+	copy(h[:], keyHash)
+	fk, ok := f.keys[h]
+	if !ok {
+		return "", errors.Errorf("no such key")
+	}
+	return fk.public, nil
 }
 
 // VerHash provides the basis for signing and verifying files.
@@ -179,4 +234,15 @@ func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
 		return nil, "", errors.Errorf("unknown key type: %q", keyType)
 	}
 	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, keyType, nil
+}
+
+func readFile(op, dir, name string) ([]byte, error) {
+	b, err := ioutil.ReadFile(filepath.Join(dir, name))
+	if os.IsNotExist(err) {
+		return nil, errors.E(op, errors.NotExist, err)
+	}
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	return b, nil
 }

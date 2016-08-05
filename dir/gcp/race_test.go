@@ -7,6 +7,8 @@ package gcp
 import (
 	"errors"
 	"math/rand"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -110,7 +112,7 @@ func TestParallelOperationsOnAccessAndRoot(t *testing.T) {
 }
 
 func newDirServerWithDummyStore(t *testing.T, gcp storage.Storage) *directory {
-	f, err := factotum.DeprecatedNew(serverPublic, serverPrivate)
+	f, err := factotum.New(repo("key/testdata/gcp"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,4 +212,13 @@ func (g *gcpMock) Dial(o *storage.Opts) error {
 
 // Close implements storage.Storage.
 func (g *gcpMock) Close() {
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

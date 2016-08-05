@@ -96,6 +96,9 @@ type Factotum interface {
 
 	// PublicKey returns the user's public key in canonical string format.
 	PublicKey() PublicKey
+
+	// PublicKeyFromHash returns the matching public key or an error.
+	PublicKeyFromHash(keyHash []byte) (PublicKey, error)
 }
 
 // A Packing identifies the technique for turning the data pointed to by

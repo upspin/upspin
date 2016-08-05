@@ -8,6 +8,8 @@ package testenv
 
 import (
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/bind"
@@ -16,7 +18,6 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/key/inprocess"
-	"upspin.io/pack/ee"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -30,14 +31,6 @@ type Entry struct {
 	C string
 }
 
-// KeyPair holds the public and private string form of a user key.  Ideally
-// this would not be used, since we want only factotum to have the private key.
-// But it helps the test setup for now.
-type KeyPair struct {
-	Public  upspin.PublicKey
-	Private string
-}
-
 // Setup is a configuration structure that contains a directory tree and other optional flags.
 type Setup struct {
 	// OwnerName is the name of the directory tree owner.
@@ -49,12 +42,6 @@ type Setup struct {
 
 	// Packing is the desired packing for the tree.
 	Packing upspin.Packing
-
-	// KeyKind is the desired key type for the tree, e.g. "p256".
-	KeyKind string
-
-	// Keys holds all keys for the owner. Leave empty to be assigned randomly-created new keys.
-	Keys KeyPair
 
 	// Tree is the directory tree desired at the start of the test environment.
 	Tree Tree
@@ -91,7 +78,7 @@ type Env struct {
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup)
+	client, context, err := innerNewUser("New", setup.OwnerName, setup)
 	if err != nil {
 		return nil, err
 	}
@@ -162,14 +149,10 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, setup *Setup) (upspin.Client, upspin.Context, error) {
+func innerNewUser(op string, userName upspin.UserName, setup *Setup) (upspin.Client, upspin.Context, error) {
 	var context upspin.Context
 	var err error
-	if keyPair == nil || *keyPair == (KeyPair{}) {
-		context, err = newContextForUser(userName, setup)
-	} else {
-		context, err = newContextForUserWithKey(userName, keyPair, setup)
-	}
+	context, err = newContextForUser(userName, setup)
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
@@ -192,12 +175,11 @@ func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, setup *
 	return client, context, nil
 }
 
-// NewUser creates a new client for a user, generating new keys of the right
-// packing type if the provided keys are nil or empty. The new user will not
+// NewUser creates a new client for a user.  The new user will not
 // have a root created. Callers should use the client to MakeDirectory if
 // necessary.
-func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, upspin.Context, error) {
-	return innerNewUser("NewUser", userName, keyPair, e.Setup)
+func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, error) {
+	return innerNewUser("NewUser", userName, e.Setup)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
@@ -246,30 +228,9 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the inprocess user service, creates a
-// new key for the user based on the setup's packing type and returns a
-// partially filled Context.
+// newContextForUser adds a new user to the inprocess user service
+// and returns a partially filled Context.
 func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, error) {
-	kind := "p256" // Default is p256.
-	if k := setup.KeyKind; setup.Packing == upspin.EEPack && (k == "p386" || k == "p521") {
-		kind = k
-	}
-
-	entropy := make([]byte, 32) // Enough for p521
-	ee.GenEntropy(entropy)
-
-	var keyPair KeyPair
-	var err error
-	keyPair.Public, keyPair.Private, err = ee.CreateKeys(kind, entropy)
-	if err != nil {
-		return nil, err
-	}
-	return newContextForUserWithKey(userName, &keyPair, setup)
-}
-
-// newContextForUserWithKey adds a new user to the inprocess user service and
-// returns a Context partially filled with specified user and key.
-func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, setup *Setup) (upspin.Context, error) {
 	context := context.New().SetUserName(userName).SetPacking(setup.Packing)
 
 	endpointInProcess := upspin.Endpoint{
@@ -285,11 +246,15 @@ func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, setup 
 		return nil, errors.Str("key service must be the in-process instance")
 	}
 	// Set the public key for the registered user.
-	testKey.SetPublicKeys(userName, []upspin.PublicKey{keyPair.Public})
-	f, err := factotum.DeprecatedNew(keyPair.Public, keyPair.Private)
-	if err != nil {
-		panic("DeprecatedNewFactotum failed")
+	j := strings.IndexByte(string(userName), '@')
+	if j < 0 {
+		log.Fatal("malformed userName ", userName)
 	}
+	f, err := factotum.New(repo("key/testdata/" + string(userName[:j])))
+	if err != nil {
+		log.Fatal("unable to initialize factotum for ", string(userName[:j]))
+	}
+	testKey.SetPublicKeys(userName, []upspin.PublicKey{f.PublicKey()})
 	context.SetFactotum(f)
 	return context, nil
 }
@@ -325,4 +290,13 @@ func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoin
 	context.SetStoreEndpoint(store)
 	context.SetDirEndpoint(dir)
 	context.SetKeyEndpoint(user)
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

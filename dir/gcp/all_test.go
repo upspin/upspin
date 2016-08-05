@@ -71,9 +71,6 @@ var (
 		},
 		accessFiles: accessFileDB{rootAccessFile: defaultAccess},
 	}
-	// These are not real keys. Just *valid* keys so authClient does not complain.
-	serverPublic  = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	serverPrivate = "82201047360680847258309465671292633303992565667422607675215625927005262185934"
 )
 
 // equal reports whether two slices of DirEntries are equal. If they are not, it logs the first that differ.
@@ -633,7 +630,7 @@ func TestPutAccessFile(t *testing.T) {
 	}
 
 	// Setup the directory's store client to return the contents of the access file.
-	f, err := factotum.DeprecatedNew(serverPublic, serverPrivate)
+	f, err := factotum.New(repo("key/testdata/gcp"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -738,7 +735,7 @@ func TestGroupAccessFile(t *testing.T) {
 		ref:      upspin.Reference(newRefOfGroupFile),
 		contents: []byte(newContentsOfFamilyGroup),
 	}
-	f, err := factotum.DeprecatedNew(serverPublic, serverPrivate)
+	f, err := factotum.New(repo("key/testdata/gcp"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1187,7 +1184,7 @@ func makeAccess(t *testing.T, path upspin.PathName, accessFileContents string) *
 }
 
 func newTestDirServer(t *testing.T, gcp storage.Storage) *directory {
-	f, err := factotum.DeprecatedNew(serverPublic, serverPrivate)
+	f, err := factotum.New(repo("key/testdata/gcp"))
 	if err != nil {
 		t.Fatal(err)
 	}

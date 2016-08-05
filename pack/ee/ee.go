@@ -330,6 +330,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
 			return nil, errors.E(Unpack, d.Name, writer, errVerify)
+			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 		}
 		// Set up stream cipher.
 		block, err := aes.NewCipher(dkey)
@@ -617,9 +618,13 @@ func aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 // Extract per-file symmetric key from w.
 // If error, len(dkey)==0.
 func (ee ee) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
+	myPub, err := f.PublicKeyFromHash(w.keyHash)
+	if err != nil {
+		return nil, err
+	}
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	pub, _, err := factotum.ParsePublicKey(f.PublicKey())
+	pub, _, err := factotum.ParsePublicKey(myPub)
 	if err != nil {
 		return nil, err
 	}
@@ -670,9 +675,12 @@ func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, ciphe
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
-	zero := big.NewInt(0)
-	n += pdPutBytes((*dst)[n:], zero.Bytes())
-	n += pdPutBytes((*dst)[n:], zero.Bytes())
+	if sig2.R == nil {
+		zero := big.NewInt(0)
+		sig2 = upspin.Signature{R: zero, S: zero}
+	}
+	n += pdPutBytes((*dst)[n:], sig2.R.Bytes())
+	n += pdPutBytes((*dst)[n:], sig2.S.Bytes())
 	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
 	for _, w := range wrap {
 		n += pdPutBytes((*dst)[n:], w.keyHash)
