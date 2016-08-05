@@ -121,12 +121,14 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 }
 
 // Size returns the total length of the data underlying the DirEntry
-// and validates the block offsets and sizes.
-func (d *DirEntry) Size() (int64, error) {
-	var size int64
+// and validates the block offsets and sizes. If the blocks are not
+// contiguous, it returns an error, but does return the sum of
+// the sizes of the underlying blocks. If a block has a negative
+// size, it returns zero and an error.
+func (d *DirEntry) Size() (size int64, err error) {
 	for i := range d.Blocks {
-		if size != d.Blocks[i].Offset {
-			return 0, fmt.Errorf("Size: %v: inconsistent offsets", d.Name)
+		if size != d.Blocks[i].Offset && err == nil {
+			err = fmt.Errorf("Size: %v: inconsistent offsets", d.Name)
 		}
 		sz := d.Blocks[i].Size
 		if sz < 0 {
@@ -134,7 +136,7 @@ func (d *DirEntry) Size() (int64, error) {
 		}
 		size += sz
 	}
-	return size, nil
+	return size, err
 }
 
 // Marshal packs the DirEntry into a new byte slice for transport.
