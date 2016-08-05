@@ -16,6 +16,24 @@
       "revId": "7f15f2d851cf160326d76c739432279751180933",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b9ffd49",
+        "filename": "test/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-05T21:47:07Z",
+      "side": 0,
+      "message": "The package is called testenv, which is a good name for a test environment. There is no compelling need to rename it on import.",
+      "parentUuid": "f9816bc9_969ecca7",
+      "revId": "7f15f2d851cf160326d76c739432279751180933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
