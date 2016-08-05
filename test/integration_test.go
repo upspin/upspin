@@ -356,7 +356,7 @@ func TestAll(t *testing.T) {
 		//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
 		{packing: upspin.DebugPack, curve: "p256"},
 	} {
-		log.Printf("=== Packing %d, %q", p.packing, p.curve)
+		log.Printf("=== Packing %v, %q", p.packing, p.curve)
 		testAllOnePacking(t, p.packing, p.curve)
 	}
 }

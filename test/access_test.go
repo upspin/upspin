@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
@@ -82,7 +81,7 @@ func (r *runner) Errorf(format string, args ...interface{}) {
 		if slash := strings.LastIndexByte(file, '/'); slash >= 0 {
 			file = file[slash+1:]
 		}
-		r.t.Errorf("called from %s:%d with %s packing:", file, line, pack.Lookup(r.env.Context.Packing()))
+		format = fmt.Sprintf("%s:%d with %v packing: ", file, line, r.env.Context.Packing()) + format
 	}
 	r.t.Errorf(format, args...)
 }
