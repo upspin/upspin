@@ -89,16 +89,13 @@ type Env struct {
 	exitCalled bool
 }
 
-var (
-	zeroKey KeyPair
-)
-
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup.KeyKind, setup.Transport)
+	client, context, err := innerNewUser("New", setup.OwnerName, &setup.Keys, setup)
 	if err != nil {
 		return nil, err
 	}
+	context.SetPacking(setup.Packing)
 	err = makeRoot(context)
 	if err != nil {
 		return nil, err
@@ -166,19 +163,19 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveName string, transport upspin.Transport) (upspin.Client, upspin.Context, error) {
+func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, setup *Setup) (upspin.Client, upspin.Context, error) {
 	var context upspin.Context
 	var err error
-	if keyPair == nil || *keyPair == zeroKey {
-		context, err = newContextForUser(userName, curveName)
+	if keyPair == nil || *keyPair == (KeyPair{}) {
+		context, err = newContextForUser(userName, setup)
 	} else {
-		context, err = newContextForUserWithKey(userName, keyPair, curveName)
+		context, err = newContextForUserWithKey(userName, keyPair, setup)
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
 	var client upspin.Client
-	switch transport {
+	switch setup.Transport {
 	case upspin.GCP:
 		client, err = gcpClient(context)
 	case upspin.InProcess:
@@ -196,11 +193,12 @@ func innerNewUser(op string, userName upspin.UserName, keyPair *KeyPair, curveNa
 	return client, context, nil
 }
 
-// NewUser creates a new client for a user, generating new keys of the right packing type if the provided
-// keys are nil or empty. The new user will not have a root created. Callers should use the client to
-// MakeDirectory if necessary.
+// NewUser creates a new client for a user, generating new keys of the right
+// packing type if the provided keys are nil or empty. The new user will not
+// have a root created. Callers should use the client to MakeDirectory if
+// necessary.
 func (e *Env) NewUser(userName upspin.UserName, keyPair *KeyPair) (upspin.Client, upspin.Context, error) {
-	return innerNewUser("NewUser", userName, keyPair, e.Setup.KeyKind, e.Setup.Transport)
+	return innerNewUser("NewUser", userName, keyPair, e.Setup)
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
@@ -249,33 +247,31 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the inprocess user service, creates a new key for the user based on
-// the chosen packing type and returns a partially filled Context.
-func newContextForUser(userName upspin.UserName, curveName string) (upspin.Context, error) {
+// newContextForUser adds a new user to the inprocess user service, creates a
+// new key for the user based on the setup's packing type and returns a
+// partially filled Context.
+func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, error) {
+	kind := "p256" // Default is p256.
+	if k := setup.KeyKind; setup.Packing == upspin.EEPack && (k == "p386" || k == "p521") {
+		kind = k
+	}
+
 	entropy := make([]byte, 32) // Enough for p521
 	ee.GenEntropy(entropy)
-	var keyPair *KeyPair
-	var pub upspin.PublicKey
-	var priv string
+
+	var keyPair KeyPair
 	var err error
-	switch curveName {
-	case "p256", "p386", "p521":
-		pub, priv, err = ee.CreateKeys(curveName, entropy)
-	default:
-		// For non-EE curveName, a p256 key will do.
-		pub, priv, err = ee.CreateKeys("p256", entropy)
-	}
+	keyPair.Public, keyPair.Private, err = ee.CreateKeys(kind, entropy)
 	if err != nil {
 		return nil, err
 	}
-	keyPair = &KeyPair{pub, priv}
-	return newContextForUserWithKey(userName, keyPair, curveName)
+	return newContextForUserWithKey(userName, &keyPair, setup)
 }
 
-// newContextForUserWithKey adds a new user to the inprocess user service and returns a Context partially filled with user,
-// key and curveName type as given.
-func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, curveName string) (upspin.Context, error) {
-	context := context.New().SetUserName(userName).SetPacking(upspin.EEPack)
+// newContextForUserWithKey adds a new user to the inprocess user service and
+// returns a Context partially filled with specified user and key.
+func newContextForUserWithKey(userName upspin.UserName, keyPair *KeyPair, setup *Setup) (upspin.Context, error) {
+	context := context.New().SetUserName(userName).SetPacking(setup.Packing)
 
 	endpointInProcess := upspin.Endpoint{
 		Transport: upspin.InProcess,
