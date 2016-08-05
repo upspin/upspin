@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9816bc9_969ecca7",
+        "filename": "test/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-05T16:07:42Z",
+      "side": 0,
+      "message": "env would be short and sweet too.",
+      "revId": "7f15f2d851cf160326d76c739432279751180933",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
