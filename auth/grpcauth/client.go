@@ -226,7 +226,6 @@ func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 			return nil, err
 		}
 	}
-	log.Debug.Printf("SetAuthContext: set auth token: %s", ac.authToken)
 	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
 }
 
