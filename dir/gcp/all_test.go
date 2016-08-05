@@ -1001,9 +1001,7 @@ func TestDeleteGroupFile(t *testing.T) {
 	}
 
 	// And now the session for bro can no longer read it.
-	// TODO: this error message is not helpful. It should contain permission denied plus the path
-	// to the missing Group file.
-	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/Group/family: file not found"
+	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/Group/family"
 	ds.context.SetUserName(broUserName)
 	_, err = ds.Lookup(pathName)
 	assertError(t, expectedError, err)
