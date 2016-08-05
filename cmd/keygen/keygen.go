@@ -109,6 +109,7 @@ func main() {
 	if packer == nil {
 		log.Fatal("unrecognized packing ee")
 	}
+	// TODO(ehg) Archive old keys in secret2.upspinkey.
 	createKeys()
 }
 
