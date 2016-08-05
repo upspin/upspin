@@ -331,13 +331,20 @@ func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 	}
 
 	// The ordering here is important as each test adds state to the tree.
-	testNoReadersAllowed(t, env)
-	testAllowListAccess(t, env)
-	testAllowReadAccess(t, env)
-	testCreateAndOpen(t, env)
-	testGlobWithLimitedAccess(t, env)
-	testGlobWithPattern(t, env)
-	testDelete(t, env)
+	for _, test := range []struct {
+		name string
+		fn   func(*testing.T, *e.Env)
+	}{
+		{"NoReadersAllowed", testNoReadersAllowed},
+		{"AllowListAccess", testAllowListAccess},
+		{"AllowReadAccess", testAllowReadAccess},
+		{"CreateAndOpen", testCreateAndOpen},
+		{"GlobWithLimitedAccess", testGlobWithLimitedAccess},
+		{"GlobWithPattern", testGlobWithPattern},
+		{"Delete", testDelete},
+	} {
+		t.Run(test.name, func(t *testing.T) { test.fn(t, env) })
+	}
 
 	err = env.Exit()
 	if err != nil {
@@ -345,7 +352,7 @@ func testAllOnePacking(t *testing.T, packing upspin.Packing, curveName string) {
 	}
 }
 
-func TestAll(t *testing.T) {
+func TestIntegration(t *testing.T) {
 	type testSetup struct {
 		packing upspin.Packing
 		curve   string
@@ -356,8 +363,9 @@ func TestAll(t *testing.T) {
 		//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
 		{packing: upspin.DebugPack, curve: "p256"},
 	} {
-		log.Printf("=== Packing %v, %q", p.packing, p.curve)
-		testAllOnePacking(t, p.packing, p.curve)
+		t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
+			testAllOnePacking(t, p.packing, p.curve)
+		})
 	}
 }
 

@@ -7,7 +7,6 @@ package test
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"testing"
 
@@ -57,9 +56,11 @@ var (
 	}
 )
 
-func TestAllInProcess(t *testing.T) {
-	for _, packing := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEPack} {
-		runAllTests(t, packing)
+func TestInProcess(t *testing.T) {
+	for _, p := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEPack} {
+		t.Run(fmt.Sprintf("packing=%v", p), func(t *testing.T) {
+			runAllTests(t, p)
+		})
 	}
 }
 
@@ -67,7 +68,6 @@ var userNameCounter = 0
 
 // newEnv configures a test environment using a packing.
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
-	log.Printf("===== Using packing: %v", packing)
 	s := &testenv.Setup{
 		OwnerName: newUserName(),
 		Transport: upspin.InProcess,
@@ -102,10 +102,18 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 
 func runAllTests(t *testing.T, packing upspin.Packing) {
 	env := newEnv(t, packing)
-	testPutGetTopLevelFile(t, env)
-	testFileSequentialAccess(t, env)
-	testReadAccess(t, packing)
-	testWhichAccess(t, packing)
+	t.Run("PutGetTopLevelFile", func(t *testing.T) {
+		testPutGetTopLevelFile(t, env)
+	})
+	t.Run("FileSequentialAccess", func(t *testing.T) {
+		testFileSequentialAccess(t, env)
+	})
+	t.Run("ReadAccess", func(t *testing.T) {
+		testReadAccess(t, packing)
+	})
+	t.Run("WhichAccess", func(t *testing.T) {
+		testWhichAccess(t, packing)
+	})
 }
 
 func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {
