@@ -41,16 +41,10 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 // toString converts an endpoint to a string.
 func (ep Endpoint) toString() (string, error) {
 	switch ep.Transport {
-	case GCP:
-		return fmt.Sprintf("gcp,%s", string(ep.NetAddr)), nil
-	case InProcess:
-		return "inprocess", nil
-	case Remote:
-		return fmt.Sprintf("remote,%s", string(ep.NetAddr)), nil
-	case HTTPS:
-		return fmt.Sprintf("https,%s", string(ep.NetAddr)), nil
-	case Unassigned:
-		return "unassigned", nil
+	case GCP, Remote, HTTPS:
+		return fmt.Sprintf("%v,%v", ep.Transport, ep.NetAddr), nil
+	case InProcess, Unassigned:
+		return ep.Transport.String(), nil
 	}
 	// Note: can't use errors here.
 	return "", fmt.Errorf("unknown transport {%v, %v}", ep.Transport, ep.NetAddr)
