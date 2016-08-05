@@ -11,10 +11,14 @@ function fail() {
 
 
 go build || fail
-./keygen -where=. -secretseed pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok || fail
 
-(cmp -s public.upspinkey public.test && cmp -s secret.upspinkey secret.test ) || fail
-rm -f keygen public.upspinkey secret.upspinkey
+./keygen -where=. -secretseed pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok || fail
+(cmp -s public.upspinkey testdata/public.test && cmp -s secret.upspinkey testdata/secret.test ) || fail
+
+./keygen -where=. -secretseed pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok || fail
+(cmp -s secret2.upspinkey testdata/secret2.test && cmp -s public.upspinkey testdata/public.test && cmp -s secret.upspinkey testdata/secret.test ) || fail
+
+rm -f keygen public.upspinkey secret.upspinkey secret2.upspinkey
 
 echo PASSED
 exit 0

@@ -212,7 +212,7 @@ func (bp *blockPacker) Close() error {
 	wrap := make([]wrappedKey, 2)
 
 	// First, wrap for myself.
-	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey())
+	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey(nil))
 	if err != nil {
 		return errors.E(Pack, name, err)
 	}
@@ -239,7 +239,7 @@ func (bp *blockPacker) Close() error {
 			return errors.E(Pack, name, owner, err)
 		}
 		ownerKey := u.PublicKey
-		if ownerKey == ctx.Factotum().PublicKey() {
+		if ownerKey == ctx.Factotum().PublicKey(nil) {
 			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName())
 			wrap = wrap[:1]
 		} else {
@@ -330,6 +330,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
 			return nil, errors.E(Unpack, d.Name, writer, errVerify)
+			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 		}
 		// Set up stream cipher.
 		block, err := aes.NewCipher(dkey)
@@ -407,7 +408,7 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 		}
 		copy(hash[i][:], factotum.KeyHash(pub))
 	}
-	myhash := factotum.KeyHash(ctx.Factotum().PublicKey())
+	myhash := factotum.KeyHash(ctx.Factotum().PublicKey(nil))
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdata {
@@ -619,7 +620,7 @@ func aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 func (ee ee) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	pub, _, err := factotum.ParsePublicKey(f.PublicKey())
+	pub, _, err := factotum.ParsePublicKey(f.PublicKey(w.keyHash))
 	if err != nil {
 		return nil, err
 	}
@@ -670,9 +671,12 @@ func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, ciphe
 	n = 1
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
-	zero := big.NewInt(0)
-	n += pdPutBytes((*dst)[n:], zero.Bytes())
-	n += pdPutBytes((*dst)[n:], zero.Bytes())
+	if sig2.R == nil {
+		zero := big.NewInt(0)
+		sig2 = upspin.Signature{R: zero, S: zero}
+	}
+	n += pdPutBytes((*dst)[n:], sig2.R.Bytes())
+	n += pdPutBytes((*dst)[n:], sig2.S.Bytes())
 	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
 	for _, w := range wrap {
 		n += pdPutBytes((*dst)[n:], w.keyHash)
@@ -783,7 +787,7 @@ func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, erro
 
 	// Are we requesting our own public key?
 	if string(user) == string(ctx.UserName()) {
-		return ctx.Factotum().PublicKey(), nil
+		return ctx.Factotum().PublicKey(nil), nil
 	}
 	userService, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
