@@ -220,24 +220,6 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	if err != nil {
 		return err
 	}
-	// Put was successful. If it was an Access or Group file, there's more to do.
-	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
-		if access.IsGroupFile(entry.Name) {
-			// Group files are loaded on demand but we must wipe the cache.
-			access.RemoveGroup(entry.Name)
-		}
-		if access.IsAccessFile(entry.Name) {
-			data, err := s.readAll(s.context, entry)
-			if err != nil {
-				return errors.E(Put, err)
-			}
-			accessFile, err := access.Parse(entry.Name, data)
-			if err != nil {
-				return errors.E(Put, err)
-			}
-			s.db.access[path.DropPath(entry.Name, 1)] = accessFile
-		}
-	}
 	return nil
 }
 
@@ -253,7 +235,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	if parsed.IsRoot() {
 		return errors.E(op, pathName, errors.Errorf("cannot create root %s with Put; use MakeDirectory", parsed))
 	}
-	dirEntry, ok := s.db.root[parsed.User()]
+	rootEntry, ok := s.db.root[parsed.User()]
 	if !ok {
 		// Cannot create user root with Put.
 		return errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
@@ -262,9 +244,9 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
 	// Invariant: dirRef refers to a directory.
 	entries := make([]*upspin.DirEntry, 0, 10) // 0th entry is the root.
-	entries = append(entries, dirEntry)
+	entries = append(entries, rootEntry)
 	for i := 0; i < parsed.NElem()-1; i++ {
-		e, err := s.fetchEntry(op, dirEntry, parsed.Elem(i))
+		e, err := s.fetchEntry(op, rootEntry, parsed.Elem(i))
 		if err != nil {
 			return err
 		}
@@ -272,10 +254,10 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 			return errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
 		}
 		entries = append(entries, e)
-		dirEntry = e
+		rootEntry = e
 	}
 	var dirBlob []byte
-	dirEntry, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), dirEntry, entry, deleting, false)
+	rootEntry, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
 		return err
@@ -286,18 +268,38 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	// i indicates the directory that needs to be updated to store the new dirRef.
 	for i := len(entries) - 2; i >= 0; i-- {
 		// Install into the ith directory the (i+1)th entry.
-		dirEntry, err = s.newDirEntry(entries[i+1].Name, dirBlob, entries[i+1].Sequence)
+		rootEntry, err = s.newDirEntry(entries[i+1].Name, dirBlob, entries[i+1].Sequence)
 		if err != nil {
 			return err
 		}
-		dirEntry, dirBlob, err = s.installEntry(op, parsed.First(i).Path(), entries[i], dirEntry, false, true)
+		rootEntry, dirBlob, err = s.installEntry(op, parsed.First(i).Path(), entries[i], rootEntry, false, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
 			return err
 		}
 	}
 	// Update the root.
-	s.db.root[parsed.User()] = dirEntry
+	s.db.root[parsed.User()] = rootEntry
+
+	// If it was an Access or Group file, there's more to do.
+	if access.IsGroupFile(entry.Name) {
+		// Group files are loaded on demand but we must wipe the cache.
+		access.RemoveGroup(entry.Name)
+	}
+	if access.IsAccessFile(entry.Name) {
+		var accessFile *access.Access
+		if !deleting {
+			data, err := s.readAll(s.context, entry)
+			if err != nil {
+				return errors.E(op, err)
+			}
+			accessFile, err = access.Parse(entry.Name, data)
+			if err != nil {
+				return errors.E(op, err)
+			}
+		}
+		s.db.access[path.DropPath(entry.Name, 1)] = accessFile
+	}
 
 	return nil
 }
