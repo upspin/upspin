@@ -16,6 +16,24 @@
       "revId": "770a16263118057fe6057721214616bf151c7b9a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19f47f40_1f8bc316",
+        "filename": "test/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-05T00:47:10Z",
+      "side": 1,
+      "message": "Yeah, this is the change that messed it up:\n\nhttps://github.com/googleprivate/upspin/commit/d9cea74bc58e5743bb0e9e64dc7dce21f78d5092#diff-93946f79a2ddc477c0f99d45831af786",
+      "parentUuid": "744bc246_fbe00327",
+      "revId": "770a16263118057fe6057721214616bf151c7b9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
