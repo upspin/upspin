@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b911b39a_04587687",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-07T18:10:29Z",
+      "side": 1,
+      "message": "I think bufio Reader would do a cleaner job here. You can do something like:\n\nf, err :\u003d os.Open(filepath.Join(.....))\nr :\u003d bufio.NewReader(f)\n\nfor {\n    str, err :\u003d r.ReadString(\"\\n\")\n    ....\n}",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
