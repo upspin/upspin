@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c94f47_8bd68d18",
+        "filename": "dir/gcp/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T07:50:11Z",
+      "side": 1,
+      "message": "should these return errors.E(errors.NotExist) ?",
+      "revId": "b95def2ff8a2fe1c31dd8a9751987547fd1fecec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
