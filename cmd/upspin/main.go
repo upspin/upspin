@@ -40,6 +40,7 @@ import (
 var commands = map[string]func(...string){
 	"get":         get,
 	"glob":        glob,
+	"info":        info,
 	"link":        link,
 	"ls":          ls,
 	"mkdir":       mkdir,
@@ -174,6 +175,32 @@ func glob(args ...string) {
 		} else {
 			printShortDirEntries(de)
 		}
+	}
+}
+
+func info(args ...string) {
+	fs := flag.NewFlagSet("info", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "info path...")
+	err := fs.Parse(args)
+	if err != nil {
+		exit(err)
+	}
+	if fs.NArg() == 0 {
+		fs.Usage()
+		os.Exit(2)
+	}
+	c, ctx := newClient()
+	for i := 0; i < fs.NArg(); i++ {
+		name := upspin.PathName(fs.Arg(i))
+		dir, err := c.DirServer(name)
+		if err != nil {
+			exit(err)
+		}
+		entry, err := dir.Lookup(name)
+		if err != nil {
+			exit(err)
+		}
+		printInfo(c, ctx, entry)
 	}
 }
 
@@ -413,15 +440,13 @@ func share(args ...string) {
 	if *force {
 		*fix = true
 	}
-	s := &sharer{
-		fs:    fs,
-		fix:   *fix,
-		force: *force,
-		isDir: *isDir,
-		recur: *recur,
-		quiet: *quiet,
-	}
-	s.do()
+	sharer.init()
+	sharer.fix = *fix
+	sharer.force = *force
+	sharer.isDir = *isDir
+	sharer.recur = *recur
+	sharer.quiet = *quiet
+	sharer.shareCommand(fs.Args())
 }
 
 func whichAccess(args ...string) {
