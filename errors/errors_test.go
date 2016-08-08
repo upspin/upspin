@@ -5,6 +5,7 @@
 package errors
 
 import (
+	"io"
 	"testing"
 
 	"upspin.io/upspin"
@@ -80,5 +81,48 @@ func TestDoesNotChangePreviousError(t *testing.T) {
 	kind := err.(*Error).Kind
 	if kind != Permission {
 		t.Fatalf("Expected kind %v, got %v", Permission, kind)
+	}
+}
+
+type matchTest struct {
+	err1, err2 error
+	matched    bool
+}
+
+const (
+	path1 = upspin.PathName("john@doe.io/x")
+	path2 = upspin.PathName("john@doe.io/y")
+	john  = upspin.UserName("john@doe.io")
+	jane  = upspin.UserName("jane@doe.io")
+)
+
+var matchTests = []matchTest{
+	// Errors not of type *Error fail outright.
+	{nil, nil, false},
+	{io.EOF, io.EOF, false},
+	{E(io.EOF), io.EOF, false},
+	{io.EOF, E(io.EOF), false},
+	// Success. We can drop fields from the first argument and still match.
+	{E(io.EOF), E(io.EOF), true},
+	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, jane, path1), true},
+	{E("Op", Syntax, io.EOF, jane), E("Op", Syntax, io.EOF, jane, path1), true},
+	{E("Op", Syntax, io.EOF), E("Op", Syntax, io.EOF, jane, path1), true},
+	{E("Op", Syntax), E("Op", Syntax, io.EOF, jane, path1), true},
+	{E("Op"), E("Op", Syntax, io.EOF, jane, path1), true},
+	// Failure.
+	{E(io.EOF), E(io.ErrClosedPipe), false},
+	{E("Op1"), E("Op2"), false},
+	{E(Syntax), E(Permission), false},
+	{E(jane), E(john), false},
+	{E(path1), E(path2), false},
+	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, john, path1), false},
+}
+
+func TestMatch(t *testing.T) {
+	for _, test := range matchTests {
+		matched := Match(test.err1, test.err2)
+		if matched != test.matched {
+			t.Errorf("Match(%q, %q)=%t; want %t", test.err1, test.err2, matched, test.matched)
+		}
 	}
 }
