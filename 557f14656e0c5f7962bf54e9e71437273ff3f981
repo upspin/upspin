@@ -474,6 +474,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_6b96c198",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "I think you might have misunderstood me. My suggested change also stores a single entry if it is larger than blockSize, just not in the first iteration of the loop. I think it is valuable to avoid writing blocks larger than blockSize if we can avoid it. Please take another look at my suggestion.",
+      "parentUuid": "b911b39a_24a812df",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_6bb9e18f",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -503,6 +521,24 @@
       "side": 1,
       "message": "ack (this makes it more obvious, at least to me)",
       "parentUuid": "99c94f47_6bb9e18f",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b8b7d6f",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "It\u0027s not the idiomatic approach, though.\nIt would satisfy my obsessive nature if you changed it to [:0],\nbut it\u0027s up to you. :-)",
+      "parentUuid": "b911b39a_04ad16ef",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -579,6 +615,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_2b90b996",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "If it\u0027s going away, then please add\n  // TODO(edpin): delete this once unit tests are done",
+      "parentUuid": "b911b39a_a4bb6225",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4bdd05d9",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -643,6 +697,24 @@
       "side": 1,
       "message": "See my answer above. This is to catch programming errors early on. Just very defensive coding at this stage. \n\nAdded a TODO.",
       "parentUuid": "99c94f47_6be241a2",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_eba151f0",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "Thanks for the TODO. Just to explain my rationale:\n\nWhen something goes wrong, it is much easier to see it in the error message than to track down the corresponding log message (especially since our logs are not request-scoped).\n\nI understand that these are \"can\u0027t happen\" style scenarios, but it has been my experience that it is in exactly those kinds of situations where the information is most valuable. (And getting \"internal error\" when I\u0027m debugging something subtle makes me want to throw my computer out the window.)\n\nAnother thing: \"can\u0027t happen\" today does not mean \"can\u0027t happen\" tomorrow. The recent DirEntry/DirBlock change affected many lines of code in our system. Invariants were changed, uprooting a lot of our assumptions. I think wherever we have the opportunity to help ourselves debug future problems, when should take it.",
+      "parentUuid": "b911b39a_e4c55aa8",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
