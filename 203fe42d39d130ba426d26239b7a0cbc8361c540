@@ -317,6 +317,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_ceb823c4",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T21:23:17Z",
+      "side": 1,
+      "message": "I generally don\u0027t ask for comments on tests. I asked in this case because I wasn\u0027t actually sure what it was testing.\n\nThe \"empty\" part threw me, as it\u0027s not clear to the reader why an \"empty root\" is distinct from a root with data in it.\n\nMaybe something like\n\n// Test that an empty root can be saved and retrieved.\n// Roots are handled differently to other directory entries.",
+      "parentUuid": "b911b39a_18e295a0",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4b91859d",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -434,6 +452,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_eeb5dfca",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T21:23:17Z",
+      "side": 1,
+      "message": "Well there\u0027s no reason to have a return statement that can never be reached. This passage of code should be:\n\nif data !\u003d nil \u0026\u0026 len(locs) \u003e 0 {\n  return nil, errors.E(get, errors.Errorf(\"location: %v: %v\", loc, errInternalInconsistency))\n}\nif data !\u003d nil {\n  return data, nil\n}\n// TODO: this should do something akin to client.Get. It now only does one indirection.\nreturn t.get(\u0026locs[0])",
+      "parentUuid": "b911b39a_ed5b7d26",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4bfae5df",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -498,6 +534,24 @@
       "side": 1,
       "message": "I want to include some hint here that this will affect the Store. writeNode or storeNode or store would be fine. put is very similar to Put in the interface and I think it would be confusing. Open to suggestions.",
       "parentUuid": "99c94f47_6bffa1ce",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8eb21be0",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T21:23:17Z",
+      "side": 1,
+      "message": "OK sounds good",
+      "parentUuid": "b911b39a_6db2ed4e",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -790,6 +844,24 @@
       "side": 1,
       "message": "No issue. I was using Rob\u0027s suggestion. My next CL will have zero comments and I\u0027ll leave it up to you two to add them for me. :-)\n\nDone.",
       "parentUuid": "99c94f47_8bd0cd4d",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_aeafd778",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T21:23:17Z",
+      "side": 1,
+      "message": ":-)",
+      "parentUuid": "b911b39a_cd296136",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
