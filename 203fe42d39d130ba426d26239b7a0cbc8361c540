@@ -2,6 +2,159 @@
   "comments": [
     {
       "key": {
+        "uuid": "99c94f47_8b7a0d4f",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "actually the primary thing this test does is check the log for consistency",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b4e1d3f",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "Please use the form \"got %v, want %v\" for test failures.\nIt is important that we be consistent in the ordering,\nand this is the canonical Go style. There\u0027s no reason for us to be unique.\nhttps://github.com/golang/go/wiki/CodeReviewComments#useful-test-failures\n\nIn this case, the code should be:\n\nif got, want :\u003d cfg.Log.LastIndex(), 2; got !\u003d want {\n  t.Fatalf(\"LastIndex \u003d %v, want %v\", got, want)\n}\n\nBy being consistent in this way, test failures will be much easier to read across our entire codebase.\n\nAlso note that you can almost always use %v. Unlike in C, in Go %d, %s, etc are only useful in specific circumstances.",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6b724180",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "if got, want :\u003d len(entries), 3 {\n  t.Fatalf(\"len(entries) \u003d\u003d %v, want %v\", got, want)\n}",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_cb57b5ce",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "t.Errorf(\"entries[0] \u003d\u003d %v, want %v\", entries[0], dir1)",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_eb54f1cb",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8b61adb0",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b67fdc0",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2b6c39a0",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ab77c967",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "comment?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4b91859d",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -110,6 +263,23 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_0bddbd67",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "Is this scoped to a username? if so, it should say so",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ebeab10a",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -121,6 +291,114 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "This comment isn\u0027t correct. I think it should be all *unexported* methods.\n\nIn any case, I still think you should be defensive and add a comment on every method that expects mu to be held, even if that\u0027s all of the unexported methods. All methods on *node that expect the tree\u0027s mu to be held should also be documented.\n\nIt is *really easy* to forget about this when you\u0027re coding with locks.\nA bit of documentation (that is trivial to copy and paste) will help avoid nasty bugs in the future.",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2be2f92e",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "why would user, packer, context, and log be protected by mu?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_cbd6d54b",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the constructor set the packer field too?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ebd39158",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "this will explode if KeyEndpoint() returns nil",
+      "range": {
+        "startLine": 69,
+        "startChar": 14,
+        "endLine": 69,
+        "endChar": 37
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_abcd89b6",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "how does this line differ from the previous one?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8bd0cd4d",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "The \"if this happens, then that\" style is awkward. \"that is fine\" is too informal.\n\nI suggested this:\n\n// Files may be overwritten,\n// but attempts to store an existing directory will return an error.\n\ndo you have an issue with that wording?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6b49e135",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "you can delete this, iterating over a nil or empty map is a noop",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
