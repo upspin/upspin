@@ -492,6 +492,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_8d12c964",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Imagine len(data) is zero, because this is the first time around. And len(block) \u003e blockSize.\n\nYour suggestion will flush a zero slice to disk and append a block larger than blockSize which will be flushed again next time around.\n\nAs written, I don\u0027t have to guard against a zero write.\n\nDoes this make sense?",
+      "parentUuid": "99c94f47_6b96c198",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_6bb9e18f",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -539,6 +557,24 @@
       "side": 1,
       "message": "It\u0027s not the idiomatic approach, though.\nIt would satisfy my obsessive nature if you changed it to [:0],\nbut it\u0027s up to you. :-)",
       "parentUuid": "b911b39a_04ad16ef",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_ed1ffd6a",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_0b8b7d6f",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -633,6 +669,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_8dfbe914",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_2b90b996",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4bdd05d9",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -715,6 +769,24 @@
       "side": 1,
       "message": "Thanks for the TODO. Just to explain my rationale:\n\nWhen something goes wrong, it is much easier to see it in the error message than to track down the corresponding log message (especially since our logs are not request-scoped).\n\nI understand that these are \"can\u0027t happen\" style scenarios, but it has been my experience that it is in exactly those kinds of situations where the information is most valuable. (And getting \"internal error\" when I\u0027m debugging something subtle makes me want to throw my computer out the window.)\n\nAnother thing: \"can\u0027t happen\" today does not mean \"can\u0027t happen\" tomorrow. The recent DirEntry/DirBlock change affected many lines of code in our system. Invariants were changed, uprooting a lot of our assumptions. I think wherever we have the opportunity to help ourselves debug future problems, when should take it.",
       "parentUuid": "b911b39a_e4c55aa8",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_8d45a952",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Added more context. But just to be clear: this is work in progress. Once I figure out how and when things fail, I will revisit them and write custom errors. I bet a lot of these will be caught earlier and then never happen or they will all happen in a cascading effect. We\u0027ll see. Added context.",
+      "parentUuid": "99c94f47_eba151f0",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -2034,6 +2106,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_6dbcadd0",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_abf4a9ec",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0b5a9d58",
         "filename": "dir/server/merkle/treeimpl.go",
         "patchSetId": 3
@@ -2081,6 +2171,24 @@
       "side": 1,
       "message": "when you say it\u0027ll change in due time, do you mean the check will go away? or that you\u0027ll improve the error message later?\nif it\u0027s the former, then ok. if the latter, then I see no reason to not write the better error now.",
       "parentUuid": "b911b39a_243f7270",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_18aa956f",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "It\u0027s one of the two. I will learn later. But I added some context for now. Done.",
+      "parentUuid": "99c94f47_4be3c535",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -2869,6 +2977,24 @@
       "side": 1,
       "message": "Does the log not persist to disk? How can it not return an error?\nI guess we can discuss this tomorrow.",
       "parentUuid": "b911b39a_c4d3fe26",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_78746901",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Added an error and a check.",
+      "parentUuid": "99c94f47_6be8010f",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
