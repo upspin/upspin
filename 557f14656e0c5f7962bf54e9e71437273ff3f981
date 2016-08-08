@@ -2016,6 +2016,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_abf4a9ec",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "it\u0027s not. path.Parsed is just a string, which is already a pointer. if you needlessly pass a string by pointer you can cause allocations that needn\u0027t happen.\n\nthe hint here is that all of path.Parsed\u0027s methods (but one, MarshalJSON) have value receivers, not pointers",
+      "parentUuid": "b911b39a_c4101efe",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0b5a9d58",
         "filename": "dir/server/merkle/treeimpl.go",
         "patchSetId": 3
@@ -2045,6 +2063,24 @@
       "side": 1,
       "message": "Same answer. This is WIP. It will change in due time.",
       "parentUuid": "99c94f47_0b5a9d58",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4be3c535",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "when you say it\u0027ll change in due time, do you mean the check will go away? or that you\u0027ll improve the error message later?\nif it\u0027s the former, then ok. if the latter, then I see no reason to not write the better error now.",
+      "parentUuid": "b911b39a_243f7270",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -2815,6 +2851,24 @@
       "side": 1,
       "message": "This is confusing Rob too. See my answer on the interface. But I think we\u0027ll need to talk in person. Short answer: Log has dual purpose for now. *Something* needs to hold the root close to the DirServer. I\u0027m using the Log, though, it\u0027s now clear it\u0027s not the best place since the two of you got confused. TODO.\n\nSetRoot does not error.",
       "parentUuid": "99c94f47_6b10015a",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6be8010f",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T05:37:10Z",
+      "side": 1,
+      "message": "Does the log not persist to disk? How can it not return an error?\nI guess we can discuss this tomorrow.",
+      "parentUuid": "b911b39a_c4d3fe26",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
