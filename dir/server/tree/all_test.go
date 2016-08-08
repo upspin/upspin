@@ -79,6 +79,18 @@ func TestPutNodes(t *testing.T) {
 		t.Errorf("dir3 = %v, want %v", entries[2], dir3)
 	}
 
+	// Lookup path.
+	de, dirty, err := tree.Lookup(userName + "/dir/doc.pdf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := dirty, true; got != want {
+		t.Errorf("dirty = %v, want %v", dirty, want)
+	}
+	if !reflect.DeepEqual(*de, dir3) {
+		t.Errorf("de = %v, want %v", de, dir3)
+	}
+
 	// Flush and very new tree is equivalent.
 	err = tree.Flush()
 	if err != nil {
@@ -88,6 +100,18 @@ func TestPutNodes(t *testing.T) {
 	// Log is empty now.
 	if got, want := cfg.Log.LastIndex(), -1; got != want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", cfg.Log.LastIndex(), want)
+	}
+
+	// Lookup now returns !dirty.
+	de, dirty, err = tree.Lookup(userName + "/dir/doc.pdf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := dirty, false; got != want {
+		t.Errorf("dirty = %v, want %v", dirty, want)
+	}
+	if !reflect.DeepEqual(*de, dir3) {
+		t.Errorf("de = %v, want %v", de, dir3)
 	}
 
 	t.Logf("Root: %v", tree.Root())
@@ -105,12 +129,9 @@ func TestPutNodes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if got, want := cfg.Log.LastIndex(), 0; got != want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", cfg.Log.LastIndex(), want)
 	}
-
-	// TODO: a Lookup here will confirm dir4 is fully integrated in the tree now.
 }
 
 // Test that an empty root can be saved and retrieved.
