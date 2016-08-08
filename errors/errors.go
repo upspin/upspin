@@ -65,6 +65,7 @@ const (
 	IsDir                  // Item is a directory.
 	NotDir                 // Item is not a directory..
 	NotEmpty               // Directory not empty.
+	Internal               // An internal error or inconsistency happened.
 )
 
 func (k Kind) String() string {
@@ -89,6 +90,8 @@ func (k Kind) String() string {
 		return "item is not a directory"
 	case NotEmpty:
 		return "directory not empty"
+	case Internal:
+		return "internal error"
 	}
 	return "unknown error kind"
 }
