@@ -419,8 +419,10 @@ func Match(err1, err2 error) bool {
 	if e1.Kind != Other && e2.Kind != e1.Kind {
 		return false
 	}
-	if e1.Err != nil && e2.Err.Error() != e1.Err.Error() {
-		return false
+	if e1.Err != nil {
+		if e2.Err == nil || e2.Err.Error() != e1.Err.Error() {
+			return false
+		}
 	}
 	return true
 }

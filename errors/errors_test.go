@@ -126,6 +126,7 @@ var matchTests = []matchTest{
 	{E(jane), E(john), false},
 	{E(path1), E(path2), false},
 	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, john, path1), false},
+	{E(path1, Str("something")), E(path1), false}, // Test nil error on rhs.
 }
 
 func TestMatch(t *testing.T) {
