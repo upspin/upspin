@@ -7,7 +7,6 @@ package gcp
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/cloud/storage"
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/metric"
 	"upspin.io/upspin"
@@ -74,13 +74,16 @@ var (
 	serverPrivate = "82201047360680847258309465671292633303992565667422607675215625927005262185934"
 )
 
-func assertError(t *testing.T, expectedError string, err error) {
-	if err == nil {
-		t.Fatal("Expected error")
+func match(t *testing.T, want, got error) bool {
+	if got == nil {
+		t.Error("expected %q error, got none", want)
+		return false
 	}
-	if !strings.Contains(err.Error(), expectedError) {
-		t.Errorf("Expected error %q, got %q", expectedError, err)
+	if !errors.Match(want, got) {
+		t.Errorf("got %T=%q error, expected %q", got, got, want)
+		return false
 	}
+	return true
 }
 
 func assertDirEntries(t *testing.T, exectedDirEntries []*upspin.DirEntry, de []*upspin.DirEntry, err error) {
@@ -101,21 +104,24 @@ func assertDirEntry(t *testing.T, exectedDirEntry *upspin.DirEntry, de *upspin.D
 	assertDirEntries(t, []*upspin.DirEntry{exectedDirEntry}, []*upspin.DirEntry{de}, err)
 }
 
-func Put(t *testing.T, ds *directory, dirEntry *upspin.DirEntry, expectedError string) {
-	err := ds.Put(dirEntry)
-	assertError(t, expectedError, err)
-}
-
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &upspin.DirEntry{}, "no user name in path")
+	expectErr := errors.E("Put", errors.E("Parse", errors.Str("no user name in path")))
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	if !match(t, expectErr, ds.Put(&upspin.DirEntry{})) {
+		t.Fatal("Put: error mismatch")
+	}
 }
 
 func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir, "no user name in path")
+	expectErr := errors.E("Put", errors.E("Parse", errors.Str("no user name in path")))
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	if !match(t, expectErr, ds.Put(&dir)) {
+		t.Fatal("Put: error mismatch")
+	}
 }
 
 func TestPutErrorInvalidSequenceNumber(t *testing.T) {
@@ -124,29 +130,38 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 		Attr:     upspin.AttrDirectory,
 		Sequence: upspin.SeqNotExist - 1,
 	}
-	Put(t, newTestDirServer(t, &storagetest.DummyStorage{}), &dir,
-		"fred@bob.com/myroot/myfile: Put: invalid operation: invalid sequence number")
+	expectErr := errors.E("Put", errors.Invalid, errors.Str("invalid sequence number"))
+	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	if !match(t, expectErr, ds.Put(&dir)) {
+		t.Fatal("Put: error mismatch")
+	}
 }
 
 func TestLookupPathError(t *testing.T) {
-	expectedError := "no user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	expectErr := errors.E("Lookup", errors.E("Parse", errors.Str("no user name in path")))
 	_, err := ds.Lookup("")
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("Lookup: error mismatch")
+	}
 }
 
 func TestGlobMissingPattern(t *testing.T) {
-	expectedError := "no user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	expectErr := errors.E("Glob", errors.E("Parse", errors.Str("no user name in path")))
 	_, err := ds.Glob("")
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("Glob: error mismatch")
+	}
 }
 
 func TestGlobBadPath(t *testing.T) {
-	expectedError := "bad user name in path"
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
+	expectErr := errors.E("Glob", errors.E("Parse", errors.Str("bad user name in path")))
 	_, err := ds.Glob("missing/email/dir/file")
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("Glob: error mismatch")
+	}
 }
 
 func TestPutErrorFileNoParentDir(t *testing.T) {
@@ -160,13 +175,16 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 		Data: [][]byte{rootJSON, []byte("")},
 	}
 
+	expectErr := errors.E("Put", upspin.PathName("test@foo.com/myroot/myfile"), errors.NotExist, errors.Str("parent path not found"))
 	ds := newTestDirServer(t, egcp)
-	Put(t, ds, &dir, "test@foo.com/myroot/myfile: Put: item does not exist: parent path not found")
+	if !match(t, expectErr, ds.Put(&dir)) {
+		t.Fatal("Put: error mismatch")
+	}
 }
 
 func TestLookupPathNotFound(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
-	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/invalid/invalid/invalid: Download: not found"
+	expectErr := errors.E("Lookup", errors.NotExist)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, "something that does not match"},
@@ -175,7 +193,9 @@ func TestLookupPathNotFound(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	_, err := ds.Lookup("test@foo.com/invalid/invalid/invalid")
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("Lookup: error mismatch")
+	}
 }
 
 // Regression test to catch that we don't panic (by going past the root).
@@ -372,7 +392,7 @@ func TestPutParentNotDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Put: item is not a directory: parent is not a directory"
+	expectErr := errors.E("Put", errors.NotDir)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, parentPathName},
@@ -381,7 +401,9 @@ func TestPutParentNotDir(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	err := ds.Put(&dir)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("Put: error mismatch")
+	}
 }
 
 func TestPutFileOverwritesDir(t *testing.T) {
@@ -395,7 +417,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Put: item already exists: directory already exists"
+	expectError := errors.E("Put", errors.Exist)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName, parentPathName},
@@ -404,7 +426,9 @@ func TestPutFileOverwritesDir(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	err := ds.Put(&dir)
-	assertError(t, expectedError, err)
+	if !match(t, expectError, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestPutDirOverwritesFile(t *testing.T) {
@@ -417,7 +441,7 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: MakeDirectory: item is not a directory: overwriting file with directory"
+	expectErr := errors.E("MakeDirectory", errors.NotDir)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName, parentPathName},
@@ -426,7 +450,9 @@ func TestPutDirOverwritesFile(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	_, err := ds.MakeDirectory(dir.Name)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestPutPermissionDenied(t *testing.T) {
@@ -435,7 +461,7 @@ func TestPutPermissionDenied(t *testing.T) {
 	newRoot.accessFiles[rootAccessFile] = makeAccess(t, rootAccessFile, "") // No one can write, including owner.
 	rootJSON := toRootJSON(t, &newRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Put: permission denied"
+	expectErr := errors.E("Put", errors.Permission)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
@@ -444,7 +470,9 @@ func TestPutPermissionDenied(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	err := ds.Put(&dir)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestPut(t *testing.T) {
@@ -527,7 +555,7 @@ func TestMakeRoot(t *testing.T) {
 }
 
 func TestMakeRootPermissionDenied(t *testing.T) {
-	expectedError := "test@foo.com/, user bozo@theclown.org: MakeDirectory: permission denied"
+	expectErr := errors.E("MakeDirectory", errors.Permission)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref: []string{"does not exist"},
@@ -538,7 +566,9 @@ func TestMakeRootPermissionDenied(t *testing.T) {
 	// The session is for a user other than the expected root owner.
 	ds.context.SetUserName("bozo@theclown.org")
 	_, err := ds.MakeDirectory(userRoot.dirEntry.Name)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 
 	if len(egcp.PutContents) != 0 {
 		t.Fatalf("Expected put to write 0 dir entries, got %d", len(egcp.PutContents))
@@ -701,7 +731,7 @@ func TestGroupAccessFile(t *testing.T) {
 		case 2:
 			return d2, nil
 		}
-		return nil, errors.New("invalid")
+		return nil, errors.Str("invalid")
 	}, timeFunc)
 	// Create a session for broUserName
 	ds.context.SetUserName(broUserName)
@@ -720,9 +750,11 @@ func TestGroupAccessFile(t *testing.T) {
 	// Go back to bro accessing.
 	ds.context.SetUserName(broUserName)
 	// Expected permission denied this time.
-	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
+	expectErr := errors.E("Lookup", errors.Permission)
 	_, err = ds.Lookup(pathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestMarshalRoot(t *testing.T) {
@@ -781,11 +813,13 @@ func TestGCPCorruptsData(t *testing.T) {
 		Data: [][]byte{rootJSON, []byte("really bad JSON structure that does not parse")},
 	}
 
-	expectedError := "test@foo.com/mydir: I/O error: json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"
+	expectErr := errors.E(errors.IO, errors.Str("json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"))
 
 	ds := newTestDirServer(t, egcp)
 	err := ds.Put(&dir)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestLookup(t *testing.T) {
@@ -810,12 +844,14 @@ func TestLookupPermissionDenied(t *testing.T) {
 		Data: [][]byte{rootJSON},
 	}
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Lookup: permission denied"
+	expectErr := errors.E("Lookup", errors.Permission)
 	ds := newTestDirServer(t, egcp)
 
 	ds.context.SetUserName("sloppyjoe@unauthorized.com")
 	_, err := ds.Lookup(pathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestDelete(t *testing.T) {
@@ -858,12 +894,14 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 		fileNames: []string{pathName}, // pathName is inside parentPathName.
 	}
 
-	expectedError := "Delete: directory not empty:\n\ttest@foo.com/mydir"
+	expectErr := errors.E("Delete", errors.NotEmpty)
 
 	ds := newTestDirServer(t, lgcp)
 
 	err := ds.Delete(parentPathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 
 	if !lgcp.listDirCalled {
 		t.Errorf("ListDir should have been called as pathName is a directory")
@@ -883,13 +921,15 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 		},
 	}
 
-	expectedError := "test@foo.com/mydir/myfile.txt: Delete: permission denied"
+	expectErr := errors.E("Delete", errors.Permission)
 
 	ds := newTestDirServer(t, lgcp)
 
 	ds.context.SetUserName("some-random-dude@bozo.com")
 	err := ds.Delete(pathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 
 	if lgcp.listDirCalled {
 		t.Errorf("ListDir should not have been called as pathName is not a directory")
@@ -1001,10 +1041,12 @@ func TestDeleteGroupFile(t *testing.T) {
 	}
 
 	// And now the session for bro can no longer read it.
-	expectedError := "Lookup: item does not exist:\n\ttest@foo.com/Group/family"
+	expectErr := errors.E("Lookup", errors.NotExist)
 	ds.context.SetUserName(broUserName)
 	_, err = ds.Lookup(pathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func TestWhichAccessImplicitAtRoot(t *testing.T) {
@@ -1051,7 +1093,7 @@ func TestWhichAccess(t *testing.T) {
 func TestWhichAccessPermissionDenied(t *testing.T) {
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedError := "test@foo.com/mydir/myfile.txt: WhichAccess: item does not exist"
+	expectErr := errors.E("WhichAccess", errors.NotExist)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName},
@@ -1061,7 +1103,9 @@ func TestWhichAccessPermissionDenied(t *testing.T) {
 	ds := newTestDirServer(t, egcp)
 	ds.context.SetUserName("somerandomguy@a.co")
 	_, err := ds.WhichAccess(pathName)
-	assertError(t, expectedError, err)
+	if !match(t, expectErr, err) {
+		t.Fatal("error mismatch")
+	}
 }
 
 func toJSON(t *testing.T, data interface{}) []byte {
@@ -1116,7 +1160,7 @@ func (l *listGCP) ListPrefix(prefix string, depth int) ([]string, error) {
 	if l.prefix == prefix {
 		return l.fileNames, nil
 	}
-	return []string{}, errors.New("Not found")
+	return []string{}, errors.Str("Not found")
 }
 
 func (l *listGCP) ListDir(dir string) ([]string, error) {
@@ -1124,7 +1168,7 @@ func (l *listGCP) ListDir(dir string) ([]string, error) {
 	if l.prefix == dir {
 		return l.fileNames, nil
 	}
-	return []string{}, errors.New("Not found")
+	return []string{}, errors.Str("Not found")
 }
 
 func (l *listGCP) Delete(path string) error {
@@ -1132,7 +1176,7 @@ func (l *listGCP) Delete(path string) error {
 	if path == l.deletePathExpected {
 		return nil
 	}
-	return errors.New("Not found")
+	return errors.Str("Not found")
 }
 
 type dummyStore struct {
@@ -1146,7 +1190,7 @@ func (d *dummyStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error
 	if ref == d.ref {
 		return d.contents, nil, nil
 	}
-	return nil, nil, errors.New("not found")
+	return nil, nil, errors.Str("not found")
 }
 func (d *dummyStore) Put(data []byte) (upspin.Reference, error) {
 	panic("unimplemented")
