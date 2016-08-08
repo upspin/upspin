@@ -8,7 +8,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -18,6 +17,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
+	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -32,11 +32,10 @@ import (
 	_ "upspin.io/store/transports"
 )
 
-// sharer holds the state for the share calculation. It holds some caches to
+// Sharer holds the state for the share calculation. It holds some caches to
 // avoid calling on the server too much.
-type sharer struct {
+type Sharer struct {
 	// Flags.
-	fs    *flag.FlagSet
 	fix   bool
 	force bool
 	isDir bool
@@ -61,29 +60,27 @@ type sharer struct {
 	userByHash map[[sha256.Size]byte]upspin.UserName
 }
 
-// do is the main function for the share subcommand.
-func (s *sharer) do() {
-	// Validate names quickly before grabbing a context.
-	for i := 0; i < s.fs.NArg(); i++ {
-		name := upspin.PathName(s.fs.Arg(i))
-		_, err := path.Parse(name)
-		if err != nil {
-			exitf("%q: %s", name, err)
-		}
-	}
+var sharer Sharer
 
+func (s *Sharer) init() {
 	context, err := context.InitContext(nil)
 	if err != nil {
 		exitf("initializing context: %s", err)
 	}
 	s.context = context
 	s.client = client.New(context)
+	s.accessFiles = make(map[upspin.PathName]*access.Access)
+	s.users = make(map[upspin.PathName][]upspin.UserName)
+	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
+	s.userByHash = make(map[[sha256.Size]byte]upspin.UserName)
+}
 
+// do is the main function for the share subcommand.
+func (s *Sharer) shareCommand(args []string) {
 	// To change things, User must be the owner of every file.
-	// (We just parsed them all, but that was before we had a context.)
 	if s.fix {
-		for i := 0; i < s.fs.NArg(); i++ {
-			name := upspin.PathName(s.fs.Arg(i))
+		for _, arg := range args {
+			name := upspin.PathName(arg)
 			parsed, _ := path.Parse(name)
 			if parsed.User() != s.context.UserName() {
 				exitf("%q: %q is not owner", name, s.context.UserName())
@@ -92,17 +89,12 @@ func (s *sharer) do() {
 	}
 
 	// Files parse. Get the list of all directory entries we care about.
-	entries := s.allEntries()
+	entries := s.allEntries(args)
 
 	// Collect the access files. We need only one per directory.
-	s.accessFiles = make(map[upspin.PathName]*access.Access)
-	s.users = make(map[upspin.PathName][]upspin.UserName)
 	for _, e := range entries {
 		s.addAccess(e)
 	}
-
-	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
-	s.userByHash = make(map[[sha256.Size]byte]upspin.UserName)
 
 	// Now we're ready. First show the state if asked.
 	if !s.quiet {
@@ -139,65 +131,24 @@ func (s *sharer) do() {
 			entriesToFix = append(entriesToFix, entry)
 			continue
 		}
-		users := s.users[path.DropPath(entry.Name, 1)]
-		for _, user := range users {
-			s.lookupKey(user)
-		}
 		packer := lookupPacker(entry)
 		if packer.Packing() == upspin.PlainPack {
 			continue
 		}
-		hashes, err := packer.ReaderHashes(entry.Packdata)
+		users, keyUsers, err := s.readers(entry)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
-		// hashUsers is the pretty-printed string of user names recovered from
-		// looking at the list of hashed keys in the packdata. It makes for an
-		// easy comparison with the return value from userListToString.
-		var hashUsers string
-		unknownUser := false
-		for _, hash := range hashes {
-			var thisUser upspin.UserName
-			switch packer.Packing() {
-			case upspin.EEPack:
-				if len(hash) != sha256.Size {
-					fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
-					s.exitCode = 1
-					continue
-				}
-				var h [sha256.Size]byte
-				copy(h[:], hash)
-				var ok bool
-				thisUser, ok = s.userByHash[h]
-				if !ok && !unknownUser {
-					// We have a key but no user with that key is known to us.
-					// This means an access change has removed permissions for some user
-					// but if that user still has the reference, the user could read the file.
-					// Someone should run upspin share -fix soon to repair the packing.
-					unknownUser = true
-					fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
-					s.exitCode = 1
-					continue
-				}
-			default:
-				fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
-				continue
-			}
-			if hashUsers != "" {
-				hashUsers += " "
-			}
-			hashUsers += string(thisUser)
-		}
 		userList := userListToString(users)
-		if userList != hashUsers {
+		if userList != keyUsers {
 			if !s.quiet {
 				if len(entriesToFix) == 0 {
 					fmt.Println("\nAccess discrepancies:")
 				}
 				fmt.Printf("\n%s:\n", entry.Name)
 				fmt.Printf("\tAccess: %s\n", userList)
-				fmt.Printf("\tKeys:   %s\n", hashUsers)
+				fmt.Printf("\tKeys:   %s\n", keyUsers)
 			}
 			entriesToFix = append(entriesToFix, entry)
 		}
@@ -217,20 +168,80 @@ func (s *sharer) do() {
 	os.Exit(s.exitCode)
 }
 
+// readers returns two lists, the list of users with access according to the
+// access file, and the the pretty-printed string of user names recovered from
+// looking at the list of hashed keys in the packdata.
+func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, error) {
+	if entry.IsDir() {
+		// Directories don't have readers.
+		return nil, "", nil
+	}
+	users := s.users[path.DropPath(entry.Name, 1)]
+	for _, user := range users {
+		s.lookupKey(user)
+	}
+	packer := lookupPacker(entry)
+	if packer == nil {
+		return users, "", errors.Errorf("no packer registered for packer %s", entry.Packing)
+	}
+	if packer.Packing() == upspin.PlainPack {
+		return users, "", nil
+	}
+	hashes, err := packer.ReaderHashes(entry.Packdata)
+	if err != nil {
+		return nil, "", err
+	}
+	var keyUsers string
+	unknownUser := false
+	for _, hash := range hashes {
+		var thisUser upspin.UserName
+		switch packer.Packing() {
+		case upspin.EEPack:
+			if len(hash) != sha256.Size {
+				fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
+				s.exitCode = 1
+				continue
+			}
+			var h [sha256.Size]byte
+			copy(h[:], hash)
+			var ok bool
+			thisUser, ok = s.userByHash[h]
+			if !ok && !unknownUser {
+				// We have a key but no user with that key is known to us.
+				// This means an access change has removed permissions for some user
+				// but if that user still has the reference, the user could read the file.
+				// Someone should run upspin share -fix soon to repair the packing.
+				unknownUser = true
+				fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
+				s.exitCode = 1
+				continue
+			}
+		default:
+			fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
+			continue
+		}
+		if keyUsers != "" {
+			keyUsers += " "
+		}
+		keyUsers += string(thisUser)
+	}
+	return users, keyUsers, nil
+}
+
 func userListToString(userList []upspin.UserName) string {
 	userString := fmt.Sprint(userList)
 	return userString[1 : len(userString)-1]
 }
 
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
-func (s *sharer) allEntries() []*upspin.DirEntry {
+func (s *Sharer) allEntries(args []string) []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
 	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
-	for i := 0; i < s.fs.NArg(); i++ {
-		name := upspin.PathName(s.fs.Arg(i))
+	for _, arg := range args {
+		name := upspin.PathName(arg)
 		entry, err := directory.Lookup(name)
 		if err != nil {
 			exitf("lookup %q: %s", name, err)
@@ -251,7 +262,7 @@ func (s *sharer) allEntries() []*upspin.DirEntry {
 }
 
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
-func (s *sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
+func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
 	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
@@ -297,7 +308,7 @@ func lookupPacker(entry *upspin.DirEntry) upspin.Packer {
 }
 
 // addAccess loads an access file.
-func (s *sharer) addAccess(entry *upspin.DirEntry) {
+func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 	name := entry.Name
 	if !entry.IsDir() {
 		name = path.DropPath(name, 1) // Directory name for this file.
@@ -317,40 +328,49 @@ func (s *sharer) addAccess(entry *upspin.DirEntry) {
 	if which == "" {
 		a, err = access.New(name)
 	} else {
-		a, err = access.Parse(which, read(s.client, which))
+		a, err = access.Parse(which, readOrExit(s.client, which))
 	}
 	if err != nil {
 		exitf("parsing access file %q: %s", name, err)
 	}
 	s.accessFiles[name] = a
-	s.users[name] = s.usersWithReadAccess(a)
+	s.users[name] = usersWithAccess(s.client, a, access.Read)
 }
 
-// usersWithReadAccess returns the list of user names granted read access by this access file.
-func (s *sharer) usersWithReadAccess(a *access.Access) []upspin.UserName {
-	userList, err := a.Users(access.Read, s.client.Get)
+// usersWithReadAccess returns the list of user names granted access by this access file.
+func usersWithAccess(client upspin.Client, a *access.Access, right access.Right) []upspin.UserName {
+	userList, err := a.Users(right, client.Get)
 	if err != nil {
 		exitf("getting user list: %s", err)
 	}
 	return userList
 }
 
-// read returns the contents of the file. It exits if the file cannot be read.
-func read(c upspin.Client, file upspin.PathName) []byte {
-	fd, err := c.Open(file)
+// readOrExit returns the contents of the file. It exits if the file cannot be read.
+func readOrExit(c upspin.Client, file upspin.PathName) []byte {
+	data, err := read(c, file)
 	if err != nil {
-		exitf("opening file: %s", err)
-	}
-	defer fd.Close()
-	data, err := ioutil.ReadAll(fd)
-	if err != nil {
-		exitf("reading %q: %s", file, err)
+		exitf("%q: %s", file, err)
 	}
 	return data
 }
 
+// read returns the contents of the file.
+func read(c upspin.Client, file upspin.PathName) ([]byte, error) {
+	fd, err := c.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer fd.Close()
+	data, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
-func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
+func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
@@ -401,7 +421,7 @@ func (s *sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 }
 
 // lookupKey returns the public key for the user.
-func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
+func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	key, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
 	if ok {
 		return key
@@ -418,7 +438,8 @@ func (s *sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 		return ""
 	}
 	// Remember the lookup, failed or otherwise.
-	if len(u.PublicKey) == 0 {
+	key = u.PublicKey
+	if len(key) == 0 {
 		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
 		s.exitCode = 1
 		s.userKeys[user] = ""
