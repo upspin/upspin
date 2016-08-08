@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_0bb29d4d",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T03:48:13Z",
+      "side": 1,
+      "message": "It\u0027s a pretty big struct and may grow, so I am unsure it should be by value. But I have thought about it.\n\nI do think your point about copying if there are changes makes sense.",
+      "parentUuid": "99c94f47_eb771199",
+      "revId": "1ec731c91850328601c454ddb6553abdd694ddfb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_cb7a5582",
         "filename": "errors/errors_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-08T03:37:42Z",
       "side": 1,
       "message": "how about \n{E(), E(io.EOF), true},",
+      "revId": "1ec731c91850328601c454ddb6553abdd694ddfb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2bb7593e",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T03:48:13Z",
+      "side": 1,
+      "message": "that doesn\u0027t work, as E() returns nil with no type. It probably shouldn\u0027t, but that\u0027s for a different CL. (Top of E returns explicit nil if no args.)",
+      "parentUuid": "99c94f47_cb7a5582",
       "revId": "1ec731c91850328601c454ddb6553abdd694ddfb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
