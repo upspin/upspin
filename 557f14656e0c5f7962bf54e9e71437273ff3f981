@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "99c94f47_2b0af929",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "This should probably be called package tree and live in directory dir/server/tree. It\u0027s not Merkle/hash tree specific and its primary exported type is Tree.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_8bd1adca",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -36,6 +53,40 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_cbfed506",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "how about just get? get(location) retrieves the data at the location.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8bf8cd18",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "this isn\u0027t the right test to do first, is it? shouldn\u0027t you check that locs is empty as well?\nif len(locs) \u003e 0 \u0026\u0026 len(data) \u003e 0 you have an internal error. pick that off first.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_2b52f968",
         "filename": "dir/server/merkle/blocks.go",
         "patchSetId": 3
@@ -47,6 +98,57 @@
       "writtenOn": "2016-08-08T00:02:25Z",
       "side": 1,
       "message": "Add a TODO: use client.Get?",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ebfb9113",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/recurse/recur/\nrecurse is an unnecessary word, an erroneous back-formation from recursion, the noun form of recur.\n\nbut it\u0027s easy to do this safely by making it a loop and counting instead of recurring.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_abf58921",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/write/store/ this stores a node.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4b0c2540",
+        "filename": "dir/server/merkle/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "this should be done once, at init time, and saved in t.",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -240,6 +342,159 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_cb1fb55d",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/ a / the /\ns/it is okay/that is fine/",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_eb1cf16a",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "entries of what?",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2b1bd974",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/Tree/the tree/",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8b29ad8f",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/via/through/ why use Latin?",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ab26e9bc",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "that is not clear. what user are we talking about?\ni think you mean the owner of the user root that holds this tree.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4b3505de",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "s/at/to/",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6b3a41cf",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "what happens if there are fewer? i have a feeling there should be an error returned.\ni\u0027m also not sure the type is right - maybe it should be []upspin.DirEntry",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b2ffd8f",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "why do you need these methods? seems like an odd place.\nbetter to store the tree it\u0027s logging for and work through that.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2b3439df",
+        "filename": "dir/server/merkle/merkle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "i still have a hard time understanding why Log is connected to the tree through this struct.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_cb46d5ad",
         "filename": "dir/server/merkle/treeimpl.go",
         "patchSetId": 3
@@ -251,6 +506,23 @@
       "writtenOn": "2016-08-08T00:02:25Z",
       "side": 1,
       "message": "suggestion: hang a \"String() string\" method on this type for easier debugging and error formation",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b161d4e",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "having a hard time reading this type with all the comments. i\u0027ll give it a proper review in the next round",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -285,6 +557,23 @@
       "writtenOn": "2016-08-08T00:02:25Z",
       "side": 1,
       "message": "I suggest wrapping all comments at 80 columns. Code can go longer.",
+      "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6b11e154",
+        "filename": "dir/server/merkle/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-08T00:27:14Z",
+      "side": 1,
+      "message": "i suggest \"kids\" rather than \"children\". much shorter, and a tip of the hat to dave hanson.",
       "revId": "557f14656e0c5f7962bf54e9e71437273ff3f981",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
