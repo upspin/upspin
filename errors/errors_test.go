@@ -84,6 +84,16 @@ func TestDoesNotChangePreviousError(t *testing.T) {
 	}
 }
 
+func TestNoArgs(t *testing.T) {
+	defer func() {
+		err := recover()
+		if err == nil {
+			t.Fatal("E() did not panic")
+		}
+	}()
+	_ = E()
+}
+
 type matchTest struct {
 	err1, err2 error
 	matched    bool

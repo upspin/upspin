@@ -94,6 +94,7 @@ func (k Kind) String() string {
 }
 
 // E builds an error value from its arguments.
+// There must be at least one argument or E panics.
 // The type of each argument determines its meaning.
 // If more than one argument of a given type is presented,
 // only the last one is recorded.
@@ -119,7 +120,7 @@ func (k Kind) String() string {
 //
 func E(args ...interface{}) error {
 	if len(args) == 0 {
-		return nil
+		panic("call to errors.E with no arguments")
 	}
 	e := &Error{}
 	for _, arg := range args {
