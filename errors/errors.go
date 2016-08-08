@@ -25,6 +25,8 @@ type Error struct {
 	Path upspin.PathName
 	// User is the Upspin name of the user attempting the operation.
 	User upspin.UserName
+	// Line is the line number where the error occurred.
+	Line int
 	// Op is the operation being performed, usually the name of the method
 	// being invoked (Get, Put, etc.). It should not contain an at sign @.
 	Op string
@@ -65,6 +67,7 @@ const (
 	IsDir                  // Item is a directory.
 	NotDir                 // Item is not a directory..
 	NotEmpty               // Directory not empty.
+	Internal               // An internal error or inconsistency happened.
 )
 
 func (k Kind) String() string {
@@ -89,6 +92,8 @@ func (k Kind) String() string {
 		return "item is not a directory"
 	case NotEmpty:
 		return "directory not empty"
+	case Internal:
+		return "internal error"
 	}
 	return "unknown error kind"
 }
@@ -129,6 +134,8 @@ func E(args ...interface{}) error {
 			e.Path = arg
 		case upspin.UserName:
 			e.User = arg
+		case int:
+			e.Line = arg
 		case string:
 			// Someone might accidentally call us with a user or path name
 			// that is not of the right type. Take care of that and log it.
@@ -224,6 +231,11 @@ func (e *Error) Error() string {
 			b.WriteString(e.Err.Error())
 		}
 	}
+	if e.Line != 0 {
+		pad(b, " ")
+		b.WriteString("on line ")
+		b.WriteString(fmt.Sprintf("%d", e.Line))
+	}
 	if b.Len() == 0 {
 		return "no error"
 	}
@@ -264,9 +276,8 @@ func (e *Error) MarshalAppend(b []byte) []byte {
 	b = appendString(b, string(e.Path))
 	b = appendString(b, string(e.User))
 	b = appendString(b, e.Op)
-	var tmp [16]byte // For use by PutVarint.
-	N := binary.PutVarint(tmp[:], int64(e.Kind))
-	b = append(b, tmp[:N]...)
+	b = appendInt(b, e.Line)
+	b = appendInt(b, int(e.Kind))
 	b = MarshalErrorAppend(e.Err, b)
 	return b
 }
@@ -325,6 +336,9 @@ func (e *Error) UnmarshalBinary(b []byte) error {
 	if data != nil {
 		e.Op = string(data)
 	}
+	l, N := binary.Varint(b)
+	e.Line = int(l)
+	b = b[N:]
 	k, N := binary.Varint(b)
 	e.Kind = Kind(k)
 	b = b[N:]
@@ -370,6 +384,12 @@ func appendString(b []byte, str string) []byte {
 	b = append(b, tmp[:N]...)
 	b = append(b, str...)
 	return b
+}
+
+func appendInt(b []byte, i int) []byte {
+	var tmp [16]byte // For use by PutVarint.
+	N := binary.PutVarint(tmp[:], int64(i))
+	return append(b, tmp[:N]...)
 }
 
 // getBytes unmarshals the byte slice at b (uvarint count followed by bytes)

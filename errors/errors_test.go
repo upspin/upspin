@@ -17,10 +17,10 @@ func TestMarshal(t *testing.T) {
 	err := Str("network unreachable")
 
 	// Single error. No user is set, so we will have a zero-length field inside.
-	e1 := E(path, "Get", IO, err)
+	e1 := E(path, "Get", IO, 17, err)
 
 	// Nested error.
-	e2 := E(path, user, "Read", Other, e1)
+	e2 := E(path, user, "Read", 32, Other, e1)
 
 	b := MarshalError(e2)
 	e3 := UnmarshalError(b)
@@ -33,6 +33,9 @@ func TestMarshal(t *testing.T) {
 	}
 	if in.User != out.User {
 		t.Errorf("expected User %q; got %q", in.User, out.User)
+	}
+	if in.Line != out.Line {
+		t.Errorf("expected Line %d; got %d", in.Line, out.Line)
 	}
 	if in.Op != out.Op {
 		t.Errorf("expected Op %q; got %q", in.Op, out.Op)
