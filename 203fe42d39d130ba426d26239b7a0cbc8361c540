@@ -1,0 +1,169 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c94f47_4b91859d",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "stale comment",
+      "range": {
+        "startLine": 21,
+        "startChar": 3,
+        "endLine": 21,
+        "endChar": 14
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ab9b49b6",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "include the location?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8b9e8da7",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "you already handle this at the end of the func",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4bfae5df",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "include the location in the error",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6bffa1ce",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "wait, i\u0027m confused. this does do put. shouldn\u0027t it be put?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0b04dde5",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "putBlock ?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ebeab10a",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "This comment isn\u0027t correct. I think it should be all *unexported* methods.\n\nIn any case, I still think you should be defensive and add a comment on every method that expects mu to be held, even if that\u0027s all of the unexported methods. All methods on *node that expect the tree\u0027s mu to be held should also be documented.\n\nIt is *really easy* to forget about this when you\u0027re coding with locks.\nA bit of documentation (that is trivial to copy and paste) will help avoid nasty bugs in the future.",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_cbed7525",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "I\u0027d stick this method up beside the node struct, so that if more state is added one might remember to update the stringer",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2b0999fc",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T04:37:09Z",
+      "side": 1,
+      "message": "s/numK/k/",
+      "range": {
+        "startLine": 327,
+        "startChar": 42,
+        "endLine": 327,
+        "endChar": 49
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
