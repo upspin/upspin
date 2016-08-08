@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c94f47_eb771199",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T03:37:42Z",
+      "side": 1,
+      "message": "Unrelated to this CL:\n\nThinking about this now, I wonder if we should be passing around Error instead of *Error. It seems like weirdness could occur if/when we zero out parts of the previous error, if that *Error is used elsewhere in the code. Maybe this section should make a copy of the previous error if there are any changes to be made.\n\nWhat do you think?",
+      "revId": "1ec731c91850328601c454ddb6553abdd694ddfb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_cb7a5582",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T03:37:42Z",
+      "side": 1,
+      "message": "how about \n{E(), E(io.EOF), true},",
+      "revId": "1ec731c91850328601c454ddb6553abdd694ddfb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
