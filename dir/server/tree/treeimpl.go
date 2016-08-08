@@ -93,9 +93,20 @@ func New(user upspin.UserName, cfg *Config) Tree {
 // Dirty reports whether the entry is different than the stored version.
 // The returned entry's references are not up-to-date if the entry is dirty.
 // Call Flush first to get an updated entry.
-func (t *tree) Lookup(path upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
-	// TODO
-	return nil, false, errNotImplemented
+func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
+	const Lookup = "Lookup"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, false, errors.E(Lookup, err)
+	}
+	node, err := t.loadPath(p)
+	if err != nil {
+		return nil, false, errors.E(Lookup, err)
+	}
+	return node.entry, node.dirty, nil
 }
 
 // Put puts a DirEntry to the Store. Files may be overwritten,
