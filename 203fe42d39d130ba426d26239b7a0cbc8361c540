@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_b8f0a163",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_8b7a0d4f",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0b4e1d3f",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 4
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_38b4b19a",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "99c94f47_0b4e1d3f",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_6b724180",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 4
@@ -65,6 +101,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "if got, want :\u003d len(entries), 3 {\n  t.Fatalf(\"len(entries) \u003d\u003d %v, want %v\", got, want)\n}",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_b846e1ab",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Was this suggestion in the wrong place?",
+      "parentUuid": "99c94f47_6b724180",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_b8a26143",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_cb57b5ce",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_eb54f1cb",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 4
@@ -105,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_f89cd901",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_eb54f1cb",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_8b61adb0",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 4
@@ -116,6 +206,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "ditto",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_989fa5f5",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_8b61adb0",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -156,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_3850313a",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_2b6c39a0",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ab77c967",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 4
@@ -167,6 +293,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "comment?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_18e295a0",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Tests often don\u0027t have comments. I added one because the test above was more complex and testing multiple things. This one tests an empty root works, as the name says. I\u0027m 93% sure you\u0027d make me delete a redundant comment like: // Tests that an empty root is successfully saved.",
+      "parentUuid": "99c94f47_ab77c967",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -196,6 +340,30 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_6d682dc6",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4b91859d",
+      "range": {
+        "startLine": 21,
+        "startChar": 3,
+        "endLine": 21,
+        "endChar": 14
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ab9b49b6",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -207,6 +375,24 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "include the location?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_cd58412d",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ab9b49b6",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -230,6 +416,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_ed5b7d26",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Rob requested this be done earlier because if both are true, I\u0027d return the data and not catch a possible bug.",
+      "parentUuid": "99c94f47_8b9e8da7",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4bfae5df",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -241,6 +445,24 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "include the location in the error",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_4d861178",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4bfae5df",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -264,6 +486,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_6db2ed4e",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "I want to include some hint here that this will affect the Store. writeNode or storeNode or store would be fine. put is very similar to Put in the interface and I think it would be confusing. Open to suggestions.",
+      "parentUuid": "99c94f47_6bffa1ce",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0b04dde5",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -275,6 +515,24 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "putBlock ?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_8db8092a",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "storeBlock?",
+      "parentUuid": "99c94f47_0b04dde5",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -298,6 +556,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_d8647d50",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_0bddbd67",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ebeab10a",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -309,6 +585,24 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "This comment isn\u0027t correct. I think it should be all *unexported* methods.\n\nIn any case, I still think you should be defensive and add a comment on every method that expects mu to be held, even if that\u0027s all of the unexported methods. All methods on *node that expect the tree\u0027s mu to be held should also be documented.\n\nIt is *really easy* to forget about this when you\u0027re coding with locks.\nA bit of documentation (that is trivial to copy and paste) will help avoid nasty bugs in the future.",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_ada4e501",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ebeab10a",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -332,6 +626,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_6d04ade7",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Work in progress. Everything is serialized until I\u0027m confident we can relax it some.",
+      "parentUuid": "99c94f47_2be2f92e",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_cbd6d54b",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -343,6 +655,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "Shouldn\u0027t the constructor set the packer field too?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_8deac909",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "I was doing it lazily. Changed.",
+      "parentUuid": "99c94f47_cbd6d54b",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -372,6 +702,30 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_0d49b936",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "endpoint is never nil. an empty endpoint has an unassigned transport.",
+      "parentUuid": "99c94f47_ebd39158",
+      "range": {
+        "startLine": 69,
+        "startChar": 14,
+        "endLine": 69,
+        "endChar": 37
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_abcd89b6",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -383,6 +737,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "how does this line differ from the previous one?",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_4d3e1171",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "It\u0027s saying specifically that the blocks\u0027 references will not be up-to-date. \n\nThe direntry returned *is* the golden one (regardless of not being saved to disk) *but* the references need fixing.\n\nIf anything, I think the second line is not adding much. Why? Because the DirServer does not care the entry is not flushed to disk yet as long as the entry is the last one the user sent over. But it should know not to use Block[i].Location.Reference if dirty.",
+      "parentUuid": "99c94f47_abcd89b6",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -406,6 +778,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_cd296136",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "No issue. I was using Rob\u0027s suggestion. My next CL will have zero comments and I\u0027ll leave it up to you two to add them for me. :-)\n\nDone.",
+      "parentUuid": "99c94f47_8bd0cd4d",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_6b49e135",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -417,6 +807,24 @@
       "writtenOn": "2016-08-08T05:37:10Z",
       "side": 1,
       "message": "you can delete this, iterating over a nil or empty map is a noop",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_adf345d6",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_6b49e135",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -440,6 +848,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_6dc30d60",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done. I moved it as far up as I\u0027m willing to go. But important types should come first (if node had 32 methods, I\u0027d hate to not see type tree until I scroll 5 pages down).",
+      "parentUuid": "99c94f47_cbed7525",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_2b0999fc",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 4
@@ -451,6 +877,30 @@
       "writtenOn": "2016-08-08T04:37:09Z",
       "side": 1,
       "message": "s/numK/k/",
+      "range": {
+        "startLine": 327,
+        "startChar": 42,
+        "endLine": 327,
+        "endChar": 49
+      },
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_0dced987",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T19:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_2b0999fc",
       "range": {
         "startLine": 327,
         "startChar": 42,
