@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c94f47_8bfd2da2",
+        "filename": "dir/gcp/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T07:25:06Z",
+      "side": 1,
+      "message": "isn\u0027t this more or less the same as the next test?\ni don\u0027t think you need this helper function at all, i think just putting\n\nif !errors.Match(want, got) {\n\nat each of the test sites should be sufficient",
+      "revId": "ccb8613c647a82aaf060f097fba4293558e15f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
