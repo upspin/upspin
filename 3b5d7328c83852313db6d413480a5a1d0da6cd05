@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b911b39a_2b10da58",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T23:39:51Z",
+      "side": 1,
+      "message": "Unrelated to this CL, but would you oppose if renamed this to NewFromKeys? It\u0027s useful if I already have the keys (true in tests) and since you\u0027re calling it from New I guess it\u0027s not really deprecated (my bad for suggesting it earlier).",
+      "revId": "3b5d7328c83852313db6d413480a5a1d0da6cd05",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_2b3a9acd",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T23:39:51Z",
+      "side": 1,
+      "message": "A comment here would help, since fKey as a name does not clarify its purpose much. \n// fKey converts a set of Upspin public and private keys to the factotum\u0027s key format.",
+      "revId": "3b5d7328c83852313db6d413480a5a1d0da6cd05",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
