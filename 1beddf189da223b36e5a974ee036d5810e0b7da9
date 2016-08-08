@@ -34,6 +34,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_ab116aab",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T23:26:52Z",
+      "side": 1,
+      "message": "My use case is to report internal logic issues and programming errors. Something like \"Internal Server Error on line 17\" should help us, even if does not help the user. As is now, the user will see an \"Other error\" with a similar cryptic description. \n\nWe can live without it, but the purpose of this package is to make error reporting a little nicer. I think error kind Internal can help.\n\nAbandon? Commit?",
+      "parentUuid": "99c94f47_cec1032e",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
