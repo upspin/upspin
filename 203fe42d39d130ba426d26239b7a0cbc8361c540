@@ -335,6 +335,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_1e555d2a",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T21:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ceb823c4",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4b91859d",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 4
@@ -464,6 +482,24 @@
       "side": 1,
       "message": "Well there\u0027s no reason to have a return statement that can never be reached. This passage of code should be:\n\nif data !\u003d nil \u0026\u0026 len(locs) \u003e 0 {\n  return nil, errors.E(get, errors.Errorf(\"location: %v: %v\", loc, errInternalInconsistency))\n}\nif data !\u003d nil {\n  return data, nil\n}\n// TODO: this should do something akin to client.Get. It now only does one indirection.\nreturn t.get(\u0026locs[0])",
       "parentUuid": "b911b39a_ed5b7d26",
+      "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_3e3939fa",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-08T21:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_eeb5dfca",
       "revId": "203fe42d39d130ba426d26239b7a0cbc8361c540",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
