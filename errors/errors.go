@@ -386,3 +386,40 @@ func getBytes(b []byte) (data, remaining []byte) {
 	}
 	return b[N : N+int(u)], b[N+int(u):]
 }
+
+// Match compares its two error arguments. It can be used to check
+// for expected errors in tests. Both arguments must have underlying
+// type *Error or Match will return false. Otherwise it returns true
+// iff every non-zero element of the first error is equal to the
+// corresponding element of the second. For the Err field, it compares
+// the string returned by its Error method. Elements that are in the
+// second argument but not present in the first are ignored.
+// For example,
+//	Match(errors.E(upspin.UserName("joe@schmoe.com"), errors.Permission), err)
+// tests whether err is an Error with Kind=Permission and User=joe@schmoe.com.
+func Match(err1, err2 error) bool {
+	e1, ok := err1.(*Error)
+	if !ok {
+		return false
+	}
+	e2, ok := err2.(*Error)
+	if !ok {
+		return false
+	}
+	if e1.Path != "" && e2.Path != e1.Path {
+		return false
+	}
+	if e1.User != "" && e2.User != e1.User {
+		return false
+	}
+	if e1.Op != "" && e2.Op != e1.Op {
+		return false
+	}
+	if e1.Kind != Other && e2.Kind != e1.Kind {
+		return false
+	}
+	if e1.Err != nil && e2.Err.Error() != e1.Err.Error() {
+		return false
+	}
+	return true
+}
