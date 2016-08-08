@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "99c94f47_ebf071cb",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T07:26:14Z",
+      "side": 1,
+      "message": "don\u0027t use underscores in variable names.\n\ni suggest writing a helper\n\nfunc readFile(op, name string) ([]byte, error) {\n  b, err :\u003d ioutil.ReadFile(name)\n  if os.IsNotExist(err) {\n    return nil, errors.E(op, errors.NotExist, err)\n  }\n  if err !\u003d nil {\n    return nil, errors.E(op, errors.IO, err)\n  }\n  return b, nil\n}\n\nand use it throughout this file.",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4bc9857e",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T07:26:14Z",
+      "side": 1,
+      "message": "instead of doing the conversion and using a new variable, just store the bytes in variables \u0027priv\u0027 and \u0027pub\u0027, and when you call DeprecatedNew below, do the conversions as you pass the arguments to the function",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b911b39a_04587687",
         "filename": "factotum/factotum.go",
         "patchSetId": 1
@@ -13,6 +47,24 @@
       "writtenOn": "2016-08-07T18:10:29Z",
       "side": 1,
       "message": "I think bufio Reader would do a cleaner job here. You can do something like:\n\nf, err :\u003d os.Open(filepath.Join(.....))\nr :\u003d bufio.NewReader(f)\n\nfor {\n    str, err :\u003d r.ReadString(\"\\n\")\n    ....\n}",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_4ba8a5df",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-08T07:26:14Z",
+      "side": 1,
+      "message": "These are tiny files, so you can avoid a lot of error handling by reading the whole thing into memory (as it is now).\n\nI suggest something like this:\n\nb, err :\u003d ioutil.ReadFile(...)\n// handle err\n\nlines :\u003d strings.Split(string(bytes.TrimSpace(b)), \"\\n\")\nif len(lines) !\u003d 4 { // assuming i\u0027m reading the code right\n  return nil, errors.Errorf(\"want 4 lines, got %v\", len(lines))\n}\n\nheader :\u003d lines[0]\ncurve :\u003d lines[1]\npubX, pubY :\u003d lines[2], lines[3]\n// validate/use those strings",
+      "parentUuid": "b911b39a_04587687",
       "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
