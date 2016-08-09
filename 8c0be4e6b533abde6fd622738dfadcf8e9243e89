@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_6e96cf98",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T05:41:25Z",
+      "side": 1,
+      "message": "switched to log.Error",
+      "parentUuid": "99c94f47_6ead6fee",
+      "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0eb2ab4d",
         "filename": "dir/gcp/gcp.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-09T05:35:16Z",
       "side": 1,
       "message": "ditto",
+      "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_0e8b8b6f",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T05:41:25Z",
+      "side": 1,
+      "message": "switched to log.Error",
+      "parentUuid": "99c94f47_0eb2ab4d",
       "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "99c94f47_cea4a303",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T05:41:25Z",
+      "side": 1,
+      "message": "switched to log.Error",
+      "parentUuid": "99c94f47_2eb7673e",
+      "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4ea8b3df",
         "filename": "dir/gcp/root.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-09T05:35:16Z",
       "side": 1,
       "message": "this seems important and unlikely enough to stay.",
+      "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_8e9e9ba7",
+        "filename": "dir/gcp/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T05:41:25Z",
+      "side": 1,
+      "message": "switched to log.Error",
+      "parentUuid": "99c94f47_4ea8b3df",
       "revId": "8c0be4e6b533abde6fd622738dfadcf8e9243e89",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
