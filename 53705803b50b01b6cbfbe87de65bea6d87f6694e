@@ -16,6 +16,24 @@
       "revId": "53705803b50b01b6cbfbe87de65bea6d87f6694e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_2e09a7fc",
+        "filename": "dir/gcp/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T05:43:16Z",
+      "side": 1,
+      "message": "I find this quite readable, but happy to change it. Done.",
+      "parentUuid": "99c94f47_2e90c796",
+      "revId": "53705803b50b01b6cbfbe87de65bea6d87f6694e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
