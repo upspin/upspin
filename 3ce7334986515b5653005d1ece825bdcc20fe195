@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b911b39a_0ae23fa0",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-09T19:05:02Z",
+      "side": 1,
+      "message": "Yes, I should have know better.  s/_bytes/Bytes/g\n\nDid the helper func.  Is this a general pattern, that we wrap existing library with local variant to clean up error handling?  I can live with that, but seems like a defect.  Maybe I have the wrong philosophical view?",
+      "parentUuid": "99c94f47_ebf071cb",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4bc9857e",
         "filename": "factotum/factotum.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-08T07:26:14Z",
       "side": 1,
       "message": "instead of doing the conversion and using a new variable, just store the bytes in variables \u0027priv\u0027 and \u0027pub\u0027, and when you call DeprecatedNew below, do the conversions as you pass the arguments to the function",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_6aa93329",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-09T19:05:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4bc9857e",
       "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -65,6 +101,24 @@
       "side": 1,
       "message": "These are tiny files, so you can avoid a lot of error handling by reading the whole thing into memory (as it is now).\n\nI suggest something like this:\n\nb, err :\u003d ioutil.ReadFile(...)\n// handle err\n\nlines :\u003d strings.Split(string(bytes.TrimSpace(b)), \"\\n\")\nif len(lines) !\u003d 4 { // assuming i\u0027m reading the code right\n  return nil, errors.Errorf(\"want 4 lines, got %v\", len(lines))\n}\n\nheader :\u003d lines[0]\ncurve :\u003d lines[1]\npubX, pubY :\u003d lines[2], lines[3]\n// validate/use those strings",
       "parentUuid": "b911b39a_04587687",
+      "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_5e3eb570",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-09T19:05:02Z",
+      "side": 1,
+      "message": "I definitely prefer that, but was subconsciously avoiding criticism of unnecessary allocations.  Take a look at the new version;  it is easier to read and hopefully the allocations will never be enough to matter.",
+      "parentUuid": "99c94f47_4ba8a5df",
       "revId": "3ce7334986515b5653005d1ece825bdcc20fe195",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
