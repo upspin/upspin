@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_663eae71",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_2e520769",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ce46e3ad",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "i don\u0027t understand this comment",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_e629be35",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ce46e3ad",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_26e59610",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ee439f9a",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_8e40db8f",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "needs a comment, and why do we need fakes? fakes of what?",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_66ef8eee",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "I\u0027d usually call them Mocks, but you correctly pointed out they\u0027re Fakes, not Mocks. Documented and renamed.\n\nDone.",
+      "parentUuid": "99c94f47_8e40db8f",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_26ce7688",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "This is where I need Kind Internal. This is not a simple IO error. This is a programmer error.\n\nDone.",
+      "parentUuid": "99c94f47_ae80379e",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_cea26345",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 8
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "poor name for this function",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_46953238",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done. But please suggest one next time to avoid the (now almost certain) round-trip.",
+      "parentUuid": "99c94f47_cea26345",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_698be115",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ee9f1ff4",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_8e9c5b01",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 8
@@ -132,6 +258,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "again",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_898f3d20",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_8e9c5b01",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_a98cf92b",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ae991710",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4e50b33a",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 8
@@ -166,6 +328,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "again",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_c9993569",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4e50b33a",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_29aac96f",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "I don\u0027t follow: What is \"this\"? And isn\u0027t \"here\" a \"place\"?\n\nIf you\u0027re saying we\u0027re reading too much from the Store, not really. Only if it\u0027s not already cached in the tree.",
+      "parentUuid": "99c94f47_6e556f29",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_ae3d9710",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 8
@@ -200,6 +398,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "s/Merkle //",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_69dda10e",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_ae3d9710",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_89c1fd2e",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4eb4339b",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_6eb9ef8f",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 8
@@ -234,6 +468,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "first with respect to what?",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_a9beb9a3",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_6eb9ef8f",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_29fc8970",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_0ebe2b79",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_2ec3e707",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 8
@@ -268,6 +538,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "is this how we put a directory as well as a regular file?",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_c935b542",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "99c94f47_2ec3e707",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -291,6 +579,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_e9327157",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_cec7c310",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_eec4ff0d",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 8
@@ -302,6 +608,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "this doesn\u0027t make sense to me. the tree owns this, not the log",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_c9d135ca",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "SetRoot exists because *something* needs to store the root\u0027s location near the Tree (on local disk or PD or database, etc). Until now, I was using the Log for storage. This will change in the next CL as per our conversation yesterday.\n\nYes, you\u0027re correct, the Tree owns the Root. \n\nAnd it needs to save it somewhere. That somewhere was the Log. My next CL will create a new interface tentatively called LogIndex, just for saving the Root and the LastIndex read from the log. \n\nI will also rename this from SetRoot to SaveRoot or similar. \n\nDoes this help?",
+      "parentUuid": "99c94f47_eec4ff0d",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -325,6 +649,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_69dcc1db",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "The test shows how it works.\n\nI think of Log as an interface that the Tree uses for reading and writing log entries. Therefore, it\u0027s injected into it.",
+      "parentUuid": "99c94f47_8ed1bbca",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4edd13d9",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -336,6 +678,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "which fragment? define the key for the map",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_a9edd98c",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_4edd13d9",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -359,6 +719,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_e980b19f",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Because if it were a slice I would have to check for duplicates, which would be more expensive, O(n) vs O(1). For every deep path marked dirty, some common ancestor will be marked several times. Adding to a map eliminates the need for checking a slice for the existence of that node.",
+      "parentUuid": "99c94f47_6ee24fa2",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0ed70bbb",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -370,6 +748,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "i don\u0027t see what Config is buying you. why not just pass the parameters to New?",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_a99f99f4",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "I want to avoid New having 37 arguments. Config used to be a little longer at 6. It is now manageable (2). But it will grow a bit more. If in the next 3-4 CLs Config remains as 2 to 4 objects, I will make New take them directly. You can file a bug against me if you\u0027re worried I will forget.",
+      "parentUuid": "99c94f47_0ed70bbb",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -393,6 +789,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_0950ad39",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "I\u0027m officially american and I agree with \"than\" but not guns. :-)\n\nChanged.",
+      "parentUuid": "99c94f47_2edc47da",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_cef02365",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -404,6 +818,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "what does \u0027first\u0027 mean? (i asked this elsewhere)",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_09398df9",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_cef02365",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -427,6 +859,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_09350ddf",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "I\u0027m pretty sure you convinced me it should be Put. I first had it as Add.\nhttps://docs.google.com/document/d/1qwcfKYK2VULedLEJ-R96XzD6Hro1hoqlFvyU6hJZ_iI/edit#bookmark\u003did.ubyb0y5obogf\n\nPlease suggest a name for it. But I\u0027m now a believer this is exactly right. The DirServer code will be very simple:\n\nfunc (d *DirServer) Put(entry) error {\n     if !AccessCheckOkay() {\n          return errPermissionDenied\n     }\n    return tree.Put(entry)\n}",
+      "parentUuid": "99c94f47_eeeddf8b",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_8eea1b71",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -438,6 +888,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "not a sufficient test. it must also be a strict prefix.\ni think you want\n\nif nodePath.Drop(1).Path !\u003d parentPath",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_e93fd1b5",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_8eea1b71",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -461,6 +929,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_29ad69ef",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "They were called ensurePathLoaded. adg made me change it. Please decide with him on a proper name. Suggestions:\n\nmaybeLoadNodeFromPath\nloadNodeFromPath\nnamingAroundHereIsTooHard",
+      "parentUuid": "99c94f47_ce7903d7",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_4e8673c3",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -472,6 +958,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "note that only node might be in memory when it returns.",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_69b7613d",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "There\u0027s a lock, so all path will be in memory.",
+      "parentUuid": "99c94f47_4e8673c3",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -495,6 +999,24 @@
     },
     {
       "key": {
+        "uuid": "39a143ab_b0e7f8db",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99c94f47_6e8b2fc8",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_2e9527e0",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -512,6 +1034,24 @@
     },
     {
       "key": {
+        "uuid": "f977ab0c_09918d9e",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "It could be the root is in the log but not yet loaded because no one has requested it and the log hasn\u0027t been flushed, say because the DirServer crashed, restarted and didn\u0027t bother flushing the log yet (not long enough). Likely won\u0027t happen that way, but it could if the DirServer chose to work this way. Just being defensive.",
+      "parentUuid": "99c94f47_2e9527e0",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99c94f47_0e906bef",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 8
@@ -523,6 +1063,24 @@
       "writtenOn": "2016-08-09T03:07:13Z",
       "side": 1,
       "message": "this is bizarre from my perspective. given a tree, why does the log own the root? why isn\u0027t this return t.root?",
+      "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "39a143ab_7000305a",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T18:38:42Z",
+      "side": 1,
+      "message": "Because t.Root may be dirty. \n\nI don\u0027t want to have to call Flush here to get an up-to-date root unless the DirServer needs it, in which case it will call Flush itself before calling Root (and will hold a lock for the entire Tree to ensure the root doesn\u0027t change in the mean time).\n\nNote that Log will have the root in memory since the last flush (or it will look it up from local disk if and only if this is the first thing it\u0027s doing).",
+      "parentUuid": "99c94f47_0e906bef",
       "revId": "f96fcef1eb0ef3d60c9483876e291243af16178c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
