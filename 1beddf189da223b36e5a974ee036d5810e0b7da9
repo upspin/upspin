@@ -70,6 +70,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_aee117c7",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-09T01:02:25Z",
+      "side": 1,
+      "message": "I tend to agree. What is the actual _use_ of this error kind?",
+      "parentUuid": "99c94f47_ceea63a4",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
