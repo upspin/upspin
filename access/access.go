@@ -98,7 +98,7 @@ type Access struct {
 
 	// list holds the lists of parsed user and group names.
 	// It is indexed by a right. Each list is stored in sorted
-	// order, mostly so Equal can be efficient.
+	// order, mostly so the equal method can be efficient.
 	list [numRights][]path.Parsed
 
 	// All the lists are concatenated into this single slice, for easy evaluation of the
@@ -234,28 +234,6 @@ type sliceOfParsed []path.Parsed
 func (s sliceOfParsed) Len() int           { return len(s) }
 func (s sliceOfParsed) Less(i, j int) bool { return s[i].Compare(s[j]) < 0 }
 func (s sliceOfParsed) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
-// Equal reports whether a and b have equal contents.
-func (a *Access) Equal(b *Access) bool {
-	if a.parsed.Compare(b.parsed) != 0 {
-		return false
-	}
-	if len(a.list) != len(b.list) {
-		return false
-	}
-	for i, al := range a.list {
-		bl := b.list[i]
-		if len(al) != len(bl) {
-			return false
-		}
-		for j, ar := range al {
-			if ar.Compare(bl[j]) != 0 {
-				return false
-			}
-		}
-	}
-	return true
-}
 
 func isSpace(b byte) bool {
 	switch b {

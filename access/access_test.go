@@ -123,7 +123,7 @@ func TestAccessEqual(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%d: %s: %s\n", i, test.path2, err)
 		}
-		if a1.Equal(a2) != test.expect {
+		if a1.equal(a2) != test.expect {
 			t.Errorf("%d: equal(%q, %q) should be %t, is not", i, test.path1, test.path2, test.expect)
 		}
 	}
@@ -518,7 +518,7 @@ func TestNew(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !a.Equal(expected) {
+	if !a.equal(expected) {
 		t.Errorf("Expected %s to equal %s", a, expected)
 	}
 }
@@ -826,4 +826,26 @@ func listFromUserName(u []upspin.UserName) []string {
 		ret[i] = string(v)
 	}
 	return ret
+}
+
+// equal reports whether a and b have equal contents.
+func (a *Access) equal(b *Access) bool {
+	if a.parsed.Compare(b.parsed) != 0 {
+		return false
+	}
+	if len(a.list) != len(b.list) {
+		return false
+	}
+	for i, al := range a.list {
+		bl := b.list[i]
+		if len(al) != len(bl) {
+			return false
+		}
+		for j, ar := range al {
+			if ar.Compare(bl[j]) != 0 {
+				return false
+			}
+		}
+	}
+	return true
 }
