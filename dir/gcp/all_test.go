@@ -750,50 +750,68 @@ func TestGroupAccessFile(t *testing.T) {
 }
 
 func TestMarshalRoot(t *testing.T) {
-	var (
-		fileInRoot       = upspin.PathName("me@here.com/foo.txt")
-		dirRestricted    = upspin.PathName("me@here.com/restricted")
-		accessRoot       = upspin.PathName("me@here.com/Access")
-		accessRestricted = upspin.PathName("me@here.com/restricted/Access")
+	const (
+		dirRoot          = upspin.PathName("me@here.com/")
+		fileRoot         = dirRoot + "foo.txt"
+		dirRestricted    = dirRoot + "restricted"
+		accessRoot       = dirRoot + "Access"
+		accessRestricted = dirRestricted + "/Access"
+		reader           = upspin.UserName("bob@foo.com")
+		writer           = upspin.UserName("marie@curie.fr")
+		lister           = upspin.UserName("gandh@pace.in")
 	)
-	acc1 := makeAccess(t, accessRoot, "r: bob@foo.com\nw: marie@curie.fr")
-	acc2 := makeAccess(t, accessRestricted, "l: gandhi@peace.in")
-	root := &root{
+	acc1 := makeAccess(t, accessRoot, string("r: "+reader+"\nw: "+writer))
+	acc2 := makeAccess(t, accessRestricted, string("l: "+lister))
+	r := &root{
 		dirEntry: upspin.DirEntry{
 			Name: upspin.PathName("me@here.com/"),
 			Attr: upspin.AttrDirectory,
 		},
 		accessFiles: accessFileDB{accessRoot: acc1, accessRestricted: acc2},
 	}
-	buf := toRootJSON(t, root)
-	root2, err := unmarshalRoot(buf)
+
+	// Round trip to/from JSON.
+	b := toRootJSON(t, r)
+	var err error
+	r, err = unmarshalRoot(b)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(root2.accessFiles) != 2 {
-		t.Fatalf("Expected two Access files, got %d", len(root2.accessFiles))
+
+	if got, want := len(r.accessFiles), 2; got != want {
+		t.Fatalf("got %v access files, want %v", got, want)
 	}
-	acc1saved, ok := root2.accessFiles[accessRoot]
-	if !ok {
-		t.Fatalf("Expected %s to exist in DB.", accessRoot)
+
+	// Test that the saved access file has the expected permissions.
+	cases := []struct {
+		access upspin.PathName
+		user   upspin.UserName
+		right  access.Right
+		path   upspin.PathName
+		want   bool
+	}{
+		{accessRoot, reader, access.Read, fileRoot, true},
+		{accessRoot, reader, access.Write, fileRoot, false},
+		{accessRoot, writer, access.Write, dirRoot, true},
+		{accessRoot, writer, access.Read, fileRoot, false},
+		{accessRestricted, lister, access.List, dirRestricted, true},
+		{accessRestricted, reader, access.Read, dirRestricted, false},
 	}
-	if !acc1.Equal(acc1saved) {
-		t.Fatalf("files differ; want %q got %q\n", acc1, acc1saved)
-	}
-	can, err := acc1saved.Can(upspin.UserName("bob@foo.com"), access.Read, fileInRoot, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !can {
-		t.Errorf("Expected bob@foo.com to have Read access to %s", fileInRoot)
-	}
-	acc2saved, ok := root2.accessFiles[accessRestricted]
-	can, err = acc2saved.Can(upspin.UserName("gandhi@peace.in"), access.List, dirRestricted, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !can {
-		t.Errorf("Expected gandhi@peace.in to have List access to %s", dirRestricted)
+	for _, c := range cases {
+		acc, ok := r.accessFiles[c.access]
+		if !ok {
+			t.Fatalf("could not find %q in accessFiles", c.access)
+		}
+		got, err := acc.Can(c.user, c.right, c.path, nil)
+		if err != nil {
+			t.Errorf("Can(%v, %v, %v) returned error: %v",
+				c.user, c.right, c.path, err)
+			continue
+		}
+		if got != c.want {
+			t.Errorf("Can(%v, %v, %v) = %v, want %v",
+				c.user, c.right, c.path, got, c.want)
+		}
 	}
 }
 
