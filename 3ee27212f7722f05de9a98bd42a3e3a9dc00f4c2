@@ -51,6 +51,24 @@
       "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_e6f53e21",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T16:29:04Z",
+      "side": 1,
+      "message": "I think you\u0027re missing my point: It\u0027s not always possible to protect (recover) from an error other than by returning the error, even if I can create it (several tests prove that).\n\nHow does one protect from programmer errors? Defensively, by checking several pre-conditions and returning an error.\n\nCase in point:\n\nIn the code review for Tree, you said errInternalInconsistency should be a better error. Can you suggest an error Kind for each one of them? Do you think they should all be Other? This my point. Most of those checks need to return an error not yet listed in errors.Kind.\n\nI don\u0027t care what the name is. It\u0027s just not any of the errors already listed.",
+      "parentUuid": "99c94f47_ae64b74e",
+      "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
