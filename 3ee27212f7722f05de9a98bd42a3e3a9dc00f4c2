@@ -34,6 +34,23 @@
       "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ae64b74e",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-09T02:20:07Z",
+      "side": 1,
+      "message": "Here\u0027s my position: An internal error only needs a Kind if we can test for it. But if we can test for it, we know how to create it, which means we can create an internal error. But if we can create an internal error, we should protect against it, which means we never see it. Reductio ad absurdum.\n\nSo I still don\u0027t see a valid reason to include this in the API, and am going to vote against doing this.",
+      "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
