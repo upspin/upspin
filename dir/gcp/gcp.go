@@ -275,7 +275,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group was not there, no harm done.
 	}
 
-	log.Debug.Printf("%s: %q %q", op, user, dirEntry.Name)
+	log.Info.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 

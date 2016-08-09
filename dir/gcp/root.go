@@ -117,7 +117,7 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 	if err != nil {
 		return err
 	}
-	log.Debug.Printf("%s: %q %q", op, user, dirEntry.Name)
+	log.Info.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 
