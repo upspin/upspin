@@ -25,7 +25,7 @@ type node struct {
 	// entry is the DirEntry this node represents.
 	entry *upspin.DirEntry
 
-	// kids maps a fragment of a path name to the dir entries that represent them.
+	// kids maps a path element of a path name to the dir entries that represent them.
 	// It is empty if this node's dirEntry represents a file or an empty directory;
 	// if it represents a directory, kids holds the memory-loaded subdir nodes
 	// (not all subdir nodes may be in-memory at a given time).
@@ -90,9 +90,9 @@ func New(user upspin.UserName, cfg *Config) Tree {
 }
 
 // Lookup returns a directory entry that represents the path.
-// Dirty reports whether the entry is different than the stored version.
+// Dirty reports whether the entry is different from the stored version.
 // The returned entry's references are not up-to-date if the entry is dirty.
-// Call Flush first to get an updated entry.
+
 func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
 	const Lookup = "Lookup"
 	t.mu.Lock()
@@ -151,9 +151,10 @@ func (t *tree) addChild(n *node, nodePath path.Parsed, parent *node, parentPath 
 		parent.kids = make(map[string]*node)
 	}
 	nElem := parentPath.NElem()
-	if nodePath.NElem() != nElem+1 {
-		log.Error.Printf("addChild: Child path %q must be exactly one element longer than parent %q", nodePath, parentPath)
-		return errors.E(addChild, errInternalInconsistency)
+	if nodePath.Drop(1).Path() != parentPath.Path() {
+		err := errors.E(addChild, nodePath.Path(), errors.Str("parent path does match parent of dir path"))
+		log.Error.Printf("%s.", err)
+		return err
 	}
 	// No need to check if it exists. Simply overwrite. DirServer checks these things.
 	parent.kids[nodePath.Elem(nElem)] = n
@@ -179,7 +180,7 @@ func (t *tree) markDirty(p path.Parsed) error {
 	var err error
 	for i := 0; i < p.NElem(); i++ {
 		elem := p.Elem(i)
-		n, err = t.loadNode(elem, n)
+		n, err = t.loadNode(n, elem)
 		if err != nil {
 			return err
 		}
@@ -209,7 +210,7 @@ func (t *tree) loadPath(p path.Parsed) (*node, error) {
 	}
 	node := t.root
 	for i := 0; i < p.NElem(); i++ {
-		node, err = t.loadNode(p.Elem(i), node)
+		node, err = t.loadNode(node, p.Elem(i))
 		if err != nil {
 			return nil, err
 		}
@@ -220,14 +221,14 @@ func (t *tree) loadPath(p path.Parsed) (*node, error) {
 // loadNode loads a child node of parent with the given path-wise element name,
 // loading it from storage if is not already loaded.
 // t.mu must be held.
-func (t *tree) loadNode(elem string, parent *node) (*node, error) {
+func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 	if parent.kids == nil {
 		// Must load from store.
 		data, err := t.readDirEntry(parent.entry)
 		if err != nil {
 			return nil, err
 		}
-		err = t.addChildren(parent, data)
+		err = t.loadKidsFromBlock(parent, data)
 		if err != nil {
 			return nil, err
 		}
