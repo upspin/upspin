@@ -35,16 +35,18 @@ var (
 		Attr:     upspin.AttrNone,
 		Time:     upspin.Now(),
 		Packdata: []byte("12345"),
-		Blocks: []upspin.DirBlock{{
-			Size: 32,
-			Location: upspin.Location{
-				Reference: upspin.Reference("1234"),
-				Endpoint: upspin.Endpoint{
-					Transport: upspin.GCP,
-					NetAddr:   "https://store-server.com",
+		Blocks: []upspin.DirBlock{
+			{
+				Size: 32,
+				Location: upspin.Location{
+					Reference: upspin.Reference("1234"),
+					Endpoint: upspin.Endpoint{
+						Transport: upspin.GCP,
+						NetAddr:   "https://store-server.com",
+					},
 				},
 			},
-		}},
+		},
 	}
 	serviceEndpoint = upspin.Endpoint{
 		Transport: upspin.GCP,
@@ -74,22 +76,19 @@ var (
 	serverPrivate = "82201047360680847258309465671292633303992565667422607675215625927005262185934"
 )
 
-func assertDirEntries(t *testing.T, exectedDirEntries []*upspin.DirEntry, de []*upspin.DirEntry, err error) {
-	if err != nil {
-		t.Fatal(err)
+// equal reports whether two slices of DirEntries are equal. If they are not, it logs the first that differ.
+func equal(t *testing.T, d1, d2 []*upspin.DirEntry) bool {
+	if len(d1) != len(d2) {
+		t.Errorf("slices of directory entries differ in length: %d %d", len(d1), len(d2))
+		return false
 	}
-	if len(exectedDirEntries) != len(de) {
-		t.Errorf("Expected %d dir entries, got %d: (%v vs %v)", len(exectedDirEntries), len(de), exectedDirEntries, de)
-	}
-	for i, dir := range exectedDirEntries {
-		if !reflect.DeepEqual(*dir, *de[i]) {
-			t.Errorf("Expected entry %d: %v, got %v", i, dir, de[i])
+	for i := range d1 {
+		if !reflect.DeepEqual(d1[i], d2[i]) {
+			t.Errorf("directory entries differ:\n%v\n%v", d1[i], d2[i])
+			return false
 		}
 	}
-}
-
-func assertDirEntry(t *testing.T, exectedDirEntry *upspin.DirEntry, de *upspin.DirEntry, err error) {
-	assertDirEntries(t, []*upspin.DirEntry{exectedDirEntry}, []*upspin.DirEntry{de}, err)
+	return true
 }
 
 func TestPutErrorParseRoot(t *testing.T) {
@@ -195,7 +194,7 @@ func TestLookupRoot(t *testing.T) {
 	// The root converted to JSON.
 	rootJSON := toRootJSON(t, &userRoot)
 
-	expectedDirEntry := upspin.DirEntry{
+	expect := &upspin.DirEntry{
 		Name:     upspin.PathName("test@foo.com/"),
 		Attr:     upspin.AttrDirectory,
 		Sequence: 0,
@@ -215,7 +214,12 @@ func TestLookupRoot(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	de, err := ds.Lookup(upspin.PathName(userName + "/"))
-	assertDirEntry(t, &expectedDirEntry, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(expect, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, expect)
+	}
 }
 
 func TestLookupWithoutReadRights(t *testing.T) {
@@ -229,10 +233,10 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	dirJSON := toJSON(t, dir)
 
 	// Default, zero Location is the expected answer.
-	expectedDirEntry := dir                                                 // copy
-	expectedDirEntry.Blocks = append([]upspin.DirBlock(nil), dir.Blocks...) // copy
-	expectedDirEntry.Blocks[0].Location = upspin.Location{}                 // Zero location
-	expectedDirEntry.Packdata = nil                                         // No pack data either
+	expect := dir                                                 // copy
+	expect.Blocks = append([]upspin.DirBlock(nil), dir.Blocks...) // copy
+	expect.Blocks[0].Location = upspin.Location{}                 // Zero location
+	expect.Packdata = nil                                         // No pack data either
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
@@ -242,7 +246,12 @@ func TestLookupWithoutReadRights(t *testing.T) {
 	ds := newTestDirServer(t, egcp)
 	ds.context.SetUserName("lister-dude@me.com")
 	de, err := ds.Lookup(pathName)
-	assertDirEntry(t, &expectedDirEntry, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&expect, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, expect)
+	}
 }
 
 func TestGlobComplex(t *testing.T) {
@@ -289,10 +298,15 @@ func TestGlobComplex(t *testing.T) {
 			"f@b.co/subdir/notpdf", "f@b.co/subdir2/b.pdf", "f@b.co/subdir3/c.pdf"},
 	}
 
-	expectedDirEntries := []*upspin.DirEntry{&dir1, &dir2} // dir3 is NOT returned to user (no access)
+	expect := []*upspin.DirEntry{&dir1, &dir2} // dir3 is NOT returned to user (no access)
 	ds := newTestDirServer(t, lgcp)
 	de, err := ds.Glob("f@b.co/sub*/*.pdf")
-	assertDirEntries(t, expectedDirEntries, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !equal(t, expect, de) {
+		t.Fatal("Glob returned wrong entries")
+	}
 
 	if lgcp.listDirCalled {
 		t.Error("Call to ListDir unexpected")
@@ -349,11 +363,16 @@ func TestGlobSimple(t *testing.T) {
 			userName + "/subdir/notpdf", userName + "/subdir/b.pdf"},
 	}
 
-	expectedDirEntries := []*upspin.DirEntry{&dir1, &dir2}
+	expect := []*upspin.DirEntry{&dir1, &dir2}
 
 	ds := newTestDirServer(t, lgcp)
 	de, err := ds.Glob(userName + "/subdir/*.pdf")
-	assertDirEntries(t, expectedDirEntries, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !equal(t, expect, de) {
+		t.Fatal("Glob returned wrong entries")
+	}
 
 	if !lgcp.listDirCalled {
 		t.Error("Expected call to ListDir")
@@ -370,10 +389,15 @@ func TestGlobSimple(t *testing.T) {
 	dir2.Blocks[0].Location = upspin.Location{}
 	dir1.Packdata = nil
 	dir2.Packdata = nil
-	expectedDirEntries = []*upspin.DirEntry{&dir1, &dir2} // new expected response does not have Location.
+	expect = []*upspin.DirEntry{&dir1, &dir2} // new expected response does not have Location.
 
 	de, err = ds.Glob(userName + "/subdir/*.pdf")
-	assertDirEntries(t, expectedDirEntries, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !equal(t, expect, de) {
+		t.Fatal("Glob returned wrong entries")
+	}
 }
 
 func TestPutParentNotDir(t *testing.T) {
@@ -533,7 +557,12 @@ func TestMakeRoot(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	de, err := ds.MakeDirectory(userRoot.dirEntry.Name)
-	assertDirEntry(t, &userRootSavedNow.dirEntry, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&userRootSavedNow.dirEntry, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, &userRootSavedNow.dirEntry)
+	}
 
 	if len(egcp.PutContents) != 1 {
 		t.Fatalf("Expected put to write 1 dir entry, got %d", len(egcp.PutContents))
@@ -728,7 +757,12 @@ func TestGroupAccessFile(t *testing.T) {
 	// Create a session for broUserName
 	ds.context.SetUserName(broUserName)
 	de, err := ds.Lookup(pathName)
-	assertDirEntry(t, &dir, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&dir, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, &dir)
+	}
 
 	// Now Put a new Group with new contents that does not include broUserName and check that if we fetch the file
 	// again with access will be denied, because the new definition got picked up (after first being invalidated).
@@ -825,7 +859,12 @@ func TestLookup(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	de, err := ds.Lookup(pathName)
-	assertDirEntry(t, &dir, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&dir, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, &dir)
+	}
 }
 
 func TestLookupPermissionDenied(t *testing.T) {
@@ -1019,7 +1058,12 @@ func TestDeleteGroupFile(t *testing.T) {
 
 	ds.context.SetUserName(broUserName)
 	de, err := ds.Lookup(pathName)
-	assertDirEntry(t, &dir, de, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&dir, de) {
+		t.Fatalf("entries differ: got %v; want %v", de, &dir)
+	}
 
 	// Now the owner deletes the group file.
 	ds.context.SetUserName(userName)
