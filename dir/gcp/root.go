@@ -117,7 +117,7 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 	if err != nil {
 		return err
 	}
-	log.Printf("%s: %q %q", op, user, dirEntry.Name)
+	log.Debug.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 
@@ -184,7 +184,7 @@ func marshalRoot(root *root) ([]byte, error) {
 		jsonAccess, err := acc.MarshalJSON()
 		if err != nil {
 			saveError(err)
-			log.Printf("Error marshaling access file %s: %s", path, err)
+			log.Debug.Printf("Error marshaling access file %s: %s", path, err)
 			continue
 		}
 		sroot.AccessFiles[path] = string(jsonAccess)

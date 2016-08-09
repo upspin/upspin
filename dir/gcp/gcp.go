@@ -269,13 +269,13 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 		}
 	}
 	if access.IsGroupFile(canonicalPath) {
-		log.Printf("Invalidating group file %s", canonicalPath)
+		log.Debug.Printf("Invalidating group file %s", canonicalPath)
 		// By removing the group we guarantee we won't be using its old definition, if any.
 		// Since we parse groups lazily, this is correct and generally efficient.
 		_ = access.RemoveGroup(canonicalPath) // error is ignored on purpose. If group was not there, no harm done.
 	}
 
-	log.Printf("%s: %q %q", op, user, dirEntry.Name)
+	log.Debug.Printf("%s: %q %q", op, user, dirEntry.Name)
 	return nil
 }
 
@@ -302,12 +302,12 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// Check ACLs before attempting to read the dirEntry to avoid leaking information about the existence of paths.
 	canRead, err := d.hasRight(op, d.context.UserName(), access.Read, &parsed, opts)
 	if err != nil {
-		log.Printf("Access error Read: %s", err)
+		log.Debug.Printf("Access error Read: %s", err)
 		return nil, errors.E(op, err)
 	}
 	canList, err := d.hasRight(op, d.context.UserName(), access.List, &parsed, opts)
 	if err != nil {
-		log.Printf("Access error List: %s", err)
+		log.Debug.Printf("Access error List: %s", err)
 		return nil, errors.E(op, err)
 	}
 	// If the user has no rights, we're done.
@@ -329,11 +329,11 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
-		log.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
+		log.Debug.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
 		dirEntry.Blocks[0].Location = upspin.Location{}
 		dirEntry.Packdata = nil
 	}
-	log.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
+	log.Debug.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
 	return dirEntry, nil
 }
 
@@ -361,7 +361,7 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, erro
 	// Check ACLs before attempting to look up the Access file to avoid leaking information about the existence of paths.
 	canKnow, err := d.hasRight(op, user, access.AnyRight, &parsed, opts)
 	if err != nil {
-		log.Printf("WhichAccess error List: %s", err)
+		log.Debug.Printf("WhichAccess error List: %s", err)
 		return "", errors.E(op, user, err)
 	}
 	// If the user has no rights, we're done, but don't tell user the path is valid.
@@ -439,7 +439,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		// error is ignored as pattern is known valid
 		if match, _ := goPath.Match(parsed.String(), lookupPath); match {
 			// Now fetch each DirEntry we need
-			log.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
+			log.Debug.Printf("Looking up: %s for glob %s", lookupPath, parsed.String())
 			de, err := d.getNonRoot(upspin.PathName(lookupPath), opts)
 			if err != nil {
 				return nil, err
@@ -452,16 +452,16 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			}
 			canList, err := d.hasRight(op, user, access.List, &parsedDirName, opts)
 			if err != nil {
-				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
+				log.Debug.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
 			canRead, err := d.hasRight(op, user, access.Read, &parsedDirName, opts)
 			if err != nil {
-				log.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
+				log.Debug.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
 			if !canRead && !canList {
-				log.Printf("User %s can't Glob %s", user, de.Name)
+				log.Debug.Printf("User %s can't Glob %s", user, de.Name)
 				continue
 			}
 			// If the user can't read a path, clear out its Location.
@@ -501,7 +501,7 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	// Check ACLs before attempting to get the dirEntry to avoid leaking information about the existence of paths.
 	canDelete, err := d.hasRight(op, user, access.Delete, &parsed, opts)
 	if err != nil {
-		log.Printf("Access error for Delete: %s", err)
+		log.Debug.Printf("Access error for Delete: %s", err)
 		return err
 	}
 	if !canDelete {
@@ -536,7 +536,7 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	if access.IsGroupFile(parsedPath) {
 		access.RemoveGroup(parsedPath) // ignore error since it doesn't matter if the group was added already.
 	}
-	log.Printf("Deleted %s", parsedPath)
+	log.Debug.Printf("Deleted %s", parsedPath)
 	return nil
 }
 
