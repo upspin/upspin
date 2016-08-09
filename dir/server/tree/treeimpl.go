@@ -6,7 +6,7 @@ package tree
 
 // This file implements the Tree interface declared in tree.go.
 
-// TODO: fine-grained locking; better errors; more logging; metrics; performance tuning.
+// TODO: fine-grained locking; crash recovery; log playback; metrics; performance tuning.
 
 import (
 	"fmt"
@@ -42,11 +42,12 @@ type tree struct {
 	// be held when calling all unexported methods.
 	mu sync.Mutex
 
-	user    upspin.UserName
-	context upspin.Context
-	packer  upspin.Packer
-	log     Log
-	root    *node
+	user     upspin.UserName
+	context  upspin.Context
+	packer   upspin.Packer
+	log      Log
+	logIndex LogIndex
+	root     *node
 	// dirtyNodes is the set of dirty nodes, grouped by path length.
 	// The index of the slice is the path length of the nodes therein.
 	// The value of the map is ignored.
@@ -55,12 +56,7 @@ type tree struct {
 
 var _ Tree = (*tree)(nil)
 
-// Some common errors.
-var (
-	errNotImplemented        = errors.E(errors.Invalid, errors.Str("not implemented"))
-	errInternalInconsistency = errors.Str("internal inconsistency")
-)
-
+// String implements fmt.Stringer.
 // t.mu must be held.
 func (n *node) String() string {
 	return fmt.Sprintf("node: %q, dirty: %v, kids: %d", n.entry.Name, n.dirty, len(n.kids))
@@ -82,10 +78,11 @@ func New(user upspin.UserName, cfg *Config) Tree {
 		return nil
 	}
 	return &tree{
-		user:    user,
-		context: cfg.Context.Copy(),
-		packer:  packer,
-		log:     cfg.Log,
+		user:     user,
+		context:  cfg.Context.Copy(),
+		packer:   packer,
+		log:      cfg.Log,
+		logIndex: cfg.LogIndex,
 	}
 }
 
@@ -152,7 +149,7 @@ func (t *tree) addChild(n *node, nodePath path.Parsed, parent *node, parentPath 
 	}
 	nElem := parentPath.NElem()
 	if nodePath.Drop(1).Path() != parentPath.Path() {
-		err := errors.E(addChild, nodePath.Path(), errors.Str("parent path does match parent of dir path"))
+		err := errors.E(addChild, nodePath.Path(), errors.Internal, errors.Str("parent path does match parent of dir path"))
 		log.Error.Printf("%s.", err)
 		return err
 	}
@@ -244,12 +241,16 @@ func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 // loadRoot loads the root into memory if it is not already loaded.
 // t.mu must be held.
 func (t *tree) loadRoot() error {
+	const loadRoot = "loadRoot"
 	if t.root != nil {
 		return nil
 	}
-	rootDirEntry := t.log.Root()
+	rootDirEntry, err := t.logIndex.Root()
+	if err != nil {
+		return errors.E(loadRoot, err)
+	}
 	if rootDirEntry == nil {
-		return errors.E(errors.NotExist, t.user)
+		return errors.E(loadRoot, errors.NotExist, t.user)
 	}
 	t.root = &node{
 		entry: rootDirEntry,
@@ -261,21 +262,32 @@ func (t *tree) loadRoot() error {
 // t.mu must be held.
 func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	const createRoot = "createRoot"
-	if t.root != nil || t.log.Root() != nil {
+	// Check that we're trying to create a root for the owner of the Tree only.
+	if p.User() != t.user {
+		return errors.E(createRoot, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
+	}
+	// Do we have a root already?
+	_, err := t.logIndex.Root()
+	if e, ok := err.(*errors.Error); !ok || e.Kind != errors.NotExist {
+		// Error reading the root.
+		return errors.E(createRoot, err)
+	}
+	if t.root != nil || err == nil {
 		// Root already exists.
 		return errors.E(createRoot, errors.Exist, errors.Str("root already created"))
 	}
 	// To be sure, the log must be empty too (or t.root wouldn't be empty).
 	if t.log.LastIndex() >= 0 {
-		log.Error.Printf("Index not empty, but root not found.")
-		return errInternalInconsistency
+		err := errors.E(createRoot, errors.Internal, errors.Str("index not empty, but root not found"))
+		log.Error.Printf("%s.", err)
+		return err
 	}
 	// Finally let's create it.
 	node := &node{
 		entry: de,
 	}
 	t.root = node
-	err := t.markDirty(p)
+	err = t.markDirty(p)
 	if err != nil {
 		return errors.E(createRoot, err)
 	}
@@ -288,9 +300,54 @@ func (t *tree) Delete(name upspin.PathName) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	// TODO. (Make sure to remove from dirty blocks if removed DirEntry was not flushed yet).
+	p, err := path.Parse(name)
+	if err != nil {
+		return errors.E(Delete, err)
+	}
+	parentPath := p.Drop(1)
+	parent, err := t.loadPath(parentPath)
+	if err != nil {
+		return errors.E(Delete, err)
+	}
+	// Load the node of interest, which is the NElem-th element in its
+	// parent's path.
+	elem := p.Elem(parentPath.NElem())
+	node, err := t.loadNode(parent, elem)
+	if err != nil {
+		// Can't load parent.
+		return errors.E(Delete, err)
+	}
+	if len(node.kids) > 0 {
+		// Node is a non-empty directory.
+		return errors.E(Delete, errors.NotEmpty, p.Path())
+	}
+	// Remove this elem from the parent's kids' map.
+	// No need to check if it was there -- it wouldn't have loaded if it weren't.
+	delete(parent.kids, elem)
 
-	return errors.E(Delete, errNotImplemented)
+	// If node was dirty, there's no need to flush it to Store ever.
+	t.removeFromDirtyList(p, node)
+
+	// Update parent: mark it dirty and log its new version.
+	err = t.markDirty(parentPath)
+	if err != nil {
+		// In practice this can't happen, since the entire path is
+		// already loaded.
+		return errors.E(Delete, err)
+	}
+	return t.log.Append(parent.entry)
+}
+
+// removeFromDirtyList removes a node n at path p from the list of dirty
+// nodes, if n was there.
+func (t *tree) removeFromDirtyList(p path.Parsed, n *node) {
+	nElem := p.NElem()
+	if nElem >= len(t.dirtyNodes) {
+		// Dirty list does not even go this far. Nothing to do.
+		return
+	}
+	m := t.dirtyNodes[nElem]
+	delete(m, n)
 }
 
 // Flush flushes all dirty entries.
@@ -300,7 +357,6 @@ func (t *tree) Flush() error {
 	defer t.mu.Unlock()
 
 	// Flush from highest path depth up to root.
-	flushed := 0
 	for i := len(t.dirtyNodes) - 1; i >= 0; i-- {
 		m := t.dirtyNodes[i]
 		// For each node at level i, flush it.
@@ -310,25 +366,22 @@ func (t *tree) Flush() error {
 				return errors.E(Flush, err)
 			}
 			n.dirty = false
-			flushed++
 		}
 	}
 	// Throw away the entire slice of maps.
 	t.dirtyNodes = nil
 
-	// Verify the log had at least the same number of dirty entries (it could have more because of deletes).
-	if t.log.LastIndex()+1 < flushed {
-		return errors.E(Flush, errInternalInconsistency)
-	}
+	// TODO: Verify the log had at least the same number of dirty entries
+	// (it could have more because of deletes).
 
-	// Truncate the log.
-	err := t.log.Drop(t.log.LastIndex())
+	// Save the last index we operated on.
+	err := t.logIndex.SaveIndex(t.log.LastIndex())
 	if err != nil {
 		return errors.E(Flush, err)
 	}
 
-	// Save new root in the log.
-	return t.log.SetRoot(t.root.entry)
+	// Save new root to the log index.
+	return t.logIndex.SaveRoot(t.root.entry)
 }
 
 // Close flushes the Tree to the Store and releases all resources.
@@ -337,14 +390,17 @@ func (t *tree) Close() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	// TODO.
+	err := t.Flush()
+	if err != nil {
+		return errors.E(Close, err)
+	}
 
-	return errors.E(Close, errNotImplemented)
+	return nil
 }
 
 // Root returns the root of the Tree.
-func (t *tree) Root() *upspin.DirEntry {
+func (t *tree) Root() (*upspin.DirEntry, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	return t.log.Root()
+	return t.logIndex.Root()
 }
