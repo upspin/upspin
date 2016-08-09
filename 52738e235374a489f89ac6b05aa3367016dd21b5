@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c94f47_ee763fe6",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T03:01:21Z",
+      "side": 1,
+      "message": "suggestion:\n\nif dirty !\u003d true {\n  t.Errorf(\"dirty \u003d %v, want true\", dirty)\n}\n\nI suggested the got, want variables in the other cases because cfg.Log.LastIndex() is a more complicated expression that should be evaluated just once. in this case, the got, want vars don\u0027t add much",
+      "revId": "52738e235374a489f89ac6b05aa3367016dd21b5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
