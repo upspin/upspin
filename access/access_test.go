@@ -5,7 +5,6 @@
 package access
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -505,7 +504,11 @@ func TestMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(t, a, b)
+	if !a.Equal(b) {
+		t.Error("Marshal/Nnmarshal failed to recover Access file")
+		t.Errorf("Original: %v\n", a)
+		t.Errorf("Recovered: %v\n", b)
+	}
 }
 
 func TestNew(t *testing.T) {
@@ -628,95 +631,6 @@ func TestUsers(t *testing.T) {
 		[]byte("r: al@foo.com, sue@foo.com, bob@foo.com, tommy@foo.com bob@foo.com/Group/friends"),
 		[]string{"al@foo.com", "anna@foo.com", "bob@foo.com", "nancy@foo.com", "sue@foo.com", "tommy@foo.com"})
 
-}
-
-// We test the differenceString function used in assertEqual.
-func TestDifferenceString(t *testing.T) {
-	a, err := Parse(testFile, accessText)
-	if err != nil {
-		t.Fatal(err)
-	}
-	buf, err := a.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
-	}
-	b, err := UnmarshalJSON(upspin.PathName("me@there.com/random/Access"), buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-	diff := differenceString(a, b)
-	// Verify failure
-	expected := "Owners don't match: me@here.com != me@there.com"
-	if diff != expected {
-		t.Fatalf("Expected error %s, got %s", expected, diff)
-	}
-
-	// Tweak a to force a failure.
-	p, err := path.Parse("hello@here.com/foo")
-	a.list[Read][1] = p // We know a.list has 3 entries.
-	b, err = UnmarshalJSON(testFile, buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-	diff = differenceString(a, b)
-	// Verify failure
-	expected = "Missing hello@here.com/foo in list b for right read"
-	if diff != expected {
-		t.Fatalf("Expected error %s, got %s", expected, diff)
-	}
-}
-
-func assertEqual(t *testing.T, a, b *Access) {
-	if str := differenceString(a, b); str != "" {
-		t.Log(a)
-		t.Log(b)
-		t.Fatal(str)
-	}
-}
-
-// differenceString returns a string describing the high-level differences between a and b or
-// an empty string if they are equal.
-func differenceString(a, b *Access) string {
-	if len(a.list) != len(b.list) {
-		return fmt.Sprintf("Lists of rights not equal length: %d != %d", len(a.list), len(b.list))
-	}
-	if len(a.list) != int(numRights) {
-		return fmt.Sprintf("Lists of rights not equal to length of rights %d != %d", len(a.list), numRights)
-	}
-	for r, al := range a.list { // for each right r
-		right := Right(r)
-		bl := b.list[right]
-		if len(al) != len(bl) {
-			return fmt.Sprintf("Lists for right %s not equal length: %d != %d", right, len(al), len(bl))
-		}
-		bChecked := make([]int, len(bl)) // list of times each entry in b was visited.
-	Outer:
-		for _, pa := range al {
-			for i := 0; i < len(bl); i++ {
-				pb := bl[i]
-				if pa.Equal(pb) {
-					bChecked[i]++
-					continue Outer
-				}
-			}
-			return fmt.Sprintf("Missing %s in list b for right %s", pa, right)
-		}
-		for i, b := range bChecked {
-			if b != 1 {
-				return fmt.Sprintf("%s appears %d times, expected 1", bl[i], b)
-			}
-		}
-	}
-	if a.owner != b.owner {
-		return fmt.Sprintf("Owners don't match: %s != %s", a.owner, b.owner)
-	}
-	if a.domain != b.domain {
-		return fmt.Sprintf("Domains don't match: %s != %s", a.domain, b.domain)
-	}
-	if !a.parsed.Equal(b.parsed) {
-		return fmt.Sprintf("Names don't match: %s != %s", a.parsed, b.parsed)
-	}
-	return ""
 }
 
 func TestIsAccessFile(t *testing.T) {
