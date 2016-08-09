@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f977ab0c_a676e6e4",
+        "filename": "dir/gcp/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T15:51:42Z",
+      "side": 1,
+      "message": "s/pace.in/peace.in/",
+      "revId": "2bed37e2ad9caa46578a6e2295969f0a8c4c52f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
