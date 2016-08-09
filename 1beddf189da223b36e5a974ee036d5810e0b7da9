@@ -178,6 +178,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ae327756",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T01:18:42Z",
+      "side": 1,
+      "message": "You never need to report \"Other\". It\u0027s just the zero value for the Kind. It should never be specified explicitly nor tested against.\n\n\u003e But I don\u0027t see why not add something more descriptive.\n\nThere\u0027s no distinction between \"Internal error\" and \"Other error\". They\u0027re both totally vague and unspecified. All the other Kinds in this file provide the handler a graceful way of dealing with the error. For an internal/other error you can only report the error and abort. We don\u0027t need another Kind for this.\n\n\u003e I see no reason not to have it.\n\nThat\u0027s not a reason to have it.",
+      "parentUuid": "b911b39a_c17925d7",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
