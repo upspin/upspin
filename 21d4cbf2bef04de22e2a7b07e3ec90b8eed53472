@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f977ab0c_66278e1f",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T15:32:14Z",
+      "side": 1,
+      "message": "This is an important message to see in the log. It\u0027s the one that says the user Put or MkDir something.",
+      "revId": "21d4cbf2bef04de22e2a7b07e3ec90b8eed53472",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f977ab0c_a628a6eb",
+        "filename": "dir/gcp/root.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T15:32:14Z",
+      "side": 1,
+      "message": "This message should stay in the logs. It shows a user created its root.",
+      "revId": "21d4cbf2bef04de22e2a7b07e3ec90b8eed53472",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
