@@ -8,6 +8,7 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -59,12 +60,26 @@ func (l *logFlag) Get() interface{} {
 	return log.Level()
 }
 
-func init() {
-	flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
-	flag.StringVar(&Context, "context", Context, "context file")
-	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
-	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "address for incoming network connections")
-	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
-	Log.Set("info")
-	flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+// Enable enables the listed flags.
+func Enable(flags ...string) error {
+	for _, f := range flags {
+		switch f {
+		case "config":
+			flag.StringVar(&Config, f, Config, "comma-separated list of configuration options (key=value) for this server")
+		case "context":
+			flag.StringVar(&Context, f, Context, "context file")
+		case "endpoint":
+			flag.StringVar(&Endpoint, f, Endpoint, "endpoint of remote service for forwarding servers")
+		case "https_addr":
+			flag.StringVar(&HTTPSAddr, f, HTTPSAddr, "address for incoming network connections")
+		case "log_file":
+			flag.StringVar(&LogFile, f, LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+		case "log":
+			Log.Set("info")
+			flag.Var(&Log, f, "`level` of logging: debug, info, error, disabled")
+		default:
+			return fmt.Errorf("unknown flag %s", f)
+		}
+	}
+	return nil
 }

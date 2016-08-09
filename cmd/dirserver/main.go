@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"upspin.io/auth"
@@ -19,6 +18,7 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/upspin"
@@ -40,11 +40,8 @@ import (
 )
 
 var (
-	httpsAddr    = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-	ctxfile      = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.dirserver"), "context file to use to configure server")
-	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	project      = flag.String("project", "", "The GCP project name, if any.")
-	configFile   = flag.String("configfile", "", "Name of file with config parameters with one key=value per line")
+	project    = flag.String("project", "", "The GCP project name, if any.")
+	configFile = flag.String("configfile", "", "Name of file with config parameters with one key=value per line")
 )
 
 // Server is a SecureServer that talks to a DirServer interface and serves gRPC requests.
@@ -59,6 +56,9 @@ const serverName = "dirserver"
 
 func main() {
 	flag.Parse()
+	if err := flags.Enable("endpoint", "context", "https_addr", "log"); err != nil {
+		log.Fatal(err)
+	}
 
 	if *project != "" {
 		log.Connect(*project, serverName)
@@ -71,7 +71,7 @@ func main() {
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctxfd, err := os.Open(*ctxfile)
+	ctxfd, err := os.Open(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
+	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
@@ -121,7 +121,7 @@ func main() {
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe(serverName, *httpsAddr, nil)
+	https.ListenAndServe(serverName, flags.HTTPSAddr, nil)
 }
 
 var (
