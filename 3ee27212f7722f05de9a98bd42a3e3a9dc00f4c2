@@ -16,6 +16,24 @@
       "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_21b47981",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T01:14:18Z",
+      "side": 1,
+      "message": "I expected so. Will revert.",
+      "parentUuid": "99c94f47_2e276720",
+      "revId": "3ee27212f7722f05de9a98bd42a3e3a9dc00f4c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
