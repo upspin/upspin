@@ -10,17 +10,44 @@ import (
 )
 
 func TestParseAndString(t *testing.T) {
-	assertParsesAndEncodes(t, "gcp,localhost:8080")
-	assertParsesAndEncodes(t, "remote,localhost:8080")
-	assertParsesAndEncodes(t, "https,https://localhost:8080")
-	assertParsesAndEncodes(t, "inprocess")
+	tests := []string{
+		"gcp,localhost:8080",
+		"remote,localhost:8080",
+		"https,https://localhost:8080",
+		"inprocess",
+	}
+	for _, test := range tests {
+		ep, err := ParseEndpoint(test)
+		if err != nil {
+			t.Errorf("parsing %q: %v", test, err)
+			continue
+		}
+		got := ep.String()
+		if got != test {
+			t.Errorf("got %q, want %q", got, test)
+		}
+	}
 }
 
 func TestErrorCases(t *testing.T) {
-	assertError(t, "remote", "requires a netaddr")
-	assertError(t, "supersonic,https://supersonic.com", "unknown transport type")
-	assertError(t, "gcp", "requires a netaddr")
-	assertError(t, "https", "requires a netaddr")
+	tests := []struct {
+		endpoint, error string
+	}{
+		{"remote", "requires a netaddr"},
+		{"supersonic,https://supersonic.com", "unknown transport type"},
+		{"gcp", "requires a netaddr"},
+		{"https", "requires a netaddr"},
+	}
+	for _, test := range tests {
+		_, err := ParseEndpoint(test.endpoint)
+		if err == nil {
+			t.Errorf("expected error for %q", test.endpoint)
+			continue
+		}
+		if !strings.Contains(err.Error(), test.error) {
+			t.Errorf("got error %q, expected %q", err, test.error)
+		}
+	}
 }
 
 // Test printing of an erroneous endpoint. Mostly to protect
@@ -47,26 +74,5 @@ func TestJSON(t *testing.T) {
 	}
 	if e != *newE {
 		t.Errorf("Expected %q, got %q", e, newE)
-	}
-}
-
-func assertError(t *testing.T, epString string, substringError string) {
-	_, err := ParseEndpoint(epString)
-	if err == nil {
-		t.Fatal("Expected error")
-	}
-	if !strings.Contains(err.Error(), substringError) {
-		t.Errorf("Expected error prefix %q, got %q", substringError, err)
-	}
-}
-
-func assertParsesAndEncodes(t *testing.T, epString string) {
-	ep, err := ParseEndpoint(epString)
-	if err != nil {
-		t.Fatal(err)
-	}
-	retStr := ep.String()
-	if retStr != epString {
-		t.Errorf("Expected %s, got %s", epString, retStr)
 	}
 }
