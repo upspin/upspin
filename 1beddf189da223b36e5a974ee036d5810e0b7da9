@@ -106,6 +106,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_6e1d6fc8",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-09T01:09:21Z",
+      "side": 1,
+      "message": "It\u0027s part of the public API, and Other has a documented use. But this one is truly internal, which argues it shouldn\u0027t be exposed. What is a user supposed to do if this Kind comes up?\n\nI\u0027m not dead set against this but it\u0027s ugly and it rubs me the wrong way. Maybe I\u0027m too sensitive.",
+      "parentUuid": "b911b39a_e1cee128",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
