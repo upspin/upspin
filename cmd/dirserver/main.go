@@ -6,11 +6,9 @@
 package main
 
 import (
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"upspin.io/auth"
@@ -19,6 +17,7 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/upspin"
@@ -39,14 +38,6 @@ import (
 	_ "upspin.io/store/transports"
 )
 
-var (
-	httpsAddr    = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-	ctxfile      = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.dirserver"), "context file to use to configure server")
-	endpointFlag = flag.String("endpoint", "inprocess", "endpoint of remote service")
-	project      = flag.String("project", "", "The GCP project name, if any.")
-	configFile   = flag.String("configfile", "", "Name of file with config parameters with one key=value per line")
-)
-
 // Server is a SecureServer that talks to a DirServer interface and serves gRPC requests.
 type Server struct {
 	context  upspin.Context
@@ -58,20 +49,22 @@ type Server struct {
 const serverName = "dirserver"
 
 func main() {
-	flag.Parse()
+	if err := flags.Enable("endpoint", "context", "https_addr", "log", "project", "configfile"); err != nil {
+		log.Fatal(err)
+	}
 
-	if *project != "" {
-		log.Connect(*project, serverName)
-		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
+	if flags.Project != "" {
+		log.Connect(flags.Project, serverName)
+		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
 		if err != nil {
-			log.Fatalf("Can't start a metric saver for GCP project %q: %s", *project, err)
+			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
 		} else {
 			metric.RegisterSaver(svr)
 		}
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctxfd, err := os.Open(*ctxfile)
+	ctxfd, err := os.Open(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	endpoint, err := upspin.ParseEndpoint(*endpointFlag)
+	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
 	if err != nil {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
@@ -93,8 +86,8 @@ func main() {
 	}
 
 	// If there are configuration options, set them now.
-	if *configFile != "" {
-		opts := parseConfigFile(*configFile)
+	if flags.ConfigFile != "" {
+		opts := parseConfigFile(flags.ConfigFile)
 		// Configure it appropriately.
 		log.Printf("Configuring server with options: %v", opts)
 		err = dir.Configure(opts...)
@@ -121,7 +114,7 @@ func main() {
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe(serverName, *httpsAddr, nil)
+	https.ListenAndServe(serverName, flags.HTTPSAddr, nil)
 }
 
 var (
