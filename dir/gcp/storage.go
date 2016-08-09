@@ -43,7 +43,7 @@ func (d *directory) getDirEntry(path *path.Parsed, opts ...options) (*upspin.Dir
 func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
 	defer span(opts).StartSpan("getNonRoot").End()
 
-	log.Printf("Looking up dir entry %q", path)
+	log.Debug.Printf("Looking up dir entry %q", path)
 
 	// Check cache first.
 	if dir, ok := d.dirCache.Get(path); ok {
@@ -93,7 +93,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 		log.Error.Printf("%s: %s: %+v", errMsg, path, dirEntry)
 		return errors.E("putmeta", path, errors.Str(errMsg))
 	}
-	log.Printf("Storing dir entry at %q", path)
+	log.Debug.Printf("Storing dir entry at %q", path)
 	ss2 := ss.StartSpan("putCloudBytes")
 	_, err = d.cloudClient.Put(string(path), jsonBuf)
 	ss2.End()
@@ -117,7 +117,7 @@ func (d *directory) isDirEmpty(path upspin.PathName, opts ...options) error {
 
 // getCloudBytes fetches the path from the storage backend.
 func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte, error) {
-	log.Printf("Downloading DirEntry from GCP: %s", path)
+	log.Debug.Printf("Downloading DirEntry from GCP: %s", path)
 	defer span(opts).StartSpan("getCloudBytes").End()
 
 	data, err := d.cloudClient.Download(string(path))
@@ -137,6 +137,6 @@ func (d *directory) deletePath(path upspin.PathName, opts ...options) error {
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)
 	d.dirNegCache.Add(path, nil) // a deleted entry goes into the negative cache.
-	log.Printf("Deleted %s from GCP and caches", path)
+	log.Debug.Printf("Deleted %s from GCP and caches", path)
 	return nil
 }
