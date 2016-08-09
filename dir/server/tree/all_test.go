@@ -9,11 +9,11 @@ import (
 	"testing"
 
 	"upspin.io/context"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/key/inprocess"
 	"upspin.io/upspin"
 
-	"upspin.io/errors"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/store/inprocess"
 )
@@ -97,9 +97,13 @@ func TestPutNodes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Log is empty now.
-	if got, want := cfg.Log.LastIndex(), -1; got != want {
-		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", cfg.Log.LastIndex(), want)
+	// New log index shows we're now at the end of the log.
+	got, err := cfg.LogIndex.ReadIndex()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := cfg.Log.LastIndex(); got != want {
+		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", got, want)
 	}
 
 	// Lookup now returns !dirty.
@@ -114,8 +118,6 @@ func TestPutNodes(t *testing.T) {
 		t.Errorf("de = %v, want %v", de, dir3)
 	}
 
-	t.Logf("Root: %v", tree.Root())
-
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
 	tree2 := New(userName, cfg)
 
@@ -129,8 +131,32 @@ func TestPutNodes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := cfg.Log.LastIndex(), 0; got != want {
+	if got, want := cfg.Log.LastIndex(), 3; got != want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", cfg.Log.LastIndex(), want)
+	}
+
+	// Delete dir4.
+	err = tree2.Delete(userName + "/dir/img.jpg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Lookup won't return it.
+	_, _, err = tree.Lookup(userName + "/dir/img.jpg")
+	expectedErr := errors.E("Delete", errors.NotExist, upspin.PathName(userName+"/dir/img.jpg"))
+	if errors.Match(expectedErr, err) {
+		t.Fatalf("err = %s, want = %s", err, expectedErr)
+	}
+	// One new entry was written to the log (an updated dir2).
+	if got, want := cfg.Log.LastIndex(), 4; got != want {
+		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", cfg.Log.LastIndex(), want)
+	}
+	// Verify logged entry is a new dir2
+	entries, err = cfg.Log.Read(4, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := entries[0].Name, upspin.PathName(userName+"/dir"); got != want {
+		t.Errorf("entries[0].Name = %s, want = %s", got, want)
 	}
 }
 
@@ -190,6 +216,7 @@ func TestPutEmptyRoot(t *testing.T) {
 // TODO: TestPutLargeNode: test that a huge DirEntry (>blockSize) gets split into multiple ones.
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
+// TODO: Implement and test starting the tree from a non-empty log and a log index not at the end of the log.
 
 // newConfigForTesting creates a config with mocks, fakes, inprocess and otherwise testing
 // versions of the Tree's dependencies.
@@ -227,7 +254,12 @@ func newConfigForTesting(t *testing.T) *Config {
 
 	return &Config{
 		Context: context,
-		Log:     new(fakeLog),
+		Log: &fakeLog{
+			user: userName,
+		},
+		LogIndex: &fakeLogIndex{
+			user: userName,
+		},
 	}
 }
 
@@ -235,10 +267,18 @@ func newConfigForTesting(t *testing.T) *Config {
 type fakeLog struct {
 	user       upspin.UserName
 	dirEntries []upspin.DirEntry
-	root       *upspin.DirEntry
 }
 
 var _ Log = (*fakeLog)(nil)
+
+// fakeLogIndex implements a simple, in-memory LogIndex for testing.
+type fakeLogIndex struct {
+	user      upspin.UserName
+	root      *upspin.DirEntry
+	lastIndex int
+}
+
+var _ LogIndex = (*fakeLogIndex)(nil)
 
 // User returns the user name for whom this log logs.
 func (l *fakeLog) User() upspin.UserName {
@@ -261,19 +301,33 @@ func (l *fakeLog) LastIndex() int {
 	return len(l.dirEntries) - 1
 }
 
-// Drop deletes the entries up to the index.
-func (l *fakeLog) Drop(index int) error {
-	l.dirEntries = l.dirEntries[index+1:]
+// Root returns the location of the user's root.
+func (l *fakeLogIndex) Root() (*upspin.DirEntry, error) {
+	if l.root != nil {
+		return l.root, nil
+	}
+	return nil, errors.E(errors.NotExist)
+}
+
+// SaveRoot saves the user's root.
+func (l *fakeLogIndex) SaveRoot(r *upspin.DirEntry) error {
+	l.root = r
 	return nil
 }
 
-// Root returns the location of the user's root.
-func (l *fakeLog) Root() *upspin.DirEntry {
-	return l.root
+// User returns the user name who owns the root of the tree that this
+// log index represents.
+func (l *fakeLogIndex) User() upspin.UserName {
+	return l.user
 }
 
-// SetRoot sets the user's root.
-func (l *fakeLog) SetRoot(r *upspin.DirEntry) error {
-	l.root = r
+// ReadIndex reads from stable storage the index saved by SaveIndex.
+func (l *fakeLogIndex) ReadIndex() (int, error) {
+	return l.lastIndex, nil
+}
+
+// SaveIndex saves to stable storage the last index processed.
+func (l *fakeLogIndex) SaveIndex(idx int) error {
+	l.lastIndex = idx
 	return nil
 }
