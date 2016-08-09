@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9316b83_991f5f10",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T22:53:43Z",
+      "side": 1,
+      "message": "Or log.Printf works too (nothing against being explicit though, this is fine).",
+      "revId": "cb0dfed3492a5661fe21991291ab75f616694d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
