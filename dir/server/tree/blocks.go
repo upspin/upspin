@@ -30,7 +30,7 @@ func (t *tree) get(loc *upspin.Location) ([]byte, error) {
 		return nil, errors.E(get, errors.Errorf("location: %v: %v", loc, err))
 	}
 	if data != nil && len(locs) > 0 {
-		return nil, errors.E(get, errInternalInconsistency)
+		return nil, errors.E(get, errors.IO, errors.Str("invalid return from Store, redirection and data."))
 	}
 	if data != nil {
 		return data, nil
@@ -66,7 +66,7 @@ func (t *tree) store(n *node) error {
 		// TODO: also check whether there are any Blocks with empty locations that are non-empty dirs or files.
 		if child.dirty {
 			// We should write nodes from the bottom up, so this should never happen.
-			return errors.E(store, child.entry.Name, errInternalInconsistency)
+			return errors.E(store, child.entry.Name, errors.Str("programmer error"))
 		}
 		log.Debug.Printf("%s: Saving child: %s", n.entry.Name, child.entry.Name)
 		block, err := child.entry.Marshal()
@@ -119,26 +119,31 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 	return nil
 }
 
-// addChildren unmarshals a block of packed dirEntries into a node.
-func (t *tree) addChildren(n *node, block []byte) error {
-	const addChildren = "addChildren"
+// loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
+func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
+	const loadKidsFromBlock = "loadKidsFromBlock"
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
 	if n.dirty {
-		log.Error.Printf("addChildren: trying to load a block from storage when the node %s is dirty.", n.entry.Name)
-		return errInternalInconsistency
+		// TODO: programmer error. Should be type Internal, not Other.
+		err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("trying to load a block from storage when the node %s is dirty"))
+		log.Error.Printf("%s.", err)
+		return err
 	}
 	if n.entry == nil || n.entry.Name == "" {
-		// Node is fubar. TODO: log details.
-		return errors.E(addChildren, errInternalInconsistency)
+		// Node is fubar.
+		// TODO: programmer error. Should be type Internal, not Other.
+		err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("entry is null or has malformed name"))
+		log.Error.Printf("%s.", err)
+		return err
 	}
 	var dirs []upspin.DirEntry
 	for len(block) > 0 {
 		var dir upspin.DirEntry
 		remaining, err := dir.Unmarshal(block)
 		if err != nil {
-			return errors.E(addChildren, err)
+			return errors.E(loadKidsFromBlock, err)
 		}
 		dirs = append(dirs, dir)
 		block = remaining
@@ -146,23 +151,29 @@ func (t *tree) addChildren(n *node, block []byte) error {
 	// Load children for this node.
 	dePath, err := path.Parse(n.entry.Name)
 	if err != nil {
-		return errors.E(addChildren, err)
+		return errors.E(loadKidsFromBlock, err)
 	}
 	elemPos := dePath.NElem()
 	for _, dir := range dirs {
 		p, err := path.Parse(dir.Name)
 		if err != nil {
-			return errors.E(addChildren, err)
+			return errors.E(loadKidsFromBlock, err)
 		}
 		if p.NElem() <= elemPos {
 			// We should never have written a dirEntry whose path does not contain
 			// one more element than the parent.
-			return errors.E(addChildren, errInternalInconsistency)
+			// TODO: programmer error. Should be type Internal, not Other.
+			err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("entry is inconsistent with parent"))
+			log.Error.Printf("%s.", err)
+			return err
 		}
 		elem := p.Elem(elemPos)
 		if _, exists := n.kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
-			return errors.E(addChildren, errInternalInconsistency)
+			// TODO: programmer error. Should be type Internal, not Other.
+			err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("re-adding an existing element in the Tree"))
+			log.Error.Printf("%s.", err)
+			return err
 		}
 		n.kids[elem] = &node{
 			entry: &dir,

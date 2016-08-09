@@ -24,10 +24,10 @@ const (
 )
 
 // This test checks the tree for log consistency by exercising the life-cycle of a tree,
-// from creating a new tree from scratch, adding new nodes, flushing it to Store to then
+// from creating a new tree from scratch, adding new nodes, flushing it to Store then
 // adding more nodes to a new tree and having to load it from the Store.
 func TestPutNodes(t *testing.T) {
-	cfg := newConfigWithFakes(t)
+	cfg := newConfigForTesting(t)
 	tree := New(userName, cfg)
 
 	dir1 := upspin.DirEntry{
@@ -91,7 +91,7 @@ func TestPutNodes(t *testing.T) {
 		t.Errorf("de = %v, want %v", de, dir3)
 	}
 
-	// Flush and very new tree is equivalent.
+	// Flush to later build a new tree and verify new is equivalent to old.
 	err = tree.Flush()
 	if err != nil {
 		t.Fatal(err)
@@ -116,7 +116,7 @@ func TestPutNodes(t *testing.T) {
 
 	t.Logf("Root: %v", tree.Root())
 
-	// Now start a new tree from scratch and confirm it is loaded from the Store just the same.
+	// Now start a new tree from scratch and confirm it is loaded from the Store.
 	tree2 := New(userName, cfg)
 
 	dir4 := &upspin.DirEntry{
@@ -137,7 +137,7 @@ func TestPutNodes(t *testing.T) {
 // Test that an empty root can be saved and retrieved.
 // Roots are handled differently than other directory entries.
 func TestPutEmptyRoot(t *testing.T) {
-	cfg := newConfigWithFakes(t)
+	cfg := newConfigForTesting(t)
 	tree := New(userName, cfg)
 
 	dir1 := &upspin.DirEntry{
@@ -191,7 +191,9 @@ func TestPutEmptyRoot(t *testing.T) {
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
 
-func newConfigWithFakes(t *testing.T) *Config {
+// newConfigForTesting creates a config with mocks, fakes, inprocess and otherwise testing
+// versions of the Tree's dependencies.
+func newConfigForTesting(t *testing.T) *Config {
 	pubKey := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	// TODO: rename factotum.DeprecatedNew to NewWithKeys or NewForTesting.
 	factotum, err := factotum.DeprecatedNew(
