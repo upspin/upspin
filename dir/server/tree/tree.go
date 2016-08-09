@@ -13,7 +13,7 @@ import "upspin.io/upspin"
 // yet committed to the Store.
 type Tree interface {
 	// Root returns the root. Its blocks will be empty if the tree is empty.
-	Root() *upspin.DirEntry
+	Root() (*upspin.DirEntry, error)
 
 	// Lookup returns an entry that represents the path. The returned de may or may not
 	// have valid references inside. If dirty is true, the references are not up-to-date.
@@ -53,15 +53,27 @@ type Log interface {
 
 	// LastIndex returns the index of the most-recently-appended entry or -1 if log is empty.
 	LastIndex() int
+}
 
-	// Drop deletes the entries up to the index.
-	Drop(index int) error
+// LogIndex reads and writes from/to stable storage log state information and
+// root entry for a user. It is used by Tree to track its progress processing
+// the log and re-computing the root.
+type LogIndex interface {
+	// User returns the user name who owns the root of the tree that this
+	// log index represents.
+	User() upspin.UserName
 
-	// Root returns the user's root.
-	Root() *upspin.DirEntry
+	// Root returns the user's root by retrieving it from local stable storage.
+	Root() (*upspin.DirEntry, error)
 
-	// SetRoot sets the user's root.
-	SetRoot(*upspin.DirEntry) error
+	// SaveRoot saves the user's root to stable storage.
+	SaveRoot(*upspin.DirEntry) error
+
+	// ReadLastIndex reads from stable storage the index saved by SaveLastIndex.
+	ReadLastIndex() (int, error)
+
+	// SaveLastIndex saves to stable storage the last index processed.
+	SaveLastIndex(int) error
 }
 
 // Config configures the behavior of the Tree.
@@ -74,4 +86,8 @@ type Config struct {
 
 	// Log manipulates the log on behalf of the tree.
 	Log Log
+
+	// LogIndex is used by Tree to track last processed changes from the log
+	// and most recently committed root.
+	LogIndex LogIndex
 }
