@@ -124,6 +124,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_c17925d7",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T01:13:35Z",
+      "side": 1,
+      "message": "Use case: in the code for Tree (and also in the GCP code) there are assert-like checks that return errInternalInconsistency. That error Kind is not listed anywhere. In some cases it\u0027s data corruption, so it could be IO. But it will most often be a programmer error that I want to guard against: why are you trying to flush a non-dirty block? Perhaps the code that put it in the flush queue was missing a dirty check somewhere. \n\nWe can report Other too. But I don\u0027t see why not add something more descriptive. Is this going to make the code worse, slower, bloated with dead code? It\u0027s a valid use case, in my view. \n\nI see no reason not to have it.\n\nAlso: I added interpretation of the line number here too. I think that will be more contentious. You seem to have missed it. :-) Refresh to the newest patch.",
+      "parentUuid": "b911b39a_e1cee128",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
