@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95ca7da_8585a204",
+        "filename": "errors/errors.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T22:41:37Z",
+      "side": 1,
+      "message": "// Internal error or inconsistency.",
+      "revId": "5a352eed775a40234da4bc9ea5610ebe1109ad42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
