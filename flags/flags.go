@@ -8,8 +8,10 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"upspin.io/log"
 )
@@ -35,6 +37,12 @@ var (
 
 	// LogLevel sets the level of logging.
 	Log logFlag
+
+	// Project is the project name on GCP; used by servers only.
+	Project = ""
+
+	// ConfigFile is the name of a configuration file used by servers.
+	ConfigFile = ""
 )
 
 type logFlag string
@@ -59,12 +67,53 @@ func (l *logFlag) Get() interface{} {
 	return log.Level()
 }
 
-func init() {
-	flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
-	flag.StringVar(&Context, "context", Context, "context file")
-	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
-	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "address for incoming network connections")
-	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
-	Log.Set("info")
-	flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+// Enable sets up the command-line flags for the given flag variables
+// and calls flag.Parse. Passing an unknown variable triggers a panic.
+//
+// For example:
+// 	flags.Enable(&flags.Config, &flags.Endpoint)
+func Enable(vars ...interface{}) error {
+	for i, v := range vars {
+		unknown := false
+		switch v := v.(type) {
+		case *string:
+			switch v {
+			case &Config:
+				flag.StringVar(v, "config", Config, "comma-separated list of configuration options (key=value) for this server")
+			case &Context:
+				flag.StringVar(v, "context", Context, "context file")
+			case &Endpoint:
+				flag.StringVar(v, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
+			case &HTTPSAddr:
+				flag.StringVar(v, "https_addr", HTTPSAddr, "address for incoming network connections")
+			case &LogFile:
+				flag.StringVar(v, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
+			case &Project:
+				flag.StringVar(v, "project", "", "The GCP project name, if any.")
+			case &ConfigFile:
+				flag.StringVar(v, "configfile", "", "Name of file with config parameters with one key=value per line")
+			default:
+				unknown = true
+			}
+		case *logFlag:
+			switch v {
+			case &Log:
+				Log.Set("info")
+				flag.Var(v, "log", "`level` of logging: debug, info, error, disabled")
+			default:
+				unknown = true
+			}
+		default:
+			unknown = true
+		}
+		if unknown {
+			msg := fmt.Sprintf("flags: unknown flag (%#v, arg %d)", v, i)
+			if reflect.TypeOf(v).Kind() != reflect.Ptr {
+				msg += ", expected pointer type"
+			}
+			panic(msg)
+		}
+	}
+	flag.Parse()
+	return nil
 }
