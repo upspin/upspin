@@ -2,29 +2,32 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package tree implements a Merkle tree whose nodes are DirEntry entries.
+// Package tree implements a tree whose nodes are DirEntry entries.
 package tree
 
 import "upspin.io/upspin"
 
 // Tree is a representation of a directory tree for a single Upspin user.
+// The tree reads and writes from/to its backing Store server, which is
+// configured when instantiating the Tree. It uses a Log to log changes not
+// yet committed to the Store.
 type Tree interface {
 	// Root returns the root. Its blocks will be empty if the tree is empty.
 	Root() *upspin.DirEntry
 
-	// Lookup returns a DirEntry (de) that represents the path. The returned de may or may not
+	// Lookup returns an entry that represents the path. The returned de may or may not
 	// have valid references inside. If dirty is true, the references are not up-to-date.
-	// Call Flush first to get an updated DirEntry.
+	// Calling Flush in a critical section prior to Lookup will ensure the entry is not dirty.
 	Lookup(path upspin.PathName) (de *upspin.DirEntry, dirty bool, err error)
 
-	// Put puts a DirEntry to the Store. If the entrye overwrites a file, that is fine,
+	// Put puts an entry to the Store. If the entry overwrites a file, that is fine,
 	// but if it overwrites a directory an error will be returned.
 	Put(de *upspin.DirEntry) error
 
-	// Delete deletes the DirEntry associated with name.
+	// Delete deletes the entry associated with name.
 	Delete(name upspin.PathName) error
 
-	// Flush flushes all dirty dir entries.
+	// Flush flushes all dirty dir entries to the Tree's Store.
 	Flush() error
 
 	// Close flushes all dirty blocks to Store and releases all resources used by the tree.
