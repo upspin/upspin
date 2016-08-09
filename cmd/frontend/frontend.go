@@ -7,19 +7,17 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 
 	"upspin.io/cloud/https"
+	"upspin.io/flags"
 )
 
-var httpsAddr = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-
 func main() {
-	flag.Parse()
+	flags.Parse("https_addr")
 	http.HandleFunc("/", handler)
-	https.ListenAndServe("frontend", *httpsAddr, nil)
+	https.ListenAndServe("frontend", flags.HTTPSAddr, nil)
 }
 
 const (
