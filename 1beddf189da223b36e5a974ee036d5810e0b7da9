@@ -52,6 +52,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99c94f47_ceea63a4",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-09T00:34:28Z",
+      "side": 1,
+      "message": "Are we ever going to want to errors.Match(E(errors.Internal), err) ?\nIf not, then this shouldn\u0027t go in IMO",
+      "parentUuid": "b911b39a_ab116aab",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
