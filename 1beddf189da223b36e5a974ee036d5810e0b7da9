@@ -88,6 +88,24 @@
       "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b911b39a_e1cee128",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-09T01:07:14Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s black and white like this. We don\u0027t match \"Other\". And there are other reasons to add this. For example, to make it easier to read the error in the code.\n\nBut yes, I can see us checking for these errors. In fact, the reason I\u0027m suggesting we add it now came up in the review of the Tree implementation. I will most likely check a few of the errInternalInconsistency, for test coverage reasons.",
+      "parentUuid": "99c94f47_ceea63a4",
+      "revId": "1beddf189da223b36e5a974ee036d5810e0b7da9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
