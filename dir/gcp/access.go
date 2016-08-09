@@ -99,7 +99,7 @@ func (d *directory) whichAccess(op string, parsedPath *path.Parsed, opts ...opti
 				}
 				return accessPath, acc, err
 			}
-			log.Printf("Found access file in %s: %+v ", accessPath, acc)
+			log.Debug.Printf("Found access file in %s: %+v ", accessPath, acc)
 			return accessPath, acc, nil
 		}
 
@@ -121,7 +121,7 @@ func (d *directory) whichAccess(op string, parsedPath *path.Parsed, opts ...opti
 func (d *directory) checkRights(user upspin.UserName, right access.Right, pathName upspin.PathName, acc *access.Access, opts ...options) (bool, error) {
 	defer span(opts).StartSpan("checkRights").End()
 	can, err := acc.Can(user, right, pathName, d.load)
-	log.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
+	log.Debug.Printf("Access check: user %s attempting to %v file %s: allowed=%v [err=%v]", user, right, pathName, can, err)
 	return can, err
 }
 
