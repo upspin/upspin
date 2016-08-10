@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95ca7da_c5007a5f",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "\"root entry for a user\" seems out of place, or there\u0027s a word missing, or something. rewrite for clarity.",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_e505766c",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "does it save only the root or the whole tree? there\u0027s a transaction quality to this that needs to be made clear in the API",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_85fa8263",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "both of these have last in the name. i\u0027m not sure it adds anything.",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_a5ff7e52",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "this is a weird sentence.\nmaybe\nLogIndex is used by Tree to track the most recent changes stored in the log.\n? or rewrite.",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_45156a95",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "i think it\u0027s weird for String to need mu, but it\u0027s ok for now",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_6512e6b0",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "s/self/for self/\nor maybe\ncan\u0027t create root for different user",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_050f7287",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "set a kind for this error, maybe Invalid",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_250cee8f",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T01:38:50Z",
+      "side": 1,
+      "message": "not a sentence. s/is/if/ ?\nbut then i still don\u0027t understand it. maybe s/is/but/?",
+      "revId": "0bf899713a468515b18b98809cc017ee1ae7b7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
