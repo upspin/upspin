@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_85328214",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_e5b33699",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_c5ae3a34",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -59,6 +77,24 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_454d6a96",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_85a84227",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_a5ad3e36",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -70,6 +106,24 @@
       "writtenOn": "2016-08-10T06:27:44Z",
       "side": 1,
       "message": "I\u0027m confused about what this paragraph means now",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_654ae681",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Deleted. I think it\u0027s covered by the previous paragraph.",
+      "parentUuid": "d95ca7da_a5ad3e36",
       "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +147,24 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_05477278",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_45a32a4a",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_65a0a63c",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -104,6 +176,24 @@
       "writtenOn": "2016-08-10T06:27:44Z",
       "side": 1,
       "message": "I think we should remove or relocate this TODO. If anything will do this, it should be the client.",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_e53d76e5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_65a0a63c",
       "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -127,6 +217,42 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_256b8eef",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_059d32fb",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_c5387af8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "i prefer cleared to zeroed.",
+      "parentUuid": "d95ca7da_059d32fb",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_259aae04",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -138,6 +264,24 @@
       "writtenOn": "2016-08-10T06:27:44Z",
       "side": 1,
       "message": "Is this true here?\nI thought this would be a property of Client\u0027s Glob, not DirServer\u0027s.\nDirServer doesn\u0027t evaluate any links. It may return links.\nI think this should say\n\nNote that the returned links (if any) may only partially match the original argument pattern.",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_056e92fe",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_259aae04",
       "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -161,6 +305,42 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_a55e9e49",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_c54f1a9b",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_6561860f",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Agree, deleted.",
+      "parentUuid": "d95ca7da_c54f1a9b",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_e554962f",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -172,6 +352,24 @@
       "writtenOn": "2016-08-10T06:27:44Z",
       "side": 1,
       "message": "The note about the returned names not matching the pattern belongs here.",
+      "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_45648a20",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T07:02:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_e554962f",
       "revId": "0309f5bf50fe0b95fdcd8d8be95fec71d6036c88",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
