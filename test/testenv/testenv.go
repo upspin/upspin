@@ -252,7 +252,7 @@ func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, 
 	}
 	f, err := factotum.New(repo("key/testdata/" + string(userName[:j])))
 	if err != nil {
-		log.Fatal("unable to initialize factotum for ", string(userName[:j]))
+		log.Fatal("unable to initialize factotum for %q", string(userName[:j]), err)
 	}
 	testKey.SetPublicKeys(userName, []upspin.PublicKey{f.PublicKey()})
 	context.SetFactotum(f)
