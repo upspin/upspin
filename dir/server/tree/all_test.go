@@ -5,6 +5,8 @@
 package tree
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -12,6 +14,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/key/inprocess"
+	"upspin.io/log"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -221,11 +224,7 @@ func TestPutEmptyRoot(t *testing.T) {
 // newConfigForTesting creates a config with mocks, fakes, inprocess and otherwise testing
 // versions of the Tree's dependencies.
 func newConfigForTesting(t *testing.T) *Config {
-	pubKey := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	// TODO: rename factotum.DeprecatedNew to NewWithKeys or NewForTesting.
-	factotum, err := factotum.DeprecatedNew(
-		pubKey,
-		"82201047360680847258309465671292633303992565667422607675215625927005262185934")
+	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -245,12 +244,12 @@ func newConfigForTesting(t *testing.T) *Config {
 		t.Fatal(err)
 	}
 	// Set the public key for the tree, since it must do Auth against the Store.
-	testKey.SetPublicKeys(serverName, []upspin.PublicKey{pubKey})
+	testKey.SetPublicKeys(serverName, []upspin.PublicKey{factotum.PublicKey()})
 
 	// Set the public key for the user, since EE Pack requires the dir owner to have a wrapped key.
 	// TODO: re-think this for directories, but probably correct as-is because if the dir server goes
 	// rogue or fails, the user can always run a dir server locally as himself and retrieve dir blocks.
-	testKey.SetPublicKeys(userName, []upspin.PublicKey{pubKey})
+	testKey.SetPublicKeys(userName, []upspin.PublicKey{factotum.PublicKey()})
 
 	return &Config{
 		Context: context,
@@ -330,4 +329,13 @@ func (l *fakeLogIndex) ReadLastIndex() (int, error) {
 func (l *fakeLogIndex) SaveLastIndex(idx int) error {
 	l.lastIndex = idx
 	return nil
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
