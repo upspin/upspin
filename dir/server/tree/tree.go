@@ -5,7 +5,11 @@
 // Package tree implements a tree whose nodes are DirEntry entries.
 package tree
 
-import "upspin.io/upspin"
+import (
+	"fmt"
+
+	"upspin.io/upspin"
+)
 
 // Tree is a representation of a directory tree for a single Upspin user.
 // The tree reads and writes from/to its backing Store server, which is
@@ -18,7 +22,7 @@ type Tree interface {
 	// Lookup returns an entry that represents the path. The returned de may or may not
 	// have valid references inside. If dirty is true, the references are not up-to-date.
 	// Calling Flush in a critical section prior to Lookup will ensure the entry is not dirty.
-	Lookup(path upspin.PathName) (de *upspin.DirEntry, dirty bool, err error)
+	Lookup(path upspin.PathName) (de upspin.DirEntry, dirty bool, err error)
 
 	// Put puts an entry to the Store. If the entry overwrites a file, that is fine,
 	// but if it overwrites a directory an error will be returned.
@@ -34,9 +38,27 @@ type Tree interface {
 	// Further uses of the tree will have unpredictable results.
 	Close() error
 
+	// For printing the Tree.
+	fmt.Stringer
+
 	// TODO: possibly add Trim(path) so we can remove internal nodes from memory,
 	// recursively from a starting path. For now our assumption is that the tree will always
 	// fit in memory.
+}
+
+// Operation is the kind of operation performed on the DirEntry.
+type Operation int
+
+// Operations on dir entries that are logged.
+const (
+	Put Operation = iota
+	Delete
+)
+
+// LogEntry is the unit of logging.
+type LogEntry struct {
+	Op    Operation
+	Entry upspin.DirEntry
 }
 
 // Log represents the log of DirEntry changes. It is primarily used by
@@ -45,19 +67,20 @@ type Log interface {
 	// User returns the user name who owns the root of the tree that this log represents.
 	User() upspin.UserName
 
-	// Append appends a DirEntry to the end of the log.
-	Append(*upspin.DirEntry) error
+	// Append appends a LogEntry to the end of the log.
+	Append(*LogEntry) error
 
-	// Read reads at most n entries from the log starting at index.
-	Read(index, n int) ([]upspin.DirEntry, error)
+	// Read reads at most n entries from the log starting at offset. It
+	// returns the next offset.
+	ReadAt(n int, offset int64) ([]LogEntry, int64, error)
 
-	// LastIndex returns the index of the most-recently-appended entry or -1 if log is empty.
-	LastIndex() int
+	// LastOffset returns the offset of the most-recently-appended entry or 0 if log is empty.
+	LastOffset() int64
 }
 
-// LogIndex reads and writes from/to stable storage log state information and
-// root entry for a user. It is used by Tree to track its progress processing
-// the log and re-computing the root.
+// LogIndex reads and writes from/to stable storage the log state information
+// and the user's root entry. It is used by Tree to track its progress processing
+// the log and storing the root.
 type LogIndex interface {
 	// User returns the user name who owns the root of the tree that this
 	// log index represents.
@@ -66,14 +89,14 @@ type LogIndex interface {
 	// Root returns the user's root by retrieving it from local stable storage.
 	Root() (*upspin.DirEntry, error)
 
-	// SaveRoot saves the user's root to stable storage.
+	// SaveRoot saves the user's root entry to stable storage.
 	SaveRoot(*upspin.DirEntry) error
 
-	// ReadLastIndex reads from stable storage the index saved by SaveLastIndex.
-	ReadLastIndex() (int, error)
+	// ReadOffset reads from stable storage the offset saved by SaveOffset.
+	ReadOffset() (int64, error)
 
-	// SaveLastIndex saves to stable storage the last index processed.
-	SaveLastIndex(int) error
+	// SaveOffset saves to stable storage the offset to process next.
+	SaveOffset(int64) error
 }
 
 // Config configures the behavior of the Tree.
@@ -87,7 +110,6 @@ type Config struct {
 	// Log manipulates the log on behalf of the tree.
 	Log Log
 
-	// LogIndex is used by Tree to track last processed changes from the log
-	// and most recently committed root.
+	// LogIndex is used by Tree to track the most recent changes stored in the log.
 	LogIndex LogIndex
 }

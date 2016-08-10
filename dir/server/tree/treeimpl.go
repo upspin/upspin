@@ -9,6 +9,7 @@ package tree
 // TODO: fine-grained locking; crash recovery; log playback; metrics; performance tuning.
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 
@@ -23,7 +24,7 @@ import (
 // All node accesses must be protected the tree's mutex.
 type node struct {
 	// entry is the DirEntry this node represents.
-	entry *upspin.DirEntry
+	entry upspin.DirEntry
 
 	// kids maps a path element of a path name to the dir entries that represent them.
 	// It is empty if this node's dirEntry represents a file or an empty directory;
@@ -77,31 +78,37 @@ func New(user upspin.UserName, cfg *Config) Tree {
 		log.Error.Printf("no packing %s registered", cfg.Context.Packing())
 		return nil
 	}
-	return &tree{
+	t := &tree{
 		user:     user,
 		context:  cfg.Context.Copy(),
 		packer:   packer,
 		log:      cfg.Log,
 		logIndex: cfg.LogIndex,
 	}
+	// Do we have entries in the log to process, to recover from a crash?
+	err := t.recoverFromLog()
+	if err != nil {
+		return nil
+	}
+	return t
 }
 
 // Lookup returns a directory entry that represents the path.
 // Dirty reports whether the entry is different from the stored version.
 // The returned entry's references are not up-to-date if the entry is dirty.
-
-func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
-	const Lookup = "Lookup"
+func (t *tree) Lookup(name upspin.PathName) (de upspin.DirEntry, dirty bool, err error) {
+	const op = "Lookup"
+	var de0 upspin.DirEntry
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
 	p, err := path.Parse(name)
 	if err != nil {
-		return nil, false, errors.E(Lookup, err)
+		return de0, false, errors.E(op, err)
 	}
 	node, err := t.loadPath(p)
 	if err != nil {
-		return nil, false, errors.E(Lookup, err)
+		return de0, false, errors.E(op, err)
 	}
 	return node.entry, node.dirty, nil
 }
@@ -109,47 +116,73 @@ func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, er
 // Put puts a DirEntry to the Store. Files may be overwritten,
 // but attempts to put an existing directory will return an error.
 func (t *tree) Put(de *upspin.DirEntry) error {
-	const Put = "Put"
+	const op = "Put"
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
 	p, err := path.Parse(de.Name)
 	if err != nil {
-		return errors.E(Put, err)
+		return errors.E(op, err)
 	}
 	if p.IsRoot() {
 		return t.createRoot(p, de)
 	}
+	err = t.put(p, de)
+	if err != nil {
+		return err
+	}
+
+	// Generate log entry.
+	return t.log.Append(&LogEntry{
+		Op:    Put,
+		Entry: *de,
+	})
+}
+
+// put implements the bulk of Tree.Put, but does not append to the log so it
+// can be used to recover from the Tree's state from the log.
+// t.mu must be held.
+func (t *tree) put(p path.Parsed, de *upspin.DirEntry) error {
+	const op = "Put"
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
 	if err != nil {
-		return errors.E(Put, err)
+		return errors.E(op, err)
 	}
 	// Now add this dirEntry as a new node
 	node := &node{
-		entry: de,
+		entry: *de,
 	}
-	err = t.addChild(node, p, parent, parentPath)
+	err = t.addKid(node, p, parent, parentPath)
 	if err != nil {
-		return errors.E(Put, err)
+		return errors.E(op, err)
 	}
-	// Generate log entry.
-	return t.log.Append(de)
+	return nil
 }
 
-// addChild adds a node n with path nodePath as the child of parent, whose path is parentPath.
+// addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
-func (t *tree) addChild(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
-	const addChild = "addChild"
+func (t *tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
+	const op = "addKid"
 	if !parent.entry.IsDir() {
-		return errors.E(addChild, errors.NotDir, errors.Errorf("path: %q", parent.entry.Name))
+		return errors.E(op, errors.NotDir, errors.Errorf("path: %q", parent.entry.Name))
 	}
 	if parent.kids == nil {
-		parent.kids = make(map[string]*node)
+		// This is a directory with no kids. If it's dirty, it's new.
+		// If it's not dirty, load kids from Store.
+		if parent.dirty {
+			parent.kids = make(map[string]*node)
+		} else {
+			err := t.loadKids(parent)
+			if err != nil {
+				return errors.E(op, err)
+			}
+		}
 	}
 	nElem := parentPath.NElem()
 	if nodePath.Drop(1).Path() != parentPath.Path() {
-		err := errors.E(addChild, nodePath.Path(), errors.Str("parent path does match parent of dir path"))
+		err := errors.E(op, nodePath.Path(), errors.Internal, errors.Str("parent path does match parent of dir path"))
 		log.Error.Printf("%s.", err)
 		return err
 	}
@@ -221,11 +254,7 @@ func (t *tree) loadPath(p path.Parsed) (*node, error) {
 func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 	if parent.kids == nil {
 		// Must load from store.
-		data, err := t.readDirEntry(parent.entry)
-		if err != nil {
-			return nil, err
-		}
-		err = t.loadKidsFromBlock(parent, data)
+		err := t.loadKids(parent)
 		if err != nil {
 			return nil, err
 		}
@@ -238,22 +267,37 @@ func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 	return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 }
 
+// loadKids loads all kids of a parent node from the Store.
+// t.mu must be held.
+func (t *tree) loadKids(parent *node) error {
+	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
+	data, err := t.readDirEntry(&parent.entry)
+	if err != nil {
+		return err
+	}
+	err = t.loadKidsFromBlock(parent, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // loadRoot loads the root into memory if it is not already loaded.
 // t.mu must be held.
 func (t *tree) loadRoot() error {
-	const loadRoot = "loadRoot"
+	const op = "loadRoot"
 	if t.root != nil {
 		return nil
 	}
 	rootDirEntry, err := t.logIndex.Root()
 	if err != nil {
-		return errors.E(loadRoot, err)
+		return errors.E(op, err)
 	}
 	if rootDirEntry == nil {
-		return errors.E(loadRoot, errors.NotExist, t.user)
+		return errors.E(op, errors.NotExist, t.user)
 	}
 	t.root = &node{
-		entry: rootDirEntry,
+		entry: *rootDirEntry,
 	}
 	return nil
 }
@@ -261,53 +305,69 @@ func (t *tree) loadRoot() error {
 // createRoot creates the root at p using the given dir entry. A root must not already exist.
 // t.mu must be held.
 func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
-	const createRoot = "createRoot"
+	const op = "createRoot"
 	// Check that we're trying to create a root for the owner of the Tree only.
 	if p.User() != t.user {
-		return errors.E(createRoot, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root other than self"))
+		return errors.E(op, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
 	}
 	// Do we have a root already?
 	_, err := t.logIndex.Root()
 	if e, ok := err.(*errors.Error); !ok || e.Kind != errors.NotExist {
 		// Error reading the root.
-		return errors.E(createRoot, err)
+		return errors.E(op, err)
 	}
 	if t.root != nil || err == nil {
 		// Root already exists.
-		return errors.E(createRoot, errors.Exist, errors.Str("root already created"))
+		return errors.E(op, errors.Exist, errors.Str("root already created"))
 	}
 	// To be sure, the log must be empty too (or t.root wouldn't be empty).
-	if t.log.LastIndex() >= 0 {
-		err := errors.E(createRoot, errors.Str("index not empty, but root not found"))
+	if t.log.LastOffset() != 0 {
+		err := errors.E(op, errors.Internal, errors.Str("index not empty, but root not found"))
 		log.Error.Printf("%s.", err)
 		return err
 	}
 	// Finally let's create it.
 	node := &node{
-		entry: de,
+		entry: *de,
 	}
 	t.root = node
 	err = t.markDirty(p)
 	if err != nil {
-		return errors.E(createRoot, err)
+		return errors.E(op, err)
 	}
-	return t.log.Append(de)
+	log.Printf("Created root: %v", t.root)
+	return t.log.Append(&LogEntry{
+		Op:    Put,
+		Entry: *de,
+	})
 }
 
 // Delete deletes the DirEntry associated with name.
 func (t *tree) Delete(name upspin.PathName) error {
-	const Delete = "Delete"
+	const op = "Delete"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
 	p, err := path.Parse(name)
 	if err != nil {
-		return errors.E(Delete, err)
+		return errors.E(op, err)
 	}
+	node, err := t.delete(p)
+	return t.log.Append(&LogEntry{
+		Op:    Delete,
+		Entry: node.entry,
+	})
+}
+
+// delete implements the bulk of Tree.Delete, but does not append to the log
+// so it can be used to recover from the Tree's state from the log.
+// t.mu must be held.
+func (t *tree) delete(p path.Parsed) (*node, error) {
+	const op = "Delete"
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
 	if err != nil {
-		return errors.E(Delete, err)
+		return nil, errors.E(op, err)
 	}
 	// Load the node of interest, which is the NElem-th element in its
 	// parent's path.
@@ -315,13 +375,13 @@ func (t *tree) Delete(name upspin.PathName) error {
 	node, err := t.loadNode(parent, elem)
 	if err != nil {
 		// Can't load parent.
-		return errors.E(Delete, err)
+		return nil, errors.E(op, err)
 	}
 	if len(node.kids) > 0 {
-		// Node is a directory is it is not empty.
-		return errors.E(Delete, errors.NotEmpty, p.Path())
+		// Node is a non-empty directory.
+		return nil, errors.E(op, errors.NotEmpty, p.Path())
 	}
-	// Remove this elem from the parent's kids' map.
+	// Remove this elem from the parent's kids map.
 	// No need to check if it was there -- it wouldn't have loaded if it weren't.
 	delete(parent.kids, elem)
 
@@ -333,13 +393,14 @@ func (t *tree) Delete(name upspin.PathName) error {
 	if err != nil {
 		// In practice this can't happen, since the entire path is
 		// already loaded.
-		return errors.E(Delete, err)
+		return nil, errors.E(op, err)
 	}
-	return t.log.Append(parent.entry)
+	return node, nil
 }
 
 // removeFromDirtyList removes a node n at path p from the list of dirty
 // nodes, if n was there.
+// t.mu must be held.
 func (t *tree) removeFromDirtyList(p path.Parsed, n *node) {
 	nElem := p.NElem()
 	if nElem >= len(t.dirtyNodes) {
@@ -352,7 +413,7 @@ func (t *tree) removeFromDirtyList(p path.Parsed, n *node) {
 
 // Flush flushes all dirty entries.
 func (t *tree) Flush() error {
-	const Flush = "Flush"
+	const op = "Flush"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -363,7 +424,7 @@ func (t *tree) Flush() error {
 		for n := range m {
 			err := t.store(n)
 			if err != nil {
-				return errors.E(Flush, err)
+				return errors.E(op, err)
 			}
 			n.dirty = false
 		}
@@ -375,13 +436,13 @@ func (t *tree) Flush() error {
 	// (it could have more because of deletes).
 
 	// Save the last index we operated on.
-	err := t.logIndex.SaveLastIndex(t.log.LastIndex())
+	err := t.logIndex.SaveOffset(t.log.LastOffset())
 	if err != nil {
-		return errors.E(Flush, err)
+		return errors.E(op, err)
 	}
 
 	// Save new root to the log index.
-	return t.logIndex.SaveRoot(t.root.entry)
+	return t.logIndex.SaveRoot(&t.root.entry)
 }
 
 // Close flushes the Tree to the Store and releases all resources.
@@ -403,4 +464,102 @@ func (t *tree) Root() (*upspin.DirEntry, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	return t.logIndex.Root()
+}
+
+// recoverFromLog inspects the LogIndex and the Log and replays the missing
+// operations. It can only be called from New.
+func (t *tree) recoverFromLog() error {
+	const (
+		op        = "recoverFromLog"
+		batchSize = 10 // max number of entries to recover at a time.
+	)
+	lastOffset := t.log.LastOffset()
+	lastProcessed, err := t.logIndex.ReadOffset()
+	if err != nil {
+		return err
+	}
+	if lastOffset == lastProcessed {
+		// All caught up.
+		log.Debug.Printf("Tree is all caught up for user %s", t.user)
+		return nil
+	}
+	err = t.loadRoot()
+	if err != nil {
+		return errors.E(op, err)
+	}
+
+	// If not, replay all entries from the log. Read in chunks of
+	// batchSizes entries at a time (a balance between efficiency and how
+	// long we want to process the log without checkpointing our state).
+	recovered := 0
+	for {
+		log.Debug.Printf("Recovering from log...")
+		replay, next, err := t.log.ReadAt(batchSize, lastProcessed)
+		if err != nil {
+			return errors.E(op, err)
+		}
+		for _, logEntry := range replay {
+			de := logEntry.Entry
+
+			p, err := path.Parse(de.Name)
+			if err != nil {
+				// We don't expect this to fail because
+				// de.Name was in the log already and thus
+				// has been validated.
+				return errors.E(op, err)
+			}
+
+			switch logEntry.Op {
+			case Put:
+				log.Debug.Printf("Putting dirEntry: %q", de.Name)
+				err = t.put(p, &de)
+			case Delete:
+				log.Debug.Printf("Ddeleting path: %q", p.Path())
+				_, err = t.delete(p)
+			default:
+				return errors.E(op, errors.Internal, errors.Errorf("no such log operation: %v", logEntry.Op))
+			}
+			if err != nil {
+				// Now we're in serious trouble. We can't recover.
+				log.Error.Printf("Can't recover from logs for user %s: %s", t.user, err)
+				return errors.E(op, err)
+			}
+		}
+		// Update the log index so if we crash now, at least we processed
+		// something already.
+		err = t.logIndex.SaveOffset(next)
+		if err != nil {
+			// Can't update log index. Something is really bad.
+			// TODO: retry?
+			return errors.E(op, err)
+		}
+		recovered += len(replay)
+		if len(replay) < batchSize {
+			break
+		}
+	}
+	log.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
+	log.Debug.Printf("Tree:\n%s\n", t.String())
+	return nil
+}
+
+// String implements fmt.Stringer.
+// t.mu must be held.
+func (t *tree) String() string {
+	var buf bytes.Buffer
+	t.loadRoot()
+	printNode(t.root, &buf)
+	return buf.String()
+}
+
+// printNode traverses the tree depth-first and appends each node to the buffer.
+// It supports method String.
+func printNode(n *node, buf *bytes.Buffer) {
+	if len(n.kids) == 0 {
+		buf.WriteString(string(n.entry.Name) + "\n")
+		return
+	}
+	for _, kid := range n.kids {
+		printNode(kid, buf)
+	}
 }
