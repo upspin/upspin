@@ -18,6 +18,7 @@ import (
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/factotum"
+	"upspin.io/flags"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -31,10 +32,6 @@ import (
 	_ "upspin.io/dir/transports"
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-
-	// Load flags
-
-	_ "upspin.io/flags"
 )
 
 var commands = map[string]func(...string){
@@ -55,7 +52,7 @@ var op string // The subcommand we are running.
 
 func main() {
 	flag.Usage = usage
-	flag.Parse()
+	flags.Parse() // enable all flags
 
 	if len(flag.Args()) < 1 {
 		usage()

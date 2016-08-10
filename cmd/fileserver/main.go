@@ -9,7 +9,6 @@ import (
 	"flag"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"upspin.io/access"
@@ -17,6 +16,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -29,16 +29,12 @@ import (
 	_ "upspin.io/key/transports"
 )
 
-var (
-	httpsAddr = flag.String("https_addr", "localhost:8000", "HTTPS listen address")
-	ctxfile   = flag.String("context", filepath.Join(os.Getenv("HOME"), "/upspin/rc.fileserver"), "context file to use to configure server")
-	root      = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
-)
+var root = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
 
 var defaultAccess *access.Access
 
 func main() {
-	flag.Parse()
+	flags.Parse("context", "https_addr")
 
 	if *root == "" {
 		log.Fatal("no root directory specified")
@@ -48,7 +44,7 @@ func main() {
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctxfd, err := os.Open(*ctxfile)
+	ctxfd, err := os.Open(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +63,7 @@ func main() {
 
 	endpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(*httpsAddr),
+		NetAddr:   upspin.NetAddr(flags.HTTPSAddr),
 	}
 
 	grpcSecureServer, err := grpcauth.NewSecureServer(config)
@@ -83,5 +79,5 @@ func main() {
 	dirServer := NewDirServer(context, endpoint, grpcSecureServer)
 	proto.RegisterDirServer(grpcServer, dirServer)
 
-	https.ListenAndServe("fileserver", *httpsAddr, nil)
+	https.ListenAndServe("fileserver", flags.HTTPSAddr, nil)
 }

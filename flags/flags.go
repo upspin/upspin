@@ -8,14 +8,12 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"upspin.io/log"
 )
-
-// We define the flags in two steps so clients don't have to write *flags.Flag.
-// It also makes the documentation easier to read.
 
 var (
 	// Config is a comma-separated list of configuration options (key=value) for this server.
@@ -35,7 +33,69 @@ var (
 
 	// LogLevel sets the level of logging.
 	Log logFlag
+
+	// Project is the project name on GCP; used by servers only.
+	Project = ""
+
+	// ConfigFile is the name of a configuration file used by servers.
+	ConfigFile = ""
 )
+
+// flags is a map of flag registration functions keyed by flag name,
+// used by Parse to register specific (or all) flags.
+var flags = map[string]func(){
+	"config": func() {
+		flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
+	},
+	"context": func() {
+		flag.StringVar(&Context, "context", Context, "context `file`")
+	},
+	"endpoint": func() {
+		flag.StringVar(&Endpoint, "endpoint", Endpoint, "`endpoint` of remote service for forwarding servers")
+	},
+	"https_addr": func() {
+		flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "`address` for incoming network connections")
+	},
+	"log_file": func() {
+		flag.StringVar(&LogFile, "log_file", LogFile, "name of the log `file` on GCP (empty to disable GCP logging)")
+	},
+	"project": func() {
+		flag.StringVar(&Project, "project", Project, "GCP `project` name")
+	},
+	"config_file": func() {
+		flag.StringVar(&ConfigFile, "config_file", ConfigFile, "`file` with config parameters, one key=value per line")
+	},
+	"log": func() {
+		Log.Set("info")
+		flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+	},
+}
+
+// Parse registers the command-line flags for the given flag names
+// and calls flag.Parse. Passing zero names registers all flags.
+// Passing an unknown name triggers a panic.
+//
+// For example:
+// 	flags.Parse("config", "endpoint") // Register Config and Endpoint.
+// or
+// 	flags.Parse() // Register all flags.
+func Parse(names ...string) {
+	if len(names) == 0 {
+		// Register all flags if no names provided.
+		for _, fn := range flags {
+			fn()
+		}
+	} else {
+		for _, n := range names {
+			fn, ok := flags[n]
+			if !ok {
+				panic(fmt.Sprintf("unknown flag %q", n))
+			}
+			fn()
+		}
+	}
+	flag.Parse()
+}
 
 type logFlag string
 
@@ -57,14 +117,4 @@ func (l *logFlag) Set(level string) error {
 // Get implements flag.Getter.
 func (l *logFlag) Get() interface{} {
 	return log.Level()
-}
-
-func init() {
-	flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
-	flag.StringVar(&Context, "context", Context, "context file")
-	flag.StringVar(&Endpoint, "endpoint", Endpoint, "endpoint of remote service for forwarding servers")
-	flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "address for incoming network connections")
-	flag.StringVar(&LogFile, "log_file", LogFile, "name of the log file on GCP (empty to disable GCP logging)")
-	Log.Set("info")
-	flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
 }

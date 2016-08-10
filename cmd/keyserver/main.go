@@ -6,7 +6,6 @@
 package main
 
 import (
-	"flag"
 	"net/http"
 	"strings"
 
@@ -28,8 +27,6 @@ import (
 	_ "upspin.io/key/transports"
 )
 
-var project = flag.String("project", "", "The GCP project name, if any.")
-
 // The upspin username for this server.
 const serverName = "keyserver"
 
@@ -43,13 +40,13 @@ type Server struct {
 }
 
 func main() {
-	flag.Parse()
+	flags.Parse("config", "endpoint", "https_addr", "project")
 
-	if *project != "" {
-		log.Connect(*project, serverName)
-		svr, err := metric.NewGCPSaver(*project, "serverName", serverName)
+	if flags.Project != "" {
+		log.Connect(flags.Project, serverName)
+		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
 		if err != nil {
-			log.Fatalf("Can't start a metric saver for GCP project %q: %s", *project, err)
+			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
 		} else {
 			metric.RegisterSaver(svr)
 		}
