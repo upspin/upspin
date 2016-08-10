@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "192f1f72_877b2622",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T23:02:25Z",
+      "side": 1,
+      "message": "in a followup CL, it would be nice to rename this to configfile or even just config.\nsimilarly i would s/https_addr/https/\nlog_file should probably be gcp_log",
+      "revId": "c0b096ace138313044557a453298004de45a91fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
