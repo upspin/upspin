@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95ca7da_a530de04",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T08:22:15Z",
+      "side": 1,
+      "message": "fakeLogIndex",
+      "revId": "4ab7c5edb98df3bd0bc5c89f081a30b4a9fc3458",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_6513c66b",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T08:22:15Z",
+      "side": 1,
+      "message": "if the entry is nil then entry.Name will panic.\nI suggest doing two tests here with two distinct errors.",
+      "revId": "4ab7c5edb98df3bd0bc5c89f081a30b4a9fc3458",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_4516ca5c",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T08:22:15Z",
+      "side": 1,
+      "message": "s/null/nil/",
+      "revId": "4ab7c5edb98df3bd0bc5c89f081a30b4a9fc3458",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_a51a1e6e",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T08:22:15Z",
+      "side": 1,
+      "message": "hm, perhaps we should allow errors.E to also take a path.Parsed",
+      "revId": "4ab7c5edb98df3bd0bc5c89f081a30b4a9fc3458",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_45200aa5",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T08:22:15Z",
+      "side": 1,
+      "message": "s/kids\u0027/kids/",
+      "revId": "4ab7c5edb98df3bd0bc5c89f081a30b4a9fc3458",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
