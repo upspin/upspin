@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b91d334f_a495828b",
+        "filename": "test/testenv/testenv_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-10T23:52:21Z",
+      "side": 1,
+      "message": "This shouldn\u0027t have fixed it. We should use the full username to match. But, okay, it\u0027s just a random key...",
+      "revId": "638bb8e94b778a69cc36ee3a01ab8290f9681b76",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
