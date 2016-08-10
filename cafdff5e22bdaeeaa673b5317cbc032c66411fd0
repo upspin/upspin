@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95ca7da_c5171aaa",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "as written, the Eventually... is the doc comment for the package.\nswap these two comments, or combine them, and go doc cmd/keygen will give you a useful result.",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_85f04296",
+        "filename": "cmd/keygen/test",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "echo 1\u003e\u00262 keygen FAILED",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_a5f53e85",
+        "filename": "dir/gcp/race_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "i think you want LookupEnv here. i should have noticed this before.",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_65e8a6ab",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "needs a doc comment now that it is exported.",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_05e532d2",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "this name really has to change. either it\u0027s deprecated or we give it a real name.\nthe comment here indicates it will persist.",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_25e2aecb",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "makeKey?",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_45eb2aa9",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:40:41Z",
+      "side": 1,
+      "message": "i\u0027d rather see an error for no match than use a sentinel value.\narguably these two functionalities should be different methods,\n\nPublicKey() PublicKey\n\nPublicKeyFromHash([]byte) (PublicKey, error)  // here the argument cannot be nil",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
