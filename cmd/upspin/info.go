@@ -69,30 +69,31 @@ func (d *infoDirEntry) WhichAccess() string {
 		exit(err)
 	}
 	var acc *access.Access
-	accFile, err := dir.WhichAccess(d.Name)
+	accEntry, err := dir.WhichAccess(d.Name)
 	if err != nil {
 		return err.Error()
 	}
-	if accFile == "" {
+	accFile := "owner only"
+	if accEntry == nil {
 		// No access file applies.
 		acc, err = access.New(d.Name)
 		if err != nil {
 			// Can't happen, since the name must be valid.
 			exitf("%q: %s", d.Name, err)
 		}
-		accFile = "owner only"
 	} else {
-		data, err := read(d.client, accFile)
+		accFile = string(accEntry.Name)
+		data, err := read(d.client, accEntry.Name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
 		}
-		acc, err = access.Parse(accFile, data)
+		acc, err = access.Parse(accEntry.Name, data)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cannot parse access file %q: %s\n", accFile, err)
 		}
 	}
 	d.access = acc
-	return string(accFile)
+	return accFile
 }
 
 // printInfo prints, in human-readable form, most of the information about
@@ -115,7 +116,7 @@ func printInfo(client upspin.Client, ctx upspin.Context, entry *upspin.DirEntry)
 	}
 }
 
-func attrFormat(attr upspin.FileAttributes) string {
+func attrFormat(attr upspin.Attribute) string {
 	switch attr {
 	case upspin.AttrNone:
 		return "none (plain file)"

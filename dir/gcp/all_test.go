@@ -92,7 +92,7 @@ func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
 	expectErr := errors.E("Put", errors.E("Parse", errors.Str("no user name in path")))
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	err := ds.Put(&upspin.DirEntry{})
+	_, err := ds.Put(&upspin.DirEntry{})
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -104,7 +104,7 @@ func TestPutErrorParseUser(t *testing.T) {
 	}
 	expectErr := errors.E("Put", errors.E("Parse", errors.Str("no user name in path")))
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -118,7 +118,7 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 	}
 	expectErr := errors.E("Put", errors.Invalid, errors.Str("invalid sequence number"))
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -164,7 +164,7 @@ func TestPutErrorFileNoParentDir(t *testing.T) {
 
 	expectErr := errors.E("Put", upspin.PathName("test@foo.com/myroot/myfile"), errors.NotExist, errors.Str("parent path not found"))
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -413,7 +413,7 @@ func TestPutParentNotDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -438,7 +438,7 @@ func TestPutFileOverwritesDir(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -482,7 +482,7 @@ func TestPutPermissionDenied(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -500,7 +500,7 @@ func TestPut(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -533,8 +533,8 @@ func TestPut(t *testing.T) {
 	// Check that a second put with SeqNotExist fails.
 	ndir := dir
 	ndir.Sequence = upspin.SeqNotExist
-	err = ds.Put(&ndir)
-	if err == nil {
+	_, err = ds.Put(&ndir)
+	if err == nil || err == upspin.ErrFollowLink {
 		t.Fatal("Put with SeqNotExist should have failed")
 	}
 	if !strings.Contains(err.Error(), "file already exists") {
@@ -644,7 +644,7 @@ func TestPutAccessFile(t *testing.T) {
 		}, timeFunc)
 	ds.context.SetUserName(userName) // the default user for the default session.
 	ds.endpoint = serviceEndpoint
-	err = ds.Put(&dir)
+	_, err = ds.Put(&dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -765,7 +765,7 @@ func TestGroupAccessFile(t *testing.T) {
 	// again with access will be denied, because the new definition got picked up (after first being invalidated).
 
 	ds.context.SetUserName(userName)
-	err = ds.Put(&newGroupDir) // This is the owner of the file putting the new group file.
+	_, err = ds.Put(&newGroupDir) // This is the owner of the file putting the new group file.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -857,7 +857,7 @@ func TestGCPCorruptsData(t *testing.T) {
 	expectErr := errors.E(errors.IO, errors.Str("json unmarshal failed retrieving metadata: invalid character 'r' looking for beginning of value"))
 
 	ds := newTestDirServer(t, egcp)
-	err := ds.Put(&dir)
+	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Put: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -914,7 +914,7 @@ func TestDelete(t *testing.T) {
 
 	ds := newTestDirServer(t, lgcp)
 
-	err := ds.Delete(pathName)
+	_, err := ds.Delete(pathName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -944,7 +944,7 @@ func TestDeleteDirNotEmpty(t *testing.T) {
 
 	ds := newTestDirServer(t, lgcp)
 
-	err := ds.Delete(parentPathName)
+	_, err := ds.Delete(parentPathName)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Delete: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -972,7 +972,7 @@ func TestDeleteDirPermissionDenied(t *testing.T) {
 	ds := newTestDirServer(t, lgcp)
 
 	ds.context.SetUserName("some-random-dude@bozo.com")
-	err := ds.Delete(pathName)
+	_, err := ds.Delete(pathName)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Delete: error mismatch: got %v; want %v", err, expectErr)
 	}
@@ -1012,7 +1012,7 @@ func TestDeleteAccessFile(t *testing.T) {
 
 	ds := newTestDirServer(t, lgcp)
 
-	err := ds.Delete(rootAccessFile)
+	_, err := ds.Delete(rootAccessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1082,7 +1082,7 @@ func TestDeleteGroupFile(t *testing.T) {
 
 	// Now the owner deletes the group file.
 	ds.context.SetUserName(userName)
-	err = ds.Delete(groupPathName)
+	_, err = ds.Delete(groupPathName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1110,12 +1110,12 @@ func TestWhichAccessImplicitAtRoot(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	accessPath, err := ds.WhichAccess(pathName)
+	accessEntry, err := ds.WhichAccess(pathName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessPath != "" {
-		t.Errorf("Expected implicit path, got %q", accessPath)
+	if accessEntry != nil {
+		t.Errorf("Expected implicit path, got %q", accessEntry.Name)
 	}
 }
 
@@ -1132,12 +1132,12 @@ func TestWhichAccess(t *testing.T) {
 	}
 
 	ds := newTestDirServer(t, egcp)
-	accessPath, err := ds.WhichAccess(pathName)
+	accessEntry, err := ds.WhichAccess(pathName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessPath != rootAccessFile {
-		t.Errorf("Expected %q, got %q", rootAccessFile, accessPath)
+	if accessEntry.Name != rootAccessFile {
+		t.Errorf("Expected %q, got %q", rootAccessFile, accessEntry.Name)
 	}
 }
 

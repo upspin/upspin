@@ -76,7 +76,7 @@ var _ upspin.DirServer = (*Service)(nil)
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // This is the general form of the method that follows, used in the tests.
-func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.FileAttributes, seq int64) (*upspin.DirEntry, error) {
+func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, seq int64) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name:     name,
 		Packing:  packing,
@@ -177,35 +177,36 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry
 	if err != nil {
 		return nil, err
 	}
-	return entry, s.put(MakeDirectory, entry, false)
+	return s.put(MakeDirectory, entry, false)
 }
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-func (s *Service) Put(entry *upspin.DirEntry) error {
+// TODO: implement links.
+func (s *Service) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const Put = "Put"
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
-		return errors.E(Put, err)
+		return nil, errors.E(Put, err)
 	}
 	// Use the clean name, in case the caller forgot.
 	entry.Name = parsed.Path()
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
-		return errors.E(Put, err)
+		return nil, errors.E(Put, err)
 	}
 	canWrite, err := s.can(access.Write, parsed)
 	if err != nil {
-		return errors.E(Put, err)
+		return nil, errors.E(Put, err)
 	}
 	if !canCreate && !canWrite {
-		return errors.E(Put, entry.Name, access.ErrPermissionDenied)
+		return nil, errors.E(Put, entry.Name, access.ErrPermissionDenied)
 	}
 	// If it doesn't exist, we need Create permission.
 	if !canCreate {
 		if _, err := s.lookup(Put, parsed); err != nil { // TODO: Check exact error?
 			// File does not exist but we do not have Create permission.
-			return errors.E(Put, entry.Name, access.ErrPermissionDenied)
+			return nil, errors.E(Put, entry.Name, access.ErrPermissionDenied)
 		}
 	}
 
@@ -213,32 +214,29 @@ func (s *Service) Put(entry *upspin.DirEntry) error {
 	defer s.db.mu.Unlock()
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
 		if entry.Packing != upspin.PlainPack {
-			return errors.E(Put, entry.Name, errors.Str("Access or Group file must use plain packing"))
+			return nil, errors.E(Put, entry.Name, errors.Str("Access or Group file must use plain packing"))
 		}
 	}
-	err = s.put(Put, entry, false)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.put(Put, entry, false)
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
 // If deleting, we expect the entry to already be present and skip it on the rewrite.
+// TODO: implement links.
 // TODO add Share?
-func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
+func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.DirEntry, error) {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 	pathName := parsed.Path()
 	if parsed.IsRoot() {
-		return errors.E(op, pathName, errors.Errorf("cannot create root %s with Put; use MakeDirectory", parsed))
+		return nil, errors.E(op, pathName, errors.Errorf("cannot create root %s with Put; use MakeDirectory", parsed))
 	}
 	rootEntry, ok := s.db.root[parsed.User()]
 	if !ok {
 		// Cannot create user root with Put.
-		return errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
+		return nil, errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
 	}
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.
@@ -248,10 +246,10 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	for i := 0; i < parsed.NElem()-1; i++ {
 		e, err := s.fetchEntry(op, rootEntry, parsed.Elem(i))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if !e.IsDir() {
-			return errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
+			return nil, errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
 		}
 		entries = append(entries, e)
 		rootEntry = e
@@ -260,7 +258,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 	rootEntry, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
 	if err != nil {
 		// TODO: System is now inconsistent.
-		return err
+		return nil, err
 	}
 	// Rewrite the tree up to the root.
 	// Invariant: dirRef identifies the directory that has just been updated,
@@ -270,12 +268,12 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		// Install into the ith directory the (i+1)th entry.
 		rootEntry, err = s.newDirEntry(entries[i+1].Name, dirBlob, entries[i+1].Sequence)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		rootEntry, dirBlob, err = s.installEntry(op, parsed.First(i).Path(), entries[i], rootEntry, false, true)
 		if err != nil {
 			// TODO: System is now inconsistent.
-			return err
+			return nil, err
 		}
 	}
 	// Update the root.
@@ -290,40 +288,45 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) error {
 		if !deleting {
 			data, err := s.readAll(s.context, entry)
 			if err != nil {
-				return errors.E(op, err)
+				return nil, errors.E(op, err)
 			}
 			accessFile, err = access.Parse(entry.Name, data)
 			if err != nil {
-				return errors.E(op, err)
+				return nil, errors.E(op, err)
 			}
 		}
 		s.db.access[path.DropPath(entry.Name, 1)] = accessFile
 	}
 
-	return nil
+	return nil, nil
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
-func (s *Service) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
+func (s *Service) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const WhichAccess = "WhichAccess"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return "", errors.E(WhichAccess, err)
+		return nil, errors.E(WhichAccess, err)
 	}
 	// If the user has any right for this file, we can show the relevant Access file.
 	canKnow, err := s.can(access.AnyRight, parsed)
 	if err != nil {
-		return "", errors.E(WhichAccess, err)
+		return nil, errors.E(WhichAccess, err)
 	}
 	if !canKnow {
 		// Don't tell the user this path exists.
-		return "", errors.E(WhichAccess, pathName, errors.NotExist)
+		return nil, errors.E(WhichAccess, pathName, errors.NotExist)
 	}
 	accessFile := s.whichAccess(parsed)
 	if accessFile == nil {
-		return "", nil
+		return nil, nil
 	}
-	return accessFile.Path(), nil
+	parsed, err = path.Parse(accessFile.Path())
+	if err != nil {
+		// Can't happen.
+		return nil, errors.E(WhichAccess, errors.Internal, err)
+	}
+	return s.lookup(WhichAccess, parsed)
 }
 
 // whichAccess is the workings of WhichAccess, accepting a parsed path name
@@ -383,26 +386,27 @@ func (s *Service) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byt
 }
 
 // Delete implements upspin.DirServer.Delete.
-func (s *Service) Delete(pathName upspin.PathName) error {
+// TODO: implement links.
+func (s *Service) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Delete = "Delete"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return errors.E(Delete, err)
+		return nil, errors.E(Delete, err)
 	}
 	canDelete, err := s.can(access.Delete, parsed)
 	if err != nil {
-		return errors.E(Delete, err)
+		return nil, errors.E(Delete, err)
 	}
 	if !canDelete {
-		return errors.E(Delete, pathName, access.ErrPermissionDenied)
+		return nil, errors.E(Delete, pathName, access.ErrPermissionDenied)
 	}
 	if parsed.IsRoot() {
-		return errors.E(Delete, pathName, errors.Str("cannot delete user root")) // Should be done in User service.
+		return nil, errors.E(Delete, pathName, errors.Str("cannot delete user root")) // Should be done in User service.
 	}
 
 	entry, err := s.lookup(Delete, parsed) // File must exist.
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	s.db.mu.Lock()
@@ -410,7 +414,7 @@ func (s *Service) Delete(pathName upspin.PathName) error {
 	// If it is a directory, it must be empty.
 	if entry.IsDir() {
 		if !s.isEmptyDirectory(Delete, entry) {
-			return errors.E(Delete, pathName, errors.NotEmpty)
+			return nil, errors.E(Delete, pathName, errors.NotEmpty)
 		}
 	}
 

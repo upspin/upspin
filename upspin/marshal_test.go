@@ -17,6 +17,7 @@ var dirEnt = DirEntry{
 		dirBlock1,
 		dirBlock2,
 	},
+	Link:     "",
 	Packdata: []byte{1, 2, 3, 4},
 	Attr:     AttrDirectory, // Just so it's not zero; this is not a semantically valid entry.
 	Sequence: 1234,
@@ -49,22 +50,38 @@ var dirBlock2 = DirBlock{
 	Packdata: []byte("nature"),
 }
 
+var linkDirEnt = DirEntry{
+	Name:     "u@foo.com/a/link",
+	Link:     "v@bar.com/b/foo",
+	Packing:  EEPack,
+	Time:     123456,
+	Packdata: []byte{1, 2, 3, 4},
+	Attr:     AttrLink,
+	Sequence: 1234,
+	Writer:   "u@foo.com",
+}
+
 func TestDirEntMarshal(t *testing.T) {
-	data, err := dirEnt.Marshal()
+	testDirEntMarshal(t, "regular file", &dirEnt)
+	testDirEntMarshal(t, "link", &linkDirEnt)
+}
+
+func testDirEntMarshal(t *testing.T, msg string, entry *DirEntry) {
+	data, err := entry.Marshal()
 	if err != nil {
-		t.Fatalf("Marshal: %v", err)
+		t.Fatalf("Marshal %s: %v", msg, err)
 	}
 	var new DirEntry
 	remaining, err := new.Unmarshal(data)
 	if err != nil {
-		t.Fatalf("Unmarshal: %v", err)
+		t.Fatalf("Unmarshal %s: %v", msg, err)
 	}
 	if len(remaining) != 0 {
-		t.Errorf("data remains after unmarshal")
+		t.Errorf("%s: data remains after unmarshal", msg)
 	}
-	if !reflect.DeepEqual(&dirEnt, &new) {
-		t.Errorf("bad result. expected:")
-		t.Errorf("%+v\n", &dirEnt)
+	if !reflect.DeepEqual(entry, &new) {
+		t.Errorf("%s: bad result. expected:", msg)
+		t.Errorf("%+v\n", entry)
 		t.Errorf("got:")
 		t.Errorf("%+v\n", &new)
 	}
