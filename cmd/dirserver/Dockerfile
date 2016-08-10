@@ -6,5 +6,5 @@ COPY public.upspinkey /.ssh/public.upspinkey
 COPY secret.upspinkey /.ssh/secret.upspinkey
 COPY dirserver /dirserver
 COPY config.gcp /config.gcp
-ENTRYPOINT ["/dirserver", "-endpoint=gcp,local", "-configfile=/config.gcp", "-project=PROJECT"]
+ENTRYPOINT ["/dirserver", "-endpoint=gcp,local", "-config_file=/config.gcp", "-project=PROJECT"]
 EXPOSE 80 443

@@ -7,7 +7,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 
 	"upspin.io/client"
 	"upspin.io/context"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -25,12 +25,10 @@ import (
 	_ "upspin.io/store/transports"
 )
 
-var httpAddr = flag.String("http", "localhost:8080", "HTTP listen address")
-
 func main() {
-	flag.Parse()
+	flags.Parse("https_addr")
 	http.Handle("/", newServer())
-	log.Fatal(http.ListenAndServe(*httpAddr, nil))
+	log.Fatal(http.ListenAndServe(flags.HTTPSAddr, nil))
 }
 
 type server struct {
