@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d95ca7da_a5269e20",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:54:05Z",
+      "side": 1,
+      "message": "if it\u0027s going to be called instead of flag.Parse, call this flags.Parse.\n\nalso it would be nice if flags.Parse() enabled all flags.",
+      "revId": "7b6f74831d81b182983e30b6d24ec18de6bce925",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_452c8aff",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:54:05Z",
+      "side": 1,
+      "message": "s/The //",
+      "revId": "7b6f74831d81b182983e30b6d24ec18de6bce925",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d95ca7da_652986ee",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T00:54:05Z",
+      "side": 1,
+      "message": "s/Name/name/\n\nalso don\u0027t forget to use `` when appropriate. here i\u0027d use `file` and drop the \u0027name of\u0027.\nprobably use `project` above. many other options possible. could be a separate CL",
+      "revId": "7b6f74831d81b182983e30b6d24ec18de6bce925",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
