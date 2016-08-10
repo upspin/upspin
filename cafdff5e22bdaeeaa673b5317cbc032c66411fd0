@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "d95ca7da_259ceead",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-10T21:37:29Z",
+      "side": 1,
+      "message": "but it is exported - it\u0027s capitalized",
+      "parentUuid": "f9316b83_7047f0a9",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_05e532d2",
         "filename": "factotum/factotum.go",
         "patchSetId": 3
