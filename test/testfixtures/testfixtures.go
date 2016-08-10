@@ -102,8 +102,8 @@ func (d *DummyDirServer) Lookup(name upspin.PathName) (*upspin.DirEntry, error) 
 }
 
 // Put implements upspin.DirServer.
-func (d *DummyDirServer) Put(entry *upspin.DirEntry) error {
-	return nil
+func (d *DummyDirServer) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return nil, nil
 }
 
 // MakeDirectory implements upspin.DirServer.
@@ -117,11 +117,11 @@ func (d *DummyDirServer) Glob(pattern string) ([]*upspin.DirEntry, error) {
 }
 
 // Delete implements upspin.DirServer.
-func (d *DummyDirServer) Delete(name upspin.PathName) error {
-	return nil
+func (d *DummyDirServer) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
 }
 
 // WhichAccess implements upspin.DirServer.
-func (d *DummyDirServer) WhichAccess(name upspin.PathName) (upspin.PathName, error) {
-	return "", nil
+func (d *DummyDirServer) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
 }

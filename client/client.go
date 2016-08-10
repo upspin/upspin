@@ -46,7 +46,7 @@ func (c *Client) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, er
 	return c.put(newName, []byte(oldName), upspin.AttrLink)
 }
 
-func (c *Client) put(name upspin.PathName, data []byte, attr upspin.FileAttributes) (*upspin.DirEntry, error) {
+func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute) (*upspin.DirEntry, error) {
 	const op = "Put"
 	dir, err := c.DirServer(name)
 	if err != nil {
@@ -123,8 +123,9 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.FileAttribut
 	}
 
 	// Record directory entry.
-	err = dir.Put(de)
+	_, err = dir.Put(de)
 	if err != nil {
+		// TODO: Implement links.
 		return nil, errors.E(op, err)
 	}
 
@@ -139,8 +140,9 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
-	accessName, err := directory.WhichAccess(name)
+	accessEntry, err := directory.WhichAccess(name)
 	if err != nil {
+		// TODO: implement links.
 		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
 			// If WhichAccess returns a "not found" error then
 			// either the destination directory doesn't exist or we don't
@@ -154,12 +156,12 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 		return err
 	}
 	var readers []upspin.UserName
-	if accessName != "" {
-		accessData, err := c.Get(accessName)
+	if accessEntry != nil {
+		accessData, err := c.Get(accessEntry.Name)
 		if err != nil {
 			return err
 		}
-		acc, err := access.Parse(accessName, accessData)
+		acc, err := access.Parse(accessEntry.Name, accessData)
 		if err != nil {
 			return err
 		}
@@ -402,13 +404,15 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 	}
 
 	// Record directory entry.
-	if err := newDir.Put(entry); err != nil {
+	if _, err := newDir.Put(entry); err != nil {
+		// TODO: Implement links.
 		return nil, err
 	}
 
 	if rename {
 		// Remove original entry.
-		if err := oldDir.Delete(oldName); err != nil {
+		if _, err := oldDir.Delete(oldName); err != nil {
+			// TODO: Implement links.
 			return entry, err
 		}
 	}

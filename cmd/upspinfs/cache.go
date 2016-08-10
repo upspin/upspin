@@ -112,6 +112,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	dir := n.f.dirLookup(n.user)
 	entry, err := dir.Lookup(name)
 	if err != nil {
+		// TODO: implement links.
 		return err
 	}
 

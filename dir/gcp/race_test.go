@@ -31,7 +31,7 @@ func createReadAndDelete(t *testing.T, wgStart *sync.WaitGroup, wgEnd *sync.Wait
 		de := &upspin.DirEntry{
 			Name: path,
 		}
-		err = d.Put(de)
+		_, err = d.Put(de)
 		if err != nil {
 			panic(err)
 		}
@@ -39,7 +39,7 @@ func createReadAndDelete(t *testing.T, wgStart *sync.WaitGroup, wgEnd *sync.Wait
 		if err != nil {
 			panic(err)
 		}
-		err = d.Delete(path)
+		_, err = d.Delete(path)
 		if err != nil {
 			panic(err)
 		}
@@ -133,7 +133,7 @@ func startDir(t *testing.T) *directory {
 		Name: userName,
 		Attr: upspin.AttrDirectory,
 	}
-	err := d.Put(root)
+	_, err := d.Put(root)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -102,7 +102,7 @@ func (t *tree) store(n *node) error {
 // storeBlock stores a single block of data to the StoreServer as part of a block packing operation.
 func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) error {
 	// TODO(edpin): remove logging once debugging is done.
-	log.Debug.Print("Writing %d bytes of data", len(data))
+	log.Debug.Printf("Writing %d bytes of data", len(data))
 	cipher, err := bp.Pack(data)
 	if err != nil {
 		return err

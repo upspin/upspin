@@ -178,6 +178,9 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	// Packdata.
 	b = appendBytes(b, d.Packdata)
 
+	// Link.
+	b = appendString(b, string(d.Link))
+
 	// Attr: One byte.
 	b = append(b, byte(d.Attr))
 
@@ -239,12 +242,14 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		return nil, ErrTooShort
 	}
 	b = b[n:]
-	d.Blocks = make([]DirBlock, nBlocks)
-	for i := range d.Blocks {
-		var err error
-		b, err = d.Blocks[i].Unmarshal(b)
-		if err != nil {
-			return nil, err
+	if nBlocks > 0 {
+		d.Blocks = make([]DirBlock, nBlocks)
+		for i := range d.Blocks {
+			var err error
+			b, err = d.Blocks[i].Unmarshal(b)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -258,11 +263,15 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	d.Packdata = make([]byte, len(bytes))
 	copy(d.Packdata, bytes)
 
+	// Link: count N followed by N bytes.
+	bytes, b = getBytes(b)
+	d.Link = PathName(bytes) // Zero-length is OK here.
+
 	// Attr: One byte.
 	if len(b) < 1 {
 		return nil, ErrTooShort
 	}
-	d.Attr = FileAttributes(b[0])
+	d.Attr = Attribute(b[0])
 	b = b[1:]
 
 	// Sequence.
