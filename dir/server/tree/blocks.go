@@ -55,7 +55,7 @@ func (t *tree) store(n *node) error {
 	n.entry.Packing = t.context.Packing()
 
 	// Start packing.
-	bp, err := packer.Pack(t.context, n.entry)
+	bp, err := packer.Pack(t.context, &n.entry)
 	if err != nil {
 		return errors.E(store, err)
 	}
@@ -126,15 +126,13 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 		n.kids = make(map[string]*node)
 	}
 	if n.dirty {
-		// TODO: programmer error. Should be type Internal, not Other.
-		err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("trying to load a block from storage when the node %s is dirty"))
+		err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+			errors.Str("trying to load a block from storage when the node is dirty"))
 		log.Error.Printf("%s.", err)
 		return err
 	}
-	if n.entry == nil || n.entry.Name == "" {
-		// Node is fubar.
-		// TODO: programmer error. Should be type Internal, not Other.
-		err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("entry is null or has malformed name"))
+	if n.entry.Name == "" {
+		err := errors.E(loadKidsFromBlock, errors.Internal, errors.Str("empty entry name"))
 		log.Error.Printf("%s.", err)
 		return err
 	}
@@ -162,21 +160,21 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 		if p.NElem() <= elemPos {
 			// We should never have written a dirEntry whose path does not contain
 			// one more element than the parent.
-			// TODO: programmer error. Should be type Internal, not Other.
-			err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("entry is inconsistent with parent"))
+			err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+				errors.Str("entry is inconsistent with parent"))
 			log.Error.Printf("%s.", err)
 			return err
 		}
 		elem := p.Elem(elemPos)
 		if _, exists := n.kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
-			// TODO: programmer error. Should be type Internal, not Other.
-			err := errors.E(loadKidsFromBlock, n.entry.Name, errors.Str("re-adding an existing element in the Tree"))
+			err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+				errors.Str("re-adding an existing element in the Tree"))
 			log.Error.Printf("%s.", err)
 			return err
 		}
 		n.kids[elem] = &node{
-			entry: &dir,
+			entry: dir,
 		}
 	}
 	return nil
