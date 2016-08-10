@@ -7,6 +7,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"text/tabwriter"
+	"text/template"
 	"time"
 
 	"upspin.io/access"
@@ -14,79 +16,102 @@ import (
 	"upspin.io/upspin"
 )
 
+// infoDirEntry wraps a DirEntry to allow new methods for easy formatting.
+// It also has fields that hold relevant information as we acquire it.
+type infoDirEntry struct {
+	*upspin.DirEntry
+	client upspin.Client
+	ctx    upspin.Context
+	// The following fields are computed as we run.
+	access    *access.Access
+	lastUsers string
+}
+
+func (d *infoDirEntry) TimeString() string {
+	return d.Time.Go().In(time.Local).Format("Mon Jan 2 15:04:05 MST 2006")
+}
+
+func (d *infoDirEntry) AttrString() string {
+	return attrFormat(d.Attr)
+}
+
+func (d *infoDirEntry) Rights() []access.Right {
+	return []access.Right{access.Read, access.Write, access.List, access.Create, access.Delete}
+}
+
+func (d *infoDirEntry) Readers() string {
+	sharer.init()
+	sharer.addAccess(d.DirEntry)
+	d.lastUsers = "<nobody>"
+	if d.IsDir() {
+		return "is a directory"
+	}
+	_, users, err := sharer.readers(d.DirEntry)
+	if err != nil {
+		return err.Error()
+	}
+	d.lastUsers = users
+	return users
+}
+
+func (d *infoDirEntry) Users(right access.Right) string {
+	users := userListToString(usersWithAccess(d.client, d.access, right))
+	if users == d.lastUsers {
+		return "(same)"
+	}
+	d.lastUsers = users
+	return users
+}
+
+func (d *infoDirEntry) WhichAccess() string {
+	dir, err := bind.DirServer(d.ctx, d.ctx.DirEndpoint())
+	if err != nil {
+		exit(err)
+	}
+	var acc *access.Access
+	accFile, err := dir.WhichAccess(d.Name)
+	if err != nil {
+		return err.Error()
+	}
+	if accFile == "" {
+		// No access file applies.
+		acc, err = access.New(d.Name)
+		if err != nil {
+			// Can't happen, since the name must be valid.
+			exitf("%q: %s", d.Name, err)
+		}
+		accFile = "owner only"
+	} else {
+		data, err := read(d.client, accFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
+		}
+		acc, err = access.Parse(accFile, data)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cannot parse access file %q: %s\n", accFile, err)
+		}
+	}
+	d.access = acc
+	return string(accFile)
+}
+
 // printInfo prints, in human-readable form, most of the information about
 // the entry, including the users that have permission to access it.
 // TODO: Present this more neatly.
 // TODO: Present group information.
 func printInfo(client upspin.Client, ctx upspin.Context, entry *upspin.DirEntry) {
-	fmt.Printf("%s:\n", entry.Name)
-	fmt.Printf("\tpacking: %s\n", entry.Packing)
-	size, err := entry.Size()
+	infoDir := &infoDirEntry{
+		DirEntry: entry,
+		client:   client,
+		ctx:      ctx,
+	}
+	writer := tabwriter.NewWriter(os.Stdout, 4, 4, 1, ' ', 0)
+	err := infoTmpl.Execute(writer, infoDir)
 	if err != nil {
-		fmt.Printf("\tsize: %d; invalid block structure: %s\n", size, err)
-	} else {
-		fmt.Printf("\tsize: %d\n", size)
+		exitf("executing info template: %v", err)
 	}
-	fmt.Printf("\ttime: %s\n", entry.Time.Go().In(time.Local).Format("Mon Jan 2 15:04:05 MST 2006"))
-	fmt.Printf("\twriter: %s\n", entry.Writer)
-	fmt.Printf("\tattributes: %s\n", attrFormat(entry.Attr))
-	fmt.Printf("\tsequence: %d\n", entry.Sequence)
-	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
-	if err != nil {
-		exit(err)
-	}
-	var acc *access.Access
-	accFile, err := dir.WhichAccess(entry.Name)
-	if err != nil {
-		fmt.Printf("\taccess file: %s\n", err)
-	} else {
-		if accFile == "" {
-			// No access file applies.
-			fmt.Printf("\taccess: owner only\n")
-			acc, err = access.New(entry.Name)
-			if err != nil {
-				// Can't happen, since the name must be valid.
-				exitf("%q: %s", entry.Name, err)
-			}
-		} else {
-			fmt.Printf("\taccess file: %s\n", accFile)
-			data, err := read(client, accFile)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
-			}
-			acc, err = access.Parse(accFile, data)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "cannot parse access file %q: %s\n", accFile, err)
-			}
-		}
-	}
-	keyUsers := "<nobody>"
-	if !entry.IsDir() {
-		sharer.init()
-		sharer.addAccess(entry)
-		_, keyUsers, err = sharer.readers(entry)
-		if err != nil {
-			fmt.Printf("\treaders with keys:   %s\n", err)
-		} else {
-			fmt.Printf("\treaders with keys:   %s\n", keyUsers)
-		}
-	}
-	if acc != nil {
-		rights := []access.Right{access.Read, access.Write, access.List, access.Create, access.Delete}
-		for _, right := range rights {
-			users := userListToString(usersWithAccess(client, acc, right))
-			if users == keyUsers {
-				fmt.Printf("\tcan %s: (same)\n", right)
-			} else {
-				fmt.Printf("\tcan %s: %s\n", right, users)
-				keyUsers = users
-			}
-		}
-	}
-	fmt.Printf("\tBlock# Offset Size   Location\n")
-	for i, block := range entry.Blocks {
-		fmt.Printf("\t%-6d %-6d %-6d %s\n",
-			i, block.Offset, block.Size, block.Location)
+	if writer.Flush() != nil {
+		exitf("flushing template output: %v", err)
 	}
 }
 
@@ -98,8 +123,25 @@ func attrFormat(attr upspin.FileAttributes) string {
 		return "directory"
 	case upspin.AttrLink:
 		return "link"
-	case upspin.AttrDirectory | upspin.AttrLink:
-		return "link, directory"
 	}
 	return fmt.Sprintf("attribute(%#x)", attr)
 }
+
+var infoTmpl = template.Must(template.New("info").Parse(infoText))
+
+const infoText = `{{.Name}}
+	packing:	{{.Packing}}
+	size:	{{.Size}}
+	time:	{{.TimeString}}
+	writer:	{{.Writer}}
+	attributes:	{{.AttrString}}
+	sequence:	{{.Sequence}}
+	access file:	{{.WhichAccess}}
+	key holders: 	{{.Readers}}
+	{{range $right := .Rights -}}
+	can {{$right}}:	{{$.Users $right}}
+	{{end -}}
+	Block#	Offset	Size	Location
+	{{range $index, $block := .Blocks -}}
+	{{$index}} {{.Offset}} {{.Size}} {{.Location}}
+	{{end}}`
