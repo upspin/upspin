@@ -11,12 +11,13 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/store/inprocess"
 )
 
 func TestInProcess(t *testing.T) {
 	const (
-		userName = "testuser@testdomain.com"
+		userName = "upspin-test@testdomain.com" // TODO: Set up a proper key for this test, don't piggyback on factotum's.
 		content2 = "yo! file2"
 	)
 	testSetup := &Setup{
