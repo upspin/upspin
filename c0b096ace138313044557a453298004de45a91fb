@@ -16,6 +16,24 @@
       "revId": "c0b096ace138313044557a453298004de45a91fb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "192f1f72_67971235",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-10T23:04:02Z",
+      "side": 1,
+      "message": "I would actually prefer to delete this flag entirely.\nWe already have a -config flag that provides the config on the command line.\nWe shouldn\u0027t have so many ways to specify a config.",
+      "parentUuid": "192f1f72_877b2622",
+      "revId": "c0b096ace138313044557a453298004de45a91fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
