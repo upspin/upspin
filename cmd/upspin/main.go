@@ -406,7 +406,7 @@ func putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	}
 	_, _, err = factotum.ParsePublicKey(user.PublicKey)
 	if err != nil && !force {
-		exitf("Invalid public key, to override use -force: %s", err.Error())
+		exitf("invalid public key, to override use -force: %s", err.Error())
 	}
 	// Validate username
 	_, _, err = path.UserAndDomain(user.Name)
