@@ -32,18 +32,18 @@ func (*unassigned) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntr
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-func (*unassigned) Put(entry *upspin.DirEntry) error {
-	return errors.E("Put", errors.Invalid, unassignedErr)
+func (*unassigned) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return nil, errors.E("Put", errors.Invalid, unassignedErr)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
-func (*unassigned) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
-	return "", errors.E("WhichAccess", errors.Invalid, unassignedErr)
+func (*unassigned) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errors.E("WhichAccess", errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.DirServer.Delete.
-func (*unassigned) Delete(pathName upspin.PathName) error {
-	return errors.E("Delete", errors.Invalid, unassignedErr)
+func (*unassigned) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errors.E("Delete", errors.Invalid, unassignedErr)
 }
 
 // Lookup implements upspin.DirServer.Lookup.

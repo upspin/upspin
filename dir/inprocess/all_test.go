@@ -134,7 +134,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	if len(entry1.Blocks) != 1 {
 		t.Fatalf("internal error: %v: expected one block, found %d", fileName, len(entry1.Blocks))
 	}
-	err := directory.Put(entry1)
+	_, err := directory.Put(entry1)
 	if err != nil {
 		t.Fatal("put file:", err)
 	}
@@ -173,7 +173,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
-		err := directory.Put(entry)
+		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -209,7 +209,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		text := strings.Repeat(fmt.Sprint(i), i)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
-		err := directory.Put(entry)
+		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
 		}
@@ -258,7 +258,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
 	entry := storeData(t, context, []byte(text), fileName)
-	err = directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,7 +275,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	// Now overwrite it.
 	text = "goodnight mother"
 	entry = storeData(t, context, []byte(text), fileName)
-	err = directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -348,7 +348,7 @@ func TestGlob(t *testing.T) {
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
 		entry := storeData(t, context, []byte(name), name)
-		err := directory.Put(entry)
+		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
 		}
@@ -394,7 +394,7 @@ func TestSequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, context, []byte(text), fileName)
-		err := directory.Put(entry)
+		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
@@ -410,7 +410,7 @@ func TestSequencing(t *testing.T) {
 	// Now check it updates if we set the sequence correctly.
 	entry := storeData(t, context, []byte("first seq version"), fileName)
 	entry.Sequence = seq
-	err := directory.Put(entry)
+	_, err := directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -424,7 +424,7 @@ func TestSequencing(t *testing.T) {
 	// Now check it fails if we don't.
 	entry = storeData(t, context, []byte("second seq version"), fileName)
 	entry.Sequence = seq
-	err = directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
@@ -444,7 +444,7 @@ func TestRootDirectorySequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, context, []byte(text), fileName)
-		err := directory.Put(entry)
+		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
@@ -466,12 +466,12 @@ func TestSeqNotExist(t *testing.T) {
 	entry := storeData(t, context, []byte("hello"), fileName)
 	// First write with SeqNotExist should succeed.
 	entry.Sequence = upspin.SeqNotExist
-	err := directory.Put(entry)
+	_, err := directory.Put(entry)
 	if err != nil {
 		t.Fatalf("put file: %v", err)
 	}
 	// Second should fail.
-	err = directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err == nil {
 		t.Fatalf("put file succeeded; should have failed")
 	}
@@ -485,7 +485,7 @@ func TestDelete(t *testing.T) {
 	user := context.UserName()
 	fileName := upspin.PathName(user + "/file")
 	entry := storeData(t, context, []byte("hello"), fileName)
-	err := dir.Put(entry)
+	_, err := dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -493,7 +493,7 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = dir.Delete(fileName)
+	_, err = dir.Delete(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -502,8 +502,8 @@ func TestDelete(t *testing.T) {
 		t.Fatal("file still exists after deletion")
 	}
 	// Another Delete should fail.
-	err = dir.Delete(fileName)
-	if err == nil {
+	_, err = dir.Delete(fileName)
+	if err == nil || err == upspin.ErrFollowLink {
 		t.Fatal("second Delete succeeds")
 	}
 	const expect = "item does not exist"
@@ -522,7 +522,7 @@ func TestDeleteDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 	entry := storeData(t, context, []byte("hello"), fileName)
-	err = dir.Put(entry)
+	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -531,15 +531,18 @@ func TestDeleteDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 	// File exists. First attempt to delete directory should fail.
-	err = dir.Delete(dirName)
+	_, err = dir.Delete(dirName)
 	if err == nil {
 		t.Fatal("deleted non-empty directory")
+	}
+	if err == upspin.ErrFollowLink {
+		t.Fatal("unexpected link")
 	}
 	if !strings.Contains(err.Error(), "empty") {
 		t.Fatalf("deleting non-empty directory succeeded with wrong error: %v", err)
 	}
 	// Now delete the file.
-	err = dir.Delete(fileName)
+	_, err = dir.Delete(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -548,7 +551,7 @@ func TestDeleteDirectory(t *testing.T) {
 		t.Fatal("file still exists after deletion")
 	}
 	// Now try again to delete the directory.
-	err = dir.Delete(dirName)
+	_, err = dir.Delete(dirName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -574,7 +577,7 @@ func TestWhichAccess(t *testing.T) {
 		t.Fatal(err)
 	}
 	entry := storeData(t, context, []byte("hello"), fileName)
-	err = dir.Put(entry)
+	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -583,37 +586,37 @@ func TestWhichAccess(t *testing.T) {
 		t.Fatal(err)
 	}
 	// No Access file exists. Should get root.
-	accessName, err := dir.WhichAccess(fileName)
+	accessEntry, err := dir.WhichAccess(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessName != "" {
-		t.Errorf("expected no Access file, got %q", accessName)
+	if accessEntry != nil {
+		t.Errorf("expected no Access file, got %q", accessEntry.Name)
 	}
 	// Add an Access file to dir1.
 	entry = storePlainData(t, context, []byte("r:*@google.com\n"), accessFileName)
-	err = dir.Put(entry)
+	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
-	accessName, err = dir.WhichAccess(fileName)
+	accessEntry, err = dir.WhichAccess(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessName != accessFileName {
-		t.Errorf("expected %q, got %q", accessFileName, accessName)
+	if accessEntry == nil || accessEntry.Name != accessFileName {
+		t.Errorf("expected %q, got %q", accessFileName, accessEntry.Name)
 	}
 	// Remove Access file from dir1.
-	err = dir.Delete(entry.Name)
+	_, err = dir.Delete(entry.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// No access file exists (again). Should get root.
-	accessName, err = dir.WhichAccess(fileName)
+	accessEntry, err = dir.WhichAccess(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessName != "" {
-		t.Errorf("expected no Access file, got %q", accessName)
+	if accessEntry != nil {
+		t.Errorf("expected no Access file, got %q", accessEntry.Name)
 	}
 }

@@ -50,11 +50,12 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
-		return nil, errors.UnmarshalError(resp.Error)
+		return nil, unmarshalError(resp.Error)
 	}
 	if len(resp.Entries) == 0 {
 		return nil, nil
 	}
+	// TODO: check for ErrFollowLink.
 	return proto.UpspinDirEntries(resp.Entries)
 }
 
@@ -73,65 +74,78 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
-		return nil, errors.UnmarshalError(resp.Error)
+		return nil, unmarshalError(resp.Error)
 	}
+	// TODO: check for ErrFollowLink.
 	return proto.UpspinDirEntry(resp.Entry)
 }
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-func (r *remote) Put(entry *upspin.DirEntry) error {
+func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	b, err := entry.Marshal()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req := &proto.DirPutRequest{
 		Entry: b,
 	}
 	resp, err := r.dirClient.Put(gCtx, req)
 	if err != nil {
-		return errors.E("Put", errors.IO, err)
+		return nil, errors.E("Put", errors.IO, err)
+	}
+	retEntry, err := proto.UpspinDirEntry(resp.Entry)
+	if err != nil {
+		return nil, errors.E("Put", errors.IO, err)
 	}
 	r.LastActivity()
-	return errors.UnmarshalError(resp.Error)
+	return retEntry, unmarshalError(resp.Error)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
-func (r *remote) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
+func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	req := &proto.DirWhichAccessRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req)
 	if err != nil {
-		return "", errors.E("WhichAccess", errors.IO, err)
+		return nil, errors.E("WhichAccess", errors.IO, err)
+	}
+	entry, err := proto.UpspinDirEntry(resp.Entry)
+	if err != nil {
+		return nil, errors.E("WhichAccess", errors.IO, err)
 	}
 	r.LastActivity()
-	return upspin.PathName(resp.Name), errors.UnmarshalError(resp.Error)
+	return entry, unmarshalError(resp.Error)
 }
 
 // Delete implements upspin.DirServer.Delete.
-func (r *remote) Delete(pathName upspin.PathName) error {
+func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req := &proto.DirDeleteRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Delete(gCtx, req)
 	if err != nil {
-		return errors.E("Delete", errors.IO, err)
+		return nil, errors.E("Delete", errors.IO, err)
+	}
+	entry, err := proto.UpspinDirEntry(resp.Entry)
+	if err != nil {
+		return nil, errors.E("Delete", errors.IO, err)
 	}
 	r.LastActivity()
-	return errors.UnmarshalError(resp.Error)
+	return entry, unmarshalError(resp.Error)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
@@ -147,11 +161,12 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E("Lookup", errors.IO, err)
 	}
-	if len(resp.Error) != 0 {
-		return nil, errors.UnmarshalError(resp.Error)
+	entry, err := proto.UpspinDirEntry(resp.Entry)
+	if err != nil {
+		return nil, errors.E("Lookup", errors.IO, err)
 	}
 	r.LastActivity()
-	return proto.UpspinDirEntry(resp.Entry)
+	return entry, unmarshalError(resp.Error)
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -201,4 +216,15 @@ const transport = upspin.Remote
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterDirServer(transport, r)
+}
+
+// unmarshalError calls proto.UnmarshalError, but if the error
+// matches upspin.ErrFollowLink, it returns that exact value so
+// the caller can do == to test for links.
+func unmarshalError(b []byte) error {
+	err := errors.UnmarshalError(b)
+	if err != nil && err.Error() == upspin.ErrFollowLink.Error() {
+		return upspin.ErrFollowLink
+	}
+	return err
 }

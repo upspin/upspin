@@ -166,8 +166,9 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Dir
 	if err != nil {
 		return nil, err
 	}
-	err = dir.Put(entry)
+	_, err = dir.Put(entry)
 	if err != nil {
+		// TODO: implement links.
 		log.Printf("Put %q failed: %v", entry.Name, err)
 		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
 	}
@@ -225,8 +226,9 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*pro
 	if err != nil {
 		return nil, err
 	}
-	err = dir.Delete(upspin.PathName(req.Name))
+	_, err = dir.Delete(upspin.PathName(req.Name))
 	if err != nil {
+		// TODO: implement links.
 		log.Printf("Delete %q failed: %v", req.Name, err)
 		return &proto.DirDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
@@ -241,13 +243,18 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 	if err != nil {
 		return nil, err
 	}
-	name, err := dir.WhichAccess(upspin.PathName(req.Name))
+	entry, err := dir.WhichAccess(upspin.PathName(req.Name))
 	if err != nil {
+		// TODO: implement links.
 		log.Printf("WhichAccess %q failed: %v", req.Name, err)
 	}
+	b, err := entry.Marshal()
+	if err != nil {
+		return nil, err
+	}
 	resp := &proto.DirWhichAccessResponse{
+		Entry: b,
 		Error: errors.MarshalError(err),
-		Name:  string(name),
 	}
 	return resp, nil
 }

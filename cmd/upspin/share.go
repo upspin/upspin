@@ -325,10 +325,10 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 		exitf("looking up access file %q: %s", name, err)
 	}
 	var a *access.Access
-	if which == "" {
+	if which == nil {
 		a, err = access.New(name)
 	} else {
-		a, err = access.Parse(which, readOrExit(s.client, which))
+		a, err = access.Parse(which.Name, readOrExit(s.client, which.Name))
 	}
 	if err != nil {
 		exitf("parsing access file %q: %s", name, err)
@@ -413,8 +413,9 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		s.exitCode = 1
 		return
 	}
-	err = directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err != nil {
+		// TODO: implement links.
 		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", name, err)
 		s.exitCode = 1
 	}

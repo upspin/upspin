@@ -325,11 +325,11 @@ func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
-		log.Fatal("malformed username %s", name)
+		log.Fatalf("malformed username %s", name)
 	}
 	f, err := factotum.New(repo("key/testdata/" + string(name[:j])))
 	if err != nil {
-		log.Fatal("unable to initialize factotum for %s", string(name[:j]))
+		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
 	ctx.SetFactotum(f)
 	return ctx, packer

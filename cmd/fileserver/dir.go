@@ -265,13 +265,22 @@ func (s *DirServer) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessR
 	if err != nil {
 		return errWhichAccess(err)
 	}
+	if ok, err := can(s, ctx, access.AnyRight, parsed); err != nil {
+		return errWhichAccess(err)
+	} else if !ok {
+		return errWhichAccess(access.ErrPermissionDenied)
+	}
 	accessPath, err := whichAccess(parsed)
 	if err != nil {
 		return errWhichAccess(err)
 	}
 
+	data, err := s.entryBytes(string(accessPath))
+	if err != nil {
+		return errWhichAccess(err)
+	}
 	return &proto.DirWhichAccessResponse{
-		Name: string(accessPath),
+		Entry: data,
 	}, nil
 }
 

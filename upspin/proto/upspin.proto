@@ -157,7 +157,8 @@ message DirPutRequest {
 }
 
 message DirPutResponse {
-    bytes error = 1;
+    bytes entry = 1;
+    bytes error = 2;
 }
 
 message DirMakeDirectoryRequest {
@@ -183,7 +184,8 @@ message DirDeleteRequest {
 }
 
 message DirDeleteResponse {
-    bytes error = 1;
+    bytes entry = 1;
+    bytes error = 2;
 }
 
 message DirWhichAccessRequest {
@@ -191,7 +193,7 @@ message DirWhichAccessRequest {
 }
 
 message DirWhichAccessResponse {
-    string name = 1;
+    bytes entry = 1;
     bytes error = 2;
 }
 

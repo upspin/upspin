@@ -130,17 +130,18 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, er
 
 // Put writes or overwrites a complete dirEntry to the back end, provided several checks have passed first.
 // It implements upspin.DirServer.
-func (d *directory) Put(dirEntry *upspin.DirEntry) error {
+// TODO: Implement links.
+func (d *directory) Put(dirEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "Put"
 
 	confLock.RLock()
 	defer confLock.RUnlock()
 	if !d.isConfigured() {
-		return errNotConfigured
+		return nil, errNotConfigured
 	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
-	return d.put(op, dirEntry, opts)
+	return nil, d.put(op, dirEntry, opts)
 }
 
 // span returns the first span found in opts or a new one if not found.
@@ -337,7 +338,17 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return dirEntry, nil
 }
 
-func (d *directory) WhichAccess(pathName upspin.PathName) (upspin.PathName, error) {
+// TODO: Implement links.
+func (d *directory) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	accessPath, err := d.whichAccessPath(pathName)
+	if accessPath == "" {
+		return nil, err
+	}
+	// TODO: This is hacky but sufficient.
+	return d.Lookup(accessPath)
+}
+
+func (d *directory) whichAccessPath(pathName upspin.PathName) (upspin.PathName, error) {
 	const op = "WhichAccess"
 
 	confLock.RLock()
@@ -478,19 +489,20 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 }
 
 // deleteDirEntry handles deleting names and their associated DirEntry.
-func (d *directory) Delete(pathName upspin.PathName) error {
+// TODO: Implement links.
+func (d *directory) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Delete"
 
 	confLock.RLock()
 	defer confLock.RUnlock()
 	if !d.isConfigured() {
-		return errNotConfigured
+		return nil, errNotConfigured
 	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	mu := userLock(parsed.User())
@@ -502,16 +514,16 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	canDelete, err := d.hasRight(op, user, access.Delete, &parsed, opts)
 	if err != nil {
 		log.Error.Printf("Access error for Delete: %s", err)
-		return err
+		return nil, err
 	}
 	if !canDelete {
-		return errors.E(op, parsed.Path(), errors.Permission)
+		return nil, errors.E(op, parsed.Path(), errors.Permission)
 	}
 
 	// Locate the entry first.
 	dirEntry, _, err := d.getDirEntry(&parsed, opts)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	parsedPath := parsed.Path()
@@ -519,25 +531,25 @@ func (d *directory) Delete(pathName upspin.PathName) error {
 	if dirEntry.IsDir() {
 		err = d.isDirEmpty(parsedPath)
 		if err != nil {
-			return errors.E(op, err)
+			return nil, errors.E(op, err)
 		}
 	}
 	// Attempt to delete it from GCP.
 	if err = d.deletePath(parsedPath); err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 	// If this was an Access file, we need to delete it from the root as well.
 	if access.IsAccessFile(parsedPath) {
 		err = d.deleteAccess(&parsed)
 		if err != nil {
-			return errors.E(op, err)
+			return nil, errors.E(op, err)
 		}
 	}
 	if access.IsGroupFile(parsedPath) {
 		access.RemoveGroup(parsedPath) // ignore error since it doesn't matter if the group was added already.
 	}
 	log.Debug.Printf("Deleted %s", parsedPath)
-	return nil
+	return nil, nil
 }
 
 // newStoreClient is a function that creates a store client for an endpoint.
