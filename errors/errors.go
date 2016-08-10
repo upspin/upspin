@@ -336,7 +336,8 @@ func (e *Error) UnmarshalBinary(b []byte) error {
 }
 
 // UnmarshalError unmarshals the byte slice into an error value.
-// The byte slice must have been created by MarshalError or
+// If the slice is nil or empty, it returns nil.
+// Ohterwise the byte slice must have been created by MarshalError or
 // MarshalErrorAppend.
 // If the encoded error was of type *Error, the returned error value
 // will have that underlying type. Otherwise it will be just a simple

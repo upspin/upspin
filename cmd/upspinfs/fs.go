@@ -254,6 +254,7 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	dir := n.f.dirLookup(nn.user)
 	log.Debug.Printf("Mkdir %s %v", nn.uname, dir)
 	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
+		// TODO: implement links.
 		// TODO(p): remove from directory cache and retry?
 		return nil, e2e(errors.E(op, err, nn.uname))
 	}
@@ -299,6 +300,7 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 	de, err := dir.Glob(string(pattern))
 	log.Debug.Printf("Glob returned %s", err)
 	if err != nil {
+		// TODO: implement links.
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
 	n.Lock()
@@ -340,6 +342,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 	dir := f.dirLookup(user)
 	de, err := dir.Lookup(uname)
 	if err != nil {
+		// TODO: implement links.
 		kind := classify(err)
 		if kind == errors.Permission {
 			// We act like a permission error didn't happen in the hopes that
@@ -356,6 +359,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 		dir = f.dirLookup(user)
 		de, err = dir.Lookup(uname)
 		if err != nil {
+			// TODO: implement links.
 			return nil, nil, err
 		}
 	}
@@ -389,8 +393,9 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	}
 
 	// Delete from the directory (but not the store).
-	err = dir.Delete(uname)
+	_, err = dir.Delete(uname)
 	if err != nil {
+		// TODO: implement links.
 		return e2e(errors.E(op, uname, err))
 	}
 

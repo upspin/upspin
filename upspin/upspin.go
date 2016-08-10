@@ -6,6 +6,7 @@ package upspin
 
 import (
 	"crypto/elliptic"
+	"errors"
 	"math/big"
 )
 
@@ -249,23 +250,32 @@ type KeyServer interface {
 // A PublicKey can be given to anyone and used for authenticating a user.
 type PublicKey string
 
+// ErrFollowLink indicates that all or part of a path name has evaluated
+// to a DirEntry that is a link. In that case, the returned DirEntry
+// will be that of the link, and its Name field is guaranteed to be an
+// element-wise prefix of the argument path name. The caller should
+// retry the operation, substituting that prefix (which may be the
+// entire name) with the contents of the Link field of the returned
+// DirEntry.
+var ErrFollowLink = errors.New("action incomplete: must follow link")
+
 // DirServer manages the name space for one or more users.
 type DirServer interface {
 	Dialer
 	Service
 
 	// Lookup returns the directory entry for the named file.
+	//
+	// If the returned error is ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// ErrFollowLink. Otherwise in the case of error the
+	// returnd DirEntry will be nil.
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put has the directory service record that the specified DirEntry
-	// describes data stored in a StoreServer at the Location recorded
+	// describes data stored in a StoreServer, as described by the DirBlocks
 	// in the DirEntry, and can thereafter be recovered using the PathName
 	// specified in the DirEntry.
-	//
-	// Before calling Put, the data must be packed using the same
-	// Packdata, which the Packer might update. That is,
-	// after calling Pack, the Packdata should not be modified
-	// before calling Put.
 	//
 	// Within the DirEntry, several fields have special properties.
 	// Time represents a timestamp for the item. It is advisory only
@@ -279,15 +289,26 @@ type DirServer interface {
 	// with that name.
 	//
 	// All but the last element of the path name must already exist
-	// and be directories. The final element, if it exists, must not
-	// be a directory. If something is already stored under the path,
-	// the new location and packdata replace the old.
-	Put(entry *DirEntry) error
+	// and be directories or links. The final element, if it exists,
+	// must not be a directory. If something is already stored under
+	// the path, the new location and packdata replace the old.
+	//
+	// If the returned error is ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// ErrFollowLink (with the added step of updating the
+	// Name field of the argument DirEntry). Otherwise, the
+	// returned DirEntry will be nil whether the operation
+	// succeeded or not.
+	Put(entry *DirEntry) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
 	// name must already exist and be directories.
-	// TODO: Make multiple elems?
+	//
+	// If the returned error is ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// ErrFollowLink. Otherwise, if there is no error, the
+	// returned DirEntry describes the newly created directory.
 	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full
@@ -297,21 +318,42 @@ type DirServer interface {
 	// name must be present in the pattern and is treated as a literal
 	// even if it contains metacharacters.
 	// If the caller has no read permission for the items named in the
-	// DirEntries, the returned Locations and Packdata fields are cleared.
+	// DirEntries, the returned Location and Packdata fields are cleared.
+	//
+	// If the returned error is ErrFollowLink, one or more of the
+	// returned DirEntries is a link (the others are completely
+	// evaluated). The caller should retry the operation for those
+	// DirEntries as outlined in the description for ErrFollowLink,
+	// updating the pattern as appropriate. Note that any returned
+	// links may only partially match the original argument pattern.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.
-	// It does not delete the data it references; use StoreServer.Delete for that.
-	Delete(name PathName) error
+	// It does not delete the data it references; use StoreServer.Delete
+	// for that. If the name identifies a link, Delete will delete the
+	// link itself, not its target.
+	//
+	// If the returned error is ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// ErrFollowLink. (And in that case, the DirEntry will never
+	// represent the full path name of the argument.) Otherwise, the
+	// returned DirEntry will be nil whether the operation succeeded
+	// or not.
+	Delete(name PathName) (*DirEntry, error)
 
-	// WhichAccess returns the path name of the Access file that is
+	// WhichAccess returns the DirEntry of the Access file that is
 	// responsible for the access rights defined for the named item.
 	// WhichAccess requires that the calling user have List rights
 	// (see the access package) for the argument name.
 	// TODO: Change to "any" rights once that's done.
 	// If there is no such file, that is, there are no Access files that
-	// apply, it returns the empty string.
-	WhichAccess(name PathName) (PathName, error)
+	// apply, it returns (nil, nil).
+	//
+	// If the returned error is ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// ErrFollowLink. Otherwise, in the case of error the returned
+	// DirEntry will be nil.
+	WhichAccess(name PathName) (*DirEntry, error)
 }
 
 // Time represents a timestamp in units of seconds since
@@ -323,18 +365,19 @@ type Time int64
 // holes and no overlaps and the first block always has offset 0.
 type DirEntry struct {
 	// Fields contributing to the signature.
-	Name     PathName   // The full path name of the file.
+	Name     PathName   // The full path name of the file. Only the last element can be a link.
 	Packing  Packing    // Packing used for every block in file.
 	Time     Time       // Time associated with file; might be when it was last written.
 	Blocks   []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
 	Packdata []byte     // Information maintained by the packing algorithm.
+	Link     PathName   // The link target, iff the DirEntry has Attr=AttrLink.
 
 	// Field determining the key used for the signature, hence also tamper-resistant.
 	Writer UserName // Writer of the file, often the same as owner.
 
 	// Fields not included in the signature.
-	Attr     FileAttributes // File attributes.
-	Sequence int64          // The sequence (version) number of the item.
+	Attr     Attribute // Attributes for the DirEntry.
+	Sequence int64     // The sequence (version) number of the item.
 }
 
 // DirBlock describes a block of data representing a contiguous section of a file.
@@ -346,22 +389,22 @@ type DirBlock struct {
 	Packdata []byte   // Information maintained by the packing algorithm.
 }
 
-// FileAttributes define the attributes for a DirEntry.
-type FileAttributes byte
+// Attribute defines the attributes for a DirEntry.
+type Attribute byte
 
-// Supported FileAttributes.
+// Supported Attributes.
 const (
 	// AttrNone is the default attribute, identifying a plain data object.
-	AttrNone = FileAttributes(0)
+	AttrNone = Attribute(0)
 	// AttrDirectory identifies a directory. It must be the only attribute.
-	AttrDirectory = FileAttributes(1 << 0)
+	AttrDirectory = Attribute(1 << 0)
 	// AttrLink identifies a link. It must be the only attribute.
-	// A link is a path name whose content identifies another
+	// A link is a path name whose DirEntry identifies another
 	// "target" item in the tree, similar to a Unix symbolic link.
 	// The target of a link may be another link.
-	// The associated Location identifies an item, packed with PlainPack,
-	// containing the full Upspin path name of the target.
-	AttrLink = FileAttributes(1 << 1)
+	// The target path is stored in the Link field of the DirEntry.
+	// A link DirEntry holds zero DirBlocks.
+	AttrLink = Attribute(1 << 1)
 )
 
 // Special Sequence numbers.
@@ -404,7 +447,12 @@ type StoreServer interface {
 // that wish to access Upspin's name space. When Client evaluates a path
 // name and encounters a link, it evaluates the link, iteratively if necessary,
 // until it reaches an item that is not a link.
-// (The DirServer interface does no special processing for links.)
+// (The DirServer interface does not evaluate links.)
+//
+// In methods where a name is evaluated and a DirEntry returned,
+// if links were evaluated in processing the operation, the Name field
+// of the DirEntry will be different from the argument path name and
+// will hold the link-free path to item.
 type Client interface {
 	// Get returns the clear, decrypted data stored under the given name.
 	// It is intended only for special purposes, since it will allocate memory
@@ -418,8 +466,10 @@ type Client interface {
 	// is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
-	// PutLink creates a symbolic link from the new name to the old name.
-	// If something is already stored with that name, it is replaced with the new data.
+	// PutLink creates a link from the new name to the old name.
+	// If something is already stored with the new name, it is
+	// first removed from the directory but its storage is not deleted
+	// from the Store.
 	PutLink(oldName, newName PathName) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
@@ -433,6 +483,9 @@ type Client interface {
 	// path may contain metacharacters. Matching is done using Go's path.Match
 	// elementwise. The user name must be present in the pattern and is treated as
 	// a literal even if it contains metacharacters.
+	// Note that if links are evaulated while executing Glob, the
+	// Name fields of the returned DirEntries might not match the
+	// original argument pattern.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// File-like methods similar to Go's os.File API.

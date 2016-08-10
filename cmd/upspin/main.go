@@ -331,8 +331,9 @@ func rm(args ...string) {
 		exit(err)
 	}
 	for i := 0; i < fs.NArg(); i++ {
-		err := dir.Delete(upspin.PathName(fs.Arg(i)))
+		_, err := dir.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
+			// TODO: implement links.
 			exit(err)
 		}
 	}
