@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f9316b83_a566a8c1",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "Done.\n\ngo doc doesn\u0027t work for me; it gives stale results.  But it presumably works for others, so happy to fix the comment and will try to do better as I learn more.",
+      "parentUuid": "d95ca7da_c5171aaa",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_85f04296",
         "filename": "cmd/keygen/test",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-10T00:40:41Z",
       "side": 1,
       "message": "echo 1\u003e\u00262 keygen FAILED",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9316b83_2514d8ef",
+        "filename": "cmd/keygen/test",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "Done.\n\nI didn\u0027t write this and am not entirely sure how it gets used, but what you suggest sounds right.",
+      "parentUuid": "d95ca7da_85f04296",
       "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f9316b83_106f9c30",
+        "filename": "dir/gcp/race_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "That\u0027s an interesting observation.  The error message is \"no GOPATH\" but what we really mean is that even if GOPATH is set to the empty string, we\u0027re still dubious.  We\u0027d rather see GOPATH\u003d\"./\" so we\u0027re sure the tester really intended the local directory as root.\n\nI\u0027m inclined to leave the code as is.",
+      "parentUuid": "d95ca7da_a5f53e85",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_65e8a6ab",
         "filename": "factotum/factotum.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-10T00:40:41Z",
       "side": 1,
       "message": "needs a doc comment now that it is exported.",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9316b83_7047f0a9",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "I wasn\u0027t trying to export it.",
+      "parentUuid": "d95ca7da_65e8a6ab",
       "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "f9316b83_f0b300b2",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "It is going away.  Fixing all the tests took a long time.   I got all of them except the Android client and the tree code that Eduardo is actively working on.",
+      "parentUuid": "d95ca7da_05e532d2",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_25e2aecb",
         "filename": "factotum/factotum.go",
         "patchSetId": 3
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "f9316b83_10b9dc90",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_25e2aecb",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d95ca7da_45eb2aa9",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -115,6 +223,24 @@
       "writtenOn": "2016-08-10T00:40:41Z",
       "side": 1,
       "message": "i\u0027d rather see an error for no match than use a sentinel value.\narguably these two functionalities should be different methods,\n\nPublicKey() PublicKey\n\nPublicKeyFromHash([]byte) (PublicKey, error)  // here the argument cannot be nil",
+      "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9316b83_b0d6e8bb",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-10T21:16:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d95ca7da_45eb2aa9",
       "revId": "cafdff5e22bdaeeaa673b5317cbc032c66411fd0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
