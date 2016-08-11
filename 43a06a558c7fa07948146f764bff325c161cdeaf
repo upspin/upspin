@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "192f1f72_072c96fe",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-11T03:39:28Z",
+      "side": 1,
+      "message": "do you need the []string?",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
