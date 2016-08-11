@@ -7,7 +7,6 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	gContext "golang.org/x/net/context"
 
@@ -67,11 +66,9 @@ func main() {
 	}
 
 	// If there are configuration options, set them now
-	if flags.Config != "" {
-		opts := strings.Split(flags.Config, ",")
-		// Configure it appropriately.
-		log.Printf("Configuring server with options: %v", opts)
-		err = key.Configure(opts...)
+	if len(flags.Config) > 0 {
+		log.Printf("Configuring server with options: %v", flags.Config)
+		err = key.Configure(flags.Config...)
 		if err != nil {
 			log.Fatal(err)
 		}

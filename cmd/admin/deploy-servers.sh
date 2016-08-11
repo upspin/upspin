@@ -50,15 +50,20 @@ function build {
     case $server in
         dirserver)
             envfiles="
-                dirserver/rc.dirserver
+                dirserver/rc
                 dirserver/public.upspinkey
                 dirserver/secret.upspinkey
-                dirserver/config.gcp
                 serviceaccountkey.json
             "
             ;;
         storeserver)
+            # Use dirserver user and keys to make it work. This is wrong,
+	    # but harmless. We need to make context.InitContext work
+	    # without keys being present. TODO(adg): fix this.
             envfiles="
+                dirserver/rc
+                dirserver/public.upspinkey
+                dirserver/secret.upspinkey
                 serviceaccountkey.json
             "
             ;;
@@ -80,12 +85,22 @@ function build {
     done
 
     pushd "$root/cmd/$server" >/dev/null
+
+    # Stuff $project into PROJECT flag
     sed 's/PROJECT/'"$project"'/g' Dockerfile > "$dir"/Dockerfile
-    # TODO(adg): remove this awful special case
-    if [[ "$project" == "upspin-test" ]]; then
-	    sed 's/upspin.io/test.upspin.io/g' "$dir"/Dockerfile > "$dir"/Dockerfile.new
-	    mv "$dir"/Dockerfile.new "$dir"/Dockerfile
+
+    # Stuff contents of $server/config file into CONFIG flag
+    config_file="$HOME/upspin/deploy/$project/$server/config"
+    if [ -f "$config_file" ]; then
+        # Note we have to replace carefully.
+        # The config string may include slashes and parens,
+        # so we escape parens and use % as the sed separator.
+        config="$(cat $config_file | sed 's/(/\\(/g' | sed 's/)/\\)/g')"
+        sed 's%CONFIG%'$config'%g' "$dir"/Dockerfile > "$dir"/Dockerfile.new
+        mv "$dir"/Dockerfile.new "$dir"/Dockerfile
     fi
+
+    # Build the server.
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "$dir/$server"
     popd >/dev/null
 
@@ -103,8 +118,8 @@ function deploy {
 
     ipfile="$HOME/upspin/deploy/$project/ip/$server"
     if [ ! -f "$ipfile" ]; then
-	    echo "Couldn't find ip file for $server in $ipfile"
-	    exit 1
+            echo "Couldn't find ip file for $server in $ipfile"
+            exit 1
     fi
     ip="$(cat $ipfile)"
 

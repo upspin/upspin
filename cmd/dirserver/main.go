@@ -6,10 +6,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -49,7 +47,7 @@ type Server struct {
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("endpoint", "context", "https", "log", "project", "config_file")
+	flags.Parse("config", "context", "endpoint", "https", "log", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -84,11 +82,9 @@ func main() {
 	}
 
 	// If there are configuration options, set them now.
-	if flags.ConfigFile != "" {
-		opts := parseConfigFile(flags.ConfigFile)
-		// Configure it appropriately.
-		log.Printf("Configuring server with options: %v", opts)
-		err = dir.Configure(opts...)
+	if len(flags.Config) > 0 {
+		log.Printf("Configuring server with options: %v", flags.Config)
+		err = dir.Configure(flags.Config...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -121,25 +117,6 @@ var (
 	deleteResponse    proto.DirDeleteResponse
 	configureResponse proto.ConfigureResponse
 )
-
-// parseConfigFile reads fileName's contents and splits it in lines, removing
-// empty lines and leading and trailing spaces on each line.
-func parseConfigFile(fileName string) (out []string) {
-	log.Debug.Printf("$HOME=%q", os.Getenv("HOME"))
-	buf, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		log.Error.Printf("Can't read config file %s", fileName)
-		return nil
-	}
-	for _, l := range strings.Split(string(buf), "\n") {
-		l = strings.TrimSpace(l)
-		if len(l) == 0 {
-			continue
-		}
-		out = append(out, l)
-	}
-	return out
-}
 
 // dirFor returns a DirServer instance bound to the user specified in the context.
 func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
