@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	flags.Parse("https_addr")
+	flags.Parse("https")
 	http.Handle("/", newServer())
 	log.Fatal(http.ListenAndServe(flags.HTTPSAddr, nil))
 }
