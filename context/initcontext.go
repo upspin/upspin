@@ -314,8 +314,13 @@ func (ctx *contextImpl) Copy() upspin.Context {
 
 func homedir() (string, error) {
 	u, err := user.Current()
-	if err != nil {
-		return "", err
+	// Ignore error from user.Current, but don't explode if it returns nil.
+	if u == nil {
+		s := errors.Str("lookup of current user failed")
+		if err != nil {
+			return "", errors.E(s, err)
+		}
+		return "", errors.E(s)
 	}
 	h := u.HomeDir
 	if h == "" {
