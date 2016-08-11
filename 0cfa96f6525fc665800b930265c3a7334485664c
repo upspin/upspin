@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e5ac169_1acefd62",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T23:27:09Z",
+      "side": 1,
+      "message": "I wonder if we should address this TODO, and allow the rc to specify a key directory, or that they explicitly want no keys. Then we don\u0027t need a sentinel error, and I can avoid the hackiness of putting the dirserver\u0027s keys in $HOME/.ssh/.\n\nWhat do you think?",
+      "revId": "0cfa96f6525fc665800b930265c3a7334485664c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
