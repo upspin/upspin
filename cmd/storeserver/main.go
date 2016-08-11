@@ -6,9 +6,8 @@
 package main
 
 import (
-	"flag"
 	"net/http"
-	"strings"
+	"os"
 
 	gContext "golang.org/x/net/context"
 
@@ -27,9 +26,11 @@ import (
 	// Load required transports
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-)
 
-var keyEndpointFlag = flag.String("keyendpoint", "inprocess", "endpoint of remote key service")
+	// This is required for context.InitContext to work.
+	// TODO(adg): This seems wrong; fix it.
+	_ "upspin.io/pack/plain"
+)
 
 const serverName = "storeserver"
 
@@ -42,7 +43,7 @@ type Server struct {
 }
 
 func main() {
-	flags.Parse("config", "project", "https", "endpoint")
+	flags.Parse("config", "context", "endpoint", "https", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -59,24 +60,27 @@ func main() {
 		log.Fatalf("endpoint parse error: %v", err)
 	}
 
-	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	keyEndpoint, err := upspin.ParseEndpoint(*keyEndpointFlag)
+	// Load context and keys for this server. It needn't have a real username.
+	ctxfd, err := os.Open(flags.Context)
 	if err != nil {
-		log.Fatalf("keyendpoint parse error: %v", err)
+		log.Fatal(err)
 	}
-	context := context.New().SetUserName("storeserver").SetKeyEndpoint(*keyEndpoint)
+	defer ctxfd.Close()
+	context, err := context.InitContext(ctxfd)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// If there are configuration options, set them now
-	if flags.Config != "" {
+	if len(flags.Config) > 0 {
 		// Get an instance so we can configure it.
 		store, err := bind.StoreServer(context, *endpoint)
 		if err != nil {
 			log.Fatal(err)
 		}
-		opts := strings.Split(flags.Config, ",")
 		// Configure it appropriately.
-		log.Printf("Configuring server with options: %v", opts)
-		err = store.Configure(opts...)
+		log.Printf("Configuring server with options: %v", flags.Config)
+		err = store.Configure(flags.Config...)
 		if err != nil {
 			log.Fatal(err)
 		}

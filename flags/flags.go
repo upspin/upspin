@@ -11,13 +11,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"upspin.io/log"
 )
 
 var (
-	// Config is a comma-separated list of configuration options (key=value) for this server.
-	Config = ""
+	// Config is a list of configuration options (key=value); used by servers only.
+	Config []string
 
 	// Context names the Upspin context file to use.
 	Context = filepath.Join(os.Getenv("HOME"), "/upspin/rc")
@@ -28,25 +29,18 @@ var (
 	// HTTPSAddr is the network address on which to listen for incoming network connections.
 	HTTPSAddr = "localhost:443"
 
-	// LogFile names the log file on GCP; leave empty to disable GCP logging.
-	LogFile = ""
-
 	// LogLevel sets the level of logging.
 	Log logFlag
 
 	// Project is the project name on GCP; used by servers only.
 	Project = ""
-
-	// ConfigFile is the name of a configuration file used by servers.
-	// TODO: delete this flag
-	ConfigFile = ""
 )
 
 // flags is a map of flag registration functions keyed by flag name,
 // used by Parse to register specific (or all) flags.
 var flags = map[string]func(){
 	"config": func() {
-		flag.StringVar(&Config, "config", Config, "comma-separated list of configuration options (key=value) for this server")
+		flag.Var(configFlag{&Config}, "config", "comma-separated list of configuration options (key=value) for this server")
 	},
 	"context": func() {
 		flag.StringVar(&Context, "context", Context, "context `file`")
@@ -57,14 +51,8 @@ var flags = map[string]func(){
 	"https": func() {
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")
 	},
-	"gcp_log": func() {
-		flag.StringVar(&LogFile, "gcp_log", LogFile, "name of the log `file` on GCP (empty to disable GCP logging)")
-	},
 	"project": func() {
 		flag.StringVar(&Project, "project", Project, "GCP `project` name")
-	},
-	"config_file": func() {
-		flag.StringVar(&ConfigFile, "config_file", ConfigFile, "`file` with config parameters, one key=value per line")
 	},
 	"log": func() {
 		Log.Set("info")
@@ -101,21 +89,41 @@ func Parse(names ...string) {
 type logFlag string
 
 // String implements flag.Value.
-func (l *logFlag) String() string {
-	return string(*l)
+func (f logFlag) String() string {
+	return string(f)
 }
 
 // Set implements flag.Value.
-func (l *logFlag) Set(level string) error {
+func (f *logFlag) Set(level string) error {
 	err := log.SetLevel(level)
 	if err != nil {
 		return err
 	}
-	*l = logFlag(log.Level())
+	*f = logFlag(log.Level())
 	return nil
 }
 
 // Get implements flag.Getter.
-func (l *logFlag) Get() interface{} {
+func (logFlag) Get() interface{} {
 	return log.Level()
+}
+
+type configFlag struct {
+	s *[]string
+}
+
+// String implements flag.Value.
+func (f configFlag) String() string {
+	return strings.Join(*f.s, ",")
+}
+
+// Set implements flag.Value.
+func (f configFlag) Set(s string) error {
+	*f.s = strings.Split(strings.TrimSpace(s), ",")
+	return nil
+}
+
+// Get implements flag.Getter.
+func (f configFlag) Get() interface{} {
+	return *f.s
 }
