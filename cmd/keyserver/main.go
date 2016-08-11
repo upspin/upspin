@@ -40,7 +40,7 @@ type Server struct {
 }
 
 func main() {
-	flags.Parse("config", "endpoint", "https_addr", "project")
+	flags.Parse("config", "endpoint", "https", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)

@@ -34,7 +34,7 @@ var root = flag.String("root", os.Getenv("HOME"), "root of directory to serve")
 var defaultAccess *access.Access
 
 func main() {
-	flags.Parse("context", "https_addr")
+	flags.Parse("context", "https")
 
 	if *root == "" {
 		log.Fatal("no root directory specified")

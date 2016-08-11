@@ -49,7 +49,7 @@ type Server struct {
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("endpoint", "context", "https_addr", "log", "project", "config_file")
+	flags.Parse("endpoint", "context", "https", "log", "project", "config_file")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
