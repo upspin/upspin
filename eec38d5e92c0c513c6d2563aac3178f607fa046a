@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e5ac169_7ad3b90a",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T23:27:09Z",
+      "side": 1,
+      "message": "I don\u0027t think we should silently fail without setting a Factotum, unless the user has explicitly requested it (as per my other comment)",
+      "revId": "eec38d5e92c0c513c6d2563aac3178f607fa046a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
