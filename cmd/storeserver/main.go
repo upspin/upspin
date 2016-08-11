@@ -67,7 +67,9 @@ func main() {
 	}
 	defer ctxfd.Close()
 	context, err := context.InitContext(ctxfd)
-	if err != nil {
+	if err != nil { //  wanted to say: == context.ErrNoFactotum {
+		log.Print("storeserver proceeding with no Factotum")
+	} else if err != nil {
 		log.Fatal(err)
 	}
 

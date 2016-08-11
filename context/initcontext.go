@@ -22,6 +22,8 @@ import (
 	"upspin.io/upspin"
 )
 
+var ErrNoFactotum = errors.Str("unable to load keys, so no Factotum set")
+
 var inTest = false // Generate errors instead of logs for certain problems.
 
 type contextImpl struct {
@@ -153,16 +155,16 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 	context.packing = packer.Packing()
 
-	dir, err := sshdir()
+	dir, err := sshdir() // TODO Allow RC to set the directory?
 	if err != nil {
-		return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+		err = ErrNoFactotum
+	} else {
+		f, err := factotum.New(dir)
+		if err == nil {
+			context.SetFactotum(f)
+		}
+		// This is done before bind so that keys are ready for authenticating to servers.
 	}
-	f, err := factotum.New(dir) // TODO Allow RC to override?
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	context.SetFactotum(f)
-	// This must be done before bind so that keys are ready for authenticating to servers.
 
 	context.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
 	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
