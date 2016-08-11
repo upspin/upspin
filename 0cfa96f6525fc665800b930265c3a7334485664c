@@ -16,6 +16,24 @@
       "revId": "0cfa96f6525fc665800b930265c3a7334485664c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fec6b12f_d4bc34af",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-11T23:35:25Z",
+      "side": 1,
+      "message": "I started to implement it, then wasn\u0027t sure if anyone wanted it for real so left as a TODO.   But I was only thinking of the case ~/upspin/rc.dirserver specifying secrets\u003d~/.ssh/dirserver/ or some such thing.  Ok by me if you want to create some syntax for explictly saying \"no secrets.\"",
+      "parentUuid": "7e5ac169_1acefd62",
+      "revId": "0cfa96f6525fc665800b930265c3a7334485664c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
