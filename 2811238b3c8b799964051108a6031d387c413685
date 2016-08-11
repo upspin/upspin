@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "192f1f72_e7514265",
+        "filename": "errors/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T06:56:13Z",
+      "side": 1,
+      "message": "Otherwise",
+      "revId": "2811238b3c8b799964051108a6031d387c413685",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
