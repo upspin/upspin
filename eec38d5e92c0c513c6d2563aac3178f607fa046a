@@ -16,6 +16,24 @@
       "revId": "eec38d5e92c0c513c6d2563aac3178f607fa046a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fec6b12f_94dd4c0d",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-11T23:35:25Z",
+      "side": 1,
+      "message": "Well, it\u0027s not exactly silent;  err is not nil if factotum is not set.\n\nBut I tend to agree with the larger point that if factotum is nil then err should have a specific form that cmd/storeserver can check for.\n\nAnyway, I\u0027d be happy to abandon this CL and let you revise the code as you like.  I think you have a better idea of what you\u0027re seeking than I do.   (And I have to leave shortly for the day.)",
+      "parentUuid": "7e5ac169_7ad3b90a",
+      "revId": "eec38d5e92c0c513c6d2563aac3178f607fa046a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
