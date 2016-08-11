@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "192f1f72_07157696",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T05:33:02Z",
+      "side": 1,
+      "message": "Yes, it\u0027s wrong.\nThe storeserver shouldn\u0027t need keys at all, but you can\u0027t set up a context without keys using initcontext. I need to fix this, but this lets me make progress before that happens. I\u0027ll update the TODO",
+      "parentUuid": "b91d334f_8a340fe4",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b91d334f_ca67e7f5",
         "filename": "cmd/storeserver/Dockerfile",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "192f1f72_e7ff8251",
+        "filename": "cmd/storeserver/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T05:33:02Z",
+      "side": 1,
+      "message": "no, it\u0027s copying the keys from $home/upspin/deploy/$project/dirserver/",
+      "parentUuid": "b91d334f_ca67e7f5",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "192f1f72_072c96fe",
         "filename": "flags/flags.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-11T03:39:28Z",
       "side": 1,
       "message": "do you need the []string?",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "192f1f72_27127aaf",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-11T05:33:02Z",
+      "side": 1,
+      "message": "no, fixed",
+      "parentUuid": "192f1f72_072c96fe",
       "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
