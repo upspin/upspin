@@ -29,7 +29,7 @@ var (
 	// HTTPSAddr is the network address on which to listen for incoming network connections.
 	HTTPSAddr = "localhost:443"
 
-	// LogLevel sets the level of logging.
+	// Log sets the level of logging (implements flag.Value).
 	Log logFlag
 
 	// Project is the project name on GCP; used by servers only.
