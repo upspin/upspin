@@ -66,10 +66,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ctxfd.Close()
-	context, err := context.InitContext(ctxfd)
-	if err != nil {
-		log.Fatal(err)
-	}
+	context, _ := context.InitContext(ctxfd)
+	// Ignore the error from not having keys, hence no factotum.
+	// TODO  Are there any other errors we care about?
 
 	// If there are configuration options, set them now
 	if len(flags.Config) > 0 {

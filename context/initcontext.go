@@ -153,16 +153,14 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 	context.packing = packer.Packing()
 
-	dir, err := sshdir()
-	if err != nil {
-		return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+	dir, err := sshdir() // TODO Allow RC to set the directory?
+	if err == nil {
+		f, err := factotum.New(dir)
+		if err == nil {
+			context.SetFactotum(f)
+			// This is best done before bind so that keys are ready for authenticating to servers.
+		}
 	}
-	f, err := factotum.New(dir) // TODO Allow RC to override?
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	context.SetFactotum(f)
-	// This must be done before bind so that keys are ready for authenticating to servers.
 
 	context.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
 	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
