@@ -52,6 +52,11 @@ const (
 	hasLocation = true
 )
 
+const (
+	ownerName  = "upspin-test@google.com"
+	readerName = "upspin-friend-test@google.com"
+)
+
 var (
 	setupTemplate = testenv.Setup{
 		Tree: testenv.Tree{
@@ -266,7 +271,7 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = dir.Delete(pathName)
+	_, err = dir.Delete(pathName)
 	// Check it really deleted it (and is not being cached in memory).
 	_, err = env.Client.Get(pathName)
 	if err == nil {
@@ -277,7 +282,7 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	}
 	// But I can't delete files in dir1, since I lack permission.
 	pathName = upspin.PathName(ownerName + "/dir1/file1.txt")
-	err = dir.Delete(pathName)
+	_, err = dir.Delete(pathName)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -286,12 +291,12 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	}
 	// But we can always remove the Access file.
 	accessPathName := upspin.PathName(ownerName + "/dir1/Access")
-	err = dir.Delete(accessPathName)
+	_, err = dir.Delete(accessPathName)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Now delete file1.txt
-	err = dir.Delete(pathName)
+	_, err = dir.Delete(pathName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -347,17 +352,12 @@ func testSharing(t *testing.T, env *testenv.Env) {
 }
 
 func testAllOnePacking(t *testing.T, setup testenv.Setup) {
-	var readerKey testenv.KeyPair
-	// Keys are needed with any packing type (even Plain) for auth purposes.
-	setup.Keys = keyStore[setup.OwnerName][setup.KeyKind]
-	readerKey = keyStore[readerName][setup.KeyKind]
-
 	env, err := testenv.New(&setup)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	readerClient, _, err = env.NewUser(readerName, &readerKey)
+	readerClient, _, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -399,7 +399,6 @@ func TestIntegration(t *testing.T) {
 				//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
 			} {
 				setup.Packing = p.packing
-				setup.KeyKind = p.curve
 				t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
 					testAllOnePacking(t, setup)
 				})
@@ -455,7 +454,7 @@ func cleanup(env *testenv.Env) error {
 	entries := append(fileSet1, fileSet2...)
 	var firstErr error
 	deleteNow := func(name upspin.PathName) {
-		err = dir.Delete(name)
+		_, err = dir.Delete(name)
 		if err != nil {
 			if firstErr == nil {
 				firstErr = err
