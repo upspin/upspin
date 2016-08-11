@@ -38,6 +38,7 @@ var (
 	Project = ""
 
 	// ConfigFile is the name of a configuration file used by servers.
+	// TODO: delete this flag
 	ConfigFile = ""
 )
 
@@ -53,11 +54,11 @@ var flags = map[string]func(){
 	"endpoint": func() {
 		flag.StringVar(&Endpoint, "endpoint", Endpoint, "`endpoint` of remote service for forwarding servers")
 	},
-	"https_addr": func() {
-		flag.StringVar(&HTTPSAddr, "https_addr", HTTPSAddr, "`address` for incoming network connections")
+	"https": func() {
+		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")
 	},
-	"log_file": func() {
-		flag.StringVar(&LogFile, "log_file", LogFile, "name of the log `file` on GCP (empty to disable GCP logging)")
+	"gcp_log": func() {
+		flag.StringVar(&LogFile, "gcp_log", LogFile, "name of the log `file` on GCP (empty to disable GCP logging)")
 	},
 	"project": func() {
 		flag.StringVar(&Project, "project", Project, "GCP `project` name")
