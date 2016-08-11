@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "b91d334f_8a340fe4",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-11T04:01:21Z",
+      "side": 1,
+      "message": "Why do you need the dirserver\u0027s keys?  The store server does not need keys. But if it did, they should be its own keys.",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b91d334f_ca67e7f5",
+        "filename": "cmd/storeserver/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-11T04:01:21Z",
+      "side": 1,
+      "message": "Is this copying my own keys? It seems risky.",
+      "revId": "43a06a558c7fa07948146f764bff325c161cdeaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "192f1f72_072c96fe",
         "filename": "flags/flags.go",
         "patchSetId": 2
