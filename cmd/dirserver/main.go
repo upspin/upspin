@@ -248,9 +248,12 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 		// TODO: implement links.
 		log.Printf("WhichAccess %q failed: %v", req.Name, err)
 	}
-	b, err := entry.Marshal()
-	if err != nil {
-		return nil, err
+	var b []byte
+	if entry != nil {
+		b, err = entry.Marshal()
+		if err != nil {
+			return nil, err
+		}
 	}
 	resp := &proto.DirWhichAccessResponse{
 		Entry: b,
