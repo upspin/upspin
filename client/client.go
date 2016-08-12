@@ -43,7 +43,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 
 // PutLink implements upspin.Client.
 func (c *Client) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
-	return c.put(newName, []byte(oldName), upspin.AttrLink)
+	return nil, errors.E("PutLink", errors.Str("unimplemented"))
 }
 
 func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute) (*upspin.DirEntry, error) {
@@ -331,13 +331,13 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	return nil, err
 }
 
-// PutDuplicate implements upspin.Link. This is more a copy on write than a Unix style Link. As soon as
+// PutDuplicate implements upspin.Client. This is more a copy on write than a Unix style Link. As soon as
 // one of the two files is written, then will diverge.
 func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	return c.linkOrRename(oldName, newName, false)
 }
 
-// Rename implements upspin.Rename.  Performed by linking to the new name and deleting the old one.
+// Rename implements upspin.Client.  Performed by linking to the new name and deleting the old one.
 func (c *Client) Rename(oldName, newName upspin.PathName) error {
 	_, err := c.linkOrRename(oldName, newName, true)
 	return err

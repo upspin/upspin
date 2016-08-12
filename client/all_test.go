@@ -348,14 +348,14 @@ func TestPutDuplicateAndRename(t *testing.T) {
 		t.Fatal("put file:", err)
 	}
 
-	// Link a new file to the same reference.
-	linked := upspin.PathName(fmt.Sprintf("%s/link", user))
-	entry, err := client.PutDuplicate(original, linked)
+	// Duplicate: create a new name for the same reference.
+	dup := upspin.PathName(fmt.Sprintf("%s/dup", user))
+	entry, err := client.PutDuplicate(original, dup)
 	if err != nil {
-		t.Fatal("link file:", err)
+		t.Fatal("duplicate file:", err)
 	}
-	if entry.Name != linked {
-		t.Fatal("directory entry has wrong name")
+	if entry.Name != dup {
+		t.Fatal("duped directory entry has wrong name")
 	}
 	in, err := client.Get(original)
 	if err != nil {
@@ -364,20 +364,20 @@ func TestPutDuplicateAndRename(t *testing.T) {
 	if string(in) != text {
 		t.Fatal(fmt.Sprintf("contents of %q corrupted", original))
 	}
-	in, err = client.Get(linked)
+	in, err = client.Get(dup)
 	if err != nil {
 		t.Fatal("get file:", err)
 	}
 	if string(in) != text {
-		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", original, linked))
+		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", original, dup))
 	}
 
 	// Rename the new file.
 	renamed := upspin.PathName(fmt.Sprintf("%s/renamed", user))
-	if err := client.Rename(linked, renamed); err != nil {
+	if err := client.Rename(dup, renamed); err != nil {
 		t.Fatal("link file:", err)
 	}
-	if _, err := client.Get(linked); err == nil {
+	if _, err := client.Get(dup); err == nil {
 		t.Fatal("renamed file still exists")
 	}
 	in, err = client.Get(renamed)

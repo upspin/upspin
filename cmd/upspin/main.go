@@ -228,7 +228,7 @@ func link(args ...string) {
 			exit(err)
 		}
 	}
-	_, err = c.PutDuplicate(originalPath, newPath)
+	_, err = c.PutLink(originalPath, newPath)
 	if err != nil {
 		exit(err)
 	}
