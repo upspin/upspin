@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "7e9ba17c_d2af2474",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T02:23:39Z",
+      "side": 1,
+      "message": "you needn\u0027t specify that it is not thread-safe. that is the assumption in all go code. instead, we should document types that are thread-safe.",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_f239883a",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T02:23:39Z",
+      "side": 1,
+      "message": "use int64 here to avoid a bunch of conversions\nalso offset is a vague name for this\nis it nextOffset? fileSize?",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e5ac169_bae391c9",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -30,6 +64,23 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "document the fields",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_f2ac2882",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T02:23:39Z",
+      "side": 1,
+      "message": "you say Log and LogIndex elsewhere, should that be the case here?",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -64,6 +115,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "s/2/os.SEEK_END/ and drop the comment",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_72d83826",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T02:23:39Z",
+      "side": 1,
+      "message": "go1.7 provides io.SeekEnd. i think we should use it",
+      "parentUuid": "7e5ac169_fadd090c",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -149,6 +218,23 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "this is really a ReadAt, so the offset should go after n.\nthat is, Log needs a minor change.\narguably dst should be an argument, since the caller knows n and can preallocate, which would make it more ReadAt-like",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_9232fc56",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T02:23:39Z",
+      "side": 1,
+      "message": "use the io seek constants",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
