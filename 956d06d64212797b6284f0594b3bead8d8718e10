@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1ed8e539_7f662f25",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-12T01:32:57Z",
+      "side": 1,
+      "message": "Did you mean:\nif err \u003d\u003d context.ErrNoFactotum {\n    log.Fatal(\"storeserver does not...\n} else if err !\u003d nil {\n    log.Fatal(err)\n}",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_b2b2a0dd",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -13,6 +30,23 @@
       "writtenOn": "2016-08-12T01:28:30Z",
       "side": 1,
       "message": "s/Key/key/g",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_bf67d71c",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-12T01:32:57Z",
+      "side": 1,
+      "message": "Remove the TODO.",
       "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
