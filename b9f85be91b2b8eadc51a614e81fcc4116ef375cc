@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_02686c1a",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_32595094",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_727cb8e6",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-12T03:34:10Z",
       "side": 1,
       "message": "better check len(entries)",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_2254905b",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_727cb8e6",
       "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_22b3b0b1",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_524ed4ca",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_7253d871",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-12T03:34:10Z",
       "side": 1,
       "message": "ditto",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_42b8b48b",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_7253d871",
       "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_a2ed0089",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "I got a little paranoid about higher layer changing the DirEntry directly and messing with the internals of the tree. For example, if the de is no longer dirty, but the DirServer messes with it, then it becomes dirty again without being marked as such.",
+      "parentUuid": "7e9ba17c_7205986a",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_d241e494",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 3
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_c2ea046e",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_d241e494",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_92191cdb",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -115,6 +223,24 @@
       "writtenOn": "2016-08-12T03:34:10Z",
       "side": 1,
       "message": "why now lowercase put when it is Put in the next func?",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_8290fcf5",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Put is an Operation.\n\nBut moved it all to op. I used to use op, but saw it being used differently and switched. Switching back to op.",
+      "parentUuid": "7e9ba17c_92191cdb",
       "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -156,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_a27420dd",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "I used to do it, then saw elsewhere in the code the current style. Back to op and sticking to it.\n\nDone.",
+      "parentUuid": "7e9ba17c_f23ee809",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_5277b402",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -167,6 +311,24 @@
       "writtenOn": "2016-08-12T03:34:10Z",
       "side": 1,
       "message": "should the mutex be held?",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_c27124ec",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "No, the comment above addresses it: It must only be called from New, before there\u0027s a mutex.",
+      "parentUuid": "7e9ba17c_5277b402",
       "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -190,6 +352,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_e27e28bb",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_f210a8aa",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_126d2c33",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -207,6 +387,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_027cecc0",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_126d2c33",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_32723014",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -218,6 +416,24 @@
       "writtenOn": "2016-08-12T03:34:10Z",
       "side": 1,
       "message": "Deleting entry: %v",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_22a81022",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T05:25:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_32723014",
       "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
