@@ -16,6 +16,24 @@
       "revId": "1fd752a449033a1147be692faec99c3f23e39488",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_b22f00ee",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-12T01:54:01Z",
+      "side": 1,
+      "message": "Do you suggest updating this comment? It seems pretty clear to me.",
+      "parentUuid": "1ed8e539_7f1aaf77",
+      "revId": "1fd752a449033a1147be692faec99c3f23e39488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
