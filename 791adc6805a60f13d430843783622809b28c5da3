@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7e9ba17c_921e7c68",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T21:49:05Z",
+      "side": 1,
+      "message": "I wrote it because I needed a place to check a DirEntry so all the implementations can use it. It can\u0027t go in package upspin because of dependency cycles. It\u0027s close to a leaf package, depending only on upspin, path, and errors. Any significant package can import it.\n\nTo do DirEntry, I needed many other pieces, and so it seemed reasonable to push for all the major types to be checked here. These routines have also been written for efficiency and avoid all allocation.\n\nI like how it\u0027s working in the code I\u0027ve been building. I agree part of its job will be to remove checking routines elsewhere, and I haven\u0027t done enough of that yet. As far as your CL point, I have used every one of these in the new code for links and the things that support it. CLs in a day or two.",
+      "parentUuid": "1ed8e539_652942ec",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ed8e539_a5e34ac9",
         "filename": "valid/valid.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7e9ba17c_d2280487",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T21:49:05Z",
+      "side": 1,
+      "message": "I will. This is more thorough in some ways. The problem with UserAndDomain is that it takes a PathName, which things like the keyserver do not need.",
+      "parentUuid": "1ed8e539_a5e34ac9",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ed8e539_e5dd520c",
         "filename": "valid/valid.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-12T14:36:39Z",
       "side": 1,
       "message": "I didn\u0027t have a chance to comment on this in the prior round. I think this one in particular will be very rarely used. Mostly because the packages that would use it are implementations of the DirServer and a path.Parsed object is needed after it\u0027s parsed. So, checking it here and throwing it away is a waste. I think most implementations will just do the check below themselves (Tree and GCP dirserver do some of this already). \n\nMaybe this could return parsed?",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_b21b8077",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T21:49:05Z",
+      "side": 1,
+      "message": "This one could probably go, it\u0027s really an internal thing for DirEntry. I\u0027ll drop it.",
+      "parentUuid": "1ed8e539_e5dd520c",
       "revId": "791adc6805a60f13d430843783622809b28c5da3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
