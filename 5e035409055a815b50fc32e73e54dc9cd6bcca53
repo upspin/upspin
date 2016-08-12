@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e40e5d2_1fc7a341",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-12T22:44:54Z",
+      "side": 1,
+      "message": "Update comment regarding allowSelfSignedCertificates.\n\nAlso clarify that \"insecure\" means skip TLS and \"upspin.AllowSelfSignedCertificate \u003d true\" means use TLS but in an insecure manner.  People might get the two confused.",
+      "revId": "5e035409055a815b50fc32e73e54dc9cd6bcca53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
