@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_253e5ae2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T15:06:26Z",
+      "side": 1,
+      "message": "I changed it to return by reference again. I can be paranoid in the DirServer implementation instead without costing us the extra copy. Mistakes will likely be easy to catch there.",
+      "parentUuid": "1ed8e539_a2ed0089",
+      "revId": "b9f85be91b2b8eadc51a614e81fcc4116ef375cc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_d241e494",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 3
