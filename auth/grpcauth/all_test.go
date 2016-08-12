@@ -130,7 +130,7 @@ func startClient(port string) {
 	}
 	ctx := context.New().SetUserName(user).SetFactotum(f)
 
-	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, AllowSelfSignedCertificate)
+	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, false)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -186,6 +186,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	upspin.AllowSelfSignedCertificate = true
 	port := startServer()
 	startClient(port) // Blocks until it's connected to the server.
 

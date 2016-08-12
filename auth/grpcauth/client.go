@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -65,7 +66,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // keep-alive packets.
 // If allowSelfSignedCertificates is true, the client will connect with a server with a self-signed certificate.
 // Otherwise it will reject it. Mostly only useful for testing a local server.
-func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, allowSelfSignedCertificate bool) (*AuthClientService, error) {
+func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, insecure bool) (*AuthClientService, error) {
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
 	}
@@ -80,12 +81,31 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case isHTTPS:
 		skip = 8
 	}
-	conn, err := grpc.Dial(addr[skip:],
+	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithDialer(dialWithKeepAlive),
-		grpc.WithTimeout(3*time.Second),
-		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: allowSelfSignedCertificate})),
-	)
+		grpc.WithTimeout(3 * time.Second),
+	}
+	if insecure {
+		// Only allow insecure connections to the loop back network.
+		host, _, err := net.SplitHostPort(addr[skip:])
+		if err != nil {
+			return nil, err
+		}
+		ips, err := net.LookupIP(host)
+		if err != nil {
+			return nil, err
+		}
+		for _, ip := range ips {
+			if !ip.IsLoopback() {
+				return nil, errors.E("Dial", netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
+			}
+		}
+		opts = append(opts, grpc.WithInsecure())
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: upspin.AllowSelfSignedCertificate})))
+	}
+	conn, err := grpc.Dial(addr[skip:], opts...)
 	if err != nil {
 		return nil, err
 	}
