@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e40e5d2_bf52376c",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T22:47:28Z",
+      "side": 0,
+      "message": "You can set allowSelfSignedCert here if you change the signature of this function.",
+      "revId": "c4aa4979544609d330c69ce75bbaf54e95050fad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}

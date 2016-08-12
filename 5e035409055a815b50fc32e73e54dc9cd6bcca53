@@ -16,6 +16,40 @@
       "revId": "5e035409055a815b50fc32e73e54dc9cd6bcca53",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_9f765305",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T22:47:28Z",
+      "side": 1,
+      "message": "Why not add a new parameter to the call allowSelfSigned along with insecure?\n\nThen you don\u0027t need the global. It\u0027s only used here and only set by tests.",
+      "revId": "5e035409055a815b50fc32e73e54dc9cd6bcca53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_9f2893ea",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T22:47:28Z",
+      "side": 1,
+      "message": "I think you don\u0027t need this necessarily. See other comment.",
+      "revId": "5e035409055a815b50fc32e73e54dc9cd6bcca53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
