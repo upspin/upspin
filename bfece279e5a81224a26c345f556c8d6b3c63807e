@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e5ac169_5aefd5b0",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "don\u0027t worry about justifying the name here, it\u0027s a fine name.\nthe fields need comments though",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_bae391c9",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "document the fields",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_9ae04dbe",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "s/or/nor/\ns/are/is/\nyay english",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_fadd090c",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "s/2/os.SEEK_END/ and drop the comment",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_dadac511",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "these sprintfs are just \"tree.root.\" + string(user)",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_3a1f81cb",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "O_TRUNC? wouldn\u0027t this just be os.Create except we need read and write on the fd?",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_1a243d14",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e5ac169_7a29f9eb",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "see above",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be635926_74d3c80a",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "this is really a ReadAt, so the offset should go after n.\nthat is, Log needs a minor change.\narguably dst should be an argument, since the caller knows n and can preallocate, which would make it more ReadAt-like",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_127b6c22",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "os.SEEK_SET",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_328070f4",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_5285f402",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "do you know how long it is at this point? i think you do or could easily.\nioutil.ReadAll is a lazy way to do this.\nReadFull would be better and avoids allocation",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_728af815",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "into",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_928e7c26",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "nil or just leave out",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_d298046d",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "%q is easier to read and safer",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_f2950832",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_12a28c92",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:09:06Z",
+      "side": 1,
+      "message": "nil etc.",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
