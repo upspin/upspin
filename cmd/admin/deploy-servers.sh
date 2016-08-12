@@ -57,13 +57,8 @@ function build {
             "
             ;;
         storeserver)
-            # Use dirserver user and keys to make it work. This is wrong,
-	    # but harmless. We need to make context.InitContext work
-	    # without keys being present. TODO(adg): fix this.
             envfiles="
-                dirserver/rc
-                dirserver/public.upspinkey
-                dirserver/secret.upspinkey
+                storeserver/rc
                 serviceaccountkey.json
             "
             ;;
