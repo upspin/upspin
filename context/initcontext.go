@@ -48,25 +48,34 @@ const (
 	dirserver   = "dirserver"
 	storeserver = "storeserver"
 	packing     = "packing"
+	secrets     = "secrets"
 )
 
 // InitContext returns a context generated from a configuration file and/or
 // environment variables.
 //
-// The default configuration file location is $HOME/upspin/rc.
-// If passed a non-nil io.Reader, that is used instead of the default file.
-// The upserpinusername, upspinpacking, upspinkeyserver, upspindirserver and upspinstoreserver
-// environment variables override the user name, packing, and key, directory, and store servers specified
-// in the provided reader or default rc file.
-//
-// Any endpoints not set in the data for the context will be set to the
-// "unassigned" transport and an empty network address.
-//
 // A configuration file should be of the format
 //   # lines that begin with a hash are ignored
 //   key = value
-// where key may be one of user, keyserver, dirserver, storeserver, or packing.
+// where key may be one of username, keyserver, dirserver, storeserver,
+// packing, or secrets.
 //
+// The default configuration file location is $HOME/upspin/rc.
+// If passed a non-nil io.Reader, that is used instead of the default file.
+//
+// Environment variables named "upspinKey", where "Key" is a recognized
+// configuration key, may override configuration values in the rc file.
+//
+// Any endpoints (keyserver, dirserver, storeserver) not set in the data for
+// the context will be set to the "unassigned" transport and an empty network
+// address.
+//
+// The default value for packing is "plain".
+//
+// The default value for secrets is "$HOME/.ssh".
+// The special value "none" indicates there are no secrets to load;
+// in this case, the returned context will not include a Factotum
+// and the returned error is ErrNoFactotum.
 func InitContext(r io.Reader) (upspin.Context, error) {
 	const op = "InitContext"
 	vals := map[string]string{
@@ -75,6 +84,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		dirserver:   "",
 		storeserver: "",
 		packing:     "plain",
+		secrets:     "",
 	}
 
 	// If the provided reader is nil, try $HOME/upspin/rc.
@@ -146,29 +156,41 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 
 	context := new(contextImpl)
-	context.userName = upspin.UserName(vals["username"])
-	packer := pack.LookupByName(vals["packing"])
+	context.userName = upspin.UserName(vals[username])
+	packer := pack.LookupByName(vals[packing])
 	if packer == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown packing %s", vals["packing"]))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown packing %q", vals[packing]))
 	}
 	context.packing = packer.Packing()
 
-	dir, err := sshdir()
-	if err != nil {
-		return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+	var err error
+	dir := vals[secrets]
+	if dir == "" {
+		dir, err = sshdir()
+		if err != nil {
+			return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+		}
 	}
-	f, err := factotum.New(dir) // TODO Allow RC to override?
-	if err != nil {
-		return nil, errors.E(op, err)
+	if dir == "none" {
+		err = ErrNoFactotum
+	} else {
+		f, err := factotum.New(dir) // TODO Allow RC to override?
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		context.SetFactotum(f)
+		// This must be done before bind so that keys are ready for authenticating to servers.
 	}
-	context.SetFactotum(f)
-	// This must be done before bind so that keys are ready for authenticating to servers.
 
 	context.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
 	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
 	context.dirEndpoint = parseEndpoint(op, vals, dirserver, &err)
 	return context, err
 }
+
+// ErrNoFactotum indicates that the returned context contains no Factotum, and
+// that the user requested this by setting secrets=none in their configuration.
+var ErrNoFactotum = errors.Str("Factotum not set: no secrets provided")
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
