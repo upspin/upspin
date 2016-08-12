@@ -6,10 +6,96 @@
 package valid
 
 import (
+	"strings"
+
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+// UserName verifies that the name is a syntactically valid user's email address.
+// The check is not especially thorough: it requires that there be one @, no slashes,
+// and have a form like <user>@<domain>.
+// For now, the checks allows only ASCII letters, numbers, and +-_.
+// TODO: The checks are (mostly) too strict and parochial.
+// TODO: What are the real rules?
+func UserName(user upspin.UserName) error {
+	const op = "valid.UserName"
+	name := string(user)
+	if strings.ContainsRune(name, '/') {
+		return errors.E(op, user, errors.Invalid, errors.Str("user name must not contain slashes"))
+	}
+	if strings.Count(name, "@") != 1 {
+		return errors.E(op, user, errors.Invalid, errors.Str("user name must contain one @ symbol"))
+	}
+	at := strings.IndexByte(name, '@')
+	userName, domainName := name[:at], name[at+1:]
+	if userName == "" || domainName == "" {
+		return errors.E(op, user, errors.Invalid)
+	}
+	if strings.Count(domainName, ".") == 0 {
+		return errors.E(op, user, errors.Invalid, errors.Str("domain name must contain a period"))
+	}
+	// Valid user name?
+	for _, c := range userName {
+		if !okUserChar(c) {
+			return errors.E(op, user, errors.Invalid, errors.Str("bad symbol in user name"))
+		}
+	}
+	// Valid domain name? We check for
+	period := -1 // First time through loop will fail if first byte is a period.
+	for i, c := range domainName {
+		if !okUserChar(c) {
+			return errors.E(op, user, errors.Invalid, errors.Str("bad symbol in domain name"))
+		}
+		if c == '.' {
+			if i == period+1 {
+				return errors.E(op, user, errors.Invalid, errors.Str("invalid domain name"))
+			}
+			period = i
+		}
+	}
+	if period == len(domainName)+1 {
+		return errors.E(op, user, errors.Invalid, errors.Str("invalid domain name"))
+	}
+	// Valid domain name?
+	return nil
+}
+
+// TODO: This is not a good check but it will serve for now.
+func okUserChar(r rune) bool {
+	switch {
+	case 'a' <= r && r <= 'z':
+		return true
+	case 'A' <= r && r <= 'Z':
+		return true
+	case '0' <= r && r <= '9':
+		return true
+	case r == '.' || r == '_' || r == '-':
+		return true
+	}
+	return false
+}
+
+// User verifies that the User struct is valid.
+func User(user *upspin.User) error {
+	const op = "valid.User"
+	if err := UserName(user.Name); err != nil {
+		return errors.E(op, err)
+	}
+	for _, ep := range user.Dirs {
+		if err := Endpoint(ep); err != nil {
+			return errors.E(op, err)
+		}
+	}
+	for _, ep := range user.Stores {
+		if err := Endpoint(ep); err != nil {
+			return errors.E(op, err)
+		}
+	}
+	// TODO: Check public key?
+	return nil
+}
 
 // PathName verifies that the name is valid, clean (no redundant slashes, no ..
 // elements, and so on) and canonically formatted. Most API calls do not require
