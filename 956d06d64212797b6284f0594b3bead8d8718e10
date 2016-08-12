@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e9ba17c_b2b2a0dd",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:28:30Z",
+      "side": 1,
+      "message": "s/Key/key/g",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_12c9ac5a",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:28:30Z",
+      "side": 1,
+      "message": "s/their/the/",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_32ceb063",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:28:30Z",
+      "side": 1,
+      "message": "s/set/initialized/ or s/set/set up/ ?",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_52d3340a",
+        "filename": "context/initcontext_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T01:28:30Z",
+      "side": 1,
+      "message": "if err !\u003d ErrFactotum seems nicer to me.",
+      "revId": "956d06d64212797b6284f0594b3bead8d8718e10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
