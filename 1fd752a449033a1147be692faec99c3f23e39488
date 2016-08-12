@@ -34,6 +34,24 @@
       "revId": "1fd752a449033a1147be692faec99c3f23e39488",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_5f640bb4",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-12T02:59:18Z",
+      "side": 1,
+      "message": "The comment is clear and matches the code here.\n\nHowever, storeserver will be called with secrets\u003dnone and err will be ErrNoFactotum and main.go will log.Fatal(err), which is not what you intended, unless I\u0027m still confused.  My misunderstanding back at Patch Set 1 made me suggest the wrong \"cleanup\" of the if else.\n\nAnyway, I\u0027ll +2 as it\u0027s fine with me if you fix either main.go or change the comment+code here.",
+      "parentUuid": "7e9ba17c_b22f00ee",
+      "revId": "1fd752a449033a1147be692faec99c3f23e39488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
