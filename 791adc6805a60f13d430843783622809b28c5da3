@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ed8e539_652942ec",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T14:36:39Z",
+      "side": 1,
+      "message": "I\u0027m not sure we need a valid package. Why shouldn\u0027t these functions live in the packages they were defined? Most should live in code.go, I think. Username stuff could be in package path, as I mention below (path has UserAndDomain already, which you\u0027re now sort of duplicating).\n\nAnyway, I\u0027m not opposed to having this, but it feels a bit like putting the cart in front of the horse. Why build this before we use it? It seems each new one should be built in the CL that uses it, so we know for sure we\u0027ll need them.",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_a5e34ac9",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T14:36:39Z",
+      "side": 1,
+      "message": "A lot of this has been done in path.UserAndDomain. Please reconcile the two.",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_e5dd520c",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T14:36:39Z",
+      "side": 1,
+      "message": "I didn\u0027t have a chance to comment on this in the prior round. I think this one in particular will be very rarely used. Mostly because the packages that would use it are implementations of the DirServer and a path.Parsed object is needed after it\u0027s parsed. So, checking it here and throwing it away is a waste. I think most implementations will just do the check below themselves (Tree and GCP dirserver do some of this already). \n\nMaybe this could return parsed?",
+      "revId": "791adc6805a60f13d430843783622809b28c5da3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
