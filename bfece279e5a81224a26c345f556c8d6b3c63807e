@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_c5420e49",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e5ac169_5aefd5b0",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_d2af2474",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-12T02:23:39Z",
       "side": 1,
       "message": "you needn\u0027t specify that it is not thread-safe. that is the assumption in all go code. instead, we should document types that are thread-safe.",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_e53f12b6",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_d2af2474",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_053dd6bd",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_f239883a",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e5ac169_bae391c9",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "document the fields",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_455efe25",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Even for a non-exported type with non-exported fields? \n\nDone (here and above for consistency).",
+      "parentUuid": "7e5ac169_bae391c9",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_856806c1",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_f2ac2882",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e5ac169_9ae04dbe",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "s/or/nor/\ns/are/is/\nyay english",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_a54c2a78",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Removed as per adg@. \n\n(I propose we adopt chinese for comments. It\u0027s more concise and we\u0027ll all be on equal footing during reviews :-))\n\nDone.",
+      "parentUuid": "7e5ac169_9ae04dbe",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -139,6 +247,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_c5492e67",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_72d83826",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e5ac169_dadac511",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -150,6 +276,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "these sprintfs are just \"tree.root.\" + string(user)",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_0554f6fb",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Years of google3 reviewers drilling into my head that string concatenations are evil.\n\nDone.",
+      "parentUuid": "7e5ac169_dadac511",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -173,6 +317,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_657a2285",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "No. We want to be able to recover a root if a root/index/log exists.",
+      "parentUuid": "7e5ac169_3a1f81cb",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e5ac169_1a243d14",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -184,6 +346,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "ditto",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_857f2672",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "ditto.",
+      "parentUuid": "7e5ac169_1a243d14",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -207,6 +387,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_a5734aab",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e5ac169_7a29f9eb",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "be635926_74d3c80a",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -218,6 +416,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "this is really a ReadAt, so the offset should go after n.\nthat is, Log needs a minor change.\narguably dst should be an argument, since the caller knows n and can preallocate, which would make it more ReadAt-like",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_c5704ea1",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done, but leaving dst as return for now. This is done in recovery only. We hope this will be rare.",
+      "parentUuid": "be635926_74d3c80a",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -241,6 +457,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_e56d52c6",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_9232fc56",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_127b6c22",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -252,6 +486,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "os.SEEK_SET",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_056b16b1",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_127b6c22",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -275,6 +527,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_25af3ae5",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_328070f4",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_5285f402",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -286,6 +556,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "do you know how long it is at this point? i think you do or could easily.\nioutil.ReadAll is a lazy way to do this.\nReadFull would be better and avoids allocation",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_65b9422e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "I don\u0027t know exactly for the root, since it could be as large as the largest DirEntry you can think of (think 1000\u0027s of Readers and wrapped keys or 1000\u0027s of filenames in the root).\n\nFor the offset, it\u0027s also not known precisely at this time, but at least I know the maximum size since I\u0027m reading an offset. \n\nI could read in chunks of 4kb, but it would do just as many allocations as ReadAll, I think, and ReadAll would do a better job most likely.\n\nLeaving as is, but yell if you disagree.",
+      "parentUuid": "7e9ba17c_5285f402",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -309,6 +597,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_c5a68e01",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_728af815",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_928e7c26",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 2
@@ -320,6 +626,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "nil or just leave out",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_25fd7ad5",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "It wasn\u0027t working before, due to an error in marshalling. But it looks like it got fixed as now this is breaking after my latest sync. Hmmm. I didn\u0027t see anyone fixing it, but great.\n\nDone.",
+      "parentUuid": "7e9ba17c_928e7c26",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -343,6 +667,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_850c8611",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_d298046d",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_f2950832",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 2
@@ -360,6 +702,24 @@
     },
     {
       "key": {
+        "uuid": "1ed8e539_a5f0aaf8",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e9ba17c_f2950832",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7e9ba17c_12a28c92",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 2
@@ -371,6 +731,24 @@
       "writtenOn": "2016-08-12T01:09:06Z",
       "side": 1,
       "message": "nil etc.",
+      "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ed8e539_c5edae1f",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-12T16:03:19Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "7e9ba17c_12a28c92",
       "revId": "bfece279e5a81224a26c345f556c8d6b3c63807e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
