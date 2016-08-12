@@ -10,7 +10,31 @@ import (
 	"upspin.io/upspin"
 )
 
-func TestPathName(t *testing.T) {
+func TestUserName(t *testing.T) {
+	tests := []struct {
+		name  upspin.UserName
+		valid bool
+	}{
+		{"", false},
+		{"a@b.com/foo", false},
+		{"a@b.com", true},
+		{"a@b", false},
+		{"@b.com", false},
+		{"a@b.c..com", false},
+		{"a@b@c.com", false},
+		{"a%b@c.com", false},
+		{"a@c.%.com", false},
+	}
+	for _, test := range tests {
+		err := UserName(test.name)
+		if test.valid == (err == nil) {
+			continue
+		}
+		t.Errorf("%q: expected valid=%t; got error %v", test.name, test.valid, err)
+	}
+}
+
+func TestValidPathName(t *testing.T) {
 	tests := []struct {
 		name  upspin.PathName
 		valid bool
@@ -24,11 +48,52 @@ func TestPathName(t *testing.T) {
 		{"a@b.com/foo/bar/..", false},
 	}
 	for _, test := range tests {
-		err := PathName(test.name)
+		err := validPathName(test.name)
 		if test.valid == (err == nil) {
 			continue
 		}
 		t.Errorf("%q: expected valid=%t; got error %v", test.name, test.valid, err)
+	}
+}
+
+func TestUser(t *testing.T) {
+	var user upspin.User
+	restore := func() {
+		user = upspin.User{
+			Name: "jamestiberius@kirk.com",
+			Dirs: []upspin.Endpoint{
+				{
+					Transport: upspin.Remote,
+					NetAddr:   "dir.upspin.io:443",
+				},
+			},
+			Stores: []upspin.Endpoint{
+				{
+					Transport: upspin.Remote,
+					NetAddr:   "store.upspin.io:443",
+				},
+			},
+			PublicKey: "this is a key",
+		}
+	}
+	restore()
+	if err := User(&user); err != nil {
+		t.Fatalf("expected no error; got %q", err)
+	}
+	// Bad name.
+	user.Name = "joe@blow.com/file"
+	if err := User(&user); err == nil {
+		t.Fatal("no error for bad user")
+	}
+	// Bad dir.
+	user.Dirs[0].Transport = 44
+	if err := User(&user); err == nil {
+		t.Fatal("no error for bad dir")
+	}
+	// Bad store.
+	user.Stores[0].Transport = 44
+	if err := User(&user); err == nil {
+		t.Fatal("no error for bad store")
 	}
 }
 
