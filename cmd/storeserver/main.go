@@ -66,15 +66,17 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ctxfd.Close()
-	context, err := context.InitContext(ctxfd)
+	ctx, err := context.InitContext(ctxfd)
 	if err != nil {
 		log.Fatal(err)
+	} else if err != context.ErrNoFactotum {
+		log.Fatal("storeserver does not use keys, set secrets=none in rc")
 	}
 
 	// If there are configuration options, set them now
 	if len(flags.Config) > 0 {
 		// Get an instance so we can configure it.
-		store, err := bind.StoreServer(context, *endpoint)
+		store, err := bind.StoreServer(ctx, *endpoint)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -91,13 +93,13 @@ func main() {
 		}
 	}
 
-	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(context)}
+	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := &Server{
-		context:      context,
+		context:      ctx,
 		endpoint:     *endpoint,
 		SecureServer: grpcSecureServer,
 	}
