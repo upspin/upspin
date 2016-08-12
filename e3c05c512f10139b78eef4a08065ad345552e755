@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e9ba17c_32add032",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T06:07:17Z",
+      "side": 1,
+      "message": "ReadAt",
+      "revId": "e3c05c512f10139b78eef4a08065ad345552e755",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_52a25441",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T06:07:17Z",
+      "side": 1,
+      "message": "s/from //",
+      "revId": "e3c05c512f10139b78eef4a08065ad345552e755",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e9ba17c_72a75850",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-12T06:07:17Z",
+      "side": 1,
+      "message": "if not what?",
+      "revId": "e3c05c512f10139b78eef4a08065ad345552e755",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
