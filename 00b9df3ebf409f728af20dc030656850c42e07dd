@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e40e5d2_d3893421",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-13T15:22:45Z",
+      "side": 1,
+      "message": "Is this used?",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_738f0824",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-13T15:22:45Z",
+      "side": 1,
+      "message": "Why\n  user \u003d\u003d \"\" ||",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
