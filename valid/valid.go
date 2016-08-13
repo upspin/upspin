@@ -11,19 +11,66 @@ import (
 	"upspin.io/upspin"
 )
 
-// PathName verifies that the name is valid, clean (no redundant slashes, no ..
-// elements, and so on) and canonically formatted. Most API calls do not require
-// such a rigorous test and should just check that the name parses rather than call
-// this function. One important difference is that this function requires a user's
-// root to have the trailing slash; path.Parse does not.
-func PathName(name upspin.PathName) error {
-	const op = "valid.PathName"
+// UserName verifies that the name is a syntactically valid user's email address.
+// It also requires that the name be lower-cased to avoid ambiguity.
+func UserName(user upspin.UserName) error {
+	const op = "valid.UserName"
+	u, d, err := path.UserAndDomain(user)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if string(user) != u+"@"+d {
+		return errors.E(op, user, "not canonically formatted")
+	}
+	return nil
+}
+
+// TODO: This is not a good check but it will serve for now.
+func okUserChar(r rune) bool {
+	switch {
+	case 'a' <= r && r <= 'z':
+		return true
+	case 'A' <= r && r <= 'Z':
+		return true
+	case '0' <= r && r <= '9':
+		return true
+	case r == '.' || r == '_' || r == '-':
+		return true
+	}
+	return false
+}
+
+// User verifies that the User struct is valid.
+func User(user *upspin.User) error {
+	const op = "valid.User"
+	if err := UserName(user.Name); err != nil {
+		return errors.E(op, err)
+	}
+	for _, ep := range user.Dirs {
+		if err := Endpoint(ep); err != nil {
+			return errors.E(op, err)
+		}
+	}
+	for _, ep := range user.Stores {
+		if err := Endpoint(ep); err != nil {
+			return errors.E(op, err)
+		}
+	}
+	// TODO: Check public key?
+	return nil
+}
+
+// validPathName verifies that the name is valid, clean (no redundant slashes, no
+// .. elements, and so on) and canonically formatted. One important check is that
+// this function requires a user's root to have the trailing slash; path.Parse does
+// not.
+func validPathName(name upspin.PathName) error {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return err
 	}
 	if parsed.Path() != name {
-		return errors.E(op, name, errors.Str("name is not clean"))
+		return errors.Str("name is not clean")
 	}
 	return nil
 }
@@ -69,8 +116,8 @@ func Endpoint(endpoint upspin.Endpoint) error {
 func DirEntry(entry *upspin.DirEntry) error {
 	const op = "valid.DirEntry"
 	// Name must be good.
-	if err := PathName(entry.Name); err != nil {
-		return errors.E(op, err)
+	if err := validPathName(entry.Name); err != nil {
+		return errors.E(op, entry.Name, err)
 	}
 	// Attribute must be valid and consistent with entry.
 	switch entry.Attr {
@@ -80,8 +127,8 @@ func DirEntry(entry *upspin.DirEntry) error {
 		if len(entry.Blocks) > 0 {
 			return errors.E(op, entry.Name, errors.Str("link cannot have data"))
 		}
-		if err := PathName(entry.Link); err != nil {
-			return errors.E(op, err)
+		if err := validPathName(entry.Link); err != nil {
+			return errors.E(op, entry.Name, err)
 		}
 	default:
 		return errors.E(op, entry.Name, errors.Errorf("invalid file attribute %d", entry.Attr))
