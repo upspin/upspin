@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_056bf21a",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:46:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e40e5d2_5396843e",
+      "revId": "af300fb6e8774ddc73de5276c67ae2c89e0f9307",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_f32478c7",
         "filename": "valid/valid_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-13T22:05:08Z",
       "side": 1,
       "message": "If username must be lower case, why is valid \u003d true here? Update the comment?",
+      "revId": "af300fb6e8774ddc73de5276c67ae2c89e0f9307",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_25686e1b",
+        "filename": "valid/valid_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:46:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e40e5d2_f32478c7",
       "revId": "af300fb6e8774ddc73de5276c67ae2c89e0f9307",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
