@@ -33,6 +33,29 @@
       "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_130b1c84",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-13T17:46:46Z",
+      "side": 1,
+      "message": "Why not just normalize and strip off the last period?  In reality google.com and google.com. are equivalent so you might as well guarantee that here.  You are already normalizing the case after all.\n\nOr did you mean to do that and forgot to change domain below into trail?",
+      "range": {
+        "startLine": 370,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 2
+      },
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
