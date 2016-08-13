@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_85ffe252",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:34:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e40e5d2_73194890",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_d333740c",
         "filename": "path/path.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-13T22:12:40Z",
       "side": 1,
       "message": "I couldn\u0027t parse this sentence very well.",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_a5045e6f",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:34:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e40e5d2_d333740c",
       "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_651746a4",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:34:55Z",
+      "side": 1,
+      "message": "It\u0027s parsing the elements, not just validating them.",
+      "parentUuid": "1e40e5d2_1311dc62",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_738f0824",
         "filename": "path/path.go",
         "patchSetId": 1
@@ -82,6 +136,24 @@
       "writtenOn": "2016-08-13T15:22:45Z",
       "side": 1,
       "message": "Why\n  user \u003d\u003d \"\" ||",
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_451a4acf",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:34:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e40e5d2_738f0824",
       "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -105,6 +177,24 @@
         "endLine": 374,
         "endChar": 2
       },
+      "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_0514529c",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-13T23:34:55Z",
+      "side": 1,
+      "message": "Cleaned up, no longer allowing a trailing .",
+      "parentUuid": "1e40e5d2_130b1c84",
       "revId": "00b9df3ebf409f728af20dc030656850c42e07dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
