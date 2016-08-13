@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e40e5d2_5396843e",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-13T15:27:28Z",
+      "side": 1,
+      "message": "s/name/domain name/\n\ni.e. The user name is case sensitive?",
+      "revId": "af300fb6e8774ddc73de5276c67ae2c89e0f9307",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
