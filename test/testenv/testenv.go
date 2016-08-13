@@ -286,10 +286,10 @@ func makeRoot(context upspin.Context) error {
 	return nil
 }
 
-func setContextEndpoints(context upspin.Context, store, dir, user upspin.Endpoint) {
+func setContextEndpoints(context upspin.Context, store, dir, key upspin.Endpoint) {
 	context.SetStoreEndpoint(store)
 	context.SetDirEndpoint(dir)
-	context.SetKeyEndpoint(user)
+	context.SetKeyEndpoint(key)
 }
 
 // repo returns the local pathname of a file in the upspin repository.

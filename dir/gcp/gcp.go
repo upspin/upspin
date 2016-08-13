@@ -331,7 +331,7 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
 	if !canRead {
 		log.Debug.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
-		dirEntry.Blocks[0].Location = upspin.Location{}
+		dirEntry.Blocks = nil
 		dirEntry.Packdata = nil
 	}
 	log.Debug.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
@@ -477,9 +477,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			}
 			// If the user can't read a path, clear out its Location.
 			if !canRead {
-				if len(de.Blocks) > 0 {
-					de.Blocks[0].Location = upspin.Location{}
-				}
+				de.Blocks = nil
 				de.Packdata = nil
 			}
 			dirEntries = append(dirEntries, de)

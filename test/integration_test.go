@@ -112,16 +112,21 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 	// Ensure we can't read the data.
 	_, err = readerClient.Get(upspin.PathName(file))
 	if err == nil {
-		t.Errorf("Get(%q) succeeded, expected permission denied", file)
+		t.Errorf("Get(%q) succeeded, expected an error", file)
 	}
-	if !strings.Contains(err.Error(), "permission") {
-		t.Errorf("Get(%q) returned error %q, expected permission denied", file, err)
-	}
+	// TODO: the error differs between GCP and InProcess. The reason is
+	// GCP Dir returns the DirEntry with Location and Packdata zeroed out,
+	// while InProcess returns permission denied.
 }
 
 func testAllowReadAccess(t *testing.T, env *testenv.Env) {
 	// Owner has no delete permission (assumption tested in testDelete).
 	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l,r:"+readerName+"\nc,w,l,r:"+ownerName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Put file back again so we force keys to be re-wrapped.
+	_, err = env.Client.Put(ownerName+"/dir1/file1.txt", []byte(contentsOfFile1))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -385,7 +390,7 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 }
 
 func TestIntegration(t *testing.T) {
-	for _, transport := range []upspin.Transport{upspin.InProcess, upspin.GCP} {
+	for _, transport := range []upspin.Transport{upspin.GCP, upspin.InProcess} {
 		t.Run(fmt.Sprintf("transport=%v", transport), func(t *testing.T) {
 			setup := setupTemplate
 			setup.Transport = transport
