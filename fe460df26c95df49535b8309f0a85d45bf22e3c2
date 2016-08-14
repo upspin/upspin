@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_45eeca84",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-14T22:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_c5d95af6",
+      "revId": "fe460df26c95df49535b8309f0a85d45bf22e3c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_d3361495",
         "filename": "test/access_test.go",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "side": 1,
       "message": "any reason not to leave this broken?",
       "parentUuid": "1e40e5d2_d3361495",
+      "revId": "fe460df26c95df49535b8309f0a85d45bf22e3c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_05e8d273",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-14T22:21:38Z",
+      "side": 1,
+      "message": "I like a clean build and broken builds confuse people. I will file an issue for it\n\nhttps://github.com/googleprivate/upspin/issues/34",
+      "parentUuid": "de5c8dda_e5ded6db",
       "revId": "fe460df26c95df49535b8309f0a85d45bf22e3c2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
