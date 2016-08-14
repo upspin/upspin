@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_a5c1be00",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-14T08:44:15Z",
+      "side": 0,
+      "message": "Yes",
+      "parentUuid": "1e40e5d2_732ce842",
+      "revId": "6e6520b9734c8635a5a0fecdaae40f8e69434f59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_b33110a0",
         "filename": "test/access_test.go",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2016-08-14T04:52:07Z",
       "side": 0,
       "message": "why remove these?",
+      "revId": "6e6520b9734c8635a5a0fecdaae40f8e69434f59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_85bcc27f",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-14T08:44:15Z",
+      "side": 0,
+      "message": "Because you can\u0027t read a directory, so this is now failing for that reason rather than permission.",
+      "parentUuid": "1e40e5d2_b33110a0",
       "revId": "6e6520b9734c8635a5a0fecdaae40f8e69434f59",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
