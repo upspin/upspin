@@ -250,6 +250,9 @@ func (s *Sharer) allEntries(args []string) []*upspin.DirEntry {
 			entries = append(entries, entry)
 			continue
 		}
+		if entry.IsLink() {
+			continue
+		}
 		if !s.isDir {
 			exitf("%q is a directory; use -r or -d", name)
 		}
