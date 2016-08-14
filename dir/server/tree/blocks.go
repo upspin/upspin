@@ -20,7 +20,7 @@ const blockSize = 1024 * 1024 // 1MB
 
 // get gets the contents of a location as a blob.
 func (t *tree) get(loc *upspin.Location) ([]byte, error) {
-	const get = "get"
+	const get = "tree.get"
 	store, err := bind.StoreServer(t.context, loc.Endpoint)
 	if err != nil {
 		return nil, err
@@ -42,13 +42,20 @@ func (t *tree) get(loc *upspin.Location) ([]byte, error) {
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
 func (t *tree) store(n *node) error {
-	const store = "store"
+	const op = "tree.store"
 
 	// Get our store server.
 	storeServer := t.context.StoreServer()
 
 	// Use our preferred packing
 	packer := t.packer
+
+	// Can't pack a non-dir entry. Something went bad if we got here.
+	if !n.entry.IsDir() {
+		err := errors.E(op, errors.Internal, errors.Str("can't pack non-dir entry"))
+		log.Error.Printf("%s.", err)
+		return err
+	}
 
 	// Prepare the dirEntry
 	n.entry.Blocks = nil // if any blocks existed, their references are lost as we're packing dirEntry again.
@@ -57,7 +64,7 @@ func (t *tree) store(n *node) error {
 	// Start packing.
 	bp, err := packer.Pack(t.context, &n.entry)
 	if err != nil {
-		return errors.E(store, err)
+		return errors.E(op, err)
 	}
 
 	// Pack and store child nodes, keeping blocks at ~blockSize.
@@ -66,13 +73,13 @@ func (t *tree) store(n *node) error {
 		// TODO: also check whether there are any Blocks with empty locations that are non-empty dirs or files.
 		if child.dirty {
 			// We should write nodes from the bottom up, so this should never happen.
-			return errors.E(store, child.entry.Name, errors.Str("programmer error"))
+			return errors.E(op, child.entry.Name, errors.Str("programmer error"))
 		}
-		log.Debug.Printf("%s: Saving child: %s", n.entry.Name, child.entry.Name)
 		block, err := child.entry.Marshal()
 		if err != nil {
-			return errors.E(store, err)
+			return errors.E(op, err)
 		}
+		log.Printf("%s: %s: Saving child: %s. Size: %d", op, n.entry.Name, child.entry.Name, len(block))
 		data = append(data, block...)
 
 		// Don't let blocks grow too much (but we never split a large DirEntry in the middle).
@@ -80,7 +87,7 @@ func (t *tree) store(n *node) error {
 			// Flush now.
 			err = storeBlock(storeServer, bp, data)
 			if err != nil {
-				return errors.E(store, err)
+				return errors.E(op, err)
 			}
 			data = data[0:0]
 		}
@@ -89,12 +96,12 @@ func (t *tree) store(n *node) error {
 	if len(data) > 0 {
 		err = storeBlock(storeServer, bp, data)
 		if err != nil {
-			return errors.E(store, err)
+			return errors.E(op, err)
 		}
 	}
 	err = bp.Close()
 	if err != nil {
-		return errors.E(store, err)
+		return errors.E(op, err)
 	}
 	return nil
 }
