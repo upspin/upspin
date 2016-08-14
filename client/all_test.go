@@ -23,34 +23,44 @@ import (
 // TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.
 
 func newContext(name upspin.UserName) upspin.Context {
-	endpoint := upspin.Endpoint{
+	inProcess := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-
-	// TODO: This bootstrapping is fragile and will break. It depends on the order of setup.
-	context := context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
+	context := context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(inProcess).SetDirEndpoint(inProcess).SetStoreEndpoint(inProcess)
 	return context
 }
 
-func setup(userName upspin.UserName, key upspin.PublicKey) upspin.Context {
+func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
 	context := newContext(userName)
-	user, err := bind.KeyServer(context, context.KeyEndpoint())
+	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		panic(err)
+	}
+	if _, ok := key.(*inprocess.Service); !ok {
+		panic("key server not a inprocess.Service")
 	}
 	dir, err := bind.DirServer(context, context.DirEndpoint())
 	if err != nil {
 		panic(err)
 	}
-	err = user.(*inprocess.Service).Install(userName, dir)
+	if publicKey == "" {
+		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	}
+	user := &upspin.User{
+		Name:      upspin.UserName(userName),
+		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
+		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		PublicKey: publicKey,
+	}
+	err = key.Put(user)
 	if err != nil {
 		panic(err)
 	}
-	if key == "" {
-		key = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	_, err = dir.MakeDirectory(upspin.PathName(userName))
+	if err != nil {
+		panic(err)
 	}
-	user.(*inprocess.Service).SetPublicKeys(userName, []upspin.PublicKey{key})
 	return context
 }
 

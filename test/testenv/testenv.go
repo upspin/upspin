@@ -168,10 +168,6 @@ func innerNewUser(op string, userName upspin.UserName, setup *Setup) (upspin.Cli
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
-	err = installUserRoot(context)
-	if err != nil {
-		return nil, nil, errors.E(op, err)
-	}
 	return client, context, nil
 }
 
@@ -228,24 +224,23 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the inprocess user service
+// newContextForUser adds a new user to the inprocess key service
 // and returns a partially filled Context.
 func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, error) {
-	context := context.New().SetUserName(userName).SetPacking(setup.Packing)
-
-	endpointInProcess := upspin.Endpoint{
+	inProcess := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	user, err := bind.KeyServer(context, endpointInProcess)
+	context := context.New().SetUserName(userName).SetPacking(setup.Packing).SetKeyEndpoint(inProcess).SetDirEndpoint(inProcess).SetStoreEndpoint(inProcess)
+
+	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		return nil, err
 	}
-	testKey, ok := user.(*inprocess.Service)
-	if !ok {
+	if _, ok := key.(*inprocess.Service); !ok { // TODO: Needless check?
 		return nil, errors.Str("key service must be the in-process instance")
 	}
-	// Set the public key for the registered user.
+	// Install the registered user.
 	j := strings.IndexByte(string(userName), '@')
 	if j < 0 {
 		log.Fatal("malformed userName ", userName)
@@ -254,23 +249,18 @@ func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, 
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %q: %q", string(userName[:j]), err)
 	}
-	testKey.SetPublicKeys(userName, []upspin.PublicKey{f.PublicKey()})
+	user := &upspin.User{
+		Name:      userName,
+		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
+		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		PublicKey: f.PublicKey(),
+	}
+	err = key.Put(user)
+	if err != nil {
+		panic(err)
+	}
 	context.SetFactotum(f)
 	return context, nil
-}
-
-// installUserRoot installs a root dir for the user in the context, but does not create the root dir.
-func installUserRoot(context upspin.Context) error {
-	user, err := bind.KeyServer(context, context.KeyEndpoint())
-	if err != nil {
-		return err
-	}
-	testKey, ok := user.(*inprocess.Service)
-	if !ok {
-		return errors.Str("user service must be the in-process instance")
-	}
-	testKey.AddRoot(context.UserName(), context.DirEndpoint())
-	return nil
 }
 
 func makeRoot(context upspin.Context) error {

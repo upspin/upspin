@@ -10,8 +10,8 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/valid"
 )
 
 // Service maps user names to potential machines holding root of the user's tree.
@@ -27,9 +27,8 @@ type Service struct {
 // There is one instance, created in init, shared by all Service objects.
 type database struct {
 	// mu protects the fields below.
-	mu       sync.RWMutex
-	root     map[upspin.UserName][]upspin.Endpoint
-	keystore map[upspin.UserName]upspin.PublicKey
+	mu    sync.RWMutex
+	users map[upspin.UserName]*upspin.User
 }
 
 var _ upspin.KeyServer = (*Service)(nil)
@@ -40,99 +39,41 @@ var db *database
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *Service) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "Lookup"
+	if err := valid.UserName(name); err != nil {
+		return nil, errors.E(op, err)
+	}
+
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	// Return copies so the caller can't modify our data structures.
-
-	u := &upspin.User{
-		Name:      name,
-		Dirs:      append([]upspin.Endpoint{}, db.root[name]...),
-		PublicKey: db.keystore[name],
-		Stores:    []upspin.Endpoint{},
+	user, ok := db.users[name]
+	if !ok {
+		return nil, errors.E(op, name, errors.NotExist)
 	}
-	return u, nil
+
+	return dup(user), nil
+}
+
+// dup creates a copy of the User structure so the caller cannot change our data structures.
+func dup(u *upspin.User) *upspin.User {
+	v := *u
+	// The slices need to be copied.
+	v.Dirs = make([]upspin.Endpoint, len(u.Dirs))
+	copy(v.Dirs, u.Dirs)
+	v.Stores = make([]upspin.Endpoint, len(u.Stores))
+	copy(v.Stores, u.Stores)
+	return &v
 }
 
 // Put implements upspin.KeyServer.
 func (s *Service) Put(user *upspin.User) error {
-	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
-}
-
-// SetPublicKeys sets a slice of public keys to the keystore for a
-// given user name. Previously-known keys for that user are
-// forgotten. To add keys to the existing set, Lookup and append to
-// the slice. If keys is nil, the user is forgotten.
-// TODO: remove and use Put everywhere instead.
-func (s *Service) SetPublicKeys(name upspin.UserName, keys []upspin.PublicKey) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	if keys == nil {
-		delete(db.keystore, name)
-	} else {
-		db.keystore[name] = keys[0]
+	const op = "Put"
+	if err := valid.User(user); err != nil {
+		return errors.E(op, err)
 	}
-}
-
-// ListUsers returns a slice of all known users with at least one public key.
-func (s *Service) ListUsers() []upspin.UserName {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	users := make([]upspin.UserName, 0, len(db.keystore))
-	for u := range db.keystore {
-		users = append(users, u)
-	}
-	return users
-}
-
-// validateUserName returns a parsed path if the username is valid.
-func validateUserName(op string, name upspin.UserName) (*path.Parsed, error) {
-	parsed, err := path.Parse(upspin.PathName(name))
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	if !parsed.IsRoot() {
-		return nil, errors.E(op, errors.Invalid, name, errors.Str("not a valid user name"))
-	}
-	return &parsed, nil
-}
-
-// Install installs a user and its.db.root in the provided DirServer.
-// For a real KeyServer, this would be done by some offline
-// administrative procedure. For this test version, we just provide a
-// simple hook for testing.
-func (s *Service) Install(name upspin.UserName, dir upspin.DirServer) error {
-	// Verify that it is a valid name.
-	parsed, err := validateUserName("Install", name)
-	if err != nil {
-		return err
-	}
-	entry, err := dir.MakeDirectory(upspin.PathName(parsed.User() + "/"))
-	if err != nil {
-		return err
-	}
-	if len(entry.Blocks) == 0 {
-		return errors.E("Install", name, errors.Str("Directory has no location"))
-	}
-	s.addRoot(parsed.User(), entry.Blocks[0].Location.Endpoint)
-	return nil
-}
-
-// addRoot adds a root for the user, which must be a parsed, valid Upspin user name.
-func (s *Service) addRoot(userName upspin.UserName, endpoint upspin.Endpoint) {
-	db.mu.Lock()
-	db.root[userName] = append(db.root[userName], endpoint)
-	db.mu.Unlock()
-}
-
-// AddRoot adds an endpoint as the user's.db.root endpoint.
-// TODO: remove and use Put everywhere instead.
-func (s *Service) AddRoot(name upspin.UserName, endpoint upspin.Endpoint) error {
-	// Verify that it is a valid name.
-	parsed, err := validateUserName("AddRoot", name)
-	if err != nil {
-		return err
-	}
-	s.addRoot(parsed.User(), endpoint)
+	db.users[user.Name] = dup(user)
 	return nil
 }
 
@@ -174,8 +115,7 @@ func (s *Service) Authenticate(upspin.Context) error {
 
 func init() {
 	db = &database{
-		root:     make(map[upspin.UserName][]upspin.Endpoint),
-		keystore: make(map[upspin.UserName]upspin.PublicKey),
+		users: make(map[upspin.UserName]*upspin.User),
 	}
 
 	bind.RegisterKeyServer(upspin.InProcess, &Service{})

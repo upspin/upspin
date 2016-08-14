@@ -13,9 +13,9 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	"upspin.io/key/inprocess"
 	"upspin.io/upspin"
 
+	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/store/inprocess"
 )
@@ -352,17 +352,31 @@ func newConfigForTesting(t *testing.T) *Config {
 		SetKeyEndpoint(endpointInProcess).
 		SetPacking(upspin.EEPack)
 	key := context.KeyServer()
-	testKey, ok := key.(*inprocess.Service)
-	if !ok {
-		t.Fatal(err)
-	}
 	// Set the public key for the tree, since it must do Auth against the Store.
-	testKey.SetPublicKeys(serverName, []upspin.PublicKey{factotum.PublicKey()})
+	user := &upspin.User{
+		Name:      serverName,
+		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
+		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		PublicKey: factotum.PublicKey(),
+	}
+	err = key.Put(user)
+	if err != nil {
+		panic(err)
+	}
 
 	// Set the public key for the user, since EE Pack requires the dir owner to have a wrapped key.
 	// TODO: re-think this for directories, but probably correct as-is because if the dir server goes
 	// rogue or fails, the user can always run a dir server locally as himself and retrieve dir blocks.
-	testKey.SetPublicKeys(userName, []upspin.PublicKey{factotum.PublicKey()})
+	user = &upspin.User{
+		Name:      userName,
+		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
+		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		PublicKey: factotum.PublicKey(),
+	}
+	err = key.Put(user)
+	if err != nil {
+		panic(err)
+	}
 
 	return &Config{
 		Context: context,
