@@ -38,24 +38,32 @@ func New(context upspin.Context) upspin.Client {
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
-	return c.put(name, data, upspin.AttrNone)
+	return c.put(name, data, upspin.AttrNone, "")
 }
 
 // PutLink implements upspin.Client.
 func (c *Client) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("PutLink", errors.Str("unimplemented"))
+	return c.put(newName, nil, upspin.AttrLink, oldName)
 }
 
-func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute) (*upspin.DirEntry, error) {
+func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute, link upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Put"
 	dir, err := c.DirServer(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
-	_, err = path.Parse(name)
+	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, err)
+	}
+	name = parsed.Path() // Make sure it's clean.
+	if attr == upspin.AttrLink {
+		parsed, err := path.Parse(link)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		link = parsed.Path() // Make sure it's clean.
 	}
 
 	var packer upspin.Packer
@@ -76,6 +84,7 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute) (
 		Time:     upspin.Now(),
 		Sequence: 0, // Don't care for now.
 		Writer:   c.context.UserName(),
+		Link:     link,
 		Attr:     attr,
 	}
 
@@ -114,7 +123,7 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute) (
 		return nil, errors.E(op, err)
 	}
 
-	if packer.Packing() == upspin.EEPack {
+	if packer.Packing() == upspin.EEPack && attr == upspin.AttrNone {
 		// For EE, update the packing for the other
 		// readers as specified by the Access file.
 		if err := c.addReaders(de, name, packer); err != nil {
@@ -207,7 +216,11 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	}
 	entry, err := dir.Lookup(name)
 	if err != nil {
+		// TODO: implement links.
 		return nil, errors.E(op, err)
+	}
+	if entry.IsDir() {
+		return nil, errors.E(op, name, errors.IsDir)
 	}
 
 	// firstError remembers the first error we saw. If we fail completely we return it.
@@ -326,7 +339,7 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 		}
 	}
 	if err == nil {
-		err = errors.Errorf("client: no endpoint for user %q", parsed.User())
+		err = errors.Errorf("client: no DirServer endpoint for user %q", parsed.User())
 	}
 	return nil, err
 }

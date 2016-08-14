@@ -69,16 +69,22 @@ func main() {
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
-		testKey, ok := key.(*inprocess.Service)
-		if !ok {
-			log.Debug.Fatal("key server not a inprocess.Service")
+		if _, ok := key.(*inprocess.Service); !ok {
+			log.Fatal("key server not a inprocess.Service")
 		}
-
-		dir, err := bind.DirServer(context, context.DirEndpoint())
-		if err != nil {
+		// Validate context.
+		if _, err = bind.DirServer(context, context.DirEndpoint()); err != nil {
 			log.Debug.Fatal(err)
 		}
-		if err := testKey.Install(upspin.UserName(*testFlag), dir); err != nil {
+		if _, err := bind.StoreServer(context, context.StoreEndpoint()); err != nil {
+			log.Debug.Fatal(err)
+		}
+		user := &upspin.User{
+			Name:   upspin.UserName(*testFlag),
+			Dirs:   []upspin.Endpoint{context.DirEndpoint()},
+			Stores: []upspin.Endpoint{context.StoreEndpoint()},
+		}
+		if err := key.Put(user); err != nil {
 			log.Debug.Print(err)
 		}
 	}

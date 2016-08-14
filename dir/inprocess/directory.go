@@ -24,6 +24,7 @@ import (
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/valid"
 
 	_ "upspin.io/pack/debug" // Used to pack directory entries.
 	_ "upspin.io/pack/plain"
@@ -185,12 +186,13 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry
 // TODO: implement links.
 func (s *Service) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const Put = "Put"
+	if err := valid.DirEntry(entry); err != nil {
+		return nil, errors.E(Put, err)
+	}
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(Put, err)
 	}
-	// Use the clean name, in case the caller forgot.
-	entry.Name = parsed.Path()
 	canCreate, err := s.can(access.Create, parsed)
 	if err != nil {
 		return nil, errors.E(Put, err)
@@ -236,7 +238,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin
 	rootEntry, ok := s.db.root[parsed.User()]
 	if !ok {
 		// Cannot create user root with Put.
-		return nil, errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user"))
+		return nil, errors.E(op, upspin.PathName(parsed.User()), errors.Str("no such user root"))
 	}
 	// Iterate along the path up to but not past the last element.
 	// We remember the entries as we descend for fast(er) overwrite of the Merkle tree.

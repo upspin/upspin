@@ -34,8 +34,8 @@ const (
 )
 
 var (
-	userEndpoint  = upspin.Endpoint{Transport: upspin.InProcess}
-	globalContext = context.New().SetUserName(userName).SetPacking(upspin.DebugPack).SetKeyEndpoint(userEndpoint)
+	inProcess     = upspin.Endpoint{Transport: upspin.InProcess}
+	globalContext = context.New().SetUserName(userName).SetPacking(upspin.DebugPack).SetKeyEndpoint(inProcess)
 )
 
 // The values returned by PackLen and UnpackLen should be exact,
@@ -134,15 +134,23 @@ func TestPack(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	user, err := bind.KeyServer(globalContext, userEndpoint)
+	key, err := bind.KeyServer(globalContext, inProcess)
 	if err != nil {
 		log.Fatalf("error binding user: %v", err)
 	}
-	testkey, ok := user.(*inprocess.Service)
-	if !ok {
+	if _, ok := key.(*inprocess.Service); !ok {
 		panic("not a test KeyServer")
 	}
-	testkey.SetPublicKeys(userName, []upspin.PublicKey{"a key"})
+	user := &upspin.User{
+		Name:      userName,
+		Dirs:      []upspin.Endpoint{inProcess},
+		Stores:    []upspin.Endpoint{inProcess},
+		PublicKey: "a key",
+	}
+	err = key.Put(user)
+	if err != nil {
+		panic(err)
+	}
 	os.Exit(m.Run())
 }
 
