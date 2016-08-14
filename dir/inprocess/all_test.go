@@ -20,11 +20,11 @@ import (
 	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
-	"upspin.io/key/inprocess"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
@@ -38,7 +38,7 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
+func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -46,7 +46,7 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 
 	ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
 	var err error
-	user, err = bind.KeyServer(ctx, endpoint)
+	key, err = bind.KeyServer(ctx, endpoint)
 	if err != nil {
 		panic(err)
 	}
@@ -62,13 +62,23 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, user upspi
 }
 
 func setup() (upspin.Context, upspin.DirServer) {
-	context, user, dir, _ := newContextAndServices(nextUser())
-	err := user.(*inprocess.Service).Install(context.UserName(), dir)
+	userName := nextUser()
+	context, key, dir, _ := newContextAndServices(userName)
+	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	user := &upspin.User{
+		Name:      upspin.UserName(userName),
+		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
+		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		PublicKey: publicKey,
+	}
+	err := key.Put(user)
 	if err != nil {
 		panic(err)
 	}
-	key := upspin.PublicKey(fmt.Sprintf("key for %s", context.UserName()))
-	user.(*inprocess.Service).SetPublicKeys(context.UserName(), []upspin.PublicKey{key})
+	_, err = dir.MakeDirectory(upspin.PathName(userName))
+	if err != nil {
+		panic(err)
+	}
 	return context, dir
 }
 

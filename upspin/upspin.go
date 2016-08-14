@@ -269,7 +269,7 @@ type DirServer interface {
 	// If the returned error is ErrFollowLink, the caller should
 	// retry the operation as outlined in the description for
 	// ErrFollowLink. Otherwise in the case of error the
-	// returnd DirEntry will be nil.
+	// returned DirEntry will be nil.
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put has the directory service record that the specified DirEntry

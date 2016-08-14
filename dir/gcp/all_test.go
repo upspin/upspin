@@ -229,11 +229,10 @@ func TestLookupWithoutReadRights(t *testing.T) {
 
 	dirJSON := toJSON(t, dir)
 
-	// Default, zero Location is the expected answer.
-	expect := dir                                                 // copy
-	expect.Blocks = append([]upspin.DirBlock(nil), dir.Blocks...) // copy
-	expect.Blocks[0].Location = upspin.Location{}                 // Zero location
-	expect.Packdata = nil                                         // No pack data either
+	// Default, no blocks is the expected answer.
+	expect := dir // copy
+	expect.Blocks = nil
+	expect.Packdata = nil // No pack data either
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
@@ -382,8 +381,8 @@ func TestGlobSimple(t *testing.T) {
 	// same list, but without the location in them.
 	ds.context.SetUserName("listerdude@me.com")
 	// Location and Packdata are anonymized.
-	dir1.Blocks[0].Location = upspin.Location{}
-	dir2.Blocks[0].Location = upspin.Location{}
+	dir1.Blocks = nil
+	dir2.Blocks = nil
 	dir1.Packdata = nil
 	dir2.Packdata = nil
 	expect = []*upspin.DirEntry{&dir1, &dir2} // new expected response does not have Location.
