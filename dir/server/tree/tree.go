@@ -98,18 +98,3 @@ type LogIndex interface {
 	// SaveOffset saves to stable storage the offset to process next.
 	SaveOffset(int64) error
 }
-
-// Config configures the behavior of the Tree.
-type Config struct {
-	// Context is a server context. It is used for contacting StoreServer,
-	// defining the default packing and setting the server name. The only
-	// field in Context that is not needed directly or indirectly is the
-	// directory endpoint. Everything else is required.
-	Context upspin.Context
-
-	// Log manipulates the log on behalf of the tree.
-	Log Log
-
-	// LogIndex is used by Tree to track the most recent changes stored in the log.
-	LogIndex LogIndex
-}

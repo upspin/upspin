@@ -18,6 +18,7 @@ import (
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/valid"
 )
 
 // node is an internal representation of a node in the tree.
@@ -63,41 +64,71 @@ func (n *node) String() string {
 	return fmt.Sprintf("node: %q, dirty: %v, kids: %d", n.entry.Name, n.dirty, len(n.kids))
 }
 
-// New creates an empty Tree for a user.
-func New(user upspin.UserName, cfg *Config) Tree {
-	// TODO: split error cases and maybe return an error too.
-	if cfg == nil || cfg.Log == nil ||
-		cfg.Context.StoreEndpoint().Transport == upspin.Unassigned ||
-		cfg.Context.Factotum() == nil || cfg.Context.UserName() == "" ||
-		cfg.Context.KeyEndpoint().Transport == upspin.Unassigned {
-		log.Error.Printf("Tree.New: Invalid config for user %q: %v", user, cfg)
-		return nil
+// New creates an empty Tree using the server's context, a Log and a
+// LogIndex for a particular user. Context is used for contacting StoreServer,
+// defining the default packing and setting the server name. The only field
+// in Context that is not needed is the directory endpoint. Everything else
+// is required. Log manipulates the log on behalf of the tree for a user.
+// LogIndex is used by Tree to track the most recent changes stored in
+// the log for the user. The user name in Log and LogIndex must match.
+// If there are unprocessed log entries in the Log, the Tree's state is
+// recovered from it.
+func New(context upspin.Context, log Log, logIndex LogIndex) (Tree, error) {
+	const op = "tree.New"
+	if context == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("context is nil"))
 	}
-	packer := pack.Lookup(cfg.Context.Packing())
+	if log == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("log is nil"))
+	}
+	if logIndex == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("logIndex is nil"))
+	}
+	if context.StoreEndpoint().Transport == upspin.Unassigned {
+		return nil, errors.E(op, errors.Invalid, errors.Str("unassigned store endpoint"))
+	}
+	if context.KeyEndpoint().Transport == upspin.Unassigned {
+		return nil, errors.E(op, errors.Invalid, errors.Str("unassigned key endpoint"))
+	}
+	if context.Factotum() == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("factotum is nil"))
+	}
+	if context.UserName() == "" {
+		return nil, errors.E(op, errors.Invalid, errors.Str("username in tree context is empty"))
+	}
+	if log.User() == "" {
+		return nil, errors.E(op, errors.Invalid, errors.Str("username in log is empty"))
+	}
+	if log.User() != logIndex.User() {
+		return nil, errors.E(op, errors.Invalid, errors.Str("username in log and logIndex mismatch"))
+	}
+	if err := valid.UserName(log.User()); err != nil {
+		return nil, errors.E(op, errors.Invalid, err)
+	}
+	packer := pack.Lookup(context.Packing())
 	if packer == nil {
-		log.Error.Printf("no packing %s registered", cfg.Context.Packing())
-		return nil
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("no packing %s registered", context.Packing()))
 	}
 	t := &tree{
-		user:     user,
-		context:  cfg.Context.Copy(),
+		user:     log.User(),
+		context:  context.Copy(),
 		packer:   packer,
-		log:      cfg.Log,
-		logIndex: cfg.LogIndex,
+		log:      log,
+		logIndex: logIndex,
 	}
 	// Do we have entries in the log to process, to recover from a crash?
 	err := t.recoverFromLog()
 	if err != nil {
-		return nil
+		return nil, errors.E(op, err)
 	}
-	return t
+	return t, nil
 }
 
 // Lookup returns a directory entry that represents the path.
 // Dirty reports whether the entry is different from the stored version.
 // The returned entry's references are not up-to-date if the entry is dirty.
 func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
-	const op = "Lookup"
+	const op = "tree.Lookup"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -115,7 +146,7 @@ func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, er
 // Put puts a DirEntry to the Store. Files may be overwritten,
 // but attempts to put an existing directory will return an error.
 func (t *tree) Put(de *upspin.DirEntry) error {
-	const op = "Put"
+	const op = "tree.Put"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -142,7 +173,7 @@ func (t *tree) Put(de *upspin.DirEntry) error {
 // can be used to recover the Tree's state from the log.
 // t.mu must be held.
 func (t *tree) put(p path.Parsed, de *upspin.DirEntry) error {
-	const op = "Put"
+	const op = "tree.put"
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
@@ -212,6 +243,10 @@ func (t *tree) markDirty(p path.Parsed) error {
 		n, err = t.loadNode(n, elem)
 		if err != nil {
 			return err
+		}
+		// Non-directory entries are never dirty, only their parents.
+		if !n.entry.IsDir() {
+			continue
 		}
 		t.setNodeDirtyAt(i+1, n)
 	}
@@ -343,7 +378,7 @@ func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 
 // Delete deletes the DirEntry associated with name.
 func (t *tree) Delete(name upspin.PathName) error {
-	const op = "Delete"
+	const op = "tree.Delete"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -362,7 +397,7 @@ func (t *tree) Delete(name upspin.PathName) error {
 // so it can be used to recover from the Tree's state from the log.
 // t.mu must be held.
 func (t *tree) delete(p path.Parsed) (*node, error) {
-	const op = "Delete"
+	const op = "tree.delete"
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
 	if err != nil {
@@ -412,7 +447,7 @@ func (t *tree) removeFromDirtyList(p path.Parsed, n *node) {
 
 // Flush flushes all dirty entries.
 func (t *tree) Flush() error {
-	const op = "Flush"
+	const op = "tree.Flush"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -446,7 +481,7 @@ func (t *tree) Flush() error {
 
 // Close flushes the Tree to the Store and releases all resources.
 func (t *tree) Close() error {
-	const Close = "Close"
+	const Close = "tree.Close"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
