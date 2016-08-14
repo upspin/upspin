@@ -509,14 +509,7 @@ func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
 		}
 		if e.IsLink() {
 			attrChar = '>'
-			data, err := c.Get(e.Name)
-			if err == nil {
-				redirect = " -> " + string(data)
-			} else {
-				fmt.Fprintf(os.Stderr, "fetching redirect for %q: %s\n", e.Name, err)
-				redirect = " (error fetching redirect)"
-			}
-
+			redirect = " -> " + string(e.Link)
 		}
 		endpt := ""
 		for i := range e.Blocks {
