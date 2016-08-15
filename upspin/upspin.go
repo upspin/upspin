@@ -45,6 +45,9 @@ const (
 	// HTTPS indicates that contents are stored at regular web services that
 	// speak the HTTPS protocol.
 	HTTPS
+
+	// Cloud indicates a server running on the cloud.
+	Cloud
 )
 
 // A Location identifies where a piece of data is stored and how to retrieve it.
