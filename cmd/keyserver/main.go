@@ -70,15 +70,18 @@ func main() {
 
 	// Create a new store implementation.
 	var key upspin.KeyServer
+	var err error
 	switch flags.ServerKind {
 	case "inprocess":
 		key = inprocess.New()
 	case "gcp":
-		var err error
 		key, err = gcp.New(flags.Config...)
-		if err != nil {
-			log.Fatalf("Setting up KeyServer: %v", err)
-		}
+	default:
+		err = errors.Errorf("bad -kind %q", flags.ServerKind)
+
+	}
+	if err != nil {
+		log.Fatalf("Setting up KeyServer: %v", err)
 	}
 
 	s := &Server{

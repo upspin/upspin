@@ -13,6 +13,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
+	"upspin.io/dir/filesystem"
 	"upspin.io/dir/gcp"
 	"upspin.io/dir/inprocess"
 	"upspin.io/errors"
@@ -79,15 +80,19 @@ func main() {
 
 	// Create a new store implementation.
 	var dir upspin.DirServer
+	err = nil
 	switch flags.ServerKind {
 	case "inprocess":
 		dir = inprocess.New(ctx)
 	case "gcp":
-		var err error
 		dir, err = gcp.New(ctx, flags.Config...)
-		if err != nil {
-			log.Fatalf("Setting up DirServer: %v", err)
-		}
+	case "filesystem":
+		dir, err = filesystem.New(ctx, flags.Config...)
+	default:
+		err = errors.Errorf("bad -kind %q", flags.ServerKind)
+	}
+	if err != nil {
+		log.Fatalf("Setting up DirServer: %v", err)
 	}
 
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
@@ -124,7 +129,10 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	u := session.User()
+	c := s.context.Copy().SetUserName(u)
+	ep := s.endpoint
+	svc, err := s.dir.Dial(c, ep)
 	return svc.(upspin.DirServer), nil
 }
 
