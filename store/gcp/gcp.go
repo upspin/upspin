@@ -14,9 +14,7 @@ import (
 	"strings"
 	"sync"
 
-	"upspin.io/bind"
 	"upspin.io/cloud/storage"
-	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
@@ -35,30 +33,47 @@ const (
 	ConfigTemporaryDir = "gcpTemporaryDir"
 )
 
-var (
-	errNotConfigured = errors.E(errors.Invalid, errors.Str("GCP StoreServer not configured"))
-)
-
-// Server implements upspin.StoreServer.
+// server implements upspin.StoreServer.
 type server struct {
-	context  upspin.Context
-	endpoint upspin.Endpoint
+	mu       sync.RWMutex // Protects fields below.
+	refCount uint64       // How many clones of us exist.
+	storage  storage.Storage
+	cache    *cache.FileCache
 }
 
 var _ upspin.StoreServer = (*server)(nil)
 
-var (
-	mu          sync.RWMutex // Protects fields below.
-	refCount    uint64       // How many clones of us exist.
-	cloudClient storage.Storage
-	fileCache   *cache.FileCache
-)
+// New returns a StoreServer that serves the given endpoint with the provided options.
+func New(options ...string) (upspin.StoreServer, error) {
+	const op = "gcp.New"
 
-// New returns a new, unconfigured StoreServer bound to the user in the context.
-func New(context upspin.Context) upspin.StoreServer {
-	return &server{
-		context: context.Copy(), // Make a copy to prevent user making further changes.
+	var dialOpts []storage.DialOpts
+	var tempDir string
+	for _, option := range options {
+		// Parse all options we understand.
+		// What we don't understand we pass it down to the storage.
+		switch {
+		case strings.HasPrefix(option, ConfigTemporaryDir):
+			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
+		default:
+			dialOpts = append(dialOpts, storage.WithOptions(option))
+		}
 	}
+
+	s, err := storage.Dial("GCS", dialOpts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	c := cache.NewFileCache(tempDir)
+	if c == nil {
+		return nil, errors.E(op, errors.Str("filecache failed to create temp directory"))
+	}
+	log.Debug.Printf("Configured GCP store: %v", options)
+
+	return &server{
+		storage: s,
+		cache:   c,
+	}, nil
 }
 
 // Put implements upspin.StoreServer.
@@ -66,42 +81,38 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	const Put = "Put"
 	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
-	mu.RLock()
-	if !s.isConfigured() {
-		return "", errors.E(Put, errNotConfigured)
-	}
+	s.mu.RLock()
 	sha := sha256key.NewShaReader(reader)
-	initialRef := fileCache.RandomRef()
-	err := fileCache.Put(initialRef, sha)
+	initialRef := s.cache.RandomRef()
+	err := s.cache.Put(initialRef, sha)
 	if err != nil {
-		mu.RUnlock()
+		s.mu.RUnlock()
 		return "", errors.E(Put, err)
 	}
 	// Figure out the appropriate reference for this blob.
 	ref := sha.EncodedSum()
 
 	// Rename it in the cache
-	fileCache.Rename(ref, initialRef)
+	s.cache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
 	go func() {
-		if _, err := cloudClient.PutLocalFile(fileCache.GetFileLocation(ref), ref); err == nil {
+		if _, err := s.storage.PutLocalFile(s.cache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
 			// compared with our much better-provisioned
 			// storage backend.  This is safe to do
 			// because FileCache is thread safe.
-			fileCache.Purge(ref)
+			s.cache.Purge(ref)
 		}
-		mu.RUnlock()
+		s.mu.RUnlock()
 	}()
 	return upspin.Reference(ref), nil
 }
 
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	fmt.Printf("context is %v\n", s.context)
-	file, loc, err := s.innerGet(s.context.UserName(), ref)
+	file, loc, err := s.innerGet(ref)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -119,14 +130,11 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // innerGet gets a local file descriptor or a new location for the reference. It returns only one of the two return
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
-func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
 	const Get = "Get"
-	mu.RLock()
-	defer mu.RUnlock()
-	if !s.isConfigured() {
-		return nil, upspin.Location{}, errors.E(Get, errNotConfigured)
-	}
-	file, err = fileCache.OpenRefForRead(string(ref))
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	file, err = s.cache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
 		log.Debug.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
@@ -135,7 +143,7 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 
 	// File is not local, try to get it from our storage.
 	var link string
-	link, err = cloudClient.Get(string(ref))
+	link, err = s.storage.Get(string(ref))
 	if err != nil {
 		err = errors.E(Get, err)
 		return
@@ -165,13 +173,10 @@ func (s *server) innerGet(userName upspin.UserName, ref upspin.Reference) (file 
 // Delete implements upspin.StoreServer.
 func (s *server) Delete(ref upspin.Reference) error {
 	const Delete = "Delete"
-	mu.RLock()
-	defer mu.RUnlock()
-	if !s.isConfigured() {
-		return errors.E(Delete, errNotConfigured)
-	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	// TODO: verify ownership and proper ACLs to delete blob
-	err := cloudClient.Delete(string(ref))
+	err := s.storage.Delete(string(ref))
 	if err != nil {
 		return errors.E(Delete, errors.Errorf("%s: %s", ref, err))
 	}
@@ -180,55 +185,10 @@ func (s *server) Delete(ref upspin.Reference) error {
 
 // Dial implements upspin.Service.
 func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	if e.Transport != upspin.GCP {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
-	}
-
-	mu.Lock()
-	defer mu.Unlock()
-	refCount++
-
-	this := *s                    // Clone ourselves.
-	this.context = context.Copy() // Make a copy of the context, to prevent changes.
-	this.endpoint = e
-	return &this, nil
-}
-
-// Configure configures the connection to the backing store (namely, GCP) once the service
-// has been dialed. The details of the configuration are explained at the package comments.
-func (s *server) Configure(options ...string) error {
-	const Configure = "Configure"
-	tempDir := ""
-	var dialOpts []storage.DialOpts
-	for _, option := range options {
-		// Parse all options we understand. What we don't understand we pass it down to the storage.
-		switch {
-		case strings.HasPrefix(option, ConfigTemporaryDir):
-			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
-		default:
-			dialOpts = append(dialOpts, storage.WithOptions(option))
-		}
-	}
-	mu.Lock()
-	defer mu.Unlock()
-
-	var err error
-	cloudClient, err = storage.Dial("GCS", dialOpts...)
-	if err != nil {
-		return errors.E(Configure, err)
-	}
-	fileCache = cache.NewFileCache(tempDir)
-	if fileCache == nil {
-		return errors.E(Configure, errors.Str("filecache failed to create temp directory"))
-	}
-	log.Debug.Printf("Configured GCP store: %v", options)
-	return nil
-}
-
-// isConfigured returns whether this server is configured properly.
-// It must be called with mu read locked.
-func (s *server) isConfigured() bool {
-	return cloudClient != nil && fileCache != nil
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.refCount++
+	return s, nil
 }
 
 // Ping implements upspin.Service.
@@ -238,39 +198,38 @@ func (s *server) Ping() bool {
 
 // Close implements upspin.Service.
 func (s *server) Close() {
-	mu.Lock()
-	defer mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if refCount == 0 {
+	if s.refCount == 0 {
 		log.Error.Printf("Closing non-dialed gcp store")
 		return
 	}
-	refCount--
+	s.refCount--
 
-	if refCount == 0 {
-		if cloudClient != nil {
-			cloudClient.Close()
+	if s.refCount == 0 {
+		if s.storage != nil {
+			s.storage.Close()
 		}
-		cloudClient = nil
-		if fileCache != nil {
-			fileCache.Delete()
+		s.storage = nil
+		if s.cache != nil {
+			s.cache.Delete()
 		}
-		fileCache = nil
-		// Do other cleanups here.
+		s.cache = nil
 	}
 }
 
 // Authenticate implements upspin.Service.
 func (s *server) Authenticate(upspin.Context) error {
-	// Authentication is not dealt here. It happens at other layers.
-	return nil
+	return errors.Str("store/gcp: Authenticate should not be called")
+}
+
+// Configure implements upspin.Service.
+func (s *server) Configure(options ...string) error {
+	return errors.Str("store/gcp: Configure should not be called")
 }
 
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
-	return s.endpoint
-}
-
-func init() {
-	bind.RegisterStoreServer(upspin.GCP, New(context.New()))
+	return upspin.Endpoint{} // No endpoint.
 }

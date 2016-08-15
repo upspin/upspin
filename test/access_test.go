@@ -109,7 +109,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
 		Packing:   packing,
-		Transport: upspin.InProcess,
+		Kind:      "inprocess",
 		Tree: testenv.Tree{
 			testenv.E(groupDir+"/", success),
 			testenv.E(publicDir+"/", success),
@@ -232,7 +232,7 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 	testSetup := &testenv.Setup{
 		OwnerName: upspin.UserName(owner),
 		Packing:   packing,
-		Transport: upspin.InProcess,
+		Kind:      "inprocess",
 		Tree: testenv.Tree{
 			testenv.E(publicDir+"/", success),
 			testenv.E(publicFile, contentsOfPublic),
