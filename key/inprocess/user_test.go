@@ -42,7 +42,7 @@ func setup(t *testing.T) upspin.KeyServer {
 
 func TestInstallAndLookup(t *testing.T) {
 	key := setup(t)
-	if _, ok := key.(*Service); !ok {
+	if _, ok := key.(*server); !ok {
 		t.Fatal("Not an inprocess KeyServer")
 	}
 

@@ -30,6 +30,18 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
+func New(context upspin.Context) upspin.DirServer {
+	return &server{
+		context: context,
+		db: &database{
+			dirContext: context,
+			root:       make(map[upspin.UserName]*upspin.DirEntry),
+			rootAccess: make(map[upspin.UserName]*access.Access),
+			access:     make(map[upspin.PathName]*access.Access),
+		},
+	}
+}
+
 // Used to store directory entries.
 // All directories are encoded with this packing.
 var (
@@ -37,9 +49,9 @@ var (
 	dirPacker  = pack.Lookup(dirPacking)
 )
 
-// Service implements the upspin.DirServer interface. It is a multiplexed
+// server implements the upspin.DirServer interface. It is a multiplexed
 // by user onto a database.
-type Service struct {
+type server struct {
 	upspin.NoConfiguration
 	// context holds the context that created the call.
 	context upspin.Context
@@ -48,8 +60,6 @@ type Service struct {
 
 // database represents the shared state of the directory forest.
 type database struct {
-	endpoint upspin.Endpoint
-
 	dirContext upspin.Context // For accessing store holding directory entries.
 
 	// mu is used to serialize access to the maps.
@@ -73,7 +83,7 @@ type database struct {
 	access map[upspin.PathName]*access.Access
 }
 
-var _ upspin.DirServer = (*Service)(nil)
+var _ upspin.DirServer = (*server)(nil)
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // This is the general form of the method that follows, used in the tests.
@@ -120,7 +130,7 @@ func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.Pat
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // It is called for directories only.
-func (s *Service) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) (*upspin.DirEntry, error) {
+func (s *server) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) (*upspin.DirEntry, error) {
 	return newDirEntry(s.db.dirContext, dirPacking, name, cleartext, upspin.AttrDirectory, seq)
 }
 
@@ -137,7 +147,7 @@ func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob [
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (s *Service) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
+func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
 	const MakeDirectory = "MakeDirectory"
 	// The name must end in / so parse will work, but adding one if it's already there
 	// is fine - the path is cleaned.
@@ -184,7 +194,7 @@ func (s *Service) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 // TODO: implement links.
-func (s *Service) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const Put = "Put"
 	if err := valid.DirEntry(entry); err != nil {
 		return nil, errors.E(Put, err)
@@ -226,7 +236,7 @@ func (s *Service) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 // If deleting, we expect the entry to already be present and skip it on the rewrite.
 // TODO: implement links.
 // TODO add Share?
-func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.DirEntry, error) {
+func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.DirEntry, error) {
 	parsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -304,7 +314,7 @@ func (s *Service) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
-func (s *Service) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const WhichAccess = "WhichAccess"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -333,7 +343,7 @@ func (s *Service) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error
 
 // whichAccess is the workings of WhichAccess, accepting a parsed path name
 // and returning a parsed access file.
-func (s *Service) whichAccess(parsed path.Parsed) *access.Access {
+func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 	for {
 		s.db.mu.RLock()
 		accessFile := s.db.access[parsed.Path()]
@@ -351,7 +361,7 @@ func (s *Service) whichAccess(parsed path.Parsed) *access.Access {
 }
 
 // readAll retrieves the data for the entry.
-func (s *Service) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
+func (s *server) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
 		return nil, errors.Errorf("no packing %#x registered", entry.Packing)
@@ -389,7 +399,7 @@ func (s *Service) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byt
 
 // Delete implements upspin.DirServer.Delete.
 // TODO: implement links.
-func (s *Service) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
+func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Delete = "Delete"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -423,7 +433,7 @@ func (s *Service) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return s.put(Delete, entry, true)
 }
 
-func (s *Service) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
+func (s *server) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
 	if !entry.IsDir() {
 		return false
 	}
@@ -435,7 +445,7 @@ func (s *Service) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
 }
 
 // Lookup implements upspin.DirServer.Lookup.
-func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Lookup = "Lookup"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -456,7 +466,7 @@ func (s *Service) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // lookup is the internal version of lookup; it does not do any Access checks.
-func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error) {
+func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error) {
 	s.db.mu.RLock()
 	defer s.db.mu.RUnlock()
 	dirEntry, ok := s.db.root[parsed.User()]
@@ -489,7 +499,7 @@ func (s *Service) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error
 
 // Glob implements upspin.DirServer.Glob.
 // TODO: Test access control for this method.
-func (s *Service) Glob(pattern string) ([]*upspin.DirEntry, error) {
+func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const Glob = "Glob"
 	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err != nil {
@@ -601,7 +611,7 @@ func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 // can reports whether the calling user (defined by s.context.UserName()) has the
 // access right for this file or directory.
 // s.db.mu is _not_ held.
-func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
+func (s *server) can(right access.Right, parsed path.Parsed) (bool, error) {
 	accessFile := s.whichAccess(parsed)
 	if accessFile == nil {
 		accessFile = s.rootAccessFile(parsed)
@@ -610,7 +620,7 @@ func (s *Service) can(right access.Right, parsed path.Parsed) (bool, error) {
 }
 
 // load is a helper for Access.Can that gets the entire contents of the named item.
-func (s *Service) load(name upspin.PathName) ([]byte, error) {
+func (s *server) load(name upspin.PathName) ([]byte, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, err
@@ -623,7 +633,7 @@ func (s *Service) load(name upspin.PathName) ([]byte, error) {
 }
 
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.
-func (s *Service) rootAccessFile(parsed path.Parsed) *access.Access {
+func (s *server) rootAccessFile(parsed path.Parsed) *access.Access {
 	s.db.mu.RLock()
 	accessFile := s.db.rootAccess[parsed.User()]
 	s.db.mu.RUnlock()
@@ -642,7 +652,7 @@ func (s *Service) rootAccessFile(parsed path.Parsed) *access.Access {
 
 // fetchEntry returns the reference for the named elem within the directory referenced by dirEntry.
 // It reads the whole directory, so avoid calling it repeatedly.
-func (s *Service) fetchEntry(op string, entry *upspin.DirEntry, elem string) (*upspin.DirEntry, error) {
+func (s *server) fetchEntry(op string, entry *upspin.DirEntry, elem string) (*upspin.DirEntry, error) {
 	payload, err := s.readAll(s.db.dirContext, entry)
 	if err != nil {
 		return nil, err
@@ -652,7 +662,7 @@ func (s *Service) fetchEntry(op string, entry *upspin.DirEntry, elem string) (*u
 
 // dirEntLookup returns the ref for the entry in the named directory whose contents are given in the payload.
 // The boolean is true if the entry itself describes a directory.
-func (s *Service) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (*upspin.DirEntry, error) {
+func (s *server) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (*upspin.DirEntry, error) {
 	if len(elem) == 0 {
 		return nil, errors.E(op, pathName, errors.E("empty path name element"))
 	}
@@ -677,7 +687,7 @@ var errSeq = errors.Str("sequence mismatch")
 
 // installEntry installs the new entry in the directory referenced by the dirEntry, appending or overwriting the
 // entry as required. It returns the entry updated directory and the blob itself.
-func (s *Service) installEntry(op string, dirName upspin.PathName, dirEntry *upspin.DirEntry, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (*upspin.DirEntry, []byte, error) {
+func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upspin.DirEntry, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (*upspin.DirEntry, []byte, error) {
 	dirData, err := s.readAll(s.db.dirContext, dirEntry)
 	if err != nil {
 		return nil, nil, err
@@ -745,7 +755,7 @@ func (s *Service) installEntry(op string, dirName upspin.PathName, dirEntry *ups
 }
 
 // DeleteAll implements upspin.DirServer.DeleteAll.
-func (s *Service) DeleteAll() {
+func (s *server) DeleteAll() {
 	s.db.mu.Lock()
 	s.db.root = make(map[upspin.UserName]*upspin.DirEntry)
 	s.db.access = make(map[upspin.PathName]*access.Access)
@@ -757,7 +767,7 @@ func (s *Service) DeleteAll() {
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	const Dial = "Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(Dial, errors.Invalid, errors.Str("unrecognized transport"))
@@ -769,7 +779,6 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 			return nil, errors.E(Dial, errors.Invalid, errors.Str("no user name"))
 		}
 		// This is the first call; set the owner and endpoint.
-		s.db.endpoint = e
 		s.db.dirContext = context
 		s.db.dialed = true
 	}
@@ -779,22 +788,25 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 }
 
 // Endpoint implements upspin.DirServer.Endpoint.
-func (s *Service) Endpoint() upspin.Endpoint {
-	return s.db.endpoint
+func (s *server) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // Ignored.
+	}
 }
 
 // Ping implements upspin.DirServer.Ping.
-func (s *Service) Ping() bool {
+func (s *server) Ping() bool {
 	return true
 }
 
-// Close implements upspin.Service.
-func (s *Service) Close() {
+// Close implements upspin.server.
+func (s *server) Close() {
 	// TODO
 }
 
-// Authenticate implements upspin.Service.
-func (s *Service) Authenticate(upspin.Context) error {
+// Authenticate implements upspin.server.
+func (s *server) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
 }
@@ -802,16 +814,5 @@ func (s *Service) Authenticate(upspin.Context) error {
 const transport = upspin.InProcess
 
 func init() {
-	s := &Service{
-		db: &database{
-			endpoint: upspin.Endpoint{
-				Transport: upspin.InProcess,
-				NetAddr:   "", // Ignored.
-			},
-			root:       make(map[upspin.UserName]*upspin.DirEntry),
-			rootAccess: make(map[upspin.UserName]*access.Access),
-			access:     make(map[upspin.PathName]*access.Access),
-		},
-	}
-	bind.RegisterDirServer(transport, s)
+	bind.RegisterDirServer(transport, New(nil))
 }

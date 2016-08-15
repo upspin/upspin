@@ -11,9 +11,10 @@ import (
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
-	"upspin.io/bind"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
+	"upspin.io/dir/gcp"
+	"upspin.io/dir/inprocess"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -38,8 +39,14 @@ import (
 
 // Server is a SecureServer that talks to a DirServer interface and serves gRPC requests.
 type Server struct {
-	context  upspin.Context
+	context upspin.Context
+
+	// What this server reports itself as through its Endpoint method.
 	endpoint upspin.Endpoint
+
+	// The underlying dirserver implementation.
+	dir upspin.DirServer
+
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
@@ -47,7 +54,7 @@ type Server struct {
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("config", "context", "endpoint", "https", "log", "project")
+	flags.Parse("addr", "config", "context", "https", "kind", "log", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -65,45 +72,37 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ctxfd.Close()
-	context, err := context.InitContext(ctxfd)
+	ctx, err := context.InitContext(ctxfd)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
-	if err != nil {
-		log.Fatalf("endpoint parse error: %v", err)
-	}
-
-	// Get an instance so we can configure it and use it for authenticated connections.
-	dir, err := bind.DirServer(context, *endpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// If there are configuration options, set them now.
-	if len(flags.Config) > 0 {
-		log.Printf("Configuring server with options: %v", flags.Config)
-		err = dir.Configure(flags.Config...)
+	// Create a new store implementation.
+	var dir upspin.DirServer
+	switch flags.ServerKind {
+	case "inprocess":
+		dir = inprocess.New(ctx)
+	case "gcp":
+		var err error
+		dir, err = gcp.New(ctx, flags.Config...)
 		if err != nil {
-			log.Fatal(err)
-		}
-		// Now this pre-configured DirServer is the one that will generate new instances.
-		err = bind.ReregisterDirServer(endpoint.Transport, dir)
-		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Setting up DirServer: %v", err)
 		}
 	}
 
-	config := auth.Config{Lookup: auth.PublicUserKeyService(context)}
+	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
 	grpcSecureServer, err := grpcauth.NewSecureServer(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := &Server{
-		context:      context,
+		context: ctx,
+		endpoint: upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   flags.NetAddr,
+		},
+		dir:          dir,
 		SecureServer: grpcSecureServer,
-		endpoint:     *endpoint,
 	}
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
@@ -125,8 +124,8 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := s.context.Copy().SetUserName(session.User())
-	return bind.DirServer(context, s.endpoint)
+	svc, err := s.dir.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	return svc.(upspin.DirServer), nil
 }
 
 // Lookup implements upspin.DirServer.

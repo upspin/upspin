@@ -10,9 +10,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/pack/ee"
-	_ "upspin.io/store/inprocess"
 )
 
 func TestInProcess(t *testing.T) {
@@ -23,7 +21,7 @@ func TestInProcess(t *testing.T) {
 	testSetup := &Setup{
 		OwnerName: upspin.UserName(userName),
 		Packing:   upspin.EEPack,
-		Transport: upspin.InProcess,
+		Kind:      "inprocess",
 		Tree: Tree{
 			E("Dir1/", ""),
 			E("Dir1/file1.txt", "yo! file1"),

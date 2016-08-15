@@ -12,10 +12,10 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
-	"upspin.io/key/inprocess"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
+	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
@@ -36,9 +36,6 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context 
 	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		panic(err)
-	}
-	if _, ok := key.(*inprocess.Service); !ok {
-		panic("key server not a inprocess.Service")
 	}
 	dir, err := bind.DirServer(context, context.DirEndpoint())
 	if err != nil {
