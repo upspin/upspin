@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -121,6 +122,13 @@ func TestLogIndex(t *testing.T) {
 	}
 	if got, want := logIndex.User(), user; got != want {
 		t.Errorf("logger.User = %q, want = %q", got, want)
+	}
+
+	// Read before write.
+	_, err = logIndex.Root()
+	expectedErr := errors.E(errors.NotExist)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want = %s", err, expectedErr)
 	}
 
 	root := upspin.DirEntry{

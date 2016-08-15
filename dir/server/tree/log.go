@@ -41,15 +41,15 @@ type logIndex struct {
 // Only one Log and LogIndex for a user in the same directory can be opened.
 // If two are opened and used simultaneously, results will be unpredictable.
 func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
-	const NewLogs = "Tree.NewLogs"
+	const op = "Tree.NewLogs"
 	loc := filepath.Join(directory, "tree.log."+string(user))
 	loggerFile, err := os.OpenFile(loc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(NewLogs, errors.IO, err)
+		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	offset, err := loggerFile.Seek(0, io.SeekEnd)
 	if err != nil {
-		return nil, nil, errors.E(NewLogs, errors.IO, err)
+		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	l := &logger{
 		user:   user,
@@ -61,11 +61,11 @@ func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
 	iloc := filepath.Join(directory, "tree.index."+string(user))
 	rootFile, err := os.OpenFile(rloc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(NewLogs, errors.IO, err)
+		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	indexFile, err := os.OpenFile(iloc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(NewLogs, errors.IO, err)
+		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	li := &logIndex{
 		user:      user,
@@ -82,18 +82,18 @@ func (l *logger) User() upspin.UserName {
 
 // Append implements Log.
 func (l *logger) Append(e *LogEntry) error {
-	const Append = "Log.Append"
+	const op = "Log.Append"
 	buf, err := e.marshal()
 	if err != nil {
 		return err
 	}
 	offs, err := l.file.Seek(0, io.SeekEnd)
 	if err != nil {
-		return errors.E(Append, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	n, err := l.file.Write(buf)
 	if err != nil {
-		return errors.E(Append, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	// n is == len(buf) when err != nil, so no need to check.
 	l.offset = offs + int64(n)
@@ -102,15 +102,15 @@ func (l *logger) Append(e *LogEntry) error {
 
 // ReadAt implements Log.
 func (l *logger) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
-	const Read = "Log.Read"
+	const op = "Log.Read"
 	if offset >= l.offset {
 		// End of file.
 		return dst, l.offset, nil
 	}
-	log.Debug.Printf("%s: seeking to offset %d, reading %d log entries", Read, offset, n)
+	log.Debug.Printf("%s: seeking to offset %d, reading %d log entries", op, offset, n)
 	_, err = l.file.Seek(offset, io.SeekStart)
 	if err != nil {
-		return nil, 0, errors.E(Read, errors.IO, err)
+		return nil, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
 	cbr := &countingByteReader{rd: bufio.NewReader(l.file)}
@@ -142,30 +142,33 @@ func (li *logIndex) User() upspin.UserName {
 
 // Root implements LogIndex.
 func (li *logIndex) Root() (*upspin.DirEntry, error) {
-	const Root = "LogIndex.Root"
+	const op = "LogIndex.Root"
 	var root upspin.DirEntry
-	buf, err := readAllFromTop(Root, li.rootFile)
+	buf, err := readAllFromTop(op, li.rootFile)
 	if err != nil {
 		return nil, err
 	}
+	if len(buf) == 0 {
+		return nil, errors.E(op, errors.NotExist, li.user, errors.Str("no root for user"))
+	}
 	more, err := root.Unmarshal(buf)
 	if err != nil {
-		return nil, errors.E(Root, err)
+		return nil, errors.E(op, err)
 	}
 	if len(more) != 0 {
-		return nil, errors.E(Root, errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
+		return nil, errors.E(op, errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
 	}
 	return &root, nil
 }
 
 // SaveRoot implements LogIndex.
 func (li *logIndex) SaveRoot(root *upspin.DirEntry) error {
-	const SaveRoot = "LogIndex.SaveRoot"
+	const op = "LogIndex.SaveRoot"
 	buf, err := root.Marshal()
 	if err != nil {
-		return errors.E(SaveRoot, err)
+		return errors.E(op, err)
 	}
-	return overwriteAndSync(SaveRoot, li.rootFile, buf)
+	return overwriteAndSync(op, li.rootFile, buf)
 }
 
 func overwriteAndSync(op string, f *os.File, buf []byte) error {
@@ -198,14 +201,17 @@ func readAllFromTop(op string, f *os.File) ([]byte, error) {
 
 // ReadOffset implements LogIndex.
 func (li *logIndex) ReadOffset() (int64, error) {
-	const ReadOffset = "LogIndex.ReadOffset"
-	buf, err := readAllFromTop(ReadOffset, li.indexFile)
+	const op = "LogIndex.ReadOffset"
+	buf, err := readAllFromTop(op, li.indexFile)
 	if err != nil {
-		return 0, errors.E(ReadOffset, errors.IO, err)
+		return 0, errors.E(op, errors.IO, err)
+	}
+	if len(buf) == 0 {
+		return 0, errors.E(op, errors.NotExist, li.user, errors.Str("no log offset for user"))
 	}
 	offset, n := binary.Varint(buf)
 	if n <= 0 {
-		return 0, errors.E(ReadOffset, errors.IO, errors.Str("invalid offset read"))
+		return 0, errors.E(op, errors.IO, errors.Str("invalid offset read"))
 	}
 	return offset, nil
 }
@@ -220,14 +226,14 @@ func (li *logIndex) SaveOffset(offset int64) error {
 
 // marshal packs the LogEntry into a new byte slice for storage.
 func (le *LogEntry) marshal() ([]byte, error) {
-	const Marshal = "LogEntry.marshal"
+	const op = "LogEntry.marshal"
 	var b []byte
 	var tmp [1]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], int64(le.Op))
 	b = append(b, tmp[:n]...)
 	entry, err := le.Entry.Marshal()
 	if err != nil {
-		return nil, errors.E(Marshal, err)
+		return nil, errors.E(op, err)
 	}
 	b = appendBytes(b, entry)
 	return b, nil
@@ -270,27 +276,27 @@ func (r *countingByteReader) Read(p []byte) (n int, err error) {
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
 // receiver.
 func (le *LogEntry) unmarshal(r *countingByteReader) error {
-	const Unmarshal = "LogEntry.unmarshal"
-	op, err := binary.ReadVarint(r)
+	const op = "LogEntry.unmarshal"
+	operation, err := binary.ReadVarint(r)
 	if err != nil {
-		return errors.E(Unmarshal, errors.IO, errors.Errorf("reading op: %s", err))
+		return errors.E(op, errors.IO, errors.Errorf("reading op: %s", err))
 	}
-	le.Op = Operation(op)
+	le.Op = Operation(operation)
 	entrySize, err := binary.ReadVarint(r)
 	if err != nil {
-		return errors.E(Unmarshal, errors.IO, errors.Errorf("reading entry size: %s", err))
+		return errors.E(op, errors.IO, errors.Errorf("reading entry size: %s", err))
 	}
 	data := make([]byte, entrySize)
 	_, err = r.Read(data)
 	if err != nil {
-		return errors.E(Unmarshal, errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
+		return errors.E(op, errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
 	}
 	leftOver, err := le.Entry.Unmarshal(data)
 	if err != nil {
-		return errors.E(Unmarshal, err)
+		return errors.E(op, err)
 	}
 	if len(leftOver) != 0 {
-		return errors.E(Unmarshal, errors.IO, errors.Errorf("%d bytes left; log misaligned", len(leftOver)))
+		return errors.E(op, errors.IO, errors.Errorf("%d bytes left; log misaligned", len(leftOver)))
 	}
 	return nil
 }
