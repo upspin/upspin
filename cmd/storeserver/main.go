@@ -19,6 +19,7 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/store/filesystem"
 	"upspin.io/store/gcp"
 	"upspin.io/store/inprocess"
 	"upspin.io/upspin"
@@ -77,14 +78,19 @@ func main() {
 
 	// Create a new store implementation.
 	var store upspin.StoreServer
+	err = nil
 	switch flags.ServerKind {
 	case "inprocess":
 		store = inprocess.New()
 	case "gcp":
 		store, err = gcp.New(flags.Config...)
-		if err != nil {
-			log.Fatalf("Setting up StoreServer: %v", err)
-		}
+	case "filesystem":
+		store, err = filesystem.New(ctx, flags.Config...)
+	default:
+		err = errors.Errorf("bad -kind %q", flags.ServerKind)
+	}
+	if err != nil {
+		log.Fatalf("Setting up StoreServer: %v", err)
 	}
 
 	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
