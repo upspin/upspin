@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "de5c8dda_850602ef",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-15T09:36:52Z",
+      "side": 1,
+      "message": "s/.*\\./All fields of the context must be defined./",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_a50bfef7",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-15T09:36:52Z",
+      "side": 1,
+      "message": "define \u0027match\u0027",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_45f1eafa",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-15T09:36:52Z",
+      "side": 1,
+      "message": "that seems like a mistake. it is surprising that \u0027New\u0027 reaches into a file and does unknown things. i would make that a separate method.",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_65ee661c",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-15T09:36:52Z",
+      "side": 1,
+      "message": "s/$/\u0027/",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
