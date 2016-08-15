@@ -10,11 +10,12 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
-	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/pack/internal/packtest"
 	"upspin.io/upspin"
+
+	_ "upspin.io/key/inprocess"
 )
 
 func TestRegister(t *testing.T) {
@@ -137,9 +138,6 @@ func TestMain(m *testing.M) {
 	key, err := bind.KeyServer(globalContext, inProcess)
 	if err != nil {
 		log.Fatalf("error binding user: %v", err)
-	}
-	if _, ok := key.(*inprocess.Service); !ok {
-		panic("not a test KeyServer")
 	}
 	user := &upspin.User{
 		Name:      userName,
