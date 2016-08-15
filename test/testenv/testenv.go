@@ -12,14 +12,19 @@ import (
 	"path/filepath"
 	"strings"
 
-	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	"upspin.io/key/inprocess"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	// Potential transports, selected by the Setup's Kind field.
+	_ "upspin.io/dir/inprocess"
+	_ "upspin.io/dir/remote"
+	_ "upspin.io/key/inprocess"
+	_ "upspin.io/store/inprocess"
+	_ "upspin.io/store/remote"
 )
 
 // Entry is an entry in the Upspin namespace.
@@ -36,9 +41,8 @@ type Setup struct {
 	// OwnerName is the name of the directory tree owner.
 	OwnerName upspin.UserName
 
-	// Transport is what kind of servers to use, InProcess or GCP. Mixed usage is not supported.
-	// TODO support mixing.
-	Transport upspin.Transport
+	// Kind is what kind of servers to use, "inprocess" or "GCP".
+	Kind string
 
 	// Packing is the desired packing for the tree.
 	Packing upspin.Packing
@@ -169,13 +173,13 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, 
 	ctx.SetFactotum(f)
 
 	var client upspin.Client
-	switch e.Setup.Transport {
-	case upspin.GCP:
+	switch k := e.Setup.Kind; k {
+	case "gcp":
 		client, err = gcpClient(ctx)
-	case upspin.InProcess:
+	case "inprocess":
 		client, err = inProcessClient(ctx)
 	default:
-		return nil, nil, errors.E(op, errors.Invalid, errors.Str("invalid transport"))
+		return nil, nil, errors.E(op, errors.Invalid, errors.Errorf("bad server kind %q", k))
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
@@ -239,13 +243,7 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 // registerUserWithKeyServer registers userName's context with the inProcess keyServer.
 func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context) error {
 	const op = "testenv.registerWithKeyServer"
-	key, err := bind.KeyServer(context, context.KeyEndpoint())
-	if err != nil {
-		return errors.E(op, err)
-	}
-	if _, ok := key.(*inprocess.Service); !ok {
-		return errors.E(op, errors.Internal, errors.Str("key service must be the in-process instance"))
-	}
+	key := context.KeyServer()
 	// Install the registered user.
 	user := &upspin.User{
 		Name:      userName,
@@ -253,20 +251,17 @@ func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context)
 		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
 		PublicKey: context.Factotum().PublicKey(),
 	}
-	err = key.Put(user)
-	if err != nil {
+	if err := key.Put(user); err != nil {
 		return errors.E(op, err)
 	}
 	return nil
 }
 
 func makeRoot(context upspin.Context) error {
+	path := upspin.PathName(context.UserName()) + "/"
+	dir := context.DirServer(path)
 	// Make the root to be sure it's there.
-	directory, err := bind.DirServer(context, context.DirEndpoint())
-	if err != nil {
-		return err
-	}
-	_, err = directory.MakeDirectory(upspin.PathName(context.UserName() + "/"))
+	_, err := dir.MakeDirectory(path)
 	if err != nil && !strings.Contains(err.Error(), "already ") {
 		return err
 	}

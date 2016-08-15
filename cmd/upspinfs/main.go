@@ -15,7 +15,6 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
-	"upspin.io/key/inprocess"
 	"upspin.io/key/usercache"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -69,7 +68,7 @@ func main() {
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
-		if _, ok := key.(*inprocess.Service); !ok {
+		if ep := key.Endpoint(); ep.Transport != upspin.InProcess {
 			log.Fatal("key server not a inprocess.Service")
 		}
 		// Validate context.

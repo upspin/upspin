@@ -380,8 +380,6 @@ func (t Transport) String() string {
 		return "unassigned"
 	case InProcess:
 		return "inprocess"
-	case GCP:
-		return "gcp"
 	case Remote:
 		return "remote"
 	case HTTPS:
