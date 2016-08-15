@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package filesystem
 
 import (
 	"io/ioutil"
@@ -10,10 +10,7 @@ import (
 	gPath "path"
 	"path/filepath"
 
-	gContext "golang.org/x/net/context"
-
 	"upspin.io/access"
-	"upspin.io/auth/grpcauth"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -21,19 +18,14 @@ import (
 
 // can reports whether the user associated with the given context has
 // the given right to access the given path.
-func can(s grpcauth.SecureServer, ctx gContext.Context, right access.Right, parsed path.Parsed) (bool, error) {
-	session, err := s.GetSessionFromContext(ctx)
-	if err != nil {
-		return false, err
-	}
-
+func can(root string, defaultAccess *access.Access, user upspin.UserName, right access.Right, parsed path.Parsed) (bool, error) {
 	a := defaultAccess
-	afn, err := whichAccess(parsed)
+	afn, err := whichAccess(root, parsed)
 	if err != nil {
 		return false, err
 	}
 	if afn != "" {
-		data, err := readFile(afn)
+		data, err := readFile(root, afn)
 		if err != nil {
 			return false, err
 		}
@@ -42,16 +34,17 @@ func can(s grpcauth.SecureServer, ctx gContext.Context, right access.Right, pars
 			return false, err
 		}
 	}
-
-	return a.Can(session.User(), right, parsed.Path(), readFile)
+	return a.Can(user, right, parsed.Path(), func(name upspin.PathName) ([]byte, error) {
+		return readFile(root, name)
+	})
 }
 
 // whichAccess is the core of the WhichAccess method,
 // factored out so it can be called from other locations.
-func whichAccess(parsed path.Parsed) (upspin.PathName, error) {
+func whichAccess(root string, parsed path.Parsed) (upspin.PathName, error) {
 	// Look for Access file starting at end of local path.
 	for i := 0; i <= parsed.NElem(); i++ {
-		dir := filepath.Join(*root, filepath.FromSlash(parsed.Drop(i).FilePath()))
+		dir := filepath.Join(root, filepath.FromSlash(parsed.Drop(i).FilePath()))
 		if fi, err := os.Stat(dir); err != nil {
 			return "", err
 		} else if !fi.IsDir() {
@@ -85,12 +78,12 @@ func whichAccess(parsed path.Parsed) (upspin.PathName, error) {
 
 // readFile returns the contents of the named file relative to the server root.
 // The file must be world-readable, or readFile returns a permissoin error.
-func readFile(name upspin.PathName) ([]byte, error) {
+func readFile(root string, name upspin.PathName) ([]byte, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, err
 	}
-	localName := *root + parsed.FilePath()
+	localName := root + parsed.FilePath()
 	info, err := os.Stat(localName)
 	if err != nil {
 		return nil, err
