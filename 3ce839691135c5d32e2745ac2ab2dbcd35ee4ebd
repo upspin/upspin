@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3ece89f0_48f79f25",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T16:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_850602ef",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_a50bfef7",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-15T09:36:52Z",
       "side": 1,
       "message": "define \u0027match\u0027",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ece89f0_a831fbf1",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T16:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_a50bfef7",
       "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3ece89f0_081c876e",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T16:10:26Z",
+      "side": 1,
+      "message": "Let\u0027s start with this and figure out if it\u0027s the wrong model. I agree New is doing too much. Maybe it shouldn\u0027t be called New but something like BuildTree.\n\nMain rationale for doing it \"atomically\" is not to have an inconsistent tree. If I must call Recover right after New or it will be in some bad state, I think it\u0027s worse than doing too much in New.\n\nAdded TODO.",
+      "parentUuid": "de5c8dda_45f1eafa",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_65ee661c",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-15T09:36:52Z",
       "side": 1,
       "message": "s/$/\u0027/",
+      "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ece89f0_48267fb8",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T16:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_65ee661c",
       "revId": "3ce839691135c5d32e2745ac2ab2dbcd35ee4ebd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
