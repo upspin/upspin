@@ -91,8 +91,6 @@ func (s *Service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Servic
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
-	db.mu.Lock()
-	defer db.mu.Unlock()
 
 	return &Service{
 		context: context.Copy(),
