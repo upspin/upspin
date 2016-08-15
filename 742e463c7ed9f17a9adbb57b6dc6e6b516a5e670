@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bbcc4b54_cc310f56",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T22:57:50Z",
+      "side": 1,
+      "message": "This can go now if Andrew\u0027s proposal comes in soon or we can clean it up later when his CL lands. I\u0027m on board with the new proposal if I understood it correctly.",
+      "revId": "742e463c7ed9f17a9adbb57b6dc6e6b516a5e670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
