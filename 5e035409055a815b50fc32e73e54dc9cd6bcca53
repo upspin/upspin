@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_054c529b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-15T02:33:47Z",
+      "side": 1,
+      "message": "if it means skip tls, then it should be called skipTLS or noTLS or withoutTLS or something. \u0027insecure\u0027 is too vague.\n\nI think it\u0027s time we created a ClientOptions struct and put this stuff in there, along with sensible defaults. Then we can also adopt Eduardo\u0027s suggestion of moving the AllowSelfSignedCerts option here, instead of creating a global in package upspin.\n\nSeeing just \"false\" at the call site for something this important is not good enough.",
+      "parentUuid": "1e40e5d2_1fc7a341",
+      "revId": "5e035409055a815b50fc32e73e54dc9cd6bcca53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e40e5d2_9f765305",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
