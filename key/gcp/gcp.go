@@ -2,32 +2,58 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements the user service upspin.KeyServer on the Google Cloud Platform (GCP).
+// Package gcp implements the user service upspin.KeyServer
+// that runs on the Google Cloud Platform (GCP).
 package gcp
 
 import (
 	"encoding/json"
 	"sync"
 
-	"upspin.io/bind"
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/valid"
 
 	// We use GCS as the backing for our data.
 	_ "upspin.io/cloud/storage/gcs"
 )
 
-// key is the implementation of the KeyServer Service on GCP.
-type key struct {
-	context     upspin.Context
-	endpoint    upspin.Endpoint
-	cloudClient storage.Storage
+// New initializes an instance of the key service.
+// Required configuration options are listed at the package comments.
+func New(options ...string) (upspin.KeyServer, error) {
+	const op = "key.New"
+
+	// All options are for the Storage layer.
+	var storageOpts []storage.DialOpts
+	for _, o := range options {
+		storageOpts = append(storageOpts, storage.WithOptions(o))
+	}
+
+	s, err := storage.Dial("GCS", storageOpts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	log.Debug.Printf("Configured GCP user: %v", options)
+	return &server{storage: s, refCount: &refCount{count: 1}}, nil
 }
 
-var _ upspin.KeyServer = (*key)(nil)
+// server is the implementation of the KeyServer Service on GCP.
+type server struct {
+	storage storage.Storage
+	*refCount
+
+	// The name of the user accessing this server, set by Dial.
+	user upspin.UserName
+}
+
+var _ upspin.KeyServer = (*server)(nil)
+
+type refCount struct {
+	sync.Mutex
+	count int
+}
 
 // userEntry is the on-disk representation of upspin.User, further annotated with
 // non-public information, such as whether the user is an admin.
@@ -36,187 +62,138 @@ type userEntry struct {
 	IsAdmin bool
 }
 
-var (
-	errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name format"))
-)
-
-var (
-	mu       sync.Mutex // protects fields below
-	refCount uint64
-)
+var errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name format"))
 
 // Lookup implements upspin.KeyServer.
-func (u *key) Lookup(userName upspin.UserName) (*upspin.User, error) {
-	const Lookup = "Lookup"
-	// Validate user name
-	_, err := path.Parse(upspin.PathName(userName) + "/")
-	if err != nil {
-		return nil, errors.E(Lookup, userName, errInvalidUserName)
+func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "gcp.Lookup"
+	if err := valid.UserName(name); err != nil {
+		return nil, errors.E(op, err)
 	}
-	// Get the user entry from GCP.
-	ue, err := u.fetchUserEntry(Lookup, userName)
+	entry, err := s.fetchUserEntry(op, name)
 	if err != nil {
 		return nil, err
 	}
-	return &ue.User, nil
+	return &entry.User, nil
 }
 
 // Put implements upspin.KeyServer.
-func (u *key) Put(user *upspin.User) error {
-	const Put = "Key.Put"
-	// Validate the user name in user.
-	_, err := path.Parse(upspin.PathName(user.Name) + "/")
-	if err != nil {
-		return errors.E(Put, errInvalidUserName)
+func (s *server) Put(user *upspin.User) error {
+	const op = "gcp.Put"
+	if s.user == "" {
+		return errors.E(op, errors.Invalid, errors.Str("not bound to user"))
 	}
+	if err := valid.User(user); err != nil {
+		return errors.E(op, err)
+	}
+
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
-	ue, err := u.fetchUserEntry(Put, user.Name)
-	if err != nil {
-		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
-			// OK; adding new user.
-		} else {
-			return errors.E(Put, err)
-		}
-	} else {
-		isAdmin = ue.IsAdmin
+	entry, err := s.fetchUserEntry(op, user.Name)
+	switch {
+	case errors.Match(errors.E(errors.NotExist), err):
+		// OK; adding new user.
+	case err != nil:
+		return errors.E(op, err)
+	default:
+		// User exists.
+		isAdmin = entry.IsAdmin
 	}
 
 	// Is the user operating on his/her own record?
-	if user.Name != u.context.UserName() {
-		// Not operating on own record, so we need to ensure u.context.UserName is an admin.
+	if user.Name != s.user {
+		// Not operating on own record, so we need to ensure context.UserName is an admin.
 		// First, retrieve the user entry for the context user.
-		ue, err := u.fetchUserEntry(Put, u.context.UserName())
+		entry, err := s.fetchUserEntry(op, s.user)
 		if err != nil {
-			return errors.E(Put, err)
+			return errors.E(op, err)
 		}
-		if !ue.IsAdmin {
-			return errors.E(Put, errors.Permission, errors.Str("not an administrator"))
+		if !entry.IsAdmin {
+			return errors.E(op, errors.Permission, errors.Str("not an administrator"))
 		}
 		// Is admin. Proceed.
 	}
+
 	// Put puts, it does not update, so we simply overwrite what's there if it exists.
 	// Set IsAdmin to what it was before or false by default.
-	return u.putUserEntry(Put, &userEntry{User: *user, IsAdmin: isAdmin})
+	return s.putUserEntry(op, &userEntry{User: *user, IsAdmin: isAdmin})
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
-func (u *key) fetchUserEntry(op string, userName upspin.UserName) (*userEntry, error) {
-	// Get the user entry from GCP
-	log.Printf("Going to get user entry on GCP for user %s", userName)
-	buf, err := u.cloudClient.Download(string(userName))
+func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
+	log.Debug.Printf("%v: fetch %q", op, name)
+	b, err := s.storage.Download(string(name))
 	if err != nil {
-		log.Printf("Error downloading user entry for %q: %q", userName, err)
-		return nil, errors.E(op, userName, errors.NotExist, err)
+		log.Debug.Printf("%v: error fetching %q: %v", op, name, err)
+		return nil, errors.E(op, name, err)
 	}
-	// Now convert it to a userEntry
-	var ue userEntry
-	err = json.Unmarshal(buf, &ue)
-	if err != nil {
-		return nil, errors.E(op, userName, errors.IO, err)
+	var entry userEntry
+	if err := json.Unmarshal(b, &entry); err != nil {
+		return nil, errors.E(op, errors.Invalid, name, err)
 	}
-	log.Printf("Fetched user entry for %s", userName)
-	return &ue, nil
+	return &entry, nil
 }
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
-func (u *key) putUserEntry(op string, userEntry *userEntry) error {
-	log.Printf("PutUserEntry %v", userEntry)
-	if userEntry == nil {
+func (s *server) putUserEntry(op string, entry *userEntry) error {
+	log.Debug.Printf("%v: put %v", op, entry.User.Name)
+	if entry == nil {
 		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
 	}
-	jsonBuf, err := json.Marshal(userEntry)
+	b, err := json.Marshal(entry)
 	if err != nil {
-		return errors.E(op, errors.Invalid, errors.Errorf("conversion to JSON failed: %v", err))
+		return errors.E(op, errors.Invalid, err)
 	}
-	_, err = u.cloudClient.Put(string(userEntry.User.Name), jsonBuf)
-	if err != nil {
+	if _, err := s.storage.Put(string(entry.User.Name), b); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil
 }
 
-// Configure configures an instance of the user service.
-// Required configuration options are listed at the package comments.
-func (u *key) Configure(options ...string) error {
-	const Configure = "Configure"
-
-	var dialOpts []storage.DialOpts
-	// All options are for the Storage layer.
-	for _, option := range options {
-		dialOpts = append(dialOpts, storage.WithOptions(option))
-	}
-
-	var err error
-	u.cloudClient, err = storage.Dial("GCS", dialOpts...)
-	if err != nil {
-		return errors.E(Configure, err)
-	}
-	log.Debug.Printf("Configured GCP user: %v", options)
-	return nil
-}
-
-// isServiceConfigured reports whether the user service has been configured via a Configure call.
-func (u *key) isServiceConfigured() bool {
-	return u.cloudClient != nil && u.context.UserName() != ""
-}
-
 // Dial implements upspin.Service.
-func (u *key) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	if e.Transport != upspin.GCP {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
-	}
-	mu.Lock()
-	defer mu.Unlock()
+func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	s.refCount.Lock()
+	s.refCount.count++
+	s.refCount.Unlock()
 
-	refCount++
-	if refCount == 0 {
-		// This is virtually impossible to happen. One will run out of memory before this happens.
-		// It means the ref count wrapped around and thus we can't handle another instance. Fail.
-		refCount--
-		return nil, errors.E("Dial", errors.Str("user gcp: internal error: refCount wrapped around"))
-	}
-
-	this := *u                    // Clone ourselves.
-	this.context = context.Copy() // Make a copy of the context, to prevent changes.
-	this.endpoint = e
-	return &this, nil
+	svc := *s
+	svc.user = ctx.UserName()
+	return &svc, nil
 }
 
 // Ping implements upspin.Service.
-func (u *key) Ping() bool {
+func (s *server) Ping() bool {
 	return true
 }
 
 // Close implements upspin.Service.
-func (u *key) Close() {
-	mu.Lock()
-	defer mu.Unlock()
+func (s *server) Close() {
+	// This instance is no longer tied to a user.
+	s.user = ""
 
-	// Clean up this instance
-	u.context.SetUserName("") // ensure we get an error in subsequent calls.
+	s.refCount.Lock()
+	defer s.refCount.Unlock()
+	s.refCount.count--
 
-	refCount--
-	if refCount == 0 {
-		if u.cloudClient != nil {
-			u.cloudClient.Close()
+	if s.refCount.count == 0 {
+		if s.storage != nil {
+			s.storage.Close()
 		}
-		u.cloudClient = nil
-		// Do any other global clean ups here.
+		s.storage = nil
 	}
 }
 
 // Authenticate implements upspin.Service.
-func (u *key) Authenticate(upspin.Context) error {
-	// Authentication is not dealt here. It happens at other layers.
-	return nil
+func (s *server) Authenticate(upspin.Context) error {
+	return errors.Str("key/gcp: Authenticate should not be called")
+}
+
+// Configure implements upspin.Service.
+func (s *server) Configure(options ...string) error {
+	return errors.Str("key/gcp: Configure should not be called")
 }
 
 // Endpoint implements upspin.Service.
-func (u *key) Endpoint() upspin.Endpoint {
-	return u.endpoint
-}
-
-func init() {
-	bind.RegisterKeyServer(upspin.GCP, &key{})
+func (s *server) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{} // No endpoint.
 }

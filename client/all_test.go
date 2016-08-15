@@ -12,10 +12,10 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
-	"upspin.io/key/inprocess"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
+	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
 )
@@ -31,19 +31,24 @@ func newContext(name upspin.UserName) upspin.Context {
 	return context
 }
 
+func checkTransport(s upspin.Service) {
+	if t := s.Endpoint().Transport; t != upspin.InProcess {
+		panic(fmt.Sprintf("bad transport %v, want inprocess", t))
+	}
+}
+
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
 	context := newContext(userName)
 	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		panic(err)
 	}
-	if _, ok := key.(*inprocess.Service); !ok {
-		panic("key server not a inprocess.Service")
-	}
+	checkTransport(key)
 	dir, err := bind.DirServer(context, context.DirEndpoint())
 	if err != nil {
 		panic(err)
 	}
+	checkTransport(dir)
 	if publicKey == "" {
 		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	}

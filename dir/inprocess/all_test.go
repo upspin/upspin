@@ -17,16 +17,15 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
+	inprocessKey "upspin.io/key/inprocess"
 	"upspin.io/pack"
 	"upspin.io/path"
+	inprocessStore "upspin.io/store/inprocess"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/debug"
-	_ "upspin.io/store/inprocess"
 )
 
 var (
@@ -43,21 +42,15 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-
-	ctx = context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(endpoint).SetDirEndpoint(endpoint).SetStoreEndpoint(endpoint)
-	var err error
-	key, err = bind.KeyServer(ctx, endpoint)
-	if err != nil {
-		panic(err)
-	}
-	store, err = bind.StoreServer(ctx, endpoint)
-	if err != nil {
-		panic(err)
-	}
-	dir, err = bind.DirServer(ctx, endpoint)
-	if err != nil {
-		panic(err)
-	}
+	ctx = context.New().
+		SetUserName(name).
+		SetPacking(upspin.DebugPack).
+		SetKeyEndpoint(endpoint).
+		SetDirEndpoint(endpoint).
+		SetStoreEndpoint(endpoint)
+	key = inprocessKey.New()
+	store = inprocessStore.New()
+	dir = New(ctx)
 	return
 }
 

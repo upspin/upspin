@@ -158,14 +158,14 @@ func registerStoreServer(op string, transport upspin.Transport, store upspin.Sto
 
 // KeyServer returns a KeyServer interface bound to the endpoint.
 func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
-	const KeyServer = "KeyServer"
+	const op = "bind.KeyServer"
 	mu.Lock()
 	u, ok := userMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(KeyServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, KeyServer, e, userDialCache, u)
+	x, err := reachableService(cc, op, e, userDialCache, u)
 	if err != nil {
 		return nil, err
 	}
@@ -174,14 +174,14 @@ func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
 
 // StoreServer returns a StoreServer interface bound to the endpoint.
 func StoreServer(cc upspin.Context, e upspin.Endpoint) (upspin.StoreServer, error) {
-	const StoreServer = "StoreServer"
+	const op = "bind.StoreServer"
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(StoreServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, StoreServer, e, storeDialCache, s)
+	x, err := reachableService(cc, op, e, storeDialCache, s)
 	if err != nil {
 		return nil, err
 	}
@@ -190,14 +190,14 @@ func StoreServer(cc upspin.Context, e upspin.Endpoint) (upspin.StoreServer, erro
 
 // DirServer returns a DirServer interface bound to the endpoint.
 func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
-	const DirServer = "DirServer"
+	const op = "bind.DirServer"
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
 	mu.Unlock()
 	if !ok {
-		return nil, errors.E(DirServer, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, DirServer, e, directoryDialCache, d)
+	x, err := reachableService(cc, op, e, directoryDialCache, d)
 	if err != nil {
 		return nil, err
 	}
