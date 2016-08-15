@@ -27,21 +27,59 @@ import (
 	_ "upspin.io/cloud/storage/postgres"
 )
 
+func New(context upspin.Context, options ...string) (upspin.DirServer, error) {
+	const op = "gcp.New"
+
+	var storageBackend string
+	var dialOpts []storage.DialOpts
+	for _, option := range options {
+		// Parse options that we understand, otherwise pass it down to the storage layer.
+		switch {
+		case strings.Contains(option, storageType):
+			storageBackend = option[len(storageType)+1:]
+		default:
+			dialOpts = append(dialOpts, storage.WithOptions(option))
+		}
+	}
+	if storageBackend == "" {
+		return nil, errors.E(op, errors.Syntax, errors.Str("must specify storage type"))
+	}
+
+	store, err := storage.Dial(storageBackend, dialOpts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	log.Debug.Printf("Configured GCP directory: %v", options)
+
+	d := newDirectory(store, context.Factotum(), nil, nil)
+	d.serverName = context.UserName()
+	d.context = context
+
+	return d, nil
+}
+
 type directory struct {
 	context  upspin.Context
 	endpoint upspin.Endpoint
 
-	// TODO: can one address space be configured to talk to multiple GCP backends and/or act as different directory
-	// service users, with different keys? If yes, then Configure should configure the caches too.
-	// If not, then these should be singletons.
-	timeNow        func() upspin.Time // returns the current time.
-	cloudClient    storage.Storage    // handle for GCP bucket g-upspin-directory.
-	serverName     upspin.UserName    // this server's user name (for talking to StoreServer, etc).
-	factotum       upspin.Factotum    // this server's factotum with its keys.
+	// Populated by the constructor.
+	store       storage.Storage // handle for GCP bucket g-upspin-directory.
+	serverName  upspin.UserName // this server's user name (for talking to StoreServer, etc).
+	factotum    upspin.Factotum // this server's factotum with its keys.
+	dirCache    *cache.LRU      // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
+	rootCache   *cache.LRU      // caches <upspin.UserName, root>. It is thread safe.
+	dirNegCache *cache.LRU      // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
+	// Injectables for testing.
 	newStoreClient newStoreClient     // how to create a StoreServer client.
-	dirCache       *cache.LRU         // caches <upspin.PathName, upspin.DirEntry>. It is thread safe.
-	rootCache      *cache.LRU         // caches <upspin.UserName, root>. It is thread safe.
-	dirNegCache    *cache.LRU         // caches the absence of a path <upspin.PathName, nil>. It is thread safe.
+	timeNow        func() upspin.Time // returns the current time.
+
+	*refCount
+}
+
+type refCount struct {
+	sync.Mutex
+	count int
 }
 
 var _ upspin.DirServer = (*directory)(nil)
@@ -53,13 +91,6 @@ const gcpDir = "gcpDir"
 const (
 	// storageType specified which storage backend to use. Current values are "storage=GCS" or "storage=Postgres".
 	storageType = "storage"
-)
-
-var (
-	errNotConfigured = errors.Str("GCP DirServer not configured")
-
-	confLock sync.RWMutex // protects all configuration options and the ref count below.
-	refCount uint64
 )
 
 // options are optional parameters to almost every inner method of directory for doing some
@@ -89,11 +120,6 @@ func newOptsForMetric(op string) (options, *metric.Metric) {
 func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "MakeDirectory"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return nil, errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 
@@ -134,11 +160,6 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, er
 func (d *directory) Put(dirEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "Put"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return nil, errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 	return nil, d.put(op, dirEntry, opts)
@@ -284,11 +305,6 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Lookup"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return nil, errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 	parsed, err := path.Parse(pathName)
@@ -351,11 +367,6 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, err
 func (d *directory) whichAccessPath(pathName upspin.PathName) (upspin.PathName, error) {
 	const op = "WhichAccess"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return "", errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 	parsed, err := path.Parse(pathName)
@@ -390,11 +401,6 @@ func (d *directory) whichAccessPath(pathName upspin.PathName) (upspin.PathName, 
 func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "Glob"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return nil, errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 
@@ -434,9 +440,9 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		if !strings.HasSuffix(prefix, "/") {
 			prefix = prefix + "/"
 		}
-		names, err = d.cloudClient.ListDir(prefix)
+		names, err = d.store.ListDir(prefix)
 	} else {
-		names, err = d.cloudClient.ListPrefix(prefix, int(depth))
+		names, err = d.store.ListPrefix(prefix, int(depth))
 	}
 	ss.End()
 	if err != nil {
@@ -491,11 +497,6 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 func (d *directory) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "Delete"
 
-	confLock.RLock()
-	defer confLock.RUnlock()
-	if !d.isConfigured() {
-		return nil, errNotConfigured
-	}
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
 	parsed, err := path.Parse(pathName)
@@ -553,13 +554,13 @@ func (d *directory) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 // newStoreClient is a function that creates a store client for an endpoint.
 type newStoreClient func(e upspin.Endpoint) (upspin.StoreServer, error)
 
-func newDirectory(cloudClient storage.Storage, f upspin.Factotum, newStoreClient newStoreClient, timeFunc func() upspin.Time) *directory {
+func newDirectory(s storage.Storage, f upspin.Factotum, newStoreClient newStoreClient, timeNow func() upspin.Time) *directory {
 	d := &directory{
 		context:        context.New(),
-		cloudClient:    cloudClient,
+		store:          s,
 		factotum:       f,
 		newStoreClient: newStoreClient,
-		timeNow:        timeFunc,
+		timeNow:        timeNow,
 		dirCache:       cache.NewLRU(1000), // TODO: adjust numbers
 		rootCache:      cache.NewLRU(1000), // TODO: adjust numbers
 		dirNegCache:    cache.NewLRU(1000), // TODO: adjust numbers
@@ -610,74 +611,20 @@ func (d *directory) storeGet(loc *upspin.Location) ([]byte, error) {
 
 // Dial implements upspin.Service.
 func (d *directory) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	if e.Transport != upspin.GCP {
-		return nil, errors.E("Dial", errors.Syntax, errors.Str("unrecognized transport"))
-	}
-	confLock.Lock()
-	defer confLock.Unlock()
+	d.refCount.Lock()
+	d.refCount.count++
+	d.refCount.Unlock()
 
-	refCount++
-	if refCount == 0 {
-		// This is virtually impossible to happen. One will run out of memory before this happens.
-		// It means the ref count wrapped around and thus we can't handle another instance. Fail.
-		refCount--
-		return nil, errors.E("Dial", errors.Other, errors.Str("refCount wrapped around"))
-	}
-
-	this := *d                    // Clone ourselves.
-	this.context = context.Copy() // Make a copy of the context, to prevent changes.
-	this.endpoint = e
-
-	// Did we inherit keys and a service username from a generator instance (the instance that was
-	// registered originally with Bind)? If not, set them up now.
-
-	// Have we keys for this service already?
-	if this.factotum == nil {
-		this.factotum = context.Factotum()
-	}
-	// Have we a server name already?
-	if this.serverName == "" {
-		this.serverName = context.UserName()
-	}
-
-	return &this, nil
+	svc := *d                    // Clone ourselves.
+	svc.context = context.Copy() // Make a copy of the context, to prevent changes.
+	svc.endpoint = e
+	return &svc, nil
 }
 
 // Configure configures the connection to the backing store (namely, GCP) once the service
 // has been dialed. The details of the configuration are explained at the package comments.
 func (d *directory) Configure(options ...string) error {
-	const Configure = "Configure"
-	var storageBackend string
-	var dialOpts []storage.DialOpts
-	for _, option := range options {
-		// Parse options that we understand, otherwise pass it down to the storage layer.
-		switch {
-		case strings.Contains(option, storageType):
-			storageBackend = option[len(storageType)+1:]
-		default:
-			dialOpts = append(dialOpts, storage.WithOptions(option))
-		}
-	}
-	if storageBackend == "" {
-		return errors.E(Configure, errors.Syntax, errors.Str("must specify storage type"))
-	}
-
-	confLock.Lock()
-	defer confLock.Unlock()
-
-	var err error
-	d.cloudClient, err = storage.Dial(storageBackend, dialOpts...)
-	if err != nil {
-		return errors.E(Configure, err)
-	}
-	log.Debug.Printf("Configured GCP directory: %v", options)
-	return nil
-}
-
-// isConfigured returns whether this server is configured properly.
-// It must be called with mu locked.
-func (d *directory) isConfigured() bool {
-	return d.cloudClient != nil && d.context.UserName() != ""
+	return errors.Str("dir/gcp: Configure method should not be called")
 }
 
 // Ping implements upspin.Service.
@@ -687,20 +634,20 @@ func (d *directory) Ping() bool {
 
 // Close implements upspin.Service.
 func (d *directory) Close() {
-	confLock.Lock()
-	defer confLock.Unlock()
-
 	// Clean up this instance
 	d.context.SetUserName("") // ensure we get an error in subsequent calls.
 
-	refCount--
-	if refCount == 0 {
-		d.cloudClient.Close()
-		d.cloudClient = nil
+	d.refCount.Lock()
+	defer d.refCount.Unlock()
+	d.refCount.count--
+	if d.refCount.count == 0 {
+		if d.store != nil {
+			d.store.Close()
+		}
+		d.store = nil
 		d.dirCache = nil
 		d.dirNegCache = nil
 		d.rootCache = nil
-		// Do any other global clean ups here.
 	}
 }
 
@@ -713,8 +660,4 @@ func (d *directory) Authenticate(upspin.Context) error {
 // Endpoint implements upspin.Service.
 func (d *directory) Endpoint() upspin.Endpoint {
 	return d.endpoint
-}
-
-func init() {
-	bind.RegisterDirServer(upspin.GCP, newDirectory(nil, nil, nil, nil))
 }
