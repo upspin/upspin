@@ -114,6 +114,9 @@ type configFlag struct {
 
 // String implements flag.Value.
 func (f configFlag) String() string {
+	if f.s == nil {
+		return ""
+	}
 	return strings.Join(*f.s, ",")
 }
 
@@ -125,5 +128,8 @@ func (f configFlag) Set(s string) error {
 
 // Get implements flag.Getter.
 func (f configFlag) Get() interface{} {
+	if f.s == nil {
+		return ""
+	}
 	return *f.s
 }
