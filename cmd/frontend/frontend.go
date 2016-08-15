@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	flags.Parse("https")
+	flags.Parse("https", "log")
 	http.HandleFunc("/", handler)
 	https.ListenAndServe("frontend", flags.HTTPSAddr, nil)
 }
