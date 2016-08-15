@@ -390,6 +390,3 @@ func (t Transport) String() string {
 		return fmt.Sprintf("transport(%d)", int(t))
 	}
 }
-
-// AllowSelfSignedCertificate, if set to true, allows calls to servers with self signed certificates.
-var AllowSelfSignedCertificate bool

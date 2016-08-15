@@ -45,9 +45,19 @@ type AuthClientService struct {
 	lastNetActivity   time.Time     // last known time of some network activity.
 }
 
+// SecurityLevel defines the security required of a GRPC connection.
+type SecurityLevel int
+
 const (
-	// AllowSelfSignedCertificate is used for documenting the parameter with same name in NewGRPCClient.
-	AllowSelfSignedCertificate = true
+	// Secure as the security argument to NewGRPCClient requires TLS connections using CA certificates.
+	Secure = SecurityLevel(iota + 1)
+
+	// InsecureAllowingSelfSignedCertificates as the security argument to NewGRPCClient requires TLS connections
+	// but allows self signed certificates.
+	InsecureAllowingSelfSignedCertificates
+
+	// NoSecurity as the security argument to NewGRPCClient requires connections with no authentication or encryption.
+	NoSecurity
 
 	// KeepAliveInterval is a suggested interval between keep-alive ping requests to the server.
 	// A value of 0 means keep-alives are disabled. Google Cloud Platform (GCP) times out connections
@@ -58,15 +68,14 @@ const (
 // To be safe, we refresh the token 1 hour ahead of time.
 var tokenFreshnessDuration = authTokenDuration - time.Hour
 
-// NewGRPCClient returns new GRPC client connected securely (with TLS) to a GRPC server at a net address.
+// NewGRPCClient returns new GRPC client connected to a GRPC server at a net address.
 // The address is expected to be a raw network address with port number, as in domain.com:5580. However, for convenience,
 // it is optionally accepted for the time being to use one of the following prefixes:
 // https://, http://, grpc://. This may change in the future.
 // A keep alive interval indicates the amount of time to send ping requests to the server. A duration of 0 disables
 // keep-alive packets.
-// If allowSelfSignedCertificates is true, the client will connect with a server with a self-signed certificate.
-// Otherwise it will reject it. Mostly only useful for testing a local server.
-func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, insecure bool) (*AuthClientService, error) {
+// The security level specifies the expected security guarantees of the connection.
+func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel) (*AuthClientService, error) {
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
 	}
@@ -86,7 +95,8 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 		grpc.WithDialer(dialWithKeepAlive),
 		grpc.WithTimeout(3 * time.Second),
 	}
-	if insecure {
+	switch security {
+	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
 		host, _, err := net.SplitHostPort(addr[skip:])
 		if err != nil {
@@ -102,8 +112,12 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 			}
 		}
 		opts = append(opts, grpc.WithInsecure())
-	} else {
-		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: upspin.AllowSelfSignedCertificate})))
+	case Secure:
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})))
+	case InsecureAllowingSelfSignedCertificates:
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
+	default:
+		return nil, errors.E(errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
 	}
 	conn, err := grpc.Dial(addr[skip:], opts...)
 	if err != nil {
