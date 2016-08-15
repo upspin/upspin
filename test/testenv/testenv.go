@@ -17,9 +17,10 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	"upspin.io/key/inprocess"
 	"upspin.io/path"
 	"upspin.io/upspin"
+
+	_ "upspin.io/key/inprocess"
 )
 
 // Entry is an entry in the Upspin namespace.
@@ -36,9 +37,8 @@ type Setup struct {
 	// OwnerName is the name of the directory tree owner.
 	OwnerName upspin.UserName
 
-	// Transport is what kind of servers to use, InProcess or GCP. Mixed usage is not supported.
-	// TODO support mixing.
-	Transport upspin.Transport
+	// Transport is what kind of servers to use, "inprocess" or "GCP".
+	Kind string
 
 	// Packing is the desired packing for the tree.
 	Packing upspin.Packing
@@ -157,13 +157,13 @@ func innerNewUser(op string, userName upspin.UserName, setup *Setup) (upspin.Cli
 		return nil, nil, errors.E(op, err)
 	}
 	var client upspin.Client
-	switch setup.Transport {
-	case upspin.GCP:
+	switch setup.Kind {
+	case "gcp":
 		client, err = gcpClient(context)
-	case upspin.InProcess:
+	case "inprocess":
 		client, err = inProcessClient(context)
 	default:
-		return nil, nil, errors.E(op, errors.Invalid, errors.Str("invalid transport"))
+		return nil, nil, errors.E(op, errors.Invalid, errors.Errorf("bad kind %q", setup.Kind))
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
@@ -236,9 +236,6 @@ func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, 
 	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
 		return nil, err
-	}
-	if _, ok := key.(*inprocess.Service); !ok { // TODO: Needless check?
-		return nil, errors.Str("key service must be the in-process instance")
 	}
 	// Install the registered user.
 	j := strings.IndexByte(string(userName), '@')

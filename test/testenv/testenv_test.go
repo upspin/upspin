@@ -23,7 +23,7 @@ func TestInProcess(t *testing.T) {
 	testSetup := &Setup{
 		OwnerName: upspin.UserName(userName),
 		Packing:   upspin.EEPack,
-		Transport: upspin.InProcess,
+		Kind:      "inprocess",
 		Tree: Tree{
 			E("Dir1/", ""),
 			E("Dir1/file1.txt", "yo! file1"),
