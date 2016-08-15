@@ -41,7 +41,7 @@ var (
 				Location: upspin.Location{
 					Reference: upspin.Reference("1234"),
 					Endpoint: upspin.Endpoint{
-						Transport: upspin.GCP,
+						Transport: upspin.Remote,
 						NetAddr:   "https://store-server.com",
 					},
 				},
@@ -49,7 +49,7 @@ var (
 		},
 	}
 	serviceEndpoint = upspin.Endpoint{
-		Transport: upspin.GCP,
+		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr("This service's location"),
 	}
 	dirParent = upspin.DirEntry{
@@ -599,7 +599,7 @@ func TestPutAccessFile(t *testing.T) {
 			Location: upspin.Location{
 				Reference: "1234",
 				Endpoint: upspin.Endpoint{
-					Transport: upspin.GCP,
+					Transport: upspin.Remote,
 					NetAddr:   upspin.NetAddr("https://store-server.upspin.io"),
 				},
 			},
