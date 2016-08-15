@@ -1,0 +1,288 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package filesystem
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+
+	"upspin.io/access"
+	"upspin.io/errors"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
+)
+
+// server is a SecureServer that serves the local file system's directory structure as an upspin.DirServer gRPC server.
+type server struct {
+	// Set by New.
+	root          string
+	server        upspin.Context
+	defaultAccess *access.Access
+	store         upspin.Endpoint
+
+	// Set by Dial.
+	user upspin.Context
+}
+
+var (
+	// Empty structs we can allocate just once.
+	putResponse       proto.DirPutResponse
+	deleteResponse    proto.DirDeleteResponse
+	configureResponse proto.ConfigureResponse
+)
+
+func New(ctx upspin.Context, options ...string) (upspin.DirServer, error) {
+	const op = "filesystem.New"
+
+	s := &server{server: ctx}
+
+	// TODO(adg): put in common.go
+	for _, opt := range options {
+		switch {
+		case strings.HasPrefix(opt, "root="):
+			s.root = opt[len("root="):]
+		case strings.HasPrefix(opt, "store="):
+			ep, err := upspin.ParseEndpoint(opt[len("store="):])
+			if err != nil {
+				return nil, errors.E(op, errors.Invalid, err)
+			}
+			s.store = *ep
+		default:
+			return nil, errors.E(op, errors.Invalid, errors.Errorf("bad option %q", opt))
+		}
+	}
+
+	// TODO(adg): check s.root exists and is readable.
+
+	var err error
+	s.defaultAccess, err = access.New(upspin.PathName(ctx.UserName()) + "/Access")
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	return s, nil
+}
+
+// verifyUserRoot checks that the user name in the path is the owner of this root.
+func (s *server) verifyUserRoot(parsed path.Parsed) error {
+	if parsed.User() != s.server.UserName() {
+		return errors.E(errors.Invalid, parsed.Path(), errors.Errorf("mismatched user name %q", parsed.User()))
+	}
+	return nil
+}
+
+// Lookup implements upspin.DirServer.
+func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "filesystem.Lookup"
+	log.Println(op, pathName)
+
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if err := s.verifyUserRoot(parsed); err != nil {
+		return nil, errors.E(op, err)
+	}
+	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.List, parsed); err != nil {
+		return nil, errors.E(op, err)
+	} else if !ok {
+		return nil, errors.E(op, access.ErrPermissionDenied)
+	}
+	e, err := s.entry(s.root + parsed.FilePath())
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return e, nil
+}
+
+// entry returns the DirEntry for the named local file or directory.
+func (s *server) entry(file string) (*upspin.DirEntry, error) {
+	info, err := os.Stat(file)
+	if err != nil {
+		return nil, err
+	}
+	attr := upspin.AttrNone
+	if info.IsDir() {
+		attr = upspin.AttrDirectory
+	}
+	if !strings.HasPrefix(file, s.root) {
+		return nil, errors.Str("internal error: not in root")
+	}
+	entry := upspin.DirEntry{
+		Name:     s.upspinPathFromLocal(file),
+		Packing:  upspin.PlainPack,
+		Time:     upspin.TimeFromGo(info.ModTime()),
+		Attr:     attr,
+		Sequence: 0,
+		Writer:   s.server.UserName(), // TODO: Is there a better answer?
+	}
+	if !info.IsDir() {
+		block := upspin.DirBlock{
+			Location: upspin.Location{
+				Endpoint:  s.store,
+				Reference: upspin.Reference(file),
+			},
+			Offset: 0,
+			Size:   info.Size(),
+		}
+		entry.Blocks = []upspin.DirBlock{block}
+	}
+	return &entry, nil
+}
+
+// upspinPathFromLocal returns the upspin.PathName for
+// the given absolute local path name.
+func (s *server) upspinPathFromLocal(local string) upspin.PathName {
+	return upspin.PathName(s.server.UserName()) + "/" + upspin.PathName(local[len(s.root):])
+}
+
+// Glob implements upspin.DirServer.
+func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "fileserver.Glob"
+	log.Println(op, pattern)
+
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if err := s.verifyUserRoot(parsed); err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	var (
+		matches []string
+		next    = []string{s.root}
+	)
+	for i := 0; i < parsed.NElem(); i++ {
+		elem := parsed.Elem(i)
+		matches, next = next, matches[:0]
+		for _, match := range matches {
+			if isGlobPattern(elem) || i == parsed.NElem()-1 {
+				parsed, err := path.Parse(s.upspinPathFromLocal(match))
+				if err != nil {
+					return nil, errors.E(op, err)
+				}
+				if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.List, parsed); err != nil {
+					return nil, errors.E(op, err)
+				} else if !ok {
+					continue
+				}
+			}
+			names, err := filepath.Glob(filepath.Join(match, elem))
+			// TODO(r): remove this error check
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			next = append(next, names...)
+		}
+	}
+	matches = next
+
+	var entries []*upspin.DirEntry
+	for _, match := range matches {
+		e, err := s.entry(match)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		parsed, err := path.Parse(upspin.PathName(s.upspinPathFromLocal(match)))
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.Read, parsed); err != nil {
+			return nil, errors.E(op, err)
+		} else if !ok {
+			e.Blocks = nil
+			e.Packdata = nil
+		}
+		entries = append(entries, e)
+	}
+	return entries, nil
+}
+
+// isGlobPattern replies whether the given path element
+// contains a glob pattern.
+func isGlobPattern(elem string) bool {
+	return strings.ContainsAny(elem, `*?[]`)
+}
+
+// WhichAccess implements upspin.DirServer.
+func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "fileserver.WhichAccess"
+	log.Println(op, pathName)
+
+	parsed, err := path.Parse(pathName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	err = s.verifyUserRoot(parsed)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.AnyRight, parsed); err != nil {
+		return nil, errors.E(op, err)
+	} else if !ok {
+		return nil, errors.E(op, access.ErrPermissionDenied)
+	}
+	accessPath, err := whichAccess(s.root, parsed)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	e, err := s.entry(string(accessPath))
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return e, nil
+}
+
+// Ping implements upspin.DirServer.Ping.
+func (s *server) Ping() bool {
+	return true
+}
+
+// Close implements upspin.Service.
+func (s *server) Close() {
+	// TODO
+}
+
+func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "filesystem.Dial"
+
+	dialed := *s
+	dialed.user = ctx.Copy()
+	return &dialed, nil
+}
+
+// Methods that are not implemented.
+
+var errReadOnly = errors.Str("read-only namespace")
+
+func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errors.E("filesystem.Delete", errReadOnly)
+}
+
+func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errors.E("filesystem.MakeDirectory", errReadOnly)
+}
+
+func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return nil, errors.E("filesystem.Put", errReadOnly)
+}
+
+// Methods that do not apply to this server.
+
+func (s *server) Configure(options ...string) error {
+	return errors.Str("store/fileserver: Configure should not be called")
+}
+
+func (s *server) Authenticate(upspin.Context) error {
+	return errors.Str("filesystem/gcp: Authenticate should not be called")
+}
+
+func (s *server) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{} // No endpoint.
+}
