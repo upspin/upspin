@@ -8,7 +8,7 @@
 package transports
 
 import (
-	_ "upspin.io/key/gcp"
+	//	_ "upspin.io/key/gcp" XXX
 	_ "upspin.io/key/inprocess"
 	_ "upspin.io/key/remote"
 	_ "upspin.io/key/unassigned"
