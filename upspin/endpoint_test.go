@@ -11,7 +11,6 @@ import (
 
 func TestParseAndString(t *testing.T) {
 	tests := []string{
-		"gcp,localhost:8080",
 		"remote,localhost:8080",
 		"https,https://localhost:8080",
 		"inprocess",
@@ -35,7 +34,6 @@ func TestErrorCases(t *testing.T) {
 	}{
 		{"remote", "requires a netaddr"},
 		{"supersonic,https://supersonic.com", "unknown transport type"},
-		{"gcp", "requires a netaddr"},
 		{"https", "requires a netaddr"},
 	}
 	for _, test := range tests {
@@ -62,7 +60,7 @@ func TestErroneousString(t *testing.T) {
 }
 
 func TestJSON(t *testing.T) {
-	e := Endpoint{Transport: GCP, NetAddr: "whatnot"}
+	e := Endpoint{Transport: Remote, NetAddr: "whatnot"}
 	buf, err := e.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

@@ -10,9 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"upspin.io/bind"
 	"upspin.io/cloud/storage/storagetest"
-	"upspin.io/context"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 
@@ -29,7 +27,7 @@ const (
 
 func TestPutAndGet(t *testing.T) {
 	s := newStoreServer()
-	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	ref, err := s.server.Put([]byte(contents))
 	if err != nil {
@@ -65,10 +63,11 @@ func TestPutAndGet(t *testing.T) {
 
 func TestGetFromLocalCache(t *testing.T) {
 	s := newStoreServer()
-	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	cache := s.server.cache
+	defer cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	// Simulate file still being locally on the server. Get the bytes instead of a new location.
-	err := fileCache.Put(expectedRef, bytes.NewReader([]byte(contents)))
+	err := cache.Put(expectedRef, bytes.NewReader([]byte(contents)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,13 +89,13 @@ func TestGetFromLocalCache(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	s := newStoreServer()
-	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	err := s.server.Delete(expectedRef)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gotRef := cloudClient.(*testGCP).deletedRef
+	gotRef := s.server.storage.(*testGCP).deletedRef
 	if gotRef != expectedRef {
 		t.Errorf("Expected delete call to %q, got %q", gotRef, expectedRef)
 	}
@@ -106,7 +105,7 @@ func TestDelete(t *testing.T) {
 
 func TestGetInvalidRef(t *testing.T) {
 	s := newStoreServer()
-	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	_, _, err := s.server.Get("bla bla bla")
 	if err == nil {
@@ -120,9 +119,11 @@ func TestGetInvalidRef(t *testing.T) {
 
 func TestGCPErrorsOut(t *testing.T) {
 	s := newStoreServer()
-	defer fileCache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
-	cloudClient = &storagetest.ExpectGet{
+	oldStorage := s.server.storage
+	defer func() { s.server.storage = oldStorage }()
+	s.server.storage = &storagetest.ExpectGet{
 		Ref:  "123",
 		Link: "very poorly-formated url",
 	}
@@ -137,29 +138,12 @@ func TestGCPErrorsOut(t *testing.T) {
 	}
 }
 
-func TestMissingConfiguration(t *testing.T) {
-	cleanSetup()
-	store, err := bind.StoreServer(context.New(), upspin.Endpoint{Transport: upspin.GCP})
+func TestNew(t *testing.T) {
+	_, err := New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, err = store.Get("bla bla bla")
-	if err == nil {
-		t.Fatalf("Expected error")
-	}
-	if !strings.Contains(err.Error(), "not configured") {
-		t.Fatalf("Expected not configured error, got %q", err)
-	}
-	bind.Release(store)
-}
-
-func TestConfigure(t *testing.T) {
-	cleanSetup()
-	store, err := bind.StoreServer(context.New(), upspin.Endpoint{Transport: upspin.GCP})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = store.Configure("dance=the macarena")
+	_, err = New("dance=the macarena")
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
@@ -167,56 +151,25 @@ func TestConfigure(t *testing.T) {
 	if !strings.Contains(err.Error(), expected) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}
-	// now configure it correctly
-	err = store.Configure("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
-	if err != nil {
-		t.Fatal(err)
-	}
-	bind.Release(store)
-}
-
-func TestRefCount(t *testing.T) {
-	cleanSetup()
-	s1, err := bind.StoreServer(context.New().SetUserName("a"), upspin.Endpoint{Transport: upspin.GCP})
-	if err != nil {
-		t.Fatal(err)
-	}
-	s2, err := bind.StoreServer(context.New().SetUserName("b"), upspin.Endpoint{Transport: upspin.GCP})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if refCount != 2 {
-		t.Fatalf("Expected 2 instances, got %d", refCount)
-	}
-	bind.Release(s1)
-	bind.Release(s2)
-	if refCount != 0 {
-		t.Fatalf("Expected 0 instances, got %d", refCount)
-	}
 }
 
 func newStoreServer() *storeTestServer {
 	ch := make(chan bool)
-	cloudClient = &testGCP{
-		ExpectGet: storagetest.ExpectGet{
-			Ref:  expectedRef,
-			Link: linkForRef,
+
+	s := &storeTestServer{
+		server: &server{
+			cache: cache.NewFileCache(""),
+			storage: &testGCP{
+				ExpectGet: storagetest.ExpectGet{
+					Ref:  expectedRef,
+					Link: linkForRef,
+				},
+				ch: ch,
+			},
 		},
 		ch: ch,
 	}
-	fileCache = cache.NewFileCache("")
-
-	s := &storeTestServer{
-		server: new(server),
-		ch:     ch,
-	}
-	s.server.context = context.New()
 	return s
-}
-
-func cleanSetup() {
-	cloudClient = nil
-	fileCache = nil
 }
 
 type storeTestServer struct {

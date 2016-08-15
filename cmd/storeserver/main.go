@@ -6,6 +6,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 	"os"
 
@@ -13,13 +14,14 @@ import (
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
-	"upspin.io/bind"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/store/gcp"
+	"upspin.io/store/inprocess"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -36,14 +38,22 @@ const serverName = "storeserver"
 
 // Server is a SecureServer that talks to a Store interface and serves gRPC requests.
 type Server struct {
-	context  upspin.Context
+	context upspin.Context
+
+	// What this server reports itself as through its Endpoint method.
 	endpoint upspin.Endpoint
+
+	// The underlying storage implementation.
+	store upspin.StoreServer
+
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
 
 func main() {
-	flags.Parse("config", "context", "endpoint", "https", "project")
+	addr := flag.String("addr", "", "publicly accessible network address (host:port)")
+	kind := flag.String("kind", "inprocess", "storeserver implementation `kind` (inprocess, gcp)")
+	flags.Parse("config", "context", "https", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -53,11 +63,6 @@ func main() {
 		} else {
 			metric.RegisterSaver(svr)
 		}
-	}
-
-	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
-	if err != nil {
-		log.Fatalf("endpoint parse error: %v", err)
 	}
 
 	// Load context and keys for this server. It needn't have a real username.
@@ -73,23 +78,15 @@ func main() {
 		log.Fatal("storeserver does not use keys, set secrets=none in rc")
 	}
 
-	// If there are configuration options, set them now
-	if len(flags.Config) > 0 {
-		// Get an instance so we can configure it.
-		store, err := bind.StoreServer(ctx, *endpoint)
+	// Create a new store implementation.
+	var store upspin.StoreServer
+	switch *kind {
+	case "inprocess":
+		store = inprocess.New()
+	case "gcp":
+		store, err = gcp.New(flags.Config...)
 		if err != nil {
-			log.Fatal(err)
-		}
-		// Configure it appropriately.
-		log.Printf("Configuring server with options: %v", flags.Config)
-		err = store.Configure(flags.Config...)
-		if err != nil {
-			log.Fatal(err)
-		}
-		// Now this pre-configured store is the one that will generate new instances for this server.
-		err = bind.ReregisterStoreServer(endpoint.Transport, store)
-		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Setting up StoreServer: %v", err)
 		}
 	}
 
@@ -99,8 +96,12 @@ func main() {
 		log.Fatal(err)
 	}
 	s := &Server{
-		context:      ctx,
-		endpoint:     *endpoint,
+		context: ctx,
+		endpoint: upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   upspin.NetAddr(*addr),
+		},
+		store:        store,
 		SecureServer: grpcSecureServer,
 	}
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
@@ -122,8 +123,11 @@ func (s *Server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := s.context.Copy().SetUserName(session.User())
-	return bind.StoreServer(context, s.endpoint)
+	svc, err := s.store.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return svc.(upspin.StoreServer), nil
 }
 
 // Get implements upspin.StoreServer.
@@ -186,35 +190,15 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 
 // Configure implements upspin.Service
 func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	log.Printf("Configure %q", req.Options)
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	err = store.Configure(req.Options...)
-	if err != nil {
-		log.Printf("Configure %q failed: %v", req.Options, err)
-		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
-	}
-	return &configureResponse, nil
+	return nil, errors.Str("Configure not implemented, nor should it be called.")
 }
 
 // Endpoint implements upspin.Service
 func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	log.Print("Endpoint")
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	endpoint := store.Endpoint()
 	resp := &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
-			Transport: int32(endpoint.Transport),
-			NetAddr:   string(endpoint.NetAddr),
+			Transport: int32(s.endpoint.Transport),
+			NetAddr:   string(s.endpoint.NetAddr),
 		},
 	}
 	return resp, nil
