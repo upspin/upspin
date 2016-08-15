@@ -138,12 +138,20 @@ func keyPutError(err error) *proto.KeyPutResponse {
 func (s *Server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
 	log.Printf("Put %v", req)
 
-	key, err := s.keyServerFor(ctx)
-	if err != nil {
-		log.Printf("Put %q authentication failed: %v", req.User.Name, err)
-		return keyPutError(err), nil
+	const disablePutAuth = true
 
+	var key upspin.KeyServer
+	var err error
+	if disablePutAuth {
+		key = s.key
+	} else {
+		key, err = s.keyServerFor(ctx)
+		if err != nil {
+			log.Printf("Put %q authentication failed: %v", req.User.Name, err)
+			return keyPutError(err), nil
+		}
 	}
+
 	user := proto.UpspinUser(req.User)
 	err = key.Put(user)
 	if err != nil {
