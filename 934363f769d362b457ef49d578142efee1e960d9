@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_651c2670",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-15T04:52:33Z",
+      "side": 1,
+      "message": "we don\u0027t put periods in error messages so i don\u0027t think they should be in log messages either. it\u0027s also messier.\ni\u0027m not going to fight about it but i think this is wrong",
+      "parentUuid": "1e40e5d2_ce68ab8a",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_45524a3e",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 1
@@ -177,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "de5c8dda_c5315af1",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-15T04:52:33Z",
+      "side": 1,
+      "message": "i thought the directory endpoint was not required?",
+      "parentUuid": "1e40e5d2_2e783756",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_25938ef7",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -276,6 +312,24 @@
       "side": 1,
       "message": "I clarified. But the quoted sentence is still correct. A direntry for a file has not been modified since its blocks were written to Store. The tree does not modify files. The client does.\n\nThe entry is written to the log so it can be played back. But it will be played back by the same logic and will not be marked dirty, only its parent. When it\u0027s finally flushed, directories will pack their subentries but files won\u0027t need to be packed, since they were packed by the client. All we need to do here is take their names and refs and encode them into the parent dir\u0027s entry.",
       "parentUuid": "de5c8dda_057532c5",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de5c8dda_e536d6e6",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-15T04:52:33Z",
+      "side": 1,
+      "message": "Oh, so the file dir entries are packed as part of their parent directory? maybe this comment should say that",
+      "parentUuid": "1e40e5d2_ae1a0726",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
