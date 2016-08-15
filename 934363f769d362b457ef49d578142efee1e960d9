@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_4e233b50",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T05:20:33Z",
+      "side": 1,
+      "message": "I think I often put a period in log messages. But I don\u0027t have to (and I don\u0027t claim to be super consistent). Removed from all here.",
+      "parentUuid": "de5c8dda_651c2670",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_45524a3e",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 1
@@ -213,6 +231,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_eee6cf15",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T05:20:33Z",
+      "side": 1,
+      "message": "Well, it\u0027s in by default and has a zero value. it\u0027s just not used by the tree directly. Might as well require it, since the DirServer will have one (its own).",
+      "parentUuid": "de5c8dda_c5315af1",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_25938ef7",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -330,6 +366,24 @@
       "side": 1,
       "message": "Oh, so the file dir entries are packed as part of their parent directory? maybe this comment should say that",
       "parentUuid": "1e40e5d2_ae1a0726",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_0eec53f4",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T05:20:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_e536d6e6",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
