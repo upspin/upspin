@@ -60,6 +60,12 @@ type server struct {
 
 var _ upspin.DirServer = (*server)(nil)
 
+const transport = upspin.InProcess
+
+func init() {
+	bind.RegisterDirServer(transport, New(nil))
+}
+
 // database represents the shared state of the directory forest.
 type database struct {
 	dirContext upspin.Context // For accessing store holding directory entries.
@@ -807,14 +813,8 @@ func (s *server) Close() {
 	// TODO
 }
 
-// Authenticate implements upspin.server.
+// Authenticate implements upspin.Service.
 func (s *server) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
-}
-
-const transport = upspin.InProcess
-
-func init() {
-	bind.RegisterDirServer(transport, New(nil))
 }
