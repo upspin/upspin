@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_ae63e7ab",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_8537e201",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_a53c5ee6",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-15T02:30:53Z",
       "side": 1,
       "message": "log.Error.Print(err)",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_ce68ab8a",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "The period at the end looks nicer. I\u0027m using this everywhere in this code.",
+      "parentUuid": "de5c8dda_a53c5ee6",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_6e7e3f47",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "I intentionally left this out because this is a very unique name. I can add if you insist. Just explaining why I don\u0027t think it\u0027s needed.",
+      "parentUuid": "de5c8dda_45524a3e",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_a5a69e51",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-15T02:30:53Z",
       "side": 1,
       "message": "I\u0027m confused by this sentence. Aren\u0027t the Log and LogIndex for this particular Tree? We need to be clear about the terminology here.\n\nAlso I think the notion of the context being the \"server\u0027s context\" is not really relevant. It\u0027s the context used to communicate with the store and key servers, right?",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_8e7b8354",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "Clarified the first.\nWell, it\u0027s true, but it does so on behalf of the server, not the user. Clarified second point as well.",
+      "parentUuid": "de5c8dda_a5a69e51",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_2e783756",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5c8dda_459c8a08",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_25938ef7",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-15T02:30:53Z",
       "side": 1,
       "message": "So the tree is totally unaware of the user name? interesting",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_ee100f0a",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "Sort of, it\u0027s aware of the username in Log and LogIndex and if they match, great. Since all subpaths must match a prefix, the username at the root is enforced only once.",
+      "parentUuid": "de5c8dda_25938ef7",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "1e40e5d2_0e169303",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "It\u0027s necessary for authentication with the StoreServer.",
+      "parentUuid": "de5c8dda_456b2aec",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de5c8dda_057532c5",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-08-15T02:30:53Z",
       "side": 1,
       "message": "How is this true? The comment on the dirty field says\n\n\"dirty indicates whether this node\u0027s DirEntry has been modified since it was last written to the store.\"\n\nI thought that entries are first written to the log, and then later written to the store? Wouldn\u0027t that make the entry dirty until it hits the store?",
+      "revId": "934363f769d362b457ef49d578142efee1e960d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e40e5d2_ae1a0726",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-15T03:26:29Z",
+      "side": 1,
+      "message": "I clarified. But the quoted sentence is still correct. A direntry for a file has not been modified since its blocks were written to Store. The tree does not modify files. The client does.\n\nThe entry is written to the log so it can be played back. But it will be played back by the same logic and will not be marked dirty, only its parent. When it\u0027s finally flushed, directories will pack their subentries but files won\u0027t need to be packed, since they were packed by the client. All we need to do here is take their names and refs and encode them into the parent dir\u0027s entry.",
+      "parentUuid": "de5c8dda_057532c5",
       "revId": "934363f769d362b457ef49d578142efee1e960d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
