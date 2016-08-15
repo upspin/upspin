@@ -396,10 +396,10 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 }
 
 func TestIntegration(t *testing.T) {
-	for _, transport := range []upspin.Transport{upspin.GCP, upspin.InProcess} {
-		t.Run(fmt.Sprintf("transport=%v", transport), func(t *testing.T) {
+	for _, kind := range []string{"inprocess", "gcp"} {
+		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
 			setup := setupTemplate
-			setup.Transport = transport
+			setup.Kind = kind
 			for _, p := range []struct {
 				packing upspin.Packing
 				curve   string

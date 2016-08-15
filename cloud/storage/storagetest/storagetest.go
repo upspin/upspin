@@ -7,9 +7,8 @@
 package storagetest
 
 import (
-	"errors"
-
 	"upspin.io/cloud/storage"
+	"upspin.io/errors"
 )
 
 // DummyStorage is a dummy version of storage.Storage that does nothing.
@@ -75,7 +74,7 @@ func (e *ExpectGet) Get(ref string) (link string, error error) {
 	if ref == e.Ref {
 		return e.Link, nil
 	}
-	return "", errors.New("not found")
+	return "", errors.E(errors.NotExist)
 }
 
 // ExpectDownloadCapturePut inspects all calls to Download with the
@@ -100,7 +99,7 @@ func (e *ExpectDownloadCapturePut) Download(ref string) ([]byte, error) {
 		e.pos++
 		return data, nil
 	}
-	return nil, errors.New("not found")
+	return nil, errors.E(errors.NotExist)
 }
 
 // Put implements storage.Storage.

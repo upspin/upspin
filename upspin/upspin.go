@@ -35,9 +35,6 @@ const (
 	// typically in memory.
 	InProcess
 
-	// GCP indicates a Google Cloud Store instance.
-	GCP
-
 	// Remote indicates a connection to a remote server through RPC.
 	// The Endpoint's NetAddr contains the HTTP address of the remote server.
 	Remote

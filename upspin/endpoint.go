@@ -14,11 +14,6 @@ import (
 func ParseEndpoint(v string) (*Endpoint, error) {
 	elems := strings.SplitN(v, ",", 2)
 	switch elems[0] {
-	case "gcp":
-		if len(elems) < 2 {
-			return nil, fmt.Errorf("gcp endpoint %q requires a netaddr", v)
-		}
-		return &Endpoint{Transport: GCP, NetAddr: NetAddr(elems[1])}, nil
 	case "inprocess":
 		return &Endpoint{Transport: InProcess}, nil
 	case "remote":
@@ -41,7 +36,7 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 // toString converts an endpoint to a string.
 func (ep Endpoint) toString() (string, error) {
 	switch ep.Transport {
-	case GCP, Remote, HTTPS:
+	case Remote, HTTPS:
 		return fmt.Sprintf("%v,%v", ep.Transport, ep.NetAddr), nil
 	case InProcess, Unassigned:
 		return ep.Transport.String(), nil

@@ -188,14 +188,16 @@ func (r *remote) Configure(options ...string) error {
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "Dial"
 	if e.Transport != upspin.Remote {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, errors.IO, e, err)
 	}
+
 	// The connection is closed when this service is released (see Bind.Release)
 	dirClient := proto.NewDirClient(authClient.GRPCConn())
 	authClient.SetService(dirClient)
