@@ -14,17 +14,18 @@ import (
 	"strings"
 
 	"upspin.io/log"
+	"upspin.io/upspin"
 )
 
 var (
-	// Config is a list of configuration options (key=value); used by servers only.
+	// Config specifies configuration options ("key=value") for servers.
 	Config []string
 
 	// Context names the Upspin context file to use.
 	Context = filepath.Join(os.Getenv("HOME"), "/upspin/rc")
 
-	// Endpoint specifies the endpoint of remote service (applies to forwarding servers only).
-	Endpoint = "inprocess"
+	// NetAddr is the publicly accessible network address of this server.
+	NetAddr upspin.NetAddr
 
 	// HTTPSAddr is the network address on which to listen for incoming network connections.
 	HTTPSAddr = "localhost:443"
@@ -34,6 +35,9 @@ var (
 
 	// Project is the project name on GCP; used by servers only.
 	Project = ""
+
+	// ServerKind is the implementation kind of this server.
+	ServerKind = "inprocess"
 )
 
 // flags is a map of flag registration functions keyed by flag name,
@@ -45,18 +49,21 @@ var flags = map[string]func(){
 	"context": func() {
 		flag.StringVar(&Context, "context", Context, "context `file`")
 	},
-	"endpoint": func() {
-		flag.StringVar(&Endpoint, "endpoint", Endpoint, "`endpoint` of remote service for forwarding servers")
+	"addr": func() {
+		flag.Var(addrFlag{&NetAddr}, "addr", "publicly accessible network address (`host:port`)")
 	},
 	"https": func() {
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")
 	},
-	"project": func() {
-		flag.StringVar(&Project, "project", Project, "GCP `project` name")
-	},
 	"log": func() {
 		Log.Set("info")
 		flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+	},
+	"project": func() {
+		flag.StringVar(&Project, "project", Project, "GCP `project` name")
+	},
+	"kind": func() {
+		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
 	},
 }
 
@@ -132,4 +139,30 @@ func (f configFlag) Get() interface{} {
 		return ""
 	}
 	return *f.s
+}
+
+type addrFlag struct {
+	a *upspin.NetAddr
+}
+
+// String implements flag.Value.
+func (f addrFlag) String() string {
+	if f.a == nil {
+		return ""
+	}
+	return string(*f.a)
+}
+
+// Set implements flag.Value.
+func (f addrFlag) Set(s string) error {
+	*f.a = upspin.NetAddr(s)
+	return nil
+}
+
+// Get implements flag.Getter.
+func (f addrFlag) Get() interface{} {
+	if f.a == nil {
+		return ""
+	}
+	return string(*f.a)
 }

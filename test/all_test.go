@@ -34,7 +34,7 @@ var userNameCounter = 0
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 	s := &testenv.Setup{
 		OwnerName: newUserName(),
-		Transport: upspin.InProcess,
+		Kind:      "inprocess",
 		Packing:   packing,
 	}
 	env, err := testenv.New(s)
