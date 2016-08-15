@@ -17,14 +17,11 @@ import (
 )
 
 var (
-	// Config is a list of configuration options (key=value); used by servers only.
+	// Config specifies configuration options ("key=value") for servers.
 	Config []string
 
 	// Context names the Upspin context file to use.
 	Context = filepath.Join(os.Getenv("HOME"), "/upspin/rc")
-
-	// Endpoint specifies the endpoint of remote service (applies to forwarding servers only).
-	Endpoint = "inprocess"
 
 	// HTTPSAddr is the network address on which to listen for incoming network connections.
 	HTTPSAddr = "localhost:443"
@@ -44,9 +41,6 @@ var flags = map[string]func(){
 	},
 	"context": func() {
 		flag.StringVar(&Context, "context", Context, "context `file`")
-	},
-	"endpoint": func() {
-		flag.StringVar(&Endpoint, "endpoint", Endpoint, "`endpoint` of remote service for forwarding servers")
 	},
 	"https": func() {
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")

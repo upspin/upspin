@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"upspin.io/cloud/storage/storagetest"
-	"upspin.io/context"
 	"upspin.io/upspin"
 )
 
@@ -54,7 +53,7 @@ func TestPutOtherUserNotAdmin(t *testing.T) {
 		t.Fatal("Expected error, got none")
 	}
 	if !strings.Contains(err.Error(), "permission denied") {
-		t.Errorf("Expected permission denied, got %q", err)
+		t.Errorf("Expected permission denied error, got: %v", err)
 	}
 	// Check that indeed we did not write to GCP.
 	if len(mockGCP.PutRef) != 0 {
@@ -214,24 +213,24 @@ func unmarshalUser(t *testing.T, buf []byte) (*upspin.User, bool) {
 }
 
 // newDummyKeyServer creates a new keyserver.
-func newDummyKeyServer() *key {
-	return &key{cloudClient: &storagetest.DummyStorage{}}
+func newDummyKeyServer() *server {
+	return &server{store: &storagetest.DummyStorage{}}
 }
 
 // newKeyServerWithMocking sets up a mock GCP client for a user and expects a
 // single lookup of user mockKey and it will reply with the preset
 // data. It returns the user server, the mock GCP client for further
 // verification.
-func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*key, *storagetest.ExpectDownloadCapturePut) {
+func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*server, *storagetest.ExpectDownloadCapturePut) {
 	mockGCP := &storagetest.ExpectDownloadCapturePut{
 		Ref:         []string{ref},
 		Data:        [][]byte{data},
 		PutContents: make([][]byte, 0, 1),
 		PutRef:      make([]string, 0, 1),
 	}
-	u := &key{
-		cloudClient: mockGCP,
-		context:     context.New().SetUserName(user),
+	s := &server{
+		store: mockGCP,
+		user:  user,
 	}
-	return u, mockGCP
+	return s, mockGCP
 }

@@ -23,6 +23,26 @@ type service struct {
 	data     *dataService
 }
 
+const transport = upspin.InProcess
+
+var singletonService = &service{
+	data: &dataService{
+		endpoint: upspin.Endpoint{
+			Transport: transport,
+			NetAddr:   "", // Ignored.
+		},
+		blob: make(map[upspin.Reference][]byte),
+	},
+}
+
+func init() {
+	bind.RegisterStoreServer(transport, singletonService)
+}
+
+func New() upspin.StoreServer {
+	return singletonService
+}
+
 // A dataService is the underlying service object.
 // There is one for the entire system, created in init.
 type dataService struct {
@@ -34,9 +54,6 @@ type dataService struct {
 	// blob contains the underlying data.
 	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
 }
-
-// This package (well, the service type) implements the upspin.StoreServer interface.
-var _ upspin.StoreServer = (*service)(nil)
 
 func copyOf(in []byte) (out []byte) {
 	out = make([]byte, len(in))
@@ -130,19 +147,4 @@ func (s *service) Close() {
 func (s *service) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
-}
-
-const transport = upspin.InProcess
-
-func init() {
-	s := &service{
-		data: &dataService{
-			endpoint: upspin.Endpoint{
-				Transport: upspin.InProcess,
-				NetAddr:   "", // Ignored.
-			},
-			blob: make(map[upspin.Reference][]byte),
-		},
-	}
-	bind.RegisterStoreServer(transport, s)
 }

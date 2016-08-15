@@ -56,8 +56,8 @@ func TestInitContext(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
 		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
-		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
+		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
@@ -67,8 +67,8 @@ func TestComments(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
 		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
-		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
+		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	testConfig(t, &expect, makeCommentedConfig(&expect))
@@ -102,16 +102,16 @@ func TestEnv(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
 		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
-		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
+		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	config := makeConfig(&expect)
 	expect.username = "quux"
 	os.Setenv("upspinusername", string(expect.username))
 	expect.keyserver = Endpoint(upspin.InProcess, "")
-	expect.dirserver = Endpoint(upspin.GCP, "who.knows:1234")
-	expect.storeserver = Endpoint(upspin.GCP, "who.knows:1234")
+	expect.dirserver = Endpoint(upspin.Remote, "who.knows:1234")
+	expect.storeserver = Endpoint(upspin.Remote, "who.knows:1234")
 	os.Setenv("upspinkeyserver", expect.keyserver.String())
 	os.Setenv("upspindirserver", expect.dirserver.String())
 	os.Setenv("upspinstoreserver", expect.storeserver.String())
@@ -124,8 +124,8 @@ func TestBadEnv(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
 		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.GCP, "who.knows:1234"),
-		storeserver: Endpoint(upspin.GCP, "who.knows:1234"),
+		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
+		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	config := makeConfig(&expect)

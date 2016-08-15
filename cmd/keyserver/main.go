@@ -6,17 +6,19 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
-	"upspin.io/bind"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/flags"
+	"upspin.io/key/gcp"
+	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/upspin"
@@ -31,15 +33,22 @@ const serverName = "keyserver"
 
 // Server is a SecureServer that talks to a KeyServer interface and serves gRPC requests.
 type Server struct {
-	context  upspin.Context
+	context upspin.Context
+
+	// What this server reports itself as through its Endpoint method.
 	endpoint upspin.Endpoint
-	key      upspin.KeyServer // default user service for looking up keys for unauthenticated users.
+
+	// The underlying keyserver implementation.
+	key upspin.KeyServer
+
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
 
 func main() {
-	flags.Parse("config", "endpoint", "https", "log", "project")
+	addr := flag.String("addr", "", "publicly accessible network address (host:port)")
+	kind := flag.String("kind", "inprocess", "storeserver implementation `kind` (inprocess, gcp)")
+	flags.Parse("config", "https", "log", "project")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -51,38 +60,29 @@ func main() {
 		}
 	}
 
-	endpoint, err := upspin.ParseEndpoint(flags.Endpoint)
-	if err != nil {
-		log.Fatalf("endpoint parse error: %v", err)
-	}
-
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	context := context.New().SetUserName(serverName)
 
-	// Get an instance so we can configure it and use it for authenticated connections.
-	key, err := bind.KeyServer(context, *endpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// If there are configuration options, set them now
-	if len(flags.Config) > 0 {
-		log.Printf("Configuring server with options: %v", flags.Config)
-		err = key.Configure(flags.Config...)
+	// Create a new store implementation.
+	var key upspin.KeyServer
+	switch *kind {
+	case "inprocess":
+		key = inprocess.New()
+	case "gcp":
+		var err error
+		key, err = gcp.New(flags.Config...)
 		if err != nil {
-			log.Fatal(err)
-		}
-		// Now this pre-configured store is the one that will generate new instances for this server.
-		err = bind.ReregisterKeyServer(endpoint.Transport, key)
-		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Setting up KeyServer: %v", err)
 		}
 	}
 
 	s := &Server{
-		context:  context,
-		endpoint: *endpoint,
-		key:      key,
+		context: context,
+		endpoint: upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   upspin.NetAddr(*addr),
+		},
+		key: key,
 	}
 	authConfig := auth.Config{Lookup: s.internalLookup}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
@@ -93,7 +93,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	// TODO: this needs to be changed to keyserver. But it involves some metadata on GCP.
+	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
 }
 
@@ -112,9 +112,11 @@ func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := s.context.Copy().SetUserName(session.User())
-	key, err := bind.KeyServer(context, s.endpoint)
-	return key, err
+	svc, err := s.key.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return svc.(upspin.KeyServer), nil
 }
 
 // Lookup implements upspin.KeyServer, and does not do any authentication.

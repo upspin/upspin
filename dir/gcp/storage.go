@@ -95,7 +95,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 	}
 	log.Debug.Printf("Storing dir entry at %q", path)
 	ss2 := ss.StartSpan("putCloudBytes")
-	_, err = d.cloudClient.Put(string(path), jsonBuf)
+	_, err = d.store.Put(string(path), jsonBuf)
 	ss2.End()
 	return err
 }
@@ -105,7 +105,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 func (d *directory) isDirEmpty(path upspin.PathName, opts ...options) error {
 	defer span(opts).StartSpan("isDirEmpty").End()
 	dirPrefix := string(path) + "/"
-	files, err := d.cloudClient.ListDir(dirPrefix)
+	files, err := d.store.ListDir(dirPrefix)
 	if err != nil {
 		return errors.E("ListDir", errors.IO, err)
 	}
@@ -120,7 +120,7 @@ func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte
 	log.Debug.Printf("Downloading DirEntry from GCP: %s", path)
 	defer span(opts).StartSpan("getCloudBytes").End()
 
-	data, err := d.cloudClient.Download(string(path))
+	data, err := d.store.Download(string(path))
 	if err != nil {
 		return nil, errors.E("Download", path, errors.NotExist, err)
 	}
@@ -131,7 +131,7 @@ func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte
 // It must be called with userlock held.
 func (d *directory) deletePath(path upspin.PathName, opts ...options) error {
 	defer span(opts).StartSpan("deletePath").End()
-	if err := d.cloudClient.Delete(string(path)); err != nil {
+	if err := d.store.Delete(string(path)); err != nil {
 		return errors.E("Delete", errors.IO, err)
 	}
 	d.dirCache.Remove(path)

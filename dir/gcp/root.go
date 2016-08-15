@@ -74,7 +74,7 @@ func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) e
 		return errors.E(op, userRootPath, errors.IO, errors.Errorf("marshal error: %s", err))
 	}
 	// Save to backend
-	_, err = d.cloudClient.Put(string(userRootPath), jsonRoot)
+	_, err = d.store.Put(string(userRootPath), jsonRoot)
 	if err != nil {
 		return errors.E(op, userRootPath, errors.IO, errors.Errorf("backend error: %s", err))
 	}
