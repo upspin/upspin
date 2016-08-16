@@ -566,7 +566,12 @@ func readAll(fileName string) []byte {
 }
 
 func newClient() (upspin.Client, upspin.Context) {
-	ctx, err := context.InitContext(nil)
+	f, err := os.Open(flags.Context)
+	if err != nil {
+		exitf("reading context: %v", err)
+	}
+	ctx, err := context.InitContext(f)
+	f.Close()
 	if err != nil {
 		exit(err)
 	}
