@@ -130,7 +130,7 @@ func startClient(port string) {
 	}
 	ctx := context.New().SetUserName(user).SetFactotum(f)
 
-	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, SecureAllowingSelfSignedCertificates)
+	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, InsecureAllowingSelfSignedCertificates)
 	if err != nil {
 		log.Fatal(err)
 	}
