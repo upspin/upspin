@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bd8f739_026cecc5",
+        "filename": "cache/lru.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T22:49:21Z",
+      "side": 1,
+      "message": "Note: I do not care what this or the method below are called. FunnyBunny17 is the only exception -- I\u0027m not naming it that. Anything else is fair game.\n\nPossible alternatives: LRUEvict, LRUDiscard, ExpireFromLRU, WhenEvicted, etc.",
+      "revId": "96aa9a05de2e3cd065ea3760324d2f58563b7717",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
