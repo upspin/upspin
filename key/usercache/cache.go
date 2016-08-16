@@ -62,6 +62,11 @@ func Global(context upspin.Context) upspin.Context {
 	}
 }
 
+// ResetGlobal resets the global cache.
+func ResetGlobal() {
+	globalCache.entries = cache.NewLRU(256)
+}
+
 // Lookup implements upspin.KeyServer.Lookup.
 func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	v, ok := c.cache.entries.Get(name)
