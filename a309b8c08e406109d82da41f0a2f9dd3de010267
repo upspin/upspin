@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ba2277b_e3ec1223",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "These tests should do a lookup to check that the entry was actually put there",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_639ca2bb",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "why? the lru is thread safe",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_2396aa9b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "please make this a field in server, rather than a global. otherwise i\u0027ll just have to do it later",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_03912ea2",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "yeah, please do this. I\u0027ve been making this change in the existing servers where appropriate.",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_83a43efa",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "you\u0027re not holding the userlock here",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_c3aa36c6",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "is there a race here?\ncan\u0027t the path become dirty in between the previous tree.Lookup and this one?\nin other words, should this if block be a loop?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_e3a732fd",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "what does this actually protect? the user tree?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_a3a13ae9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "this seems like an odd check. the caller is in control over both p and entry. when/why does this go wrong? and why not just set entry.Name to p.Path() ?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_43fc06d8",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "avoid unnecessary nesting:\n\nif errors.Match(errNotExist, err) {\n  // OK; entry not found as expected.\n} else if err !\u003d nil {\n  // unexpected error\n} else {\n  // path exists; can we overwrite, etc?\n}",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_03060ef2",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "errors.Errorf(\"userTrees contained value of unexpected type %T\", val)",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_230b0af9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "what does \u0027we\u0027re all set\u0027 mean?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_c3ef9615",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:19:52Z",
+      "side": 1,
+      "message": "Debug",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
