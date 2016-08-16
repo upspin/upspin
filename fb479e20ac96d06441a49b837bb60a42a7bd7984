@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bd8f739_02014ca3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:10:10Z",
+      "side": 1,
+      "message": "This could be exported here or put in package cloud. Just so we don\u0027t replicate it 3 times more (you have one replication, but dir and store will need their own).",
+      "revId": "fb479e20ac96d06441a49b837bb60a42a7bd7984",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
