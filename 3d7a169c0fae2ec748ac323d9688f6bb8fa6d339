@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bbcc4b54_2f9c4568",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-16T01:50:56Z",
+      "side": 1,
+      "message": "Actually, I want something that can\u0027t be accidentally promoted to one of the values, i.e., I want people purposefully picking a value that means something.  Perhaps I should make the 3 values structs so a zero won\u0027t get promoted to mean something?",
+      "parentUuid": "9ba2277b_437ac61d",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbcc4b54_ccc10fa0",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -60,6 +78,24 @@
     },
     {
       "key": {
+        "uuid": "bbcc4b54_d28d242b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-16T01:50:56Z",
+      "side": 1,
+      "message": "Its certainly no worse.  I\u0027ll use them.",
+      "parentUuid": "9ba2277b_637fc20c",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_0384ce07",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -77,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "bbcc4b54_f28aa010",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-16T01:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_0384ce07",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_e38ad210",
         "filename": "cmd/storecache/main.go",
         "patchSetId": 1
@@ -88,6 +142,24 @@
       "writtenOn": "2016-08-16T00:53:28Z",
       "side": 1,
       "message": "drop this file from this CL",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbcc4b54_4f9d1167",
+        "filename": "cmd/storecache/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-16T01:50:56Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "9ba2277b_e38ad210",
       "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
