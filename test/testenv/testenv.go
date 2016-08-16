@@ -150,25 +150,41 @@ func (e *Env) Exit() error {
 }
 
 func innerNewUser(op string, userName upspin.UserName, setup *Setup) (upspin.Client, upspin.Context, error) {
-	var context upspin.Context
+	var ctx upspin.Context
 	var err error
-	context, err = newContextForUser(userName, setup)
+	ctx = context.New().SetUserName(userName).SetPacking(setup.Packing)
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
+	// Get keys for user.
+	j := strings.IndexByte(string(userName), '@')
+	if j < 0 {
+		log.Fatal("malformed userName ", userName)
+	}
+	f, err := factotum.New(repo("key/testdata/" + string(userName[:j])))
+	if err != nil {
+		log.Fatalf("unable to initialize factotum for %q: %q", string(userName[:j]), err)
+	}
+	ctx.SetFactotum(f)
+
+
 	var client upspin.Client
 	switch setup.Transport {
 	case upspin.GCP:
-		client, err = gcpClient(context)
+		client, err = gcpClient(ctx)
 	case upspin.InProcess:
-		client, err = inProcessClient(context)
+		client, err = inProcessClient(ctx)
 	default:
 		return nil, nil, errors.E(op, errors.Invalid, errors.Str("invalid transport"))
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
-	return client, context, nil
+
+	// Register user with key server.
+	registerUserWithKeyServer(userName, ctx)
+
+	return client, ctx, nil
 }
 
 // NewUser creates a new client for a user.  The new user will not
@@ -224,43 +240,26 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the inprocess key service
-// and returns a partially filled Context.
-func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, error) {
-	inProcess := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "",
-	}
-	context := context.New().SetUserName(userName).SetPacking(setup.Packing).SetKeyEndpoint(inProcess).SetDirEndpoint(inProcess).SetStoreEndpoint(inProcess)
-
+// registerUserWithKeyServer registers userName's context with the inProcess keyServer.
+func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context) {
 	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 	if _, ok := key.(*inprocess.Service); !ok { // TODO: Needless check?
-		return nil, errors.Str("key service must be the in-process instance")
+		log.Fatal("key service must be the in-process instance")
 	}
 	// Install the registered user.
-	j := strings.IndexByte(string(userName), '@')
-	if j < 0 {
-		log.Fatal("malformed userName ", userName)
-	}
-	f, err := factotum.New(repo("key/testdata/" + string(userName[:j])))
-	if err != nil {
-		log.Fatalf("unable to initialize factotum for %q: %q", string(userName[:j]), err)
-	}
 	user := &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
 		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
-		PublicKey: f.PublicKey(),
+		PublicKey: context.Factotum().PublicKey(),
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	context.SetFactotum(f)
-	return context, nil
 }
 
 func makeRoot(context upspin.Context) error {
