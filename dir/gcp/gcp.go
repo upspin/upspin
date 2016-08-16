@@ -306,13 +306,8 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		log.Debug.Printf("Access error Read: %s", err)
 		return nil, errors.E(op, err)
 	}
-	canList, err := d.hasRight(op, d.context.UserName(), access.List, &parsed, opts)
-	if err != nil {
-		log.Debug.Printf("Access error List: %s", err)
-		return nil, errors.E(op, err)
-	}
-	// If the user has no rights, we're done.
-	if !canRead && !canList {
+	// If the user has no read rights, we're done.
+	if !canRead {
 		return nil, errors.E(op, parsed.Path(), errors.Permission)
 	}
 	// Look up entry
@@ -327,12 +322,6 @@ func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
-	}
-	// We have a dirEntry and ACLs check. But we still must clear Location if user does not have Read rights.
-	if !canRead {
-		log.Debug.Printf("Zeroing out location information in Get for user %s on path %s", d.context.UserName(), parsed)
-		dirEntry.Blocks = nil
-		dirEntry.Packdata = nil
 	}
 	log.Debug.Printf("Got dir entry for user %s: path %s: %v", d.context.UserName(), parsed.Path(), dirEntry)
 	return dirEntry, nil
@@ -471,7 +460,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				log.Error.Printf("Error checking access for user: %s on %s: %s", user, de.Name, err)
 				continue
 			}
-			if !canRead && !canList {
+			if !canList {
 				log.Debug.Printf("User %s can't Glob %s", user, de.Name)
 				continue
 			}
