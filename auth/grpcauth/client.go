@@ -98,18 +98,8 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	switch security {
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
-		host, _, err := net.SplitHostPort(addr[skip:])
-		if err != nil {
-			return nil, err
-		}
-		ips, err := net.LookupIP(host)
-		if err != nil {
-			return nil, err
-		}
-		for _, ip := range ips {
-			if !ip.IsLoopback() {
-				return nil, errors.E("Dial", netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
-			}
+		if !isLocal(addr[skip:]) {
+			return nil, errors.E("Dial", netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
 		}
 		opts = append(opts, grpc.WithInsecure())
 	case Secure:
@@ -133,6 +123,23 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 		go ac.keepAlive()
 	}
 	return ac, nil
+}
+
+func isLocal(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	ips, err := net.LookupIP(host)
+	if err != nil {
+		return false
+	}
+	for _, ip := range ips {
+		if !ip.IsLoopback() {
+			return false
+		}
+	}
+	return true
 }
 
 // keepAlive loops forever pinging the server every keepAliveInterval. It skips pings if there has been network

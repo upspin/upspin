@@ -7,10 +7,10 @@ package main
 
 import (
 	"flag"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	gContext "golang.org/x/net/context"
 
@@ -98,7 +98,7 @@ func main() {
 		if key.Endpoint().Transport != upspin.InProcess {
 			log.Fatal("cannot use testuser for endpoint %q", key.Endpoint())
 		}
-		if !strings.HasPrefix(flags.HTTPSAddr, "localhost:") {
+		if !isLocal(flags.HTTPSAddr) {
 			log.Fatal("cannot use -testuser flag except on localhost:port")
 		}
 		s.setupTestUser()
@@ -115,6 +115,24 @@ func main() {
 	http.Handle("/", grpcSecureServer.GRPCServer())
 	// TODO: this needs to be changed to keyserver. But it involves some metadata on GCP.
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
+}
+
+// isLocal returns true if the name only resolves to loopback addresses.
+func isLocal(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	ips, err := net.LookupIP(host)
+	if err != nil {
+		return false
+	}
+	for _, ip := range ips {
+		if !ip.IsLoopback() {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *Server) setupTestUser() {
