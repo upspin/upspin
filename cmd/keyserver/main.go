@@ -6,7 +6,11 @@
 package main
 
 import (
+	"flag"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	gContext "golang.org/x/net/context"
 
@@ -16,9 +20,11 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -37,6 +43,8 @@ type Server struct {
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
+
+var testUser = flag.String("testuser", "", "for localhost only, initialize this one user with test keys")
 
 func main() {
 	flags.Parse("config", "endpoint", "https", "log", "project")
@@ -84,6 +92,18 @@ func main() {
 		endpoint: *endpoint,
 		key:      key,
 	}
+
+	// Special hack for bootstrapping the inprocess key server.
+	if *testUser != "" {
+		if key.Endpoint().Transport != upspin.InProcess {
+			log.Fatal("cannot use testuser for endpoint %q", key.Endpoint())
+		}
+		if !strings.HasPrefix(flags.HTTPSAddr, "localhost:") {
+			log.Fatal("cannot use -testuser flag except on localhost:port")
+		}
+		s.setupTestUser()
+	}
+
 	authConfig := auth.Config{Lookup: s.internalLookup}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
@@ -95,6 +115,35 @@ func main() {
 	http.Handle("/", grpcSecureServer.GRPCServer())
 	// TODO: this needs to be changed to keyserver. But it involves some metadata on GCP.
 	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
+}
+
+func (s *Server) setupTestUser() {
+	user, _, err := path.UserAndDomain(upspin.UserName(*testUser))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f, err := factotum.New(repo("key/testdata/" + user))
+	if err != nil {
+		log.Fatalf("unable to initialize factotum for %q: %v", user, err)
+	}
+	userStruct := &upspin.User{
+		Name:      upspin.UserName(*testUser),
+		PublicKey: f.PublicKey(),
+	}
+	err = s.key.Put(userStruct)
+	if err != nil {
+		log.Fatalf("Put %q failed: %v", *testUser, err)
+	}
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+// For support of the testuser flag only.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
 
 func (s *Server) internalLookup(userName upspin.UserName) (upspin.PublicKey, error) {
