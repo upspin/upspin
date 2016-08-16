@@ -16,6 +16,24 @@
       "revId": "fb479e20ac96d06441a49b837bb60a42a7bd7984",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_e3d5f244",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:32:23Z",
+      "side": 1,
+      "message": "why do dir and store need this?\nit\u0027s just for the keyserver hack\nlet\u0027s worry about exporting this if/when we have a 3rd copy",
+      "parentUuid": "1bd8f739_02014ca3",
+      "revId": "fb479e20ac96d06441a49b837bb60a42a7bd7984",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
