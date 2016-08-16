@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "1bd8f739_7f654f17",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-16T21:36:33Z",
+      "side": 1,
+      "message": "Just for my understanding, not needing a comment:\nThis would be an internal logic bug, not a race condition, correct?   The userLock on p.User() would protect us?",
+      "revId": "742e463c7ed9f17a9adbb57b6dc6e6b516a5e670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_5f4c0b48",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-16T21:36:33Z",
+      "side": 1,
+      "message": "Remind me what the plans are to remove the duplicate path parsing and walking?   Or do we feel that\u0027s inexpensive?",
+      "revId": "742e463c7ed9f17a9adbb57b6dc6e6b516a5e670",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbcc4b54_cc310f56",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
