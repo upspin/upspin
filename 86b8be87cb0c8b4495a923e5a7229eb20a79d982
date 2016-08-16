@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bd8f739_a2efc015",
+        "filename": "cloud/storage/storagetest/storagetest.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "Good. Thanks.",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_c2a764fd",
+        "filename": "dir/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "it\u0027s a little confusing to call this store, even though the type is storage.Storage, because it could be confused with upspin.StoreServer. How about storage?",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_22e57033",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "storage?",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_82e47c35",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "You could do this here. parsed is not needed after this check.",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_c2d5a445",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_a25500cf",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "Can you reverse these two? Empty if blocks with non-empty else blocks is weird.",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_2242d017",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_c25204e4",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "%s as op is a string.",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_e25f08e9",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "%s",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_226bb087",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "%s",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_c2292432",
+        "filename": "key/transports/transports.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_a20340be",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "you actually used storage here. :-)",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_8238fc81",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "Must have an explanation or be removed.",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_2239f087",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:07:00Z",
+      "side": 1,
+      "message": "bad _server_ kind?",
+      "revId": "86b8be87cb0c8b4495a923e5a7229eb20a79d982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
