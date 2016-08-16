@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9bf5c793_2b10d907",
+        "filename": "test/integration_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T18:32:32Z",
+      "side": 1,
+      "message": "No, not for this reason alone. But I suspect we never needed so many users, it was just to be safe. There are other things we can do to fix that. I\u0027ll take a look next time I\u0027m waiting for reviews.",
+      "parentUuid": "9bf5c793_6bdf8167",
+      "revId": "099e2e8b6cc856c385810467fdb236705ff0d79a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9bf5c793_2bae19e7",
         "filename": "test/testenv/testenv.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-16T18:28:00Z",
       "side": 1,
       "message": "Where is err set?",
+      "revId": "099e2e8b6cc856c385810467fdb236705ff0d79a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9bf5c793_cb75d55f",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T18:32:32Z",
+      "side": 1,
+      "message": "Oh crap, left over. Removed.",
+      "parentUuid": "9bf5c793_2bae19e7",
       "revId": "099e2e8b6cc856c385810467fdb236705ff0d79a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
