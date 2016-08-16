@@ -85,3 +85,27 @@ func TestRemoveOne(t *testing.T) {
 		t.Errorf("Expected nil")
 	}
 }
+
+type testOnEviction struct {
+	keyDeleted string
+}
+
+func (t *testOnEviction) OnEviction(key interface{}) {
+	t.keyDeleted = key.(string)
+}
+
+func TestImplementsLRUDeleter(t *testing.T) {
+	c := cache.NewLRU(1)
+	one := &testOnEviction{}
+	two := &testOnEviction{}
+	c.Add("1", one)
+	c.Add("2", two)
+	c.Add("3", "does not matter")
+
+	if one.keyDeleted != "1" {
+		t.Errorf("keyCalled = %s, want = 1", one.keyDeleted)
+	}
+	if two.keyDeleted != "2" {
+		t.Errorf("keyCalled = %s, want = 2", two.keyDeleted)
+	}
+}

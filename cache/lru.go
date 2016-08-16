@@ -5,12 +5,24 @@
 // Package cache implements various caching strategies.
 package cache
 
-// This is copied verbatim from https://github.com/golang/build/blob/master/internal/lru/cache.go
+// This is mostly copied from https://github.com/golang/build/blob/master/internal/lru/cache.go
 
 import (
 	"container/list"
 	"sync"
 )
+
+// EvictionNotifier is an optional interface used by LRU entries that wish to be
+// notified when they are being deleted from the LRU. If implemented by the
+// value of an LRU entry, OnEviction is called when it's time for that
+// entry to be evicted. It is not called if the entry is removed by the LRU's
+// Remove method.
+type EvictionNotifier interface {
+	// OnEviction is called on the value of an LRU entry when it's about
+	// to be evicted from the cache. This method must not call the LRU
+	// cache nor block indefinitely.
+	OnEviction(key interface{})
+}
 
 // LRU is a least-recently used cache, safe for concurrent access.
 type LRU struct {
@@ -93,6 +105,11 @@ func (c *LRU) removeOldest() (key, value interface{}) {
 	ele := c.ll.Back()
 	if ele == nil {
 		return
+	}
+	// If LRUDeleter interface is implemented on the value, call it.
+	ent := ele.Value.(*entry)
+	if notifier, ok := ent.value.(EvictionNotifier); ok {
+		notifier.OnEviction(ent.key)
 	}
 	return c.remove(ele)
 }
