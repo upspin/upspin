@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bbcc4b54_520a9427",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T04:44:20Z",
+      "side": 1,
+      "message": "Since you\u0027re here, this first sentence is hard to parse. I encountered it today and meant to touch it, but haven\u0027t gotten to it yet.",
+      "revId": "185a57f5f9c6ccc65082fc97376883eb5d95a584",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
