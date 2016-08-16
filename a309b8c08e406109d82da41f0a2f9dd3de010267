@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_e57d52bf",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Done\nNote: reflect.DeepEqual won\u0027t be true given other things we add when we do a Put/MkDir, such as Time. I won\u0027t compare every field possible here, but am checking a few, such as name, writer.",
+      "parentUuid": "9ba2277b_e3ec1223",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_639ca2bb",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "why? the lru is thread safe",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_85f00693",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Because the tree is not thread safe. Locking it before taking the tree from the LRU is a precaution. There\u0027s no point in allowing one to take the tree from the LRU and then take the userlock later.",
+      "parentUuid": "9ba2277b_639ca2bb",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -71,6 +107,42 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_a5e42ad4",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Why do we have to do later? It\u0027s unlikely we\u0027ll more than one of these in the same address space.\n\nDone.",
+      "parentUuid": "9ba2277b_2396aa9b",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_a5698af3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "9ba2277b_a3f61af1",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_03912ea2",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -82,6 +154,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "yeah, please do this. I\u0027ve been making this change in the existing servers where appropriate.",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_45235e0e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_03912ea2",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -105,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_652862e8",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_83a43efa",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_c3aa36c6",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -116,6 +224,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "is there a race here?\ncan\u0027t the path become dirty in between the previous tree.Lookup and this one?\nin other words, should this if block be a loop?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_05395638",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "No. We\u0027re taking the userLock which prevents that. (see earlier answer to Eric).",
+      "parentUuid": "9ba2277b_c3aa36c6",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -139,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_25073a79",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "9ba2277b_e3a732fd",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_a3a13ae9",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -150,6 +294,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "this seems like an odd check. the caller is in control over both p and entry. when/why does this go wrong? and why not just set entry.Name to p.Path() ?",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_a51a6aca",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "This is exactly what valid.UserName does. Rob said we should not sanitize for users. If we get something bad, we reject it. I\u0027m doing the check here so the callers don\u0027t need to replicate it. This data still comes from the user and we don\u0027t control all client implementations (or those calling our RPC interface directly).",
+      "parentUuid": "9ba2277b_a3a13ae9",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -173,6 +335,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_a55fca7b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Not a fan of empty if blocks.",
+      "parentUuid": "9ba2277b_43fc06d8",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_03060ef2",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -184,6 +364,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "errors.Errorf(\"userTrees contained value of unexpected type %T\", val)",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_654f82c5",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_03060ef2",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -207,6 +405,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_c545aea3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_230b0af9",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_c3ef9615",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -218,6 +434,24 @@
       "writtenOn": "2016-08-16T23:19:52Z",
       "side": 1,
       "message": "Debug",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_85c1e601",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:52:23Z",
+      "side": 1,
+      "message": "This is the main path that creates a root. It should be logged so we know which users are creating roots.",
+      "parentUuid": "9ba2277b_c3ef9615",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
