@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9bf5c793_6bdf8167",
+        "filename": "test/integration_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-16T18:28:00Z",
+      "side": 1,
+      "message": "I wonder if this allows us to collapse some of user1..user15?",
+      "revId": "099e2e8b6cc856c385810467fdb236705ff0d79a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9bf5c793_2bae19e7",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-16T18:28:00Z",
+      "side": 1,
+      "message": "Where is err set?",
+      "revId": "099e2e8b6cc856c385810467fdb236705ff0d79a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
