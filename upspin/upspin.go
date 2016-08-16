@@ -466,10 +466,14 @@ type Client interface {
 	// is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
-	// PutLink creates a link from the new name to the old name.
-	// If something is already stored with the new name, it is
-	// first removed from the directory but its storage is not deleted
-	// from the Store.
+	// PutLink creates a link from the new name to the old name. The
+	// new name must not look like the path to an Access or Group file.
+	// If something is already stored with the new name, it is first
+	// removed from the directory but its storage is not deleted from
+	// the Store. The old name is not evaluated, that is, the resulting
+	// link will hold the argument to PutLink even if it refers to a
+	// path that itself contains links. The name is canonicalized,
+	// however (see path.Clean).
 	PutLink(oldName, newName PathName) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
