@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_6514e24b",
+        "filename": "cache/lru.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:59:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_63ea6203",
+      "revId": "96aa9a05de2e3cd065ea3760324d2f58563b7717",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_03dfee67",
         "filename": "cache/lru.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2016-08-16T23:29:06Z",
       "side": 1,
       "message": "another smaller and more flexible approach is to add an argument here\n onEviction func()\nand store that function in the entry struct.\n\nUsers that want to implement this as a method can do so and pass the method value\n\nc.Add(key, value, value.OnEvicted)\n\nUsers that want to just do something ad hoc can do it in line\n\nc.Add(key, value, func() {\n  log.Println(value, \"evicted\")\n})",
+      "revId": "96aa9a05de2e3cd065ea3760324d2f58563b7717",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_e52712b4",
+        "filename": "cache/lru.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-16T23:59:31Z",
+      "side": 1,
+      "message": "Hmmm. But then we need two Add methods or every Add will take a nil (or a special cache.NoEvictFunc const) which is unclean.\n\nI think this is fine.",
+      "parentUuid": "9ba2277b_03dfee67",
       "revId": "96aa9a05de2e3cd065ea3760324d2f58563b7717",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
