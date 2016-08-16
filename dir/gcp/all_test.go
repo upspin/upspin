@@ -229,11 +229,6 @@ func TestLookupWithoutReadRights(t *testing.T) {
 
 	dirJSON := toJSON(t, dir)
 
-	// Default, no blocks is the expected answer.
-	expect := dir // copy
-	expect.Blocks = nil
-	expect.Packdata = nil // No pack data either
-
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref:  []string{userName, pathName},
 		Data: [][]byte{rootJSON, dirJSON},
@@ -241,12 +236,10 @@ func TestLookupWithoutReadRights(t *testing.T) {
 
 	ds := newTestDirServer(t, egcp)
 	ds.context.SetUserName("lister-dude@me.com")
-	de, err := ds.Lookup(pathName)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !reflect.DeepEqual(&expect, de) {
-		t.Fatalf("entries differ: got %v; want %v", de, expect)
+	_, err := ds.Lookup(pathName)
+	expectedErr := errors.E(errors.Permission)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %q, want = %q", err, expectedErr)
 	}
 }
 

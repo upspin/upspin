@@ -78,24 +78,24 @@ type Env struct {
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	client, context, err := innerNewUser("New", setup.OwnerName, setup)
+	env := &Env{
+		Setup: setup,
+	}
+	client, context, err := env.NewUser(setup.OwnerName)
 	if err != nil {
 		return nil, err
 	}
+	env.Client = client
+	env.Context = context
 	err = makeRoot(context)
 	if err != nil {
 		return nil, err
-	}
-	env := &Env{
-		Client:  client,
-		Context: context,
-		Setup:   setup,
 	}
 	// Generate the dir tree using the client.
 	for _, e := range setup.Tree {
 		if strings.HasSuffix(e.P, "/") {
 			if len(e.C) > 0 {
-				return nil, errors.E("New", errors.NotEmpty, errors.Str("directory entry must not have contents"))
+				return nil, errors.E("testenv.New", errors.NotEmpty, errors.Str("directory entry must not have contents"))
 			}
 			dir := path.Join(upspin.PathName(setup.OwnerName), e.P)
 			entry, err := client.MakeDirectory(dir)
@@ -137,7 +137,7 @@ func E(pathName string, contents string) Entry {
 // Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
 func (e *Env) Exit() error {
 	if e.exitCalled {
-		return errors.E("Exit", errors.Invalid, errors.Str("exit already called"))
+		return errors.E("testenv.Exit", errors.Invalid, errors.Str("exit already called"))
 	}
 	e.exitCalled = true
 	if e.Setup.Cleanup != nil {
@@ -149,33 +149,45 @@ func (e *Env) Exit() error {
 	return nil
 }
 
-func innerNewUser(op string, userName upspin.UserName, setup *Setup) (upspin.Client, upspin.Context, error) {
-	var context upspin.Context
+// NewUser creates a new client for a user.  The new user will not
+// have a root created. Callers should use the client to MakeDirectory if
+// necessary.
+func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, error) {
+	const op = "testenv.NewUser"
+	var ctx upspin.Context
 	var err error
-	context, err = newContextForUser(userName, setup)
+	ctx = context.New().SetUserName(userName).SetPacking(e.Setup.Packing)
+	// Get keys for user.
+	user, _, err := path.UserAndDomain(userName)
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
+	f, err := factotum.New(repo("key/testdata/" + string(user)))
+	if err != nil {
+		return nil, nil, errors.E(op, userName, err)
+	}
+	ctx.SetFactotum(f)
+
 	var client upspin.Client
-	switch setup.Transport {
+	switch e.Setup.Transport {
 	case upspin.GCP:
-		client, err = gcpClient(context)
+		client, err = gcpClient(ctx)
 	case upspin.InProcess:
-		client, err = inProcessClient(context)
+		client, err = inProcessClient(ctx)
 	default:
 		return nil, nil, errors.E(op, errors.Invalid, errors.Str("invalid transport"))
 	}
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
-	return client, context, nil
-}
 
-// NewUser creates a new client for a user.  The new user will not
-// have a root created. Callers should use the client to MakeDirectory if
-// necessary.
-func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, error) {
-	return innerNewUser("NewUser", userName, e.Setup)
+	// Register user with key server.
+	err = registerUserWithKeyServer(userName, ctx)
+	if err != nil {
+		return nil, nil, errors.E(op, err)
+	}
+
+	return client, ctx, nil
 }
 
 // gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
@@ -224,43 +236,28 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 	return client, nil
 }
 
-// newContextForUser adds a new user to the inprocess key service
-// and returns a partially filled Context.
-func newContextForUser(userName upspin.UserName, setup *Setup) (upspin.Context, error) {
-	inProcess := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "",
-	}
-	context := context.New().SetUserName(userName).SetPacking(setup.Packing).SetKeyEndpoint(inProcess).SetDirEndpoint(inProcess).SetStoreEndpoint(inProcess)
-
+// registerUserWithKeyServer registers userName's context with the inProcess keyServer.
+func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context) error {
+	const op = "testenv.registerWithKeyServer"
 	key, err := bind.KeyServer(context, context.KeyEndpoint())
 	if err != nil {
-		return nil, err
+		return errors.E(op, err)
 	}
-	if _, ok := key.(*inprocess.Service); !ok { // TODO: Needless check?
-		return nil, errors.Str("key service must be the in-process instance")
+	if _, ok := key.(*inprocess.Service); !ok {
+		return errors.E(op, errors.Internal, errors.Str("key service must be the in-process instance"))
 	}
 	// Install the registered user.
-	j := strings.IndexByte(string(userName), '@')
-	if j < 0 {
-		log.Fatal("malformed userName ", userName)
-	}
-	f, err := factotum.New(repo("key/testdata/" + string(userName[:j])))
-	if err != nil {
-		log.Fatalf("unable to initialize factotum for %q: %q", string(userName[:j]), err)
-	}
 	user := &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
 		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
-		PublicKey: f.PublicKey(),
+		PublicKey: context.Factotum().PublicKey(),
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		return errors.E(op, err)
 	}
-	context.SetFactotum(f)
-	return context, nil
+	return nil
 }
 
 func makeRoot(context upspin.Context) error {
@@ -286,7 +283,7 @@ func setContextEndpoints(context upspin.Context, store, dir, key upspin.Endpoint
 func repo(dir string) string {
 	gopath := os.Getenv("GOPATH")
 	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
+		log.Fatal("test/testenv: no GOPATH")
 	}
 	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
