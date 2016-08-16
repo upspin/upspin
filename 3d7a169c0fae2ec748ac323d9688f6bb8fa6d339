@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9ba2277b_437ac61d",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T00:29:56Z",
+      "side": 1,
+      "message": "This could be\n\nSecure SecurityLevel \u003d iota\n\nand the following ones\n\nSecureAllowingSelfSignedCertificates\n\nInsecure\n\nthat way, the zero value is Secure (nice) and the declarations are less noisy",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbcc4b54_ccc10fa0",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -19,6 +36,41 @@
         "endLine": 57,
         "endChar": 37
       },
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_637fc20c",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T00:29:56Z",
+      "side": 1,
+      "message": "Maybe this should be\n\nInsecureAllowSelfSignedCerts\n\nand the following \n\nNoSecurity",
+      "parentUuid": "bbcc4b54_ccc10fa0",
+      "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_0384ce07",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T00:29:56Z",
+      "side": 1,
+      "message": "errors.Errorf(\"invalid... : %v\", security)",
       "revId": "3d7a169c0fae2ec748ac323d9688f6bb8fa6d339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
