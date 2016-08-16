@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ba2277b_431e46ce",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T05:01:21Z",
+      "side": 1,
+      "message": "\"initialize this `user` with test keys (localhost only)\"\n?",
+      "revId": "697ebf9ed18d40072591b9847804197d3633fd0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
