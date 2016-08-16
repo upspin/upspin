@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9bf5c793_cb23154f",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-16T18:36:09Z",
+      "side": 1,
+      "message": "You can remove this, too.",
+      "revId": "d477e7eb1ff4f3f80ec53a959ded9b73f41b1b44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
