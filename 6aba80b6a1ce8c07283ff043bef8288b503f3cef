@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ba2277b_2389ca1e",
+        "filename": "cmd/storecache/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T00:29:56Z",
+      "side": 0,
+      "message": "Did you intend to add this in this CL?",
+      "revId": "6aba80b6a1ce8c07283ff043bef8288b503f3cef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
