@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "9ba2277b_a3f61af1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-16T23:23:50Z",
+      "side": 1,
+      "message": "also, the size of this lru should be configurable (through Configure, or—after my change—through a constructor). right now, if there are 1001 active users then cache entries will be continuously evicted, creating a lot of churn.",
+      "parentUuid": "9ba2277b_2396aa9b",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_03912ea2",
         "filename": "dir/server/server.go",
         "patchSetId": 2
