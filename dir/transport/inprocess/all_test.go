@@ -19,10 +19,10 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/errors"
-	inprocessKey "upspin.io/key/inprocess"
+	inprocessKey "upspin.io/key/transport/inprocess"
 	"upspin.io/pack"
 	"upspin.io/path"
-	inprocessStore "upspin.io/store/inprocess"
+	inprocessStore "upspin.io/store/transport/inprocess"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/debug"

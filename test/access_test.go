@@ -14,7 +14,7 @@ import (
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/unassigned"
+	_ "upspin.io/dir/transport/unassigned"
 )
 
 // Arguments for errStr in helpers.

@@ -22,7 +22,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/key/gcp"
-	"upspin.io/key/inprocess"
+	"upspin.io/key/transport/inprocess"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
@@ -30,7 +30,7 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
-	_ "upspin.io/key/transports"
+	_ "upspin.io/key/transport"
 )
 
 // The upspin username for this server.

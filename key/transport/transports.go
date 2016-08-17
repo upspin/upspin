@@ -5,10 +5,10 @@
 // Package transports is a helper package that aggregates the user imports.
 // It has no functionality itself; it is meant to be imported, using an "underscore"
 // import, as a convenient way to link with all the transport implementations.
-package transports
+package transport
 
 import (
-	_ "upspin.io/key/inprocess"
-	_ "upspin.io/key/remote"
-	_ "upspin.io/key/unassigned"
+	_ "upspin.io/key/transport/inprocess"
+	_ "upspin.io/key/transport/remote"
+	_ "upspin.io/key/transport/unassigned"
 )

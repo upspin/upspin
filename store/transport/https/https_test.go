@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"upspin.io/errors"
-	"upspin.io/store/https/nettest"
+	"upspin.io/store/transport/https/nettest"
 )
 
 const (

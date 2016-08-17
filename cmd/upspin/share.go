@@ -27,9 +27,9 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/dir/transport"
+	_ "upspin.io/key/transport"
+	_ "upspin.io/store/transport"
 )
 
 // Sharer holds the state for the share calculation. It holds some caches to

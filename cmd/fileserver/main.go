@@ -26,7 +26,7 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports. We only use the KeyServer interface itself; we are DirServer and StoreServer.
-	_ "upspin.io/key/transports"
+	_ "upspin.io/key/transport"
 )
 
 var root = flag.String("root", os.Getenv("HOME"), "root of directory to serve")

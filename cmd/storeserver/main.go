@@ -20,13 +20,13 @@ import (
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/store/gcp"
-	"upspin.io/store/inprocess"
+	"upspin.io/store/transport/inprocess"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
 	// Load required transports
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/key/transport"
+	_ "upspin.io/store/transport"
 
 	// This is required for context.InitContext to work.
 	// TODO(adg): This seems wrong; fix it.
