@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9baf87ac_bbbb4786",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T04:36:20Z",
+      "side": 1,
+      "message": "How about just Duplicate ?",
+      "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
