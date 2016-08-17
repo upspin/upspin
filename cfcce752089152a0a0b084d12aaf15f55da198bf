@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1bd8f739_2842af17",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-17T02:32:37Z",
+      "side": 1,
+      "message": "s/keys/key\n\nhere and below.   We switched to requiring that we know the user\u0027s single current key.",
+      "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_7bbc9fab",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 1
@@ -13,6 +30,23 @@
       "writtenOn": "2016-08-17T02:32:10Z",
       "side": 1,
       "message": "you need upspin.UserName(req.UserName)",
+      "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_4847f326",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-17T02:32:37Z",
+      "side": 1,
+      "message": "We \"verify\" rather than \"match\" a signature in crypto lingo.  Perhaps reword to:\n\"signature fails to validate using the provided key\"",
       "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
