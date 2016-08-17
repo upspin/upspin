@@ -188,7 +188,10 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry) (*upspin.
 
 	// TODO: check access permissions.
 
-	err = tree.Put(entry)
+	entry, err = tree.Put(entry)
+	if err == upspin.ErrFollowLink {
+		return entry, err
+	}
 	if err != nil {
 		return nil, errors.E(op, p.Path(), err)
 	}
@@ -350,7 +353,11 @@ func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) 
 	}
 
 	// Attempt to put this new dir entry as the root.
-	err = tree.Put(de)
+	_, err = tree.Put(de)
+	if err == upspin.ErrFollowLink {
+		// The root can't be a link. Something very bad happened.
+		return nil, errors.E(op, errors.Internal, p.User(), p.Path(), errors.Str("got ErrFollowLink putting root"))
+	}
 	if err != nil {
 		// This can't be a Link redirection (roots can't be links).
 		return nil, errors.E(op, err)

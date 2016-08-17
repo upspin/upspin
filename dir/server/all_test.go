@@ -99,6 +99,53 @@ func TestMakeDirectory(t *testing.T) {
 	}
 }
 
+func TestLink(t *testing.T) {
+	s := newDirServerForTesting(t)
+	de := &upspin.DirEntry{
+		Name:    userName + "/mylink",
+		Attr:    upspin.AttrLink,
+		Writer:  userName,
+		Link:    "linkerdude@linkatron.lnk/target",
+		Packing: upspin.PlainPack,
+	}
+	_, err := s.Put(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	de2, err := s.Lookup(de.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = checkDirEntry("TestLink", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Lookup something past the link entry.
+	de2, err = s.Lookup(userName + "/mylink/landing_place.jpg")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.Lookup", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Put file into linked destination
+	deAfterLink := &upspin.DirEntry{
+		Name:    userName + "/mylink/new_file.txt",
+		Attr:    upspin.AttrNone,
+		Writer:  userName,
+		Packing: upspin.PlainPack,
+	}
+	de2, err = s.Put(deAfterLink)
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.Put", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestMain(m *testing.M) {
 	var err error
 	testDir, err = ioutil.TempDir("", "DirServer")

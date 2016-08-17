@@ -37,40 +37,37 @@ func TestPutNodes(t *testing.T) {
 	}
 
 	dir1 := newDirEntry("/", isDir, context)
-	err = tree.Put(dir1)
+	_, err = tree.Put(dir1)
 	if err != nil {
 		t.Fatal(err)
 	}
 	dir2 := newDirEntry("/dir", isDir, context)
-	err = tree.Put(dir2)
+	_, err = tree.Put(dir2)
 	if err != nil {
 		t.Fatal(err)
 	}
 	dir3 := newDirEntry("/dir/doc.pdf", !isDir, context)
-	err = tree.Put(dir3)
+	_, err = tree.Put(dir3)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify three log entries were written.
-	if got, want := log.LastOffset(), int64(3); got != want {
+	if got, want := log.LastOffset(), int64(2); got != want {
 		t.Fatalf("LastIndex = %d, want %d", got, want)
 	}
-	entries, _, err := log.ReadAt(3, int64(0))
+	entries, _, err := log.ReadAt(2, int64(0))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(entries), 3; got != want {
+	if got, want := len(entries), 2; got != want {
 		t.Errorf("len(entries) = %d, want = %d", got, want)
 	}
-	if !reflect.DeepEqual(&entries[0].Entry, dir1) {
-		t.Errorf("dir1 = %v, want %v", entries[0], dir1)
+	if !reflect.DeepEqual(&entries[0].Entry, dir2) {
+		t.Errorf("dir2 = %v, want %v", entries[0], dir2)
 	}
-	if !reflect.DeepEqual(&entries[1].Entry, dir2) {
-		t.Errorf("dir2 = %v, want %v", entries[1], dir2)
-	}
-	if !reflect.DeepEqual(&entries[2].Entry, dir3) {
-		t.Errorf("dir3 = %v, want %v", entries[2], dir3)
+	if !reflect.DeepEqual(&entries[1].Entry, dir3) {
+		t.Errorf("dir3 = %v, want %v", entries[1], dir3)
 	}
 
 	// Lookup path.
@@ -122,18 +119,18 @@ func TestPutNodes(t *testing.T) {
 
 	t.Logf("== Tree:\n%s\n", tree2.String())
 	dir4 := newDirEntry("/dir/img.jpg", !isDir, context)
-	err = tree2.Put(dir4)
+	_, err = tree2.Put(dir4)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := log.LastOffset(), int64(4); got != want {
+	if got, want := log.LastOffset(), int64(3); got != want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
 
 	t.Logf("== Tree:\n%s\n", tree2.String())
 
 	// Delete dir4.
-	err = tree2.Delete(userName + "/dir/img.jpg")
+	_, err = tree2.Delete(userName + "/dir/img.jpg")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,11 +141,11 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
 	// One new entry was written to the log (an updated dir2).
-	if got, want := log.LastOffset(), int64(5); got != want {
+	if got, want := log.LastOffset(), int64(4); got != want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
 	// Verify logged entry is a new dir2
-	entries, _, err = log.ReadAt(1, int64(4))
+	entries, _, err = log.ReadAt(1, int64(3))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,12 +168,12 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 	}
 
 	de := newDirEntry("/", isDir, context)
-	err = tree.Put(de)
+	_, err = tree.Put(de)
 	if err != nil {
 		t.Fatal(err)
 	}
 	de = newDirEntry("/dir", isDir, context)
-	err = tree.Put(de)
+	_, err = tree.Put(de)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -185,7 +182,7 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	de = newDirEntry("/dir/subdir", isDir, context)
-	err = tree.Put(de)
+	_, err = tree.Put(de)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +198,7 @@ func TestPutEmptyRoot(t *testing.T) {
 	}
 
 	dir1 := newDirEntry("/", isDir, context)
-	err = tree.Put(dir1)
+	_, err = tree.Put(dir1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,14 +215,14 @@ func TestPutEmptyRoot(t *testing.T) {
 	}
 
 	dir2 := newDirEntry("/dir", isDir, context)
-	err = tree2.Put(dir2)
+	_, err = tree2.Put(dir2)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Try to put a file under an non-existent dir
 	dir3 := newDirEntry("/invaliddir/myfile", !isDir, context)
-	err = tree2.Put(dir3)
+	_, err = tree2.Put(dir3)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
@@ -256,10 +253,37 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 	for _, test := range tests {
 		de := newDirEntry(test.name, test.isDir, context)
-		err := tree.Put(de)
+		_, err := tree.Put(de)
 		if err != nil {
 			t.Fatalf("Creating %q, isDir %v: %s", test.name, test.isDir, err)
 		}
+	}
+
+	offsetBeforeCrash, err := logIndex.ReadOffset()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Simulate a crash and restart, without ever having flushed the tree.
+	tree, err = New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	offsetAfterCrash, err := logIndex.ReadOffset()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Log index does not move until we Flush.
+	if offsetBeforeCrash != offsetAfterCrash {
+		t.Fatalf("offsetAfterCrash = %d, want = %d", offsetAfterCrash, offsetBeforeCrash)
+	}
+
+	// Lookup a file.
+	de, _, err := tree.Lookup(userName + "/dir0/file_in_dir.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := string(de.Name), userName+"/dir0/file_in_dir.txt"; got != want {
+		t.Errorf("de.Name = %q, want = %q", got, want)
 	}
 
 	// Flush to Store.
@@ -279,17 +303,17 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 	for _, test := range tests {
 		de := newDirEntry(test.name, test.isDir, context)
-		err := tree.Put(de)
+		_, err := tree.Put(de)
 		if err != nil {
 			t.Fatalf("Creating %q, isDir %v: %s", test.name, test.isDir, err)
 		}
 	}
 	// And delete some others.
-	err = tree.Delete(userName + "/file1.txt")
+	_, err = tree.Delete(userName + "/file1.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tree.Delete(userName + "/dir0/file_in_dir.txt")
+	_, err = tree.Delete(userName + "/dir0/file_in_dir.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -329,8 +353,8 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	// Furthermore, we can create entries in an existing directory.
-	de := newDirEntry("/dir0/will_not_fail", !isDir, context)
-	err = tree.Put(de)
+	de = newDirEntry("/dir0/will_not_fail", !isDir, context)
+	_, err = tree.Put(de)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -344,18 +368,18 @@ func TestPutLargeNode(t *testing.T) {
 	}
 
 	dir1 := newDirEntry("/", isDir, context)
-	err = tree.Put(dir1)
+	_, err = tree.Put(dir1)
 	if err != nil {
 		t.Fatal(err)
 	}
 	dir2 := newDirEntry("/largefile", !isDir, context)
 	dir2.Packdata = make([]byte, blockSize+1) // force a block split on the next file.
-	err = tree.Put(dir2)
+	_, err = tree.Put(dir2)
 	if err != nil {
 		t.Fatal(err)
 	}
 	dir3 := newDirEntry("/smallfile", !isDir, context)
-	err = tree.Put(dir3)
+	_, err = tree.Put(dir3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -368,7 +392,103 @@ func TestPutLargeNode(t *testing.T) {
 		t.Fatal(err)
 	}
 	if got, want := len(root.Blocks), 2; got != want {
-		t.Errorf("len(root.Blocks) = %d, want = %d", got, want)
+		t.Errorf("len(root.Blocks) = %d, want = %d, root=%v", got, want, root)
+	}
+}
+
+func TestLinks(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Make root.
+	deRoot := newDirEntry("/", isDir, context)
+	_, err = tree.Put(deRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Test links in subdirectories, starting right at the root and going
+	// down, for a comprehensive check.
+	for _, subdir := range []upspin.PathName{"", "/mysubdir", "/mysubdir/deeper"} {
+		if subdir != "" {
+			deSub := newDirEntry(subdir, isDir, context)
+			_, err = tree.Put(deSub)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		// Put a link.
+		deLink := newDirEntry(subdir+"/link", !isDir, context)
+		deLink.Attr = upspin.AttrLink
+		deLink.Link = "linkerdude@link.lnk/the_target"
+		_, err = tree.Put(deLink)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Try to put a file inside the link.
+		deFile := newDirEntry(subdir+"/link/file.txt", !isDir, context)
+		got, err := tree.Put(deFile)
+		if err != upspin.ErrFollowLink {
+			t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+		}
+		if got.Link != deLink.Link {
+			t.Errorf("got.Link = %q, want = %q", got.Link, deLink.Link)
+		}
+
+		// Try to read something with a link.
+		got, _, err = tree.Lookup(userName + subdir + "/link/subdir/more/cookie.jar")
+		if err != upspin.ErrFollowLink {
+			t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+		}
+		if got.Link != deLink.Link {
+			t.Errorf("got.Link = %q, want = %q", got.Link, deLink.Link)
+		}
+
+		// Lookup the link itself.
+		got, _, err = tree.Lookup(userName + subdir + "/link")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !got.IsLink() {
+			t.Error("Expected link")
+		}
+
+		// Start a new tree to ensure links are recovered from the log.
+		tree, err = New(context, log, logIndex)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Now try to delete something inside the link's path.
+		got, err = tree.Delete(userName + subdir + "/link/deep/inside/your/soul")
+		if err != upspin.ErrFollowLink {
+			t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+		}
+		if got.Link != deLink.Link {
+			t.Errorf("got.Link = %q, want = %q", got.Link, deLink.Link)
+		}
+
+		// Delete the link.
+		_, err = tree.Delete(userName + subdir + "/link")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Looking up inside link now returns a normal error.
+		_, _, err = tree.Lookup(userName + subdir + "/link/subdir/more/cookie.jar")
+		expectedErr := errors.E(errors.NotExist)
+		if !errors.Match(expectedErr, err) {
+			t.Errorf("err = %v, want = %v", err, expectedErr)
+		}
+	}
+
+	// Flush the whole thing just for fun.
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
