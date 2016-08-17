@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_5bc32307",
+        "filename": "dir/server/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:48:59Z",
+      "side": 1,
+      "message": "Aha, the penny has dropped. I see it now.\nApologies for the bafflement. It\u0027s been there for a while, and I even said at one point I would wait to see what unfolded.",
+      "parentUuid": "1bd8f739_68975748",
+      "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_c3f9d6b4",
         "filename": "dir/server/server.go",
         "patchSetId": 5
@@ -107,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_3bd057ca",
+        "filename": "dir/server/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:48:59Z",
+      "side": 1,
+      "message": "You are right, of course, and things are much clearer for me now.",
+      "parentUuid": "1bd8f739_c88dc332",
+      "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_e3f652c4",
         "filename": "dir/server/server.go",
         "patchSetId": 5
@@ -136,6 +172,24 @@
       "side": 1,
       "message": "Not really, because most errors have an op and often the path. I want to compare the kind. I could do err.(*Errors).Kind as GCP was doing before Match, but I think Match is the right way, no?",
       "parentUuid": "9ba2277b_e3f652c4",
+      "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_1bcd9b2e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:48:59Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "1bd8f739_537fa40b",
       "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
