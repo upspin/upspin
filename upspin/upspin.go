@@ -437,7 +437,7 @@ type StoreServer interface {
 
 	// Delete permanently removes all storage space associated
 	// with the reference. After a successful Delete, calls to Get with the
-	// same key will fail. If a key is not found, an error is
+	// same reference will fail. If the reference is not found, an error is
 	// returned.
 	Delete(ref Reference) error
 }
@@ -461,57 +461,69 @@ type Client interface {
 	// API below.
 	Get(name PathName) ([]byte, error)
 
+	// Lookup returns the directory entry for the named file. The
+	// boolean determines whether, if the final path element is a link,
+	// to return the DirEntry for the link (false) or for the target of
+	// the link (true).
+	Lookup(name PathName, followFinal bool) (*DirEntry, error)
+
 	// Put stores the data at the given name. If something is already
-	// stored with that name, it is replaced with the new data.
-	// Like Get, it is not the usual access method. The file-like API
-	// is preferred.
+	// stored with that name, it will no longer be available using the
+	// name, although it may still exist in the storage server. (See
+	// the documentation for Delete.) Like Get, it is not the usual
+	// access method. The file-like API is preferred.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
 	// PutLink creates a link from the new name to the old name. The
 	// new name must not look like the path to an Access or Group file.
 	// If something is already stored with the new name, it is first
-	// removed from the directory but its storage is not deleted from
-	// the Store. The old name is not evaluated, that is, the resulting
-	// link will hold the argument to PutLink even if it refers to a
-	// path that itself contains links. The name is canonicalized,
-	// however (see path.Clean).
+	// deleted from the directory but its storage is not deleted from
+	// the Store. (See the documentation for Delete.) The old name is
+	// not evaluated, that is, the resulting link will hold the
+	// argument to PutLink even if it refers to a path that itself
+	// contains links. The name is canonicalized, however (see
+	// path.Clean).
 	PutLink(oldName, newName PathName) (*DirEntry, error)
 
+	// PutDuplicate creates a new name for the references referred to
+	// by the old name. Subsequent Puts to either name do not effect
+	// the contents referred to by the other. There must be no existing
+	// item with the new name.
+	PutDuplicate(oldName, newName PathName) (*DirEntry, error)
+
 	// MakeDirectory creates a directory with the given name, which
-	// must not already exist. All but the last element of the path name
-	// must already exist and be directories.
+	// must not already exist. All but the last element of the path
+	// name must already exist and be directories.
 	// TODO: Make multiple elems?
 	MakeDirectory(dirName PathName) (*DirEntry, error)
 
-	// Glob matches the pattern against the file names of the full rooted tree.
-	// That is, the pattern must look like a full path name, but elements of the
-	// path may contain metacharacters. Matching is done using Go's path.Match
-	// elementwise. The user name must be present in the pattern and is treated as
-	// a literal even if it contains metacharacters.
-	// Note that if links are evaulated while executing Glob, the
-	// Name fields of the returned DirEntries might not match the
-	// original argument pattern.
+	// Rename renames oldName to newName. The old name is no longer valid.
+	Rename(oldName, newName PathName) error
+
+	// Delete deletes the DirEntry associated with the name. The
+	// storage referenced by the DirEntry is not explicitly deleted,
+	// although the storage server may garbage collect unreferenced
+	// data independently. If the final element of the path name is a
+	// link, Delete will delete the link itself, not the link target.
+	Delete(name PathName) error
+
+	// Glob matches the pattern against the file names of the full
+	// rooted tree. That is, the pattern must look like a full path
+	// name, but elements of the path may contain metacharacters.
+	// Matching is done using Go's path.Match elementwise. The user
+	// name must be present in the pattern and is treated as a literal
+	// even if it contains metacharacters. Note that if links are
+	// evaulated while executing Glob, the Name fields of the returned
+	// DirEntries might not match the original argument pattern.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// File-like methods similar to Go's os.File API.
 	// The name, however, is a fully-qualified upspin PathName.
-	// TODO: Should there be a concept of current directory and
-	// local names?
 	Create(name PathName) (File, error)
 	Open(name PathName) (File, error)
 
 	// DirServer returns an error or a reachable bound DirServer for the user.
 	DirServer(name PathName) (DirServer, error)
-
-	// PutDuplicate creates a new name for the references
-	// referred to by the old name. Subsequent Puts
-	// to either name do not effect the contents referred
-	// to by the other. There must be no existing item with
-	// the new name.
-	PutDuplicate(oldName, newName PathName) (*DirEntry, error)
-
-	// Rename renames oldName to newName. The old name is no longer valid.
-	Rename(oldName, newName PathName) error
 }
 
 // The File interface has semantics and API that parallels a subset
