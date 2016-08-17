@@ -84,6 +84,24 @@
       "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_c80063b4",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-17T03:11:09Z",
+      "side": 1,
+      "message": "I\u0027m confused.  GCP has now disappeared.  What is this?",
+      "parentUuid": "9ba2277b_43e64619",
+      "revId": "27c1c024a2c8f8ed914e17a86ba8e206917393df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
