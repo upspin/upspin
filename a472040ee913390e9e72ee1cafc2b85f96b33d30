@@ -69,6 +69,24 @@
       "revId": "a472040ee913390e9e72ee1cafc2b85f96b33d30",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_7b749fdc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T05:23:11Z",
+      "side": 1,
+      "message": "well, okay, I mean it\u0027s just this:\n\nfunc New(ctx context.Context) upspin.DirServer { \n  // TODO: take configuration options\n  return \u0026server{\n    userTrees: cache.NewLRU(1000),\n    serverContext: ctx,\n  }\n}",
+      "parentUuid": "1bd8f739_93c12c02",
+      "revId": "a472040ee913390e9e72ee1cafc2b85f96b33d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
