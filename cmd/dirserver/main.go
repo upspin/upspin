@@ -14,7 +14,7 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/dir/gcp"
-	"upspin.io/dir/inprocess"
+	"upspin.io/dir/transport/inprocess"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -32,9 +32,9 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/dir/transport"
+	_ "upspin.io/key/transport"
+	_ "upspin.io/store/transport"
 )
 
 // Server is a SecureServer that talks to a DirServer interface and serves gRPC requests.

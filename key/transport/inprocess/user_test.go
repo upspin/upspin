@@ -12,8 +12,8 @@ import (
 	"upspin.io/context"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/store/inprocess"
+	_ "upspin.io/dir/transport/inprocess"
+	_ "upspin.io/store/transport/inprocess"
 )
 
 var (

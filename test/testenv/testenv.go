@@ -20,11 +20,11 @@ import (
 	"upspin.io/upspin"
 
 	// Potential transports, selected by the Setup's Kind field.
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/dir/remote"
-	_ "upspin.io/key/inprocess"
-	_ "upspin.io/store/inprocess"
-	_ "upspin.io/store/remote"
+	_ "upspin.io/dir/transport/inprocess"
+	_ "upspin.io/dir/transport/remote"
+	_ "upspin.io/key/transport/inprocess"
+	_ "upspin.io/store/transport/inprocess"
+	_ "upspin.io/store/transport/remote"
 )
 
 // Entry is an entry in the Upspin namespace.

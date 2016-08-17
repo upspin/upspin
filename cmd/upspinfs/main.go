@@ -19,11 +19,11 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
+	_ "upspin.io/dir/transport"
+	_ "upspin.io/key/transport"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/store/transport"
 )
 
 var (

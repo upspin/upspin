@@ -15,7 +15,7 @@ import (
 	"upspin.io/pack/internal/packtest"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
+	_ "upspin.io/key/transport/inprocess"
 )
 
 func TestRegister(t *testing.T) {

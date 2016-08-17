@@ -5,11 +5,11 @@
 // Package transports is a helper package that aggregates the store imports.
 // It has no functionality itself; it is meant to be imported, using an "underscore"
 // import, as a convenient way to link with all the transport implementations.
-package transports
+package transport
 
 import (
 	_ "upspin.io/store/https"
-	_ "upspin.io/store/inprocess"
-	_ "upspin.io/store/remote"
-	_ "upspin.io/store/unassigned"
+	_ "upspin.io/store/transport/inprocess"
+	_ "upspin.io/store/transport/remote"
+	_ "upspin.io/store/transport/unassigned"
 )

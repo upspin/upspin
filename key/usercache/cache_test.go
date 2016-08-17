@@ -17,8 +17,8 @@ import (
 
 	"strings"
 
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/store/inprocess"
+	_ "upspin.io/dir/transport/inprocess"
+	_ "upspin.io/store/transport/inprocess"
 )
 
 // service is a KeyServer implementation that counts lookups.

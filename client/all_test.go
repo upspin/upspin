@@ -14,10 +14,10 @@ import (
 	"upspin.io/context"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/key/inprocess"
+	_ "upspin.io/dir/transport/inprocess"
+	_ "upspin.io/key/transport/inprocess"
 	_ "upspin.io/pack/debug"
-	_ "upspin.io/store/inprocess"
+	_ "upspin.io/store/transport/inprocess"
 )
 
 // TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.

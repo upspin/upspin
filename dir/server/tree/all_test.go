@@ -15,9 +15,9 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
+	_ "upspin.io/key/transport/inprocess"
 	_ "upspin.io/pack/ee"
-	_ "upspin.io/store/inprocess"
+	_ "upspin.io/store/transport/inprocess"
 )
 
 const (

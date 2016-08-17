@@ -29,9 +29,9 @@ import (
 
 	// Load required transports
 
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/dir/transport"
+	_ "upspin.io/key/transport"
+	_ "upspin.io/store/transport"
 )
 
 var commands = map[string]func(...string){
