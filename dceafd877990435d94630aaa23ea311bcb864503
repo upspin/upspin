@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_fbc78f45",
+        "filename": "client/all_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T02:37:18Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9baf87ac_9ba1ab8e",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_43b406e9",
         "filename": "key/inprocess/user.go",
         "patchSetId": 11
@@ -119,6 +137,24 @@
       "side": 0,
       "message": "it\u0027s not possible\n1. Service is no longer exported\n2. we\u0027re passing the inProcess endpoint to bind, it can\u0027t get anything else\n\nif you like, i could change this to call key.Endpoint() and check its transport type is InProcess, but that seems tautological to me",
       "parentUuid": "9ba2277b_c3e236f7",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_dbccd36a",
+        "filename": "pack/debug/testpack_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T02:37:18Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9baf87ac_9b888b1c",
       "revId": "dceafd877990435d94630aaa23ea311bcb864503",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
