@@ -16,6 +16,24 @@
       "revId": "025e69118bba4778215e0857480b4bed9c2d9d8b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_9b2c0bfc",
+        "filename": "store/inprocess/store.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T03:01:27Z",
+      "side": 0,
+      "message": "done, and added one or two that weren\u0027t there before",
+      "parentUuid": "9baf87ac_fbf0af96",
+      "revId": "025e69118bba4778215e0857480b4bed9c2d9d8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
