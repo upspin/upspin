@@ -51,6 +51,24 @@
       "revId": "a472040ee913390e9e72ee1cafc2b85f96b33d30",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_93c12c02",
+        "filename": "dir/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T05:20:47Z",
+      "side": 1,
+      "message": "Sure. Will come in due time. I think this CL has outlived its purpose for now.\n\nThanks.",
+      "parentUuid": "9baf87ac_fbdaefe7",
+      "revId": "a472040ee913390e9e72ee1cafc2b85f96b33d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
