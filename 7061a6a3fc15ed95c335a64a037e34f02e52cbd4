@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ba2277b_83dc3e3f",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T01:36:59Z",
+      "side": 1,
+      "message": "i\u0027d rather not add this dependency if we can avoid it. i can see a future where upspin might want to declare a flag.\n\nto do that, the netaddr flag would need to be a string. is that a hardship? there would be a lot less code",
+      "revId": "7061a6a3fc15ed95c335a64a037e34f02e52cbd4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
