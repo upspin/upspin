@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9baf87ac_db0053d8",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T23:50:52Z",
+      "side": 1,
+      "message": "i think you need the boolean flag here too",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_fbfb0fdf",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T23:50:52Z",
+      "side": 1,
+      "message": "i wouldn\u0027t expect this to be possible if loadPath returned ErrFollowLink.\nthere is a subtle thing about links: whether or not you want a link in the last\nelement to step through the link. loadPath might need a flag, like in client.Lookup,\nto control that",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
