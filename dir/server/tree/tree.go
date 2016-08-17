@@ -19,23 +19,43 @@ type Tree interface {
 	// Root returns the root. Its blocks will be empty if the tree is empty.
 	Root() (*upspin.DirEntry, error)
 
-	// Lookup returns an entry that represents the path. The returned de may or may not
-	// have valid references inside. If dirty is true, the references are not up-to-date.
-	// Calling Flush in a critical section prior to Lookup will ensure the entry is not dirty.
+	// Lookup returns an entry that represents the path. The returned
+	// DirEntry may or may not have valid references inside. If dirty is
+	// true, the references are not up-to-date. Calling Flush in a critical
+	// section prior to Lookup will ensure the entry is not dirty.
+	//
+	// If the returned error is ErrFollowLink, the caller should retry the
+	// operation as outlined in the description for upspin.ErrFollowLink.
+	// Otherwise in the case of error the returned DirEntry will be nil.
 	Lookup(path upspin.PathName) (de *upspin.DirEntry, dirty bool, err error)
 
-	// Put puts an entry to the Store. If the entry overwrites a file, that is fine,
-	// but if it overwrites a directory an error will be returned.
-	Put(de *upspin.DirEntry) error
+	// Put puts an entry into the Tree. If the entry exists, it will be
+	// overwritten.
+	//
+	// If the returned error is ErrFollowLink, the caller should retry the
+	// operation as outlined in the description for upspin.ErrFollowLink
+	// (with the added step of updating the Name field of the argument
+	// DirEntry). Otherwise, the returned DirEntry will be nil whether the
+	// operation succeeded or not.
+	Put(de *upspin.DirEntry) (*upspin.DirEntry, error)
 
-	// Delete deletes the entry associated with name.
-	Delete(name upspin.PathName) error
+	// Delete deletes the entry associated with name. If the name identifies
+	// a link, Delete will delete the link itself, not its target.
+	//
+	// If the returned error is upspin.ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// upspin.ErrFollowLink. (And in that case, the DirEntry will never
+	// represent the full path name of the argument.) Otherwise, the
+	// returned DirEntry will be nil whether the operation succeeded
+	// or not.
+	Delete(name upspin.PathName) (*upspin.DirEntry, error)
 
 	// Flush flushes all dirty dir entries to the Tree's Store.
 	Flush() error
 
-	// Close flushes all dirty blocks to Store and releases all resources used by the tree.
-	// Further uses of the tree will have unpredictable results.
+	// Close flushes all dirty blocks to Store and releases all resources
+	// used by the tree. Further uses of the tree will have unpredictable
+	// results.
 	Close() error
 
 	// For printing the Tree.
