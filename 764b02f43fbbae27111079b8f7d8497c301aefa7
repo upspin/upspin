@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1bd8f739_f3def805",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T04:41:59Z",
+      "side": 1,
+      "message": "s/followFinal/followLink/?\n\nDo you want to add a maxHopCount or is that built-in?",
+      "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_bbbb4786",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
