@@ -87,6 +87,24 @@
       "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_d34574a3",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-17T05:15:05Z",
+      "side": 1,
+      "message": "I like the PutDuplicate",
+      "parentUuid": "9baf87ac_5bec4388",
+      "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
