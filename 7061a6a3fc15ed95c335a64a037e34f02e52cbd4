@@ -16,6 +16,24 @@
       "revId": "7061a6a3fc15ed95c335a64a037e34f02e52cbd4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_5b8b2316",
+        "filename": "flags/flags.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T01:50:38Z",
+      "side": 1,
+      "message": "ack, will turn it into a string",
+      "parentUuid": "9ba2277b_83dc3e3f",
+      "revId": "7061a6a3fc15ed95c335a64a037e34f02e52cbd4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
