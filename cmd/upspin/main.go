@@ -203,10 +203,9 @@ func info(args ...string) {
 
 func link(args ...string) {
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
-	force := fs.Bool("f", false, "create link even if original path does not exist")
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
-	fs.Usage = subUsage(fs, "link original_path new_path")
+	fs.Usage = subUsage(fs, "link original_path link_path")
 	err := fs.Parse(args)
 	if err != nil {
 		exit(err)
@@ -216,19 +215,9 @@ func link(args ...string) {
 		os.Exit(2)
 	}
 	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
-	newPath := path.Clean(upspin.PathName(fs.Arg(1)))
+	linkPath := path.Clean(upspin.PathName(fs.Arg(1)))
 	c, _ := newClient()
-	// We require the original to exist unless explicitly requested otherwise.
-	if !*force {
-		dir, err := c.DirServer(originalPath)
-		if err != nil {
-			exit(err)
-		}
-		if _, err = dir.Lookup(originalPath); err != nil {
-			exit(err)
-		}
-	}
-	_, err = c.PutLink(originalPath, newPath)
+	_, err = c.PutLink(originalPath, linkPath)
 	if err != nil {
 		exit(err)
 	}
@@ -333,7 +322,7 @@ func rm(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		_, err := dir.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			// TODO: implement links.
+			// TODO: client must implement Delete so links work.
 			exit(err)
 		}
 	}
