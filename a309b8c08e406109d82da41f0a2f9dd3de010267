@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_05d07650",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_a3cffaae",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_639ca2bb",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "I see. Can you please expand on this comment as to how the locking should be done. State that when adding or getting a user, you should take userLock(user).",
       "parentUuid": "1bd8f739_85f00693",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_e55f12e9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_4342c618",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -191,6 +227,24 @@
       "side": 1,
       "message": "because i\u0027m removing global state from everywhere that makes sense. the server owns this cache, so it should be a field in server. and the lru should only be initialized when someone initializes a server, not merely as a tax for importing this package",
       "parentUuid": "1bd8f739_a5e42ad4",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_45151ef7",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_6347c227",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -390,6 +444,24 @@
     },
     {
       "key": {
+        "uuid": "1bd8f739_651a2228",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ba2277b_034cce46",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_43fc06d8",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -437,6 +509,24 @@
       "side": 1,
       "message": "you might not be a fan, but there is a sound rationale for this suggestion.\n\nthree things distinct may happen as a result of this call\n\n1. the thing doesn\u0027t exist, that\u0027s fine\n2. an error occurred, that\u0027s not fine\n3. path exists, check if overwrite\n\nreading the current code, it is not clear that there are three outcomes, and the logic for one of the outcomes is inverted (if NOT match errNotExist (\"not not\"), that\u0027s an error).\n\nif you don\u0027t like empty if statements, how about a switch?\n\nswitch {\ncase errors.Match(errNotExist, err):\n  // OK.\ncase err !\u003d nil:\n  // Error\ndefault:\n  // Exists, overwrite.\n}\n\ni suggested this change because i had trouble decoding the logic, not because i have some fetish about indentation.",
       "parentUuid": "1bd8f739_a55fca7b",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_05af968c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "I think my style is easier for me to read, because (other than I\u0027m used to it) it\u0027s sequential: \"if err not null, then check whether the error is something else other than NotExist, if err is nil, do something else.\"\n\nBut in name of being a team player, let\u0027s move on.\n\nDone.",
+      "parentUuid": "9ba2277b_c35556ce",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -560,6 +650,24 @@
       "side": 1,
       "message": "So Info then?\nIn any case, don\u0027t use the bare log.Print.\nWe need to have the option to control the verbosity of our logging.",
       "parentUuid": "1bd8f739_85c1e601",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bd8f739_85f566bc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-17T00:33:38Z",
+      "side": 1,
+      "message": "Info is the same as the bare log.Print. I slightly prefer the bare one because it\u0027s easier to read and type. But if you want consistency and more documentation, it can be accommodated.\n\nDone.",
+      "parentUuid": "9ba2277b_e352d2e3",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
