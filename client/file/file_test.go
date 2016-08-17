@@ -209,12 +209,15 @@ var _ upspin.Client = (*dummyClient)(nil)
 func (d *dummyClient) Get(name upspin.PathName) ([]byte, error) {
 	return nil, nil
 }
+func (d *dummyClient) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
+	return nil, nil
+}
 func (d *dummyClient) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
 	d.putData = make([]byte, len(data))
 	copy(d.putData, data)
 	return nil, nil
 }
-func (d *dummyClient) PutLink(oleName, newName upspin.PathName) (*upspin.DirEntry, error) {
+func (d *dummyClient) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
 }
 func (d *dummyClient) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
@@ -222,6 +225,9 @@ func (d *dummyClient) PutDuplicate(oldName, newName upspin.PathName) (*upspin.Di
 }
 func (d *dummyClient) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
+}
+func (d *dummyClient) Delete(name upspin.PathName) error {
+	return nil
 }
 func (d *dummyClient) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, nil

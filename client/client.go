@@ -294,6 +294,16 @@ Blocks:
 	return data, nil
 }
 
+// Lookup implements upspin.Client.
+func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
+	return nil, errors.E("client.Lookup", errors.Str("not implemented"))
+}
+
+// Delete implements upspin.Client.
+func (c *Client) Delete(name upspin.PathName) error {
+	return errors.E("client.Delete", errors.Str("not implemented"))
+}
+
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	dir, err := c.DirServer(upspin.PathName(pattern))
