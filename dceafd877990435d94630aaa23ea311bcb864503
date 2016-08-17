@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_fb79cf28",
+        "filename": "client/all_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T01:50:38Z",
+      "side": 0,
+      "message": "It\u0027s not possible anymore. Service is no longer exported.",
+      "parentUuid": "9ba2277b_a3d93a4e",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_43b406e9",
         "filename": "key/inprocess/user.go",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-17T01:36:59Z",
       "side": 0,
       "message": "do not delete this",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_bb834701",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T01:50:38Z",
+      "side": 0,
+      "message": "The constructor returns the type as an upspin.KeyServer. How much more explicit do we need to be?",
+      "parentUuid": "9ba2277b_43b406e9",
       "revId": "dceafd877990435d94630aaa23ea311bcb864503",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_9b888b1c",
+        "filename": "pack/debug/testpack_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T01:50:38Z",
+      "side": 0,
+      "message": "it\u0027s not possible\n1. Service is no longer exported\n2. we\u0027re passing the inProcess endpoint to bind, it can\u0027t get anything else\n\nif you like, i could change this to call key.Endpoint() and check its transport type is InProcess, but that seems tautological to me",
+      "parentUuid": "9ba2277b_c3e236f7",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_03c92e7f",
         "filename": "store/inprocess/store.go",
         "patchSetId": 11
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-17T01:36:59Z",
       "side": 0,
       "message": "this should not be deleted.",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_7b8edf27",
+        "filename": "store/inprocess/store.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T01:50:38Z",
+      "side": 0,
+      "message": "again, the constructor returns it. do we need to do the check twice?",
+      "parentUuid": "9ba2277b_03c92e7f",
       "revId": "dceafd877990435d94630aaa23ea311bcb864503",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
