@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_9ba1ab8e",
+        "filename": "client/all_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T02:09:30Z",
+      "side": 0,
+      "message": "then please use key.Endpoint().Transport \u003d upspin.InProcess",
+      "parentUuid": "9baf87ac_fb79cf28",
+      "revId": "dceafd877990435d94630aaa23ea311bcb864503",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_43b406e9",
         "filename": "key/inprocess/user.go",
         "patchSetId": 11
