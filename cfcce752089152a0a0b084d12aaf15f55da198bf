@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_7be5bfcd",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T02:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bd8f739_2842af17",
+      "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_7bbc9fab",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_5be203c8",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T02:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9baf87ac_7bbc9fab",
+      "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1bd8f739_4847f326",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-17T02:32:37Z",
       "side": 1,
       "message": "We \"verify\" rather than \"match\" a signature in crypto lingo.  Perhaps reword to:\n\"signature fails to validate using the provided key\"",
+      "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_3bdf3704",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T02:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bd8f739_4847f326",
       "revId": "cfcce752089152a0a0b084d12aaf15f55da198bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
