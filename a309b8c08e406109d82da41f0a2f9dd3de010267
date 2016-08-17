@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "9ba2277b_a3cffaae",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "In general I prefer not to use DeepEqual as it feels like a blunt instrument when reality is usually more subtle.\nI\u0027d be happy for you to write a small helper function that checks the relevant fields.",
+      "parentUuid": "1bd8f739_e57d52bf",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_639ca2bb",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Because the tree is not thread safe. Locking it before taking the tree from the LRU is a precaution. There\u0027s no point in allowing one to take the tree from the LRU and then take the userlock later.",
       "parentUuid": "9ba2277b_639ca2bb",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_4342c618",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "I see. Can you please expand on this comment as to how the locking should be done. State that when adding or getting a user, you should take userLock(user).",
+      "parentUuid": "1bd8f739_85f00693",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -137,6 +173,24 @@
       "side": 1,
       "message": "Will do.",
       "parentUuid": "9ba2277b_a3f61af1",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_6347c227",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "because i\u0027m removing global state from everywhere that makes sense. the server owns this cache, so it should be a field in server. and the lru should only be initialized when someone initializes a server, not merely as a tax for importing this package",
+      "parentUuid": "1bd8f739_a5e42ad4",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -318,6 +372,24 @@
     },
     {
       "key": {
+        "uuid": "9ba2277b_034cce46",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "ok, well please make the error message more informative. show the mismatched strings, and include op in the error",
+      "parentUuid": "1bd8f739_a51a6aca",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ba2277b_43fc06d8",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -347,6 +419,24 @@
       "side": 1,
       "message": "Not a fan of empty if blocks.",
       "parentUuid": "9ba2277b_43fc06d8",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_c35556ce",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "you might not be a fan, but there is a sound rationale for this suggestion.\n\nthree things distinct may happen as a result of this call\n\n1. the thing doesn\u0027t exist, that\u0027s fine\n2. an error occurred, that\u0027s not fine\n3. path exists, check if overwrite\n\nreading the current code, it is not clear that there are three outcomes, and the logic for one of the outcomes is inverted (if NOT match errNotExist (\"not not\"), that\u0027s an error).\n\nif you don\u0027t like empty if statements, how about a switch?\n\nswitch {\ncase errors.Match(errNotExist, err):\n  // OK.\ncase err !\u003d nil:\n  // Error\ndefault:\n  // Exists, overwrite.\n}\n\ni suggested this change because i had trouble decoding the logic, not because i have some fetish about indentation.",
+      "parentUuid": "1bd8f739_a55fca7b",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -452,6 +542,24 @@
       "side": 1,
       "message": "This is the main path that creates a root. It should be logged so we know which users are creating roots.",
       "parentUuid": "9ba2277b_c3ef9615",
+      "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ba2277b_e352d2e3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-17T00:03:12Z",
+      "side": 1,
+      "message": "So Info then?\nIn any case, don\u0027t use the bare log.Print.\nWe need to have the option to control the verbosity of our logging.",
+      "parentUuid": "1bd8f739_85c1e601",
       "revId": "a309b8c08e406109d82da41f0a2f9dd3de010267",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
