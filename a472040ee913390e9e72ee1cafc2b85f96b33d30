@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9baf87ac_bbd467bb",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:51:50Z",
+      "side": 1,
+      "message": "Please don\u0027t do this, as it means the error line in the output appears in the helper, not here.\nEither have checkDirEntry do t.Errorf and return a boolean and do\nif !checkDirEntry() { t.Error(\"bad DirEntry\") }\nor, better, just have checkDirEntry return an error.",
+      "revId": "a472040ee913390e9e72ee1cafc2b85f96b33d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
