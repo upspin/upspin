@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9baf87ac_7befff7e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:54:55Z",
+      "side": 1,
+      "message": "It\u0027s built in for simplicity. The Unix kernel does the same and I\u0027m fine with agreeing with it.\nPlus, if you pass a count, you need to add the argument to every call that might evaluate a link.",
+      "parentUuid": "1bd8f739_f3def805",
+      "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_bbbb4786",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-17T04:36:20Z",
       "side": 1,
       "message": "How about just Duplicate ?",
+      "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9baf87ac_5bec4388",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-17T04:54:55Z",
+      "side": 1,
+      "message": "While I normally favor the shorter name, here I prefer having Put on all the guys that actually Put. The other option would be Put, Link, and Duplicate but I feel it\u0027s clearer this way.\n\nPushback?",
+      "parentUuid": "9baf87ac_bbbb4786",
       "revId": "764b02f43fbbae27111079b8f7d8497c301aefa7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
