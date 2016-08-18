@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "bbfa8bf0_5c959d30",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:41:34Z",
+      "side": 1,
+      "message": "Agree, I should have mentioned that it should happen in a separate CL. Mechanical changes should always be separate to semantic changes.",
+      "parentUuid": "fb316383_b91edb17",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_fbfb0fdf",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -248,6 +266,24 @@
     },
     {
       "key": {
+        "uuid": "bbfa8bf0_bca2e191",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:41:34Z",
+      "side": 1,
+      "message": "Oh cool, if it\u0027s just flushing for this user then that\u0027s fine. I think it\u0027s reasonable for creating a root to only reply once the action has been flushed to permanent storage.",
+      "parentUuid": "fb316383_1904afb3",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbfa8bf0_1c8b1517",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -277,6 +313,24 @@
       "side": 1,
       "message": "Done (my worry here is that there would be a cost associated with the declaration of the var and it\u0027s in a loop. But I guess  you\u0027re asserting that the compiler is smart or, even better, there\u0027s no code emitted at the declaration point. Which one is it?",
       "parentUuid": "bbfa8bf0_1c8b1517",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbfa8bf0_9ca725a2",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:41:34Z",
+      "side": 1,
+      "message": "the compiler is smart enough that it doesn\u0027t care where you declare the var.\nin any case, even if it wasn\u0027t smart enough, i\u0027d make the argument on style grounds anyway as what you\u0027re doing here is 2-4 orders of magnitude more expensive than a stack variable.",
+      "parentUuid": "fb316383_59a8e785",
       "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
