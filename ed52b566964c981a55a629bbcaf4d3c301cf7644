@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bbfa8bf0_1ca835cc",
+        "filename": "dir/filesystem/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T21:14:19Z",
+      "side": 1,
+      "message": "the comment is also totally wrong, will fix",
+      "parentUuid": "fb316383_6012bbb4",
+      "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_205a8388",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 6
