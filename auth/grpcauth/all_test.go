@@ -22,6 +22,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 )
 
 var (
@@ -98,6 +99,10 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 	}
 	s.t.Fatalf("iteration %d: invalid request %q", s.iteration, req.PeopleDemand)
 	return nil, nil // not reached
+}
+
+func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
+	return nil, nil
 }
 
 type client struct {

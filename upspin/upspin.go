@@ -593,6 +593,12 @@ type Context interface {
 	// SetStoreEndpoint sets the StoreEndpoint.
 	SetStoreEndpoint(Endpoint) Context
 
+	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
+	StoreCacheEndpoint() Endpoint
+
+	// SetStoreCacheEndpoint sets the StoreEndpoint.
+	SetStoreCacheEndpoint(Endpoint) Context
+
 	// StoreServer returns a StoreServer instance bound to StoreEndpoint.  In the event of an
 	// error binding, all subsequent calls on the StoreServer will return errors.
 	StoreServer() StoreServer
