@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bbfa8bf0_1c503533",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T07:58:37Z",
+      "side": 1,
+      "message": "the convention with git is to wrap commit messages at 80 columns",
+      "revId": "b00ef52fc9c365a3cf968f2b15b68195fff076f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
