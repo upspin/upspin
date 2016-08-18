@@ -11,6 +11,8 @@ package inprocess
 // Even empty directories contain a single zero-sized block.
 // For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
 
+// TODO: If links are present, access control will use wrong Access file. Needs to be fixed!
+
 import (
 	goPath "path"
 
@@ -196,7 +198,6 @@ func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-// TODO: implement links.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const Put = "Put"
 	if err := valid.DirEntry(entry); err != nil {
@@ -230,6 +231,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
 		if entry.Packing != upspin.PlainPack {
 			return nil, errors.E(Put, entry.Name, errors.Str("Access or Group file must use plain packing"))
+		}
+		if entry.IsLink() {
+			return nil, errors.E(Put, entry.Name, errors.Str("cannot create a link named Access or Group"))
 		}
 	}
 	return s.put(Put, entry, false)
@@ -293,12 +297,16 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 	}
 	// Update the root.
 	s.db.root[parsed.User()] = rootEntry
-
-	// If it was an Access or Group file, there's more to do.
 	if access.IsGroupFile(entry.Name) {
+		if entry.IsLink() {
+			return nil, errors.E(op, errors.Internal, entry.Name, "Group file cannot be a link")
+		}
 		// Group files are loaded on demand but we must wipe the cache.
 		access.RemoveGroup(entry.Name)
 	} else if access.IsAccessFile(entry.Name) {
+		if entry.IsLink() {
+			return nil, errors.E(op, errors.Internal, entry.Name, "Access file cannot be a link")
+		}
 		var accessFile *access.Access
 		if !deleting {
 			data, err := s.readAll(s.context, entry)
@@ -313,7 +321,7 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 		s.db.access[path.DropPath(entry.Name, 1)] = accessFile
 	}
 
-	return nil, nil
+	return entry, nil
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
@@ -358,7 +366,7 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 			// We've reached the root but there is no access file there.
 			return nil
 		}
-		// Step up to parent directory.
+		// Step up to parent directory. // TODO: This is incorrect in the presence of links.
 		parsed = parsed.Drop(1)
 	}
 }
@@ -369,7 +377,6 @@ func (s *server) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte
 }
 
 // Delete implements upspin.DirServer.Delete.
-// TODO: implement links.
 func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Delete = "Delete"
 	parsed, err := path.Parse(pathName)
@@ -389,7 +396,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 	entry, err := s.lookup(Delete, parsed) // File must exist.
 	if err != nil {
-		return nil, err
+		return entry, err
 	}
 
 	s.db.mu.Lock()
@@ -429,11 +436,7 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if !canRead {
 		return nil, errors.E(Lookup, pathName, access.ErrPermissionDenied)
 	}
-	entry, err := s.lookup(Lookup, parsed)
-	if err != nil {
-		return nil, err
-	}
-	return entry, nil
+	return s.lookup(Lookup, parsed)
 }
 
 // lookup is the internal version of lookup; it does not do any Access checks.
@@ -454,6 +457,9 @@ func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error)
 		if err != nil {
 			return nil, err
 		}
+		if entry.IsLink() {
+			return entry, upspin.ErrFollowLink
+		}
 		if !entry.IsDir() {
 			return nil, errors.E(op, parsed.Path(), errors.NotDir)
 		}
@@ -464,6 +470,9 @@ func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error)
 	entry, err := s.fetchEntry(op, dirEntry, lastElem)
 	if err != nil {
 		return nil, err
+	}
+	if entry.IsLink() {
+		return entry, upspin.ErrFollowLink
 	}
 	return entry, nil
 }
@@ -739,7 +748,7 @@ func (s *server) DeleteAll() {
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
 func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const Dial = "Dial"
+	const Dial = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(Dial, errors.Invalid, errors.Str("unrecognized transport"))
 	}
