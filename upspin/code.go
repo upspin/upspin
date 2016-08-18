@@ -23,8 +23,8 @@ var ErrNoConfiguration = errors.New("service does not accept configuration optio
 type NoConfiguration struct{}
 
 // Configure implements Service.
-func (NoConfiguration) Configure(options ...string) error {
-	return ErrNoConfiguration
+func (NoConfiguration) Configure(options ...string) (UserName, error) {
+	return "", ErrNoConfiguration
 }
 
 // Marshal packs the DirBlock into a byte slice for transport.

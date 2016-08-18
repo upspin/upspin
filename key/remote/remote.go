@@ -75,16 +75,16 @@ func (r *remote) Endpoint() upspin.Endpoint {
 }
 
 // Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) error {
+func (r *remote) Configure(options ...string) (upspin.UserName, error) {
 	const op = "key/remote.Configure"
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
 	resp, err := r.keyClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return "", errors.E(op, errors.IO, err)
 	}
-	return errors.UnmarshalError(resp.Error)
+	return "", errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.

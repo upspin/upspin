@@ -22,6 +22,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
+	"upspin.io/upspin/proto"
 )
 
 var (
@@ -98,6 +99,22 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 	}
 	s.t.Fatalf("iteration %d: invalid request %q", s.iteration, req.PeopleDemand)
 	return nil, nil // not reached
+}
+
+// COnfigure is defined in the proto file. The reason:
+//
+// CacheConfig is a client method and does not go across the wire.  It does however use the GRCP Configure and
+// Authenticate from proto (not testproto) though.
+//
+// Because of the above I had to add Configure to the GRPCCommon interface required in auth/grpcauth/client.go i.e.,
+// it now has to have a proto GRPC Configure method in addition to Authenticate and Ping.  To make the TestServer
+// client be conformant, I had to add a Configure routine to its grpc Service definition.  However, doing that
+// also requires a Configure routine defined for the server (since the pb generator creates definitions for both sides).
+// All other servers already have one defined but the poor test service here did not.
+//
+// It uses the proto config as opposed to the test proto that's where the Configure messages are defined.
+func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
+	return nil, nil
 }
 
 type client struct {

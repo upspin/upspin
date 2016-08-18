@@ -548,9 +548,9 @@ func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, er
 }
 
 // Configure implements upspin.Service.
-func (s *server) Configure(options ...string) error {
+func (s *server) Configure(options ...string) (upspin.UserName, error) {
 	// TODO: to be removed.
-	return nil
+	return "", nil
 }
 
 // Endpoint implements upspin.Service.

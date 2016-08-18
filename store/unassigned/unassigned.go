@@ -44,9 +44,9 @@ func (u *unassigned) Endpoint() upspin.Endpoint {
 }
 
 // Configure implements upspin.Service.
-func (*unassigned) Configure(options ...string) error {
+func (*unassigned) Configure(options ...string) (upspin.UserName, error) {
 	const op = "store/unassigned.Configure"
-	return errors.E(op, errors.Invalid, unassignedErr)
+	return "", errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Close implements upspin.Service.

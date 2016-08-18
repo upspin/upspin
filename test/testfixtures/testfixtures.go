@@ -53,8 +53,8 @@ func (d *dummyService) Endpoint() upspin.Endpoint {
 }
 
 // Configure implements upspin.Service.
-func (d *dummyService) Configure(options ...string) error {
-	return nil
+func (d *dummyService) Configure(options ...string) (upspin.UserName, error) {
+	return "", nil
 }
 
 // Authenticate implements upspin.Service.

@@ -105,8 +105,8 @@ func (s *server) Delete(ref upspin.Reference) error {
 
 // Methods that do not apply to this server.
 
-func (s *server) Configure(options ...string) error {
-	return errors.Str("store/filesystem: Configure should not be called")
+func (s *server) Configure(options ...string) (upspin.UserName, error) {
+	return "", errors.Str("store/filesystem: Configure should not be called")
 }
 
 func (s *server) Authenticate(upspin.Context) error {

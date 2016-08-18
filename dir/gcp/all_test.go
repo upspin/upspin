@@ -1247,7 +1247,7 @@ func (d *dummyStore) Ping() bool {
 func (d *dummyStore) Endpoint() upspin.Endpoint {
 	panic("unimplemented")
 }
-func (d *dummyStore) Configure(options ...string) error {
+func (d *dummyStore) Configure(options ...string) (upspin.UserName, error) {
 	panic("unimplemented")
 }
 func (d *dummyStore) Delete(ref upspin.Reference) error {

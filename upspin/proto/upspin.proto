@@ -42,6 +42,8 @@ message ConfigureRequest {
 
 message ConfigureResponse {
     bytes error = 1;
+    string user_name = 2;
+    Signature signature = 3;
 }
 
 message EndpointRequest {

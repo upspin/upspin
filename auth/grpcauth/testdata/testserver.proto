@@ -15,5 +15,6 @@ message DoATrumpResponse {
 service TestService {
 	rpc Authenticate (proto.AuthenticateRequest) returns (proto.AuthenticateResponse) {}
 	rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
+	rpc Configure (proto.ConfigureRequest) returns (proto.ConfigureResponse) {}
 	rpc DoATrump (DoATrumpRequest) returns (DoATrumpResponse) {}
 }

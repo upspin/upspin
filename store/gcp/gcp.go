@@ -226,8 +226,8 @@ func (s *server) Authenticate(upspin.Context) error {
 }
 
 // Configure implements upspin.Service.
-func (s *server) Configure(options ...string) error {
-	return errors.Str("store/gcp: Configure should not be called")
+func (s *server) Configure(options ...string) (upspin.UserName, error) {
+	return "", errors.Str("store/gcp: Configure should not be called")
 }
 
 // Endpoint implements upspin.Service.
