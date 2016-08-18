@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb316383_6012bbb4",
+        "filename": "dir/filesystem/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T21:01:20Z",
+      "side": 1,
+      "message": "80 cols?",
+      "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_205a8388",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T21:01:20Z",
+      "side": 1,
+      "message": "s/server/Service",
+      "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
