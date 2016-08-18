@@ -25,12 +25,13 @@ import (
 var inTest = false // Generate errors instead of logs for certain problems.
 
 type contextImpl struct {
-	userName      upspin.UserName
-	factotum      upspin.Factotum
-	packing       upspin.Packing
-	keyEndpoint   upspin.Endpoint
-	dirEndpoint   upspin.Endpoint
-	storeEndpoint upspin.Endpoint
+	userName           upspin.UserName
+	factotum           upspin.Factotum
+	packing            upspin.Packing
+	keyEndpoint        upspin.Endpoint
+	dirEndpoint        upspin.Endpoint
+	storeEndpoint      upspin.Endpoint
+	storeCacheEndpoint upspin.Endpoint
 }
 
 // New returns a context with all fields set as defaults.
@@ -47,6 +48,7 @@ const (
 	keyserver   = "keyserver"
 	dirserver   = "dirserver"
 	storeserver = "storeserver"
+	storecache  = "storecache"
 	packing     = "packing"
 	secrets     = "secrets"
 )
@@ -83,6 +85,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		keyserver:   "",
 		dirserver:   "",
 		storeserver: "",
+		storecache:  "",
 		packing:     "plain",
 		secrets:     "",
 	}
@@ -184,6 +187,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	context.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
 	context.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
+	context.storeCacheEndpoint = parseEndpoint(op, vals, storecache, &err)
 	context.dirEndpoint = parseEndpoint(op, vals, dirserver, &err)
 	return context, err
 }
@@ -325,6 +329,17 @@ func (ctx *contextImpl) StoreEndpoint() upspin.Endpoint {
 // SetStoreEndpoint implements upspin.Context.
 func (ctx *contextImpl) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
 	ctx.storeEndpoint = e
+	return ctx
+}
+
+// StoreCacheEndpoint implements upspin.Context.
+func (ctx *contextImpl) StoreCacheEndpoint() upspin.Endpoint {
+	return ctx.storeCacheEndpoint
+}
+
+// SetStoreCacheEndpoint implements upspin.Context.
+func (ctx *contextImpl) SetStoreCacheEndpoint(e upspin.Endpoint) upspin.Context {
+	ctx.storeCacheEndpoint = e
 	return ctx
 }
 

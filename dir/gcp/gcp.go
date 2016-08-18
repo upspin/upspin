@@ -613,8 +613,8 @@ func (d *directory) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Serv
 
 // Configure configures the connection to the backing store (namely, GCP) once the service
 // has been dialed. The details of the configuration are explained at the package comments.
-func (d *directory) Configure(options ...string) error {
-	return errors.Str("dir/gcp: Configure method should not be called")
+func (d *directory) Configure(options ...string) (upspin.UserName, error) {
+	return "", errors.Str("dir/gcp: Configure method should not be called")
 }
 
 // Ping implements upspin.Service.

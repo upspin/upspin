@@ -106,7 +106,7 @@ func (c *userCacheContext) Dial(context upspin.Context, e upspin.Endpoint) (upsp
 }
 
 // Configure implements upspin.Service.
-func (c *userCacheContext) Configure(options ...string) error {
+func (c *userCacheContext) Configure(options ...string) (upspin.UserName, error) {
 	panic("unimplemented")
 }
 

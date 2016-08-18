@@ -187,8 +187,8 @@ func (s *service) Endpoint() upspin.Endpoint {
 	return s.endpoint
 }
 
-func (s *service) Configure(options ...string) error {
-	return nil
+func (s *service) Configure(options ...string) (upspin.UserName, error) {
+	return "", nil
 }
 
 func (s *service) Ping() bool {

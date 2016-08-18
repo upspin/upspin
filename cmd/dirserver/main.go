@@ -230,7 +230,7 @@ func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	err = dir.Configure(req.Options...)
+	_, err = dir.Configure(req.Options...)
 	if err != nil {
 		log.Printf("Configure %q failed: %v", req.Options, err)
 	}
