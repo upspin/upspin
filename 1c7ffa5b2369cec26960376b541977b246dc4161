@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "bbfa8bf0_7cb179da",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-18T01:08:43Z",
+      "side": 1,
+      "message": "Right. When my client stuff finally lands all this will become clearer I hope. At least to me.",
+      "parentUuid": "fb316383_b93d7be2",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbfa8bf0_9c7e050e",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
