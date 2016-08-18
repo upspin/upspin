@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb316383_b0d4a8bb",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "There\u0027s more to authentication than just this (though, this is the bulk of it to be sure). I\u0027d suggest a small refactoring of server.go\u0027s Authenticate method to expose the auth token validation pieces, so we don\u0027t have to maintain them in two places. It would include the time quasi-synchronicity test as well, which ehg had mentioned is important (I think, to avoid playback attacks, but maybe it\u0027s something else).\n\nIf you prefer, I can do that in another CL once this is in.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_504af480",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "So, if we\u0027re Dialing a Remote (Transport !\u003d Unssigned) then it\u0027s insecure? This looks wrong. If it\u0027s not, a comment would help.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_1029dc9c",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "So, if we\u0027re Dialing a Remote (Transport !\u003d Unssigned) then it\u0027s insecure? This looks wrong (I\u0027d expect the other way around). If it\u0027s not, a comment would help.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_d03da4e1",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "I\u0027m a little unsure what this check for not unassigned does. Why would we ever want to create a client for an unassigned transport? Are you using unassigned because it\u0027s the zero value and in this new dial dance it means a cache dial and then we\u0027ll figure out the transport at configuration time? \n\nI\u0027d add a comment explaining. The else branch looks odd as is.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_70eff07e",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "You can pass serverUser directly to errors.E and drop it from the Errorf:\n\nerrors.E(\"Dial\", errors.Invalid, serverUser, errors.Str(\"incorrect cache user\"))",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_709db002",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T17:16:38Z",
+      "side": 1,
+      "message": "I thought the plan was to kill Configure. If you need it, I guess we\u0027ll scrap that plan.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
