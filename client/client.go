@@ -16,6 +16,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"upspin.io/client/clientutil"
 	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
 )
 
@@ -222,74 +223,9 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	if entry.IsDir() {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
-
-	// firstError remembers the first error we saw. If we fail completely we return it.
-	var firstError error
-	// isError reports whether err is non-nil and remembers it if it is.
-	isError := func(err error) bool {
-		if err == nil {
-			return false
-		}
-		if firstError == nil {
-			firstError = err
-		}
-		return true
-	}
-
-	var data []byte
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
-	}
-	bu, err := packer.Unpack(c.context, entry)
+	data, err := clientutil.ReadAll(c.context, entry)
 	if err != nil {
-		return nil, errors.E(op, name, err) // Showstopper.
-	}
-Blocks:
-	for b := 0; ; b++ {
-		block, ok := bu.NextBlock()
-		if !ok {
-			break // EOF
-		}
-		// Get the data for this block.
-		// where is the list of locations to examine. It is updated in the loop.
-		where := []upspin.Location{block.Location}
-		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
-			loc := where[i]
-			store, err := bind.StoreServer(c.context, loc.Endpoint)
-			if isError(err) {
-				continue
-			}
-			cipher, locs, err := store.Get(loc.Reference)
-			if isError(err) {
-				continue // locs guaranteed to be nil.
-			}
-			if locs == nil && err == nil {
-				// Found the data. Unpack it.
-				clear, err := bu.Unpack(cipher)
-				if err != nil {
-					return nil, errors.E(op, name, err) // Showstopper.
-				}
-				data = append(data, clear...) // TODO: Could avoid a copy if only one block.
-				continue Blocks
-			}
-			// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
-		outer:
-			for _, newLoc := range locs {
-				for _, oldLoc := range where {
-					if oldLoc == newLoc {
-						continue outer
-					}
-				}
-				where = append(where, newLoc)
-			}
-		}
-		// If we arrive here, we have failed to find a block.
-		// TODO: custom error types.
-		if firstError != nil {
-			return nil, errors.E(op, name, firstError)
-		}
-		return nil, errors.Errorf("client: data for block %d in %q not found on any store server", b, name)
+		return nil, errors.E(op, err)
 	}
 	return data, nil
 }
