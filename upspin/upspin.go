@@ -341,11 +341,10 @@ type DirServer interface {
 
 	// WhichAccess returns the DirEntry of the Access file that is
 	// responsible for the access rights defined for the named item.
-	// WhichAccess requires that the calling user have List rights
-	// (see the access package) for the argument name.
-	// TODO: Change to "any" rights once that's done.
-	// If there is no such file, that is, there are no Access files that
-	// apply, it returns (nil, nil).
+	// WhichAccess requires that the calling user have at least one access
+	// right granted for the argument name. If not, WhichAccess will return
+	// a "does not exist" error, even if the item and/or the Access file
+	// exist.
 	//
 	// If the returned error is ErrFollowLink, the caller should
 	// retry the operation as outlined in the description for
