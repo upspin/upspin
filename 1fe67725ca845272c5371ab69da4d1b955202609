@@ -71,6 +71,42 @@
     },
     {
       "key": {
+        "uuid": "fb316383_b0bd88cb",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:17:27Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "fb316383_504af480",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_70a85086",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:17:27Z",
+      "side": 1,
+      "message": "Need a better comment.  What it says is, if there is a cache endpoint use the cache (without TLS).  If not, call direct.  I\u0027ll add a comment or make a boolean with a reasonable name.",
+      "parentUuid": "fb316383_1029dc9c",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_d03da4e1",
         "filename": "store/remote/remote.go",
         "patchSetId": 3
@@ -82,6 +118,24 @@
       "writtenOn": "2016-08-18T17:16:38Z",
       "side": 1,
       "message": "I\u0027m a little unsure what this check for not unassigned does. Why would we ever want to create a client for an unassigned transport? Are you using unassigned because it\u0027s the zero value and in this new dial dance it means a cache dial and then we\u0027ll figure out the transport at configuration time? \n\nI\u0027d add a comment explaining. The else branch looks odd as is.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_f09c606d",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:17:27Z",
+      "side": 1,
+      "message": "UInassigned means exactly that.  This is not a valid endpoint.  That is, the endpoint was never set in the context.  If it not invalid then its a real endpoint, use it.  As above, i\u0027ll clarify.",
+      "parentUuid": "fb316383_d03da4e1",
       "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -105,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_908e4c2c",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:17:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb316383_70eff07e",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_709db002",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 3
@@ -116,6 +188,24 @@
       "writtenOn": "2016-08-18T17:16:38Z",
       "side": 1,
       "message": "I thought the plan was to kill Configure. If you need it, I guess we\u0027ll scrap that plan.",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_ab9c395a",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:17:27Z",
+      "side": 1,
+      "message": "Yesterday we decided it can stay around for this kind of stuff, i.e., it can be used on a per Dial basis to pass any needed flavoring.  It may change name but for now it stays Configure.",
+      "parentUuid": "fb316383_709db002",
       "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
