@@ -6,6 +6,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -145,17 +146,20 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 		return nil, err
 	}
 	entry, err := dir.Lookup(upspin.PathName(req.Name))
-	if err != nil {
+	if err != nil && err != upspin.ErrFollowLink {
 		log.Printf("Lookup %q failed: %v", req.Name, err)
 		return &proto.DirLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
-	b, err := entry.Marshal()
-	if err != nil {
-		return nil, err
+
+	// Fall through OK for ErrFollowLink.
+	b, marshalErr := entry.Marshal()
+	if marshalErr != nil {
+		return nil, marshalErr
 	}
 
 	resp := &proto.DirLookupResponse{
 		Entry: b,
+		Error: errors.MarshalError(err),
 	}
 	return resp, nil
 }
@@ -166,18 +170,32 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Dir
 
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	if err != nil {
+		log.Printf("Put %q failed: %v", entry.Name, err)
 		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	log.Printf("Put %q", entry.Name)
+
 	dir, err := s.dirFor(ctx)
 	if err != nil {
 		return nil, err
 	}
-	_, err = dir.Put(entry)
-	if err != nil {
-		// TODO: implement links.
+
+	entry, err = dir.Put(entry)
+	if err != nil && err != upspin.ErrFollowLink {
 		log.Printf("Put %q failed: %v", entry.Name, err)
 		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
+	}
+
+	if err == upspin.ErrFollowLink {
+		b, marshalErr := entry.Marshal()
+		if marshalErr != nil {
+			return nil, marshalErr
+		}
+		resp := &proto.DirPutResponse{
+			Entry: b,
+			Error: errors.MarshalError(err),
+		}
+		return resp, nil
 	}
 	return &putResponse, nil
 }
@@ -191,16 +209,20 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectory
 		return nil, err
 	}
 	entry, err := dir.MakeDirectory(upspin.PathName(req.Name))
-	if err != nil {
+	if err != nil && err != upspin.ErrFollowLink {
 		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
 		return &proto.DirMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
 	}
-	b, err := entry.Marshal()
+
+	// Fall through OK for ErrFollowLink.
+	fmt.Println("MAKE", entry, err)
+	b, marshalErr := entry.Marshal()
 	if err != nil {
-		return nil, err
+		return nil, marshalErr
 	}
 	resp := &proto.DirMakeDirectoryResponse{
 		Entry: b,
+		Error: errors.MarshalError(err),
 	}
 	return resp, nil
 }
@@ -215,6 +237,7 @@ func (s *Server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.D
 	}
 	entries, err := dir.Glob(req.Pattern)
 	if err != nil {
+		// TODO: Implement links.
 		log.Printf("Glob %q failed: %v", req.Pattern, err)
 		return &proto.DirGlobResponse{Error: errors.MarshalError(err)}, nil
 	}
@@ -233,11 +256,21 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*pro
 	if err != nil {
 		return nil, err
 	}
-	_, err = dir.Delete(upspin.PathName(req.Name))
-	if err != nil {
-		// TODO: implement links.
+	entry, err := dir.Delete(upspin.PathName(req.Name))
+	if err != nil && err != upspin.ErrFollowLink {
 		log.Printf("Delete %q failed: %v", req.Name, err)
 		return &proto.DirDeleteResponse{Error: errors.MarshalError(err)}, nil
+	}
+	if err == upspin.ErrFollowLink {
+		b, marshalErr := entry.Marshal()
+		if marshalErr != nil {
+			return nil, marshalErr
+		}
+		resp := &proto.DirDeleteResponse{
+			Entry: b,
+			Error: errors.MarshalError(err),
+		}
+		return resp, nil
 	}
 	return &deleteResponse, nil
 }
@@ -251,10 +284,12 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 		return nil, err
 	}
 	entry, err := dir.WhichAccess(upspin.PathName(req.Name))
-	if err != nil {
-		// TODO: implement links.
+	if err != nil && err != upspin.ErrFollowLink {
 		log.Printf("WhichAccess %q failed: %v", req.Name, err)
+		return &proto.DirWhichAccessResponse{Error: errors.MarshalError(err)}, nil
 	}
+
+	// Entry might be nil, representing no Access file present.
 	var b []byte
 	if entry != nil {
 		b, err = entry.Marshal()

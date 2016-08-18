@@ -11,6 +11,7 @@ package inprocess
 // to run.
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
 	"strings"
@@ -87,7 +88,7 @@ func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name ups
 	if path.Clean(name) != name {
 		t.Fatalf("%q is not a clean path name", name)
 	}
-	entry, err := newDirEntry(context, packing, name, data, upspin.AttrNone, 0)
+	entry, err := newDirEntry(context, packing, name, data, upspin.AttrNone, "", upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -506,7 +507,7 @@ func TestDelete(t *testing.T) {
 	}
 	// Another Delete should fail.
 	_, err = dir.Delete(fileName)
-	if err == nil || err == upspin.ErrFollowLink {
+	if err == nil {
 		t.Fatal("second Delete succeeds")
 	}
 	const expect = "item does not exist"
@@ -622,4 +623,69 @@ func TestWhichAccess(t *testing.T) {
 	if accessEntry != nil {
 		t.Errorf("expected no Access file, got %q", accessEntry.Name)
 	}
+}
+
+// TODO: Links need much more thorough testing.
+func TestLinkToFile(t *testing.T) {
+	context, dir := setup()
+	user := context.UserName()
+	dirName := upspin.PathName(user + "/dir")
+	fileName := dirName + "/file"
+	linkName := upspin.PathName(user + "/link")
+	_, err := dir.MakeDirectory(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry := storeData(t, context, []byte("hello"), fileName)
+	_, err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// File exists. Now create a link to it in the root.
+	linkEntry, err := newDirEntry(context, upspin.PlainPack, linkName, nil, upspin.AttrLink, fileName, upspin.SeqIgnore)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Put(linkEntry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Now fetch the link, should get ErrFollow link with the right path.
+	lookupEntry, err := dir.Lookup(linkName)
+	if err == nil || err != upspin.ErrFollowLink {
+		t.Fatalf("expected ErrFollowLink, got %v", err)
+	}
+	if !equal(linkEntry, lookupEntry) {
+		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
+	}
+	// TODO: Glob
+	// TODO: WhichAccess
+	// TODO: MakeDirectory
+	// Now try to delete the link, should succeed but leave the original intact.
+	_, err = dir.Delete(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// reflect.DeepEqual is too fussy, worrying about nil vs. empty. This is a lazy way to
+// compare their equivalence.
+func equal(d0, d1 *upspin.DirEntry) bool {
+	b0, err := d0.Marshal()
+	if err != nil {
+		panic(err)
+	}
+	b1, err := d1.Marshal()
+	if err != nil {
+		panic(err)
+	}
+	return bytes.Equal(b0, b1)
 }
