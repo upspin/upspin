@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb316383_abef59e7",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-18T19:53:04Z",
+      "side": 1,
+      "message": "I\u0027d find this formulation less ambiguous:\n// Insecure connections are only allowed on the loop back network.",
+      "revId": "a2a96cbc9e4e7b1a14f7b629bf75f351882dc4b4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b826f83_c1a7e2a0",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-18T19:53:04Z",
+      "side": 1,
+      "message": "The code proves the cache is running as resp.UserName, but doesn\u0027t it also need to check resp.UserName \u003d\u003d ac.context.UserName to fully satisfy this comment?",
+      "revId": "a2a96cbc9e4e7b1a14f7b629bf75f351882dc4b4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
