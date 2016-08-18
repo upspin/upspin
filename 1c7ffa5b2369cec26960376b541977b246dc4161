@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_19d34f61",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dbf1ff14_bd793f2a",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_db0053d8",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -71,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_f9469329",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbfa8bf0_9c7e050e",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbfa8bf0_fc83c9ff",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -82,6 +118,24 @@
       "writtenOn": "2016-08-18T00:18:13Z",
       "side": 1,
       "message": "It\u0027s probably about time we did away with the Tree interface and just made tree the exported type Tree.",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_b91edb17",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Sure, but I\u0027d rather do it in another CL. Rationale:\n- It will involve a filename change and some code movement.\n- The intention of this CL gets murkier the more we do here.\n- I\u0027d like to delete the interface in another 2 or 3 CLs when I\u0027ll be sure I won\u0027t need to mock the Tree for testing the server. I still think it might come in handy for error tests, such as when the tree lcorrupts data, forgets things, etc.\n\nThanks.",
+      "parentUuid": "bbfa8bf0_fc83c9ff",
       "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -141,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_f93d3373",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbfa8bf0_dc888d1d",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbfa8bf0_3c8ed126",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -158,6 +230,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_1904afb3",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Yes and no. Yes, everything is flushed for this user. No, because nothing exists prior to the root.\n\nThe cost problem is something I worried about too, but creating a root involves creating an entry in the key server and so many other things and it\u0027s done once for the lifetime of a user. Likely it will be done entirely offline by the web service that creates users or the email exchange mechanism discussed a while back.\n\nI\u0027ve clarified the comment.\n\nTo be sure: I implemented about 80% of root recovery for this very reason, and found the complexities involved not worth saving a flush for.",
+      "parentUuid": "bbfa8bf0_3c8ed126",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bbfa8bf0_1c8b1517",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -169,6 +259,24 @@
       "writtenOn": "2016-08-18T00:18:13Z",
       "side": 1,
       "message": "please move this declaration to directly before the ReadAt call, otherwise it looks like it is used at this scope level when it is not.",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_59a8e785",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:38:32Z",
+      "side": 1,
+      "message": "Done (my worry here is that there would be a cost associated with the declaration of the var and it\u0027s in a loop. But I guess  you\u0027re asserting that the compiler is smart or, even better, there\u0027s no code emitted at the declaration point. Which one is it?",
+      "parentUuid": "bbfa8bf0_1c8b1517",
       "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
