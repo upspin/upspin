@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_b93d7be2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:06:44Z",
+      "side": 1,
+      "message": "Servers don\u0027t need to resolve links, right? The client will do that.\n\nUnless you\u0027re referring to links to this dir itself. But that\u0027s not always possible to resolve from a pathname, right? \n\nIn summary, I don\u0027t think I need a boolean here. \n\nCheck the tests, they cover all possible cases now. I\u0027ve added the only missing one which is Lookup the link itself (the case you mentioned below and was covered, indirectly by Delete, but is now explicit).\n\nThanks.",
+      "parentUuid": "9baf87ac_db0053d8",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_fbfb0fdf",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-17T23:50:52Z",
       "side": 1,
       "message": "i wouldn\u0027t expect this to be possible if loadPath returned ErrFollowLink.\nthere is a subtle thing about links: whether or not you want a link in the last\nelement to step through the link. loadPath might need a flag, like in client.Lookup,\nto control that",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_d9a87724",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-18T00:06:44Z",
+      "side": 1,
+      "message": "loadPath only returns ErrFollowLink if an interim element is a link. If it\u0027s the last one, it will return it.\n\nThe check here is necessary because I\u0027m putting an element under the parent and it\u0027s a link, it should return to the user with ErrFollowLink.\n\nThe boolean is not needed by servers. Servers only resolve the links locally.",
+      "parentUuid": "9baf87ac_fbfb0fdf",
       "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
