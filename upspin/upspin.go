@@ -341,9 +341,8 @@ type DirServer interface {
 
 	// WhichAccess returns the DirEntry of the Access file that is
 	// responsible for the access rights defined for the named item.
-	// WhichAccess requires that the calling user have List rights
+	// WhichAccess requires that the calling user have Any rights
 	// (see the access package) for the argument name.
-	// TODO: Change to "any" rights once that's done.
 	// If there is no such file, that is, there are no Access files that
 	// apply, it returns (nil, nil).
 	//

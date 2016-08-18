@@ -213,7 +213,16 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 // WhichAccess implements upspin.DirServer.
 func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "DirServer.WhichAccess"
-	return nil, errors.E(op, errNotImplemented)
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
+
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
+
+	return s.whichAccess(p)
 }
 
 // Dial implements upspin.Dialer.
