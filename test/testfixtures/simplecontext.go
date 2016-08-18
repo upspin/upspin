@@ -100,3 +100,13 @@ func (ctx *simpleContext) Copy() upspin.Context {
 	c := *ctx
 	return &c
 }
+
+// StoreCacheEndpoint implements upspin.Context.
+func (ctx *simpleContext) StoreCacheEndpoint() upspin.Endpoint {
+	return ep0
+}
+
+// SetStoreCacheEndpoint implements upspin.Context.
+func (ctx *simpleContext) SetStoreCacheEndpoint(e upspin.Endpoint) upspin.Context {
+	return ctx
+}

@@ -6,6 +6,7 @@ package grpcauth
 
 import (
 	"crypto/tls"
+	"math/big"
 	"math/rand"
 	"net"
 	"strings"
@@ -270,4 +271,55 @@ func (ac *AuthClientService) Close() {
 	}
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
 	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
+}
+
+type ConfigureService interface {
+	Configure(gContext.Context, *proto.ConfigureRequest, ...grpc.CallOption) (*proto.ConfigureResponse, error)
+}
+
+// CacheConfigure uses the Configure command to tell the cache the endpoint it is caching for and
+// to ensure that the cache is running as our upspin user identity.
+func (ac *AuthClientService) CacheConfigure(ctx upspin.Context, cs ConfigureService, e upspin.Endpoint) (upspin.UserName, error) {
+	op := "Configure"
+	gCtx, err := ac.NewAuthContext()
+	if err != nil {
+		return "", err
+	}
+
+	token, err := generateRandomToken()
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	req := &proto.ConfigureRequest{
+		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
+	}
+	resp, err := cs.Configure(gCtx, req)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+
+	// Get user's public keys.
+	u, err := ctx.KeyServer().Lookup(upspin.UserName(resp.UserName))
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	key := u.PublicKey
+
+	// Parse signature
+	var rs, ss big.Int
+	_, ok := rs.SetString(resp.Signature.R, 10)
+	if !ok {
+		return "", errors.E(op, errors.Str("bad signature"))
+	}
+	_, ok = ss.SetString(resp.Signature.S, 10)
+	if !ok {
+		return "", errors.E(op, errors.Str("bad signature"))
+	}
+
+	// Validate signature.
+	err = verifySignature(key, []byte(resp.UserName+" Authenticate "+token), &rs, &ss)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	return upspin.UserName(resp.UserName), nil
 }
