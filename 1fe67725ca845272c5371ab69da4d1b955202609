@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fb316383_d0cda48b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T18:07:52Z",
+      "side": 1,
+      "message": "I agree that validating the parsing should be done in one place.  I don\u0027t to time validation here because I\u0027m using a challenge/response which I like a bit better, but I guess I could get rid of the challenge and use the time here also.  I actually dislike the time just because its the only place where we require syncronized clocks.  I\u0027d rather get rid of it altogether since its a requirement we really shouldn\u0027t need.",
+      "parentUuid": "fb316383_b0d4a8bb",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_504af480",
         "filename": "store/remote/remote.go",
         "patchSetId": 3
