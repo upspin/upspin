@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "dbf1ff14_bd793f2a",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "s/subdir/dir/ ?\nthey\u0027re all directories",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_db0053d8",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -37,6 +54,40 @@
     },
     {
       "key": {
+        "uuid": "bbfa8bf0_9c7e050e",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "\u0027overwrites into\u0027 seems ungrammatical to me. how bout:\n\nPut puts an entry in the Tree.\nIf the entry exists, it will be overwritten.",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbfa8bf0_fc83c9ff",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "It\u0027s probably about time we did away with the Tree interface and just made tree the exported type Tree.",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9baf87ac_fbfb0fdf",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -66,6 +117,58 @@
       "side": 1,
       "message": "loadPath only returns ErrFollowLink if an interim element is a link. If it\u0027s the last one, it will return it.\n\nThe check here is necessary because I\u0027m putting an element under the parent and it\u0027s a link, it should return to the user with ErrFollowLink.\n\nThe boolean is not needed by servers. Servers only resolve the links locally.",
       "parentUuid": "9baf87ac_fbfb0fdf",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbfa8bf0_dc888d1d",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "It would be good to document this behavior of loadPath/loadNode wrt links, as it differs from the exported interface and is easy to misunderstand.",
+      "parentUuid": "fb316383_d9a87724",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbfa8bf0_3c8ed126",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "so creating a root causes a flush of everything?\nI wonder how often we\u0027ll be creating roots, and whether this will be a problem.",
+      "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbfa8bf0_1c8b1517",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-18T00:18:13Z",
+      "side": 1,
+      "message": "please move this declaration to directly before the ReadAt call, otherwise it looks like it is used at this scope level when it is not.",
       "revId": "1c7ffa5b2369cec26960376b541977b246dc4161",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
