@@ -124,7 +124,7 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	svc, err := s.dir.Dial(s.context.Copy().SetUserName(session.User()), s.dir.Endpoint())
 	return svc.(upspin.DirServer), nil
 }
 

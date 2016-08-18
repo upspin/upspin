@@ -120,7 +120,7 @@ func (s *Server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.store.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	svc, err := s.store.Dial(s.context.Copy().SetUserName(session.User()), s.store.Endpoint())
 	if err != nil {
 		return nil, err
 	}

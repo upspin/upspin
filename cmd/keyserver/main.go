@@ -176,7 +176,7 @@ func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(s.context.Copy().SetUserName(session.User()), s.endpoint)
+	svc, err := s.key.Dial(s.context.Copy().SetUserName(session.User()), s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}
