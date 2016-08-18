@@ -188,12 +188,12 @@ func (r *remote) Configure(options ...string) error {
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "Dial"
+	const op = "dir/remote.Dial"
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.InsecureAllowingSelfSignedCertificates)
 	if err != nil {
 		return nil, errors.E(op, errors.IO, e, err)
 	}
