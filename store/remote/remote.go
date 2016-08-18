@@ -109,13 +109,38 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
+	var err error
+	var authClient *grpcauth.AuthClientService
+
+	// Are we using a Store cache?
+	ce := context.StoreCacheEndpoint()
+	useCache := ce.Transport != upspin.Unassigned
+
+	if useCache {
+		// Call the cache.  The cache is local so don't bother with TLS.
+		authClient, err = grpcauth.NewGRPCClient(context, ce.NetAddr, grpcauth.KeepAliveInterval, grpcauth.NoSecurity)
+	} else {
+		// Call the server directly.
+		authClient, err = grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
+	}
 	if err != nil {
 		return nil, err
 	}
 	// The connection is closed when this service is released (see Bind.Release)
 	storeClient := proto.NewStoreClient(authClient.GRPCConn())
 	authClient.SetService(storeClient)
+
+	if useCache {
+		// Configure the cache connection and confirm the user.
+		serverUser, err := authClient.CacheConfigure(context, e)
+		if err != nil {
+			return nil, err
+		}
+		if serverUser != context.UserName() {
+			return nil, errors.E("Dial", errors.Invalid, serverUser, errors.Errorf("incorrect cache user"))
+		}
+	}
+
 	r := &remote{
 		AuthClientService: authClient,
 		ctx: dialContext{
