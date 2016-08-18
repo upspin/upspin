@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5b826f83_01a2aa90",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-18T19:53:04Z",
+      "side": 1,
+      "message": "I concur that challenge/response is superior to time.  We used time in the other situation because we only had a one-way message and were willing to accept the (eventual) weak check.  Here, because of the asymmetry of client and server, we have a handshake and can use the better design.",
+      "parentUuid": "fb316383_d0cda48b",
+      "revId": "1fe67725ca845272c5371ab69da4d1b955202609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_504af480",
         "filename": "store/remote/remote.go",
         "patchSetId": 3
