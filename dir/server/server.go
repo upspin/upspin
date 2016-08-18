@@ -213,7 +213,21 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 // WhichAccess implements upspin.DirServer.
 func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "DirServer.WhichAccess"
-	return nil, errors.E(op, errNotImplemented)
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
+
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
+
+	// TODO: check whether the user has Any right on p.
+	// Complication here is that p might be on a link path and
+	// ErrFollowLink may be returned. In that case, we must check whether
+	// the user has Any right on the link
+
+	return s.whichAccess(p)
 }
 
 // Dial implements upspin.Dialer.

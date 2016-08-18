@@ -10,14 +10,17 @@ import (
 	"path/filepath"
 	"testing"
 
+	"upspin.io/access"
 	"upspin.io/cache"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/path"
 	"upspin.io/upspin"
 
 	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/inprocess"
 )
 
@@ -146,6 +149,106 @@ func TestLink(t *testing.T) {
 	}
 }
 
+func TestWhichAccess(t *testing.T) {
+	s := newDirServerForTesting(t)
+	de := &upspin.DirEntry{
+		Name:    userName + "/Access",
+		Attr:    upspin.AttrNone,
+		Writer:  userName,
+		Packing: upspin.PlainPack,
+	}
+	_, err := s.Put(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check the root.
+	accEntry, err := s.WhichAccess(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := checkDirEntry("TestWhichAccess.1", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
+	// Check dir1, still the same Access file at the root.
+	accEntry, err = s.WhichAccess(userName + "/dir")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := checkDirEntry("TestWhichAccess.2", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
+	// Add Access to dir1. New answer.
+	de2 := &upspin.DirEntry{
+		Name:    userName + "/dir/Access",
+		Attr:    upspin.AttrNone,
+		Writer:  userName,
+		Packing: upspin.PlainPack,
+	}
+	_, err = s.Put(de2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	accEntry, err = s.WhichAccess(userName + "/dir")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := checkDirEntry("TestWhichAccess.3", accEntry, de2); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestHasRight(t *testing.T) {
+	const accessFile = "l: " + userName
+	s := newDirServerForTesting(t)
+
+	loc := writeToStore(t, s.serverContext, []byte(accessFile))
+	de := &upspin.DirEntry{
+		Name:   userName + "/Access",
+		Attr:   upspin.AttrNone,
+		Writer: userName,
+		Blocks: []upspin.DirBlock{
+			{
+				Location: loc,
+				Offset:   0,
+				Size:     int64(len(accessFile)),
+			},
+		},
+		Packing: upspin.PlainPack,
+	}
+	_, err := s.Put(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := path.Parse(userName + "/")
+
+	checkAccess := func(right access.Right, want bool) error {
+		hasAccess, err := s.hasRight(right, p)
+		if err != nil {
+			return err
+		}
+		if want != hasAccess {
+			return errors.Errorf("%s: right %v: hasAccess = %v, want = %v", p.Path(), right, hasAccess, want)
+		}
+		return nil
+	}
+
+	for _, test := range []struct {
+		right    access.Right
+		expected bool
+	}{
+		{access.List, true}, // owner always has List access.
+		{access.Read, true}, // owner always has Read access.
+		{access.Create, false},
+		{access.Write, false},
+	} {
+		// Check whether userName has each of the rights.
+		err = checkAccess(test.right, test.expected)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
 func TestMain(m *testing.M) {
 	var err error
 	testDir, err = ioutil.TempDir("", "DirServer")
@@ -223,6 +326,18 @@ func newDirServerForTesting(t *testing.T) *server {
 		userName:      userName,
 		logDir:        testDir,
 		userTrees:     cache.NewLRU(10),
+	}
+}
+
+func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location {
+	store := ctx.StoreServer()
+	ref, err := store.Put(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return upspin.Location{
+		Endpoint:  store.Endpoint(),
+		Reference: ref,
 	}
 }
 
