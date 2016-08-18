@@ -20,6 +20,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -364,39 +365,7 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 
 // readAll retrieves the data for the entry.
 func (s *server) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return nil, errors.Errorf("no packing %#x registered", entry.Packing)
-	}
-	u, err := packer.Unpack(context, entry)
-	if err != nil {
-		return nil, err
-	}
-	var data []byte
-	for {
-		block, ok := u.NextBlock()
-		if !ok {
-			break
-		}
-		// Must invoke the user's store, not ours.
-		store, err := bind.StoreServer(s.context, block.Location.Endpoint)
-		if err != nil {
-			return nil, err
-		}
-		ciphertext, locs, err := store.Get(block.Location.Reference)
-		if err != nil {
-			return nil, err
-		}
-		if locs != nil { // TODO
-			return nil, errors.Str("dir/inprocess: redirection not implemented")
-		}
-		cleartext, err := u.Unpack(ciphertext)
-		if err != nil {
-			return nil, err
-		}
-		data = append(data, cleartext...)
-	}
-	return data, nil
+	return clientutil.ReadAll(context, entry)
 }
 
 // Delete implements upspin.DirServer.Delete.

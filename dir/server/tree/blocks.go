@@ -10,7 +10,6 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -185,33 +184,4 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 		}
 	}
 	return nil
-}
-
-// readDirEntry retrieves all the data for a dir entry.
-func (t *tree) readDirEntry(de *upspin.DirEntry) ([]byte, error) {
-	packer := pack.Lookup(de.Packing)
-	if packer == nil {
-		return nil, errors.Errorf("no packing %s registered", de.Packing)
-	}
-	u, err := packer.Unpack(t.context, de)
-	if err != nil {
-		return nil, err
-	}
-	var data []byte
-	for {
-		block, ok := u.NextBlock()
-		if !ok {
-			break
-		}
-		ciphertext, err := t.get(&block.Location)
-		if err != nil {
-			return nil, err
-		}
-		cleartext, err := u.Unpack(ciphertext)
-		if err != nil {
-			return nil, err
-		}
-		data = append(data, cleartext...)
-	}
-	return data, nil
 }
