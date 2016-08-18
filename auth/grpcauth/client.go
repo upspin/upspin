@@ -6,6 +6,7 @@ package grpcauth
 
 import (
 	"crypto/tls"
+	"math/big"
 	"math/rand"
 	"net"
 	"strings"
@@ -29,6 +30,8 @@ type GRPCCommon interface {
 	Authenticate(ctx gContext.Context, in *proto.AuthenticateRequest, opts ...grpc.CallOption) (*proto.AuthenticateResponse, error)
 	// Ping is the GRPC call for Ping.
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
+	// Configure is the GRPC call for Configure.
+	Configure(ctx gContext.Context, in *proto.ConfigureRequest, opts ...grpc.CallOption) (*proto.ConfigureResponse, error)
 }
 
 // AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.
@@ -270,4 +273,51 @@ func (ac *AuthClientService) Close() {
 	}
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
 	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
+}
+
+// CacheConfigure uses the Configure command to tell the cache the endpoint it is caching for and
+// to ensure that the cache is running as our upspin user identity.
+func (ac *AuthClientService) CacheConfigure(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
+	op := "Configure"
+	gCtx, err := ac.NewAuthContext()
+	if err != nil {
+		return "", err
+	}
+
+	token, err := generateRandomToken()
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	req := &proto.ConfigureRequest{
+		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
+	}
+	resp, err := ac.grpcCommon.Configure(gCtx, req)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+
+	// Get user's public keys.
+	u, err := ctx.KeyServer().Lookup(upspin.UserName(resp.UserName))
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	key := u.PublicKey
+
+	// Parse signature
+	var rs, ss big.Int
+	_, ok := rs.SetString(resp.Signature.R, 10)
+	if !ok {
+		return "", errors.E(op, errors.Str("bad signature"))
+	}
+	_, ok = ss.SetString(resp.Signature.S, 10)
+	if !ok {
+		return "", errors.E(op, errors.Str("bad signature"))
+	}
+
+	// Validate signature.
+	err = verifySignature(key, []byte(resp.UserName+" Authenticate "+token), &rs, &ss)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	return upspin.UserName(resp.UserName), nil
 }
