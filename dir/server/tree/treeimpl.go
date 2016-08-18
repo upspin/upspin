@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"sync"
 
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -327,7 +328,7 @@ func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 // t.mu must be held.
 func (t *tree) loadKids(parent *node) error {
 	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
-	data, err := t.readDirEntry(&parent.entry)
+	data, err := clientutil.ReadAll(t.context, &parent.entry)
 	if err != nil {
 		return err
 	}
