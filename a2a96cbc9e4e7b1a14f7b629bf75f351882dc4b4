@@ -33,6 +33,24 @@
       "revId": "a2a96cbc9e4e7b1a14f7b629bf75f351882dc4b4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb316383_dde37c2b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-18T20:27:00Z",
+      "side": 1,
+      "message": "That is done by the Dial routine that calls it.  I figured there might be cases where you didn\u0027t care, though you do with out current servers.",
+      "parentUuid": "5b826f83_c1a7e2a0",
+      "revId": "a2a96cbc9e4e7b1a14f7b629bf75f351882dc4b4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
