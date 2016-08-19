@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_550e36e5",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "No, sorry, my bad. This is right. The comment is incorrect though. tree.Lookup goes from root to path forwards. What I meant to say is that I will \"do tree Lookups backwards\" (where tree lookup is forwards). Sorry, too confusing. But correct.\n\nUpdated comment.",
+      "parentUuid": "e850b71d_e5b3d6e0",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_85dc220d",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-19T02:21:47Z",
       "side": 1,
       "message": "period",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_750b32d4",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_85dc220d",
       "revId": "6a139768d73312397cfb786be56402f90d134d81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_9538ae85",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c5b0dad6",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_a5adde80",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-19T01:08:30Z",
       "side": 1,
       "message": "this is an internal discussion that won\u0027t be visible. instead, file an issue and you can link to that",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_b53daa74",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_a5adde80",
       "revId": "6a139768d73312397cfb786be56402f90d134d81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_d53226a3",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_85aae264",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_65cb6656",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-19T01:08:30Z",
       "side": 1,
       "message": "i don\u0027t believe so, because it might be in a path that is hidden from the user but that terminates in a visible name.\nbut worth thinking about. please file an issue.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_f5372290",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_65cb6656",
       "revId": "6a139768d73312397cfb786be56402f90d134d81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_35a53aae",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Yup, I meant to get to the table. It started a separate func (hence the extra p) and I forgot to complete. Done now.",
+      "parentUuid": "e850b71d_a5df1e01",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_c5e21ac7",
         "filename": "dir/server/all_test.go",
         "patchSetId": 3
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_55dd5638",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c5e21ac7",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_059f124e",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -149,6 +293,24 @@
       "writtenOn": "2016-08-19T01:08:30Z",
       "side": 1,
       "message": "WhichAccess requires that the calling user have at least one access right granted for the argument name. If not, WhichAccess will return a \"does not exist\" error, even if the item and/or the Access file exist.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_95e50e0d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_059f124e",
       "revId": "6a139768d73312397cfb786be56402f90d134d81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
