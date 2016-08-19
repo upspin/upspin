@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb27a396_208ed626",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T17:11:24Z",
+      "side": 1,
+      "message": "Why isn\u0027t this SeqBase?",
+      "revId": "f92a9e39f1a7e9d4a616dc194938d133ed0d4732",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_c0cc226b",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T17:11:24Z",
+      "side": 1,
+      "message": "lookup is a weird name for something that does a put. Maybe it should be called walkAndApplyFn or walkPathApply, etc. Lookup implies read only.",
+      "revId": "f92a9e39f1a7e9d4a616dc194938d133ed0d4732",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_80dcea0d",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T17:11:24Z",
+      "side": 1,
+      "message": "s/operationg/operation",
+      "revId": "f92a9e39f1a7e9d4a616dc194938d133ed0d4732",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_c070a20e",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-19T17:11:24Z",
+      "side": 1,
+      "message": "This is fine as a precaution, but if the DirServer returns something that doesn\u0027t conform, it\u0027s broken. The server should have this check in place. Here it\u0027s more of a sanity check.",
+      "revId": "f92a9e39f1a7e9d4a616dc194938d133ed0d4732",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
