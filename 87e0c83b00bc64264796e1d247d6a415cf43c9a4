@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_0588321c",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T00:29:09Z",
+      "side": 1,
+      "message": "shouldn\u0027t this CacheConfigure? confused\n\nand why does this introduce the proto dependency, when the rest of the tests use prototest? weird",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_25832e04",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T00:29:09Z",
+      "side": 1,
+      "message": "const op \u003d \"CacheConfigure\"",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_457e2a10",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T00:29:09Z",
+      "side": 1,
+      "message": "add a TODO about re-enabling TLS here once we have the self-signed cert story sorted?\nI think we should verify the services we\u0027re communicating with, even locally",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_65792626",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T00:29:09Z",
+      "side": 1,
+      "message": "should there be a corresponding change to upspin.Service?",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
