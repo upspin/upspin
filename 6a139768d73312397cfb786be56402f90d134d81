@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_85dc220d",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T02:21:47Z",
+      "side": 1,
+      "message": "period",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_c5b0dad6",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -81,6 +98,40 @@
       "writtenOn": "2016-08-19T01:08:30Z",
       "side": 1,
       "message": "i don\u0027t believe so, because it might be in a path that is hidden from the user but that terminates in a visible name.\nbut worth thinking about. please file an issue.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a5df1e01",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T02:21:47Z",
+      "side": 1,
+      "message": "fyi, the way i would typically do this is\n\nfor _, c :\u003d range []struct{\n  right access.Right\n  want bool\n}{\n  {access.List, true}, // owner always has list access\n  {access.Read, true}, // owner always has read access\n  {access.Write, false},\n  {access.Create, false},\n} {\n  // do the test and report\n}\n\nthis has the advantage that the tests themselves are expressed together as a table, where you can more easily see what the various test combinations are.\n\nalso in this function you needn\u0027t take p as an argument, it\u0027s enclosed by the closure",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c5e21ac7",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T02:21:47Z",
+      "side": 1,
+      "message": "s/read/list/ ?",
       "revId": "6a139768d73312397cfb786be56402f90d134d81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
