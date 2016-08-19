@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_653a467d",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T23:31:30Z",
+      "side": 1,
+      "message": "you don\u0027t need these len checks, since errors.UnmarshalError handles nil and empty correctly, returning nil.",
+      "revId": "e8252ead70a0feefccdb8af6efda68be4f78f6aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
