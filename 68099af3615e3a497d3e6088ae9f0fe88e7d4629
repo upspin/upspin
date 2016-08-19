@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_25bb2e87",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:17:39Z",
+      "side": 1,
+      "message": "i\u0027d do this the other way around,and make the err from lookup be named lookupErr, as that\u0027s the one you care about preserving.",
+      "revId": "68099af3615e3a497d3e6088ae9f0fe88e7d4629",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_05c032fb",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:17:39Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "68099af3615e3a497d3e6088ae9f0fe88e7d4629",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e5c4f611",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:17:39Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "68099af3615e3a497d3e6088ae9f0fe88e7d4629",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
