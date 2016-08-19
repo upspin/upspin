@@ -21,6 +21,8 @@ import (
 	"upspin.io/upspin"
 )
 
+const debug = false
+
 type factotumKey struct {
 	keyHash      []byte
 	public       upspin.PublicKey
@@ -32,8 +34,9 @@ type factotumKey struct {
 type keyHashArray [sha256.Size]byte
 
 type factotum struct {
-	current keyHashArray
-	keys    map[keyHashArray]factotumKey
+	current  keyHashArray
+	previous keyHashArray
+	keys     map[keyHashArray]factotumKey
 }
 
 var _ upspin.Factotum = factotum{}
@@ -68,10 +71,14 @@ func New(dir string) (upspin.Factotum, error) {
 	fm := make(map[keyHashArray]factotumKey)
 	var h keyHashArray
 	copy(h[:], pfk.keyHash)
+	if debug {
+		fmt.Printf("factotum %x %q\n", h, pubBytes)
+	}
 	fm[h] = *pfk
 	f := &factotum{
-		current: h,
-		keys:    fm,
+		current:  h,
+		previous: h,
+		keys:     fm,
 	}
 
 	// Read older key pairs.
@@ -102,11 +109,15 @@ func New(dir string) (upspin.Factotum, error) {
 		}
 		var h keyHashArray
 		copy(h[:], pfk.keyHash)
+		if debug {
+			fmt.Printf("factotum %x %q\n", h, lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n")
+		}
 		_, ok := f.keys[h]
 		if ok { // Duplicate.
 			continue // TODO Should we warn?
 		}
 		f.keys[h] = *pfk
+		f.previous = h
 		lines = lines[5:]
 	}
 	return f, err
@@ -165,6 +176,11 @@ func (f factotum) UserSign(hash []byte) (upspin.Signature, error) {
 		return sig0, err
 	}
 	return upspin.Signature{R: r, S: s}, nil
+}
+
+// Pop derives a Factotum by switching default from the current to the previous key.
+func (f factotum) Pop() upspin.Factotum {
+	return &factotum{current: f.previous, previous: f.previous, keys: f.keys}
 }
 
 // PublicKey returns the user's latest public key.

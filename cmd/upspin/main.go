@@ -35,6 +35,7 @@ import (
 )
 
 var commands = map[string]func(...string){
+	"countersign": countersign,
 	"get":         get,
 	"glob":        glob,
 	"info":        info,
@@ -111,6 +112,20 @@ func subUsage(fs *flag.FlagSet, msg string) func() {
 		}
 		os.Exit(2)
 	}
+}
+
+func countersign(args ...string) {
+	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "countersign")
+	err := fs.Parse(args)
+	if err != nil {
+		exit(err)
+	}
+	if fs.NArg() != 0 {
+		fs.Usage()
+	}
+	countersigner.init()
+	countersigner.countersignCommand()
 }
 
 func get(args ...string) {

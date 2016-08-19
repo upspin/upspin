@@ -36,6 +36,8 @@ import (
 	"upspin.io/upspin"
 )
 
+const debug = false
+
 // wrappedKey encodes a key that will decrypt and verify the ciphertext.
 type wrappedKey struct {
 	keyHash   []byte // recipient's public key
@@ -312,12 +314,18 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 	dkey := make([]byte, aesKeyLen)
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
+	if debug {
+		fmt.Printf("Unpack for %x\n", rhash)
+	}
 	for _, w := range wrap {
+		if debug {
+			fmt.Printf("           %x\n", w.keyHash)
+		}
 		if !bytes.Equal(rhash, w.keyHash) {
 			continue
 		}
 		// Decode my wrapped key using my private key.
-		dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
+		dkey, err = aesUnwrap(ctx.Factotum(), w)
 		if err != nil {
 			return nil, errors.E(Unpack, d.Name, me, err)
 		}
@@ -432,7 +440,7 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 				// to unwrap dkey, we can only use our own private key
 				continue
 			}
-			dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
+			dkey, err = aesUnwrap(ctx.Factotum(), w)
 			if err != nil {
 				log.Printf("dkey unwrap failed: %v", err)
 				break // give up;  might mean that owner has changed keys
@@ -532,7 +540,7 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 
 	// Decode my wrapped key using my private key
-	dkey, err = ee.aesUnwrap(ctx.Factotum(), w)
+	dkey, err = aesUnwrap(ctx.Factotum(), w)
 	if err != nil {
 		log.Printf("unwrap failed: %s", err)
 		return errors.E(Name, d.Name, errors.Str("unwrap failed"))
@@ -570,6 +578,61 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 	d.Name = newName
 
+	return nil
+}
+
+// Countersign adds a signature using factotum to a DirEntry already signed by oldKey.
+func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
+	// TODO(ehg) Consolidate shared code amongst Countersign, Name, Share.
+	const op = "Countersign"
+	if d.IsDir() || d.IsLink() {
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory or link")
+	}
+
+	// Get ECDSA forms of keys.
+	oldPubKey, oldCurveName, err := factotum.ParsePublicKey(oldKey)
+	if err != nil {
+		return errors.E(op, d.Name, err)
+	}
+
+	// Extract existing signature
+	sig, _, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
+	if err != nil {
+		return errors.E(op, d.Name, errors.Invalid, err)
+	}
+
+	// Get wrapped key.
+	rhash := ecdsaKeyHash(oldPubKey)
+	wrapFound := false
+	var w wrappedKey
+	for _, w = range wrap {
+		if bytes.Equal(rhash, w.keyHash) {
+			wrapFound = true
+			break
+		}
+	}
+	if !wrapFound {
+		return errors.E(op, d.Name, errNoWrappedKey)
+	}
+	dkey := make([]byte, aesKeyLen)
+	dkey, err = aesUnwrap(f, w)
+	if err != nil {
+		return errors.E(op, d.Name, errors.Str("unwrap failed"))
+	}
+
+	// Verify existing signature with oldKey.
+	name := path.Clean(d.Name)
+	vhash := factotum.VerHash(oldCurveName, name, d.Time, dkey, cipherSum)
+	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
+		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
+	}
+
+	// Sign with newKey.
+	sig0, err := f.FileSign(name, d.Time, dkey, cipherSum)
+	if err != nil {
+		return errors.E(op, d.Name, errVerify, "unable to make new signature")
+	}
+	pdMarshal(&d.Packdata, sig0, sig, wrap, cipherSum)
 	return nil
 }
 
@@ -617,7 +680,7 @@ func aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 
 // Extract per-file symmetric key from w.
 // If error, len(dkey)==0.
-func (ee ee) aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
+func aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	myPub, err := f.PublicKeyFromHash(w.keyHash)
 	if err != nil {
 		return nil, err
