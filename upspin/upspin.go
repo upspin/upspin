@@ -92,6 +92,9 @@ type Factotum interface {
 	// UserSign assists in authenticating to Upspin servers.
 	UserSign(hash []byte) (Signature, error)
 
+	// Pop derives a Factotum that defaults to the previous key.
+	Pop() Factotum
+
 	// PublicKey returns the user's public key in canonical string format.
 	PublicKey() PublicKey
 
