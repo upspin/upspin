@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_0555d252",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:11:57Z",
+      "side": 1,
+      "message": "Errorf(\"inconsistent attribute (%v) and link (%q) fields\", attr, link)\n\n?",
+      "revId": "7377e079d736abb8aa3a775a2acf05f073da418a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e54996c1",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:11:57Z",
+      "side": 1,
+      "message": "if attr \u003d\u003d upspin.AttrLink {\n  // No data to pack\n  return entry, nil\n}\n// Pack data.\n\n?",
+      "revId": "7377e079d736abb8aa3a775a2acf05f073da418a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
