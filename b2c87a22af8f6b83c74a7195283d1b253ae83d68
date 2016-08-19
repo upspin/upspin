@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_85e2e293",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:42:43Z",
+      "side": 1,
+      "message": "is this sentence unfinished?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_658366b5",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:42:43Z",
+      "side": 1,
+      "message": "name the return values?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_258d6edf",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:42:43Z",
+      "side": 1,
+      "message": "I\u0027ve been thinking about this. I think we should define a constant in package upspin, and make it apply globally.",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c5733af0",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:42:43Z",
+      "side": 1,
+      "message": "all the other comments here say \"foo implements upspin.Client\"; should these?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e57636e2",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:42:43Z",
+      "side": 1,
+      "message": "copying the data makes it sound like the data is actually being duplicated, but it\u0027s not, it\u0027s just the entries right?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
