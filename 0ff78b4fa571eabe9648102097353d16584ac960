@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_25620eab",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "Countersigner is capitalized for convenient discrimination from the lowercased variable.\nreceiver is a pointer because the methods update its state.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_056712bb",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "this is fine and should probably stay for good practice, but you are exiting so it is unnecessary",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e57bd651",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "you actually don\u0027t need the /, but it\u0027s ok and clear to have it.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c578da57",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "we will eventually use Client almost everywhere, and this problem will go away.\nthis is fine for now.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a575de5d",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_8572e271",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "yay! recur not recurse!!!!",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_65136613",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "// TODO: find a way to share this with Sharer.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_6568068d",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "do you really want the same one (f.previous) twice? if so, i think the documentation should say more.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_456d0a9b",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T22:52:48Z",
+      "side": 1,
+      "message": "this is not easy to parse. maybe s/factotum/\u0026 f/\n\nor rephrase\n\nCountersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
