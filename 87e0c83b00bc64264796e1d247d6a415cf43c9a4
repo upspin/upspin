@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_09c2eda3",
+        "filename": "auth/grpcauth/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-19T00:59:10Z",
+      "side": 1,
+      "message": "You are only confused because the maze of twisty little passages is beyond belief.\n\n1) CacheConfig is a client method and does not go across the wire.  It does however use the GRCP Configure and Authenticate from proto (not testproto) though.  Only peripherally relevant here.\n\n2) Because of (1) I had to add Configure to the GRPCCommon interface required in auth/grpcauth/client.go i.e., it now has to have a proto GRPC Configure method in addition to Authenticate and Ping.  To make the TestServer client be conformant, I had to add a Configure routine to its grpc Service definition.  However, doing that also requires a Configure routine defined for the server (since the pb generator creates definitions for both sides).  All other servers already have one defined but the poor test service did not.  Hence I had to add one.  It uses the proto config because that\u0027s where the Configure messages are defined.\n\nThis was hard to figure out at 1 in the morning after a glass or two of wine.",
+      "parentUuid": "e850b71d_0588321c",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_25832e04",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 5
@@ -72,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_c93295a3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-19T00:59:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c589fa20",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_457e2a10",
         "filename": "store/remote/remote.go",
         "patchSetId": 5
@@ -89,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_89e5fd0c",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-19T00:59:10Z",
+      "side": 1,
+      "message": "Actually I was intending not to do it.  Having everyone have to create a self signed certificate for something that doesn\u0027t require TLS is just stupid.",
+      "parentUuid": "e850b71d_457e2a10",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_65792626",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 5
@@ -100,6 +154,24 @@
       "writtenOn": "2016-08-19T00:29:09Z",
       "side": 1,
       "message": "should there be a corresponding change to upspin.Service?",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb27a396_e9f4b1bf",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-19T00:59:10Z",
+      "side": 1,
+      "message": "There should.  Kind of surprised that nothing forced me to do it.  Got to go figure that out.",
+      "parentUuid": "e850b71d_65792626",
       "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
