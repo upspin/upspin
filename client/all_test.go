@@ -369,6 +369,9 @@ func TestPutDuplicateAndRename(t *testing.T) {
 	if err != nil {
 		t.Fatal("duplicate file:", err)
 	}
+	if entry == nil {
+		t.Fatal("nil entry returned by PutDuplicate")
+	}
 	if entry.Name != dup {
 		t.Fatal("duped directory entry has wrong name")
 	}
@@ -401,5 +404,81 @@ func TestPutDuplicateAndRename(t *testing.T) {
 	}
 	if string(in) != text {
 		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", renamed, original))
+	}
+}
+
+func TestSimpleLinks(t *testing.T) {
+	const (
+		user     = "linker@google.com"
+		root     = user + "/"
+		dirName  = root + "/dir"
+		fileName = dirName + "/file"
+		linkName = root + "/link"
+		text     = "hello sailor"
+		linkText = "what a lovely lovely day"
+	)
+	client := New(setup(user, ""))
+	// Install and check file.
+	_, err := client.MakeDirectory(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = client.Put(fileName, []byte(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := client.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != text {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text)
+	}
+	// Make a link.
+	entry, err := client.PutLink(fileName, linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry == nil {
+		t.Fatal("empty entry from PutLink")
+	}
+	// Get through the link.
+	data, err = client.Get(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != text {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text)
+	}
+	// Put through the link.
+	_, err = client.Put(fileName, []byte(linkText))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Get through the file.
+	data, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != linkText {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, linkText)
+	}
+	// Get through the link.
+	data, err = client.Get(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != linkText {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, linkText)
+	}
+	// Delete the link.
+	err = client.Delete(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Get through the file, which should still be there.
+	_, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
