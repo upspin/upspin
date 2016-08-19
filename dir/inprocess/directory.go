@@ -11,6 +11,8 @@ package inprocess
 // Even empty directories contain a single zero-sized block.
 // For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
 
+// TODO: If links are present, access control will use wrong Access file. Needs to be fixed!
+
 import (
 	goPath "path"
 
@@ -96,43 +98,49 @@ var _ upspin.DirServer = (*server)(nil)
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // This is the general form of the method that follows, used in the tests.
-func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, seq int64) (*upspin.DirEntry, error) {
+func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name:     name,
 		Packing:  packing,
 		Time:     upspin.Now(),
 		Attr:     attr,
+		Link:     link,
 		Sequence: seq,
 		Writer:   context.UserName(),
+	}
+	if (link != "") != (attr == upspin.AttrLink) {
+		return nil, errors.Str("inconsistent attribute and link field")
 	}
 	packer := pack.Lookup(packing)
 	if packer == nil {
 		return nil, errors.Errorf("no packing %#x registered", packing)
 	}
-	bp, err := packer.Pack(context, entry)
-	if err != nil {
-		return nil, err
-	}
-	ciphertext, err := bp.Pack(cleartext)
-	if err != nil {
-		return nil, err
-	}
-	store, err := bind.StoreServer(context, context.StoreEndpoint())
-	if err != nil {
-		return nil, err
-	}
-	ref, err := store.Put(ciphertext)
-	if err != nil {
-		return nil, err
-	}
-	bp.SetLocation(
-		upspin.Location{
-			Endpoint:  context.StoreEndpoint(),
-			Reference: ref,
-		},
-	)
-	if err := bp.Close(); err != nil {
-		return nil, err
+	if attr != upspin.AttrLink {
+		bp, err := packer.Pack(context, entry)
+		if err != nil {
+			return nil, err
+		}
+		ciphertext, err := bp.Pack(cleartext)
+		if err != nil {
+			return nil, err
+		}
+		store, err := bind.StoreServer(context, context.StoreEndpoint())
+		if err != nil {
+			return nil, err
+		}
+		ref, err := store.Put(ciphertext)
+		if err != nil {
+			return nil, err
+		}
+		bp.SetLocation(
+			upspin.Location{
+				Endpoint:  context.StoreEndpoint(),
+				Reference: ref,
+			},
+		)
+		if err := bp.Close(); err != nil {
+			return nil, err
+		}
 	}
 	return entry, nil
 }
@@ -140,7 +148,7 @@ func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.Pat
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // It is called for directories only.
 func (s *server) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) (*upspin.DirEntry, error) {
-	return newDirEntry(s.db.dirContext, dirPacking, name, cleartext, upspin.AttrDirectory, seq)
+	return newDirEntry(s.db.dirContext, dirPacking, name, cleartext, upspin.AttrDirectory, "", seq)
 }
 
 // dirBlock constructs an upspin.DirBlock with the appropriate fields.
@@ -202,7 +210,6 @@ func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-// TODO: implement links.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const Put = "Put"
 	if err := valid.DirEntry(entry); err != nil {
@@ -225,7 +232,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	}
 	// If it doesn't exist, we need Create permission.
 	if !canCreate {
-		if _, err := s.lookup(Put, parsed); err != nil { // TODO: Check exact error?
+		if _, err := s.lookup(Put, parsed, true); err != nil { // TODO: Check exact error?
 			// File does not exist but we do not have Create permission.
 			return nil, errors.E(Put, entry.Name, access.ErrPermissionDenied)
 		}
@@ -237,8 +244,15 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		if entry.Packing != upspin.PlainPack {
 			return nil, errors.E(Put, entry.Name, errors.Str("Access or Group file must use plain packing"))
 		}
+		if entry.IsLink() {
+			return nil, errors.E(Put, entry.Name, errors.Str("cannot create a link named Access or Group"))
+		}
 	}
-	return s.put(Put, entry, false)
+	entry, err = s.put(Put, entry, false)
+	if err == nil {
+		return nil, nil // Successful Put returns no entry.
+	}
+	return entry, err
 }
 
 // put is the underlying implementation of Put and MakeDirectory.
@@ -269,6 +283,9 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 		if err != nil {
 			return nil, err
 		}
+		if e.IsLink() {
+			return e, upspin.ErrFollowLink
+		}
 		if !e.IsDir() {
 			return nil, errors.E(op, parsed.First(i+1).Path(), errors.NotDir)
 		}
@@ -278,7 +295,6 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 	var dirBlob []byte
 	rootEntry, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
 	if err != nil {
-		// TODO: System is now inconsistent.
 		return nil, err
 	}
 	// Rewrite the tree up to the root.
@@ -299,12 +315,16 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 	}
 	// Update the root.
 	s.db.root[parsed.User()] = rootEntry
-
-	// If it was an Access or Group file, there's more to do.
 	if access.IsGroupFile(entry.Name) {
+		if entry.IsLink() {
+			return nil, errors.E(op, errors.Internal, entry.Name, "Group file cannot be a link")
+		}
 		// Group files are loaded on demand but we must wipe the cache.
 		access.RemoveGroup(entry.Name)
 	} else if access.IsAccessFile(entry.Name) {
+		if entry.IsLink() {
+			return nil, errors.E(op, errors.Internal, entry.Name, "Access file cannot be a link")
+		}
 		var accessFile *access.Access
 		if !deleting {
 			data, err := s.readAll(s.context, entry)
@@ -319,7 +339,7 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 		s.db.access[path.DropPath(entry.Name, 1)] = accessFile
 	}
 
-	return nil, nil
+	return entry, nil
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
@@ -347,7 +367,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 		// Can't happen.
 		return nil, errors.E(WhichAccess, errors.Internal, err)
 	}
-	return s.lookup(WhichAccess, parsed)
+	return s.lookup(WhichAccess, parsed, true)
 }
 
 // whichAccess is the workings of WhichAccess, accepting a parsed path name
@@ -364,7 +384,7 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 			// We've reached the root but there is no access file there.
 			return nil
 		}
-		// Step up to parent directory.
+		// Step up to parent directory. // TODO: This is incorrect in the presence of links.
 		parsed = parsed.Drop(1)
 	}
 }
@@ -375,7 +395,6 @@ func (s *server) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte
 }
 
 // Delete implements upspin.DirServer.Delete.
-// TODO: implement links.
 func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const Delete = "Delete"
 	parsed, err := path.Parse(pathName)
@@ -393,9 +412,9 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(Delete, pathName, errors.Str("cannot delete user root")) // Should be done in User service.
 	}
 
-	entry, err := s.lookup(Delete, parsed) // File must exist.
+	entry, err := s.lookup(Delete, parsed, false) // File must exist.
 	if err != nil {
-		return nil, err
+		return entry, err
 	}
 
 	s.db.mu.Lock()
@@ -435,15 +454,11 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if !canRead {
 		return nil, errors.E(Lookup, pathName, access.ErrPermissionDenied)
 	}
-	entry, err := s.lookup(Lookup, parsed)
-	if err != nil {
-		return nil, err
-	}
-	return entry, nil
+	return s.lookup(Lookup, parsed, true)
 }
 
 // lookup is the internal version of lookup; it does not do any Access checks.
-func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error) {
+func (s *server) lookup(op string, parsed path.Parsed, followFinal bool) (*upspin.DirEntry, error) {
 	s.db.mu.RLock()
 	defer s.db.mu.RUnlock()
 	dirEntry, ok := s.db.root[parsed.User()]
@@ -460,6 +475,9 @@ func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error)
 		if err != nil {
 			return nil, err
 		}
+		if entry.IsLink() {
+			return entry, upspin.ErrFollowLink
+		}
 		if !entry.IsDir() {
 			return nil, errors.E(op, parsed.Path(), errors.NotDir)
 		}
@@ -470,6 +488,9 @@ func (s *server) lookup(op string, parsed path.Parsed) (*upspin.DirEntry, error)
 	entry, err := s.fetchEntry(op, dirEntry, lastElem)
 	if err != nil {
 		return nil, err
+	}
+	if entry.IsLink() && followFinal {
+		return entry, upspin.ErrFollowLink
 	}
 	return entry, nil
 }
@@ -602,7 +623,7 @@ func (s *server) load(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	entry, err := s.lookup("access", parsed)
+	entry, err := s.lookup("access", parsed, true)
 	if err != nil {
 		return nil, err
 	}
@@ -684,6 +705,10 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 			continue
 		}
 		// We found the item with that name.
+		// If it is a link, we error out unless we are deleting it.
+		if nextEntry.IsLink() && !deleting {
+			return &nextEntry, nil, upspin.ErrFollowLink
+		}
 		found = true
 		if !deleting {
 			// If it's already there and the sequence number is SeqNotExist, this is an error.
@@ -745,7 +770,7 @@ func (s *server) DeleteAll() {
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
 func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const Dial = "Dial"
+	const Dial = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(Dial, errors.Invalid, errors.Str("unrecognized transport"))
 	}
