@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_e5b3d6e0",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "// TODO: This is incorrect; we must start at the root or links can defeat access permissions.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c5b0dad6",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "goroutine is one word.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a5adde80",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "this is an internal discussion that won\u0027t be visible. instead, file an issue and you can link to that",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_85aae264",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "s/currently //\npresent tense means currently",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_65cb6656",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "i don\u0027t believe so, because it might be in a path that is hidden from the user but that terminates in a visible name.\nbut worth thinking about. please file an issue.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_059f124e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:08:30Z",
+      "side": 1,
+      "message": "WhichAccess requires that the calling user have at least one access right granted for the argument name. If not, WhichAccess will return a \"does not exist\" error, even if the item and/or the Access file exist.",
+      "revId": "6a139768d73312397cfb786be56402f90d134d81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
