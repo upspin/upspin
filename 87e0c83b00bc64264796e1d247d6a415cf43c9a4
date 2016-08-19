@@ -143,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "fb27a396_0f6aede6",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-19T05:06:57Z",
+      "side": 1,
+      "message": "I concur with Dave that we don\u0027t want TLS for intra-machine connections.   We all agree we do want to verify the service we\u0027re communicating with, hence the supplement of the Authenticate message with Configure, so that the client knows for sure which server identity it is talking to.\n\nPerhaps what you\u0027re saying here is that you\u0027d also like the server to give its type \"storecache\" as part of that signed Configure reply?  That seems to me a good suggestion.",
+      "parentUuid": "e850b71d_457e2a10",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_65792626",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 5
