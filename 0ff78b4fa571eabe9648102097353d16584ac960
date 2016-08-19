@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_64134413",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-19T23:57:31Z",
+      "side": 1,
+      "message": "thanks",
+      "parentUuid": "e850b71d_25620eab",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_056712bb",
         "filename": "cmd/upspin/countersign.go",
         "patchSetId": 1
@@ -121,6 +139,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_64e5840b",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-19T23:57:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_65136613",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_6568068d",
         "filename": "factotum/factotum.go",
         "patchSetId": 1
@@ -138,6 +174,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_44f400bb",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-19T23:57:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_6568068d",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_456d0a9b",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -149,6 +203,24 @@
       "writtenOn": "2016-08-19T22:52:48Z",
       "side": 1,
       "message": "this is not easy to parse. maybe s/factotum/\u0026 f/\n\nor rephrase\n\nCountersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.",
+      "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_04a83886",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-19T23:57:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_456d0a9b",
       "revId": "0ff78b4fa571eabe9648102097353d16584ac960",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
