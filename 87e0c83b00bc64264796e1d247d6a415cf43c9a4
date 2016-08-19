@@ -161,6 +161,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_c5e8da79",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T05:27:32Z",
+      "side": 1,
+      "message": "No, I just meant TLS. If you don\u0027t see value in that, then forget it.\nI\u0027m no security expert.",
+      "parentUuid": "fb27a396_0f6aede6",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_65792626",
         "filename": "upspin/proto/upspin.proto",
         "patchSetId": 5
