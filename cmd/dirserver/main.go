@@ -136,6 +136,10 @@ func (s *Server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	return svc.(upspin.DirServer), nil
 }
 
+// TODO: We can probably simplify a lot of this by declaring one DirEntryError proto
+// message and having all the functions return it, and then just writing one helper that
+// takes entry, err and marshals it appropriately.
+
 // Lookup implements upspin.DirServer.
 func (s *Server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.DirLookupResponse, error) {
 	log.Printf("Lookup %q", req.Name)
@@ -144,11 +148,13 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 	if err != nil {
 		return nil, err
 	}
-	entry, err := dir.Lookup(upspin.PathName(req.Name))
-	if err != nil {
-		log.Printf("Lookup %q failed: %v", req.Name, err)
-		return &proto.DirLookupResponse{Error: errors.MarshalError(err)}, nil
+	entry, lookupErr := dir.Lookup(upspin.PathName(req.Name))
+	if lookupErr != nil && lookupErr != upspin.ErrFollowLink {
+		log.Printf("Lookup %q failed: %v", req.Name, lookupErr)
+		return &proto.DirLookupResponse{Error: errors.MarshalError(lookupErr)}, nil
 	}
+
+	// Fall through OK for ErrFollowLink.
 	b, err := entry.Marshal()
 	if err != nil {
 		return nil, err
@@ -156,6 +162,7 @@ func (s *Server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 
 	resp := &proto.DirLookupResponse{
 		Entry: b,
+		Error: errors.MarshalError(lookupErr),
 	}
 	return resp, nil
 }
@@ -166,18 +173,32 @@ func (s *Server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Dir
 
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	if err != nil {
+		log.Printf("Put %q failed: %v", entry.Name, err)
 		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	log.Printf("Put %q", entry.Name)
+
 	dir, err := s.dirFor(ctx)
 	if err != nil {
 		return nil, err
 	}
-	_, err = dir.Put(entry)
-	if err != nil {
-		// TODO: implement links.
-		log.Printf("Put %q failed: %v", entry.Name, err)
-		return &proto.DirPutResponse{Error: errors.MarshalError(err)}, nil
+
+	entry, putErr := dir.Put(entry)
+	if putErr != nil && putErr != upspin.ErrFollowLink {
+		log.Printf("Put %q failed: %v", entry.Name, putErr)
+		return &proto.DirPutResponse{Error: errors.MarshalError(putErr)}, nil
+	}
+
+	if putErr == upspin.ErrFollowLink {
+		b, err := entry.Marshal()
+		if err != nil {
+			return nil, err
+		}
+		resp := &proto.DirPutResponse{
+			Entry: b,
+			Error: errors.MarshalError(putErr),
+		}
+		return resp, nil
 	}
 	return &putResponse, nil
 }
@@ -190,17 +211,20 @@ func (s *Server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectory
 	if err != nil {
 		return nil, err
 	}
-	entry, err := dir.MakeDirectory(upspin.PathName(req.Name))
-	if err != nil {
-		log.Printf("MakeDirectory %q failed: %v", req.Name, err)
-		return &proto.DirMakeDirectoryResponse{Error: errors.MarshalError(err)}, nil
+	entry, mkDirErr := dir.MakeDirectory(upspin.PathName(req.Name))
+	if mkDirErr != nil && mkDirErr != upspin.ErrFollowLink {
+		log.Printf("MakeDirectory %q failed: %v", req.Name, mkDirErr)
+		return &proto.DirMakeDirectoryResponse{Error: errors.MarshalError(mkDirErr)}, nil
 	}
+
+	// Fall through OK for ErrFollowLink.
 	b, err := entry.Marshal()
 	if err != nil {
 		return nil, err
 	}
 	resp := &proto.DirMakeDirectoryResponse{
 		Entry: b,
+		Error: errors.MarshalError(mkDirErr),
 	}
 	return resp, nil
 }
@@ -213,14 +237,20 @@ func (s *Server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.D
 	if err != nil {
 		return nil, err
 	}
-	entries, err := dir.Glob(req.Pattern)
-	if err != nil {
-		log.Printf("Glob %q failed: %v", req.Pattern, err)
-		return &proto.DirGlobResponse{Error: errors.MarshalError(err)}, nil
+	entries, globErr := dir.Glob(req.Pattern)
+	if globErr != nil && globErr != upspin.ErrFollowLink {
+		log.Printf("Glob %q failed: %v", req.Pattern, globErr)
+		return &proto.DirGlobResponse{Error: errors.MarshalError(globErr)}, nil
 	}
-	data, err := proto.DirEntryBytes(entries)
+
+	// Fall through OK for ErrFollowLink.
+	b, err := proto.DirEntryBytes(entries)
+	if err != nil {
+		return nil, err
+	}
 	resp := &proto.DirGlobResponse{
-		Entries: data,
+		Entries: b,
+		Error:   errors.MarshalError(globErr),
 	}
 	return resp, err
 }
@@ -233,11 +263,21 @@ func (s *Server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*pro
 	if err != nil {
 		return nil, err
 	}
-	_, err = dir.Delete(upspin.PathName(req.Name))
-	if err != nil {
-		// TODO: implement links.
-		log.Printf("Delete %q failed: %v", req.Name, err)
-		return &proto.DirDeleteResponse{Error: errors.MarshalError(err)}, nil
+	entry, deleteErr := dir.Delete(upspin.PathName(req.Name))
+	if deleteErr != nil && deleteErr != upspin.ErrFollowLink {
+		log.Printf("Delete %q failed: %v", req.Name, deleteErr)
+		return &proto.DirDeleteResponse{Error: errors.MarshalError(deleteErr)}, nil
+	}
+	if err == upspin.ErrFollowLink {
+		b, err := entry.Marshal()
+		if err != nil {
+			return nil, err
+		}
+		resp := &proto.DirDeleteResponse{
+			Entry: b,
+			Error: errors.MarshalError(deleteErr),
+		}
+		return resp, nil
 	}
 	return &deleteResponse, nil
 }
@@ -250,11 +290,13 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 	if err != nil {
 		return nil, err
 	}
-	entry, err := dir.WhichAccess(upspin.PathName(req.Name))
-	if err != nil {
-		// TODO: implement links.
-		log.Printf("WhichAccess %q failed: %v", req.Name, err)
+	entry, whichAccessErr := dir.WhichAccess(upspin.PathName(req.Name))
+	if whichAccessErr != nil && whichAccessErr != upspin.ErrFollowLink {
+		log.Printf("WhichAccess %q failed: %v", req.Name, whichAccessErr)
+		return &proto.DirWhichAccessResponse{Error: errors.MarshalError(whichAccessErr)}, nil
 	}
+
+	// Entry might be nil, representing no Access file present.
 	var b []byte
 	if entry != nil {
 		b, err = entry.Marshal()
@@ -264,7 +306,7 @@ func (s *Server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 	}
 	resp := &proto.DirWhichAccessResponse{
 		Entry: b,
-		Error: errors.MarshalError(err),
+		Error: errors.MarshalError(whichAccessErr),
 	}
 	return resp, nil
 }
