@@ -242,6 +242,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		return nil, ErrTooShort
 	}
 	b = b[n:]
+	d.Blocks = nil
 	if nBlocks > 0 {
 		d.Blocks = make([]DirBlock, nBlocks)
 		for i := range d.Blocks {
