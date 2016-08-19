@@ -61,12 +61,12 @@ var linkDirEnt = DirEntry{
 	Writer:   "u@foo.com",
 }
 
-func TestDirEntMarshal(t *testing.T) {
-	testDirEntMarshal(t, "regular file", &dirEnt)
-	testDirEntMarshal(t, "link", &linkDirEnt)
+func TestDirEntryMarshal(t *testing.T) {
+	testDirEntryMarshal(t, "regular file", &dirEnt)
+	testDirEntryMarshal(t, "link", &linkDirEnt)
 }
 
-func testDirEntMarshal(t *testing.T, msg string, entry *DirEntry) {
+func testDirEntryMarshal(t *testing.T, msg string, entry *DirEntry) {
 	data, err := entry.Marshal()
 	if err != nil {
 		t.Fatalf("Marshal %s: %v", msg, err)
@@ -84,6 +84,31 @@ func testDirEntMarshal(t *testing.T, msg string, entry *DirEntry) {
 		t.Errorf("%+v\n", entry)
 		t.Errorf("got:")
 		t.Errorf("%+v\n", &new)
+	}
+}
+
+// Was a bug that Unmarshal would not clear the Block field of the receiver
+// if the unmarshaled entry was of zero length.
+func TestDirEntryMarshalClearsBlocks(t *testing.T) {
+	full := dirEnt
+	empty := dirEnt
+	empty.Blocks = nil
+	data, err := empty.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	remaining, err := full.Unmarshal(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(remaining) != 0 {
+		t.Error("data remains after unmarshal")
+	}
+	if !reflect.DeepEqual(&empty, &full) {
+		t.Errorf("bad result. expected:")
+		t.Errorf("%+v\n", empty)
+		t.Errorf("got:")
+		t.Errorf("%+v\n", full)
 	}
 }
 
