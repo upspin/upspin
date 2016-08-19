@@ -166,7 +166,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.InsecureAllowingSelfSignedCertificates)
 	if err != nil {
 		return nil, errors.E(op, errors.IO, e, err)
 	}
