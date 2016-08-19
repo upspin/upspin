@@ -7,6 +7,8 @@
 package client
 
 import (
+	"strings"
+
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client/clientutil"
@@ -30,6 +32,11 @@ var _ upspin.Client = (*Client)(nil)
 
 const maxBlockSize = 1024 * 1024
 
+const (
+	followFinalLink      = true
+	doNotFollowFinalLink = false
+)
+
 // New creates a Client. The client finds the servers according to the given Context.
 func New(context upspin.Context) upspin.Client {
 	return &Client{
@@ -37,35 +44,61 @@ func New(context upspin.Context) upspin.Client {
 	}
 }
 
-// Put implements upspin.Client.
-func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
-	return c.put(name, data, upspin.AttrNone, "")
-}
-
 // PutLink implements upspin.Client.
-func (c *Client) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
-	return c.put(newName, nil, upspin.AttrLink, oldName)
-}
+func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "client.PutLink"
 
-func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute, link upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "Put"
-	dir, err := c.DirServer(name)
+	if access.IsAccessFile(oldName) || access.IsGroupFile(oldName) {
+		return nil, errors.E(op, oldName, errors.Invalid, errors.Str("cannot link to Access or Group file"))
+	}
+	if access.IsAccessFile(linkName) || access.IsGroupFile(linkName) {
+		return nil, errors.E(op, linkName, errors.Invalid, errors.Str("cannot create link named Access or Group"))
+	}
+
+	parsed, err := path.Parse(oldName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	oldName = parsed.Path() // Make sure it's clean.
+	parsedLink, err := path.Parse(linkName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	linkName = parsedLink.Path() // Make sure it's clean.
+
+	entry := &upspin.DirEntry{
+		Name:     linkName,
+		Packing:  upspin.PlainPack, // Unused but be explicit.
+		Time:     upspin.Now(),
+		Sequence: upspin.SeqIgnore,
+		Writer:   c.context.UserName(),
+		Link:     oldName,
+		Attr:     upspin.AttrLink,
+	}
+
+	// Record directory entry.
+	entry, _, err = c.lookup(op, entry, putLookupFn, doNotFollowFinalLink)
+	return entry, err
+}
+
+func putLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	e, err := dir.Put(entry)
+	// TODO: PutDuplicate needs an entry and the tests check that. It probably shouldn't.
+	if err != nil {
+		return e, err
+	}
+	return entry, nil
+}
+
+// Put implements upspin.Client.
+func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	const op = "client.Put"
 
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	name = parsed.Path() // Make sure it's clean.
-	if attr == upspin.AttrLink {
-		parsed, err := path.Parse(link)
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		link = parsed.Path() // Make sure it's clean.
-	}
 
 	var packer upspin.Packer
 	if access.IsAccessFile(name) || access.IsGroupFile(name) {
@@ -79,14 +112,14 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute, l
 		}
 	}
 
-	de := &upspin.DirEntry{
+	entry := &upspin.DirEntry{
 		Name:     name,
 		Packing:  packer.Packing(),
 		Time:     upspin.Now(),
-		Sequence: 0, // Don't care for now.
+		Sequence: upspin.SeqIgnore,
 		Writer:   c.context.UserName(),
-		Link:     link,
-		Attr:     attr,
+		Link:     "",
+		Attr:     upspin.AttrNone,
 	}
 
 	// Start the I/O.
@@ -94,7 +127,7 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute, l
 	if err != nil {
 		return nil, err
 	}
-	bp, err := packer.Pack(c.context, de)
+	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
 		return nil, err
 	}
@@ -124,35 +157,39 @@ func (c *Client) put(name upspin.PathName, data []byte, attr upspin.Attribute, l
 		return nil, errors.E(op, err)
 	}
 
-	if packer.Packing() == upspin.EEPack && attr == upspin.AttrNone {
-		// For EE, update the packing for the other
-		// readers as specified by the Access file.
-		if err := c.addReaders(de, name, packer); err != nil {
-			return nil, errors.E(op, err)
-		}
+	if err := c.addReaders(op, entry, entry.Name); err != nil {
+		return nil, err
 	}
 
-	// Record directory entry.
-	_, err = dir.Put(de)
-	if err != nil {
-		// TODO: Implement links.
-		return nil, errors.E(op, err)
-	}
-
-	return de, nil
+	// Record directory entry. Its Name field may have been
+	// updated by addReaders.
+	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
+	return entry, err
 }
 
-func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer upspin.Packer) error {
-	directory, err := bind.DirServer(c.context, c.context.DirEndpoint())
-	if err != nil {
-		return err
+func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return dir.WhichAccess(entry.Name)
+}
+
+// For EE, update the packing for the other readers as specified by the Access file.
+// This call, if successful, will replace entry.Name with the value, after any
+// link evaluation, from the final call to WhichAccess. The caller may then
+// use that name or entry to avoid evaluating the links again.
+func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathName) error {
+	if entry.Packing != upspin.EEPack {
+		return nil
+	}
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return errors.E(op, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
-	accessEntry, err := directory.WhichAccess(name)
+	// evalEntry will contain the argument (most importantly the name)
+	// for the last successful call to WhichAccess.
+	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: name}, whichAccessLookupFn, followFinalLink)
 	if err != nil {
-		// TODO: implement links.
 		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
 			// If WhichAccess returns a "not found" error then
 			// either the destination directory doesn't exist or we don't
@@ -163,17 +200,17 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 			// Put is independent of the packing.
 			e.Kind = errors.Permission
 		}
-		return err
+		return errors.E(op, err)
 	}
 	var readers []upspin.UserName
 	if accessEntry != nil {
 		accessData, err := c.Get(accessEntry.Name)
 		if err != nil {
-			return err
+			return errors.E(op, err)
 		}
 		acc, err := access.Parse(accessEntry.Name, accessData)
 		if err != nil {
-			return err
+			return errors.E(op, err)
 		}
 		readers, err = acc.Users(access.Read, c.Get)
 	}
@@ -194,30 +231,31 @@ func (c *Client) addReaders(de *upspin.DirEntry, name upspin.PathName, packer up
 	}
 	readersPublicKey = readersPublicKey[:n]
 	packdata := make([]*[]byte, 1)
-	packdata[0] = &de.Packdata
+	packdata[0] = &entry.Packdata
 	packer.Share(c.context, readersPublicKey, packdata)
+	// The call to WhichAccess succeeded for evalEntry, so update
+	// the incoming entry to that point, avoiding the need to
+	// follow the links again.
+	entry.Name = evalEntry.Name
 	return nil
 }
 
+func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return dir.MakeDirectory(entry.Name)
+}
+
 // MakeDirectory implements upspin.Client.
-func (c *Client) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
-	dir, err := c.DirServer(dirName)
-	if err != nil {
-		return nil, err
-	}
-	return dir.MakeDirectory(dirName)
+func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "client.MakeDirectory"
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, makeDirectoryLookupFn, doNotFollowFinalLink)
+	return entry, err
 }
 
 // Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	const op = "Get"
-	dir, err := c.DirServer(name)
+	const op = "client.Get"
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinalLink)
 	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	entry, err := dir.Lookup(name)
-	if err != nil {
-		// TODO: implement links.
 		return nil, errors.E(op, err)
 	}
 	if entry.IsDir() {
@@ -230,14 +268,99 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	return data, nil
 }
 
+func lookupLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return dir.Lookup(entry.Name)
+}
+
 // Lookup implements upspin.Client.
 func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
-	return nil, errors.E("client.Lookup", errors.Str("not implemented"))
+	const op = "client.Lookup"
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinal)
+	return entry, err
+}
+
+// A lookupFn is called by the evaluation loop in lookup. It calls the underlying
+// DirServer operationg and may return ErrFollowLink, some other error, or success.
+// If it is ErrFollowLink, lookup will step through the link and try again.
+type lookupFn func(upspin.DirServer, *upspin.DirEntry) (*upspin.DirEntry, error)
+
+// lookup returns the DirEntry referenced by the argument entry,
+// evaluated by following any links in the path except:
+// The boolean states whether, if the final path element is a link,
+// that link should be evaluated. If true, the returned entry represents
+// the target of the link. If false, it represents the link itself.
+// In some cases, such as when called from Lookup, the argument
+// entry might contain nothing but a name, but it must always have a name.
+// The call may overwrite the fields of the argument DirEntry,
+// updating its name as it crosses links.
+// The returned DirEntries on success are the result of completing
+// the operation followed by the argument to the last successful
+// call to fn, which for instance will contain the actual path that
+// resulted in a successful call to WhichAccess.
+func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFinal bool) (*upspin.DirEntry, *upspin.DirEntry, error) {
+	// As we run, we want to maintain the incoming DirEntry to track the name,
+	// leaving the rest alone. As the fn will return a newly allocated entry,
+	// after each link we update the entry to achieve this.
+	originalName := entry.Name
+	copied := false           // Do we need to allocate a new entry to modify its name?
+	for i := 0; i < 10; i++ { // TODO: What is the right limit?
+		parsed, err := path.Parse(entry.Name)
+		if err != nil {
+			return nil, nil, errors.E(op, err)
+		}
+		dir, err := c.DirServer(parsed.Path())
+		if err != nil {
+			return nil, nil, errors.E(op, err)
+		}
+		resultEntry, err := fn(dir, entry)
+		if err == nil {
+			return resultEntry, entry, nil
+		}
+		if err != upspin.ErrFollowLink {
+			return resultEntry, nil, err
+		}
+		// We have a link.
+		// First, allocate a new entry if necessary so we don't overwrite user's memory.
+		if !copied {
+			tmp := *entry
+			entry = &tmp
+			copied = true
+		}
+		// Take the prefix of the result entry and substitute that section of the existing name.
+		parsedResult, err := path.Parse(resultEntry.Name)
+		if err != nil {
+			return nil, nil, errors.E(op, err)
+		}
+		resultPath := parsedResult.Path()
+		// The result entry's name must be a prefix of the name we're looking up.
+		if !strings.HasPrefix(parsed.String(), string(resultPath)) {
+			return nil, nil, errors.E(op, resultPath, errors.Internal, errors.Str("link path not prefix"))
+		}
+		// Update the entry to have the new Name field.
+		if resultPath == parsed.Path() {
+			// We're on the last element. We may be done.
+			if followFinal {
+				entry.Name = resultEntry.Link
+			} else {
+				// Yes, we are done. Return this entry, which is a link.
+				return resultEntry, entry, nil
+			}
+		} else {
+			entry.Name = path.Join(resultEntry.Link, string(parsed.Path()[len(resultPath):]))
+		}
+	}
+	return nil, nil, errors.E(op, errors.IO, originalName, errors.Str("link loop"))
+}
+
+func deleteLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return dir.Delete(entry.Name)
 }
 
 // Delete implements upspin.Client.
 func (c *Client) Delete(name upspin.PathName) error {
-	return errors.E("client.Delete", errors.Str("not implemented"))
+	const op = "client.Delete"
+	_, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, deleteLookupFn, doNotFollowFinalLink)
+	return err
 }
 
 // Glob implements upspin.Client.
@@ -290,43 +413,36 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	return nil, err
 }
 
-// PutDuplicate implements upspin.Client. This is more a copy on write than a Unix style Link. As soon as
-// one of the two files is written, then will diverge.
+// PutDuplicate implements upspin.Client. It copies the contents of the old name to the new.
+// If one of the two files is later modified, the copy and the original will differ.
 func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
-	return c.linkOrRename(oldName, newName, false)
+	const op = "client.PutDuplicate"
+	return c.dupOrRename(op, oldName, newName, false)
 }
 
-// Rename implements upspin.Client.  Performed by linking to the new name and deleting the old one.
+// Rename implements upspin.Client. Performed by copying the data to the new name and deleting the old one.
 func (c *Client) Rename(oldName, newName upspin.PathName) error {
-	_, err := c.linkOrRename(oldName, newName, true)
+	const op = "client.Rename"
+	_, err := c.dupOrRename(op, oldName, newName, true)
 	return err
 }
 
-func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*upspin.DirEntry, error) {
-	newParsed, err := path.Parse(newName)
+func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename bool) (*upspin.DirEntry, error) {
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: oldName}, lookupLookupFn, followFinalLink)
 	if err != nil {
 		return nil, err
 	}
-	oldParsed, err := path.Parse(oldName)
-	if err != nil {
-		return nil, err
-	}
-
-	oldDir, err := c.DirServer(oldName)
-	if err != nil {
-		return nil, err
-	}
-	entry, err := oldDir.Lookup(oldName)
-	if err != nil {
-		return nil, err
+	if entry.IsLink() {
+		return nil, errors.E(op, oldName, errors.Internal, "after lookup, cannot be link")
 	}
 	if entry.IsDir() {
-		return nil, errors.Errorf("cannot link or rename directories")
+		return nil, errors.E(op, oldName, "cannot link or rename directories")
 	}
+	trueOldName := entry.Name
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.Errorf("unrecognized Packing %d for %q", c.context.Packing(), oldName)
+		return nil, errors.E(op, oldName, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
 		if entry.Packing != upspin.PlainPack {
@@ -334,44 +450,42 @@ func (c *Client) linkOrRename(oldName, newName upspin.PathName, rename bool) (*u
 		}
 	}
 
-	// Rewrap reader keys only if changing directory.
-	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
-		if err := c.addReaders(entry, newName, packer); err != nil {
-			return nil, err
-		}
-	}
-
-	// Get the destination upspin.DirServer.
-	newDir := oldDir
-	if oldParsed.User() != newParsed.User() {
-		newDir, err = c.DirServer(newName)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// Update the directory entry with the new name and sequence.
-	// If we are linking, the new file must not exist.
-	// TODO: Should it also not exist on a rename?
-	if rename {
-		entry.Sequence = upspin.SeqIgnore
-	} else {
-		entry.Sequence = upspin.SeqNotExist
-	}
+	// We insist the new file must not exist.
+	entry.Sequence = upspin.SeqNotExist
 	if err := packer.Name(c.context, entry, newName); err != nil {
 		return nil, err
 	}
 
+	// Rewrap reader keys only if changing directory.
+	// TODO: This could be cheaper (just compare the prefix), but it's clear and correct as written.
+	newParsed, err := path.Parse(entry.Name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	oldParsed, err := path.Parse(trueOldName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
+		if err := c.addReaders(op, entry, entry.Name); err != nil {
+			return nil, errors.E(trueOldName, err)
+		}
+	}
+
 	// Record directory entry.
-	if _, err := newDir.Put(entry); err != nil {
-		// TODO: Implement links.
+	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
+	if err != nil {
 		return nil, err
 	}
 
 	if rename {
-		// Remove original entry.
-		if _, err := oldDir.Delete(oldName); err != nil {
-			// TODO: Implement links.
+		// Remove original entry. We have all we need here and we know it's not a link.
+		oldDir, err := c.DirServer(trueOldName)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if _, err := oldDir.Delete(trueOldName); err != nil {
 			return entry, err
 		}
 	}
