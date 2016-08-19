@@ -106,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_45098a8a",
+        "filename": "dir/filesystem/dir.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T03:07:18Z",
+      "side": 1,
+      "message": "added a todo",
+      "parentUuid": "e850b71d_45f74a8a",
+      "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fb316383_205a8388",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 6
@@ -151,6 +169,24 @@
       "writtenOn": "2016-08-19T01:20:50Z",
       "side": 1,
       "message": "the default root should be $HOME. that fell on the floor somewhere?",
+      "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_4522aa0c",
+        "filename": "store/filesystem/store.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-19T03:07:18Z",
+      "side": 1,
+      "message": "I think this might be a bad idea.\nI\u0027d hate to accidentally expose my root directory because of a misconfiguration.\nI think we should ask the user to be explicit about what they want to share.",
+      "parentUuid": "e850b71d_a5c83e53",
       "revId": "ed52b566964c981a55a629bbcaf4d3c301cf7644",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
