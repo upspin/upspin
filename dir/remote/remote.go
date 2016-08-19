@@ -37,136 +37,115 @@ var _ upspin.DirServer = (*remote)(nil)
 
 // Glob implements upspin.DirServer.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "dir/remote.Glob"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirGlobRequest{
 		Pattern: pattern,
 	}
 	resp, err := r.dirClient.Glob(gCtx, req)
 	if err != nil {
-		return nil, errors.E("Glob", errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
+
 	if len(resp.Error) != 0 {
-		return nil, unmarshalError(resp.Error)
+		err = unmarshalError(resp.Error)
 	}
+	if err != nil && err != upspin.ErrFollowLink {
+		return nil, errors.E(op, err)
+	}
+	var entries []*upspin.DirEntry
 	if len(resp.Entries) == 0 {
-		return nil, nil
+		var pErr error
+		entries, pErr = proto.UpspinDirEntries(resp.Entries)
+		if pErr != nil {
+			return nil, errors.E(op, errors.IO, pErr)
+		}
 	}
-	// TODO: check for ErrFollowLink.
-	return proto.UpspinDirEntries(resp.Entries)
+	return entries, err
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/remote.MakeDirectory"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirMakeDirectoryRequest{
 		Name: string(directoryName),
 	}
 	resp, err := r.dirClient.MakeDirectory(gCtx, req)
-	if err != nil {
-		return nil, errors.E("MakeDirectory", errors.IO, err)
-	}
 	r.LastActivity()
-	if len(resp.Error) != 0 {
-		return nil, unmarshalError(resp.Error)
-	}
-	// TODO: check for ErrFollowLink.
-	return proto.UpspinDirEntry(resp.Entry)
+	return entryError(op, resp, err)
 }
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/remote.Put"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	b, err := entry.Marshal()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirPutRequest{
 		Entry: b,
 	}
 	resp, err := r.dirClient.Put(gCtx, req)
-	if err != nil {
-		return nil, errors.E("Put", errors.IO, err)
-	}
-	retEntry, err := proto.UpspinDirEntry(resp.Entry)
-	if err != nil {
-		return nil, errors.E("Put", errors.IO, err)
-	}
 	r.LastActivity()
-	return retEntry, unmarshalError(resp.Error)
+	return entryError(op, resp, err)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/remote.WhichAccess"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirWhichAccessRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req)
-	if err != nil {
-		return nil, errors.E("WhichAccess", errors.IO, err)
-	}
-	entry, err := proto.UpspinDirEntry(resp.Entry)
-	if err != nil {
-		return nil, errors.E("WhichAccess", errors.IO, err)
-	}
 	r.LastActivity()
-	return entry, unmarshalError(resp.Error)
+	return entryError(op, resp, err)
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/remote.Delete"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirDeleteRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Delete(gCtx, req)
-	if err != nil {
-		return nil, errors.E("Delete", errors.IO, err)
-	}
-	entry, err := proto.UpspinDirEntry(resp.Entry)
-	if err != nil {
-		return nil, errors.E("Delete", errors.IO, err)
-	}
 	r.LastActivity()
-	return entry, unmarshalError(resp.Error)
+	return entryError(op, resp, err)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/remote.Lookup"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	req := &proto.DirLookupRequest{
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Lookup(gCtx, req)
-	if err != nil {
-		return nil, errors.E("Lookup", errors.IO, err)
-	}
-	entry, err := proto.UpspinDirEntry(resp.Entry)
-	if err != nil {
-		return nil, errors.E("Lookup", errors.IO, err)
-	}
 	r.LastActivity()
-	return entry, unmarshalError(resp.Error)
+	return entryError(op, resp, err)
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -181,14 +160,14 @@ func (r *remote) Configure(options ...string) error {
 	}
 	resp, err := r.dirClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return errors.E("Configure", errors.IO, err)
+		return errors.E("dir/remote.Configure", errors.IO, err)
 	}
 	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "Dial"
+	const op = "dir/remote.Dial"
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
@@ -229,4 +208,23 @@ func unmarshalError(b []byte) error {
 		return upspin.ErrFollowLink
 	}
 	return err
+}
+
+// entryError performs the common operation of converting an EntryError
+// protocol buffer into a directory entry and error pair.
+func entryError(op string, p *proto.EntryError, err error) (*upspin.DirEntry, error) {
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	if len(p.Error) != 0 {
+		err = unmarshalError(p.Error)
+	}
+	if err != nil && err != upspin.ErrFollowLink {
+		return nil, errors.E(op, err)
+	}
+	entry, unmarshalErr := proto.UpspinDirEntry(p.Entry)
+	if unmarshalErr != nil {
+		return nil, errors.E(op, unmarshalErr)
+	}
+	return entry, err
 }

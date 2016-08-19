@@ -143,58 +143,38 @@ service Key {
 // the alternative is to create a DirEntry proto message and copy the fields
 // from one struct to the other, which is needless busywork.)
 
-message DirLookupRequest {
-    string name = 1;
-}
-
-message DirLookupResponse {
+message EntryError {
     bytes entry = 1;
     bytes error = 2;
+}
+
+message EntriesError {
+    repeated bytes entries = 1;
+    bytes error = 2;
+}
+
+message DirLookupRequest {
+    string name = 1;
 }
 
 message DirPutRequest {
     bytes entry = 1;
 }
 
-message DirPutResponse {
-    bytes entry = 1;
-    bytes error = 2;
-}
-
 message DirMakeDirectoryRequest {
     string name = 1;
-}
-
-message DirMakeDirectoryResponse {
-    bytes entry = 1;
-    bytes error = 2;
 }
 
 message DirGlobRequest {
     string pattern = 1;
 }
 
-message DirGlobResponse {
-    repeated bytes entries = 1;
-    bytes error = 2;
-}
-
 message DirDeleteRequest {
     string name = 1;
 }
 
-message DirDeleteResponse {
-    bytes entry = 1;
-    bytes error = 2;
-}
-
 message DirWhichAccessRequest {
     string name = 1;
-}
-
-message DirWhichAccessResponse {
-    bytes entry = 1;
-    bytes error = 2;
 }
 
 service Dir{
@@ -204,10 +184,10 @@ service Dir{
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
-    rpc Lookup (DirLookupRequest) returns (DirLookupResponse) {}
-    rpc Put (DirPutRequest) returns (DirPutResponse) {}
-    rpc MakeDirectory (DirMakeDirectoryRequest) returns (DirMakeDirectoryResponse) {}
-    rpc Glob (DirGlobRequest) returns (DirGlobResponse) {}
-    rpc Delete (DirDeleteRequest) returns (DirDeleteResponse) {}
-    rpc WhichAccess (DirWhichAccessRequest) returns (DirWhichAccessResponse) {}
+    rpc Lookup (DirLookupRequest) returns (EntryError) {}
+    rpc Put (DirPutRequest) returns (EntryError) {}
+    rpc MakeDirectory (DirMakeDirectoryRequest) returns (EntryError) {}
+    rpc Glob (DirGlobRequest) returns (EntriesError) {}
+    rpc Delete (DirDeleteRequest) returns (EntryError) {}
+    rpc WhichAccess (DirWhichAccessRequest) returns (EntryError) {}
 }
