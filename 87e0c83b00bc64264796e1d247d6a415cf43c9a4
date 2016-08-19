@@ -175,6 +175,24 @@
       "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_05da721c",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T01:12:54Z",
+      "side": 1,
+      "message": "The type system never connects the protos to the service. That\u0027s true in C++ as well. The service just takes the argument *proto.ConfigureResponse, and if it has a field it doesn\u0027t know about, no machinery will notice. It\u0027s just an unused field.\n\nNothing surprising there, really.",
+      "parentUuid": "fb27a396_e9f4b1bf",
+      "revId": "87e0c83b00bc64264796e1d247d6a415cf43c9a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
