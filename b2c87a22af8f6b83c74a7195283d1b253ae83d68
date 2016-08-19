@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_c5657a18",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T06:41:54Z",
+      "side": 1,
+      "message": "no, but i will adjust.",
+      "parentUuid": "e850b71d_85e2e293",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_658366b5",
         "filename": "client/client.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-19T05:42:43Z",
       "side": 1,
       "message": "name the return values?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_653c86e7",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T06:41:54Z",
+      "side": 1,
+      "message": "Done although it\u0027s hard to find good names.",
+      "parentUuid": "e850b71d_658366b5",
       "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_45418a69",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T06:41:54Z",
+      "side": 1,
+      "message": "It\u0027s a TODO.",
+      "parentUuid": "e850b71d_258d6edf",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_c5733af0",
         "filename": "client/client.go",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_25368e05",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T06:41:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c5733af0",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_e57636e2",
         "filename": "client/client.go",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2016-08-19T05:42:43Z",
       "side": 1,
       "message": "copying the data makes it sound like the data is actually being duplicated, but it\u0027s not, it\u0027s just the entries right?",
+      "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_053b92ed",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-19T06:41:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_e57636e2",
       "revId": "b2c87a22af8f6b83c74a7195283d1b253ae83d68",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
