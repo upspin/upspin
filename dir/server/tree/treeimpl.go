@@ -309,8 +309,12 @@ func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 	if parent.entry.IsLink() {
 		return parent, upspin.ErrFollowLink
 	}
-	if parent.kids == nil {
-		// Must load from store.
+	if !parent.entry.IsDir() {
+		return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
+	}
+	// Must load from store if kids are not loaded. However, if it's dirty,
+	// we have the most recent version, so no point in loading it.
+	if parent.kids == nil && !parent.dirty {
 		err := t.loadKids(parent)
 		if err != nil {
 			return nil, err
@@ -610,6 +614,15 @@ func (t *tree) recoverFromLog() error {
 	log.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
 	log.Debug.Printf("Tree:\n%s\n", t.String())
 	return nil
+}
+
+// OnEviction implements cache.EvictionNotifier.
+func (t *tree) OnEviction(key interface{}) {
+	log.Debug.Printf("Tree being evicted: %s", t.log.User())
+	err := t.Flush()
+	if err != nil {
+		log.Error.Printf("OnEviction: Flush: %v", err)
+	}
 }
 
 // String implements fmt.Stringer.
