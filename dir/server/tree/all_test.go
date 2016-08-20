@@ -26,6 +26,8 @@ const (
 	isDir      = true
 )
 
+var errNotExist = errors.E(errors.NotExist)
+
 // This test checks the tree for log consistency by exercising the life-cycle of a tree,
 // from creating a new tree from scratch, adding new nodes, flushing it to Store then
 // adding more nodes to a new tree and having to load it from the Store.
@@ -127,6 +129,13 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
 
+	// Try to lookup a file inside a file (checks a corner case bug).
+	_, _, err = tree2.Lookup(userName + "/dir/img.jpg/subfile")
+	expectedErr := errNotExist
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
 	t.Logf("== Tree:\n%s\n", tree2.String())
 
 	// Delete dir4.
@@ -136,8 +145,8 @@ func TestPutNodes(t *testing.T) {
 	}
 	// Lookup won't return it.
 	_, _, err = tree2.Lookup(userName + "/dir/img.jpg")
-	expectedErr := errors.E("Delete", errors.NotExist, upspin.PathName(userName+"/dir/img.jpg"))
-	if errors.Match(expectedErr, err) {
+	expectedErr = errNotExist
+	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
 	// One new entry was written to the log (an updated dir2).
@@ -176,6 +185,12 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 	_, err = tree.Put(de)
 	if err != nil {
 		t.Fatal(err)
+	}
+	// Look for a path that doesn't exist yet (exercises a previous bug).
+	_, _, err = tree.Lookup(userName + "/dir/Access")
+	expectedErr := errNotExist
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 	err = tree.Flush()
 	if err != nil {
@@ -226,7 +241,7 @@ func TestPutEmptyRoot(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	expectedErr := errors.E(errors.NotExist)
+	expectedErr := errNotExist
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
@@ -343,7 +358,7 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	_, _, err = tree.Lookup(userName + "/file1.txt")
-	expectedErr := errors.E(errors.NotExist)
+	expectedErr := errNotExist
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %s, want %s", err, expectedErr)
 	}
@@ -479,7 +494,7 @@ func TestLinks(t *testing.T) {
 
 		// Looking up inside link now returns a normal error.
 		_, _, err = tree.Lookup(userName + dir + "/link/subdir/more/cookie.jar")
-		expectedErr := errors.E(errors.NotExist)
+		expectedErr := errNotExist
 		if !errors.Match(expectedErr, err) {
 			t.Errorf("err = %v, want = %v", err, expectedErr)
 		}
@@ -615,7 +630,7 @@ func (l *fakeLogIndex) Root() (*upspin.DirEntry, error) {
 	if l.hasRoot {
 		return &l.root, nil
 	}
-	return nil, errors.E(errors.NotExist)
+	return nil, errNotExist
 }
 
 // SaveRoot saves the user's root.
