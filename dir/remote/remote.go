@@ -51,9 +51,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	r.LastActivity()
 
-	if len(resp.Error) != 0 {
-		err = unmarshalError(resp.Error)
-	}
+	err = unmarshalError(resp.Error)
 	if err != nil && err != upspin.ErrFollowLink {
 		return nil, errors.E(op, err)
 	}
@@ -212,9 +210,7 @@ func entryError(op string, p *proto.EntryError, err error) (*upspin.DirEntry, er
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
-	if len(p.Error) != 0 {
-		err = unmarshalError(p.Error)
-	}
+	err = unmarshalError(p.Error)
 	if err != nil && err != upspin.ErrFollowLink {
 		return nil, errors.E(op, err)
 	}
