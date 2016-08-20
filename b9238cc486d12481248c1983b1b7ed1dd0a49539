@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_28830304",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "we decided it\u0027s illegal to link to an Access, so you shouldn\u0027t need this.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e88ccb32",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "the DirEntry will be that of the link",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_05c6f269",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "errors.Str(\"nil context\") ?\nin an error message saying what you need implies what\u0027s wrong but doesn\u0027t say it.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e5aab680",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "errors.Str(\"nil factotum\")",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c5a7bab6",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "will crash if length of options is odd.\nneed to verify that before the loop",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a5b4bee0",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "s/temp/dir/temporary directory/",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c58e9a30",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "call valid.DirEntry(entry)\nthere probably other places in this code where data from the user should be validated first.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_0888471c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "if it\u0027s a link, must disallow Access and Group\nif it is, must be plain packing",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_659ec665",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "if the file does not exist, must check access.Create.\nalso, if the file does not exist, you only need create perm, not write.\nthe right algorithm is:\n\nsee if there\u0027s write permission\nsee if there\u0027s create permission\nif neither, error\nif !exist \u0026\u0026 !createpermission, error",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_85b1c2f0",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "i would do this check first, since it\u0027s easier.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_8588a222",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "just use dirName :\u003d p.Path() above.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_059dd263",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "why not?\ni know it\u0027s dangerous but this is a new check, i think, and will make cleanup hard.\ndo you have a technical need for this?",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_25c1ee51",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T21:15:19Z",
+      "side": 1,
+      "message": "not errors.E(errors.IsDir, parent.entry.Name)?",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
