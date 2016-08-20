@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "688a07dd_4792c2fc",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-20T00:28:36Z",
+      "side": 1,
+      "message": "This should be in upspin/proto/proto.go.",
+      "revId": "e8252ead70a0feefccdb8af6efda68be4f78f6aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_653a467d",
         "filename": "dir/remote/remote.go",
         "patchSetId": 3
@@ -13,6 +30,40 @@
       "writtenOn": "2016-08-19T23:31:30Z",
       "side": 1,
       "message": "you don\u0027t need these len checks, since errors.UnmarshalError handles nil and empty correctly, returning nil.",
+      "revId": "e8252ead70a0feefccdb8af6efda68be4f78f6aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_e77676e2",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-20T00:28:36Z",
+      "side": 1,
+      "message": "move to upspin/proto/proto.go",
+      "revId": "e8252ead70a0feefccdb8af6efda68be4f78f6aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_c7e25295",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 3
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-20T00:28:36Z",
+      "side": 1,
+      "message": "EntryError seems to refer to the error in an entry. Why not EntryOrError? Or better yet, EntryOrErrorResponse to keep it protocol-buffery.",
       "revId": "e8252ead70a0feefccdb8af6efda68be4f78f6aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
