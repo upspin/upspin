@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_e52d1642",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T00:55:53Z",
+      "side": 1,
+      "message": "what?",
+      "revId": "fa683d5833386f78a5b6628b790c391ad5daa887",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
