@@ -16,9 +16,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"u-old/log"
 
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
