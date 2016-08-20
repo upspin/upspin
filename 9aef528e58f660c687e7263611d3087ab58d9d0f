@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_4a2c07fe",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-20T02:58:09Z",
+      "side": 1,
+      "message": "oops, done",
+      "parentUuid": "e850b71d_a5271e5e",
+      "revId": "9aef528e58f660c687e7263611d3087ab58d9d0f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_8524225a",
         "filename": "cmd/upspin/countersign.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-20T01:17:41Z",
       "side": 1,
       "message": "please add the TODO requested in the first review",
+      "revId": "9aef528e58f660c687e7263611d3087ab58d9d0f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_8a09af8d",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-20T02:58:09Z",
+      "side": 1,
+      "message": "I added at line 115 because I\u0027m not yet sure I understand when godoc will take a comment line.  I\u0027ll move it to right after line 113.",
+      "parentUuid": "e850b71d_8524225a",
       "revId": "9aef528e58f660c687e7263611d3087ab58d9d0f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
