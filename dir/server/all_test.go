@@ -4,6 +4,9 @@
 
 package server
 
+// TODO: tests build upon earlier tests. This is brittle. Make it more hermetic
+// by using testenv or something similar.
+
 import (
 	"io/ioutil"
 	"os"
@@ -11,7 +14,6 @@ import (
 	"testing"
 
 	"upspin.io/access"
-	"upspin.io/cache"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -32,7 +34,7 @@ const (
 var testDir string
 
 func TestMakeRoot(t *testing.T) {
-	s := newDirServerForTesting(t)
+	s := newDirServerForTesting(t, userName)
 	de, err := s.MakeDirectory(userName + "/")
 	if err != nil {
 		t.Fatal(err)
@@ -59,7 +61,7 @@ func TestMakeRoot(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	s := newDirServerForTesting(t)
+	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
 		Name:    userName + "/file1.txt",
 		Attr:    upspin.AttrNone,
@@ -81,7 +83,7 @@ func TestPut(t *testing.T) {
 }
 
 func TestMakeDirectory(t *testing.T) {
-	s := newDirServerForTesting(t)
+	s := newDirServerForTesting(t, userName)
 	de, err := s.MakeDirectory(userName + "/dir")
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +105,7 @@ func TestMakeDirectory(t *testing.T) {
 }
 
 func TestLink(t *testing.T) {
-	s := newDirServerForTesting(t)
+	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
 		Name:    userName + "/mylink",
 		Attr:    upspin.AttrLink,
@@ -147,17 +149,25 @@ func TestLink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// Delete something at the other side of the link.
+	de2, err = s.Delete(userName + "/mylink/will_return_follow_link")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.Lookup", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Deletion of the link itself is tested in TestDelete (we need it
+	// around for other tests, sadly).
 }
 
 func TestWhichAccess(t *testing.T) {
-	s := newDirServerForTesting(t)
-	de := &upspin.DirEntry{
-		Name:    userName + "/Access",
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
-	}
-	_, err := s.Put(de)
+	const accessFile = "*: " + userName
+	s := newDirServerForTesting(t, userName)
+	de, err := putAccessFile(t, s, userName+"/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,13 +188,7 @@ func TestWhichAccess(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Add Access to dir1. New answer.
-	de2 := &upspin.DirEntry{
-		Name:    userName + "/dir/Access",
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
-	}
-	_, err = s.Put(de2)
+	de2, err := putAccessFile(t, s, userName+"/dir/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,34 +199,29 @@ func TestWhichAccess(t *testing.T) {
 	if err := checkDirEntry("TestWhichAccess.3", accEntry, de2); err != nil {
 		t.Fatal(err)
 	}
+
+	// Check that links work.
+	accEntry, err = s.WhichAccess(userName + "/mylink")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The Access file for the link is the one for the parent (de).
+	if err := checkDirEntry("TestWhichAccess.4", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestHasRight(t *testing.T) {
-	const accessFile = "l: " + userName
-	s := newDirServerForTesting(t)
-
-	loc := writeToStore(t, s.serverContext, []byte(accessFile))
-	de := &upspin.DirEntry{
-		Name:   userName + "/Access",
-		Attr:   upspin.AttrNone,
-		Writer: userName,
-		Blocks: []upspin.DirBlock{
-			{
-				Location: loc,
-				Offset:   0,
-				Size:     int64(len(accessFile)),
-			},
-		},
-		Packing: upspin.PlainPack,
-	}
-	_, err := s.Put(de)
+	const accessFile = "l,d: " + userName
+	s := newDirServerForTesting(t, userName)
+	_, err := putAccessFile(t, s, userName+"/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 	p, err := path.Parse(userName + "/")
 
 	checkAccess := func(right access.Right, want bool) error {
-		hasAccess, err := s.hasRight(right, p)
+		hasAccess, _, err := s.hasRight(right, p)
 		if err != nil {
 			return err
 		}
@@ -240,12 +239,85 @@ func TestHasRight(t *testing.T) {
 		{access.Read, true}, // owner always has Read access.
 		{access.Create, false},
 		{access.Write, false},
+		{access.Delete, true},
 	} {
 		// Check whether userName has each of the rights.
 		err = checkAccess(test.right, test.expected)
 		if err != nil {
 			t.Fatal(err)
 		}
+	}
+}
+
+func TestDelete(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+
+	// Directory not empty (there's an Access file there).
+	_, err := s.Delete(userName + "/dir")
+	expectedErr := errors.E(errors.NotEmpty)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Owner can remove it.
+	_, err = s.Delete(userName + "/dir/Access")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now deleting dir works.
+	_, err = s.Delete(userName + "/dir")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Delete a link.
+	_, err = s.Delete(userName + "/mylink")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Tests some error conditions too.
+
+func TestPermissionDenied(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	// Access file permits only List rights.
+	_, err := putAccessFile(t, s, userName+"/Access", "l:"+userName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	de := &upspin.DirEntry{
+		Name:    userName + "/some_new_file.txt",
+		Attr:    upspin.AttrNone,
+		Writer:  userName,
+		Packing: upspin.PlainPack,
+	}
+	_, err = s.Put(de)
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
+	}
+	_, err = s.MakeDirectory(userName + "/dir")
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
+	}
+
+	// Now Access file permits Create right too.
+	_, err = putAccessFile(t, s, userName+"/Access", "l,c:"+userName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now a new file can be Put.
+	_, err = s.Put(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// But can't be overwritten (lacks Write permission).
+	_, err = s.Put(de)
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
 	}
 }
 
@@ -260,6 +332,28 @@ func TestMain(m *testing.M) {
 
 	os.RemoveAll(testDir)
 	os.Exit(code)
+}
+
+func putAccessFile(t *testing.T, s *server, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
+	if !access.IsAccessFile(name) { // For internal consistency only.
+		t.Fatalf("%s not an access file", name)
+	}
+	loc := writeToStore(t, s.serverContext, []byte(contents))
+	de := &upspin.DirEntry{
+		Name:    name,
+		Attr:    upspin.AttrNone,
+		Writer:  userName,
+		Packing: upspin.PlainPack,
+		Blocks: []upspin.DirBlock{
+			{
+				Location: loc,
+				Offset:   0,
+				Size:     int64(len(contents)),
+			},
+		},
+	}
+	_, err := s.Put(de)
+	return de, err
 }
 
 // checkDirEntry compares the main fields in dir entries got and want and
@@ -280,7 +374,9 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 	return nil
 }
 
-func newDirServerForTesting(t *testing.T) *server {
+var generatorInstance upspin.DirServer
+
+func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
@@ -289,44 +385,51 @@ func newDirServerForTesting(t *testing.T) *server {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	cxt := context.New().
+	ctx := context.New().
 		SetFactotum(factotum).
 		SetUserName(serverName).
 		SetStoreEndpoint(endpointInProcess).
 		SetKeyEndpoint(endpointInProcess).
+		SetDirEndpoint(endpointInProcess).
 		SetPacking(upspin.EEPack)
-	key := cxt.KeyServer()
+	key := ctx.KeyServer()
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
 		Name:      serverName,
-		Dirs:      []upspin.Endpoint{cxt.DirEndpoint()},
-		Stores:    []upspin.Endpoint{cxt.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: factotum.PublicKey(),
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	// Set the public key for the user, since EE Pack requires the dir owner
 	// to have a wrapped key.
+	userCtx := context.New().SetUserName(userName).SetDirEndpoint(ctx.DirEndpoint())
 	user = &upspin.User{
 		Name:      userName,
-		Dirs:      []upspin.Endpoint{cxt.DirEndpoint()},
-		Stores:    []upspin.Endpoint{cxt.StoreEndpoint()},
-		PublicKey: factotum.PublicKey(),
+		Dirs:      []upspin.Endpoint{userCtx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		PublicKey: factotum.PublicKey(), // doesn't matter
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-
-	return &server{
-		serverContext: cxt,
-		userName:      userName,
-		logDir:        testDir,
-		userTrees:     cache.NewLRU(10),
+	if generatorInstance == nil {
+		generatorInstance, err = New(ctx, "logDir="+testDir)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
+	// Get a new instance properly initialized for this user.
+	svr, err := generatorInstance.Dial(userCtx, endpointInProcess)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return svr.(*server)
 }
 
 func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location {
