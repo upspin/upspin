@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_a5271e5e",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T01:17:41Z",
+      "side": 1,
+      "message": "i answered this in the first review. please delete the TODO.",
+      "revId": "9aef528e58f660c687e7263611d3087ab58d9d0f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_8524225a",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-20T01:17:41Z",
+      "side": 1,
+      "message": "please add the TODO requested in the first review",
+      "revId": "9aef528e58f660c687e7263611d3087ab58d9d0f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
