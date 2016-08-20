@@ -58,7 +58,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	var entries []*upspin.DirEntry
-	if len(resp.Entries) == 0 {
+	if len(resp.Entries) > 0 {
 		var pErr error
 		entries, pErr = proto.UpspinDirEntries(resp.Entries)
 		if pErr != nil {
