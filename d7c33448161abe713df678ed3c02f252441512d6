@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_68cb3b56",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "this comment is a bit odd. \u0027from root to path\u0027 and \u0027from full path down to the root\u0027. which is it?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_88aaf764",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "include op?\nalso use a variable so you don\u0027t path.Join twice\n\naccess :\u003d path.Join(p.Path(), \"Access\")",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_48d07ffc",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "The comments above and below here are not very clear to me. I had to read and think for a while to understand what\u0027s happening.\n\nIs it true that this if statement can only evaluate to true during the first iteration of the loop? If so, I think that should be documented.",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_28d543ec",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "(\"loadAccess: %v\", entry) ?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e8be0ba3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "ctx instead of context? you use it a lot in this function",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c8bb4fb1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "This breaks with the way we are handling options everywhere else in the system. The options should be a []string that contains strings like \"key\u003dvalue\". (see flags.Config) Let\u0027s not deviate from that now.",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_88c5573b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "I thought a Group was a directory? maybe i\u0027m misremembering",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_68f21b9c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "I commented on the issue, but I think that it should be the hasRight function that does this, not here.",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_08da871c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "I don\u0027t think you need to check or use the endpoint at all",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_48f75f8a",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-21T23:56:21Z",
+      "side": 1,
+      "message": "log the error, if any",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
