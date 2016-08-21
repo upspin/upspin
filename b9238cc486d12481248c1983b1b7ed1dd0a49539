@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_d5699c22",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Is it illegal to link to an Access file or for an Access file to exist in a directory where we link to?\n\nI knew this was going to be confusing, hence the long comment.\n\nWhat this is doing is the following:\n1) When told to get the access file for a/b/c it looks up /a/b/c/Access.\n2) If the lookup from 1 returns ErrFollowLink we need to figure out whether the link is /a or /a/b/ or /a/b/c. If it\u0027s \"c\", then the user is asking me \"what is the access file for this link\", which is a different question than \"is this a linked Access file\".\n\nSo, if c is a link, I need to find an Access file in b or a. Otherwise, I can\u0027t even say if the user has the right to Delete the link or Put a new link or Glob the link, etc.\n\nI\u0027m pretty sure this is right. I wrote a few tests to check that I can Put, Lookup and Delete a link.",
+      "parentUuid": "e850b71d_28830304",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_e88ccb32",
         "filename": "dir/server/access.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "the DirEntry will be that of the link",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_75569064",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_e88ccb32",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_955b148a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_05c6f269",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_e5aab680",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "errors.Str(\"nil factotum\")",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_35500863",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_e5aab680",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_55558c51",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c5a7bab6",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_a5b4bee0",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "s/temp/dir/temporary directory/",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_154704ad",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_a5b4bee0",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_b543b89d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "put does that already (lower-case put).",
+      "parentUuid": "e850b71d_c58e9a30",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_0888471c",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "if it\u0027s a link, must disallow Access and Group\nif it is, must be plain packing",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_f5c4e011",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_0888471c",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_b5ce582e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done (added necessary tests).",
+      "parentUuid": "e850b71d_659ec665",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_85b1c2f0",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -166,6 +328,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "i would do this check first, since it\u0027s easier.",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_15c2a403",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_85b1c2f0",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_35bb2887",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "I thought you said we shouldn\u0027t be cleaning the path for users and instead should be rejecting if they send us something bad. s.put below will very that and will then reject if it\u0027s not a clean path.",
+      "parentUuid": "e850b71d_8588a222",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_059dd263",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_55c02cfc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "deleting the root does not yet work. I put a TODO here.",
+      "parentUuid": "e850b71d_059dd263",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_25c1ee51",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -217,6 +433,24 @@
       "writtenOn": "2016-08-20T21:15:19Z",
       "side": 1,
       "message": "not errors.E(errors.IsDir, parent.entry.Name)?",
+      "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_75d8d0ee",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-21T01:58:24Z",
+      "side": 1,
+      "message": "I was debating errors.NotDir but was afraid it could leak that it exists. But then the real reason is that this low-level function needs to return NotExist when a node is not found, so that callers can take action.",
+      "parentUuid": "e850b71d_25c1ee51",
       "revId": "b9238cc486d12481248c1983b1b7ed1dd0a49539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
