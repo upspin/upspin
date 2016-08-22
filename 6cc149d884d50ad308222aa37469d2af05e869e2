@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_68b1fba4",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T07:17:00Z",
+      "side": 1,
+      "message": "Hm, IIRC that was an internal helper that was doing that. Maybe I missed the bigger picture at the time. We should probably document that a *DirEntry returned by any of these methods should not be mutated, as this tends to happen in common usage.\n\nI think the actual upspin.DirServer implementation *should* return a copy, though, as there you can\u0027t make any guarantees about its usage.",
+      "parentUuid": "688a07dd_90a5629d",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_2879c3f4",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
