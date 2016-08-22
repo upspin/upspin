@@ -249,20 +249,158 @@ func TestHasRight(t *testing.T) {
 	}
 }
 
+func TestGlob(t *testing.T) {
+	const globberUser = "somedude@somewhere.com"
+
+	sOwner := newDirServerForTesting(t, userName)
+
+	// Put an Access file that has List permissions for newUser.
+	_, err := putAccessFile(t, sOwner, userName+"/Access", "*:"+userName+"\nl:"+globberUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Get a server for globberUser.
+	s := newDirServerForTesting(t, globberUser)
+
+	//
+	// First subtest: list someone else's root without Read rights.
+	//
+
+	ents, err := s.Glob(userName + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := map[upspin.PathName]bool{
+		userName + "/file1.txt": true,
+		userName + "/dir":       true,
+		userName + "/mylink":    true,
+		userName + "/Access":    true,
+	}
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for _, e := range ents {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want one-of {%v}", e.Name, expected)
+		}
+		// Verify that Blocks and Packdata are nil, since we don't have
+		// Read rights.
+		if len(e.Blocks) != 0 {
+			t.Errorf("len(e.Blocks) = %d, want = 0", len(e.Blocks))
+		}
+		if len(e.Packdata) != 0 {
+			t.Errorf("len(e.Packdata) = %d, want = 0", len(e.Packdata))
+		}
+	}
+
+	//
+	// Second subtest: globber has Read permissions and Glob is more complex.
+	//
+
+	// Put an Access file where globber has Read permissions.
+	_, err = putAccessFile(t, sOwner, userName+"/dir/Access", "*:"+userName+"\nl,r:"+globberUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add stuff to dir, to check more complex Globs.
+	for _, dir := range []upspin.PathName{
+		"/dir/subdir",
+		"/dir/subway",
+		"/dir/foo",
+		"/dir/bar",
+		"/dir/subdir/sub",
+		"/dir/subdir/blub",
+		"/dir/subway/meh",
+	} {
+		_, err = sOwner.MakeDirectory(userName + dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	ents, err = s.Glob(userName + "/?ir/sub*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]bool{
+		userName + "/dir/subdir": true,
+		userName + "/dir/subway": true,
+	}
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for _, e := range ents {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want one-of {%v}", e.Name, expected)
+		}
+		// Since both dirs contain subdirs, verify that Blocks and
+		// Packdata are not nil, because we have Read rights.
+		if len(e.Blocks) == 0 {
+			t.Errorf("len(e.Blocks) = %d, want > 0", len(e.Blocks))
+		}
+		if len(e.Packdata) == 0 {
+			t.Errorf("len(e.Packdata) = %d, want > 0", len(e.Packdata))
+		}
+	}
+
+	//
+	// Third subtest: A deep regex by directory owner.
+	//
+
+	ents, err = sOwner.Glob(userName + "/?ir/*dir/s*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]bool{
+		userName + "/dir/subdir/sub": true,
+	}
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for _, e := range ents {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want one-of {%v}", e.Name, expected)
+		}
+	}
+}
+
 func TestDelete(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 
-	// Directory not empty (there's an Access file there).
+	// Directory not empty (there are entries there).
 	_, err := s.Delete(userName + "/dir")
 	expectedErr := errors.E(errors.NotEmpty)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 
-	// Owner can remove it.
-	_, err = s.Delete(userName + "/dir/Access")
-	if err != nil {
-		t.Fatal(err)
+	// Owner can remove contents. Order matters, we remove subdirs first.
+	for _, dir := range []upspin.PathName{
+		"/dir/Access",
+		"/dir/subdir/sub",
+		"/dir/subdir/blub",
+		"/dir/subdir",
+		"/dir/subway/meh",
+		"/dir/subway",
+		"/dir/foo",
+		"/dir/bar",
+	} {
+		_, err = s.Delete(userName + dir)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	// Now deleting dir works.
