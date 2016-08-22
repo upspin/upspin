@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "28556f39_ba754d90",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "We can now delete Reregister*. But we can leave that for another CL.\nhttps://github.com/googleprivate/upspin/issues/42",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_68833bb5",
         "filename": "cloud/storage/gcs/gcs.go",
         "patchSetId": 1
@@ -81,6 +98,24 @@
       "writtenOn": "2016-08-22T12:35:10Z",
       "side": 1,
       "message": "lowercase \"gcs\" is the package name\nbut should this be \"cloud/storage/gcs\" ?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28556f39_da6c81cc",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "I\u0027m happy with just gcs since it does not occur anywhere else. But if want to be consistent, the long version is fine too.",
+      "parentUuid": "e850b71d_68833bb5",
       "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -138,6 +173,23 @@
     },
     {
       "key": {
+        "uuid": "28556f39_faca25ba",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_c8734ff0",
         "filename": "dir/gcp/access.go",
         "patchSetId": 1
@@ -155,6 +207,41 @@
     },
     {
       "key": {
+        "uuid": "28556f39_1a0439ea",
+        "filename": "dir/gcp/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "it\u0027s pretty useful in debugging. Might be useful long term too in reporting bugs. I use it in \"important\" unexported funcs.",
+      "parentUuid": "e850b71d_c8734ff0",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28556f39_baf26dfc",
+        "filename": "dir/gcp/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "s/MakeDirectory/handleRootCreation/",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_a88013a2",
         "filename": "dir/gcp/root.go",
         "patchSetId": 1
@@ -166,6 +253,24 @@
       "writtenOn": "2016-08-22T12:35:10Z",
       "side": 1,
       "message": "I\u0027d remove the op from this function, as its unexported",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28556f39_9aefa918",
+        "filename": "dir/gcp/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T21:05:40Z",
+      "side": 1,
+      "message": "-1.\n\nBut happy to go with whatever we decide is the norm.",
+      "parentUuid": "e850b71d_a88013a2",
       "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
