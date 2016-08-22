@@ -212,6 +212,40 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_681d7bce",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T02:08:15Z",
+      "side": 1,
+      "message": "%q\nand errors.Syntax ?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_4822bf0c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T02:08:15Z",
+      "side": 1,
+      "message": "maybe \nk, v :\u003d o[0], o[1]\n?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_88c5573b",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -241,6 +275,24 @@
       "side": 1,
       "message": "IsGroupFile checks whether this file is in a Groups directory: user/Group/*.  You can mkdir the group dir, but not mkdir a subdir there.",
       "parentUuid": "e850b71d_88c5573b",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_082cc7fc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T02:08:15Z",
+      "side": 1,
+      "message": "Ah, right.",
+      "parentUuid": "688a07dd_75e69042",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -282,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "e850b71d_e8304b4f",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T02:08:15Z",
+      "side": 1,
+      "message": "SGTM",
+      "parentUuid": "688a07dd_95eb1408",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_08da871c",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -311,6 +381,24 @@
       "side": 1,
       "message": "We allow any transport (and the tests are using InProcess), but we should not allow unassigned. It\u0027s used strictly for prohibiting calls. See the upspin.go definition of Unassigned:\n\n// Unassigned indicates a connection to a service that returns an error\n// from every method call. It is useful when a component wants to\n// guarantee it does not access another service.",
       "parentUuid": "e850b71d_08da871c",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c82d8ff9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T02:08:15Z",
+      "side": 1,
+      "message": "Sure, I guess I\u0027m just wondering what you\u0027re protecting against here. It makes it look like the method cares about e, when it really doesn\u0027t.",
+      "parentUuid": "688a07dd_35e00821",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
