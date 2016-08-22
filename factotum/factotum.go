@@ -151,11 +151,12 @@ func (f factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) 
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
 func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
+	const op = "factotum.ScalarMult"
 	var h keyHashArray
 	copy(h[:], keyHash)
 	fk, ok := f.keys[h]
 	if !ok {
-		err = errors.E("scalarMult", errors.Errorf("no such key %x", keyHash))
+		err = errors.E(op, errors.Errorf("no such key %x", keyHash))
 	} else {
 		sx, sy = curve.ScalarMult(x, y, fk.ecdsaKeyPair.D.Bytes())
 	}
@@ -187,14 +188,15 @@ func (f factotum) PublicKey() upspin.PublicKey {
 
 // PublicKeyFromHash returns the user's public key with matching keyHash.
 func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
+	const op = "factotum.PublicKeyFromHash"
 	if keyHash == nil || len(keyHash) == 0 {
-		return "", errors.Errorf("invalid keyHash")
+		return "", errors.E(op, errors.Invalid, errors.Errorf("invalid keyHash"))
 	}
 	var h keyHashArray
 	copy(h[:], keyHash)
 	fk, ok := f.keys[h]
 	if !ok {
-		return "", errors.Errorf("no such key")
+		return "", errors.E(op, errors.NotExist, errors.Errorf("no such key"))
 	}
 	return fk.public, nil
 }
@@ -220,19 +222,20 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa
 // ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key, returning its type.
 // The Upspin string representation uses \n as newline no matter what native OS it runs on.
 func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
+	const op = "factotum.ParsePublicKey"
 	fields := strings.Split(string(public), "\n")
 	if len(fields) != 4 { // 4 is because string should be terminated by \n, hence fields[3]==""
-		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
+		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
 	}
 	keyType := fields[0]
 	var x, y big.Int
 	_, ok := x.SetString(fields[1], 10)
 	if !ok {
-		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("%s is not a big int", fields[1]))
+		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[1]))
 	}
 	_, ok = y.SetString(fields[2], 10)
 	if !ok {
-		return nil, "", errors.E("ParsePublicKey", errors.Invalid, errors.Errorf("%s is not a big int", fields[2]))
+		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[2]))
 	}
 
 	var curve elliptic.Curve
@@ -244,7 +247,7 @@ func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
 	case "p384":
 		curve = elliptic.P384()
 	default:
-		return nil, "", errors.Errorf("unknown key type: %q", keyType)
+		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("unknown key type: %q", keyType))
 	}
 	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, keyType, nil
 }

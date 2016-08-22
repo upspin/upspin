@@ -23,7 +23,7 @@ import (
 // New initializes an instance of the key service.
 // Required configuration options are listed at the package comments.
 func New(options ...string) (upspin.KeyServer, error) {
-	const op = "key.New"
+	const op = "key/gcp.New"
 
 	// All options are for the Storage layer.
 	var storageOpts []storage.DialOpts
@@ -66,7 +66,7 @@ var errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name 
 
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "gcp.Lookup"
+	const op = "key/gcp.Lookup"
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -79,7 +79,7 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.KeyServer.
 func (s *server) Put(user *upspin.User) error {
-	const op = "gcp.Put"
+	const op = "key/gcp.Put"
 	if s.user == "" {
 		return errors.E(op, errors.Invalid, errors.Str("not bound to user"))
 	}

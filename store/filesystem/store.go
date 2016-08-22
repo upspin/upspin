@@ -94,11 +94,13 @@ func (s *server) Close() {
 var errNotImplemented = errors.Str("not implemented")
 
 func (s *server) Put(ciphertext []byte) (upspin.Reference, error) {
-	return "", errors.E("store/filesystem.Put", errNotImplemented)
+	const op = "store/filesystem.Put"
+	return "", errors.E(op, errNotImplemented)
 }
 
 func (s *server) Delete(ref upspin.Reference) error {
-	return errors.E("store/filesystem.Delete", errNotImplemented)
+	const op = "store/filesystem.Delete"
+	return errors.E(op, errNotImplemented)
 }
 
 // Methods that do not apply to this server.

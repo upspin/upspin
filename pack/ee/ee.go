@@ -117,9 +117,9 @@ func (ee ee) String() string {
 }
 
 func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
-	const Pack = "Pack"
+	const op = "pack/ee.Pack"
 	if err := pack.CheckPacking(ee, d); err != nil {
-		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 
 	// TODO(adg): support append; for now assume a new file.
@@ -129,16 +129,16 @@ func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 	dkey := make([]byte, aesKeyLen)
 	_, err := rand.Read(dkey)
 	if err != nil {
-		return nil, errors.E(Pack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 
 	// Set up the stream cipher.
 	if len(dkey) != aesKeyLen {
-		return nil, errors.E(Pack, errKeyLength)
+		return nil, errors.E(op, errKeyLength)
 	}
 	block, err := aes.NewCipher(dkey)
 	if err != nil {
-		return nil, errors.E(Pack, err)
+		return nil, errors.E(op, err)
 	}
 	iv := make([]byte, block.BlockSize())
 	// iv=0 is ok because we're certain that dkey is random and not reused
@@ -162,6 +162,7 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	const op = "pack/ee.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
@@ -175,7 +176,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	size := int64(len(ciphertext))
 	offs, err := bp.entry.Size()
 	if err != nil {
-		return nil, errors.E("Pack", errors.Invalid, err)
+		return nil, errors.E(op, errors.Invalid, err)
 	}
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
@@ -197,6 +198,7 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 }
 
 func (bp *blockPacker) Close() error {
+	const op = "pack/ee.blockPacker.Pack"
 	// Zero out encryption key when we're done.
 	defer zeroSlice(&bp.dkey)
 
@@ -214,17 +216,17 @@ func (bp *blockPacker) Close() error {
 	// First, wrap for myself.
 	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey())
 	if err != nil {
-		return errors.E(Pack, name, err)
+		return errors.E(op, name, err)
 	}
 	wrap[0], err = aesWrap(p, bp.dkey)
 	if err != nil {
-		return errors.E(Pack, name, err)
+		return errors.E(op, name, err)
 	}
 
 	// Also wrap for owner, if different.
 	parsed, err := path.Parse(name)
 	if err != nil {
-		return errors.E(Pack, name, err)
+		return errors.E(op, name, err)
 	}
 	owner := parsed.User()
 	if owner == ctx.UserName() {
@@ -232,11 +234,11 @@ func (bp *blockPacker) Close() error {
 	} else {
 		userConn, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {
-			return errors.E(Pack, name, owner, err)
+			return errors.E(op, name, owner, err)
 		}
 		u, err := userConn.Lookup(owner)
 		if err != nil {
-			return errors.E(Pack, name, owner, err)
+			return errors.E(op, name, owner, err)
 		}
 		ownerKey := u.PublicKey
 		if ownerKey == ctx.Factotum().PublicKey() {
@@ -245,11 +247,11 @@ func (bp *blockPacker) Close() error {
 		} else {
 			p, _, err = factotum.ParsePublicKey(ownerKey)
 			if err != nil {
-				return errors.E(Pack, name, owner, err)
+				return errors.E(op, name, owner, err)
 			}
 			wrap[1], err = aesWrap(p, bp.dkey)
 			if err != nil {
-				return errors.E(Pack, name, owner, err)
+				return errors.E(op, name, owner, err)
 			}
 		}
 	}
@@ -260,52 +262,52 @@ func (bp *blockPacker) Close() error {
 	// Compute entry signature.
 	sig, err := ctx.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)
 	if err != nil {
-		return errors.E("Pack", err)
+		return errors.E(op, err)
 	}
 
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
 }
 
 func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const Unpack = "Unpack"
+	const op = "pack/ee.Unpack"
 	if err := pack.CheckPacking(ee, d); err != nil {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 
 	// Call Size to check that the block Offsets and Sizes are consistent.
 	if _, err := d.Size(); err != nil {
-		return nil, errors.E(Unpack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 
 	sig, sig2, wrap, hash, err := pdUnmarshal(d.Packdata)
 	if err != nil {
-		return nil, errors.E(Unpack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 
 	// Check that our stored+signed block checksum matches the sum of the actual blocks.
 	if got, want := internal.BlockSum(d.Blocks), hash; !bytes.Equal(got, want) {
-		return nil, errors.E(Unpack, d.Name, errors.Str("checksum mismatch"))
+		return nil, errors.E(op, d.Name, errors.Str("checksum mismatch"))
 	}
 
 	// Fetch writer public key.
 	writer := d.Writer
 	if len(writer) == 0 {
-		return nil, errors.E(Unpack, d.Name, errWriter)
+		return nil, errors.E(op, d.Name, errWriter)
 	}
 	writerRawPubKey, err := publicKey(ctx, writer)
 	if err != nil {
-		return nil, errors.E(Unpack, writer, err)
+		return nil, errors.E(op, writer, err)
 	}
 	writerPubKey, writerCurveName, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
-		return nil, errors.E(Unpack, writer, err)
+		return nil, errors.E(op, writer, err)
 	}
 
 	// Fetch my own keys, as I am the recipient of the file.
 	me := ctx.UserName()
 	rawPublicKey, err := publicKey(ctx, me)
 	if err != nil {
-		return nil, errors.E(Unpack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 
 	// Pull the decryption key out of the wrapped keys.
@@ -321,23 +323,23 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 		// Decode my wrapped key using my private key.
 		dkey, err = aesUnwrap(ctx.Factotum(), w)
 		if err != nil {
-			return nil, errors.E(Unpack, d.Name, me, err)
+			return nil, errors.E(op, d.Name, me, err)
 		}
 		if len(dkey) != aesKeyLen {
-			return nil, errors.E(Unpack, d.Name, errKeyLength)
+			return nil, errors.E(op, d.Name, errKeyLength)
 		}
 		// Verify that this was signed with the writer's old or new public key.
 		vhash := factotum.VerHash(writerCurveName, path.Clean(d.Name), d.Time, dkey, hash)
 		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
-			return nil, errors.E(Unpack, d.Name, writer, errVerify)
+			return nil, errors.E(op, d.Name, writer, errVerify)
 			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 		}
 		// Set up stream cipher.
 		block, err := aes.NewCipher(dkey)
 		if err != nil {
-			return nil, errors.E(Unpack, d.Name, err)
+			return nil, errors.E(op, d.Name, err)
 		}
 		iv := make([]byte, aes.BlockSize)
 		stream := cipher.NewCTR(block, iv)
@@ -349,7 +351,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			cipher:       stream,
 		}, nil
 	}
-	return nil, errors.E(Unpack, d.Name, me, errors.Str("could not find wrapped key"))
+	return nil, errors.E(op, d.Name, me, errors.Str("could not find wrapped key"))
 }
 
 type blockUnpacker struct {
@@ -362,11 +364,12 @@ type blockUnpacker struct {
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
+	const op = "pack/ee.blockUpacker.Unpack"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
 	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
-		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
+		return nil, errors.E(op, bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 
 	cleartext = bp.buf.Bytes(len(ciphertext))
@@ -379,9 +382,10 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
 func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
+	const op = "pack/ee.ReaderHashes"
 	_, _, wrap, _, err := pdUnmarshal(packdata)
 	if err != nil {
-		return nil, errors.E("ReaderHashes", errors.Invalid, err)
+		return nil, errors.E(op, errors.Invalid, err)
 	}
 	readers = make([][]byte, len(wrap))
 	for i := 0; i < len(wrap); i++ {
@@ -477,45 +481,45 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 
 // Name implements upspin.Name.
 func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
-	const Name = "Name"
+	const op = "pack/ee.Name"
 	if d.IsDir() {
-		return errors.E(Name, d.Name, errors.IsDir, "cannot rename directory")
+		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
 	}
 	if err := pack.CheckPacking(ee, d); err != nil {
-		return errors.E(Name, errors.Invalid, d.Name, err)
+		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
 	dkey := make([]byte, aesKeyLen)
 	sig, sig2, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
 	if err != nil {
-		return errors.E(Name, errors.Invalid, d.Name, err)
+		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
 	// File owner is part of the pathname
 	parsed, err := path.Parse(d.Name)
 	if err != nil {
-		return errors.E(Name, err)
+		return errors.E(op, err)
 	}
 	owner := parsed.User()
 	// The owner has a well-known public key
 	ownerRawPubKey, err := publicKey(ctx, owner)
 	if err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 	ownerPubKey, ownerCurveName, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 
 	// Now get my own keys
 	me := ctx.UserName() // Recipient of the file is me (the user in the context)
 	rawPublicKey, err := publicKey(ctx, me)
 	if err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 	pubkey, _, err := factotum.ParsePublicKey(rawPublicKey)
 	if err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
@@ -530,14 +534,14 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 	if !wrapFound {
 		log.Printf("unwrap failed: %s", errNoWrappedKey)
-		return errors.E(Name, d.Name, errNoWrappedKey)
+		return errors.E(op, d.Name, errNoWrappedKey)
 	}
 
 	// Decode my wrapped key using my private key
 	dkey, err = aesUnwrap(ctx.Factotum(), w)
 	if err != nil {
 		log.Printf("unwrap failed: %s", err)
-		return errors.E(Name, d.Name, errors.Str("unwrap failed"))
+		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
@@ -546,13 +550,13 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
 		log.Println("verify failed")
-		return errors.E(Name, d.Name, errVerify)
+		return errors.E(op, d.Name, errVerify)
 	}
 
 	// If we are changing directories, remove all wrapped keys except my own.
 	parsedNew, err := path.Parse(newName)
 	if err != nil {
-		return errors.E(Name, err)
+		return errors.E(op, err)
 	}
 	newName = parsedNew.Path()
 	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
@@ -562,13 +566,13 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	// Compute new signature.
 	sig, err = ctx.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
 	if err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
 	if err := pdMarshal(&d.Packdata, sig, sig0, wrap, cipherSum); err != nil {
-		return errors.E(Name, d.Name, err)
+		return errors.E(op, d.Name, err)
 	}
 	d.Name = newName
 
@@ -578,7 +582,7 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 // Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
 func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
 	// TODO(ehg) Consolidate shared code amongst Countersign, Name, Share.
-	const op = "Countersign"
+	const op = "pack/ee.Countersign"
 	if d.IsDir() || d.IsLink() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory or link")
 	}

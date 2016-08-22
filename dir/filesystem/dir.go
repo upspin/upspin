@@ -237,15 +237,18 @@ func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, er
 var errReadOnly = errors.Str("read-only namespace")
 
 func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("filesystem.Delete", errReadOnly)
+	const op = "dir/filesystem.Delete"
+	return nil, errors.E(op, errReadOnly)
 }
 
 func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("dir/filesystem.MakeDirectory", errReadOnly)
+	const op = "dir/filesystem.MakeDirectory"
+	return nil, errors.E(op, errReadOnly)
 }
 
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	return nil, errors.E("dir/filesystem.Put", errReadOnly)
+	const op = "dir/filesystem.Put"
+	return nil, errors.E(op, errReadOnly)
 }
 
 // Methods that do not apply to this server.

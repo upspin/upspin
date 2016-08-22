@@ -50,7 +50,7 @@ func (d *drng) Read(p []byte) (n int, err error) {
 
 // CreateKeys creates a key pair based on the chosen curve and a slice of entropy.
 func CreateKeys(curveName string, entropy []byte) (public upspin.PublicKey, private string, err error) {
-	const CreateKeys = "CreateKeys"
+	const op = "pack/ee.CreateKeys"
 	var curve elliptic.Curve
 	switch curveName {
 	case "p256":
@@ -60,12 +60,12 @@ func CreateKeys(curveName string, entropy []byte) (public upspin.PublicKey, priv
 	case "p521":
 		curve = elliptic.P521()
 	default:
-		return public, private, errors.E(CreateKeys, errors.Invalid, errors.Errorf("curveName %s", curveName))
+		return public, private, errors.E(op, errors.Invalid, errors.Errorf("curveName %s", curveName))
 	}
 
 	priv, err := createKeysFromEntropy(curve, entropy)
 	if err != nil {
-		return public, private, errors.E(CreateKeys, errors.Invalid, err)
+		return public, private, errors.E(op, errors.Invalid, err)
 	}
 	public, private = encodeKeys(priv, curveName)
 	return

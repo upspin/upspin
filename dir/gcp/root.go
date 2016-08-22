@@ -28,7 +28,7 @@ type accessFileDB map[upspin.PathName]*access.Access
 // getRoot retrieves the user's root, possibly by fetching it from storage.
 // It must be called with userlock held.
 func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error) {
-	const op = "getRoot"
+	const op = "dir/gcp.getRoot"
 	defer span(opts).StartSpan("getRoot").End()
 
 	userRootPath := upspin.PathName(user)
@@ -60,7 +60,7 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 // putRoot stores the user's root to stable storage, updating the cache.
 // It must be called with userlock held.
 func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) error {
-	const op = "putRoot"
+	const op = "dir/gcp.putRoot"
 	defer span(opts).StartSpan("putRoot").End()
 
 	// Put it in the root cache.
@@ -84,7 +84,7 @@ func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) e
 // handleRootCreation creates a root for a user.
 // It must be called with any userlock held.
 func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry, opts ...options) error {
-	const op = "MakeDirectory"
+	const op = "dir/gcp.handleRootCreation"
 	// Permission for root creation is special: only the owner can do it.
 	if user != parsed.User() {
 		return errors.E(op, parsed.Path(), user, errors.Permission)
@@ -134,6 +134,7 @@ type savedRoot struct {
 
 // unmarshalRoot takes plain JSON of a savedRoot struct and returns the root.
 func unmarshalRoot(buf []byte) (*root, error) {
+	const op = "dir/gcp.unmarshalRoot"
 	var sroot savedRoot
 	err := json.Unmarshal(buf, &sroot)
 	if err != nil {
@@ -159,7 +160,7 @@ func unmarshalRoot(buf []byte) (*root, error) {
 		if _, exists := root.accessFiles[path]; exists {
 			// This is bad. Our map serialization included a duplicate, which should never happen unless
 			// the JSON entry on disk was modified manually or somehow strangely corrupted.
-			err = errors.E("unmarshalRoot", path, errors.Str("Access file duplicated in root"))
+			err = errors.E(op, path, errors.Str("Access file duplicated in root"))
 			log.Error.Print(err)
 			saveError(err)
 		}

@@ -95,6 +95,7 @@ func (p Parsed) FilePath() string {
 // the trailing slash is optional. The name is 'cleaned' (see the Clean
 // function) to canonicalize it.
 func Parse(pathName upspin.PathName) (Parsed, error) {
+	const op = "path.Parse"
 	name := string(pathName)
 	// Pull off the user name.
 	var user string
@@ -106,11 +107,11 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	}
 	if len(user) < 6 {
 		// No user name. Must be at least "u@x.co". Silly test - do more.
-		return Parsed{}, errors.E("Parse", pathName, errors.Str("no user name in path"))
+		return Parsed{}, errors.E(op, pathName, errors.Str("no user name in path"))
 	}
 	if strings.Count(user, "@") != 1 {
 		// User name must contain exactly one "@".
-		return Parsed{}, errors.E("Parse", pathName, errors.Str("bad user name in path"))
+		return Parsed{}, errors.E(op, pathName, errors.Str("bad user name in path"))
 	}
 	p := Parsed{
 		// If pathName is already clean, which it usually is, this will not allocate.
@@ -373,7 +374,8 @@ func UserAndDomain(userName upspin.UserName) (user string, domain string, err er
 }
 
 func errUserName(user upspin.UserName, msg string) (string, string, error) {
-	return "", "", errors.E("path.UserAndDomain", errors.Syntax, user, errors.Str(msg))
+	const op = "path.UserAndDomain"
+	return "", "", errors.E(op, errors.Syntax, user, errors.Str(msg))
 }
 
 // See the comments for UserAndDomain.
