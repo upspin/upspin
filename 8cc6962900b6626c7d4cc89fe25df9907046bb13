@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_e8ebab73",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "use it here? and the other exported functions in this file?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c8e8ef79",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "grpcauth",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a8e5b39f",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "this an other functions in this package could use the op too",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_88e2f793",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "grpcauth, here and elsewhere",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_68833bb5",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "lowercase \"gcs\" is the package name\nbut should this be \"cloud/storage/gcs\" ?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_288d43df",
+        "filename": "cloud/storage/mysql/mysql.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "\"cloud/storage/sql\" ? \"storage/sql\" ?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_089287fb",
+        "filename": "cloud/storage/postgres/postgres.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "\"cloud/storage/postgres\" ? \"storage/postgres\" ?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_e8760be2",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "you needn\u0027t plumb the op here, as we adorn the error with an op two lines down",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_c8734ff0",
+        "filename": "dir/gcp/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "i don\u0027t think we should use the op for unexported functions",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_a88013a2",
+        "filename": "dir/gcp/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "I\u0027d remove the op from this function, as its unexported",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_887d57be",
+        "filename": "dir/gcp/storage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_68aa1b1f",
+        "filename": "key/usercache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T12:35:10Z",
+      "side": 1,
+      "message": "this method should definitely be using errors.E",
+      "revId": "8cc6962900b6626c7d4cc89fe25df9907046bb13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
