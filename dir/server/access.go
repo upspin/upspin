@@ -12,7 +12,6 @@ import (
 	"upspin.io/access"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -21,7 +20,7 @@ import (
 // caching of Access files.
 // userLock must be held for p.User().
 func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
-	const op = "DirServer.whichAccessNoCache"
+	const op = "dir/server.whichAccessNoCache"
 	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -32,7 +31,6 @@ func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
 	// while being aware of links in the way.
 	for {
 		accPath := path.Join(p.Path(), "Access")
-		log.Debug.Printf("%s: Looking up %s", op, accPath)
 		entry, _, err := tree.Lookup(accPath)
 		if err == upspin.ErrFollowLink {
 			// If we got ErrFollowLink in the first iteration of the
@@ -69,7 +67,7 @@ func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
 // DirEntry of the link if ErrFollowLink is returned.
 // userLock must be held for p.User().
 func (s *server) whichAccess(p path.Parsed) (*upspin.DirEntry, error) {
-	const op = "DirServer.whichAccess"
+	const op = "dir/server.whichAccess"
 	// TODO: check the cache and negcache for an access dir entry for this path.
 
 	entry, err := s.whichAccessNoCache(p)
@@ -87,7 +85,6 @@ func (s *server) whichAccess(p path.Parsed) (*upspin.DirEntry, error) {
 
 // loadAccess loads and processes an Access file from its DirEntry.
 func (s *server) loadAccess(entry *upspin.DirEntry) (*access.Access, error) {
-	log.Debug.Printf("loadAccess: entry: %v", entry)
 	buf, err := clientutil.ReadAll(s.serverContext, entry)
 	if err != nil {
 		return nil, err
@@ -99,7 +96,7 @@ func (s *server) loadAccess(entry *upspin.DirEntry) (*access.Access, error) {
 // DirServer. Intended for use with access.Can. The userLock for the current
 // user must be held.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
-	const op = "DirServer.loadPath"
+	const op = "dir/server.loadPath"
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -124,7 +121,7 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 // ErrFollowLink is returned, the DirEntry will be that of the link.
 // userLock must be held for p.User().
 func (s *server) hasRight(right access.Right, p path.Parsed) (bool, *upspin.DirEntry, error) {
-	const op = "DirServer.hasRight"
+	const op = "dir/server.hasRight"
 	entry, err := s.whichAccess(p)
 	if err == upspin.ErrFollowLink {
 		return false, entry, upspin.ErrFollowLink
