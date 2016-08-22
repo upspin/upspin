@@ -7,6 +7,7 @@ package server
 
 import (
 	"io/ioutil"
+	goPath "path"
 	"strconv"
 	"strings"
 
@@ -20,14 +21,9 @@ import (
 	"upspin.io/valid"
 )
 
-var (
-	// TODO: delete once everything is implemented.
-	errNotImplemented = errors.Str("not implemented")
-
-	// errNotExist is only used for comparison, to detect whether entries
-	// already exist.
-	errNotExist = errors.E(errors.NotExist)
-)
+// errNotExist is only used for comparison, to detect whether entries already
+// exist.
+var errNotExist = errors.E(errors.NotExist)
 
 const (
 	// entryMustBeClean is used with lookup to specify whether the caller
@@ -347,7 +343,101 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 // Glob implements upspin.DirServer.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "DirServer.Glob"
-	return nil, errors.E(op, errNotImplemented)
+	p, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Check if pattern is a valid go path pattern
+	_, err = goPath.Match(string(p.FilePath()), "")
+	if err != nil {
+		return nil, errors.E(op, p.Path(), err)
+	}
+
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
+
+	tree, err := s.loadTreeFor(p.User())
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	// User wants valid dir entries, so we must flush (we could check if
+	// !dirty first, but flush when nothing is dirty is cheap and doing
+	// everything again if dirty is expensive, so flush now).
+	err = tree.Flush()
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Look for the longest prefix that does not contain a metacharacter, so
+	// we know which level we need to apply Glob and look for Access files.
+	firstMeta := p.NElem()
+	for i := 0; i < firstMeta; i++ {
+		if strings.ContainsAny(p.Elem(i), "*?[]^") {
+			firstMeta = i
+			break
+		}
+	}
+	log.Printf("=== firstMeta: %d %q", firstMeta, p.Path())
+	var entries []*upspin.DirEntry
+	toList := []path.Parsed{p.First(firstMeta)}
+	i := 0 // i is the iterator over toList. It only moves forward.
+	for d := firstMeta; d <= p.NElem(); d++ {
+		for ; i < len(toList); i++ { // not range loop, slice grows.
+			dir := toList[i]
+			log.Printf("=== %q %q: dir.NElem=%d, d=%d", dir.Path(), p.First(d), dir.NElem(), d)
+			if dir.NElem() > d {
+				// We've listed all dirs at this level. Move to next.
+				break
+			}
+
+			ents, _, err := tree.List(dir)
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			canList, _, err := s.hasRight(access.List, dir)
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			log.Printf("CanList %q? %v", dir, canList)
+			if !canList {
+				continue
+			}
+			// Apply goPath regexp to each e in ents.
+			for _, e := range ents {
+				if d < p.NElem()-1 {
+					log.Printf("=== testing %q against %q ", e.Name, p.First(d+1))
+					// No need to check for errors, pattern was validated.
+					if matched, _ := goPath.Match(p.First(d+1).String(), string(e.Name)); !matched {
+						continue
+					}
+					log.Printf("===         matched.")
+				}
+				// If we can't read, strip Packdata and Location information.
+				canRead, _, err := s.hasRight(access.Read, dir)
+				if err != nil {
+					return nil, errors.E(op, err)
+				}
+				if canRead {
+					entries = append(entries, e)
+				} else {
+					// Make a shallow copy, since we need to clean
+					// the entry.
+					eCopy := *e
+					eCopy.Packdata = nil
+					eCopy.Blocks = nil
+					entries = append(entries, &eCopy)
+				}
+				// Next, we must list this subdir.
+				if e.IsDir() {
+					p, _ := path.Parse(e.Name) // e.Name is valid.
+					toList = append(toList, p)
+				}
+			}
+		}
+	}
+	return entries, nil
 }
 
 // Delete implements upspin.DirServer.

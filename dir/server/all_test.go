@@ -249,7 +249,63 @@ func TestHasRight(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestGlob(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	ents, err := s.Glob(userName + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := map[upspin.PathName]bool{
+		userName + "/file1.txt": true,
+		userName + "/dir":       true,
+		userName + "/mylink":    true,
+		userName + "/Access":    true,
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for _, e := range ents {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want one-of {%v}", expected)
+		}
+	}
+
+	// Add stuff to dir, to check complex Globs.
+	for _, dir := range []upspin.PathName{
+		"/dir/subdir",
+		"/dir/subway",
+		"/dir/foo",
+		"/dir/bar",
+	} {
+		_, err = s.MakeDirectory(userName + dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	ents, err = s.Glob(userName + "/?ir/sub*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]bool{
+		userName + "/dir/subdir":    true,
+		userName + "/dir/subway":    true,
+		userName + "/dir/ffffubdir": true,
+	}
+	for _, e := range ents {
+		t.Logf("== got: %q", e.Name)
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for _, e := range ents {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want one-of {%v}", expected)
+		}
+	}
+}
+
+func xTestDelete(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 
 	// Directory not empty (there's an Access file there).
