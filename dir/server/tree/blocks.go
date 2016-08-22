@@ -7,7 +7,6 @@ package tree
 // This file implements block reading and writing.
 
 import (
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -16,27 +15,6 @@ import (
 
 // TODO: move to package upspin or somewhere else more appropriate.
 const blockSize = 1024 * 1024 // 1MB
-
-// get gets the contents of a location as a blob.
-func (t *tree) get(loc *upspin.Location) ([]byte, error) {
-	const get = "tree.get"
-	store, err := bind.StoreServer(t.context, loc.Endpoint)
-	if err != nil {
-		return nil, err
-	}
-	data, locs, err := store.Get(loc.Reference)
-	if err != nil {
-		return nil, errors.E(get, errors.Errorf("location: %v: %v", loc, err))
-	}
-	if data != nil && len(locs) > 0 {
-		return nil, errors.E(get, errors.IO, errors.Str("invalid return from Store, redirection and data."))
-	}
-	if data != nil {
-		return data, nil
-	}
-	// TODO: this should do something akin to client.Get. It now only does one indirection.
-	return t.get(&locs[0])
-}
 
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
