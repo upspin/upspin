@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e850b71d_c8146f9f",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T05:14:49Z",
+      "side": 1,
+      "message": "t.mu must be held",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_4874fffc",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T05:14:49Z",
+      "side": 1,
+      "message": "I wonder if here and elsewhere you should be returning a copy of the DirEntry struct? The user of Tree may modify it and corrupt the data stored in the Tree.",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e850b71d_2879c3f4",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-22T05:14:49Z",
+      "side": 1,
+      "message": "maybe i\u0027m misunderstanding the model, but shouldn\u0027t a node\u0027s ancestors all be considered dirty if that node is dirty?",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
