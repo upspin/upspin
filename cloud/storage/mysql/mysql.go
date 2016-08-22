@@ -26,38 +26,40 @@ var _ storage.Storage = (*mysql)(nil)
 // PutLocalFile implements storage.Storage.
 func (p *mysql) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// TODO: implement. Only relevant if we want to store blobs though.
-	return "", errors.E("SQL.PutLocalFile", errors.Syntax, errors.Str("putlocalfile not implemented for SQL"))
+	const op = "cloud/storage/mysql.PutLocalFile"
+	return "", errors.E(op, errors.Syntax, errors.Str("putlocalfile not implemented for SQL"))
 }
 
 // Get implements storage.Storage.
 func (p *mysql) Get(ref string) (link string, error error) {
 	// TODO: implement. Only relevant if we want to store blobs though.
-	return "", errors.E("SQL.Get", errors.Syntax, errors.Str("get not implemented for SQL"))
+	const op = "cloud/storage/mysql.Get"
+	return "", errors.E(op, errors.Syntax, errors.Str("get not implemented for SQL"))
 }
 
 // Download implements storage.Storage.
 func (p *mysql) Download(ref string) ([]byte, error) {
-	const Download = "SQL.Download"
+	const op = "cloud/storage/mysql.Download"
 	var data string
 	// QueryRow with $1 parameters ensures we don't have SQL escape problems.
 	err := p.db.QueryRow("SELECT data FROM directory WHERE ref = ?", ref).Scan(&data)
 	if err == sql.ErrNoRows {
-		return nil, errors.E(Download, errors.NotExist, err)
+		return nil, errors.E(op, errors.NotExist, err)
 	}
 	if err != nil {
-		return nil, errors.E(Download, errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	return []byte(data), nil
 }
 
 // Put implements storage.Storage.
 func (p *mysql) Put(ref string, contents []byte) (refLink string, error error) {
-	const Put = "SQL.Put"
+	const op = "cloud/storage/mysql.Put"
 	res, err := p.db.Exec(
 		`INSERT INTO directory (ref, data) VALUES (?, ?) ON DUPLICATE KEY UPDATE data = ?`,
 		ref, string(contents), string(contents))
 	if err != nil {
-		return "", errors.E(Put, errors.IO, err)
+		return "", errors.E(op, errors.IO, err)
 	}
 	n, err := res.RowsAffected()
 	if err != nil {
@@ -66,18 +68,18 @@ func (p *mysql) Put(ref string, contents []byte) (refLink string, error error) {
 	}
 	if n != 1 && n != 2 {
 		// Something went wrong. Updates affect two rows and inserts affect one.
-		return "", errors.E(Put, errors.IO, errors.Errorf("spurious updates in DB: %d, but [1-2] expected", n))
+		return "", errors.E(op, errors.IO, errors.Errorf("spurious updates in DB: %d, but [1-2] expected", n))
 	}
 	return "", nil
 }
 
 // ListPrefix implements storage.Storage.
 func (p *mysql) ListPrefix(prefix string, depth int) ([]string, error) {
-	const ListPrefix = "SQL.ListPrefix"
+	const op = "cloud/storage/mysql.ListPrefix"
 	query := "SELECT ref FROM directory WHERE ref LIKE ?"
 	arg := prefix + "%" // a left-prefix-match.
 	// TODO: check depth and enforce it.
-	return p.commonListDir(ListPrefix, query, arg)
+	return p.commonListDir(op, query, arg)
 }
 
 // commonListDir implements common functionality shared between ListPrefix and ListDir.
@@ -116,7 +118,7 @@ func (p *mysql) commonListDir(op string, query string, args ...interface{}) ([]s
 
 // ListDir implements storage.Storage.
 func (p *mysql) ListDir(dir string) ([]string, error) {
-	const ListDir = "SQL.ListDir"
+	const ListDir = "cloud/storage/mysql.ListDir"
 	topDir := dir + "%"
 	notSubDir := dir + "[^/]+/%"
 	// Usage of LIKE and NOT SIMILAR is necessary here to trigger the use of the index.
@@ -127,22 +129,22 @@ func (p *mysql) ListDir(dir string) ([]string, error) {
 
 // Delete implements storage.Storage.
 func (p *mysql) Delete(ref string) error {
-	const Delete = "SQL.Delete"
+	const op = "cloud/storage/mysql.Delete"
 	_, err := p.db.Exec("DELETE FROM directory WHERE ref = ?", ref)
 	if err != nil {
-		return errors.E(Delete, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	return nil
 }
 
 // Dial implements storage.Storage.
 func (p *mysql) Dial(opts *storage.Opts) error {
-	const Dial = "SQL.Dial"
+	const op = "cloud/storage/mysql.Dial"
 	optStr := buildOptStr(opts)
 	log.Printf("Connecting and creating table with options [%s]", optStr)
 	db, err := sql.Open("mysql", optStr)
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	// Create the table if it's not there yet. Note that mySQL version 5.6 and prior only support
 	// VARCHAR up to 255 characters. Once Google Cloud upgrades to 5.7, we can have 64k length.
@@ -154,7 +156,7 @@ func (p *mysql) Dial(opts *storage.Opts) error {
 	             data TEXT NOT NULL
 	         )`)
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	// Build a text index on ref to speed up regex pattern matching queries, if one does not exist yet.
 	var res int
@@ -164,13 +166,13 @@ func (p *mysql) Dial(opts *storage.Opts) error {
 		       table_name='directory' AND
 		       index_name='directory_ref_index'`).Scan(&res)
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	if res == 0 {
 		// Index is not there. Create it now.
 		_, err = db.Exec("CREATE INDEX directory_ref_index ON directory (ref)")
 		if err != nil {
-			return errors.E(Dial, errors.IO, err)
+			return errors.E(op, errors.IO, err)
 		}
 	}
 

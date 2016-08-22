@@ -41,7 +41,7 @@ type logIndex struct {
 // Only one Log and LogIndex for a user in the same directory can be opened.
 // If two are opened and used simultaneously, results will be unpredictable.
 func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
-	const op = "Tree.NewLogs"
+	const op = "dir/server/tree.NewLogs"
 	loc := filepath.Join(directory, "tree.log."+string(user))
 	loggerFile, err := os.OpenFile(loc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
@@ -82,7 +82,7 @@ func (l *logger) User() upspin.UserName {
 
 // Append implements Log.
 func (l *logger) Append(e *LogEntry) error {
-	const op = "Log.Append"
+	const op = "dir/server/tree.Log.Append"
 	buf, err := e.marshal()
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func (l *logger) Append(e *LogEntry) error {
 
 // ReadAt implements Log.
 func (l *logger) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
-	const op = "Log.Read"
+	const op = "dir/server/tree.Log.Read"
 	if offset >= l.offset {
 		// End of file.
 		return dst, l.offset, nil
@@ -142,7 +142,7 @@ func (li *logIndex) User() upspin.UserName {
 
 // Root implements LogIndex.
 func (li *logIndex) Root() (*upspin.DirEntry, error) {
-	const op = "LogIndex.Root"
+	const op = "dir/server/tree.LogIndex.Root"
 	var root upspin.DirEntry
 	buf, err := readAllFromTop(op, li.rootFile)
 	if err != nil {
@@ -163,7 +163,7 @@ func (li *logIndex) Root() (*upspin.DirEntry, error) {
 
 // SaveRoot implements LogIndex.
 func (li *logIndex) SaveRoot(root *upspin.DirEntry) error {
-	const op = "LogIndex.SaveRoot"
+	const op = "dir/server/tree.LogIndex.SaveRoot"
 	buf, err := root.Marshal()
 	if err != nil {
 		return errors.E(op, err)
@@ -201,7 +201,7 @@ func readAllFromTop(op string, f *os.File) ([]byte, error) {
 
 // ReadOffset implements LogIndex.
 func (li *logIndex) ReadOffset() (int64, error) {
-	const op = "LogIndex.ReadOffset"
+	const op = "dir/server/tree.LogIndex.ReadOffset"
 	buf, err := readAllFromTop(op, li.indexFile)
 	if err != nil {
 		return 0, errors.E(op, errors.IO, err)
@@ -218,15 +218,15 @@ func (li *logIndex) ReadOffset() (int64, error) {
 
 // SaveOffset implements LogIndex.
 func (li *logIndex) SaveOffset(offset int64) error {
-	const SaveOffset = "LogIndex.SaveOffset"
+	const op = "dir/server/tree.LogIndex.SaveOffset"
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
-	return overwriteAndSync(SaveOffset, li.indexFile, tmp[:n])
+	return overwriteAndSync(op, li.indexFile, tmp[:n])
 }
 
 // marshal packs the LogEntry into a new byte slice for storage.
 func (le *LogEntry) marshal() ([]byte, error) {
-	const op = "LogEntry.marshal"
+	const op = "dir/server/tree.LogEntry.marshal"
 	var b []byte
 	var tmp [1]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], int64(le.Op))
@@ -276,7 +276,7 @@ func (r *countingByteReader) Read(p []byte) (n int, err error) {
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
 // receiver.
 func (le *LogEntry) unmarshal(r *countingByteReader) error {
-	const op = "LogEntry.unmarshal"
+	const op = "dir/server/tree.LogEntry.unmarshal"
 	operation, err := binary.ReadVarint(r)
 	if err != nil {
 		return errors.E(op, errors.IO, errors.Errorf("reading op: %s", err))

@@ -70,8 +70,9 @@ type DialOpts func(*Opts) error
 
 // Register registers a new Storage under a name. It is typically used in init functions.
 func Register(name string, storage Storage) error {
+	const op = "cloud/storage.Register"
 	if _, exists := registration[name]; exists {
-		return errors.E("Register", errors.Exist)
+		return errors.E(op, errors.Exist)
 	}
 	registration[name] = storage
 	return nil
@@ -98,12 +99,13 @@ func WithTimeout(timeout time.Duration) DialOpts {
 // are specific to each storage backend. Neither key nor value may contain the characters "," or "=".
 // Use WithKeyValue repeatedly if these characters need to be used.
 func WithOptions(options string) DialOpts {
+	const op = "cloud/storage.WithOptions"
 	return func(o *Opts) error {
 		pairs := strings.Split(options, ",")
 		for _, p := range pairs {
 			kv := strings.Split(p, "=")
 			if len(kv) != 2 {
-				return errors.E("WithOptions", errors.Syntax, errors.Errorf("error parsing option %s", kv))
+				return errors.E(op, errors.Syntax, errors.Errorf("error parsing option %s", kv))
 			}
 			o.Opts[kv[0]] = kv[1]
 		}
@@ -121,9 +123,10 @@ func WithKeyValue(key, value string) DialOpts {
 
 // Dial dials the named storage backend using the dial options opts.
 func Dial(name string, opts ...DialOpts) (Storage, error) {
+	const op = "cloud/storage.Dial"
 	s, found := registration[name]
 	if !found {
-		return nil, errors.E("Dial", errors.NotExist, errors.Str("storage backend type not registered"))
+		return nil, errors.E(op, errors.NotExist, errors.Str("storage backend type not registered"))
 	}
 	dOpts := &Opts{
 		Opts: make(map[string]string),

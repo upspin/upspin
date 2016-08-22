@@ -78,6 +78,7 @@ func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.D
 // backend without checking anything but the marshaling.
 // It must be called with userlock held.
 func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, opts ...options) error {
+	const op = "dir/gcp.putNonRoot"
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
 
@@ -91,7 +92,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
 		errMsg := fmt.Sprintf("internal server error: conversion to json failed: %s", err)
 		log.Error.Printf("%s: %s: %+v", errMsg, path, dirEntry)
-		return errors.E("putmeta", path, errors.Str(errMsg))
+		return errors.E(op, path, errors.Str(errMsg))
 	}
 	log.Debug.Printf("Storing dir entry at %q", path)
 	ss2 := ss.StartSpan("putCloudBytes")
@@ -103,26 +104,28 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 // isDirEmpty reports whether the directory path is empty.
 // It must be called with userlock held.
 func (d *directory) isDirEmpty(path upspin.PathName, opts ...options) error {
+	const op = "dir/gcp.ListDir"
 	defer span(opts).StartSpan("isDirEmpty").End()
 	dirPrefix := string(path) + "/"
 	files, err := d.storage.ListDir(dirPrefix)
 	if err != nil {
-		return errors.E("ListDir", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	if len(files) > 0 {
-		return errors.E(path, errors.NotEmpty)
+		return errors.E(op, path, errors.NotEmpty)
 	}
 	return nil
 }
 
 // getCloudBytes fetches the path from the storage backend.
 func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte, error) {
+	const op = "dir/gcp.Download"
 	log.Debug.Printf("Downloading DirEntry from GCP: %s", path)
 	defer span(opts).StartSpan("getCloudBytes").End()
 
 	data, err := d.storage.Download(string(path))
 	if err != nil {
-		return nil, errors.E("Download", path, errors.NotExist, err)
+		return nil, errors.E(op, path, errors.NotExist, err)
 	}
 	return data, nil
 }
@@ -130,9 +133,10 @@ func (d *directory) getCloudBytes(path upspin.PathName, opts ...options) ([]byte
 // deletePath deletes the path from the storage backend and if successful also deletes it from all caches.
 // It must be called with userlock held.
 func (d *directory) deletePath(path upspin.PathName, opts ...options) error {
+	const op = "dir/gcp.Delete"
 	defer span(opts).StartSpan("deletePath").End()
 	if err := d.storage.Delete(string(path)); err != nil {
-		return errors.E("Delete", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	d.dirCache.Remove(path)
 	d.rootCache.Remove(path)

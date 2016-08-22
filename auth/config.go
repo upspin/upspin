@@ -30,25 +30,25 @@ type Config struct {
 
 // NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
 func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {
-	const NewDefaultTLSConfig = "NewDefaultTLSConfig"
+	const op = "auth.NewDefaultTLSConfig"
 	certReadable, err := isReadableFile(certFile)
 	if err != nil {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("SSL certificate in %q: %q", certFile, err))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("SSL certificate in %q: %q", certFile, err))
 	}
 	if !certReadable {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("certificate file %q not readable", certFile))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("certificate file %q not readable", certFile))
 	}
 	keyReadable, err := isReadableFile(certKeyFile)
 	if err != nil {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("SSL key in %q: %v", certKeyFile, err))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("SSL key in %q: %v", certKeyFile, err))
 	}
 	if !keyReadable {
-		return nil, errors.E(NewDefaultTLSConfig, errors.Invalid, errors.Errorf("certificate key file %q not readable", certKeyFile))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("certificate key file %q not readable", certKeyFile))
 	}
 
 	cert, err := tls.LoadX509KeyPair(certFile, certKeyFile)
 	if err != nil {
-		return nil, errors.E(NewDefaultTLSConfig, err)
+		return nil, errors.E(op, err)
 	}
 
 	tlsConfig := &tls.Config{
@@ -70,11 +70,12 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 // PublicUserKeyService returns a Lookup function that looks up user's public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) (upspin.PublicKey, error) {
+	const op = "auth.PublicUserKeyService"
 	ctx = usercache.Global(ctx)
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
 		u, err := ctx.KeyServer().Lookup(userName)
 		if err != nil {
-			return "", errors.E("PublicUserKeyService", err)
+			return "", errors.E(op, err)
 		}
 		return u.PublicKey, nil
 	}

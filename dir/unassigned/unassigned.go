@@ -22,33 +22,39 @@ var unassignedErr = errors.Str("request to unassigned service")
 
 // Glob implements upspin.DirServer.Glob.
 func (*unassigned) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	return nil, errors.E("Glob", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Glob"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (*unassigned) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("MakeDirectory", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.MakeDirectory"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (*unassigned) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	return nil, errors.E("Put", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Put"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (*unassigned) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("WhichAccess", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.WhichAccess"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (*unassigned) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("Delete", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Delete"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (*unassigned) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, errors.E("Lookup", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Lookup"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.
@@ -58,7 +64,8 @@ func (u *unassigned) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (*unassigned) Configure(options ...string) error {
-	return errors.E("Configure", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Configure"
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Close implements upspin.Service.
@@ -67,7 +74,8 @@ func (*unassigned) Close() {
 
 // Authenticate implements upspin.Service.
 func (*unassigned) Authenticate(context upspin.Context) error {
-	return errors.E("Authenticate", errors.Invalid, unassignedErr)
+	const op = "dir/unassigned.Authenticate"
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Ping implements upspin.Service.
@@ -77,8 +85,9 @@ func (*unassigned) Ping() bool {
 
 // Dial implements upspin.Service.
 func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "dir/unassigned.Dial"
 	if e.Transport != upspin.Unassigned {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	return &unassigned{e}, nil
