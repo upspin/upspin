@@ -229,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_55502cda",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T03:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_681d7bce",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_4822bf0c",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -240,6 +258,24 @@
       "writtenOn": "2016-08-22T02:08:15Z",
       "side": 1,
       "message": "maybe \nk, v :\u003d o[0], o[1]\n?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_f554e0cf",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T03:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_4822bf0c",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -399,6 +435,24 @@
       "side": 1,
       "message": "Sure, I guess I\u0027m just wondering what you\u0027re protecting against here. It makes it look like the method cares about e, when it really doesn\u0027t.",
       "parentUuid": "688a07dd_35e00821",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_1552a4e1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T03:21:40Z",
+      "side": 1,
+      "message": "Just ensuring that the user is not thinking that this is a transport that returns error on every call.",
+      "parentUuid": "e850b71d_c82d8ff9",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
