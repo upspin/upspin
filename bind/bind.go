@@ -93,12 +93,14 @@ const allowOverwrite = true // for documentation purposes
 // RegisterKeyServer registers a KeyServer interface for the transport.
 // There must be no previous registration.
 func RegisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
-	return registerKeyServer("RegisterKeyServer", transport, user, !allowOverwrite)
+	const op = "bind.RegisterKeyServer"
+	return registerKeyServer(op, transport, user, !allowOverwrite)
 }
 
 // ReregisterKeyServer replaces the KeyServer interface for the transport.
 func ReregisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
-	return registerKeyServer("ReregisterKeyServer", transport, user, allowOverwrite)
+	const op = "bind.ReregisterKeyServer"
+	return registerKeyServer(op, transport, user, allowOverwrite)
 }
 
 func registerKeyServer(op string, transport upspin.Transport, user upspin.KeyServer, allowOverwrite bool) error {
@@ -115,12 +117,14 @@ func registerKeyServer(op string, transport upspin.Transport, user upspin.KeySer
 // RegisterDirServer registers a DirServer interface for the transport.
 // There must be no previous registration.
 func RegisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
-	return registerDirServer("RegisterDirServer", transport, dir, !allowOverwrite)
+	const op = "bind.RegisterDirServer"
+	return registerDirServer(op, transport, dir, !allowOverwrite)
 }
 
 // ReregisterDirServer replaces the DirServer interface for the transport.
 func ReregisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
-	return registerDirServer("ReregisterDirServer", transport, dir, allowOverwrite)
+	const op = "bind.ReregisterDirServer"
+	return registerDirServer(op, transport, dir, allowOverwrite)
 }
 
 func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServer, allowOverwrite bool) error {
@@ -137,12 +141,14 @@ func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServ
 // RegisterStoreServer registers a StoreServer interface for the transport.
 // There must be no previous registration.
 func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
-	return registerStoreServer("RegisterStoreServer", transport, store, !allowOverwrite)
+	const op = "bind.RegisterStoreServer"
+	return registerStoreServer(op, transport, store, !allowOverwrite)
 }
 
 // ReregisterStoreServer replaces a StoreServer interface for the transport.
 func ReregisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
-	return registerStoreServer("ReregisterStoreServer", transport, store, allowOverwrite)
+	const op = "bind.ReregisterStoreServer"
+	return registerStoreServer(op, transport, store, allowOverwrite)
 }
 
 func registerStoreServer(op string, transport upspin.Transport, store upspin.StoreServer, allowOverwrite bool) error {
@@ -206,13 +212,13 @@ func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
 
 // Release closes the service and releases all resources associated with it.
 func Release(service upspin.Service) error {
-	const Release = "Release"
+	const op = "bind.Release"
 	mu.Lock()
 	defer mu.Unlock()
 
 	key, ok := reverseLookup[service]
 	if !ok {
-		return errors.E(Release, errors.NotExist, errors.Str("service not found"))
+		return errors.E(op, errors.NotExist, errors.Str("service not found"))
 	}
 	switch service.(type) {
 	case upspin.DirServer:
@@ -222,7 +228,7 @@ func Release(service upspin.Service) error {
 	case upspin.KeyServer:
 		delete(userDialCache, key)
 	default:
-		return errors.E(Release, errors.Invalid, errors.Errorf("unknown service type %T", service))
+		return errors.E(op, errors.Invalid, errors.Errorf("unknown service type %T", service))
 	}
 	service.Close()
 	delete(reverseLookup, service)

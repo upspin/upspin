@@ -28,7 +28,7 @@ import (
 )
 
 func New(context upspin.Context, options ...string) (upspin.DirServer, error) {
-	const op = "gcp.New"
+	const op = "dir/gcp.New"
 
 	var storageBackend string
 	var dialOpts []storage.DialOpts
@@ -118,7 +118,7 @@ func newOptsForMetric(op string) (options, *metric.Metric) {
 
 // MakeDirectory implements upspin.DirServer.
 func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "MakeDirectory"
+	const op = "dir/gcp.MakeDirectory"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
@@ -158,7 +158,7 @@ func (d *directory) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, er
 // It implements upspin.DirServer.
 // TODO: Implement links.
 func (d *directory) Put(dirEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "Put"
+	const op = "dir/gcp.Put"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
@@ -303,7 +303,7 @@ func (d *directory) put(op string, dirEntry *upspin.DirEntry, opts ...options) e
 
 // Lookup implements upspin.DirServer.
 func (d *directory) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "Lookup"
+	const op = "dir/gcp.Lookup"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
@@ -354,7 +354,7 @@ func (d *directory) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, err
 }
 
 func (d *directory) whichAccessPath(pathName upspin.PathName) (upspin.PathName, error) {
-	const op = "WhichAccess"
+	const op = "dir/gcp.WhichAccess"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
@@ -388,7 +388,7 @@ func (d *directory) whichAccessPath(pathName upspin.PathName) (upspin.PathName, 
 }
 
 func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "Glob"
+	const op = "dir/gcp.Glob"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()
@@ -484,7 +484,7 @@ func (d *directory) Glob(pattern string) ([]*upspin.DirEntry, error) {
 // deleteDirEntry handles deleting names and their associated DirEntry.
 // TODO: Implement links.
 func (d *directory) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "Delete"
+	const op = "dir/gcp.Delete"
 
 	opts, m := newOptsForMetric(op)
 	defer m.Done()

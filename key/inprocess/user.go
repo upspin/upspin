@@ -45,7 +45,7 @@ type database struct {
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "Lookup"
+	const op = "key/inprocess.Lookup"
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -73,7 +73,7 @@ func dup(u *upspin.User) *upspin.User {
 
 // Put implements upspin.KeyServer.
 func (s *server) Put(user *upspin.User) error {
-	const op = "Put"
+	const op = "key/inprocess.Put"
 	if err := valid.User(user); err != nil {
 		return errors.E(op, err)
 	}
@@ -94,8 +94,9 @@ func (s *server) Endpoint() upspin.Endpoint {
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
 func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "key/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 	return s, nil
 }

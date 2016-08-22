@@ -21,7 +21,7 @@ import (
 // caching of Access files.
 // userLock must be held for p.User().
 func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
-	const op = "DirServer.whichAccessNoCache"
+	const op = "dir/server.whichAccessNoCache"
 	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -53,7 +53,7 @@ func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
 // DirEntry of the link if ErrFollowLink is returned.
 // userLock must be held for p.User().
 func (s *server) whichAccess(p path.Parsed) (*upspin.DirEntry, error) {
-	const op = "DirServer.whichAccess"
+	const op = "dir/server.whichAccess"
 	// TODO: check the cache and negcache for an access dir entry for this path.
 
 	entry, err := s.whichAccessNoCache(p)
@@ -82,7 +82,7 @@ func (s *server) loadAccess(entry *upspin.DirEntry) (*access.Access, error) {
 // DirServer. Intended for use with access.Can. The userLock for the current
 // user must be held.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
-	const op = "DirServer.loadPath"
+	const op = "dir/server.loadPath"
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -106,7 +106,7 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 // hasRight reports whether the current user has the given right on the path.
 // userLock must be held for p.User().
 func (s *server) hasRight(right access.Right, p path.Parsed) (bool, error) {
-	const op = "DirServer.hasRight"
+	const op = "dir/server.hasRight"
 	entry, err := s.whichAccess(p)
 	if err == upspin.ErrFollowLink {
 		// TODO: call hasRight on the link itself?

@@ -61,7 +61,8 @@ func (f *File) Name() upspin.PathName {
 
 // Read implements upspin.File.
 func (f *File) Read(b []byte) (n int, err error) {
-	n, err = f.readAt("Read", b, f.offset)
+	const op = "file.Read"
+	n, err = f.readAt(op, b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
 	}
@@ -70,7 +71,8 @@ func (f *File) Read(b []byte) (n int, err error) {
 
 // ReadAt implements upspin.File.
 func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
-	return f.readAt("ReadAt", b, off)
+	const op = "file.ReadAt"
+	return f.readAt(op, b, off)
 }
 
 func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
@@ -92,8 +94,9 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 
 // Seek implements upspin.File.
 func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
+	const op = "file.Seek"
 	if f.closed {
-		return 0, f.errClosed("Seek")
+		return 0, f.errClosed(op)
 	}
 	switch whence {
 	case 0:
@@ -103,10 +106,10 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	case 2:
 		ret = int64(len(f.data)) + offset
 	default:
-		return 0, errors.E("Seek", errors.Invalid, f.name, errors.Str("bad whence"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad whence"))
 	}
 	if ret < 0 || offset > maxInt {
-		return 0, errors.E("Seek", errors.Invalid, f.name, errors.Str("bad offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad offset"))
 	}
 	f.offset = ret
 	return ret, nil
@@ -114,7 +117,8 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 
 // Write implements upspin.File.
 func (f *File) Write(b []byte) (n int, err error) {
-	n, err = f.writeAt("Write", b, f.offset)
+	const op = "file.Write"
+	n, err = f.writeAt(op, b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
 	}
@@ -123,7 +127,8 @@ func (f *File) Write(b []byte) (n int, err error) {
 
 // WriteAt implements upspin.File.
 func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
-	return f.writeAt("WriteAt", b, off)
+	const op = "file.WriteAt"
+	return f.writeAt(op, b, off)
 }
 
 func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
@@ -161,8 +166,9 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 
 // Close implements upspin.File.
 func (f *File) Close() error {
+	const op = "file.Close"
 	if f.closed {
-		return f.errClosed("Close")
+		return f.errClosed(op)
 	}
 	f.closed = true
 	if !f.writable {

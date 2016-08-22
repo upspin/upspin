@@ -164,11 +164,12 @@ func (s *service) add(name string) {
 }
 
 func (s *service) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "key/usercache.service.Lookup"
 	s.lookups++
 	if u, ok := s.entries[string(name)]; ok {
 		return u, nil
 	}
-	return nil, errors.E("Lookup", name, errors.NotExist)
+	return nil, errors.E(op, name, errors.NotExist)
 }
 
 func (s *service) Put(user *upspin.User) error {

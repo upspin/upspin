@@ -407,6 +407,7 @@ func AddGroup(pathName upspin.PathName, contents []byte) error {
 
 // RemoveGroup undoes the installation of a group added by AddGroup.
 func RemoveGroup(pathName upspin.PathName) error {
+	const op = "access.RemoveGroup"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return err
@@ -414,7 +415,7 @@ func RemoveGroup(pathName upspin.PathName) error {
 	mu.Lock()
 	defer mu.Unlock()
 	if _, found := groups[parsed.Path()]; !found {
-		return errors.E("RemoveGroup", errors.NotExist, errors.Str("group does not exist"))
+		return errors.E(op, errors.NotExist, errors.Str("group does not exist"))
 	}
 	delete(groups, parsed.Path())
 	return nil

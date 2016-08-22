@@ -77,7 +77,7 @@ const (
 // in this case, the returned context will not include a Factotum
 // and the returned error is ErrNoFactotum.
 func InitContext(r io.Reader) (upspin.Context, error) {
-	const op = "InitContext"
+	const op = "context.InitContext"
 	vals := map[string]string{
 		username:    "noone@nowhere.org",
 		keyserver:   "",
@@ -89,7 +89,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	// If the provided reader is nil, try $HOME/upspin/rc.
 	if r == nil {
-		home, err := homedir()
+		home, err := homedir(op)
 		if err != nil {
 			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
 		}
@@ -118,7 +118,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 			val := strings.TrimSpace(tokens[1])
 			attr := strings.TrimSpace(tokens[0])
 			if _, ok := vals[attr]; !ok {
-				return nil, errors.E("context:", errors.Invalid, errors.Errorf("unrecognized key %q", attr))
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("unrecognized key %q", attr))
 			}
 			vals[attr] = val
 		}
@@ -166,7 +166,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	var err error
 	dir := vals[secrets]
 	if dir == "" {
-		dir, err = sshdir()
+		dir, err = sshdir(op)
 		if err != nil {
 			return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
 		}
@@ -334,7 +334,7 @@ func (ctx *contextImpl) Copy() upspin.Context {
 	return &c
 }
 
-func homedir() (string, error) {
+func homedir(op string) (string, error) {
 	u, err := user.Current()
 	// user.Current may return an error, but we should only handle it if it
 	// returns a nil user. This is because os/user is wonky without cgo,
@@ -348,7 +348,7 @@ func homedir() (string, error) {
 	}
 	h := u.HomeDir
 	if h == "" {
-		return "", errors.E(errors.NotExist, errors.Str("user home directory not found"))
+		return "", errors.E(op, errors.NotExist, errors.Str("user home directory not found"))
 	}
 	if err := isDir(h); err != nil {
 		return "", err
@@ -356,8 +356,8 @@ func homedir() (string, error) {
 	return h, nil
 }
 
-func sshdir() (string, error) {
-	h, err := homedir()
+func sshdir(op string) (string, error) {
+	h, err := homedir(op)
 	if err != nil {
 		return "", err
 	}

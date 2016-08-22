@@ -76,7 +76,7 @@ func (n *node) String() string {
 // TODO: Maybe new is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
 func New(context upspin.Context, log Log, logIndex LogIndex) (Tree, error) {
-	const op = "tree.New"
+	const op = "dir/server/tree.New"
 	if context == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("context is nil"))
 	}
@@ -131,7 +131,7 @@ func New(context upspin.Context, log Log, logIndex LogIndex) (Tree, error) {
 // The returned entry's references are not up-to-date if the entry is dirty.
 // See full description on interface on tree.go.
 func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
-	const op = "tree.Lookup"
+	const op = "dir/server/tree.Lookup"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -152,7 +152,7 @@ func (t *tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, er
 // Put puts a DirEntry into the Tree.
 // See full description on interface in tree.go.
 func (t *tree) Put(de *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "tree.Put"
+	const op = "dir/server/tree.Put"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -182,7 +182,7 @@ func (t *tree) Put(de *upspin.DirEntry) (*upspin.DirEntry, error) {
 // can be used to recover the Tree's state from the log.
 // t.mu must be held.
 func (t *tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
-	const op = "tree.put"
+	const op = "dir/server/tree.put"
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
@@ -209,7 +209,7 @@ func (t *tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
 func (t *tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
-	const op = "addKid"
+	const op = "dir/server/tree.addKid"
 	if !parent.entry.IsDir() {
 		return errors.E(op, errors.NotDir, errors.Errorf("path: %q", parent.entry.Name))
 	}
@@ -342,7 +342,7 @@ func (t *tree) loadKids(parent *node) error {
 // loadRoot loads the root into memory if it is not already loaded.
 // t.mu must be held.
 func (t *tree) loadRoot() error {
-	const op = "loadRoot"
+	const op = "dir/server/tree.loadRoot"
 	if t.root != nil {
 		return nil
 	}
@@ -362,7 +362,7 @@ func (t *tree) loadRoot() error {
 // createRoot creates the root at p using the given dir entry. A root must not already exist.
 // t.mu must be held.
 func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
-	const op = "createRoot"
+	const op = "dir/server/tree.createRoot"
 	// Check that we're trying to create a root for the owner of the Tree only.
 	if p.User() != t.user {
 		return errors.E(op, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
@@ -402,7 +402,7 @@ func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 // Delete deletes the DirEntry associated with name.
 // See full description on interface in tree.go.
 func (t *tree) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "tree.Delete"
+	const op = "dir/server/tree.Delete"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -427,7 +427,7 @@ func (t *tree) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 // so it can be used to recover from the Tree's state from the log.
 // t.mu must be held.
 func (t *tree) delete(p path.Parsed) (*node, error) {
-	const op = "tree.delete"
+	const op = "dir/server/tree.delete"
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
 	if err == upspin.ErrFollowLink {
@@ -491,7 +491,7 @@ func (t *tree) Flush() error {
 // flush flushes all dirty entries.
 // t.mu must be held.
 func (t *tree) flush() error {
-	const op = "tree.Flush"
+	const op = "dir/server/tree.Flush"
 	// Flush from highest path depth up to root.
 	for i := len(t.dirtyNodes) - 1; i >= 0; i-- {
 		m := t.dirtyNodes[i]
@@ -522,13 +522,13 @@ func (t *tree) flush() error {
 
 // Close flushes the Tree to the Store and releases all resources.
 func (t *tree) Close() error {
-	const Close = "tree.Close"
+	const op = "dir/server/tree.Close"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
 	err := t.Flush()
 	if err != nil {
-		return errors.E(Close, err)
+		return errors.E(op, err)
 	}
 
 	return nil
@@ -545,7 +545,7 @@ func (t *tree) Root() (*upspin.DirEntry, error) {
 // operations. It can only be called from New.
 func (t *tree) recoverFromLog() error {
 	const (
-		op        = "recoverFromLog"
+		op        = "dir/server/tree.recoverFromLog"
 		batchSize = 10 // max number of entries to recover at a time.
 	)
 	lastOffset := t.log.LastOffset()

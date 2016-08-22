@@ -33,6 +33,7 @@ var _ upspin.StoreServer = (*remote)(nil)
 
 // Get implements upspin.StoreServer.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+	const op = "store/remote.Get"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return nil, nil, err
@@ -42,7 +43,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	}
 	resp, err := r.storeClient.Get(gCtx, req)
 	if err != nil {
-		return nil, nil, errors.E("Get", errors.IO, err)
+		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
@@ -54,6 +55,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // Put implements upspin.StoreServer.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
+	const op = "store/remote.Put"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return "", err
@@ -63,7 +65,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	}
 	resp, err := r.storeClient.Put(gCtx, req)
 	if err != nil {
-		return "", errors.E("Put", errors.IO, err)
+		return "", errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
 	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
@@ -71,6 +73,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 
 // Delete implements upspin.StoreServer.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
+	const op = "store/remote.Delete"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
@@ -80,7 +83,7 @@ func (r *remote) Delete(ref upspin.Reference) error {
 	}
 	resp, err := r.storeClient.Delete(gCtx, req)
 	if err != nil {
-		return errors.E("Delete", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
 	return errors.UnmarshalError(resp.Error)
@@ -93,19 +96,20 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) error {
+	const op = "store/remote.Configure"
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
 	resp, err := r.storeClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return errors.E("Configure", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "Dial"
+	const op = "store/remote.Dial"
 
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))

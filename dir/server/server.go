@@ -59,7 +59,7 @@ var _ upspin.DirServer = (*server)(nil)
 
 // Lookup implements upspin.DirServer.
 func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "DirServer.Lookup"
+	const op = "dir/server.Lookup"
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -104,7 +104,7 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool) (*upspi
 
 // Put implements upspin.DirServer.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "DirServer.Put"
+	const op = "dir/server.Put"
 	p, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err)
@@ -123,7 +123,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 // MakeDirectory implements upspin.DirServer.
 func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "DirServer.MakeDirectory"
+	const op = "dir/server.MakeDirectory"
 	p, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, dirName, err)
@@ -200,19 +200,19 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry) (*upspin.
 
 // Glob implements upspin.DirServer.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "DirServer.Glob"
+	const op = "dir/server.Glob"
 	return nil, errors.E(op, errNotImplemented)
 }
 
 // Delete implements upspin.DirServer.
 func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "DirServer.Delete"
+	const op = "dir/server.Delete"
 	return nil, errors.E(op, errNotImplemented)
 }
 
 // WhichAccess implements upspin.DirServer.
 func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "DirServer.WhichAccess"
+	const op = "dir/server.WhichAccess"
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -232,7 +232,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 
 // Dial implements upspin.Dialer.
 func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "DirServer.Dial"
+	const op = "dir/server.Dial"
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("transport must be Remote"))
 	}
@@ -284,7 +284,7 @@ func (s *server) Close() {
 // loadTreeFor loads the user's tree, if it exists.
 // userLock must be held for user.
 func (s *server) loadTreeFor(user upspin.UserName) (tree.Tree, error) {
-	const op = "loadTreeFor"
+	const op = "dir/server.loadTreeFor"
 	if err := valid.UserName(user); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}

@@ -76,6 +76,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // keep-alive packets.
 // The security level specifies the expected security guarantees of the connection.
 func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel) (*AuthClientService, error) {
+	const op = "auth.NewGRPCClient"
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
 	}
@@ -99,7 +100,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
 		if !isLocal(addr[skip:]) {
-			return nil, errors.E("Dial", netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
+			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
 		}
 		opts = append(opts, grpc.WithInsecure())
 	case Secure:
@@ -107,7 +108,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case InsecureAllowingSelfSignedCertificates:
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
 	default:
-		return nil, errors.E(errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
 	}
 	conn, err := grpc.Dial(addr[skip:], opts...)
 	if err != nil {

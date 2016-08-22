@@ -223,33 +223,33 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 
 // Dial implements storage.Storage.
 func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
-	const Dial = "GCS.Dial"
+	const op = "GCS.Dial"
 
 	if v, ok := opts.Opts[projectID]; ok {
 		gcs.projectID = v
 	} else {
-		return errors.E(Dial, errors.Syntax, errors.Str("Project ID argument is required"))
+		return errors.E(op, errors.Syntax, errors.Str("Project ID argument is required"))
 	}
 	if v, ok := opts.Opts[bucketName]; ok {
 		gcs.bucketName = v
 	} else {
-		return errors.E(Dial, errors.Syntax, errors.Str("Bucket name argument is required"))
+		return errors.E(op, errors.Syntax, errors.Str("Bucket name argument is required"))
 	}
 	if v, ok := opts.Opts[defaultACL]; ok {
 		gcs.defaultWriteACL = v
 	} else {
-		return errors.E(Dial, errors.Syntax, errors.Str("Default ACL argument is required"))
+		return errors.E(op, errors.Syntax, errors.Str("Default ACL argument is required"))
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(gContext.Background(), scope)
 	if err != nil {
-		return errors.E(Dial, errors.IO, errors.Errorf("Unable to get default client: %s", err))
+		return errors.E(op, errors.IO, errors.Errorf("Unable to get default client: %s", err))
 	}
 	service, err := gcsBE.New(client)
 	if err != nil {
-		errors.E(Dial, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
+		errors.E(op, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
 	}
 	// Initialize the object
 	gcs.client = client

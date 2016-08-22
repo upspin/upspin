@@ -41,8 +41,9 @@ func (plainPack) Share(context upspin.Context, readers []upspin.PublicKey, packd
 }
 
 func (p plainPack) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+	const op = "pack/plain.Pack"
 	if err := pack.CheckPacking(p, d); err != nil {
-		return nil, errors.E("Pack", errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockPacker{
 		ctx:   ctx,
@@ -56,6 +57,7 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
+	const op = "pack/plain.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
@@ -65,7 +67,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	size := int64(len(ciphertext))
 	offs, err := bp.entry.Size()
 	if err != nil {
-		return nil, errors.E("Pack", errors.Invalid, err)
+		return nil, errors.E(op, errors.Invalid, err)
 	}
 
 	block := upspin.DirBlock{
@@ -87,13 +89,13 @@ func (bp *blockPacker) Close() error {
 }
 
 func (p plainPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const Unpack = "Unpack"
+	const op = "pack/plain.Unpack"
 	if err := pack.CheckPacking(p, d); err != nil {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	// Call Size to check that the block Offsets and Sizes are consistent.
 	if _, err := d.Size(); err != nil {
-		return nil, errors.E(Unpack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 	return &blockUnpacker{
 		ctx:          ctx,
@@ -115,13 +117,13 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 
 // Name implements upspin.Name.
 func (p plainPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
-	const Name = "Name"
+	const op = "pack/plain.Name"
 	if dirEntry.IsDir() {
-		return errors.E(Name, errors.IsDir, dirEntry.Name, "cannot rename directory")
+		return errors.E(op, errors.IsDir, dirEntry.Name, "cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
 	if err != nil {
-		return errors.E(Name, err)
+		return errors.E(op, err)
 	}
 	dirEntry.Name = parsed.Path()
 	return nil

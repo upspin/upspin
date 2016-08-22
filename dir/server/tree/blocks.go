@@ -19,17 +19,17 @@ const blockSize = 1024 * 1024 // 1MB
 
 // get gets the contents of a location as a blob.
 func (t *tree) get(loc *upspin.Location) ([]byte, error) {
-	const get = "tree.get"
+	const op = "dir/server/tree.get"
 	store, err := bind.StoreServer(t.context, loc.Endpoint)
 	if err != nil {
 		return nil, err
 	}
 	data, locs, err := store.Get(loc.Reference)
 	if err != nil {
-		return nil, errors.E(get, errors.Errorf("location: %v: %v", loc, err))
+		return nil, errors.E(op, errors.Errorf("location: %v: %v", loc, err))
 	}
 	if data != nil && len(locs) > 0 {
-		return nil, errors.E(get, errors.IO, errors.Str("invalid return from Store, redirection and data."))
+		return nil, errors.E(op, errors.IO, errors.Str("invalid return from Store, redirection and data."))
 	}
 	if data != nil {
 		return data, nil
@@ -41,7 +41,7 @@ func (t *tree) get(loc *upspin.Location) ([]byte, error) {
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
 func (t *tree) store(n *node) error {
-	const op = "tree.store"
+	const op = "dir/server/tree.store"
 
 	// Get our store server.
 	storeServer := t.context.StoreServer()
@@ -127,18 +127,18 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 
 // loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
 func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
-	const loadKidsFromBlock = "loadKidsFromBlock"
+	const op = "dir/server/tree.loadKidsFromBlock"
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
 	if n.dirty {
-		err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+		err := errors.E(op, errors.Internal, n.entry.Name,
 			errors.Str("trying to load a block from storage when the node is dirty"))
 		log.Error.Print(err)
 		return err
 	}
 	if n.entry.Name == "" {
-		err := errors.E(loadKidsFromBlock, errors.Internal, errors.Str("empty entry name"))
+		err := errors.E(op, errors.Internal, errors.Str("empty entry name"))
 		log.Error.Print(err)
 		return err
 	}
@@ -147,7 +147,7 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 		var dir upspin.DirEntry
 		remaining, err := dir.Unmarshal(block)
 		if err != nil {
-			return errors.E(loadKidsFromBlock, err)
+			return errors.E(op, err)
 		}
 		dirs = append(dirs, dir)
 		block = remaining
@@ -155,18 +155,18 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 	// Load children for this node.
 	dePath, err := path.Parse(n.entry.Name)
 	if err != nil {
-		return errors.E(loadKidsFromBlock, err)
+		return errors.E(op, err)
 	}
 	elemPos := dePath.NElem()
 	for _, dir := range dirs {
 		p, err := path.Parse(dir.Name)
 		if err != nil {
-			return errors.E(loadKidsFromBlock, err)
+			return errors.E(op, err)
 		}
 		if p.NElem() <= elemPos {
 			// We should never have written a dirEntry whose path does not contain
 			// one more element than the parent.
-			err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+			err := errors.E(op, errors.Internal, n.entry.Name,
 				errors.Str("entry is inconsistent with parent"))
 			log.Error.Print(err)
 			return err
@@ -174,7 +174,7 @@ func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
 		elem := p.Elem(elemPos)
 		if _, exists := n.kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
-			err := errors.E(loadKidsFromBlock, errors.Internal, n.entry.Name,
+			err := errors.E(op, errors.Internal, n.entry.Name,
 				errors.Str("re-adding an existing element in the Tree"))
 			log.Error.Print(err)
 			return err

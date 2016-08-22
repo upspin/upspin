@@ -22,17 +22,20 @@ var unassignedErr = errors.Str("request to unassigned service")
 
 // Get implements upspin.StoreServer.Get.
 func (*unassigned) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	return nil, nil, errors.E("Get", errors.Invalid, unassignedErr)
+	const op = "store/unassigned.Get"
+	return nil, nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.StoreServer.Put.
 func (*unassigned) Put(data []byte) (upspin.Reference, error) {
-	return "", errors.E("Put", errors.Invalid, unassignedErr)
+	const op = "store/unassigned.Put"
+	return "", errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.StoreServer.Delete.
 func (*unassigned) Delete(ref upspin.Reference) error {
-	return errors.E("Delete", errors.Invalid, unassignedErr)
+	const op = "store/unassigned.Delete"
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.
@@ -42,7 +45,8 @@ func (u *unassigned) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (*unassigned) Configure(options ...string) error {
-	return errors.E("Configure", errors.Invalid, unassignedErr)
+	const op = "store/unassigned.Configure"
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Close implements upspin.Service.
@@ -51,7 +55,8 @@ func (*unassigned) Close() {
 
 // Authenticate implements upspin.Service.
 func (*unassigned) Authenticate(context upspin.Context) error {
-	return errors.E("Authenticate", errors.Invalid, unassignedErr)
+	const op = "store/unassigned.Authenticate"
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Ping implements upspin.Service.
@@ -61,8 +66,9 @@ func (*unassigned) Ping() bool {
 
 // Dial implements upspin.Service.
 func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "store/unassigned.Dial"
 	if e.Transport != upspin.Unassigned {
-		return nil, errors.E("Dial", errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	return &unassigned{e}, nil

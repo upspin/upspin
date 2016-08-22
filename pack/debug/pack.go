@@ -95,16 +95,16 @@ func addSignature(d *upspin.DirEntry, signature byte) error {
 }
 
 func (p testPack) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
-	const Pack = "Pack"
+	const op = "pack/debug.Pack"
 	if err := pack.CheckPacking(p, d); err != nil {
-		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	if len(d.Name) > 64*1024 {
-		return nil, errors.E(Pack, errors.Invalid, d.Name, errors.Str("name too long"))
+		return nil, errors.E(op, errors.Invalid, d.Name, errors.Str("name too long"))
 	}
 	cb, err := cryptByte(d, true)
 	if err != nil {
-		return nil, errors.E(Pack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockPacker{
 		ctx:       ctx,
@@ -122,13 +122,13 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
-	const Pack = "Pack"
+	const op = "pack/debug.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
 
 	if len(cleartext) > 1024*1024*1024 {
-		return nil, errors.E(Pack, errors.Invalid, bp.entry.Name, errors.Str("cleartext too long"))
+		return nil, errors.E(op, errors.Invalid, bp.entry.Name, errors.Str("cleartext too long"))
 	}
 
 	// (re-)allocate shared buffer if necessary.
@@ -140,7 +140,7 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	size := int64(len(ciphertext))
 	offs, err := bp.entry.Size()
 	if err != nil {
-		return nil, errors.E("Pack", errors.Invalid, err)
+		return nil, errors.E(op, errors.Invalid, err)
 	}
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
@@ -179,28 +179,28 @@ func (bp *blockPacker) Close() error {
 }
 
 func (p testPack) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const Unpack = "Unpack"
+	const op = "pack/debug.Unpack"
 	if err := pack.CheckPacking(p, d); err != nil {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 
 	// Call Size to check that the block Offsets and Sizes are consistent.
 	if _, err := d.Size(); err != nil {
-		return nil, errors.E(Unpack, d.Name, err)
+		return nil, errors.E(op, d.Name, err)
 	}
 
 	// Validate signature.
 	sig := sign(ctx, internal.BlockSum(d.Blocks), d.Name)
 	if len(d.Packdata) < 2 {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, errors.Str("incomplete signature"))
+		return nil, errors.E(op, errors.Invalid, d.Name, errors.Str("incomplete signature"))
 	}
 	if d.Packdata[1] != sig {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, errors.Str("signature mismatch"))
+		return nil, errors.E(op, errors.Invalid, d.Name, errors.Str("signature mismatch"))
 	}
 
 	cb, err := cryptByte(d, false)
 	if err != nil {
-		return nil, errors.E(Unpack, errors.Invalid, d.Name, err)
+		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockUnpacker{
 		ctx:          ctx,
@@ -220,17 +220,17 @@ type blockUnpacker struct {
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
-	const Unpack = "Unpack"
+	const op = "pack/debug.blockUnpacker.Unpack"
 
 	if len(ciphertext) > 64*1024+1024*1024*1024 {
-		return nil, errors.E(Unpack, errors.Invalid, bp.entry.Name, errors.Str("ciphertext too long"))
+		return nil, errors.E(op, errors.Invalid, bp.entry.Name, errors.Str("ciphertext too long"))
 	}
 
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
 	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
-		return nil, errors.E("Unpack", bp.entry.Name, errors.Str("checksum mismatch"))
+		return nil, errors.E(op, bp.entry.Name, errors.Str("checksum mismatch"))
 	}
 
 	cleartext = bp.buf.Bytes(len(ciphertext))
@@ -275,13 +275,13 @@ func sign(ctx upspin.Context, data []byte, name upspin.PathName) byte {
 
 // Name implements upspin.Pack.Name.
 func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
-	const Name = "Name"
+	const op = "pack/debug.Name"
 	if d.IsDir() {
-		return errors.E(Name, errors.IsDir, d.Name, "cannot rename directory")
+		return errors.E(op, errors.IsDir, d.Name, "cannot rename directory")
 	}
 	parsed, err := path.Parse(newName)
 	if err != nil {
-		return errors.E(Name, err)
+		return errors.E(op, err)
 	}
 
 	// Update directory entry and metadata with new name.
@@ -289,7 +289,7 @@ func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.Path
 	d.Name = name
 	oldName, err := getPath(d)
 	if err != nil {
-		return errors.E(Name, errors.Invalid, d.Name, err)
+		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 	putPath(d)
 

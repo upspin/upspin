@@ -95,7 +95,8 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.KeyServer.Put.
 func (c *userCacheContext) Put(user *upspin.User) error {
-	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
+	const op = "key/usercache.Put"
+	return errors.E(op, errors.Syntax, errors.Str("not implemented"))
 }
 
 // Dial implements upspin.Service.

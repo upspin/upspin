@@ -39,7 +39,7 @@ var _ Saver = (*gcpSaver)(nil)
 // will be saved as labels on GCP. They are useful, for example, in the case of differentiating
 // a metric coming from a test instance versus production.
 func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
-	const NewGCPSaver = "NewGCPSaver"
+	const op = "metric.NewGCPSaver"
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), trace.CloudPlatformScope)
@@ -49,10 +49,10 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 
 	srv, err := trace.New(client)
 	if err != nil {
-		return nil, errors.E(NewGCPSaver, errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	if len(labels)%2 != 0 {
-		return nil, errors.E(NewGCPSaver, errors.Syntax, errors.Str("metric labels must come in pairs"))
+		return nil, errors.E(op, errors.Syntax, errors.Str("metric labels must come in pairs"))
 	}
 	return &gcpSaver{
 		projectID: projectID,
