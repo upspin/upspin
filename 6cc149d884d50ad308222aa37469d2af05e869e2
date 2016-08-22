@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_f08cee32",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T05:27:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_c8146f9f",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_4874fffc",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_90a5629d",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T05:27:01Z",
+      "side": 1,
+      "message": "Ah, you had a comment a few CLs ago about Lookup returning a copy instead of a pointer (my first CL returned copies). I mentioned this exact reason but then later changed my mind and agreed with you. :-) The DirServer won\u0027t change an entry because Lookup and Glob are non-mutating. Can it happen by accident? Sure. But that\u0027s what unittests are for. \n\nI was leaning towards copy earlier, but I it\u0027s not needed really.",
+      "parentUuid": "e850b71d_4874fffc",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_2879c3f4",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-22T05:14:49Z",
       "side": 1,
       "message": "maybe i\u0027m misunderstanding the model, but shouldn\u0027t a node\u0027s ancestors all be considered dirty if that node is dirty?",
+      "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_509fda4c",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T05:27:01Z",
+      "side": 1,
+      "message": "Ah, yes. There\u0027s no need to check whether any of the children is dirty. Good point.\n\nFixed.",
+      "parentUuid": "e850b71d_2879c3f4",
       "revId": "6cc149d884d50ad308222aa37469d2af05e869e2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
