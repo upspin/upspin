@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_950474ec",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_68cb3b56",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_88aaf764",
         "filename": "dir/server/access.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-21T23:56:21Z",
       "side": 1,
       "message": "include op?\nalso use a variable so you don\u0027t path.Join twice\n\naccess :\u003d path.Join(p.Path(), \"Access\")",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_550eec0b",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_88aaf764",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_f5f2a0fd",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Correct. Done.",
+      "parentUuid": "e850b71d_48d07ffc",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_28d543ec",
         "filename": "dir/server/access.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-21T23:56:21Z",
       "side": 1,
       "message": "(\"loadAccess: %v\", entry) ?",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_15f064f3",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_28d543ec",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_b5fc18d2",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_e8be0ba3",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_c8bb4fb1",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-08-21T23:56:21Z",
       "side": 1,
       "message": "This breaks with the way we are handling options everywhere else in the system. The options should be a []string that contains strings like \"key\u003dvalue\". (see flags.Config) Let\u0027s not deviate from that now.",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_d5f99ce0",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Ah, my bad. I thought I was copying the standard but missed it.\n\nFixed (BTW: I know you did this differently in GCP, but I prefer this concise switch).\n\nDone.",
+      "parentUuid": "e850b71d_c8bb4fb1",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_75e69042",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "IsGroupFile checks whether this file is in a Groups directory: user/Group/*.  You can mkdir the group dir, but not mkdir a subdir there.",
+      "parentUuid": "e850b71d_88c5573b",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_68f21b9c",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -132,6 +258,24 @@
       "writtenOn": "2016-08-21T23:56:21Z",
       "side": 1,
       "message": "I commented on the issue, but I think that it should be the hasRight function that does this, not here.",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_95eb1408",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Right. I need to think more about this and resolve it. Since this is already a TODO, the bug is not closed yet and the tests are covering this weird case for now, I\u0027d like to leave it for this CL.",
+      "parentUuid": "e850b71d_68f21b9c",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "688a07dd_35e00821",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "We allow any transport (and the tests are using InProcess), but we should not allow unassigned. It\u0027s used strictly for prohibiting calls. See the upspin.go definition of Unassigned:\n\n// Unassigned indicates a connection to a service that returns an error\n// from every method call. It is useful when a component wants to\n// guarantee it does not access another service.",
+      "parentUuid": "e850b71d_08da871c",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e850b71d_48f75f8a",
         "filename": "dir/server/tree/treeimpl.go",
         "patchSetId": 2
@@ -166,6 +328,24 @@
       "writtenOn": "2016-08-21T23:56:21Z",
       "side": 1,
       "message": "log the error, if any",
+      "revId": "d7c33448161abe713df678ed3c02f252441512d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688a07dd_55e58c2f",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-22T01:43:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e850b71d_48f75f8a",
       "revId": "d7c33448161abe713df678ed3c02f252441512d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
