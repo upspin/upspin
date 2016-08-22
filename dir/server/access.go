@@ -12,7 +12,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
-	"upspin.io/log"
+	//	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -32,7 +32,6 @@ func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
 	// while being aware of links in the way.
 	for {
 		accPath := path.Join(p.Path(), "Access")
-		log.Debug.Printf("%s: Looking up %s", op, accPath)
 		entry, _, err := tree.Lookup(accPath)
 		if err == upspin.ErrFollowLink {
 			// If we got ErrFollowLink in the first iteration of the
@@ -87,7 +86,6 @@ func (s *server) whichAccess(p path.Parsed) (*upspin.DirEntry, error) {
 
 // loadAccess loads and processes an Access file from its DirEntry.
 func (s *server) loadAccess(entry *upspin.DirEntry) (*access.Access, error) {
-	log.Debug.Printf("loadAccess: entry: %v", entry)
 	buf, err := clientutil.ReadAll(s.serverContext, entry)
 	if err != nil {
 		return nil, err
