@@ -30,38 +30,40 @@ var _ storage.Storage = (*postgres)(nil)
 // PutLocalFile implements storage.Storage.
 func (p *postgres) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
 	// TODO: implement. Only relevant if we want to store blobs though.
-	return "", errors.E("Postgres.PutLocalFile", errors.Syntax, errors.Str("putlocalfile not implemented for postgres"))
+	const op = "cloud/storage/postgres.PutLocalFile"
+	return "", errors.E(op, errors.Syntax, errors.Str("putlocalfile not implemented for postgres"))
 }
 
 // Get implements storage.Storage.
 func (p *postgres) Get(ref string) (link string, error error) {
 	// TODO: implement. Only relevant if we want to store blobs though.
-	return "", errors.E("Postgres.Get", errors.Syntax, errors.Str("get not implemented for postgres"))
+	const op = "cloud/storage/postgres.Get"
+	return "", errors.E(op, errors.Syntax, errors.Str("get not implemented for postgres"))
 }
 
 // Download implements storage.Storage.
 func (p *postgres) Download(ref string) ([]byte, error) {
-	const Download = "Postgres.Download"
+	const op = "cloud/storage/postgres.Download"
 	var data string
 	// QueryRow with $1 parameters ensures we don't have SQL escape problems.
 	err := p.db.QueryRow("SELECT data FROM directory WHERE ref = $1;", ref).Scan(&data)
 	if err == sql.ErrNoRows {
-		return nil, errors.E(Download, errors.NotExist, err)
+		return nil, errors.E(op, errors.NotExist, err)
 	}
 	if err != nil {
-		return nil, errors.E(Download, errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	return []byte(data), nil
 }
 
 // Put implements storage.Storage.
 func (p *postgres) Put(ref string, contents []byte) (refLink string, error error) {
-	const Put = "Postgres.Put"
+	const op = "cloud/storage/postgres.Put"
 	res, err := p.db.Exec(
 		`INSERT INTO directory (ref, data) values ($1, $2) ON CONFLICT (ref) DO UPDATE SET data = $2;`,
 		ref, string(contents))
 	if err != nil {
-		return "", errors.E(Put, errors.IO, err)
+		return "", errors.E(op, errors.IO, err)
 	}
 	n, err := res.RowsAffected()
 	if err != nil {
@@ -70,18 +72,18 @@ func (p *postgres) Put(ref string, contents []byte) (refLink string, error error
 	}
 	if n != 1 {
 		// Something went wrong.
-		return "", errors.E(Put, errors.IO, errors.Errorf("spurious updates in SQL DB, expected 1, got %d", n))
+		return "", errors.E(op, errors.IO, errors.Errorf("spurious updates in SQL DB, expected 1, got %d", n))
 	}
 	return "", nil
 }
 
 // ListPrefix implements storage.Storage.
 func (p *postgres) ListPrefix(prefix string, depth int) ([]string, error) {
-	const ListPrefix = "Postgres.ListPrefix"
+	const op = "cloud/storage/postgres.ListPrefix"
 	query := "SELECT ref FROM directory WHERE ref LIKE $1"
 	arg := prefix + "%" // a left-prefix-match.
 	// TODO: check depth and enforce it.
-	return p.commonListDir(ListPrefix, query, arg)
+	return p.commonListDir(op, query, arg)
 }
 
 // commonListDir implements common functionality shared between ListPrefix and ListDir.
@@ -120,33 +122,33 @@ func (p *postgres) commonListDir(op string, query string, args ...interface{}) (
 
 // ListDir implements storage.Storage.
 func (p *postgres) ListDir(dir string) ([]string, error) {
-	const ListDir = "Postgres.ListDir"
+	const op = "cloud/storage/postgres.ListDir"
 	topDir := dir + "%"
 	notSubDir := dir + "[^/]+/%"
 	// Usage of LIKE and NOT SIMILAR is necessary here to trigger the use of the index.
 	// Using posix-regex (i.e. using the operator "~") does not trigger the index.
 	query := "SELECT ref FROM directory WHERE ref LIKE $1 AND ref NOT SIMILAR TO $2"
-	return p.commonListDir(ListDir, query, topDir, notSubDir)
+	return p.commonListDir(op, query, topDir, notSubDir)
 }
 
 // Delete implements storage.Storage.
 func (p *postgres) Delete(ref string) error {
-	const Delete = "Postgres.Delete"
+	const op = "cloud/storage/postgres.Delete"
 	_, err := p.db.Exec("DELETE FROM directory WHERE ref = $1", ref)
 	if err != nil {
-		return errors.E(Delete, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	return nil
 }
 
 // Dial implements storage.Storage.
 func (p *postgres) Dial(opts *storage.Opts) error {
-	const Dial = "Postgres.Dial"
+	const op = "cloud/storage/postgres.Dial"
 	optStr := buildOptStr(opts)
 	log.Printf("Connecting and creating table with options [%s]", optStr)
 	db, err := sql.Open("postgres", optStr)
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	// We need a dummy primary key so that we can build an index on ref.
 	_, err = db.Exec(
@@ -156,12 +158,12 @@ func (p *postgres) Dial(opts *storage.Opts) error {
 	             data text NOT NULL
 	         )`)
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	// Build a text index on ref to speed up regex pattern matching queries.
 	_, err = db.Exec("CREATE INDEX IF NOT EXISTS directory_ref_index ON directory (ref text_pattern_ops);")
 	if err != nil {
-		return errors.E(Dial, errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 
 	// We're ready to have fun with the db.

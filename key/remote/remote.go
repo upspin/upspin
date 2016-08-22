@@ -33,12 +33,13 @@ var _ upspin.KeyServer = (*remote)(nil)
 
 // Lookup implements upspin.Key.Lookup.
 func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "key/remote.Lookup"
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),
 	}
 	resp, err := r.keyClient.Lookup(gContext.Background(), req)
 	if err != nil {
-		return nil, errors.E("Lookup", errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
@@ -49,6 +50,7 @@ func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.Key.Put.
 func (r *remote) Put(user *upspin.User) error {
+	const op = "key/remote.Put"
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
 		return err
@@ -58,7 +60,7 @@ func (r *remote) Put(user *upspin.User) error {
 	}
 	resp, err := r.keyClient.Put(gCtx, req)
 	if err != nil {
-		return errors.E("Put", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
@@ -74,19 +76,20 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) error {
+	const op = "key/remote.Configure"
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
 	resp, err := r.keyClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return errors.E("Configure", errors.IO, err)
+		return errors.E(op, errors.IO, err)
 	}
 	return errors.UnmarshalError(resp.Error)
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "Dial"
+	const op = "key/remote.Dial"
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}

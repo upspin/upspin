@@ -69,6 +69,7 @@ func ResetGlobal() {
 
 // Lookup implements upspin.KeyServer.Lookup.
 func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "key/usercache.Lookup"
 	v, ok := c.cache.entries.Get(name)
 
 	// If we have an unexpired binding, use it.
@@ -83,7 +84,7 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	// Not found, look it up.
 	u, err := c.Context.KeyServer().Lookup(name)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	e := &entry{
 		expires: time.Now().Add(c.cache.duration),
@@ -95,7 +96,8 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.KeyServer.Put.
 func (c *userCacheContext) Put(user *upspin.User) error {
-	return errors.E("Put", errors.Syntax, errors.Str("not implemented"))
+	const op = "key/usercache.Put"
+	return errors.E(op, errors.Syntax, errors.Str("not implemented"))
 }
 
 // Dial implements upspin.Service.

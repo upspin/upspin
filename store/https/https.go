@@ -64,7 +64,7 @@ func IsServerReachable(serverURL string) bool {
 
 // Dial implements Dialer.
 func (s *Store) Dial(context upspin.Context, endpoint upspin.Endpoint) (upspin.Service, error) {
-	const op = "Dial"
+	const op = "store/https.Dial"
 	if context == nil {
 		return nil, newStoreError(op, "nil context", "")
 	}
@@ -86,7 +86,7 @@ func (s *Store) Ping() bool {
 
 // Get implements StoreServer.
 func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	const op = "Get"
+	const op = "store/https.Get"
 	if ref == "" {
 		return nil, nil, newStoreError(op, invalidRefError, "")
 	}
@@ -107,12 +107,14 @@ func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 
 // Put implements StoreServer.
 func (s *Store) Put(data []byte) (upspin.Reference, error) {
-	return "", errors.E("Put", errors.Str("not implemented"))
+	const op = "store/https.Put"
+	return "", errors.E(op, errors.Str("not implemented"))
 }
 
 // Delete implements StoreServer.
 func (s *Store) Delete(ref upspin.Reference) error {
-	return errors.E("Delete", errors.Str("not implemented"))
+	const op = "store/https.Delete"
+	return errors.E(op, errors.Str("not implemented"))
 }
 
 // requestAndReadResponseBody is an internal helper function that
@@ -164,6 +166,7 @@ func newStoreError(op string, err string, ref upspin.Reference) error {
 // BufferResponse reads the body of an HTTP response up to maxBufLen bytes. It closes the response body.
 // If the response is larger than maxBufLen, it returns ErrTooLong.
 func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
+	const op = "store/https.BufferResponse"
 	var buf []byte
 	defer resp.Body.Close()
 	if resp.ContentLength >= 0 {
@@ -171,7 +174,7 @@ func BufferResponse(resp *http.Response, maxBufLen int64) ([]byte, error) {
 			buf = make([]byte, resp.ContentLength)
 		} else {
 			// Return an error
-			return nil, errors.E("BufferResponse", errors.Invalid, errors.Str("response body too long"))
+			return nil, errors.E(op, errors.Invalid, errors.Str("response body too long"))
 		}
 	} else {
 		buf = make([]byte, maxBufLen)

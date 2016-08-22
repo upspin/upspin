@@ -82,6 +82,7 @@ type Env struct {
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
+	const op = "testenv.New"
 	env := &Env{
 		Setup: setup,
 	}
@@ -99,7 +100,7 @@ func New(setup *Setup) (*Env, error) {
 	for _, e := range setup.Tree {
 		if strings.HasSuffix(e.P, "/") {
 			if len(e.C) > 0 {
-				return nil, errors.E("testenv.New", errors.NotEmpty, errors.Str("directory entry must not have contents"))
+				return nil, errors.E(op, errors.NotEmpty, errors.Str("directory entry must not have contents"))
 			}
 			dir := path.Join(upspin.PathName(setup.OwnerName), e.P)
 			entry, err := client.MakeDirectory(dir)
@@ -117,7 +118,7 @@ func New(setup *Setup) (*Env, error) {
 			entry, err := client.Put(name, []byte(e.C))
 			if err != nil {
 				log.Printf("Error creating file %s: %s", name, err)
-				return nil, errors.E("New", err)
+				return nil, errors.E(op, err)
 			}
 			if setup.Verbose {
 				log.Printf("Tree: Created file %#v", entry)
@@ -140,14 +141,15 @@ func E(pathName string, contents string) Entry {
 
 // Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
 func (e *Env) Exit() error {
+	const op = "testenv.Exit"
 	if e.exitCalled {
-		return errors.E("testenv.Exit", errors.Invalid, errors.Str("exit already called"))
+		return errors.E(op, errors.Invalid, errors.Str("exit already called"))
 	}
 	e.exitCalled = true
 	if e.Setup.Cleanup != nil {
 		err := e.Setup.Cleanup(e)
 		if err != nil {
-			return errors.E("Exit", err)
+			return errors.E(op, err)
 		}
 	}
 	return nil

@@ -45,7 +45,7 @@ var _ upspin.StoreServer = (*server)(nil)
 
 // New returns a StoreServer that serves the given endpoint with the provided options.
 func New(options ...string) (upspin.StoreServer, error) {
-	const op = "gcp.New"
+	const op = "store/gcp.New"
 
 	var dialOpts []storage.DialOpts
 	var tempDir string
@@ -78,7 +78,7 @@ func New(options ...string) (upspin.StoreServer, error) {
 
 // Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (upspin.Reference, error) {
-	const Put = "Put"
+	const op = "store/gcp.Put"
 	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
 	s.mu.RLock()
@@ -87,7 +87,7 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	err := s.cache.Put(initialRef, sha)
 	if err != nil {
 		s.mu.RUnlock()
-		return "", errors.E(Put, err)
+		return "", errors.E(op, err)
 	}
 	// Figure out the appropriate reference for this blob.
 	ref := sha.EncodedSum()
@@ -112,6 +112,7 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+	const op = "store/gcp.Get"
 	file, loc, err := s.innerGet(ref)
 	if err != nil {
 		return nil, nil, err
@@ -120,7 +121,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		defer file.Close()
 		bytes, err := ioutil.ReadAll(file)
 		if err != nil {
-			err = errors.E("Get", err)
+			err = errors.E(op, err)
 		}
 		return bytes, nil, err
 	}
@@ -131,7 +132,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
-	const Get = "Get"
+	const op = "store/gcp.Get"
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	file, err = s.cache.OpenRefForRead(string(ref))
@@ -145,19 +146,19 @@ func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.
 	var link string
 	link, err = s.storage.Get(string(ref))
 	if err != nil {
-		err = errors.E(Get, err)
+		err = errors.E(op, err)
 		return
 	}
 	// GCP should return an http link
 	if !strings.HasPrefix(link, "http") {
-		err = errors.E(Get, errors.Errorf("invalid link returned from GCP: %s", link))
+		err = errors.E(op, errors.Errorf("invalid link returned from GCP: %s", link))
 		log.Error.Println(err)
 		return
 	}
 
 	url, err := url.Parse(link)
 	if err != nil {
-		err = errors.E(Get, errors.Errorf("can't parse url: %s: %s", link, err))
+		err = errors.E(op, errors.Errorf("can't parse url: %s: %s", link, err))
 		log.Error.Print(err)
 		return
 	}
@@ -172,13 +173,13 @@ func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.
 
 // Delete implements upspin.StoreServer.
 func (s *server) Delete(ref upspin.Reference) error {
-	const Delete = "Delete"
+	const op = "store/gcp.Delete"
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	// TODO: verify ownership and proper ACLs to delete blob
 	err := s.storage.Delete(string(ref))
 	if err != nil {
-		return errors.E(Delete, errors.Errorf("%s: %s", ref, err))
+		return errors.E(op, errors.Errorf("%s: %s", ref, err))
 	}
 	return nil
 }

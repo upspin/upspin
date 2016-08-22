@@ -77,7 +77,7 @@ const (
 // in this case, the returned context will not include a Factotum
 // and the returned error is ErrNoFactotum.
 func InitContext(r io.Reader) (upspin.Context, error) {
-	const op = "InitContext"
+	const op = "context.InitContext"
 	vals := map[string]string{
 		username:    "noone@nowhere.org",
 		keyserver:   "",
@@ -118,7 +118,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 			val := strings.TrimSpace(tokens[1])
 			attr := strings.TrimSpace(tokens[0])
 			if _, ok := vals[attr]; !ok {
-				return nil, errors.E("context:", errors.Invalid, errors.Errorf("unrecognized key %q", attr))
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("unrecognized key %q", attr))
 			}
 			vals[attr] = val
 		}

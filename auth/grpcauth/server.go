@@ -105,20 +105,20 @@ var _ SecureServer = (*secureServerImpl)(nil)
 
 // Authenticate authenticates the calling user.
 func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
-	const Authenticate = "Authenticate"
+	const op = "auth/grpcauth.Authenticate"
 	log.Printf("Authenticate %q %q", req.UserName, req.Now)
 	// Must be a valid name.
 	parsed, err := path.Parse(upspin.PathName(req.UserName))
 	if err != nil {
 		log.Error.Printf("Authenticate %q: %v", req.UserName, err)
-		return nil, errors.E(Authenticate, err)
+		return nil, errors.E(op, err)
 	}
 
 	// Time should be sane.
 	reqNow, err := time.Parse(time.ANSIC, req.Now)
 	if err != nil {
 		log.Fatalf("time failed to parse: %q", req.Now)
-		return nil, errors.E(Authenticate, err)
+		return nil, errors.E(op, err)
 	}
 	var now time.Time
 	if s.config.TimeFunc == nil {
@@ -137,24 +137,24 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	key, err := s.config.Lookup(parsed.User())
 	log.Printf("Authenticate: Done looking for key. Error: %v", err)
 	if err != nil {
-		return nil, errors.E(Authenticate, err)
+		return nil, errors.E(op, err)
 	}
 
 	// Parse signature
 	var rs, ss big.Int
 	_, ok := rs.SetString(req.Signature.R, 10)
 	if !ok {
-		return nil, errors.E(Authenticate, errMissingSignature)
+		return nil, errors.E(op, errMissingSignature)
 	}
 	_, ok = ss.SetString(req.Signature.S, 10)
 	if !ok {
-		return nil, errors.E(Authenticate, errMissingSignature)
+		return nil, errors.E(op, errMissingSignature)
 	}
 
 	// Validate signature.
 	err = verifySignature(key, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
 	if err != nil {
-		err := errors.E(Authenticate, errors.Permission, upspin.UserName(req.UserName), errors.Errorf("invalid signature: %v", err))
+		err := errors.E(op, errors.Permission, upspin.UserName(req.UserName), errors.Errorf("invalid signature: %v", err))
 		log.Error.Print(err)
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.Authent
 	authToken, err := generateRandomToken()
 	if err != nil {
 		log.Error.Printf("Can't create auth token.")
-		return nil, errors.E(Authenticate, err)
+		return nil, errors.E(op, err)
 	}
 	_ = auth.NewSession(parsed.User(), expiration, authToken, nil) // session is cached, ignore return value
 
@@ -198,18 +198,18 @@ func generateRandomToken() (string, error) {
 
 // GetSessionFromContext returns a session from the context if there is one.
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
-	const GetSessionFromContext = "GetSessionFromContext"
+	const op = "auth/grpcauth.GetSessionFromContext"
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("invalid metadata"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("invalid metadata"))
 	}
 	data, ok := md[authTokenKey]
 	if !ok || len(data) != 1 {
-		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("no auth token in metadata"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("no auth token in metadata"))
 	}
 	authToken := data[0]
 	if len(authToken) < authTokenEntropyLen {
-		return nil, errors.E(GetSessionFromContext, errors.Invalid, errors.Str("invalid auth token"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("invalid auth token"))
 	}
 	log.Printf("Got authToken from context: %s", authToken)
 
@@ -219,7 +219,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 		// We don't know this client or have forgotten about it. We must authenticate.
 		// Log it so we can track how often this happens. Maybe we need to increase the session cache size.
 		log.Debug.Printf("Got token from user but there's no session for it.")
-		return nil, errors.E(GetSessionFromContext, errors.Permission, errUnauthenticated)
+		return nil, errors.E(op, errors.Permission, errUnauthenticated)
 	}
 
 	// If session has expired, forcibly remove it from the cache and return an error.
@@ -229,7 +229,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 	}
 	if session.Expires().Before(timeFunc()) {
 		auth.ClearSession(authToken)
-		return nil, errors.E(GetSessionFromContext, errors.Permission, errExpired)
+		return nil, errors.E(op, errors.Permission, errExpired)
 	}
 
 	return session, nil
