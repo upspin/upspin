@@ -13,6 +13,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/path"
 	"upspin.io/upspin"
 
 	_ "upspin.io/key/inprocess"
@@ -504,6 +505,82 @@ func TestLinks(t *testing.T) {
 	err = tree.Flush()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestList(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Build a simple tree.
+	for _, dir := range []upspin.PathName{"/", "/dir1", "/dir2", "/dir3", "/dir3/sub1"} {
+		de := newDirEntry(dir, isDir, context)
+		_, err = tree.Put(de)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// List root.
+	root, err := path.Parse(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, dirty, err := tree.List(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !dirty {
+		t.Errorf("dirty = %v, want = true", dirty)
+	}
+	if got, want := len(entries), 3; got != want {
+		t.Fatalf("len(entries) = %d, want = %d", got, want)
+	}
+	expected := map[upspin.PathName]bool{
+		userName + "/dir1": true,
+		userName + "/dir2": true,
+		userName + "/dir3": true,
+	}
+	for _, e := range entries {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want = one-of {%v}", e.Name, expected)
+		}
+	}
+
+	// List dir3.
+	subdir, err := path.Parse(userName + "/dir3")
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, dirty, err = tree.List(subdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !dirty {
+		t.Errorf("dirty = %v, want = true", dirty)
+	}
+	if len(entries) != 1 {
+		t.Fatalf("len(entries) = %d, want = %d", len(entries), 1)
+	}
+	if got, want := entries[0].Name, upspin.PathName(userName+"/dir3/sub1"); got != want {
+		t.Errorf("entries[0].Name = %q, want = %q", got, want)
+	}
+
+	// Flush and check no entry is dirty anymore.
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, dirty, err = tree.List(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dirty {
+		t.Errorf("dirty = %v, want = false", dirty)
+	}
+	if len(entries) != 3 {
+		t.Fatalf("len(entries) = %d, want = %d", len(entries), 3)
 	}
 }
 

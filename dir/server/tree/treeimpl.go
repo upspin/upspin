@@ -301,6 +301,20 @@ func (t *tree) loadPath(p path.Parsed) (*node, error) {
 	return node, nil
 }
 
+// loadDir loads the contents of a directory's node if it's not already loaded.
+// The node must be known to be a directory and cannot be a link.
+func (t *tree) loadDir(dir *node) error {
+	// Must load from store if kids are not loaded. However, if it's dirty,
+	// we have the most recent version, so no point in loading it.
+	if dir.kids == nil && !dir.dirty {
+		err := t.loadKids(dir)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // loadNode loads a child node of parent with the given path-wise element name,
 // loading it from storage if is not already loaded. If the parent node is a
 // link, ErrFollowLink is returned, along with the parent node itself.
@@ -312,13 +326,9 @@ func (t *tree) loadNode(parent *node, elem string) (*node, error) {
 	if !parent.entry.IsDir() {
 		return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 	}
-	// Must load from store if kids are not loaded. However, if it's dirty,
-	// we have the most recent version, so no point in loading it.
-	if parent.kids == nil && !parent.dirty {
-		err := t.loadKids(parent)
-		if err != nil {
-			return nil, err
-		}
+	err := t.loadDir(parent)
+	if err != nil {
+		return nil, err
 	}
 	for dirName, node := range parent.kids {
 		if elem == dirName {
@@ -401,6 +411,39 @@ func (t *tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	// so only the root will be flushed.
 	log.Printf("Created root: %v", t.root)
 	return t.flush()
+}
+
+// List lists the contents of a prefix. If prefix names a directory, all
+// entries of the directory are returned. If prefix names a file, that
+// file's entry is returned. List does not interpret wildcards. Dirty reports
+// whether any DirEntry returned is dirty (and thus may contain outdated
+// references).
+func (t *tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
+	const op = "tree.List"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	node, err := t.loadPath(prefix)
+	if err == upspin.ErrFollowLink {
+		return []*upspin.DirEntry{&node.entry}, node.dirty, err
+	}
+	if err != nil {
+		return nil, false, errors.E(op, err)
+	}
+	if !node.entry.IsDir() {
+		return []*upspin.DirEntry{&node.entry}, node.dirty, err
+	}
+	err = t.loadDir(node)
+	if err != nil {
+		return nil, false, errors.E(op, err)
+	}
+	dirty := node.dirty
+	var entries []*upspin.DirEntry
+	for _, n := range node.kids {
+		entries = append(entries, &n.entry)
+		dirty = dirty || n.dirty
+	}
+	return entries, dirty, nil
 }
 
 // Delete deletes the DirEntry associated with name.
