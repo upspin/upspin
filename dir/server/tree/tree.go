@@ -8,6 +8,7 @@ package tree
 import (
 	"fmt"
 
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -15,6 +16,8 @@ import (
 // The tree reads and writes from/to its backing Store server, which is
 // configured when instantiating the Tree. It uses a Log to log changes not
 // yet committed to the Store.
+// TODO: delete the interface.
+// TODO: change all paths from upspin.PathName to path.Parsed. (Issue #35)
 type Tree interface {
 	// Root returns the root. Its blocks will be empty if the tree is empty.
 	Root() (*upspin.DirEntry, error)
@@ -49,6 +52,18 @@ type Tree interface {
 	// returned DirEntry will be nil whether the operation succeeded
 	// or not.
 	Delete(name upspin.PathName) (*upspin.DirEntry, error)
+
+	// List lists the contents of a prefix. If prefix names a directory, all
+	// entries of the directory are returned. If prefix names a file, that
+	// file's entry is returned. List does not interpret wildcards. Dirty
+	// reports whether any DirEntry returned is dirty (and thus may contain
+	// outdated references).
+	//
+	// If the returned error is upspin.ErrFollowLink, the caller should
+	// retry the operation as outlined in the description for
+	// upspin.ErrFollowLink. (And in that case, only one DirEntry will be
+	// returned, that of the link itself.)
+	List(prefix path.Parsed) (entries []*upspin.DirEntry, dirty bool, err error)
 
 	// Flush flushes all dirty dir entries to the Tree's Store.
 	Flush() error
