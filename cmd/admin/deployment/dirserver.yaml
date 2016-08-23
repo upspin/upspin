@@ -15,3 +15,11 @@ spec:
         ports:
         - containerPort: 80
         - containerPort: 443
+        volumeMounts:
+        - mountPath: /dirserver-logs
+          name: dirserver-logs
+      volumes:
+      - name: dirserver-logs
+        gcePersistentDisk:
+          pdName: dirserver-logs
+          fsType: ext4
