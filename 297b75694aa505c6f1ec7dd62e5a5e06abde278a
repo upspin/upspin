@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_5c7c1d7d",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-23T21:51:08Z",
+      "side": 1,
+      "message": "use exitf instead. it will tag the error with the subcommand name",
+      "revId": "297b75694aa505c6f1ec7dd62e5a5e06abde278a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_7c81d95f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-23T21:51:08Z",
+      "side": 1,
+      "message": "instead:\nfs.Usage()\nos.Exit(2)\n\nthere is another instance of this below, in put\n\ni am about to put proper help stuff in here and that will help.",
+      "revId": "297b75694aa505c6f1ec7dd62e5a5e06abde278a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
