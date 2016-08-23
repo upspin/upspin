@@ -30,7 +30,10 @@ func (s *server) whichAccessNoCache(p path.Parsed) (*upspin.DirEntry, error) {
 	// pop up one level. This is so we can find the closest Acesss file,
 	// while being aware of links in the way.
 	for {
-		accPath := path.Join(p.Path(), "Access")
+		accPath, err := path.Parse(path.Join(p.Path(), "Access"))
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 		entry, _, err := tree.Lookup(accPath)
 		if err == upspin.ErrFollowLink {
 			// If we got ErrFollowLink in the first iteration of the
@@ -110,7 +113,7 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	entry, _, err := tree.Lookup(name)
+	entry, _, err := tree.Lookup(p)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

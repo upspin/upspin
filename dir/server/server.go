@@ -171,7 +171,7 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool) (*upspi
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	entry, dirty, err := tree.Lookup(p.Path())
+	entry, dirty, err := tree.Lookup(p)
 	if err != nil {
 		// This could be ErrFollowLink so return the entry as well.
 		return entry, err
@@ -182,7 +182,7 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool) (*upspi
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		entry, dirty, err = tree.Lookup(p.Path())
+		entry, dirty, err = tree.Lookup(p)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -331,7 +331,7 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		}
 	}
 
-	entry, err = tree.Put(entry)
+	entry, err = tree.Put(p, entry)
 	if err == upspin.ErrFollowLink {
 		return entry, err
 	}
@@ -485,12 +485,12 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	entry, _, err := tree.Lookup(p.Path())
+	entry, _, err := tree.Lookup(p)
 	if err != nil {
 		// This could be ErrFollowLink so return the entry as well.
 		return entry, err
 	}
-	return tree.Delete(name)
+	return tree.Delete(p)
 }
 
 // WhichAccess implements upspin.DirServer.
@@ -661,7 +661,7 @@ func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) 
 	}
 
 	// Attempt to put this new dir entry as the root.
-	_, err = tree.Put(de)
+	_, err = tree.Put(p, de)
 	if err == upspin.ErrFollowLink {
 		// The root can't be a link. Something very bad happened.
 		return nil, errors.E(op, errors.Internal, p.User(), p.Path(), errors.Str("got ErrFollowLink putting root"))
