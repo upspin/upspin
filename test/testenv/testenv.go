@@ -244,7 +244,6 @@ func inProcessClient(context upspin.Context) (upspin.Client, error) {
 
 // registerUserWithKeyServer registers userName's context with the inProcess keyServer.
 func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context) error {
-	const op = "testenv.registerWithKeyServer"
 	key := context.KeyServer()
 	// Install the registered user.
 	user := &upspin.User{
@@ -254,7 +253,7 @@ func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context)
 		PublicKey: context.Factotum().PublicKey(),
 	}
 	if err := key.Put(user); err != nil {
-		return errors.E(op, err)
+		return errors.E(err)
 	}
 	return nil
 }

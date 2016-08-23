@@ -28,7 +28,6 @@ type accessFileDB map[upspin.PathName]*access.Access
 // getRoot retrieves the user's root, possibly by fetching it from storage.
 // It must be called with userlock held.
 func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error) {
-	const op = "dir/gcp.getRoot"
 	defer span(opts).StartSpan("getRoot").End()
 
 	userRootPath := upspin.PathName(user)
@@ -37,7 +36,7 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 	if r, found := d.rootCache.Get(user); found {
 		rootEntry, ok := r.(root) // Can't fail, but we check anyway to be abundantly safe.
 		if !ok {
-			err := errors.E(op, userRootPath, errors.IO, errors.Str("user root cache fubar"))
+			err := errors.E(userRootPath, errors.IO, errors.Str("user root cache fubar"))
 			log.Error.Print(err)
 			return nil, err
 		}
@@ -50,7 +49,7 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 	}
 	root, err := unmarshalRoot(buf)
 	if err != nil {
-		return nil, errors.E(op, userRootPath, errors.IO, errors.Errorf("marshal error: %s", err))
+		return nil, errors.E(userRootPath, errors.IO, errors.Errorf("marshal error: %s", err))
 	}
 	// Put it in the cache.
 	d.rootCache.Add(user, *root)
@@ -60,7 +59,6 @@ func (d *directory) getRoot(user upspin.UserName, opts ...options) (*root, error
 // putRoot stores the user's root to stable storage, updating the cache.
 // It must be called with userlock held.
 func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) error {
-	const op = "dir/gcp.putRoot"
 	defer span(opts).StartSpan("putRoot").End()
 
 	// Put it in the root cache.
@@ -71,12 +69,12 @@ func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) e
 	// Convert root to a savedRoot
 	jsonRoot, err := marshalRoot(root)
 	if err != nil {
-		return errors.E(op, userRootPath, errors.IO, errors.Errorf("marshal error: %s", err))
+		return errors.E(userRootPath, errors.IO, errors.Errorf("marshal error: %s", err))
 	}
 	// Save to backend
 	_, err = d.storage.Put(string(userRootPath), jsonRoot)
 	if err != nil {
-		return errors.E(op, userRootPath, errors.IO, errors.Errorf("backend error: %s", err))
+		return errors.E(userRootPath, errors.IO, errors.Errorf("backend error: %s", err))
 	}
 	return nil
 }
@@ -84,21 +82,20 @@ func (d *directory) putRoot(user upspin.UserName, root *root, opts ...options) e
 // handleRootCreation creates a root for a user.
 // It must be called with any userlock held.
 func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed, dirEntry *upspin.DirEntry, opts ...options) error {
-	const op = "dir/gcp.handleRootCreation"
 	// Permission for root creation is special: only the owner can do it.
 	if user != parsed.User() {
-		return errors.E(op, parsed.Path(), user, errors.Permission)
+		return errors.E(parsed.Path(), user, errors.Permission)
 	}
 	_, err := d.getRoot(parsed.User())
 	if err != nil && !isErrNotExist(err) {
 		return err
 	}
 	if err == nil {
-		return errors.E(op, parsed.Path(), errors.Exist)
+		return errors.E(parsed.Path(), errors.Exist)
 	}
 	if !dirEntry.IsDir() {
 		// We could fix this here, but let's force clients to make their requests crystal clear.
-		return errors.E(op, parsed.Path(), errors.NotDir)
+		return errors.E(parsed.Path(), errors.NotDir)
 	}
 	// Store the entry.
 	root := &root{
@@ -117,7 +114,7 @@ func (d *directory) handleRootCreation(user upspin.UserName, parsed *path.Parsed
 	if err != nil {
 		return err
 	}
-	log.Info.Printf("%s: %q %q", op, user, dirEntry.Name)
+	log.Info.Printf("directory.handleRootCreation: %q %q", user, dirEntry.Name)
 	return nil
 }
 
@@ -134,7 +131,6 @@ type savedRoot struct {
 
 // unmarshalRoot takes plain JSON of a savedRoot struct and returns the root.
 func unmarshalRoot(buf []byte) (*root, error) {
-	const op = "dir/gcp.unmarshalRoot"
 	var sroot savedRoot
 	err := json.Unmarshal(buf, &sroot)
 	if err != nil {
@@ -160,7 +156,7 @@ func unmarshalRoot(buf []byte) (*root, error) {
 		if _, exists := root.accessFiles[path]; exists {
 			// This is bad. Our map serialization included a duplicate, which should never happen unless
 			// the JSON entry on disk was modified manually or somehow strangely corrupted.
-			err = errors.E(op, path, errors.Str("Access file duplicated in root"))
+			err = errors.E(path, errors.Str("Access file duplicated in root"))
 			log.Error.Print(err)
 			saveError(err)
 		}
