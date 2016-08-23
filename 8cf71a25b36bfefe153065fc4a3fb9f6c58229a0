@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08e18be4_b2aaa87f",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 711,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T02:35:03Z",
+      "side": 1,
+      "message": "As agreed earlier:\n\nt.Fatalf(\"err \u003d %q, want \u003d %q (ErrFollowLink)\", err, upspin.ErrFollowLink)",
+      "revId": "8cf71a25b36bfefe153065fc4a3fb9f6c58229a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08e18be4_f2b430e2",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T02:35:03Z",
+      "side": 1,
+      "message": "Ditto got \u003d %q, want \u003d %q...",
+      "revId": "8cf71a25b36bfefe153065fc4a3fb9f6c58229a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08e18be4_52a324a7",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T02:35:03Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "8cf71a25b36bfefe153065fc4a3fb9f6c58229a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08e18be4_b291c84f",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T02:35:03Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "8cf71a25b36bfefe153065fc4a3fb9f6c58229a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08e18be4_d28e5430",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T02:35:03Z",
+      "side": 1,
+      "message": "%d: name \u003d %q, want \u003d %q",
+      "revId": "8cf71a25b36bfefe153065fc4a3fb9f6c58229a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
