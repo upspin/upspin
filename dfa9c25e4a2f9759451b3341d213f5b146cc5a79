@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_5cb7bd38",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-23T23:14:13Z",
+      "side": 0,
+      "message": "errors.E(err) should be just err, everywhere",
+      "revId": "dfa9c25e4a2f9759451b3341d213f5b146cc5a79",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
