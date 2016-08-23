@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08e18be4_1356fe03",
+        "filename": "dir/server/tree/treeimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-23T15:05:56Z",
+      "side": 0,
+      "message": "This file no longer exists. You need to sync.",
+      "revId": "3beeeb3018c4a07c1db8beeaf610b14aae816207",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
