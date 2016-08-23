@@ -20,13 +20,12 @@ import (
 // caching of Access files.
 // userLock must be held for p.User().
 func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
-	const op = "dir/server.whichAccessNoCache"
-	o, ss := subspan(op, opts)
+	o, ss := subspan("whichAccessNoCache", opts)
 	defer ss.End()
 
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	// Do tree lookups until we find an Access file. Lookups start at the
 	// root and go forward till the named path. If no Access file is there,
@@ -35,7 +34,7 @@ func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.Dir
 	for {
 		accPath, err := path.Parse(path.Join(p.Path(), "Access"))
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 		entry, _, err := tree.Lookup(accPath)
 		if err == upspin.ErrFollowLink {
@@ -62,7 +61,7 @@ func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.Dir
 			continue
 		}
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 		// Found the Access file.
 		return entry, nil
@@ -73,8 +72,7 @@ func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.Dir
 // DirEntry of the link if ErrFollowLink is returned.
 // userLock must be held for p.User().
 func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
-	const op = "dir/server.whichAccess"
-	o, ss := subspan(op, opts)
+	o, ss := subspan("whichAccess", opts)
 	defer ss.End()
 
 	// TODO: check the cache and negcache for an access dir entry for this path.
@@ -85,7 +83,7 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 	}
 	if err != nil {
 		// TODO: if not found, record that fact in a negative cache.
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 
 	// TODO: add acc to a cache.
@@ -106,23 +104,22 @@ func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Ac
 // DirServer. Intended for use with access.Can. The userLock for the current
 // user must be held.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
-	const op = "dir/server.loadPath"
 	p, err := path.Parse(name)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	// TODO: relax this constraint, possibly using Client in a goroutine.
 	// https://github.com/googleprivate/upspin/issues/37
 	if p.User() != s.userName {
-		return nil, errors.E(op, name, errors.Str("can't fetch other user's Access/Group files"))
+		return nil, errors.E(name, errors.Str("can't fetch other user's Access/Group files"))
 	}
 	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	entry, _, err := tree.Lookup(p)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	return clientutil.ReadAll(s.serverContext, entry)
 }
@@ -131,8 +128,7 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 // ErrFollowLink is returned, the DirEntry will be that of the link.
 // userLock must be held for p.User().
 func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (bool, *upspin.DirEntry, error) {
-	const op = "dir/server.hasRight"
-	o, ss := subspan(op, opts)
+	o, ss := subspan("hasRight", opts)
 	defer ss.End()
 
 	entry, err := s.whichAccess(p, o)
@@ -140,21 +136,21 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 		return false, entry, upspin.ErrFollowLink
 	}
 	if err != nil {
-		return false, nil, errors.E(op, err)
+		return false, nil, err
 	}
 	// TODO: look up in accessCache.
 	var acc *access.Access
 	if entry != nil {
 		acc, err = s.loadAccess(entry, o)
 		if err != nil {
-			return false, nil, errors.E(op, err)
+			return false, nil, err
 		}
 	} else {
 		acc = s.defaultAccess
 	}
 	can, err := acc.Can(s.userName, right, p.Path(), s.loadPath)
 	if err != nil {
-		return false, nil, errors.E(op, err)
+		return false, nil, errors.E(err)
 	}
 	return can, nil, nil
 }
