@@ -15,8 +15,6 @@ import (
 	"upspin.io/errors"
 	"upspin.io/upspin"
 
-	"strings"
-
 	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/store/inprocess"
 )
@@ -31,36 +29,31 @@ type service struct {
 	dialed   int
 }
 
+var keyService = &service{
+	entries:  make(map[string]*upspin.User),
+	endpoint: upspin.Endpoint{Transport: upspin.InProcess},
+}
+
+func init() {
+	keyService.add("a@a.com")
+	keyService.add("b@b.com")
+	keyService.add("c@c.com")
+	keyService.add("d@d.com")
+
+	err := bind.RegisterKeyServer(keyService.endpoint.Transport, keyService)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, d time.Duration, user string) (upspin.Context, upspin.Context, *service) {
 	c := context.New().SetUserName(upspin.UserName(user)).SetPacking(upspin.DebugPack)
-	e := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "",
-	}
+	c.SetKeyEndpoint(keyService.endpoint)
+	keyService.context = c
+	keyService.dialed = 0
 
-	s := &service{
-		entries:  make(map[string]*upspin.User),
-		endpoint: e,
-		context:  c.Copy(),
-	}
-	s.add("a@a.com")
-	s.add("b@b.com")
-	s.add("c@c.com")
-	s.add("d@d.com")
-
-	err := bind.RegisterKeyServer(e.Transport, s)
-	if err != nil {
-		if strings.Contains(err.Error(), "cannot override") {
-			err = bind.ReregisterKeyServer(e.Transport, s)
-		}
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-	c.SetKeyEndpoint(e)
-
-	return c, Private(c, d), s
+	return c, Private(c, d), keyService
 }
 
 // TestCache tests the User cache for equivalence with the uncached version and
