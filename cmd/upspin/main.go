@@ -43,6 +43,7 @@ var commands = map[string]func(...string){
 	"ls":          ls,
 	"mkdir":       mkdir,
 	"put":         put,
+	"rotate":      rotate,
 	"rm":          rm,
 	"share":       share,
 	"user":        user,
@@ -314,6 +315,34 @@ func put(args ...string) {
 	c, _ := newClient()
 	data := readAll(*inFile)
 	_, err = c.Put(upspin.PathName(fs.Arg(0)), data)
+	if err != nil {
+		exit(err)
+	}
+}
+
+func rotate(args ...string) {
+	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "rotate")
+	err := fs.Parse(args)
+	if err != nil {
+		exit(err)
+	}
+	if fs.NArg() != 0 {
+		exitf("extraneous arguments for 'rotate'")
+	}
+	_, ctx := newClient()
+	f := ctx.Factotum()      // save new key
+	ctx.SetFactotum(f.Pop()) // ctx now defaults to old key
+	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		exit(err)
+	}
+	u, err := keyServer.Lookup(ctx.UserName())
+	if err != nil {
+		exit(err)
+	}
+	u.PublicKey = f.PublicKey()
+	keyServer.Put(u)
 	if err != nil {
 		exit(err)
 	}
