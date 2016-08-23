@@ -17,7 +17,6 @@ import (
 // updateAccess handles fetching and parsing a new or updated Access file and caches its parsed representation in root.accessFiles.
 // It must be called with userlock held.
 func (d *directory) updateAccess(accessPath *path.Parsed, location *upspin.Location, opts ...options) error {
-	const op = "dir/gcp.updateAccess"
 	defer span(opts).StartSpan("updateAccess").End()
 	buf, err := d.storeGet(location)
 	if err != nil {
@@ -26,7 +25,7 @@ func (d *directory) updateAccess(accessPath *path.Parsed, location *upspin.Locat
 	acc, err := access.Parse(accessPath.Path(), buf)
 	if err != nil {
 		// access.Parse already sets the path, no need to duplicate it here.
-		return errors.E(op, err)
+		return errors.E(err)
 	}
 
 	user := accessPath.User()

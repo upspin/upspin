@@ -565,7 +565,7 @@ func TestMakeRoot(t *testing.T) {
 }
 
 func TestMakeRootPermissionDenied(t *testing.T) {
-	expectErr := errors.E("dir/gcp.handleRootCreation", errors.Permission)
+	expectErr := errors.E(errors.Permission)
 
 	egcp := &storagetest.ExpectDownloadCapturePut{
 		Ref: []string{"does not exist"},
