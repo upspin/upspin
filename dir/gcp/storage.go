@@ -78,7 +78,6 @@ func (d *directory) getNonRoot(path upspin.PathName, opts ...options) (*upspin.D
 // backend without checking anything but the marshaling.
 // It must be called with userlock held.
 func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, opts ...options) error {
-	const op = "dir/gcp.putNonRoot"
 	// TODO(ehg): if using crypto packing here, as we should, how will secrets get to code at service startup?
 	// Save on cache.
 
@@ -92,7 +91,7 @@ func (d *directory) putNonRoot(path upspin.PathName, dirEntry *upspin.DirEntry, 
 		// This is really bad. It means we created a DirEntry that does not marshal to JSON.
 		errMsg := fmt.Sprintf("internal server error: conversion to json failed: %s", err)
 		log.Error.Printf("%s: %s: %+v", errMsg, path, dirEntry)
-		return errors.E(op, path, errors.Str(errMsg))
+		return errors.E(path, errors.Str(errMsg))
 	}
 	log.Debug.Printf("Storing dir entry at %q", path)
 	ss2 := ss.StartSpan("putCloudBytes")

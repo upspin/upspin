@@ -578,9 +578,8 @@ func (s *server) Close() {
 // loadTreeFor loads the user's tree, if it exists.
 // userLock must be held for user.
 func (s *server) loadTreeFor(user upspin.UserName) (*tree.Tree, error) {
-	const op = "dir/server.loadTreeFor"
 	if err := valid.UserName(user); err != nil {
-		return nil, errors.E(op, errors.Invalid, err)
+		return nil, errors.E(errors.Invalid, err)
 	}
 
 	// Do we have a cached tree for this user already?
@@ -589,23 +588,23 @@ func (s *server) loadTreeFor(user upspin.UserName) (*tree.Tree, error) {
 			return tree, nil
 		}
 		// This should never happen because we only store type tree.Tree in the userTree.
-		return nil, errors.E(op, user, errors.Internal,
+		return nil, errors.E(user, errors.Internal,
 			errors.Errorf("userTrees contained value of unexpected type %T", val))
 	}
 	// User is not in the cache. Load a tree from the logs, if they exist.
 	log, logIndex, err := tree.NewLogs(user, s.logDir)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	// If user has root, we can load the tree from it.
 	if _, err := logIndex.Root(); err != nil {
 		// Likely the user has no root yet.
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	// Create a new tree for the user.
 	tree, err := tree.New(s.serverContext, log, logIndex)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	// Add to the cache and return
 	s.userTrees.Add(user, tree)
