@@ -187,7 +187,6 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 // can be used to recover the Tree's state from the log.
 // t.mu must be held.
 func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
-	const op = "dir/server/tree.put"
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
@@ -195,7 +194,7 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 		return parent, err
 	}
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	if parent.entry.IsLink() {
 		return parent, upspin.ErrFollowLink
@@ -206,7 +205,7 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 	}
 	err = t.addKid(node, p, parent, parentPath)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	return node, nil
 }
@@ -214,9 +213,8 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
 func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
-	const op = "dir/server/tree.addKid"
 	if !parent.entry.IsDir() {
-		return errors.E(op, errors.NotDir, errors.Errorf("path: %q", parent.entry.Name))
+		return errors.E(errors.NotDir, errors.Errorf("path: %q", parent.entry.Name))
 	}
 	if parent.kids == nil {
 		// This is a directory with no kids. If it's dirty, it's new.
@@ -226,13 +224,13 @@ func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath pa
 		} else {
 			err := t.loadKids(parent)
 			if err != nil {
-				return errors.E(op, err)
+				return errors.E(err)
 			}
 		}
 	}
 	nElem := parentPath.NElem()
 	if nodePath.Drop(1).Path() != parentPath.Path() {
-		err := errors.E(op, nodePath.Path(), errors.Internal, errors.Str("parent path does match parent of dir path"))
+		err := errors.E(nodePath.Path(), errors.Internal, errors.Str("parent path does match parent of dir path"))
 		log.Error.Print(err)
 		return err
 	}
@@ -362,16 +360,15 @@ func (t *Tree) loadKids(parent *node) error {
 // loadRoot loads the root into memory if it is not already loaded.
 // t.mu must be held.
 func (t *Tree) loadRoot() error {
-	const op = "dir/server/tree.loadRoot"
 	if t.root != nil {
 		return nil
 	}
 	rootDirEntry, err := t.logIndex.Root()
 	if err != nil {
-		return errors.E(op, err)
+		return errors.E(err)
 	}
 	if rootDirEntry == nil {
-		return errors.E(op, errors.NotExist, t.user)
+		return errors.E(errors.NotExist, t.user)
 	}
 	t.root = &node{
 		entry: *rootDirEntry,
@@ -382,24 +379,23 @@ func (t *Tree) loadRoot() error {
 // createRoot creates the root at p using the given dir entry. A root must not already exist.
 // t.mu must be held.
 func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
-	const op = "dir/server/tree.createRoot"
 	// Check that we're trying to create a root for the owner of the Tree only.
 	if p.User() != t.user {
-		return errors.E(op, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
+		return errors.E(p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
 	}
 	// Do we have a root already?
 	_, err := t.logIndex.Root()
 	if e, ok := err.(*errors.Error); !ok || e.Kind != errors.NotExist {
 		// Error reading the root.
-		return errors.E(op, err)
+		return errors.E(err)
 	}
 	if t.root != nil || err == nil {
 		// Root already exists.
-		return errors.E(op, errors.Exist, errors.Str("root already created"))
+		return errors.E(errors.Exist, errors.Str("root already created"))
 	}
 	// To be sure, the log must be empty too (or t.root wouldn't be empty).
 	if t.log.LastOffset() != 0 {
-		err := errors.E(op, errors.Internal, errors.Str("index not empty, but root not found"))
+		err := errors.E(errors.Internal, errors.Str("index not empty, but root not found"))
 		log.Error.Print(err)
 		return err
 	}
@@ -410,7 +406,7 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	t.root = node
 	err = t.markDirty(p)
 	if err != nil {
-		return errors.E(op, err)
+		return errors.E(err)
 	}
 	// The root of the tree must be flushed immediately or its recovery
 	// becomes cumbersome. Nothing else exists prior to a root existing,
@@ -487,14 +483,13 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 // so it can be used to recover from the Tree's state from the log.
 // t.mu must be held.
 func (t *Tree) delete(p path.Parsed) (*node, error) {
-	const op = "dir/server/tree.delete"
 	parentPath := p.Drop(1)
 	parent, err := t.loadPath(parentPath)
 	if err == upspin.ErrFollowLink {
 		return parent, err
 	}
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	// Load the node of interest, which is the NElem-th element in its
 	// parent's path.
@@ -505,11 +500,11 @@ func (t *Tree) delete(p path.Parsed) (*node, error) {
 	}
 	if err != nil {
 		// Can't load parent.
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	if len(node.kids) > 0 {
 		// Node is a non-empty directory.
-		return nil, errors.E(op, errors.NotEmpty, p.Path())
+		return nil, errors.E(errors.NotEmpty, p.Path())
 	}
 	// Remove this elem from the parent's kids map.
 	// No need to check if it was there -- it wouldn't have loaded if it weren't.
@@ -523,7 +518,7 @@ func (t *Tree) delete(p path.Parsed) (*node, error) {
 	if err != nil {
 		// In practice this can't happen, since the entire path is
 		// already loaded.
-		return nil, errors.E(op, err)
+		return nil, errors.E(err)
 	}
 	return node, nil
 }
