@@ -16,6 +16,7 @@ import (
 	"upspin.io/dir/filesystem"
 	"upspin.io/dir/gcp"
 	"upspin.io/dir/inprocess"
+	"upspin.io/dir/server"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -88,6 +89,8 @@ func main() {
 		dir, err = gcp.New(ctx, flags.Config...)
 	case "filesystem":
 		dir, err = filesystem.New(ctx, flags.Config...)
+	case "dirserver":
+		dir, err = server.New(ctx, flags.Config...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
