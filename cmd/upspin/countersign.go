@@ -45,7 +45,12 @@ func (s *Countersigner) init() {
 	}
 	s.context = context
 	s.client = client.New(context)
-	s.oldKey = s.lookupKey(s.context.UserName()) // the one at keyserver
+	u, err := context.KeyServer().Lookup(context.UserName())
+	if err != nil || len(u.PublicKey) == 0 {
+		fmt.Fprintf(os.Stderr, "can't find old key for %q: %s\n", context.UserName(), err)
+		os.Exit(1)
+	}
+	s.oldKey = u.PublicKey
 }
 
 // countersignCommand is the main function for the countersign subcommand.
@@ -107,25 +112,4 @@ func (s *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 		}
 	}
 	return entries
-}
-
-// lookupKey returns the public key for the user.
-// TODO: find a way to share this with Sharer.
-func (s *Countersigner) lookupKey(user upspin.UserName) upspin.PublicKey {
-	userService, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
-	if err != nil {
-		exit(err)
-	}
-	u, err := userService.Lookup(user)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
-		s.exitCode = 1
-		return ""
-	}
-	key := u.PublicKey
-	if len(key) == 0 {
-		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
-		s.exitCode = 1
-	}
-	return key
 }

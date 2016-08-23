@@ -414,7 +414,6 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 		}
 		copy(hash[i][:], factotum.KeyHash(pub))
 	}
-	myhash := factotum.KeyHash(ctx.Factotum().PublicKey())
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdata {
@@ -434,14 +433,15 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 			var h keyHashArray
 			copy(h[:], w.keyHash)
 			alreadyWrapped[h] = &wrap[i]
-			if !bytes.Equal(myhash, w.keyHash) {
-				// to unwrap dkey, we can only use our own private key
+			_, err := ctx.Factotum().PublicKeyFromHash(w.keyHash)
+			if err != nil {
+				// to unwrap dkey, we can only use our own private keys
 				continue
 			}
 			dkey, err = aesUnwrap(ctx.Factotum(), w)
 			if err != nil {
 				log.Printf("dkey unwrap failed: %v", err)
-				break // give up;  might mean that owner has changed keys
+				break
 			}
 		}
 		if len(dkey) == 0 { // Failed to get a valid decryption key.
