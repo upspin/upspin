@@ -212,23 +212,19 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, err
 				// Check old keys in Factotum.
 				_, err := s.context.Factotum().PublicKeyFromHash(hash)
 				if err == nil {
-					// TODO(ehg) The rest of the share.go design doesn't allow us to recover
-					// gracefully here, but we can at least give a better error message for now.
-					unknownUser = true
-					fmt.Fprintf(os.Stderr, "%q: wrapped for old key\n", entry.Name)
-					s.exitCode = 1
-					continue
+					thisUser = s.context.UserName()
+					ok = true
 				}
-				if !unknownUser {
-					// We have a key but no user with that key is known to us.
-					// This means an access change has removed permissions for some user
-					// but if that user still has the reference, the user could read the file.
-					// Someone should run upspin share -fix soon to repair the packing.
-					unknownUser = true
-					fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
-					s.exitCode = 1
-					continue
-				}
+			}
+			if !ok && !unknownUser {
+				// We have a key but no user with that key is known to us.
+				// This means an access change has removed permissions for some user
+				// but if that user still has the reference, the user could read the file.
+				// Someone should run upspin share -fix soon to repair the packing.
+				unknownUser = true
+				fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
+				s.exitCode = 1
+				continue
 			}
 		default:
 			fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
