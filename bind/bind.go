@@ -94,21 +94,11 @@ const allowOverwrite = true // for documentation purposes
 // There must be no previous registration.
 func RegisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
 	const op = "bind.RegisterKeyServer"
-	return registerKeyServer(op, transport, user, !allowOverwrite)
-}
-
-// ReregisterKeyServer replaces the KeyServer interface for the transport.
-func ReregisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
-	const op = "bind.ReregisterKeyServer"
-	return registerKeyServer(op, transport, user, allowOverwrite)
-}
-
-func registerKeyServer(op string, transport upspin.Transport, user upspin.KeyServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := userMap[transport]
-	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override KeyServer interface: %v", transport))
+	if ok {
+		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
 	}
 	userMap[transport] = user
 	return nil
@@ -118,21 +108,11 @@ func registerKeyServer(op string, transport upspin.Transport, user upspin.KeySer
 // There must be no previous registration.
 func RegisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
 	const op = "bind.RegisterDirServer"
-	return registerDirServer(op, transport, dir, !allowOverwrite)
-}
-
-// ReregisterDirServer replaces the DirServer interface for the transport.
-func ReregisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
-	const op = "bind.ReregisterDirServer"
-	return registerDirServer(op, transport, dir, allowOverwrite)
-}
-
-func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := directoryMap[transport]
-	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override DirServer interface: %v", transport))
+	if ok {
+		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
 	}
 	directoryMap[transport] = dir
 	return nil
@@ -142,21 +122,11 @@ func registerDirServer(op string, transport upspin.Transport, dir upspin.DirServ
 // There must be no previous registration.
 func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
 	const op = "bind.RegisterStoreServer"
-	return registerStoreServer(op, transport, store, !allowOverwrite)
-}
-
-// ReregisterStoreServer replaces a StoreServer interface for the transport.
-func ReregisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
-	const op = "bind.ReregisterStoreServer"
-	return registerStoreServer(op, transport, store, allowOverwrite)
-}
-
-func registerStoreServer(op string, transport upspin.Transport, store upspin.StoreServer, allowOverwrite bool) error {
 	mu.Lock()
 	defer mu.Unlock()
 	_, ok := storeMap[transport]
-	if ok && !allowOverwrite {
-		return errors.E(op, errors.Invalid, errors.Errorf("cannot override StoreServer interface: %v", transport))
+	if ok {
+		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
 	}
 	storeMap[transport] = store
 	return nil
