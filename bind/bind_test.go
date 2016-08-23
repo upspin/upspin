@@ -41,17 +41,6 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("RegisterDirServer should have failed")
 	}
 
-	// These should all work.
-	if err := ReregisterKeyServer(upspin.InProcess, du); err != nil {
-		t.Error(err)
-	}
-	if err := ReregisterStoreServer(upspin.InProcess, &dummyStoreServer{}); err != nil {
-		t.Error(err)
-	}
-	if err := ReregisterDirServer(upspin.InProcess, &dummyDirServer{}); err != nil {
-		t.Error(err)
-	}
-
 	// These should return different NetAddrs
 	s1, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
 	s2, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
