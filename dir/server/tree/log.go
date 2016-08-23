@@ -4,7 +4,7 @@
 
 package tree
 
-// This file implements Log and LogIndex for use in Tree.
+// This file defines and implements Log and LogIndex for use in Tree.
 
 import (
 	"bufio"
@@ -18,6 +18,59 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 )
+
+// Operation is the kind of operation performed on the DirEntry.
+type Operation int
+
+// Operations on dir entries that are logged.
+const (
+	Put Operation = iota
+	Delete
+)
+
+// LogEntry is the unit of logging.
+type LogEntry struct {
+	Op    Operation
+	Entry upspin.DirEntry
+}
+
+// Log represents the log of DirEntry changes. It is primarily used by
+// Tree (provided through its Config struct) to log changes.
+type Log interface {
+	// User returns the user name who owns the root of the tree that this log represents.
+	User() upspin.UserName
+
+	// Append appends a LogEntry to the end of the log.
+	Append(*LogEntry) error
+
+	// ReadAt reads at most n entries from the log starting at offset. It
+	// returns the next offset.
+	ReadAt(n int, offset int64) ([]LogEntry, int64, error)
+
+	// LastOffset returns the offset of the most-recently-appended entry or 0 if log is empty.
+	LastOffset() int64
+}
+
+// LogIndex reads and writes from/to stable storage the log state information
+// and the user's root entry. It is used by Tree to track its progress processing
+// the log and storing the root.
+type LogIndex interface {
+	// User returns the user name who owns the root of the tree that this
+	// log index represents.
+	User() upspin.UserName
+
+	// Root returns the user's root by retrieving it from local stable storage.
+	Root() (*upspin.DirEntry, error)
+
+	// SaveRoot saves the user's root entry to stable storage.
+	SaveRoot(*upspin.DirEntry) error
+
+	// ReadOffset reads from stable storage the offset saved by SaveOffset.
+	ReadOffset() (int64, error)
+
+	// SaveOffset saves to stable storage the offset to process next.
+	SaveOffset(int64) error
+}
 
 // logger implements Log.
 type logger struct {
