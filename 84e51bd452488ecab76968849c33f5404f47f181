@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_1c6ff52e",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-23T00:51:21Z",
+      "side": 1,
+      "message": "I\u0027m not very happy with this name.\nAll the kinds in this list are dirserver implementations.\nCan we think of something more descriptive?\nAt the very least, this should be \"server\" to mirror the package name,\nbut even that\u0027s pretty vague.",
+      "revId": "84e51bd452488ecab76968849c33f5404f47f181",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
