@@ -221,7 +221,7 @@ func TestSharing(t *testing.T) {
 		userToMatch: []upspin.UserName{joesUserName},
 		keyToReturn: []upspin.PublicKey{joectx.Factotum().PublicKey()},
 	}
-	bind.ReregisterKeyServer(upspin.InProcess, mockKey)
+	bind.RegisterKeyServer(upspin.InProcess, mockKey)
 	joectx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
@@ -289,7 +289,7 @@ func TestBadSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx.SetFactotum(f)
-	bind.ReregisterKeyServer(upspin.InProcess, mockKey)
+	bind.RegisterKeyServer(upspin.InProcess, mockKey)
 	ctx.SetKeyEndpoint(upspin.Endpoint{
 		Transport: upspin.InProcess,
 	})
