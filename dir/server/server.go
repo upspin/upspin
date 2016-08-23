@@ -577,7 +577,7 @@ func (s *server) Close() {
 
 // loadTreeFor loads the user's tree, if it exists.
 // userLock must be held for user.
-func (s *server) loadTreeFor(user upspin.UserName) (tree.Tree, error) {
+func (s *server) loadTreeFor(user upspin.UserName) (*tree.Tree, error) {
 	const op = "dir/server.loadTreeFor"
 	if err := valid.UserName(user); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
@@ -585,7 +585,7 @@ func (s *server) loadTreeFor(user upspin.UserName) (tree.Tree, error) {
 
 	// Do we have a cached tree for this user already?
 	if val, found := s.userTrees.Get(user); found {
-		if tree, ok := val.(tree.Tree); ok {
+		if tree, ok := val.(*tree.Tree); ok {
 			return tree, nil
 		}
 		// This should never happen because we only store type tree.Tree in the userTree.

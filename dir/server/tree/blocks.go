@@ -18,7 +18,7 @@ const blockSize = 1024 * 1024 // 1MB
 
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
-func (t *tree) store(n *node) error {
+func (t *Tree) store(n *node) error {
 	const op = "dir/server/tree.store"
 
 	// Get our store server.
@@ -104,7 +104,7 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 }
 
 // loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
-func (t *tree) loadKidsFromBlock(n *node, block []byte) error {
+func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	const op = "dir/server/tree.loadKidsFromBlock"
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
