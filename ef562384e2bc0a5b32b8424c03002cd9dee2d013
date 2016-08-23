@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_bc14419e",
+        "filename": "cmd/admin/SETUP",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-23T00:31:01Z",
+      "side": 1,
+      "message": "s/PD/persistent disk/",
+      "revId": "ef562384e2bc0a5b32b8424c03002cd9dee2d013",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
