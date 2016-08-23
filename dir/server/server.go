@@ -17,6 +17,7 @@ import (
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/valid"
@@ -66,6 +67,13 @@ type server struct {
 }
 
 var _ upspin.DirServer = (*server)(nil)
+
+// options are optional parameters to almost every inner method of directory
+// for doing optional, non-correctness-related work.
+type options struct {
+	span *metric.Span
+	// Add other things below (for example, some health monitoring stats).
+}
 
 // New creates a new instance of DirServer with the given options
 func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
@@ -139,6 +147,9 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 // Lookup implements upspin.DirServer.
 func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.Lookup"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -148,7 +159,7 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	defer lock.Unlock()
 
 	// Check access permission.
-	canRead, link, err := s.hasRight(access.Read, p)
+	canRead, link, err := s.hasRight(access.Read, p, o)
 	if err == upspin.ErrFollowLink {
 		return link, err
 	}
@@ -159,15 +170,18 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, access.ErrPermissionDenied)
 	}
 
-	return s.lookup(op, p, entryMustBeClean)
+	return s.lookup(op, p, entryMustBeClean, o)
 }
 
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
 // by put. If entryMustBeClean is true, the returned entry is guaranteed to have
 // valid references in its DirBlocks.
 // userLock must be held for p.User().
-func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool) (*upspin.DirEntry, error) {
-	tree, err := s.loadTreeFor(p.User())
+func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ...options) (*upspin.DirEntry, error) {
+	o, ss := subspan("lookup", opts)
+	defer ss.End()
+
+	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -196,6 +210,9 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool) (*upspi
 // Put implements upspin.DirServer.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/server.Put"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err)
@@ -221,14 +238,14 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	// First round of access checks: can user write or create? If not,
 	// reject early.
-	canWrite, link, err := s.hasRight(access.Write, p)
+	canWrite, link, err := s.hasRight(access.Write, p, o)
 	if err == upspin.ErrFollowLink {
 		return link, err
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	canCreate, _, err := s.hasRight(access.Create, p) // ErrFollowLink won't happen here.
+	canCreate, _, err := s.hasRight(access.Create, p, o) // ErrFollowLink won't happen here.
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -236,12 +253,15 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
 	}
 
-	return s.put(op, p, entry, canCreate, canWrite)
+	return s.put(op, p, entry, canCreate, canWrite, o)
 }
 
 // MakeDirectory implements upspin.DirServer.
 func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.MakeDirectory"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, dirName, err)
@@ -253,7 +273,7 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 
 	// Is this the root we're making? Handle it separately.
 	if p.IsRoot() {
-		return s.createRoot(op, p)
+		return s.createRoot(op, p, o)
 	}
 
 	if access.IsAccessFile(dirName) || access.IsGroupFile(dirName) {
@@ -261,7 +281,7 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 	}
 
 	// Check access permissions.
-	canCreate, link, err := s.hasRight(access.Create, p)
+	canCreate, link, err := s.hasRight(access.Create, p, o)
 	if err == upspin.ErrFollowLink {
 		return link, err
 	}
@@ -283,12 +303,15 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 	const canWrite = true
 
 	// Attempt to put this new dir entry. We know we canCreate & !canWrite.
-	return s.put(op, p, de, canCreate, !canWrite)
+	return s.put(op, p, de, canCreate, !canWrite, o)
 }
 
 // put implements the common functionality between Put and MakeDirectory.
 // userLock must be held for p.User().
-func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate, canWrite bool) (*upspin.DirEntry, error) {
+func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate, canWrite bool, opts ...options) (*upspin.DirEntry, error) {
+	o, ss := subspan("put", opts)
+	defer ss.End()
+
 	if p.Path() != entry.Name {
 		return nil, errors.E(op, p.Path(), errors.Str("path name is not clean"))
 	}
@@ -298,13 +321,13 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 	}
 	// Since dir is not the root, the user must have a tree already.
 	// Load it now.
-	tree, err := s.loadTreeFor(p.User())
+	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
 	// Check for links along the path.
-	existingEntry, err := s.lookup(op, p, !entryMustBeClean)
+	existingEntry, err := s.lookup(op, p, !entryMustBeClean, o)
 	if err == upspin.ErrFollowLink {
 		return existingEntry, err
 	}
@@ -344,6 +367,9 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 // Glob implements upspin.DirServer.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "dir/server.Glob"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(upspin.PathName(pattern))
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -359,7 +385,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	tree, err := s.loadTreeFor(p.User())
+	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -394,7 +420,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				// next level (move d forward).
 				break
 			}
-			canList, _, err := s.hasRight(access.List, dir)
+			canList, _, err := s.hasRight(access.List, dir, o)
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
@@ -416,7 +442,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				// Next, we must list any subdirs, unless the pattern is finished.
 				if d == p.NElem()-1 {
 					// If we can't read, strip Packdata and Location information.
-					canRead, _, err := s.hasRight(access.Read, dir)
+					canRead, _, err := s.hasRight(access.Read, dir, o)
 					if err != nil {
 						return nil, errors.E(op, err)
 					}
@@ -456,6 +482,9 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 // Delete implements upspin.DirServer.
 func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.Delete"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -465,7 +494,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	canDelete, link, err := s.hasRight(access.Delete, p)
+	canDelete, link, err := s.hasRight(access.Delete, p, o)
 	if err == upspin.ErrFollowLink {
 		return link, err
 	}
@@ -481,7 +510,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 
 	// Load the entry so we can check whether it's a dir.
-	tree, err := s.loadTreeFor(p.User())
+	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -496,6 +525,9 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 // WhichAccess implements upspin.DirServer.
 func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.WhichAccess"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -506,7 +538,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	defer mu.Unlock()
 
 	// Check whether the user has Any right on p.
-	hasAny, link, err := s.hasRight(access.AnyRight, p)
+	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
 	if err == upspin.ErrFollowLink {
 		// TODO: We may have more work to do. We may need to check
 		// whether the user has Any right on the link itself.
@@ -523,7 +555,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, errors.NotExist, name)
 	}
 
-	return s.whichAccess(p)
+	return s.whichAccess(p, o)
 }
 
 // Dial implements upspin.Dialer.
@@ -577,8 +609,10 @@ func (s *server) Close() {
 
 // loadTreeFor loads the user's tree, if it exists.
 // userLock must be held for user.
-func (s *server) loadTreeFor(user upspin.UserName) (*tree.Tree, error) {
+func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree, error) {
 	const op = "dir/server.loadTreeFor"
+	defer span(opts).StartSpan(op).End()
+
 	if err := valid.UserName(user); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}
@@ -614,14 +648,17 @@ func (s *server) loadTreeFor(user upspin.UserName) (*tree.Tree, error) {
 
 // createRoot creates a new root for a user, if some checks pass.
 // userLock must be held for user.
-func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) {
+func (s *server) createRoot(op string, p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
+	o, ss := subspan("createRoot", opts)
+	defer ss.End()
+
 	if s.userName != p.User() {
 		// Can only create root for the authenticated user.
 		return nil, errors.E(op, errors.Invalid, s.userName,
 			errors.Str("can't create root for another user"))
 	}
 	// Is there a tree for such user already?
-	_, err := s.loadTreeFor(p.User())
+	_, err := s.loadTreeFor(p.User(), o)
 	if err == nil {
 		// Can't make root again if tree is found.
 		return nil, errors.E(op, errors.Exist, p.Path())
@@ -630,7 +667,6 @@ func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) 
 		// Some other error loading tree. Abort.
 		return nil, errors.E(op, p.Path(), err)
 	}
-	log.Debug.Printf("Creating new logs for user: %q", p.User())
 
 	// Create logs first.
 	logger, logIndex, err := tree.NewLogs(p.User(), s.logDir)
@@ -642,7 +678,6 @@ func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) 
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	log.Debug.Printf("Creating new tree for user: %q", p.User())
 
 	// Create a new tree for the user.
 	tree, err := tree.New(s.serverContext, logger, logIndex)
@@ -676,6 +711,34 @@ func (s *server) createRoot(op string, p path.Parsed) (*upspin.DirEntry, error) 
 
 	log.Info.Printf("Created root for user %q", p.User())
 	return de, nil
+}
+
+// newOptMetric creates a new options populated with a metric for operation op.
+func newOptMetric(op string) (options, *metric.Metric) {
+	m := metric.New("server")
+	opts := options{
+		span: m.StartSpan(op),
+	}
+	return opts, m
+}
+
+// span returns the first span found in opts or a new one if not found.
+func span(opts []options) *metric.Span {
+	for _, o := range opts {
+		if o.span != nil {
+			return o.span
+		}
+	}
+	// This is probably an error. Metrics should be created at the entry
+	// points only.
+	return metric.New("FIXME").StartSpan("FIXME")
+}
+
+// subspan creates a span for an operation op in the given option. It returns
+// a new option with the new span, for passing along subfunctions.
+func subspan(op string, opts []options) (options, *metric.Span) {
+	s := span(opts).StartSpan(op)
+	return options{span: s}, s
 }
 
 // For sorting (copied from dir/inprocess/directory.go).

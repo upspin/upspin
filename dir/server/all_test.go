@@ -17,6 +17,7 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -534,6 +535,9 @@ func TestPermissionDenied(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	// So we don't see a ton of "Metric channel is full" messages
+	metric.RegisterSaver(&sinkSaver{})
+
 	var err error
 	testDir, err = ioutil.TempDir("", "DirServer")
 	if err != nil {
@@ -664,3 +668,17 @@ func repo(dir string) string {
 	}
 	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
+
+type sinkSaver struct {
+}
+
+func (s *sinkSaver) Register(ch chan *metric.Metric) {
+	go func() {
+		for {
+			<-ch
+			// Drop it on the floor
+		}
+	}()
+}
+
+var _ metric.Saver = (*sinkSaver)(nil)
