@@ -6,7 +6,6 @@
 package tree
 
 // TODO: fine-grained locking; metrics; performance tuning.
-// TODO: change all paths from upspin.PathName to path.Parsed. (Issue #35)
 
 import (
 	"bytes"
@@ -138,15 +137,11 @@ func New(context upspin.Context, log Log, logIndex LogIndex) (*Tree, error) {
 // If the returned error is ErrFollowLink, the caller should retry the
 // operation as outlined in the description for upspin.ErrFollowLink.
 // Otherwise in the case of error the returned DirEntry will be nil.
-func (t *Tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, err error) {
+func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error) {
 	const op = "dir/server/tree.Lookup"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	p, err := path.Parse(name)
-	if err != nil {
-		return nil, false, errors.E(op, err)
-	}
 	node, err := t.loadPath(p)
 	if err == upspin.ErrFollowLink {
 		return &node.entry, node.dirty, err
@@ -157,7 +152,7 @@ func (t *Tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, er
 	return &node.entry, node.dirty, nil
 }
 
-// Put puts an entry into the Tree. If the entry exists, it will be
+// Put puts an entry at path p into the Tree. If the entry exists, it will be
 // overwritten.
 //
 // If the returned error is ErrFollowLink, the caller should retry the
@@ -165,15 +160,11 @@ func (t *Tree) Lookup(name upspin.PathName) (de *upspin.DirEntry, dirty bool, er
 // (with the added step of updating the Name field of the argument
 // DirEntry). Otherwise, the returned DirEntry will be nil whether the
 // operation succeeded or not.
-func (t *Tree) Put(de *upspin.DirEntry) (*upspin.DirEntry, error) {
+func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.Put"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	p, err := path.Parse(de.Name)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
 	if p.IsRoot() {
 		return nil, t.createRoot(p, de)
 	}
@@ -465,7 +456,7 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	return entries, dirty, nil
 }
 
-// Delete deletes the entry associated with name. If the name identifies
+// Delete deletes the entry associated with the path. If the path identifies
 // a link, Delete will delete the link itself, not its target.
 //
 // If the returned error is upspin.ErrFollowLink, the caller should
@@ -474,15 +465,11 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 // represent the full path name of the argument.) Otherwise, the
 // returned DirEntry will be nil whether the operation succeeded
 // or not.
-func (t *Tree) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
+func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.Delete"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	p, err := path.Parse(name)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
 	node, err := t.delete(p)
 	if err == upspin.ErrFollowLink {
 		return &node.entry, err
