@@ -638,13 +638,13 @@ func TestWhichAccess(t *testing.T) {
 	}
 }
 
-// TODO: Links need much more thorough testing.
 func TestLinkToFile(t *testing.T) {
 	context, dir := setup()
 	user := context.UserName()
 	dirName := upspin.PathName(user + "/dir")
 	fileName := dirName + "/file"
 	linkName := upspin.PathName(user + "/link")
+	dirLinkName := upspin.PathName(user + "/dirlink")
 	e, err := dir.MakeDirectory(dirName)
 	if err != nil {
 		t.Fatal(err)
@@ -673,7 +673,8 @@ func TestLinkToFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Now fetch the link, should get ErrFollow link with the right path.
+
+	// Lookup the link, should get ErrFollow link with the right path.
 	lookupEntry, err := dir.Lookup(linkName)
 	if err == nil || err != upspin.ErrFollowLink {
 		t.Fatalf("expected ErrFollowLink, got %v", err)
@@ -681,7 +682,8 @@ func TestLinkToFile(t *testing.T) {
 	if !equal(linkEntry, lookupEntry) {
 		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
 	}
-	// Now Put through the link, should get ErrFollow link with the right path.
+
+	// Put through the link, should get ErrFollow link with the right path.
 	putEntry, err := newDirEntry(context, upspin.PlainPack, linkName, []byte("hello"), upspin.AttrNone, "", upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
@@ -693,10 +695,44 @@ func TestLinkToFile(t *testing.T) {
 	if !equal(linkEntry, lookupEntry) {
 		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
 	}
-	// TODO: Glob
-	// TODO: WhichAccess
-	// TODO: MakeDirectory
-	// Now try to delete the link, should succeed but leave the original intact.
+
+	// Make a link to the directory.
+	dirLinkEntry, err := newDirEntry(context, upspin.PlainPack, dirLinkName, nil, upspin.AttrLink, dirName, upspin.SeqIgnore)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Put(dirLinkEntry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Try to make a directory through the link, should get ErrFollowLink.
+	e, err = dir.MakeDirectory(dirLinkName + "/subdir")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("got error %v; expected ErrFollowLink", err)
+	}
+	if e.Link != dirName {
+		t.Fatalf("got %q as link to directory, expected %q", e.Link, dirName)
+	}
+
+	// Test Glob("*/*"). We should get ErrFollowLink due to the evaluation of dirlink/*.
+	entries, err := dir.Glob(string(user + "/*/*"))
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("got error %v; expected ErrFollowLink", err)
+	}
+	if !equalNames(t, user, entries, []upspin.PathName{"dir/file", "dirlink", "link"}) {
+		t.Fatal(`wrong names from Glob("*")`)
+	}
+
+	// Test Glob("*"). It should not error out, but instead include the links.
+	entries, err = dir.Glob(string(user + "/*"))
+	if err != nil {
+		t.Fatalf("got error %v; expected none", err)
+	}
+	if !equalNames(t, user, entries, []upspin.PathName{"dir", "dirlink", "link"}) {
+		t.Fatal(`wrong names from Glob("*")`)
+	}
+
+	// Now try to delete the file link, should succeed but leave the original intact.
 	_, err = dir.Delete(linkName)
 	if err != nil {
 		t.Fatal(err)
@@ -705,6 +741,27 @@ func TestLinkToFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func equalNames(t *testing.T, user upspin.UserName, entries []*upspin.DirEntry, expectNames []upspin.PathName) bool {
+	if len(entries) != len(expectNames) {
+		t.Errorf("got %d entries, expected %d", len(entries), len(expectNames))
+		return false
+	}
+	// The results are known to be sorted.
+	for i, name := range expectNames {
+		got := entries[i].Name
+		expect := upspin.PathName(user) + "/" + name
+		if got != upspin.PathName(expect) {
+			t.Errorf("glob result %d: got %q; expected %q", i, got, expect)
+			return false
+		}
+	}
+	return true
+}
+
+func TestWhichAccessLink(t *testing.T) {
+	// TODO
 }
 
 // reflect.DeepEqual is too fussy, worrying about nil vs. empty. This is a lazy way to

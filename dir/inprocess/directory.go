@@ -524,9 +524,11 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	// Make a copy of the entry so we don't overwrite the root if we wipe the data before returning.
 	e := *rootEntry
 	next[0] = &e
+	var links []*upspin.DirEntry // Will collect links we encounter.
 	for i := 0; i < parsed.NElem(); i++ {
 		elem := parsed.Elem(i)
 		this, next = next, this[:0]
+		// Invariant: There are no links in the list to be processed this iteration.
 		for _, ent := range this {
 			// ent must refer to a directory.
 			if !ent.IsDir() {
@@ -564,7 +566,14 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				if matched, _ := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1)); !matched {
 					continue
 				}
-				next = append(next, &nextEntry)
+				// Do not return ErrFollowLink if the link is the last element. The result
+				// of the glob operation is the link itself in that case.
+				if i != parsed.NElem()-1 && nextEntry.IsLink() {
+					// Remove it from consideration. Will be restored after the loop.
+					links = append(links, &nextEntry)
+				} else {
+					next = append(next, &nextEntry)
+				}
 			}
 		}
 	}
@@ -577,6 +586,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	var checked, canRead bool
 	var checkedPrefix upspin.PathName
 
+	next = append(next, links...)
 	sort.Sort(dirEntrySlice(next))
 	for _, entry := range next {
 		parsed, _ := path.Parse(entry.Name) // should always work
@@ -594,6 +604,9 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 
+	if len(links) > 0 {
+		return next, upspin.ErrFollowLink
+	}
 	return next, nil
 }
 
