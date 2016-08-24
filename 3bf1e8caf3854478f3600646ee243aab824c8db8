@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_bcefe117",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "should this be commented out?\nshould it be here at all?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_dcfcadd3",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "what about deleting it after it\u0027s already gone?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_9ca78500",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "const op \u003d \"...\"",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_9cf225fd",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "What if the root already exists here (err \u003d\u003d nil)? Is that ok?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_1cfff5cc",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "I think that rather than taking the op as an argument here, you should check the error in Delete and use errors.E(op, err) there.\n(And you didn\u0027t include op on most of the errors in this func.)",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_bca441fc",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "should include the root that\u0027s being deleted in this message",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_5c097d01",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T01:24:48Z",
+      "side": 1,
+      "message": "Do you also need to check that t.root is non-nil, as you have with createRoot?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
