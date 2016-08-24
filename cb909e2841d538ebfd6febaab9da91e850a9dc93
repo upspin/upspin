@@ -16,6 +16,24 @@
       "revId": "cb909e2841d538ebfd6febaab9da91e850a9dc93",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_5f8defdd",
+        "filename": "cmd/upspin/upspin",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-24T20:59:21Z",
+      "side": 1,
+      "message": "Aw, hell. I do this about once a year and it makes me feel awful. So sorry.",
+      "parentUuid": "8883bb54_dbf13f97",
+      "revId": "cb909e2841d538ebfd6febaab9da91e850a9dc93",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
