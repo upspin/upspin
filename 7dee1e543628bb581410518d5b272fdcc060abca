@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "c8e693fe_bf4c33a1",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:47:38Z",
+      "side": 1,
+      "message": "Leave the test here, and add a TODO to check the error when we add it",
+      "parentUuid": "68dda79f_cff391d2",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_df973fdf",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -107,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "c8e693fe_9f4f7795",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:47:38Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "68dda79f_afcbbd7c",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_ff94fbdc",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -136,6 +172,24 @@
       "side": 1,
       "message": "It could. But not in this CL since it\u0027s an upspin.Service interface. We\u0027d need to change that everywhere.",
       "parentUuid": "c8e693fe_ff94fbdc",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_7f3b8bec",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:47:38Z",
+      "side": 1,
+      "message": "Please add a TODO. I\u0027m sure I argued that Close should return an error when we first introduced the method :-)",
+      "parentUuid": "68dda79f_afb61dec",
       "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
