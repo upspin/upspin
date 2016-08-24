@@ -202,14 +202,15 @@ func info(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	c, ctx := newClient()
+	_, ctx := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
-		dir, err := c.DirServer(name)
+		// We don't want to follow links, so don't use Client.
+		dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
 		if err != nil {
 			exit(err)
 		}
-		entry, err := dir.Lookup(name)
+		entry, err := dir.Lookup(name, false)
 		if err != nil {
 			exit(err)
 		}
@@ -254,11 +255,10 @@ func ls(args ...string) {
 	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
-		dir, err := c.DirServer(name)
-		if err != nil {
-			exit(err)
-		}
-		entry, err := dir.Lookup(name)
+		// Note: this follows links. This is not what Unix ls does.
+		// If you want to know about the link itself, info will tell you.
+		// TODO: Is this what we want?
+		entry, err := c.Lookup(name, false)
 		if err != nil {
 			exit(err)
 		}
@@ -359,13 +359,9 @@ func rm(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	_, ctx := newClient()
-	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
-	if err != nil {
-		exit(err)
-	}
+	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
-		_, err := dir.Delete(upspin.PathName(fs.Arg(i)))
+		err := c.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			// TODO: client must implement Delete so links work.
 			exit(err)
@@ -493,17 +489,38 @@ func whichAccess(args ...string) {
 		fs.Usage()
 	}
 	_, ctx := newClient()
-	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
-	if err != nil {
-		exit(err)
-	}
 	for i := 0; i < fs.NArg(); i++ {
-		acc, err := dir.WhichAccess(upspin.PathName(fs.Arg(i)))
+		name := upspin.PathName(fs.Arg(i))
+		acc, err := whichAccessFollowLinks(ctx, name)
 		if err != nil {
 			exit(err)
 		}
-		fmt.Println(acc)
+		if acc == nil {
+			fmt.Printf("%s: owner only\n", name)
+		} else {
+			fmt.Printf("%s: %s\n", name, acc.Name)
+		}
 	}
+}
+
+func whichAccessFollowLinks(ctx upspin.Context, name upspin.PathName) (*upspin.DirEntry, error) {
+	for loop := 0; loop < upspin.MaxLinks; loop++ {
+		dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
+		if err != nil {
+			exit(err)
+		}
+		entry, err := dir.WhichAccess(name)
+		if err == upspin.ErrFollowLink {
+			name = entry.Link
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		return entry, nil
+	}
+	exitf("%s: link loop", name)
+	return nil, nil
 }
 
 func hasFinalSlash(name upspin.PathName) bool {
