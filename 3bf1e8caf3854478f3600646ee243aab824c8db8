@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8883bb54_75a5c2f5",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8e693fe_bcefe117",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_dcfcadd3",
         "filename": "dir/server/tree/all_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-24T01:24:48Z",
       "side": 1,
       "message": "what about deleting it after it\u0027s already gone?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_15a236ef",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "It will fail. \n\nDone.",
+      "parentUuid": "c8e693fe_dcfcadd3",
       "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "8883bb54_b50d6a0f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "But it\u0027s one line... !!?!?\n\nDone.",
+      "parentUuid": "c8e693fe_9ca78500",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_9cf225fd",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-24T01:24:48Z",
       "side": 1,
       "message": "What if the root already exists here (err \u003d\u003d nil)? Is that ok?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_55f3de02",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "It would be caught on line 387. Unless some data corruption happened.",
+      "parentUuid": "c8e693fe_9cf225fd",
       "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "8883bb54_75f062f5",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8e693fe_1cfff5cc",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_bca441fc",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 1
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "8883bb54_15fd56cc",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8e693fe_bca441fc",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_5c097d01",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 1
@@ -115,6 +223,24 @@
       "writtenOn": "2016-08-24T01:24:48Z",
       "side": 1,
       "message": "Do you also need to check that t.root is non-nil, as you have with createRoot?",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_35fadad5",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T04:49:20Z",
+      "side": 1,
+      "message": "Yup. \n\nDone.",
+      "parentUuid": "c8e693fe_5c097d01",
       "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
