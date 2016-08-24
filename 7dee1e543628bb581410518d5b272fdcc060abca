@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_3f5ae35e",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:07:45Z",
+      "side": 1,
+      "message": "s/Mkdir/WhichAccess/",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_5f5faf4d",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:07:45Z",
+      "side": 1,
+      "message": "All this tests is that Close doesn\u0027t panic\nIt should do more",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_df973fdf",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:07:45Z",
+      "side": 1,
+      "message": "when would this not be ok? if Close is called twice?\nThat should be an error",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_ff94fbdc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:07:45Z",
+      "side": 1,
+      "message": "I think Close should return an error, merely logging this isn\u0027t enough",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_1f55272e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:07:45Z",
+      "side": 1,
+      "message": "Delete",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
