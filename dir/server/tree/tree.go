@@ -53,8 +53,8 @@ type Tree struct {
 	user     upspin.UserName
 	context  upspin.Context
 	packer   upspin.Packer
-	log      Log
-	logIndex LogIndex
+	log      *Log
+	logIndex *LogIndex
 	root     *node
 	// dirtyNodes is the set of dirty nodes, grouped by path length.
 	// The index of the slice is the path length of the nodes therein.
@@ -78,7 +78,7 @@ func (n *node) String() string {
 // the Log, the Tree's state is recovered from it.
 // TODO: Maybe new is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
-func New(context upspin.Context, log Log, logIndex LogIndex) (*Tree, error) {
+func New(context upspin.Context, log *Log, logIndex *LogIndex) (*Tree, error) {
 	const op = "dir/server/tree.New"
 	if context == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("context is nil"))
@@ -383,19 +383,19 @@ func (t *Tree) loadRoot() error {
 // t.mu must be held.
 func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	const op = "dir/server/tree.createRoot"
+	// Do we have a root already?
+	if t.root != nil {
+		// Root already exists.
+		return errors.E(op, errors.Exist, errors.Str("root already created"))
+	}
 	// Check that we're trying to create a root for the owner of the Tree only.
 	if p.User() != t.user {
 		return errors.E(op, p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
 	}
-	// Do we have a root already?
 	_, err := t.logIndex.Root()
-	if e, ok := err.(*errors.Error); !ok || e.Kind != errors.NotExist {
+	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
 		// Error reading the root.
 		return errors.E(op, err)
-	}
-	if t.root != nil || err == nil {
-		// Root already exists.
-		return errors.E(op, errors.Exist, errors.Str("root already created"))
 	}
 	// To be sure, the log must be empty too (or t.root wouldn't be empty).
 	if t.log.LastOffset() != 0 {
@@ -470,12 +470,16 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
+	if p.IsRoot() {
+		return nil, t.deleteRoot(op)
+	}
+
 	node, err := t.delete(p)
 	if err == upspin.ErrFollowLink {
 		return &node.entry, err
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	return nil, t.log.Append(&LogEntry{
 		Op:    Delete,
@@ -526,6 +530,35 @@ func (t *Tree) delete(p path.Parsed) (*node, error) {
 		return nil, errors.E(op, err)
 	}
 	return node, nil
+}
+
+// deleteRoot deletes the root, if it's empty.
+// t.mu must be held.
+func (t *Tree) deleteRoot(op string) error {
+	log.Printf("Deleting root....")
+	if len(t.root.kids) > 0 {
+		// Root is not empty.
+		return errors.E(op, errors.NotEmpty, t.root.entry.Name)
+	}
+	// Make sure all log entries are saved, because we're about to lose the
+	// last reference to them (and they could be backed up by another tree,
+	// so they may still be needed -- we can't simply throw all away).
+	err := t.flush()
+	if err != nil {
+		return err
+	}
+	// We're all caught up now. Hopefully, some other entry somewhere has a
+	// link to this root, because we're about to lose it forever.
+	err = t.logIndex.DeleteRoot()
+	if err != nil {
+		return err
+	}
+	err = t.log.Truncate(0)
+	if err != nil {
+		return err
+	}
+	t.root = nil
+	return nil
 }
 
 // removeFromDirtyList removes a node n at path p from the list of dirty

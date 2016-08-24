@@ -5,6 +5,8 @@
 package tree
 
 import (
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -39,25 +41,23 @@ func TestPutNodes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, dir1 := newDirEntry("/", isDir, context)
-	_, err = tree.Put(p, dir1)
+	_, err = tree.Put(newDirEntry("/", isDir, context))
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, dir2 := newDirEntry("/dir", isDir, context)
-	_, err = tree.Put(p, dir2)
+	dir2, err := tree.Put(newDirEntry("/dir", isDir, context))
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, dir3 := newDirEntry("/dir/doc.pdf", !isDir, context)
-	_, err = tree.Put(p, dir3)
+	dir3, err := tree.Put(newDirEntry("/dir/doc.pdf", !isDir, context))
 	if err != nil {
 		t.Fatal(err)
 	}
+	totBytes := entrySize(t, dir2) + entrySize(t, dir3)
 
 	// Verify three log entries were written.
-	if got, want := log.LastOffset(), int64(2); got != want {
-		t.Fatalf("LastIndex = %d, want %d", got, want)
+	if got, want := log.LastOffset(), int64(totBytes); got < want {
+		t.Fatalf("LastIndex = %d, want > %d", got, want)
 	}
 	entries, _, err := log.ReadAt(2, int64(0))
 	if err != nil {
@@ -66,11 +66,12 @@ func TestPutNodes(t *testing.T) {
 	if got, want := len(entries), 2; got != want {
 		t.Errorf("len(entries) = %d, want = %d", got, want)
 	}
+	//entries[0].Entry = *dir2
 	if !reflect.DeepEqual(&entries[0].Entry, dir2) {
-		t.Errorf("dir2 = %v, want %v", entries[0], dir2)
+		t.Errorf("dir2 = %v, want %v", entries[0].Entry, dir2)
 	}
 	if !reflect.DeepEqual(&entries[1].Entry, dir3) {
-		t.Errorf("dir3 = %v, want %v", entries[1], dir3)
+		t.Errorf("dir3 = %v, want %v", entries[1].Entry, dir3)
 	}
 
 	// Lookup path.
@@ -121,13 +122,13 @@ func TestPutNodes(t *testing.T) {
 	}
 
 	t.Logf("== Tree:\n%s\n", tree2.String())
-	p, dir4 := newDirEntry("/dir/img.jpg", !isDir, context)
-	_, err = tree2.Put(p, dir4)
+	dir4, err := tree2.Put(newDirEntry("/dir/img.jpg", !isDir, context))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := log.LastOffset(), int64(3); got != want {
-		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
+	totBytes += entrySize(t, dir4)
+	if got, want := log.LastOffset(), int64(totBytes); got < want {
+		t.Fatalf("cfg.Log.LastIndex() = %d, want > %d", log.LastOffset(), want)
 	}
 
 	// Try to lookup a file inside a file (checks a corner case bug).
@@ -139,7 +140,8 @@ func TestPutNodes(t *testing.T) {
 
 	t.Logf("== Tree:\n%s\n", tree2.String())
 
-	// Delete dir4.
+	// Delete dir4. Save offset before deleting.
+	last := log.LastOffset()
 	_, err = tree2.Delete(mkpath(t, userName+"/dir/img.jpg"))
 	if err != nil {
 		t.Fatal(err)
@@ -151,11 +153,11 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
 	// One new entry was written to the log (an updated dir2).
-	if got, want := log.LastOffset(), int64(4); got != want {
+	if got, want := log.LastOffset(), int64(totBytes); got < want {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
-	// Verify logged entry is a new dir2
-	entries, _, err = log.ReadAt(1, int64(3))
+	// Verify logged entry is the deletion of a file.
+	entries, _, err = log.ReadAt(1, last)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -245,6 +247,37 @@ func TestPutEmptyRoot(t *testing.T) {
 	expectedErr := errNotExist
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %s, want %s", err, expectedErr)
+	}
+
+	// Try to delete the root.
+	_, err = tree2.Delete(mkpath(t, userName+"/"))
+	expectedErr = errors.E(errors.NotEmpty)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Delete dir and root.
+	_, err = tree2.Delete(mkpath(t, userName+"/dir"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Now it succeeds.
+	_, err = tree2.Delete(mkpath(t, userName+"/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Can't Put to tree2 anymore.
+	_, err = tree2.Put(newDirEntry("/newdir", isDir, context))
+	expectedErr = errors.E(errors.NotExist)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// But we can create the root again.
+	_, err = tree2.Put(newDirEntry("/", isDir, context))
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -584,6 +617,21 @@ func TestList(t *testing.T) {
 	}
 }
 
+var topDir string // where we write our test data.
+
+func TestMain(m *testing.M) {
+	var err error
+	topDir, err = ioutil.TempDir("", "Tree")
+	if err != nil {
+		panic(err)
+	}
+
+	code := m.Run()
+
+	os.RemoveAll(topDir)
+	os.Exit(code)
+}
+
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
 
@@ -612,16 +660,17 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		panic(err)
 	}
 	return p, &upspin.DirEntry{
-		Name:    p.Path(),
-		Attr:    attr,
-		Packing: context.Packing(),
-		Writer:  writer,
+		Name:     p.Path(),
+		Attr:     attr,
+		Packing:  context.Packing(),
+		Writer:   writer,
+		Packdata: []byte("1234"),
 	}
 }
 
-// newConfigForTesting creates the necessary items to instantiate a Tree with
-// mocks, fakes, inprocess and otherwise testing versions of the Tree's dependencies.
-func newConfigForTesting(t *testing.T) (upspin.Context, Log, LogIndex) {
+// newConfigForTesting creates the necessary items to instantiate a Tree for
+// testing.
+func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
 	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
@@ -646,7 +695,7 @@ func newConfigForTesting(t *testing.T) (upspin.Context, Log, LogIndex) {
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	// Set the public key for the user, since EE Pack requires the dir owner to have a wrapped key.
@@ -660,90 +709,24 @@ func newConfigForTesting(t *testing.T) (upspin.Context, Log, LogIndex) {
 	}
 	err = key.Put(user)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-
-	return context,
-		&fakeLog{
-			user: userName,
-		},
-		&fakeLogIndex{
-			user: userName,
-		}
-}
-
-// fakeLog implements a simple, in-memory Log for testing.
-type fakeLog struct {
-	user       upspin.UserName
-	logEntries []LogEntry
-}
-
-var _ Log = (*fakeLog)(nil)
-
-// fakeLogIndex implements a simple, in-memory LogIndex for testing.
-type fakeLogIndex struct {
-	user       upspin.UserName
-	root       upspin.DirEntry
-	lastOffset int64
-	hasRoot    bool
-}
-
-var _ LogIndex = (*fakeLogIndex)(nil)
-
-// User returns the user name for whom this log logs.
-func (l *fakeLog) User() upspin.UserName {
-	return l.user
-}
-
-// Append appends a DirEntry at the end of the log.
-func (l *fakeLog) Append(le *LogEntry) error {
-	l.logEntries = append(l.logEntries, *le)
-	return nil
-}
-
-// Read reads at most n entries from the log starting at index.
-func (l *fakeLog) ReadAt(n int, offset int64) ([]LogEntry, int64, error) {
-	if int(offset)+n > len(l.logEntries) {
-		n = len(l.logEntries) - int(offset)
+	// Create a new tempdir as a subdir of topdir, so it gets garbage
+	// collected at the very end.
+	tmpDir, err := ioutil.TempDir(topDir, "test")
+	if err != nil {
+		t.Fatal(err)
 	}
-	return l.logEntries[int(offset) : int(offset)+n], offset + int64(n), nil
-}
-
-// LastOffset returns the offset after the most-recently-appended entry.
-func (l *fakeLog) LastOffset() int64 {
-	return int64(len(l.logEntries))
-}
-
-// Root returns the location of the user's root.
-func (l *fakeLogIndex) Root() (*upspin.DirEntry, error) {
-	if l.hasRoot {
-		return &l.root, nil
+	log.Printf("tmpDir: %s", tmpDir)
+	log, logIndex, err := NewLogs(userName, tmpDir)
+	if err != nil {
+		t.Fatal(err)
 	}
-	return nil, errNotExist
-}
-
-// SaveRoot saves the user's root.
-func (l *fakeLogIndex) SaveRoot(r *upspin.DirEntry) error {
-	l.root = *r
-	l.hasRoot = true
-	return nil
-}
-
-// User returns the user name who owns the root of the tree that this
-// log index represents.
-func (l *fakeLogIndex) User() upspin.UserName {
-	return l.user
-}
-
-// ReadOffset reads from stable storage the offset saved by SaveOffset.
-func (l *fakeLogIndex) ReadOffset() (int64, error) {
-	return l.lastOffset, nil
-}
-
-// SaveOffset saves to stable storage the last offset processed.
-func (l *fakeLogIndex) SaveOffset(offs int64) error {
-	l.lastOffset = offs
-	return nil
+	err = logIndex.SaveOffset(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return context, log, logIndex
 }
 
 // repo returns the local pathname of a file in the upspin repository.
@@ -753,4 +736,12 @@ func repo(dir string) string {
 		panic("no GOPATH")
 	}
 	return filepath.Join(gopath, "src/upspin.io/"+dir)
+}
+
+func entrySize(t *testing.T, entry *upspin.DirEntry) int {
+	buf, err := entry.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return len(buf)
 }
