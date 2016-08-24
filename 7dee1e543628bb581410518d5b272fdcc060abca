@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "68dda79f_3231f652",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T23:51:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8e693fe_bf4c33a1",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_df973fdf",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -190,6 +208,24 @@
       "side": 1,
       "message": "Please add a TODO. I\u0027m sure I argued that Close should return an error when we first introduced the method :-)",
       "parentUuid": "68dda79f_afb61dec",
+      "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68dda79f_5238ea33",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T23:51:45Z",
+      "side": 1,
+      "message": "Done.\n\nI don\u0027t recall. I think Close was added before you joined.",
+      "parentUuid": "c8e693fe_7f3b8bec",
       "revId": "7dee1e543628bb581410518d5b272fdcc060abca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
