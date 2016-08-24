@@ -59,6 +59,18 @@ func TestMakeRoot(t *testing.T) {
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %q, want = %q", err, expectedErr)
 	}
+
+	// Delete root works.
+	_, err = s.Delete(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create it again.
+	_, err = s.MakeDirectory(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestPut(t *testing.T) {
@@ -477,23 +489,15 @@ func TestDelete(t *testing.T) {
 		"/dir/subway",
 		"/dir/foo",
 		"/dir/bar",
+		"/dir", // Deleting dir now works.
+		"/Access",
+		"/file1.txt",
+		"/mylink", // Deleting the link works.
 	} {
 		_, err = s.Delete(userName + dir)
 		if err != nil {
 			t.Fatal(err)
 		}
-	}
-
-	// Now deleting dir works.
-	_, err = s.Delete(userName + "/dir")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Delete a link.
-	_, err = s.Delete(userName + "/mylink")
-	if err != nil {
-		t.Fatal(err)
 	}
 }
 
