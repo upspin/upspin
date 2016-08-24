@@ -96,7 +96,7 @@ function build {
     fi
 
     # Build the server.
-    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o "$dir/$server"
+    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags debug -v -o "$dir/$server"
     popd >/dev/null
 
     pushd "$dir" >/dev/null
