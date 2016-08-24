@@ -68,7 +68,7 @@ func (d *infoDirEntry) Hashes() string {
 		if h == "" {
 			h += " "
 		}
-		h += fmt.Sprintf("%x", r)
+		h += fmt.Sprintf("%x...", r[:4])
 	}
 	return h
 }
