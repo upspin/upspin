@@ -158,15 +158,14 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 // If the returned error is ErrFollowLink, the caller should retry the
 // operation as outlined in the description for upspin.ErrFollowLink
 // (with the added step of updating the Name field of the argument
-// DirEntry). Otherwise, the returned DirEntry will be nil whether the
-// operation succeeded or not.
+// DirEntry). Otherwise, the returned DirEntry will be the one put.
 func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.Put"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
 	if p.IsRoot() {
-		return nil, t.createRoot(p, de)
+		return de, t.createRoot(p, de)
 	}
 	node, err := t.put(p, de)
 	if err == upspin.ErrFollowLink {
