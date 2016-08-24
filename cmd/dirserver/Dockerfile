@@ -5,5 +5,5 @@ COPY rc /upspin/rc
 COPY public.upspinkey /upspin/public.upspinkey
 COPY secret.upspinkey /upspin/secret.upspinkey
 COPY dirserver /dirserver
-ENTRYPOINT ["/dirserver", "-context=/upspin/rc", "-kind=dirserver", "-config=CONFIG", "-project=PROJECT"]
+ENTRYPOINT ["/dirserver", "-context=/upspin/rc", "-kind=server", "-config=CONFIG", "-project=PROJECT"]
 EXPOSE 80 443
