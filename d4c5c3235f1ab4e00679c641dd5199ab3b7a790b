@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "c8e693fe_1f3c47e6",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:25:29Z",
+      "side": 1,
+      "message": "now? odd comment",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_3f41036b",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:25:29Z",
+      "side": 1,
+      "message": "why wouldn\u0027t it work?",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_bf651319",
         "filename": "dir/server/server.go",
         "patchSetId": 2
