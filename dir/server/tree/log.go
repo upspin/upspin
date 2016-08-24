@@ -36,51 +36,16 @@ type LogEntry struct {
 
 // Log represents the log of DirEntry changes. It is primarily used by
 // Tree (provided through its Config struct) to log changes.
-type Log interface {
-	// User returns the user name who owns the root of the tree that this log represents.
-	User() upspin.UserName
-
-	// Append appends a LogEntry to the end of the log.
-	Append(*LogEntry) error
-
-	// ReadAt reads at most n entries from the log starting at offset. It
-	// returns the next offset.
-	ReadAt(n int, offset int64) ([]LogEntry, int64, error)
-
-	// LastOffset returns the offset of the most-recently-appended entry or 0 if log is empty.
-	LastOffset() int64
-}
-
-// LogIndex reads and writes from/to stable storage the log state information
-// and the user's root entry. It is used by Tree to track its progress processing
-// the log and storing the root.
-type LogIndex interface {
-	// User returns the user name who owns the root of the tree that this
-	// log index represents.
-	User() upspin.UserName
-
-	// Root returns the user's root by retrieving it from local stable storage.
-	Root() (*upspin.DirEntry, error)
-
-	// SaveRoot saves the user's root entry to stable storage.
-	SaveRoot(*upspin.DirEntry) error
-
-	// ReadOffset reads from stable storage the offset saved by SaveOffset.
-	ReadOffset() (int64, error)
-
-	// SaveOffset saves to stable storage the offset to process next.
-	SaveOffset(int64) error
-}
-
-// logger implements Log.
-type logger struct {
+type Log struct {
 	user   upspin.UserName // user for whom this log is intended.
 	file   *os.File        // file descriptor for the log.
 	offset int64           // last position appended to the log (end of log).
 }
 
-// logIndex implements LogIndex.
-type logIndex struct {
+// LogIndex reads and writes from/to stable storage the log state information
+// and the user's root entry. It is used by Tree to track its progress
+// processing the log and storing the root.
+type LogIndex struct {
 	user      upspin.UserName // user for whom this logindex is intended.
 	indexFile *os.File        // file descriptor for the last index in the log.
 	rootFile  *os.File        // file descriptor for the root of the tree.
@@ -93,7 +58,7 @@ type logIndex struct {
 //
 // Only one Log and LogIndex for a user in the same directory can be opened.
 // If two are opened and used simultaneously, results will be unpredictable.
-func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
+func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	const op = "dir/server/tree.NewLogs"
 	loc := filepath.Join(directory, "tree.log."+string(user))
 	loggerFile, err := os.OpenFile(loc, os.O_RDWR|os.O_CREATE, 0600)
@@ -104,7 +69,7 @@ func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
-	l := &logger{
+	l := &Log{
 		user:   user,
 		file:   loggerFile,
 		offset: offset,
@@ -120,7 +85,7 @@ func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
-	li := &logIndex{
+	li := &LogIndex{
 		user:      user,
 		indexFile: indexFile,
 		rootFile:  rootFile,
@@ -128,13 +93,13 @@ func NewLogs(user upspin.UserName, directory string) (Log, LogIndex, error) {
 	return l, li, nil
 }
 
-// User implements Log.
-func (l *logger) User() upspin.UserName {
+// User returns the user name who owns the root of the tree that this log represents.
+func (l *Log) User() upspin.UserName {
 	return l.user
 }
 
-// Append implements Log.
-func (l *logger) Append(e *LogEntry) error {
+// Append appends a LogEntry to the end of the log.
+func (l *Log) Append(e *LogEntry) error {
 	const op = "dir/server/tree.Log.Append"
 	buf, err := e.marshal()
 	if err != nil {
@@ -153,8 +118,9 @@ func (l *logger) Append(e *LogEntry) error {
 	return nil
 }
 
-// ReadAt implements Log.
-func (l *logger) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
+// ReadAt reads at most n entries from the log starting at offset. It
+// returns the next offset.
+func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"
 	if offset >= l.offset {
 		// End of file.
@@ -183,18 +149,31 @@ func (l *logger) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err er
 	return
 }
 
-// LastOffset implements Log.
-func (l *logger) LastOffset() int64 {
+// LastOffset returns the offset of the most-recently-appended entry or 0 if the
+// log is empty.
+func (l *Log) LastOffset() int64 {
 	return l.offset
 }
 
-// User implements LogIndex.
-func (li *logIndex) User() upspin.UserName {
+// Truncate truncates the log at offset.
+func (l *Log) Truncate(offset int64) error {
+	const op = "dir/server/tree.Log.Truncate"
+	err := l.file.Truncate(offset)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	l.offset = offset
+	return nil
+}
+
+// User returns the user name who owns the root of the tree that this
+// log index represents.
+func (li *LogIndex) User() upspin.UserName {
 	return li.user
 }
 
-// Root implements LogIndex.
-func (li *logIndex) Root() (*upspin.DirEntry, error) {
+// Root returns the user's root by retrieving it from local stable storage.
+func (li *LogIndex) Root() (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.LogIndex.Root"
 	var root upspin.DirEntry
 	buf, err := readAllFromTop(op, li.rootFile)
@@ -214,14 +193,20 @@ func (li *logIndex) Root() (*upspin.DirEntry, error) {
 	return &root, nil
 }
 
-// SaveRoot implements LogIndex.
-func (li *logIndex) SaveRoot(root *upspin.DirEntry) error {
+// SaveRoot saves the user's root entry to stable storage.
+func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
 	const op = "dir/server/tree.LogIndex.SaveRoot"
 	buf, err := root.Marshal()
 	if err != nil {
 		return errors.E(op, err)
 	}
 	return overwriteAndSync(op, li.rootFile, buf)
+}
+
+// DeleteRoot deletes the root.
+func (li *LogIndex) DeleteRoot() error {
+	const op = "dir/server/tree.LogIndex.DeleteRoot"
+	return overwriteAndSync(op, li.rootFile, []byte{})
 }
 
 func overwriteAndSync(op string, f *os.File, buf []byte) error {
@@ -252,8 +237,8 @@ func readAllFromTop(op string, f *os.File) ([]byte, error) {
 	return buf, nil
 }
 
-// ReadOffset implements LogIndex.
-func (li *logIndex) ReadOffset() (int64, error) {
+// ReadOffset reads from stable storage the offset saved by SaveOffset.
+func (li *LogIndex) ReadOffset() (int64, error) {
 	const op = "dir/server/tree.LogIndex.ReadOffset"
 	buf, err := readAllFromTop(op, li.indexFile)
 	if err != nil {
@@ -269,8 +254,8 @@ func (li *logIndex) ReadOffset() (int64, error) {
 	return offset, nil
 }
 
-// SaveOffset implements LogIndex.
-func (li *logIndex) SaveOffset(offset int64) error {
+// SaveOffset saves to stable storage the offset to process next.
+func (li *LogIndex) SaveOffset(offset int64) error {
 	const op = "dir/server/tree.LogIndex.SaveOffset"
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
