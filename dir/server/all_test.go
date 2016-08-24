@@ -448,6 +448,12 @@ func TestGlob(t *testing.T) {
 		}
 	}
 
+	// Test syntax error.
+	_, err = s.Glob(userName + "/[]")
+	expectErr := errors.E(errors.Syntax)
+	if !errors.Match(expectErr, err) {
+		t.Fatalf("err = %q, want = %q", err, expectErr)
+	}
 }
 
 func TestDelete(t *testing.T) {

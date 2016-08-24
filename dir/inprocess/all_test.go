@@ -401,6 +401,24 @@ func TestGlob(t *testing.T) {
 	}
 }
 
+func TestGlobSyntaxError(t *testing.T) {
+	context, directory := setup()
+	// We need to create a file so the Glob test processes the whole pattern.
+	user := context.UserName()
+	root := upspin.PathName(user + "/")
+	fileName := root + "file"
+	entry := storeData(t, context, []byte("hello"), fileName)
+	_, err := directory.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectErr := errors.E("dir/inprocess.Glob", errors.Syntax)
+	_, err = directory.Glob(string(context.UserName()) + "/[]")
+	if !errors.Match(expectErr, err) {
+		t.Fatalf("err = %v; expected %v", err, expectErr)
+	}
+}
+
 func TestSequencing(t *testing.T) {
 	context, directory := setup()
 	user := context.UserName()

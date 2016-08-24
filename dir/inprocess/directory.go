@@ -511,11 +511,6 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	if !ok {
 		return nil, errors.E(op, upspin.PathName(pattern), errors.NotExist, "no such user")
 	}
-	// Check if pattern is a valid go path pattern
-	_, err = goPath.Match(parsed.FilePath(), "")
-	if err != nil {
-		return nil, errors.E(op, upspin.PathName(pattern), errors.Syntax, err)
-	}
 
 	// Loop elementwise along the path, growing the list of candidates breadth-first.
 	this := make([]*upspin.DirEntry, 0, 100)
@@ -562,8 +557,11 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				if err != nil {
 					return nil, errors.E(op, ent.Name, err)
 				}
-				// No need to check error; pattern is validated above.
-				if matched, _ := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1)); !matched {
+				matched, err := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1))
+				if err != nil {
+					return nil, errors.E(op, upspin.PathName(pattern), errors.Syntax, err)
+				}
+				if !matched {
 					continue
 				}
 				// Do not return ErrFollowLink if the link is the last element. The result

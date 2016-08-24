@@ -375,12 +375,6 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 
-	// Check if pattern is a valid Go path pattern.
-	_, err = goPath.Match(string(p.FilePath()), "")
-	if err != nil {
-		return nil, errors.E(op, p.Path(), err)
-	}
-
 	mu := userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
@@ -434,9 +428,12 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			// Apply goPath regexp to each e in ents and verify
 			// access rights.
 			for _, e := range ents {
-				// No need to check for errors, pattern was validated above.
 				// It's safe to request d+1 because we just listed a directory at level +1 from current.
-				if matched, _ := goPath.Match(p.First(d+1).String(), string(e.Name)); !matched {
+				matched, err := goPath.Match(p.First(d+1).String(), string(e.Name))
+				if err != nil {
+					return nil, errors.E(op, p.Path(), errors.Syntax, err)
+				}
+				if !matched {
 					continue
 				}
 				// Next, we must list any subdirs, unless the pattern is finished.
