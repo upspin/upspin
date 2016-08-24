@@ -259,6 +259,10 @@ type PublicKey string
 // DirEntry.
 var ErrFollowLink = errors.New("action incomplete: must follow link")
 
+// MaxLinkHops is the maximum number of links that will be followed
+// when evaluating a single path name.
+const MaxLinkHops = 20
+
 // DirServer manages the name space for one or more users.
 type DirServer interface {
 	Dialer
