@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8883bb54_f8e9a9e8",
+        "filename": "cmd/admin/deploy-servers.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "Always? Or only when $project \u003d\u003d \"upspin-test\"?",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_380091a0",
+        "filename": "errors/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "Doc? I know this is unexported, but this file is light in function-level comments.",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_b8ca4175",
+        "filename": "errors/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "Maybe here too. How does one create a Buffer that can be printed by this method?",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_db9fff4d",
+        "filename": "errors/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "Will this work in a Windows system where the slashes may be backwards? How about Android?",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_38d73119",
+        "filename": "errors/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "Callers of what? The return type is hard to decipher. A slice of uint pointers to what? Memory addresses, I suppose. Should this be called stackFunctionCalls?",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8883bb54_188cad35",
+        "filename": "errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-24T16:07:12Z",
+      "side": 1,
+      "message": "No longer used.",
+      "revId": "84a482640a6abf32a55e10425f8ecdc3ccf69f91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
