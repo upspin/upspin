@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/upspin"
 )
 
@@ -64,12 +63,8 @@ func (d *infoDirEntry) Users(right access.Right) string {
 }
 
 func (d *infoDirEntry) WhichAccess() string {
-	dir, err := bind.DirServer(d.ctx, d.ctx.DirEndpoint())
-	if err != nil {
-		exit(err)
-	}
 	var acc *access.Access
-	accEntry, err := dir.WhichAccess(d.Name)
+	accEntry, err := whichAccessFollowLinks(d.client, d.Name)
 	if err != nil {
 		return err.Error()
 	}
