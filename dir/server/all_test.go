@@ -151,6 +151,26 @@ func TestLink(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Try to MakeDirectory under the link.
+	de2, err = s.MakeDirectory(userName + "/mylink/newdir")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.Mkdir", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Call WhichAccess under the link.
+	de2, err = s.WhichAccess(userName + "/mylink/will_return_follow_link")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.WhichAccess", de2, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Delete something at the other side of the link.
 	de2, err = s.Delete(userName + "/mylink/will_return_follow_link")
 	if err != upspin.ErrFollowLink {
@@ -495,6 +515,11 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestClose(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	s.Close()
 }
 
 // Tests some error conditions too.
