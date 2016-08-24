@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "c8e693fe_dcd90d4e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T04:57:34Z",
+      "side": 1,
+      "message": "that\u0027s the way rob chose to do it",
+      "parentUuid": "8883bb54_b50d6a0f",
+      "revId": "3bf1e8caf3854478f3600646ee243aab824c8db8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_9cf225fd",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 1
