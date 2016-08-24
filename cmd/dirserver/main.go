@@ -258,7 +258,9 @@ func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 // entryError performs the common operation of converting a directory entry
 // and error result pair into the corresponding protocol buffer.
 func entryError(entry *upspin.DirEntry, err error) (*proto.EntryError, error) {
-	// TODO(adg): log message
+	if err != nil {
+		log.Println(err)
+	}
 	var b []byte
 	if entry != nil {
 		var mErr error
