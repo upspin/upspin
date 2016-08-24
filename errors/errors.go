@@ -33,6 +33,13 @@ type Error struct {
 	Kind Kind
 	// The underlying error that triggered this one, if any.
 	Err error
+
+	// Stack information; used only when the 'debug' build tag is set.
+	stack
+}
+
+func (e *Error) isZero() bool {
+	return e.Path == "" && e.User == "" && e.Op == "" && e.Kind == 0 && e.Err == nil
 }
 
 var (
@@ -164,6 +171,10 @@ func E(args ...interface{}) error {
 			return Errorf("unknown type %T, value %v in error call", arg, arg)
 		}
 	}
+
+	// Populate stack information (only in debug mode).
+	e.populateStack()
+
 	prev, ok := e.Err.(*Error)
 	if !ok {
 		return e
@@ -199,11 +210,17 @@ func pad(b *bytes.Buffer, str string) {
 
 func (e *Error) Error() string {
 	b := new(bytes.Buffer)
+	e.printStack(b)
 	if e.Path != "" {
+		pad(b, ": ")
 		b.WriteString(string(e.Path))
 	}
 	if e.User != "" {
-		pad(b, ", ")
+		if e.Path == "" {
+			pad(b, ": ")
+		} else {
+			pad(b, ", ")
+		}
 		b.WriteString("user ")
 		b.WriteString(string(e.User))
 	}
@@ -218,7 +235,7 @@ func (e *Error) Error() string {
 	if e.Err != nil {
 		// Indent on new line if we are cascading non-empty Upspin errors.
 		if prevErr, ok := e.Err.(*Error); ok {
-			if *prevErr != zeroErr {
+			if !prevErr.isZero() {
 				pad(b, Separator)
 				b.WriteString(e.Err.Error())
 			}
