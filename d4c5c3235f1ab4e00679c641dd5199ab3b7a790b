@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_bf651319",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:16:03Z",
+      "side": 1,
+      "message": "s/entry/link/",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_df72dfdb",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:16:03Z",
+      "side": 1,
+      "message": "this is wrong for Put (which calls s.put and returns these values directly). It should only return a DirEntry for ErrFollowLink.\nThis is distinct from MakeDirectory which returns the newly created DirEntry.",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_9f6857f2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T23:16:03Z",
+      "side": 1,
+      "message": "I don\u0027t think you should return de if err !\u003d nil.\nalso why do you return the de if it\u0027s the same one the user provided?",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
