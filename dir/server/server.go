@@ -601,7 +601,27 @@ func (s *server) Authenticate(upspin.Context) error {
 
 // Close implements upspin.Service.
 func (s *server) Close() {
-	// TODO
+	const op = "dir/server.Close"
+
+	// Remove this user's tree from the cache. This allows it to be
+	// garbage-collected even if other servers have pointers into the
+	// cache (which at least one will have, the one created with New).
+
+	mu := userLock(s.userName)
+	mu.Lock()
+	defer mu.Unlock()
+
+	t := s.userTrees.Remove(s.userName)
+	if tree, ok := t.(*tree.Tree); ok {
+		// Flush everything since Remove won't invoke EvictionNotifier.
+		err := tree.Flush()
+		if err != nil {
+			// TODO: return an error when Close expects it.
+			log.Error.Printf("%s: Error flushing user tree %q: %q", op, s.userName, err)
+		}
+	}
+
+	s.defaultAccess = nil
 }
 
 // loadTreeFor loads the user's tree, if it exists.
