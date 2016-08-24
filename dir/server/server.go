@@ -271,11 +271,6 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 	mu.Lock()
 	defer mu.Unlock()
 
-	// Is this the root we're making? Handle it separately.
-	if p.IsRoot() {
-		return s.createRoot(op, p, o)
-	}
-
 	if access.IsAccessFile(dirName) || access.IsGroupFile(dirName) {
 		return nil, errors.E(op, errors.Invalid, errors.Str("cannot make directory named Access or Group"))
 	}
@@ -341,12 +336,17 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		// Some unexpected error happened looking up path. Abort.
 		return nil, errors.E(op, err)
 	} else {
-		// Error is nil therefore path exists. Check if we can overwrite.
+		// Error is nil therefore path exists.
+		// Check if it's root.
+		if p.IsRoot() {
+			return nil, errors.E(op, p.Path(), errors.Exist)
+		}
+		// Check if we can overwrite.
 		if existingEntry.IsDir() {
 			return nil, errors.E(op, p.Path(), errors.IsDir, errors.Str("can't overwrite directory"))
 		}
 		if entry.IsDir() {
-			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("cannot overwrite file with directory"))
+			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("can't overwrite file with directory"))
 		}
 		// To overwrite a file, we need Write permission.
 		if !canWrite {
@@ -501,10 +501,6 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if !canDelete {
 		return nil, errors.E(op, name, access.ErrPermissionDenied)
 	}
-	if p.IsRoot() {
-		// TODO: support this soon.
-		return nil, errors.E(op, name, errors.Invalid, errors.Str("cannot delete root"))
-	}
 
 	// Load the entry so we can check whether it's a dir.
 	tree, err := s.loadTreeFor(p.User(), o)
@@ -630,7 +626,22 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	// If user has root, we can load the tree from it.
 	if _, err := logIndex.Root(); err != nil {
 		// Likely the user has no root yet.
-		return nil, err
+		if !errors.Match(errNotExist, err) {
+			// No it's some other error. Abort.
+			return nil, err
+		}
+		// If user is allowed to create a root, let this proceed.
+		if s.userName != user {
+			return nil, errors.E(errors.Permission, s.userName,
+				errors.Str("can't create root for another user"))
+		}
+		// Ok, let it proceed. The  user will still need to make the
+		// root, but we allow setting up a new tree for now.
+		err = logIndex.SaveOffset(0)
+		if err != nil {
+			return nil, err
+		}
+		// Fall through and load a new tree.
 	}
 	// Create a new tree for the user.
 	tree, err := tree.New(s.serverContext, log, logIndex)
@@ -640,73 +651,6 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	// Add to the cache and return
 	s.userTrees.Add(user, tree)
 	return tree, nil
-}
-
-// createRoot creates a new root for a user, if some checks pass.
-// userLock must be held for user.
-func (s *server) createRoot(op string, p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
-	o, ss := subspan("createRoot", opts)
-	defer ss.End()
-
-	if s.userName != p.User() {
-		// Can only create root for the authenticated user.
-		return nil, errors.E(op, errors.Invalid, s.userName,
-			errors.Str("can't create root for another user"))
-	}
-	// Is there a tree for such user already?
-	_, err := s.loadTreeFor(p.User(), o)
-	if err == nil {
-		// Can't make root again if tree is found.
-		return nil, errors.E(op, errors.Exist, p.Path())
-	}
-	if !errors.Match(errNotExist, err) {
-		// Some other error loading tree. Abort.
-		return nil, errors.E(op, p.Path(), err)
-	}
-
-	// Create logs first.
-	logger, logIndex, err := tree.NewLogs(p.User(), s.logDir)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	// Initialize the logIndex so we're at the end of the new log.
-	err = logIndex.SaveOffset(0)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	// Create a new tree for the user.
-	tree, err := tree.New(s.serverContext, logger, logIndex)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	// Create a new dir entry for this new dir.
-	de := &upspin.DirEntry{
-		Name:     p.Path(),
-		Attr:     upspin.AttrDirectory,
-		Writer:   s.userName,
-		Packing:  s.serverContext.Packing(),
-		Time:     upspin.Now(),
-		Sequence: upspin.SeqBase,
-	}
-
-	// Attempt to put this new dir entry as the root.
-	_, err = tree.Put(p, de)
-	if err == upspin.ErrFollowLink {
-		// The root can't be a link. Something very bad happened.
-		return nil, errors.E(op, errors.Internal, p.User(), p.Path(), errors.Str("got ErrFollowLink putting root"))
-	}
-	if err != nil {
-		// This can't be a Link redirection (roots can't be links).
-		return nil, errors.E(op, err)
-	}
-
-	// Add to the cache and return.
-	s.userTrees.Add(p.User(), tree)
-
-	log.Info.Printf("Created root for user %q", p.User())
-	return de, nil
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
