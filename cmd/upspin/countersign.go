@@ -14,8 +14,6 @@ import (
 	"os"
 
 	"upspin.io/bind"
-	"upspin.io/client"
-	"upspin.io/context"
 	"upspin.io/pack/ee"
 	"upspin.io/upspin"
 
@@ -39,15 +37,10 @@ type Countersigner struct {
 var countersigner Countersigner
 
 func (s *Countersigner) init() {
-	context, err := context.InitContext(nil)
-	if err != nil {
-		exitf("initializing context: %s", err)
-	}
-	s.context = context
-	s.client = client.New(context)
-	u, err := context.KeyServer().Lookup(context.UserName())
+	s.client, s.context = newClient()
+	u, err := s.context.KeyServer().Lookup(s.context.UserName())
 	if err != nil || len(u.PublicKey) == 0 {
-		exitf("can't find old key for %q: %s\n", context.UserName(), err)
+		exitf("can't find old key for %q: %s\n", s.context.UserName(), err)
 	}
 	s.oldKey = u.PublicKey
 }
@@ -91,7 +84,7 @@ func (s *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 	if err != nil {
 		exit(err)
 	}
-	thisDir, err := directory.Glob(string(dir) + "/*")
+	thisDir, err := directory.Glob(string(dir) + "/*") // Do not want to follow links.
 	if err != nil {
 		exitf("globbing %q: %s", dir, err)
 	}
