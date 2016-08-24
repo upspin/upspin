@@ -16,6 +16,24 @@
       "revId": "7a2b48ad4d3435ee9db91d4de05ac575d202ae9e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_5ffecf56",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-24T07:40:58Z",
+      "side": 1,
+      "message": "but it\u0027s wrong. need to use the dir server for the target.\nwill rethink",
+      "parentUuid": "c8e693fe_ffdcfb0d",
+      "revId": "7a2b48ad4d3435ee9db91d4de05ac575d202ae9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
