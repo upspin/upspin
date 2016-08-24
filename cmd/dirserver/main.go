@@ -89,7 +89,7 @@ func main() {
 		dir, err = gcp.New(ctx, flags.Config...)
 	case "filesystem":
 		dir, err = filesystem.New(ctx, flags.Config...)
-	case "dirserver":
+	case "server":
 		dir, err = server.New(ctx, flags.Config...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
