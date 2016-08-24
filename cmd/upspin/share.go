@@ -15,8 +15,6 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/bind"
-	"upspin.io/client"
-	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -64,12 +62,7 @@ type Sharer struct {
 var sharer Sharer
 
 func (s *Sharer) init() {
-	context, err := context.InitContext(nil)
-	if err != nil {
-		exitf("initializing context: %s", err)
-	}
-	s.context = context
-	s.client = client.New(context)
+	s.client, s.context = newClient()
 	s.accessFiles = make(map[upspin.PathName]*access.Access)
 	s.users = make(map[upspin.PathName][]upspin.UserName)
 	s.userKeys = make(map[upspin.UserName]upspin.PublicKey)
@@ -249,6 +242,7 @@ func userListToString(userList []upspin.UserName) string {
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
 func (s *Sharer) allEntries(args []string) []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
+	// We will not follow links; don't use Client. Use the directory server directly.
 	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
@@ -279,7 +273,7 @@ func (s *Sharer) allEntries(args []string) []*upspin.DirEntry {
 
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
-	// Get list of files for this directory.
+	// Get list of files for this directory. See comment in allEntries about links.
 	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
 	if err != nil {
 		exit(err)
@@ -336,7 +330,7 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 	if err != nil {
 		exit(err)
 	}
-	which, err := directory.WhichAccess(name)
+	which, err := directory.WhichAccess(name) // Guaranteed to have no links.
 	if err != nil {
 		exitf("looking up access file %q: %s", name, err)
 	}
@@ -391,7 +385,7 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	if err != nil {
 		exit(err)
 	}
-	entry, err := directory.Lookup(name)
+	entry, err := directory.Lookup(name) // Guaranteed to have no links.
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "looking up %q: %s", name, err)
 		s.exitCode = 1
