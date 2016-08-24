@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_ffdcfb0d",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-24T07:00:34Z",
+      "side": 1,
+      "message": "ctx doesn\u0027t change, so you can do this at the top of the function",
+      "revId": "7a2b48ad4d3435ee9db91d4de05ac575d202ae9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
