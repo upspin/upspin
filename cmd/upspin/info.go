@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/pack"
 	"upspin.io/upspin"
 )
 
@@ -46,12 +47,31 @@ func (d *infoDirEntry) Readers() string {
 	if d.IsDir() {
 		return "is a directory"
 	}
-	_, users, err := sharer.readers(d.DirEntry)
+	_, users, _, err := sharer.readers(d.DirEntry)
 	if err != nil {
 		return err.Error()
 	}
 	d.lastUsers = users
 	return users
+}
+
+func (d *infoDirEntry) Hashes() string {
+	h := ""
+	if d.IsDir() || d.Packing != upspin.EEPack {
+		return h
+	}
+	packer := pack.Lookup(d.Packing)
+	hashes, err := packer.ReaderHashes(d.Packdata)
+	if err != nil {
+		return h
+	}
+	for _, r := range hashes {
+		if h == "" {
+			h += " "
+		}
+		h += fmt.Sprintf("%x", r)
+	}
+	return h
 }
 
 func (d *infoDirEntry) Users(right access.Right) string {
@@ -139,6 +159,7 @@ const infoText = `{{.Name}}
 	sequence:	{{.Sequence}}
 	access file:	{{.WhichAccess}}
 	key holders: 	{{.Readers}}
+	key hashes:     {{.Hashes}}
 	{{range $right := .Rights -}}
 	can {{$right}}:	{{$.Users $right}}
 	{{end -}}

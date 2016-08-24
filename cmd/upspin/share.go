@@ -136,13 +136,13 @@ func (s *Sharer) shareCommand(args []string) {
 		if packer.Packing() == upspin.PlainPack {
 			continue
 		}
-		users, keyUsers, err := s.readers(entry)
+		users, keyUsers, self, err := s.readers(entry)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
 		userList := userListToString(users)
-		if userList != keyUsers {
+		if userList != keyUsers || self {
 			if !s.quiet {
 				if len(entriesToFix) == 0 {
 					fmt.Println("\nAccess discrepancies:")
@@ -172,10 +172,12 @@ func (s *Sharer) shareCommand(args []string) {
 // readers returns two lists, the list of users with access according to the
 // access file, and the the pretty-printed string of user names recovered from
 // looking at the list of hashed keys in the packdata.
-func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, error) {
+// It also returns a boolean saying whether key rewrapping is needed for self.
+func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, bool, error) {
+	self := false
 	if entry.IsDir() {
 		// Directories don't have readers.
-		return nil, "", nil
+		return nil, "", self, nil
 	}
 	users := s.users[path.DropPath(entry.Name, 1)]
 	for _, user := range users {
@@ -183,14 +185,14 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, err
 	}
 	packer := lookupPacker(entry)
 	if packer == nil {
-		return users, "", errors.Errorf("no packer registered for packer %s", entry.Packing)
+		return users, "", self, errors.Errorf("no packer registered for packer %s", entry.Packing)
 	}
 	if packer.Packing() == upspin.PlainPack {
-		return users, "", nil
+		return users, "", self, nil
 	}
 	hashes, err := packer.ReaderHashes(entry.Packdata)
 	if err != nil {
-		return nil, "", err
+		return nil, "", self, err
 	}
 	var keyUsers string
 	unknownUser := false
@@ -214,6 +216,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, err
 				if err == nil {
 					thisUser = s.context.UserName()
 					ok = true
+					self = true
 				}
 			}
 			if !ok && !unknownUser {
@@ -235,7 +238,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, err
 		}
 		keyUsers += string(thisUser)
 	}
-	return users, keyUsers, nil
+	return users, keyUsers, self, nil
 }
 
 func userListToString(userList []upspin.UserName) string {
