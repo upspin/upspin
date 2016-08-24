@@ -31,7 +31,7 @@ func TestGetError(t *testing.T) {
 	_, _, err := s.Get(ref)
 
 	expected := fmt.Sprintf("store/https.Get: %s: %s", ref, errSomethingBad)
-	if err.Error() != expected {
+	if !strings.Contains(err.Error(), expected) {
 		t.Fatalf("Server reply failed: expected %v got %v", expected, err)
 	}
 

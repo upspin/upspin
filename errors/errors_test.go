@@ -64,10 +64,9 @@ func TestSeparator(t *testing.T) {
 	e2 := E(path, user, "Read", Other, e1)
 
 	want := "jane@doe.com/file, user joe@blow.com: Read: I/O error:: Get: network unreachable"
-	if e2.Error() != want {
+	if errorAsString(e2) != want {
 		t.Errorf("expected %q; got %q", want, e2)
 	}
-
 }
 
 func TestDoesNotChangePreviousError(t *testing.T) {
@@ -75,7 +74,7 @@ func TestDoesNotChangePreviousError(t *testing.T) {
 	err2 := E("I will NOT modify err", err)
 
 	expected := "I will NOT modify err: permission denied"
-	if err2.Error() != expected {
+	if errorAsString(err2) != expected {
 		t.Fatalf("Expected %q, got %q", expected, err2)
 	}
 	kind := err.(*Error).Kind
@@ -136,4 +135,16 @@ func TestMatch(t *testing.T) {
 			t.Errorf("Match(%q, %q)=%t; want %t", test.err1, test.err2, matched, test.matched)
 		}
 	}
+}
+
+// errorAsString returns the string form of the provided error value.
+// If the given string is an *Error, the stack information is removed
+// before the value is stringified.
+func errorAsString(err error) string {
+	if e, ok := err.(*Error); ok {
+		e2 := *e
+		e2.stack = stack{}
+		return e2.Error()
+	}
+	return err.Error()
 }
