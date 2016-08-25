@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "c51bde68_f461583d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-25T04:39:46Z",
+      "side": 1,
+      "message": "Here is where the entry from put is returned directly by Put.\nAre you thinking about the same piece of code that I am?",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_bf651319",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -172,6 +189,24 @@
       "side": 1,
       "message": "It err\u003d\u003dnil, the entry value is not used in dir.Put.\n\nI guess I can nil that if you think it\u0027s safer.",
       "parentUuid": "c51bde68_34d470f0",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c51bde68_d45e5c7d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-25T04:39:46Z",
+      "side": 1,
+      "message": "It\u0027s not about safety, it\u0027s about satisfying the upspin.DirServer API:\n\n    // If the returned error is ErrFollowLink, the caller should\n    // retry the operation as outlined in the description for\n    // ErrFollowLink (with the added step of updating the\n    // Name field of the argument DirEntry). Otherwise, the\n    // returned DirEntry will be nil whether the operation\n    // succeeded or not.",
+      "parentUuid": "88349bbf_ad03a9e2",
       "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
