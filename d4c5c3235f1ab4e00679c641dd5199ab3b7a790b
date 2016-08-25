@@ -160,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "88349bbf_ad03a9e2",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-25T04:28:05Z",
+      "side": 1,
+      "message": "It err\u003d\u003dnil, the entry value is not used in dir.Put.\n\nI guess I can nil that if you think it\u0027s safer.",
+      "parentUuid": "c51bde68_34d470f0",
+      "revId": "d4c5c3235f1ab4e00679c641dd5199ab3b7a790b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8e693fe_9f6857f2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
