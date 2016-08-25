@@ -464,7 +464,7 @@ func (s *server) lookup(op string, parsed path.Parsed, followFinal bool) (*upspi
 	defer s.db.mu.RUnlock()
 	dirEntry, ok := s.db.root[parsed.User()]
 	if !ok {
-		return nil, errors.E(upspin.PathName(parsed.User()), "no such user")
+		return nil, errors.E(upspin.PathName(parsed.User()), errors.NotExist, errors.Str("no such user"))
 	}
 	if parsed.IsRoot() {
 		return dirEntry, nil
@@ -508,7 +508,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	rootEntry, ok := s.db.root[parsed.User()]
 	s.db.mu.RUnlock()
 	if !ok {
-		return nil, errors.E(op, upspin.PathName(pattern), errors.NotExist, "no such user")
+		return nil, errors.E(op, upspin.PathName(pattern), errors.NotExist, errors.Str("no such user"))
 	}
 
 	// Loop elementwise along the path, growing the list of candidates breadth-first.
