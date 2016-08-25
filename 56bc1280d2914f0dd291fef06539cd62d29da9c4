@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8e693fe_7f362bfd",
+        "filename": "errors/debug_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-25T00:19:03Z",
+      "side": 1,
+      "message": "the problem with this approach is that when it goes wrong the test failure is uninformative and you need to read a regexp to know what went wrong.\ni\u0027d make this a slice of string pairs, one prefix and one suffix, and loop over the error line by line. then you can give a helpful message. (matching \\d+ is unnecessary)",
+      "revId": "56bc1280d2914f0dd291fef06539cd62d29da9c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8e693fe_9f1a1782",
+        "filename": "errors/example_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-25T00:19:03Z",
+      "side": 1,
+      "message": "// TODO: Is there a way to keep this test enabled?",
+      "revId": "56bc1280d2914f0dd291fef06539cd62d29da9c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
