@@ -7,6 +7,8 @@
 package storeserver
 
 import (
+	"fmt"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
@@ -42,12 +44,6 @@ func New(ctx upspin.Context, store upspin.StoreServer, ss grpcauth.SecureServer,
 	}
 }
 
-var (
-	// Empty structs we can allocate just once.
-	deleteResponse    proto.StoreDeleteResponse
-	configureResponse proto.ConfigureResponse
-)
-
 // storeFor returns a StoreServer instance bound to the user specified in the context.
 func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
@@ -64,16 +60,17 @@ func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 
 // Get implements proto.StoreServer.
 func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
-	log.Printf("Get %q", req.Reference)
+	op := infof("Get %q", req.Reference)
 
 	store, err := s.storeFor(ctx)
 	if err != nil {
-		return nil, err
+		op.log(err)
+		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
 
 	data, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
-		log.Printf("Get %q failed: %v", req.Reference, err)
+		op.log(err)
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StoreGetResponse{
@@ -85,16 +82,17 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 
 // Put implements proto.StoreServer.
 func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
-	log.Printf("Put %.30x...", req.Data)
+	op := infof("Put %.30x...", req.Data)
 
 	store, err := s.storeFor(ctx)
 	if err != nil {
-		return nil, err
+		op.log(err)
+		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 
 	ref, err := store.Put(req.Data)
 	if err != nil {
-		log.Printf("Put %.30q failed: %v", req.Data, err)
+		op.log(err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StorePutResponse{
@@ -103,18 +101,22 @@ func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 	return resp, nil
 }
 
+// Empty struct we can allocate just once.
+var deleteResponse proto.StoreDeleteResponse
+
 // Delete implements proto.StoreServer.
 func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
-	log.Printf("Delete %q", req.Reference)
+	op := infof("Delete %q", req.Reference)
 
 	store, err := s.storeFor(ctx)
 	if err != nil {
-		return nil, err
+		op.log(err)
+		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
 
 	err = store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
-		log.Printf("Delete %q failed: %v", req.Reference, err)
+		op.log(err)
 		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &deleteResponse, nil
@@ -122,7 +124,22 @@ func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 
 // Configure implements proto.StoreServer.
 func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	return nil, errors.Str("Configure not implemented, nor should it be called.")
+	op := infof("Configure %q", req.Options)
+
+	store, err := s.storeFor(ctx)
+	if err != nil {
+		op.log(err)
+		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
+	}
+
+	name, err := store.Configure(req.Options...)
+	if err != nil {
+		op.log(err)
+	}
+	return &proto.ConfigureResponse{
+		UserName: string(name),
+		Error:    errors.MarshalError(err),
+	}, nil
 }
 
 // Endpoint implements proto.StoreServer.
@@ -133,4 +150,16 @@ func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 			NetAddr:   string(s.endpoint.NetAddr),
 		},
 	}, nil
+}
+
+func infof(format string, args ...interface{}) operation {
+	s := fmt.Sprintf(format, args...)
+	log.Info.Print("grpc/storeserver: " + s)
+	return operation(s)
+}
+
+type operation string
+
+func (op operation) log(err error) {
+	infof("%v failed: %v", op, err)
 }

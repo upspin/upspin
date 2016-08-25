@@ -7,6 +7,8 @@
 package dirserver
 
 import (
+	"fmt"
+
 	"upspin.io/auth/grpcauth"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -58,13 +60,14 @@ func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 
 // Lookup implements proto.DirServer.
 func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.EntryError, error) {
-	log.Printf("Lookup %q", req.Name)
+	op := infof("Lookup %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		return op.entryError(nil, err)
 	}
-	return entryError(dir.Lookup(upspin.PathName(req.Name)))
+
+	return op.entryError(dir.Lookup(upspin.PathName(req.Name)))
 }
 
 // Put implements proto.DirServer.
@@ -73,72 +76,82 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 	if err != nil {
 		return &proto.EntryError{Error: errors.MarshalError(err)}, nil
 	}
-	log.Printf("Put %q", entry.Name)
+	op := infof("Put %q", entry.Name)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		return op.entryError(nil, err)
 	}
-	return entryError(dir.Put(entry))
+
+	return op.entryError(dir.Put(entry))
 }
 
 // MakeDirectory implements proto.DirServer.
 func (s *server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectoryRequest) (*proto.EntryError, error) {
-	log.Printf("MakeDirectory %q", req.Name)
+	op := infof("MakeDirectory %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		return op.entryError(nil, err)
 	}
-	return entryError(dir.MakeDirectory(upspin.PathName(req.Name)))
+
+	return op.entryError(dir.MakeDirectory(upspin.PathName(req.Name)))
 }
 
 // Glob implements proto.DirServer.
 func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.EntriesError, error) {
-	log.Printf("Glob %q", req.Pattern)
+	op := infof("Glob %q", req.Pattern)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
-	}
-	entries, globErr := dir.Glob(req.Pattern)
-	if globErr != nil && globErr != upspin.ErrFollowLink {
-		log.Printf("Glob %q failed: %v", req.Pattern, globErr)
-		return &proto.EntriesError{Error: errors.MarshalError(globErr)}, nil
+		op.log(err)
+		return globError(err), nil
 	}
 
+	entries, globErr := dir.Glob(req.Pattern)
+	if globErr != nil && globErr != upspin.ErrFollowLink {
+		op.log(globErr)
+		return globError(globErr), nil
+	}
 	// Fall through OK for ErrFollowLink.
+
 	b, err := proto.DirEntryBytes(entries)
 	if err != nil {
-		return nil, err
+		op.log(err)
+		return globError(err), nil
 	}
-	resp := &proto.EntriesError{
+	return &proto.EntriesError{
 		Entries: b,
 		Error:   errors.MarshalError(globErr),
-	}
-	return resp, err
+	}, nil
+}
+
+func globError(err error) *proto.EntriesError {
+	return &proto.EntriesError{Error: errors.MarshalError(err)}
 }
 
 // Delete implements proto.DirServer.
 func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.EntryError, error) {
-	log.Printf("Delete %q", req.Name)
+	op := infof("Delete %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		return op.entryError(nil, err)
 	}
-	return entryError(dir.Delete(upspin.PathName(req.Name)))
+
+	return op.entryError(dir.Delete(upspin.PathName(req.Name)))
 }
 
 // WhichAccess implements proto.DirServer.
 func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.EntryError, error) {
-	log.Printf("WhichAccess %q", req.Name)
+	op := infof("WhichAccess %q", req.Name)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		return op.entryError(nil, err)
 	}
-	return entryError(dir.WhichAccess(upspin.PathName(req.Name)))
+
+	return op.entryError(dir.WhichAccess(upspin.PathName(req.Name)))
 }
 
 // Empty struct we can allocate just once.
@@ -146,23 +159,25 @@ var configureResponse proto.ConfigureResponse
 
 // Configure implements proto.DirServer.
 func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	log.Printf("Configure %q", req.Options)
+	op := infof("Configure %q", req.Options)
 
 	dir, err := s.dirFor(ctx)
 	if err != nil {
-		return nil, err
+		op.log(err)
+		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
 	}
-	_, err = dir.Configure(req.Options...)
+	name, err := dir.Configure(req.Options...)
 	if err != nil {
-		log.Printf("Configure %q failed: %v", req.Options, err)
+		op.log(err)
 	}
-	return &configureResponse, err
+	return &proto.ConfigureResponse{
+		UserName: string(name),
+		Error:    errors.MarshalError(err),
+	}, nil
 }
 
 // Endpoint implements proto.DirServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	log.Print("Endpoint")
-
 	return &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(s.endpoint.Transport),
@@ -171,12 +186,21 @@ func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 	}, nil
 }
 
+func infof(format string, args ...interface{}) operation {
+	s := fmt.Sprintf(format, args...)
+	log.Info.Print("grpc/dirserver: " + s)
+	return operation(s)
+}
+
+type operation string
+
+func (op operation) log(err error) {
+	infof("%v failed: %v", op, err)
+}
+
 // entryError performs the common operation of converting a directory entry
 // and error result pair into the corresponding protocol buffer.
-func entryError(entry *upspin.DirEntry, err error) (*proto.EntryError, error) {
-	if err != nil {
-		log.Println(err)
-	}
+func (op operation) entryError(entry *upspin.DirEntry, err error) (*proto.EntryError, error) {
 	var b []byte
 	if entry != nil {
 		var mErr error
