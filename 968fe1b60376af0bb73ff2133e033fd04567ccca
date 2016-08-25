@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "88349bbf_edd681be",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-25T02:55:13Z",
+      "side": 1,
+      "message": "I like documenting these booleans with a const unique \u003d true then\nupspin.SortDirEntries(entries, !unique)\n\nBut this works too.",
+      "revId": "968fe1b60376af0bb73ff2133e033fd04567ccca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
