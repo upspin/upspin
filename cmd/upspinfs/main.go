@@ -15,6 +15,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
+	"upspin.io/flags"
 	"upspin.io/key/usercache"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -27,8 +28,7 @@ import (
 )
 
 var (
-	testFlag  = flag.String("test", "", "set up test context with specified user")
-	debugFlag = flag.Bool("d", false, "turn on debugging")
+	testFlag = flag.String("test", "", "set up test context with specified user")
 )
 
 func usage() {
@@ -43,11 +43,10 @@ func debug(msg interface{}) {
 
 func main() {
 	flag.Usage = usage
-	flag.Parse()
+	flags.Parse()
 
-	if *debugFlag {
+	if log.Level() == "debug" {
 		fuse.Debug = debug
-		log.SetLevel("debug")
 	}
 
 	if flag.NArg() != 1 {
