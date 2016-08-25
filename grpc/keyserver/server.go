@@ -114,16 +114,10 @@ func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 
-	key, err := s.keyServerFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-	endpoint := key.Endpoint()
-	resp := &proto.EndpointResponse{
+	return &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
-			Transport: int32(endpoint.Transport),
-			NetAddr:   string(endpoint.NetAddr),
+			Transport: int32(s.endpoint.Transport),
+			NetAddr:   string(s.endpoint.NetAddr),
 		},
-	}
-	return resp, nil
+	}, nil
 }
