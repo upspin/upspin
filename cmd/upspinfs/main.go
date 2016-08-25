@@ -14,7 +14,6 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 
-	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/flags"
 	"upspin.io/key/usercache"
@@ -42,6 +41,28 @@ func debug(msg interface{}) {
 	log.Debug.Printf("FUSE %v", msg)
 }
 
+func testSetup(name upspin.UserName) (ctx upspin.Context, err error) {
+	endpoint := upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // ignored
+	}
+	ctx = context.New().
+		SetUserName(name).
+		SetPacking(upspin.DebugPack).
+		SetKeyEndpoint(endpoint).
+		SetDirEndpoint(endpoint).
+		SetStoreEndpoint(endpoint)
+	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))
+	user := &upspin.User{
+		Name:      upspin.UserName(name),
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		PublicKey: publicKey,
+	}
+	err = ctx.KeyServer().Put(user)
+	return
+}
+
 func main() {
 	flag.Usage = usage
 	flags.Parse()
@@ -58,40 +79,26 @@ func main() {
 		log.Fatal("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
 
-	ctx, err := context.FromFile(flags.Context)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// dfuse does not do user lookups, so it does not need a usercache (other layers will use it).
-
-	// Hack for testing
+	var ctx upspin.Context
 	if *testFlag != "" {
-		key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+		// Special setup for testing.
+		ctx, err = testSetup(upspin.UserName(*testFlag))
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		// Normal setup, get context from file.
+		cf, err := os.Open(flags.Context)
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
-		if ep := key.Endpoint(); ep.Transport != upspin.InProcess {
-			log.Fatal("key server not a inprocess.Service")
+		ctx, err = context.InitContext(cf)
+		if err != nil {
+			log.Fatal(err)
 		}
-		// Validate context.
-		if _, err = bind.DirServer(ctx, ctx.DirEndpoint()); err != nil {
-			log.Debug.Fatal(err)
-		}
-		if _, err := bind.StoreServer(ctx, ctx.StoreEndpoint()); err != nil {
-			log.Debug.Fatal(err)
-		}
-		user := &upspin.User{
-			Name:   upspin.UserName(*testFlag),
-			Dirs:   []upspin.Endpoint{ctx.DirEndpoint()},
-			Stores: []upspin.Endpoint{ctx.StoreEndpoint()},
-		}
-		if err := key.Put(user); err != nil {
-			log.Debug.Print(err)
-		}
+		ctx = usercache.Global(ctx)
 	}
 
-	ctx = usercache.Global(ctx)
 	f := newUpspinFS(ctx, mountpoint)
 
 	c, err := fuse.Mount(
@@ -109,6 +116,13 @@ func main() {
 		log.Debug.Fatal(err)
 	}
 	defer c.Close()
+
+	keyserver := ctx.KeyServer()
+	if u, err := keyserver.Lookup(upspin.UserName(*testFlag)); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Debug.Printf("looked up %v %v", u, keyserver)
+	}
 
 	err = fs.Serve(c, f)
 	if err != nil {
