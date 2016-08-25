@@ -16,6 +16,24 @@
       "revId": "2bc670782ad00255a07e73734c77c869a5252b6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68dda79f_923ee26c",
+        "filename": "cmd/upspin/info.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-25T00:12:28Z",
+      "side": 1,
+      "message": "Right, for actual security we\u0027d need a longer hash.  But for just disambiguating which of several old keys for ehg@google.com, eight hex prefix is enough with high probability.",
+      "parentUuid": "68dda79f_1279525a",
+      "revId": "2bc670782ad00255a07e73734c77c869a5252b6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
