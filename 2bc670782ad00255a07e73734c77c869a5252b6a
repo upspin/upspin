@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "68dda79f_1279525a",
+        "filename": "cmd/upspin/info.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-25T00:09:32Z",
+      "side": 1,
+      "message": "I think the suggestion was to elide in the middle \"%x...%x\", r[:2],r[2:4] or something like that. But this works too, up to you.",
+      "revId": "2bc670782ad00255a07e73734c77c869a5252b6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
