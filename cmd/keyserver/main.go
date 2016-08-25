@@ -12,8 +12,6 @@ import (
 	"os"
 	"path/filepath"
 
-	gContext "golang.org/x/net/context"
-
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
@@ -21,6 +19,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
+	"upspin.io/grpc/keyserver"
 	"upspin.io/key/gcp"
 	"upspin.io/key/inprocess"
 	"upspin.io/log"
@@ -35,20 +34,6 @@ import (
 
 // The upspin username for this server.
 const serverName = "keyserver"
-
-// Server is a SecureServer that talks to a KeyServer interface and serves gRPC requests.
-type Server struct {
-	context upspin.Context
-
-	// What this server reports itself as through its Endpoint method.
-	endpoint upspin.Endpoint
-
-	// The underlying keyserver implementation.
-	key upspin.KeyServer
-
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
-}
 
 var testUser = flag.String("testuser", "", "initialize this `user` with test keys (localhost, inprocess only)")
 
@@ -66,7 +51,7 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	context := context.New().SetUserName(serverName)
+	ctx := context.New().SetUserName(serverName)
 
 	// Create a new store implementation.
 	var key upspin.KeyServer
@@ -84,15 +69,6 @@ func main() {
 		log.Fatalf("Setting up KeyServer: %v", err)
 	}
 
-	s := &Server{
-		context: context,
-		endpoint: upspin.Endpoint{
-			Transport: upspin.Remote,
-			NetAddr:   upspin.NetAddr(flags.NetAddr),
-		},
-		key: key,
-	}
-
 	// Special hack for bootstrapping the inprocess key server.
 	if *testUser != "" {
 		if key.Endpoint().Transport != upspin.InProcess {
@@ -101,15 +77,21 @@ func main() {
 		if !isLocal(flags.HTTPSAddr) {
 			log.Fatal("cannot use -testuser flag except on localhost:port")
 		}
-		s.setupTestUser()
+		setupTestUser(key)
 	}
 
-	authConfig := auth.Config{Lookup: s.internalLookup}
+	authConfig := auth.Config{Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
+		user, err := key.Lookup(userName)
+		if err != nil {
+			return "", err
+		}
+		return user.PublicKey, nil
+	}}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s.SecureServer = grpcSecureServer
+	s := keyserver.New(ctx, key, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
@@ -135,7 +117,7 @@ func isLocal(addr string) bool {
 	return true
 }
 
-func (s *Server) setupTestUser() {
+func setupTestUser(key upspin.KeyServer) {
 	user, _, err := path.UserAndDomain(upspin.UserName(*testUser))
 	if err != nil {
 		log.Fatal(err)
@@ -148,7 +130,7 @@ func (s *Server) setupTestUser() {
 		Name:      upspin.UserName(*testUser),
 		PublicKey: f.PublicKey(),
 	}
-	err = s.key.Put(userStruct)
+	err = key.Put(userStruct)
 	if err != nil {
 		log.Fatalf("Put %q failed: %v", *testUser, err)
 	}
@@ -162,96 +144,4 @@ func repo(dir string) string {
 		log.Fatal("no GOPATH")
 	}
 	return filepath.Join(gopath, "src/upspin.io/"+dir)
-}
-
-func (s *Server) internalLookup(userName upspin.UserName) (upspin.PublicKey, error) {
-	user, err := s.key.Lookup(userName)
-	if err != nil {
-		return "", err
-	}
-	return user.PublicKey, nil
-}
-
-// keyServerFor returns a KeyServer bound to the user specified in the context.
-func (s *Server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	svc, err := s.key.Dial(s.context.Copy().SetUserName(session.User()), s.key.Endpoint())
-	if err != nil {
-		return nil, err
-	}
-	return svc.(upspin.KeyServer), nil
-}
-
-// Lookup implements upspin.KeyServer, and does not do any authentication.
-func (s *Server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*proto.KeyLookupResponse, error) {
-	log.Printf("Lookup %q", req.UserName)
-
-	user, err := s.key.Lookup(upspin.UserName(req.UserName))
-	if err != nil {
-		log.Printf("Lookup %q failed: %v", req.UserName, err)
-		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
-	}
-	return &proto.KeyLookupResponse{User: proto.UserProto(user)}, nil
-}
-
-// keyPutError is
-func keyPutError(err error) *proto.KeyPutResponse {
-	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
-}
-
-// Put implements upspin.KeyServer.
-func (s *Server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
-	log.Printf("Put %v", req)
-
-	key, err := s.keyServerFor(ctx)
-	if err != nil {
-		log.Printf("Put %q authentication failed: %v", req.User.Name, err)
-		return keyPutError(err), nil
-
-	}
-	user := proto.UpspinUser(req.User)
-	err = key.Put(user)
-	if err != nil {
-		log.Printf("Put %q failed: %v", user.Name, err)
-		return keyPutError(err), nil
-	}
-	return &proto.KeyPutResponse{}, nil
-}
-
-// Configure implements upspin.Service
-func (s *Server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	log.Printf("Configure %q", req.Options)
-
-	key, err := s.keyServerFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-	_, err = key.Configure(req.Options...)
-	if err != nil {
-		log.Printf("Configure %q failed: %v", req.Options, err)
-		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
-	}
-	return nil, nil
-}
-
-// Endpoint implements upspin.Service
-func (s *Server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	log.Print("Endpoint")
-
-	key, err := s.keyServerFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-	endpoint := key.Endpoint()
-	resp := &proto.EndpointResponse{
-		Endpoint: &proto.Endpoint{
-			Transport: int32(endpoint.Transport),
-			NetAddr:   string(endpoint.NetAddr),
-		},
-	}
-	return resp, nil
 }
