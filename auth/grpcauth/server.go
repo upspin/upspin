@@ -211,7 +211,7 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 	if len(authToken) < authTokenEntropyLen {
 		return nil, errors.E(op, errors.Invalid, errors.Str("invalid auth token"))
 	}
-	log.Printf("Got authToken from context: %s", authToken)
+	log.Debug.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)
