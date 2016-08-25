@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
@@ -52,11 +53,18 @@ func main() {
 	if flag.NArg() != 1 {
 		usage()
 	}
-	mountpoint := flag.Arg(0)
+	mountpoint, err := filepath.Abs(flag.Arg(0))
+	if err != nil {
+		log.Fatal("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
+	}
 
-	context, err := context.InitContext(nil)
+	cf, err := os.Open(flags.Context)
 	if err != nil {
 		log.Debug.Fatal(err)
+	}
+	context, err := context.InitContext(cf)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// dfuse does not do user lookups, so it does not need a usercache (other layers will use it).
@@ -88,7 +96,7 @@ func main() {
 	}
 
 	context = usercache.Global(context)
-	f := newUpspinFS(context)
+	f := newUpspinFS(context, mountpoint)
 
 	c, err := fuse.Mount(
 		mountpoint,
