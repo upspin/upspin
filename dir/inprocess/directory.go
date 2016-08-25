@@ -16,7 +16,6 @@ package inprocess
 import (
 	goPath "path"
 
-	"sort"
 	"strings"
 	"sync"
 
@@ -585,7 +584,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	var checkedPrefix upspin.PathName
 
 	next = append(next, links...)
-	sort.Sort(dirEntrySlice(next))
+	upspin.SortDirEntries(next, false)
 	for _, entry := range next {
 		parsed, _ := path.Parse(entry.Name) // should always work
 		if parent := parsed.Drop(1).Path(); !parsed.IsRoot() && checkedPrefix != parent {
@@ -611,13 +610,6 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 func isGlobPattern(elem string) bool {
 	return strings.ContainsAny(elem, `*?[]`)
 }
-
-// For sorting.
-type dirEntrySlice []*upspin.DirEntry
-
-func (d dirEntrySlice) Len() int           { return len(d) }
-func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
-func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // can reports whether the calling user (defined by s.context.UserName()) has the
 // access right for this file or directory.

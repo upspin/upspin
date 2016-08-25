@@ -8,7 +8,6 @@ package server
 import (
 	"io/ioutil"
 	goPath "path"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -471,8 +470,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 
-	// Sort entries.
-	sort.Sort(dirEntrySlice(entries))
+	upspin.SortDirEntries(entries, false)
 	return entries, errFollowLink
 }
 
@@ -736,10 +734,3 @@ func subspan(op string, opts []options) (options, *metric.Span) {
 	s := span(opts).StartSpan(op)
 	return options{span: s}, s
 }
-
-// For sorting (copied from dir/inprocess/directory.go).
-type dirEntrySlice []*upspin.DirEntry
-
-func (d dirEntrySlice) Len() int           { return len(d) }
-func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
-func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
