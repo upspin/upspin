@@ -304,8 +304,8 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 	// leaving the rest alone. As the fn will return a newly allocated entry,
 	// after each link we update the entry to achieve this.
 	originalName := entry.Name
-	copied := false           // Do we need to allocate a new entry to modify its name?
-	for i := 0; i < 10; i++ { // TODO: What is the right limit?
+	copied := false // Do we need to allocate a new entry to modify its name?
+	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
 		parsed, err := path.Parse(entry.Name)
 		if err != nil {
 			return nil, nil, errors.E(op, err)
@@ -367,11 +367,75 @@ func (c *Client) Delete(name upspin.PathName) error {
 
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "client.Glob"
+	var results []*upspin.DirEntry
+	var this []string
+	next := []string{pattern}
+	for loop := 0; loop < upspin.MaxLinkHops && len(next) > 0; loop++ {
+		this, next = next, this
+		next = next[:0]
+		for _, pattern := range this {
+			files, links, err := c.globOnePattern(pattern)
+			if err != nil {
+				return nil, err
+			}
+			results = append(results, files...)
+			if len(links) > 0 {
+				parsed, err := path.Parse(upspin.PathName(pattern))
+				if err != nil { // Cannot happen, but be careful.
+					return nil, err
+				}
+				for _, link := range links {
+					// We searched for
+					//	u@g.c/a/*/b
+					// and have link entry with name
+					//	u@g.c/a/foo
+					// and target
+					// 	v@x.y/d/e/f.
+					// Replace the the pattern that matches the link name
+					// with the link target and try that the next time:
+					// 	v@x.y/d/e/f/b.
+					linkName, err := path.Parse(link.Name)
+					if err != nil { // Cannot happen, but be careful.
+						return nil, err
+					}
+					tail := strings.TrimPrefix(parsed.FilePath(),
+						parsed.First(linkName.NElem()).FilePath())
+					newPattern := path.Join(link.Link, tail)
+					next = append(next, string(newPattern))
+				}
+			}
+		}
+	}
+	if len(next) > 0 {
+		return nil, errors.E(op, upspin.PathName(pattern), errors.Str("link loop"))
+	}
+	results = upspin.SortDirEntries(results, true)
+	return results, nil
+}
+
+func (c *Client) globOnePattern(pattern string) (entries, links []*upspin.DirEntry, err error) {
 	dir, err := c.DirServer(upspin.PathName(pattern))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return dir.Glob(pattern)
+	entries, err = dir.Glob(pattern)
+	switch err {
+	case nil:
+		return entries, nil, nil
+	case upspin.ErrFollowLink:
+		var files, links []*upspin.DirEntry
+		for _, entry := range entries {
+			if entry.IsLink() {
+				links = append(links, entry)
+			} else {
+				files = append(files, entry)
+			}
+		}
+		return files, links, nil
+	default:
+		return nil, nil, err
+	}
 }
 
 // Create implements upspin.Client.
