@@ -6,8 +6,9 @@ package upspin
 
 import (
 	"encoding/binary"
-	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
-	"fmt"
+	"errors"
+	"fmt" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"sort"
 	"time"
 )
 
@@ -388,4 +389,32 @@ func (t Transport) String() string {
 	default:
 		return fmt.Sprintf("transport(%d)", int(t))
 	}
+}
+
+// Sorting []*DirEntry by name.
+
+type dirEntrySlice []*DirEntry
+
+func (d dirEntrySlice) Len() int           { return len(d) }
+func (d dirEntrySlice) Less(i, j int) bool { return d[i].Name < d[j].Name }
+func (d dirEntrySlice) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+
+// SortDirEntries does an in-place sort of the slice of DirEntries, sorting them in
+// increasing lexical order by Name. The boolean flag specifies whether to elide
+// identical entries, that is, whether the result should contain entries with
+// unique names only. (Other fields of the DirEntries are ignored.) The return
+// value is the resulting slice, which shares storage with the original but may be
+// shorter if unique is true.
+func SortDirEntries(slice []*DirEntry, unique bool) []*DirEntry {
+	sort.Sort(dirEntrySlice(slice))
+	if !unique {
+		return slice
+	}
+	result := make([]*DirEntry, 0, len(slice))
+	for i, entry := range slice {
+		if i == 0 || entry.Name != result[i-1].Name {
+			result = append(result, entry)
+		}
+	}
+	return result
 }
