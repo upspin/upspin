@@ -259,7 +259,6 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
 	dir := n.f.dirLookup(nn.user)
-	log.Debug.Printf("Mkdir %s %v", nn.uname, dir)
 	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
 		// TODO: implement links.
 		// TODO(p): remove from directory cache and retry?
