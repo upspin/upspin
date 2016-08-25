@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c51bde68_143cd4e1",
+        "filename": "grpc/dirserver/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-25T10:17:24Z",
+      "side": 1,
+      "message": "by calling this infof, vet can\u0027t recognize it and check calls.",
+      "revId": "e5d5a7558f0a00e7de94575ea9c8539c11ee7a67",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
