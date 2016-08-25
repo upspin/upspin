@@ -252,7 +252,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
 	}
 
-	return s.put(op, p, entry, canCreate, canWrite, o)
+	link, err = s.put(op, p, entry, canCreate, canWrite, o)
+	if err == upspin.ErrFollowLink {
+		// Should never happen, since hasRight does this check already.
+		return link, err
+	}
+	return nil, err
 }
 
 // MakeDirectory implements upspin.DirServer.
