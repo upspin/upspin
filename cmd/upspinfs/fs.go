@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -31,6 +32,7 @@ const (
 // upspinFS represents an instance of the mounted file system.
 type upspinFS struct {
 	sync.Mutex                               // Protects concurrent access to the rest of this struct.
+	mountpoint string                        // Absolute Unix path to mountpoint.
 	context    upspin.Context                // Upspin context used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
 	root       *node                         // The root of the upspin file system.
@@ -62,6 +64,7 @@ type node struct {
 	user       upspin.UserName  // The upspin user whose directory tree contains this node.
 	attr       fuse.Attr        // Attributes of this node, e.g. POSIX mode bits.
 	handles    map[*handle]bool // Handles (open instances) of this node.
+	link       upspin.PathName  // If this is a symlink, the target.
 
 	// cached info.
 	cf *cachedFile        // Local file system contents of this node.
@@ -84,15 +87,19 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context upspin.Context) *upspinFS {
+func newUpspinFS(context upspin.Context, mountpoint string) *upspinFS {
+	if !strings.HasSuffix(mountpoint, "/") {
+		mountpoint = mountpoint + "/"
+	}
 	f := &upspinFS{
-		context:   context,
-		client:    client.New(context),
-		uid:       os.Getuid(),
-		gid:       os.Getgid(),
-		userDirs:  make(map[string]bool),
-		nodeMap:   make(map[upspin.PathName]*node),
-		enoentMap: make(map[upspin.PathName]time.Time),
+		mountpoint: mountpoint,
+		context:    context,
+		client:     client.New(context),
+		uid:        os.Getuid(),
+		gid:        os.Getgid(),
+		userDirs:   make(map[string]bool),
+		nodeMap:    make(map[upspin.PathName]*node),
+		enoentMap:  make(map[upspin.PathName]time.Time),
 	}
 	homeDir := os.Getenv("HOME")
 	if len(homeDir) == 0 {
@@ -451,6 +458,9 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	nn := n.f.allocNode(n, name, mode, uint64(size), de.Time.Go())
+	if de.IsLink() {
+		nn.link = upspin.PathName(de.Link)
+	}
 
 	// If this is the root, add an entry for this user directory so ReadDirAll will work.
 	if n.t == rootNode {
@@ -701,13 +711,29 @@ func (n *node) Removexattr(ctx gContext.Context, req *fuse.RemovexattrRequest) e
 	return nil
 }
 
+func (dir *node) unixPathToUpspinPath(unixpath string) (upspin.PathName, error) {
+	if unixpath[0] != '/' {
+		return path.Join(dir.uname, unixpath), nil
+	}
+	upspinpath := strings.TrimPrefix(unixpath, dir.f.mountpoint)
+	if unixpath != upspinpath {
+		return upspin.PathName(unixpath), errors.Str("symlink outside of upspin")
+	}
+	return upspin.PathName(upspinpath), nil
+}
+
 // Symlink implements fs.Symlink.
 func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
 	const op = "upspinfs/Fuse Symlink"
 	n.Lock()
 	defer n.Unlock()
-	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(req.Target)), time.Now())
-	if err := n.f.cache.putRedirect(nn, req.Target); err != nil {
+	target, err := n.unixPathToUpspinPath(req.Target)
+	if err != nil {
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(target)), time.Now())
+	nn.link = target
+	if err := n.f.cache.putRedirect(nn, target); err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	nn.exists()
@@ -715,25 +741,16 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	return nn, nil
 }
 
+func (n *node) upspinPathToUnixPath(path upspin.PathName) string {
+	// All upspin paths are absolute.
+	return n.f.mountpoint + string(path)
+}
+
 // Symlink implements fs.NodeReadlinker.Readlink.
 func (n *node) Readlink(ctx gContext.Context, req *fuse.ReadlinkRequest) (string, error) {
 	const op = "upspinfs/Fuse Readlink"
-	h, err := n.openFile(ctx, &fuse.OpenRequest{Flags: fuse.OpenReadOnly}, nil)
-	if err != nil {
-		return "", e2e(errors.E(op, n.uname, err))
-	}
-	realh := h.(*handle)
-	defer realh.free()
-	buf := make([]byte, n.attr.Size)
-	l, err := n.cf.readAt(buf, 0)
-	if err != nil {
-		return "", e2e(errors.E(op, n.uname, err))
-	}
-	if uint64(l) != n.attr.Size {
-		return "", e2e(errors.E(op, errors.IO, n.uname, errors.Str("short read")))
-	}
-	log.Debug.Printf("Readlink %q -> %q", n, string(buf))
-	return string(buf), nil
+	log.Debug.Printf("Readlink %q -> %q", n, n.link)
+	return n.upspinPathToUnixPath(n.link), nil
 }
 
 // isEnoent returns true if we already know this path name doesn't exist.

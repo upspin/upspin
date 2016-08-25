@@ -399,9 +399,9 @@ func (cf *cachedFile) writeBack(h *handle) error {
 }
 
 // putRedirect assumes that the target fits in a single block.
-func (c *cache) putRedirect(n *node, target string) error {
+func (c *cache) putRedirect(n *node, target upspin.PathName) error {
 	// Use the client library to write it.
-	_, err := c.client.PutLink(upspin.PathName(target), n.uname)
+	_, err := c.client.PutLink(target, n.uname)
 	if err != nil {
 		return err
 	}
