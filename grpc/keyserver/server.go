@@ -7,6 +7,8 @@
 package keyserver
 
 import (
+	"fmt"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
@@ -45,8 +47,8 @@ func New(ctx upspin.Context, key upspin.KeyServer, ss grpcauth.SecureServer, add
 	}
 }
 
-// keyServerFor returns a KeyServer bound to the user specified in the context.
-func (s *server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
+// keyFor returns a KeyServer bound to the user specified in the context.
+func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
@@ -61,63 +63,77 @@ func (s *server) keyServerFor(ctx gContext.Context) (upspin.KeyServer, error) {
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
 func (s *server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*proto.KeyLookupResponse, error) {
-	log.Printf("Lookup %q", req.UserName)
+	op := logf("Lookup %q", req.UserName)
 
 	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
-		log.Printf("Lookup %q failed: %v", req.UserName, err)
+		op.log(err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &proto.KeyLookupResponse{User: proto.UserProto(user)}, nil
 }
 
-func keyPutError(err error) *proto.KeyPutResponse {
-	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
-}
-
 // Put implements proto.KeyServer.
 func (s *server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
-	log.Printf("Put %v", req)
+	op := logf("Put %v", req)
 
-	key, err := s.keyServerFor(ctx)
+	key, err := s.keyFor(ctx)
 	if err != nil {
-		log.Printf("Put %q authentication failed: %v", req.User.Name, err)
-		return keyPutError(err), nil
-
+		op.log(err)
+		return putError(err), nil
 	}
+
 	user := proto.UpspinUser(req.User)
 	err = key.Put(user)
 	if err != nil {
-		log.Printf("Put %q failed: %v", user.Name, err)
-		return keyPutError(err), nil
+		op.log(err)
+		return putError(err), nil
 	}
 	return &proto.KeyPutResponse{}, nil
 }
 
+func putError(err error) *proto.KeyPutResponse {
+	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
+}
+
 // Configure implements proto.KeyServer.
 func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	log.Printf("Configure %q", req.Options)
+	op := logf("Configure %q", req.Options)
 
-	key, err := s.keyServerFor(ctx)
+	key, err := s.keyFor(ctx)
 	if err != nil {
-		return nil, err
-	}
-	_, err = key.Configure(req.Options...)
-	if err != nil {
-		log.Printf("Configure %q failed: %v", req.Options, err)
+		op.log(err)
 		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
 	}
-	return nil, nil
+
+	name, err := key.Configure(req.Options...)
+	if err != nil {
+		op.log(err)
+	}
+	return &proto.ConfigureResponse{
+		UserName: string(name),
+		Error:    errors.MarshalError(err),
+	}, nil
 }
 
 // Endpoint implements proto.KeyServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	log.Print("Endpoint")
-
 	return &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(s.endpoint.Transport),
 			NetAddr:   string(s.endpoint.NetAddr),
 		},
 	}, nil
+}
+
+func logf(format string, args ...interface{}) operation {
+	s := fmt.Sprintf(format, args...)
+	log.Info.Print("grpc/keyserver: " + s)
+	return operation(s)
+}
+
+type operation string
+
+func (op operation) log(err error) {
+	logf("%v failed: %v", op, err)
 }
