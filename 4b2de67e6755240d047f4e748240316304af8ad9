@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e57e229c_b5abc068",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-08-25T15:30:16Z",
+      "side": 1,
+      "message": "Are the two returns swapped here?   Presumably you want to normally return link.",
+      "revId": "4b2de67e6755240d047f4e748240316304af8ad9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
