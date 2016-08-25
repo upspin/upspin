@@ -127,11 +127,10 @@ func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 
 // Endpoint implements proto.StoreServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	resp := &proto.EndpointResponse{
+	return &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
 			Transport: int32(s.endpoint.Transport),
 			NetAddr:   string(s.endpoint.NetAddr),
 		},
-	}
-	return resp, nil
+	}, nil
 }

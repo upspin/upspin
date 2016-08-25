@@ -163,18 +163,12 @@ func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	log.Print("Endpoint")
 
-	dir, err := s.dirFor(ctx)
-	if err != nil {
-		return nil, err
-	}
-	endpoint := dir.Endpoint()
-	resp := &proto.EndpointResponse{
+	return &proto.EndpointResponse{
 		Endpoint: &proto.Endpoint{
-			Transport: int32(endpoint.Transport),
-			NetAddr:   string(endpoint.NetAddr),
+			Transport: int32(s.endpoint.Transport),
+			NetAddr:   string(s.endpoint.NetAddr),
 		},
-	}
-	return resp, nil
+	}, nil
 }
 
 // entryError performs the common operation of converting a directory entry
