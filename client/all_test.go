@@ -316,24 +316,32 @@ func TestFileZeroFill(t *testing.T) {
 	}
 }
 
+func globAndCheck(t *testing.T, client upspin.Client, pattern string, expect ...upspin.PathName) bool {
+	entries, err := client.Glob(pattern)
+	if err != nil {
+		t.Errorf("Glob(%q): err = %v; expected none", pattern, err)
+		return false
+	}
+	if len(entries) != len(expect) {
+		t.Errorf("Glob(%q): got %d entries, expected %d:", pattern, len(entries), len(expect))
+		for _, entry := range entries {
+			t.Logf("\t%s", entry.Name)
+		}
+		return false
+	}
+	for i, p := range expect {
+		if entries[i].Name != p {
+			t.Errorf("Glob(%q): index %d: got %q; expected %q", pattern, i, p, entries[i].Name)
+			return false
+		}
+	}
+	return true
+}
+
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
 	client := New(setup(user, ""))
 	var err error
-	var paths []*upspin.DirEntry
-	checkPaths := func(expPaths ...string) {
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-		if len(paths) != len(expPaths) {
-			t.Fatalf("Expected %d paths, got %d", len(expPaths), len(paths))
-		}
-		for i, p := range expPaths {
-			if string(paths[i].Name) != p {
-				t.Errorf("Expected path %d %q, got %q", i, p, paths[i].Name)
-			}
-		}
-	}
 
 	for _, fno := range []int{0, 1, 7, 17} {
 		fileName := fmt.Sprintf("%s/testfile%d.txt", user, fno)
@@ -344,14 +352,19 @@ func TestGlob(t *testing.T) {
 		}
 	}
 
-	paths, err = client.Glob("multiuser@a.co/testfile*.txt")
-	checkPaths("multiuser@a.co/testfile0.txt", "multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt")
+	if !globAndCheck(t, client, "multiuser@a.co/testfile*.txt",
+		"multiuser@a.co/testfile0.txt", "multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt") {
+		t.Error("glob failed")
+	}
+	if !globAndCheck(t, client, "multiuser@a.co/*7.txt",
+		"multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt") {
+		t.Error("glob failed")
+	}
+	if !globAndCheck(t, client, "multiuser@a.co/*1*.txt",
+		"multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt") {
+		t.Error("glob failed")
+	}
 
-	paths, err = client.Glob("multiuser@a.co/*7.txt")
-	checkPaths("multiuser@a.co/testfile17.txt", "multiuser@a.co/testfile7.txt")
-
-	paths, err = client.Glob("multiuser@a.co/*1*.txt")
-	checkPaths("multiuser@a.co/testfile1.txt", "multiuser@a.co/testfile17.txt")
 }
 
 func TestPutDuplicateAndRename(t *testing.T) {
@@ -415,7 +428,7 @@ func TestSimpleLinks(t *testing.T) {
 		fileName = dirName + "/file"
 		linkName = root + "/link"
 		text     = "hello sailor"
-		linkText = "what a lovely lovely day"
+		linkText = "what a lovely day"
 	)
 	client := New(setup(user, ""))
 	// Install and check file.
@@ -480,5 +493,49 @@ func TestSimpleLinks(t *testing.T) {
 	_, err = client.Get(fileName)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestGlobLinks(t *testing.T) {
+	const (
+		user     = "linkglobber@google.com"
+		root     = user
+		dirName  = root + "/dir"
+		fileName = dirName + "/file"
+		linkName = root + "/link" // Will point to dir.
+		text     = "ignored"
+	)
+	client := New(setup(user, ""))
+	_, err := client.MakeDirectory(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = client.Put(fileName, []byte(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Link to directory.
+	_, err = client.PutLink(dirName, linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// There are two entries in the root, one a link.
+	if !globAndCheck(t, client, root+"/*",
+		"linkglobber@google.com/dir", "linkglobber@google.com/link") {
+		t.Error("glob failed")
+	}
+	if !globAndCheck(t, client, dirName+"/*",
+		"linkglobber@google.com/dir/file") {
+		t.Error("glob failed")
+	}
+	if !globAndCheck(t, client, linkName+"/*",
+		"linkglobber@google.com/dir/file") {
+		t.Error("glob failed")
+	}
+	// There is only one file, although there are two paths to it.
+	if !globAndCheck(t, client, root+"/*/*",
+		"linkglobber@google.com/dir/file") {
+		t.Error("glob failed")
 	}
 }
