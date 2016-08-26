@@ -486,8 +486,8 @@ func TestParseBadGroupMember(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
-	if !strings.Contains(err.Error(), "no user name") {
-		t.Fatalf("expected missing user name error, got: %v", err)
+	if !strings.Contains(err.Error(), "missing domain name") {
+		t.Fatalf("expected missing domain name error, got: %v", err)
 	}
 }
 

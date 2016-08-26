@@ -65,15 +65,17 @@ func TestCountMallocs(t *testing.T) {
 }
 
 var badParseTests = []upspin.PathName{
-	"u@x/a/b",  // User name too short.
-	"user/a/b", // Invalid user name.
+	"u@x/a/b",              // User name too short.
+	"user/a/b",             // Invalid user name.
+	"user@domain.com*",     // Spurious character in user name.
+	"user@domain.com*/a/b", // Spurious character in user name.
 }
 
 func TestBadParse(t *testing.T) {
 	for _, test := range badParseTests {
 		_, err := Parse(test)
 		if err == nil {
-			t.Errorf("%q: error, got none", test)
+			t.Errorf("%q: got no error, expected one", test)
 			continue
 		}
 	}
