@@ -779,7 +779,74 @@ func equalNames(t *testing.T, user upspin.UserName, entries []*upspin.DirEntry, 
 }
 
 func TestWhichAccessLink(t *testing.T) {
-	// TODO
+	context, dir := setup()
+	user := context.UserName()
+	// This is more elaborate than we need, but it's clear.
+	// We construct a tree with a private directory and a public one, with
+	// suitable access controls. (We just one user; it's all we need.)
+	// The test verifies that a link in the public directory to a private
+	// is controlled by the private Access file.
+	publicDirName := upspin.PathName(user + "/public")
+	privateDirName := upspin.PathName(user + "/private")
+	privateFileName := privateDirName + "/file"
+	publicLinkName := publicDirName + "/link" // Will point to the _private_file
+	privateAccessFileName := upspin.PathName(user + "/private/Access")
+	publicAccessFileName := upspin.PathName(user + "/public/Access")
+	_, err := dir.MakeDirectory(publicDirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.MakeDirectory(privateDirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry := storeData(t, context, []byte("hello"), privateFileName)
+	_, err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Lookup(privateFileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Private file exists. Now create a link to it in the public directory.
+	linkEntry, err := newDirEntry(context, upspin.PlainPack, publicLinkName, nil, upspin.AttrLink, privateFileName, upspin.SeqIgnore)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = dir.Put(linkEntry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Lookup the link, should get ErrFollow link with the right path.
+	lookupEntry, err := dir.Lookup(publicLinkName)
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v; expected %v", err, upspin.ErrFollowLink)
+	}
+	if !equal(linkEntry, lookupEntry) {
+		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
+	}
+	// All is well. Now create two access files, a public one and a private one.
+	// The contents don't really matter, since DirServer doesn't evaluate links, but be thorough.
+	entry = storePlainData(t, context, []byte(""), privateAccessFileName) // Empty file means the owner (only) can read or list.
+	_, err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	allRights := fmt.Sprintf("*:%s\n", user)
+	entry = storePlainData(t, context, []byte(allRights), publicAccessFileName) // Empty file means the owner (only) can read or list.
+	_, err = dir.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// WhichAccess should not show the private Access file, but instead present the link.
+	entry, err = dir.WhichAccess(publicLinkName)
+	if err != upspin.ErrFollowLink {
+		t.Fatal(err)
+	}
+	if entry.Link != privateFileName {
+		t.Fatalf("got %q for link; expected %q", entry.Link, privateFileName)
+	}
 }
 
 // reflect.DeepEqual is too fussy, worrying about nil vs. empty. This is a lazy way to
