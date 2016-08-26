@@ -73,6 +73,17 @@ func TestMakeRoot(t *testing.T) {
 	}
 }
 
+// Test that we can call MakeDirectory to make a root using only the user name
+// without a slash. This was a bug.
+func TestMakeRootNoSlash(t *testing.T) {
+	const userName = "wilma@flintstone.org"
+	s := newDirServerForTesting(t, userName)
+	_, err := s.MakeDirectory(userName) // Note: No terminal slash on this name.
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestPut(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
