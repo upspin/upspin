@@ -77,7 +77,7 @@ func (p Parsed) Elem(n int) string {
 func (p Parsed) NElem() int {
 	str := string(p.path)
 	n := strings.Count(str, "/")
-	if n == 1 && strings.HasSuffix(str, "/") { // User root
+	if n == 1 && str[len(str)-1] == '/' { // User root
 		n = 0
 	}
 	return n
@@ -101,17 +101,13 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	var user string
 	slash := strings.IndexByte(name, '/')
 	if slash < 0 {
-		user, name = name, ""
+		user = name
 	} else {
-		user, name = name[:slash], name[slash:]
+		user = name[:slash]
 	}
-	if len(user) < 6 {
-		// No user name. Must be at least "u@x.co". Silly test - do more.
-		return Parsed{}, errors.E(op, pathName, errors.Str("no user name in path"))
-	}
-	if strings.Count(user, "@") != 1 {
-		// User name must contain exactly one "@".
-		return Parsed{}, errors.E(op, pathName, errors.Str("bad user name in path"))
+	if _, _, err := UserAndDomain(upspin.UserName(user)); err != nil {
+		// Bad user name.
+		return Parsed{}, err
 	}
 	p := Parsed{
 		// If pathName is already clean, which it usually is, this will not allocate.
