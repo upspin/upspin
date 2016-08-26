@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6523123b_d9771332",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T22:12:59Z",
+      "side": 1,
+      "message": "i would call this stripCR.",
+      "revId": "a8655ab3947b0fafc67f41fa6e416272cc6317bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
