@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e5dd422d_ddae6b7a",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T02:47:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c51bde68_9468e41d",
+      "revId": "549acb51a8fe72bc40a85987b9bfb9f1a72bd22e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c51bde68_74578860",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-25T04:49:16Z",
       "side": 1,
       "message": "should we also return results when there are too many hops?\ni wonder about partial results in general, for this function that may consult may dirservers, some of which may not be available",
+      "revId": "549acb51a8fe72bc40a85987b9bfb9f1a72bd22e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5dd422d_1dca9350",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T02:47:16Z",
+      "side": 1,
+      "message": "added a todo",
+      "parentUuid": "c51bde68_74578860",
       "revId": "549acb51a8fe72bc40a85987b9bfb9f1a72bd22e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
