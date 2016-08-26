@@ -90,7 +90,7 @@ func equal(t *testing.T, d1, d2 []*upspin.DirEntry) bool {
 
 func TestPutErrorParseRoot(t *testing.T) {
 	// No path given
-	expectErr := errors.E("dir/gcp.Put", errors.E("path.Parse", errors.Str("no user name in path")))
+	expectErr := errors.E("dir/gcp.Put", errors.Syntax)
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Put(&upspin.DirEntry{})
 	if !errors.Match(expectErr, err) {
@@ -102,7 +102,7 @@ func TestPutErrorParseUser(t *testing.T) {
 	dir := upspin.DirEntry{
 		Name: upspin.PathName("a@x/myroot/myfile"),
 	}
-	expectErr := errors.E("dir/gcp.Put", errors.E("path.Parse", errors.Str("no user name in path")))
+	expectErr := errors.E("dir/gcp.Put", errors.Syntax)
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
 	_, err := ds.Put(&dir)
 	if !errors.Match(expectErr, err) {
@@ -126,7 +126,7 @@ func TestPutErrorInvalidSequenceNumber(t *testing.T) {
 
 func TestLookupPathError(t *testing.T) {
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	expectErr := errors.E("dir/gcp.Lookup", errors.E("path.Parse", errors.Str("no user name in path")))
+	expectErr := errors.E("dir/gcp.Lookup", errors.Syntax)
 	_, err := ds.Lookup("")
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Lookup: error mismatch: got %v; want %v", err, expectErr)
@@ -135,7 +135,7 @@ func TestLookupPathError(t *testing.T) {
 
 func TestGlobMissingPattern(t *testing.T) {
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	expectErr := errors.E("dir/gcp.Glob", errors.E("path.Parse", errors.Str("no user name in path")))
+	expectErr := errors.E("dir/gcp.Glob", errors.Syntax)
 	_, err := ds.Glob("")
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Glob: error mismatch: got %v; want %v", err, expectErr)
@@ -144,7 +144,7 @@ func TestGlobMissingPattern(t *testing.T) {
 
 func TestGlobBadPath(t *testing.T) {
 	ds := newTestDirServer(t, &storagetest.DummyStorage{})
-	expectErr := errors.E("dir/gcp.Glob", errors.E("path.Parse", errors.Str("bad user name in path")))
+	expectErr := errors.E("dir/gcp.Glob", errors.Syntax)
 	_, err := ds.Glob("missing/email/dir/file")
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("Glob: error mismatch: got %v; want %v", err, expectErr)
