@@ -50,7 +50,8 @@ var commands = map[string]func(...string){
 	"whichaccess": whichAccess,
 }
 
-var op string // The subcommand we are running.
+var op string           // The subcommand we are running.
+var interactive = false // Whether we are running the shell.
 
 func main() {
 	flag.Usage = usage
@@ -61,8 +62,14 @@ func main() {
 	}
 
 	args := flag.Args()[1:]
-	op = flag.Arg(0)
-	fn := commands[strings.ToLower(op)]
+	op = strings.ToLower(flag.Arg(0))
+	// Shell cannot be in commands because of the initialization loop,
+	// and anyway we should avoid recursion in the interpreter.
+	if op == "shell" {
+		shell(args...)
+		return
+	}
+	fn := commands[op]
 	if fn == nil {
 		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", flag.Arg(0))
 		usage()
@@ -79,6 +86,7 @@ func usage() {
 		cmdStrs = append(cmdStrs, cmd)
 	}
 	sort.Strings(cmdStrs)
+	fmt.Fprintf(os.Stderr, "\tshell (Interactive mode)\n")
 	for _, cmd := range cmdStrs {
 		fmt.Fprintf(os.Stderr, "\t%s\n", cmd)
 	}
@@ -88,11 +96,15 @@ func usage() {
 }
 
 // exitf prints the error and exits the program.
+// If we are interactive, it pops up to the interpreter.
 // We don't use log (although the packages we call do) because the errors
 // are for regular people.
 func exitf(format string, args ...interface{}) {
 	format = fmt.Sprintf("upspin: %s: %s\n", op, format)
 	fmt.Fprintf(os.Stderr, format, args...)
+	if interactive {
+		panic("exit")
+	}
 	os.Exit(1)
 }
 
