@@ -6,6 +6,7 @@
 package factotum
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -59,10 +60,12 @@ func New(dir string) (upspin.Factotum, error) {
 	if err != nil {
 		return nil, err
 	}
+	privBytes = removeR(privBytes)
 	pubBytes, err := readFile(op, dir, "public.upspinkey")
 	if err != nil {
 		return nil, err
 	}
+	pubBytes = removeR(pubBytes)
 	pfk, err := makeKey(upspin.PublicKey(pubBytes), string(privBytes))
 	if err != nil {
 		return nil, err
@@ -87,6 +90,7 @@ func New(dir string) (upspin.Factotum, error) {
 	if err != nil {
 		return f, nil
 	}
+	s2 = removeR(s2)
 	lines := strings.Split(string(s2), "\n")
 	for {
 		if len(lines) < 5 {
@@ -116,6 +120,11 @@ func New(dir string) (upspin.Factotum, error) {
 		lines = lines[5:]
 	}
 	return f, err
+}
+
+// removeR removes \r.
+func removeR(b []byte) []byte {
+	return bytes.Replace(b, []byte("\r"), []byte(""), -1)
 }
 
 // makeKey creates a factotumKey by filling in the derived fields.
