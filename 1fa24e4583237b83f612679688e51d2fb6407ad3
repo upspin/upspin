@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6523123b_598c632f",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T23:48:09Z",
+      "side": 1,
+      "message": "would set -e help this? that makes every failing command exit the shell immediately.\nless checking needed, but you\u0027d need to be careful about things like mkdir failing.\nyour call.",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_7989271e",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T23:48:09Z",
+      "side": 1,
+      "message": "tests shouldn\u0027t do this.\ninstead, you can go build -o /tmp/upspinfs.$$ and run that (and clean it up later)",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_1996eb3d",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-26T23:48:09Z",
+      "side": 1,
+      "message": "blank line for consistency.",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
