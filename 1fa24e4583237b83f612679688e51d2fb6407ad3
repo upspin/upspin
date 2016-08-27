@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "65c79282_cd49a93b",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-27T00:04:15Z",
+      "side": 1,
+      "message": "Except I want some commands to fail to check that they do. Perhaps I can rephrase them.",
+      "parentUuid": "6523123b_598c632f",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6523123b_7989271e",
         "filename": "cmd/upspinfs/test.sh",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "65c79282_ed446d25",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-27T00:04:15Z",
+      "side": 1,
+      "message": "Thanks, it felt wront to me but I wasn\u0027t sure what would be correct.  The $$ looks good, I\u0027ll do it.",
+      "parentUuid": "6523123b_7989271e",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6523123b_1996eb3d",
         "filename": "cmd/upspinfs/test.sh",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-26T23:48:09Z",
       "side": 1,
       "message": "blank line for consistency.",
+      "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65c79282_0d40c10f",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-27T00:04:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6523123b_1996eb3d",
       "revId": "1fa24e4583237b83f612679688e51d2fb6407ad3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
