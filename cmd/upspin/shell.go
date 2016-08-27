@@ -14,6 +14,7 @@ import (
 
 func shell(args ...string) {
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
+	promptFlag := fs.String("prompt", "u> ", "interactive prompt")
 	fs.Usage = subUsage(fs, "shell")
 	err := fs.Parse(args)
 	if err != nil {
@@ -22,12 +23,15 @@ func shell(args ...string) {
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
+	prompt := func() {
+		if len(*promptFlag) > 0 {
+			fmt.Print(*promptFlag)
+		}
+	}
 	interactive = true
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("u> ")
-	for scanner.Scan() {
+	for prompt(); scanner.Scan(); prompt() {
 		exec(scanner.Text())
-		fmt.Print("u> ")
 	}
 	interactive = false
 	if scanner.Err() != nil {
