@@ -20,8 +20,6 @@ import (
 // It also has fields that hold relevant information as we acquire it.
 type infoDirEntry struct {
 	*upspin.DirEntry
-	client upspin.Client
-	ctx    upspin.Context
 	// The following fields are computed as we run.
 	access    *access.Access
 	lastUsers string
@@ -74,7 +72,7 @@ func (d *infoDirEntry) Hashes() string {
 }
 
 func (d *infoDirEntry) Users(right access.Right) string {
-	users := userListToString(usersWithAccess(d.client, d.access, right))
+	users := userListToString(usersWithAccess(state.client, d.access, right))
 	if users == d.lastUsers {
 		return "(same)"
 	}
@@ -84,7 +82,7 @@ func (d *infoDirEntry) Users(right access.Right) string {
 
 func (d *infoDirEntry) WhichAccess() string {
 	var acc *access.Access
-	accEntry, err := whichAccessFollowLinks(d.client, d.Name)
+	accEntry, err := whichAccessFollowLinks(state.client, d.Name)
 	if err != nil {
 		return err.Error()
 	}
@@ -98,7 +96,7 @@ func (d *infoDirEntry) WhichAccess() string {
 		}
 	} else {
 		accFile = string(accEntry.Name)
-		data, err := read(d.client, accEntry.Name)
+		data, err := read(state.client, accEntry.Name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
 		}
@@ -115,11 +113,9 @@ func (d *infoDirEntry) WhichAccess() string {
 // the entry, including the users that have permission to access it.
 // TODO: Present this more neatly.
 // TODO: Present group information.
-func printInfo(client upspin.Client, ctx upspin.Context, entry *upspin.DirEntry) {
+func printInfo(entry *upspin.DirEntry) {
 	infoDir := &infoDirEntry{
 		DirEntry: entry,
-		client:   client,
-		ctx:      ctx,
 	}
 	writer := tabwriter.NewWriter(os.Stdout, 4, 4, 1, ' ', 0)
 	err := infoTmpl.Execute(writer, infoDir)

@@ -29,29 +29,26 @@ import (
 // Countersigner holds the state for the countersign calculation.
 type Countersigner struct {
 	exitCode int // Exit with non-zero status for minor problems.
-	context  upspin.Context
-	client   upspin.Client
 	oldKey   upspin.PublicKey
 }
 
 var countersigner Countersigner
 
 func (s *Countersigner) init() {
-	s.client, s.context = newClient()
-	u, err := s.context.KeyServer().Lookup(s.context.UserName())
+	u, err := state.context.KeyServer().Lookup(state.context.UserName())
 	if err != nil || len(u.PublicKey) == 0 {
-		exitf("can't find old key for %q: %s\n", s.context.UserName(), err)
+		exitf("can't find old key for %q: %s\n", state.context.UserName(), err)
 	}
 	s.oldKey = u.PublicKey
 }
 
 // countersignCommand is the main function for the countersign subcommand.
 func (s *Countersigner) countersignCommand() {
-	newF := s.context.Factotum()
+	newF := state.context.Factotum()
 	oldF := newF.Pop()
-	s.context.SetFactotum(oldF) // so calls to servers Authenticate using old key
-	defer s.context.SetFactotum(newF)
-	root := upspin.PathName(string(s.context.UserName()) + "/")
+	state.context.SetFactotum(oldF) // so calls to servers Authenticate using old key
+	defer state.context.SetFactotum(newF)
+	root := upspin.PathName(string(state.context.UserName()) + "/")
 	entries := s.entriesFromDirectory(root)
 	for _, e := range entries {
 		s.countersign(e, newF)
@@ -65,7 +62,7 @@ func (s *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 	if err != nil {
 		exit(err)
 	}
-	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
+	directory, err := bind.DirServer(state.context, state.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -80,7 +77,7 @@ func (s *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 // entriesFromDirectory returns the list of relevant entries in the directory, recursively.
 func (s *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	directory, err := bind.DirServer(s.context, s.context.DirEndpoint())
+	directory, err := bind.DirServer(state.context, state.context.DirEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -93,7 +90,7 @@ func (s *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 	for _, e := range thisDir {
 		if !e.IsDir() && !e.IsLink() &&
 			e.Packing == upspin.EEPack &&
-			string(e.Writer) == string(s.context.UserName()) {
+			string(e.Writer) == string(state.context.UserName()) {
 			entries = append(entries, e)
 		}
 	}

@@ -50,8 +50,17 @@ var commands = map[string]func(...string){
 	"whichaccess": whichAccess,
 }
 
-var op string           // The subcommand we are running.
-var interactive = false // Whether we are running the shell.
+var (
+	op          string  // The subcommand we are running.
+	interactive = false // Whether we are running the shell.
+)
+
+type State struct {
+	client  upspin.Client
+	context upspin.Context
+}
+
+var state State
 
 func main() {
 	flag.Usage = usage
@@ -60,6 +69,8 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
+
+	state.client, state.context = newClient()
 
 	args := flag.Args()[1:]
 	op = strings.ToLower(flag.Arg(0))
@@ -154,8 +165,7 @@ func get(args ...string) {
 		os.Exit(2)
 	}
 
-	c, _ := newClient()
-	data, err := c.Get(upspin.PathName(fs.Arg(0)))
+	data, err := state.client.Get(upspin.PathName(fs.Arg(0)))
 	if err != nil {
 		exit(err)
 	}
@@ -188,15 +198,14 @@ func glob(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
-		de, err := c.Glob(fs.Arg(i))
+		de, err := state.client.Glob(fs.Arg(i))
 		if err != nil {
 			exit(err)
 		}
 
 		if *longFormat {
-			printLongDirEntries(c, de)
+			printLongDirEntries(de)
 		} else {
 			printShortDirEntries(de)
 		}
@@ -214,11 +223,10 @@ func info(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	c, ctx := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
 		// We don't want to follow links, so don't use Client.
-		dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
+		dir, err := bind.DirServer(state.context, state.context.DirEndpoint())
 		if err != nil {
 			exit(err)
 		}
@@ -226,7 +234,7 @@ func info(args ...string) {
 		if err != nil {
 			exit(err)
 		}
-		printInfo(c, ctx, entry)
+		printInfo(entry)
 	}
 }
 
@@ -245,8 +253,7 @@ func link(args ...string) {
 	}
 	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
 	linkPath := path.Clean(upspin.PathName(fs.Arg(1)))
-	c, _ := newClient()
-	_, err = c.PutLink(originalPath, linkPath)
+	_, err = state.client.PutLink(originalPath, linkPath)
 	if err != nil {
 		exit(err)
 	}
@@ -264,20 +271,19 @@ func ls(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
 		// Note: this follows links. This is not what Unix ls does.
 		// If you want to know about the link itself, info will tell you.
 		// TODO: Is this what we want?
-		entry, err := c.Lookup(name, false)
+		entry, err := state.client.Lookup(name, false)
 		if err != nil {
 			exit(err)
 		}
 
 		var de []*upspin.DirEntry
 		if entry.IsDir() {
-			de, err = c.Glob(string(entry.Name) + "/*")
+			de, err = state.client.Glob(string(entry.Name) + "/*")
 			if err != nil {
 				exit(err)
 			}
@@ -286,7 +292,7 @@ func ls(args ...string) {
 		}
 
 		if *longFormat {
-			printLongDirEntries(c, de)
+			printLongDirEntries(de)
 		} else {
 			printShortDirEntries(de)
 		}
@@ -303,9 +309,8 @@ func mkdir(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
-		_, err := c.MakeDirectory(upspin.PathName(fs.Arg(i)))
+		_, err := state.client.MakeDirectory(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			exit(err)
 		}
@@ -324,9 +329,8 @@ func put(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	c, _ := newClient()
 	data := readAll(*inFile)
-	_, err = c.Put(upspin.PathName(fs.Arg(0)), data)
+	_, err = state.client.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		exit(err)
 	}
@@ -343,7 +347,7 @@ func rotate(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	_, ctx := newClient()
+	ctx := state.context
 	f := ctx.Factotum()      // save new key
 	ctx.SetFactotum(f.Pop()) // ctx now defaults to old key
 	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
@@ -371,9 +375,8 @@ func rm(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
-		err := c.Delete(upspin.PathName(fs.Arg(i)))
+		err := state.client.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
 			// TODO: client must implement Delete so links work.
 			exit(err)
@@ -392,8 +395,7 @@ func user(args ...string) {
 	if err != nil {
 		exit(err)
 	}
-	_, ctx := newClient()
-	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	keyServer, err := bind.KeyServer(state.context, state.context.KeyEndpoint())
 	if err != nil {
 		exit(err)
 	}
@@ -413,7 +415,7 @@ func user(args ...string) {
 	}
 	var userNames []upspin.UserName
 	if fs.NArg() == 0 {
-		userNames = append(userNames, ctx.UserName())
+		userNames = append(userNames, state.context.UserName())
 	} else {
 		for i := 0; i < fs.NArg(); i++ {
 			userNames = append(userNames, upspin.UserName(fs.Arg(i)))
@@ -500,10 +502,9 @@ func whichAccess(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	c, _ := newClient()
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
-		acc, err := whichAccessFollowLinks(c, name)
+		acc, err := whichAccessFollowLinks(state.client, name)
 		if err != nil {
 			exit(err)
 		}
@@ -549,7 +550,7 @@ func printShortDirEntries(de []*upspin.DirEntry) {
 	}
 }
 
-func printLongDirEntries(c upspin.Client, de []*upspin.DirEntry) {
+func printLongDirEntries(de []*upspin.DirEntry) {
 	seqWidth := 2
 	sizeWidth := 2
 	for _, e := range de {
