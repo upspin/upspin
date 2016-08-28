@@ -621,12 +621,7 @@ func newState() *State {
 	s := &State{
 		op: "init",
 	}
-	f, err := os.Open(flags.Context)
-	if err != nil {
-		s.exitf("reading context: %v", err)
-	}
-	ctx, err := context.InitContext(f)
-	f.Close()
+	ctx, err := context.FromFile(flags.Context)
 	if err != nil {
 		s.exit(err)
 	}

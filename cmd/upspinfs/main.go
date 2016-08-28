@@ -58,11 +58,7 @@ func main() {
 		log.Fatal("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
 
-	cf, err := os.Open(flags.Context)
-	if err != nil {
-		log.Debug.Fatal(err)
-	}
-	context, err := context.InitContext(cf)
+	ctx, err := context.FromFile(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,7 +67,7 @@ func main() {
 
 	// Hack for testing
 	if *testFlag != "" {
-		key, err := bind.KeyServer(context, context.KeyEndpoint())
+		key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
@@ -79,24 +75,24 @@ func main() {
 			log.Fatal("key server not a inprocess.Service")
 		}
 		// Validate context.
-		if _, err = bind.DirServer(context, context.DirEndpoint()); err != nil {
+		if _, err = bind.DirServer(ctx, ctx.DirEndpoint()); err != nil {
 			log.Debug.Fatal(err)
 		}
-		if _, err := bind.StoreServer(context, context.StoreEndpoint()); err != nil {
+		if _, err := bind.StoreServer(ctx, ctx.StoreEndpoint()); err != nil {
 			log.Debug.Fatal(err)
 		}
 		user := &upspin.User{
 			Name:   upspin.UserName(*testFlag),
-			Dirs:   []upspin.Endpoint{context.DirEndpoint()},
-			Stores: []upspin.Endpoint{context.StoreEndpoint()},
+			Dirs:   []upspin.Endpoint{ctx.DirEndpoint()},
+			Stores: []upspin.Endpoint{ctx.StoreEndpoint()},
 		}
 		if err := key.Put(user); err != nil {
 			log.Debug.Print(err)
 		}
 	}
 
-	context = usercache.Global(context)
-	f := newUpspinFS(context, mountpoint)
+	ctx = usercache.Global(ctx)
+	f := newUpspinFS(ctx, mountpoint)
 
 	c, err := fuse.Mount(
 		mountpoint,

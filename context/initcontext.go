@@ -16,6 +16,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -52,6 +53,18 @@ const (
 	packing     = "packing"
 	secrets     = "secrets"
 )
+
+// FromFile initializes a context using the given file.
+// As with InitContext, environment variables may override the
+// values in the context file.
+func FromFile(name string) (upspin.Context, error) {
+	f, err := os.Open(flags.Context)
+	if err != nil {
+		return nil, errors.E("context.FromFile", err)
+	}
+	defer f.Close()
+	return InitContext(f)
+}
 
 // InitContext returns a context generated from a configuration file and/or
 // environment variables.
