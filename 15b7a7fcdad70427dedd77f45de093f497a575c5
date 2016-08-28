@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6523123b_39c5ef39",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-28T22:37:04Z",
+      "side": 1,
+      "message": "I am concerned that this permits probing of the name space.\nBy doing mkdir user@domain/a/b/c I can see if \"b\" is a file, by seeing whether I get a NotDir error. I can also see if /a or /a/b are links because I\u0027ll get ErrFollowLink.\nI thought we were trying to prevent this kind of probing?\n\nHere\u0027s how I think it should work: this code should walk up the path from the root, looking for Access files and noting the deepest one found.\nIf it encounters a link along the path, it should only return ErrFollowLink if the user has access to List the link name.\nIf the put/mkdir is trying to create an entry inside a non-directory, the user should only get the NotDir error if the have List access to the file in question.\nIn all other cases they should get a NotExist error.",
+      "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
