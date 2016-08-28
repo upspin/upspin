@@ -16,6 +16,24 @@
       "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_b9f1ff95",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-28T22:41:06Z",
+      "side": 1,
+      "message": "We never discussed the rights for a link but they could well be List.\nI will think about this.",
+      "parentUuid": "6523123b_39c5ef39",
+      "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
