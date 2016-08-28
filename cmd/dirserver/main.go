@@ -7,7 +7,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -54,12 +53,7 @@ func main() {
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctxfd, err := os.Open(flags.Context)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ctxfd.Close()
-	ctx, err := context.InitContext(ctxfd)
+	ctx, err := context.FromFile(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
