@@ -20,6 +20,7 @@ import (
 // It also has fields that hold relevant information as we acquire it.
 type infoDirEntry struct {
 	*upspin.DirEntry
+	state *State
 	// The following fields are computed as we run.
 	access    *access.Access
 	lastUsers string
@@ -38,13 +39,12 @@ func (d *infoDirEntry) Rights() []access.Right {
 }
 
 func (d *infoDirEntry) Readers() string {
-	sharer.init()
-	sharer.addAccess(d.DirEntry)
+	d.state.sharer.addAccess(d.DirEntry)
 	d.lastUsers = "<nobody>"
 	if d.IsDir() {
 		return "is a directory"
 	}
-	_, users, _, err := sharer.readers(d.DirEntry)
+	_, users, _, err := d.state.sharer.readers(d.DirEntry)
 	if err != nil {
 		return err.Error()
 	}
@@ -72,7 +72,7 @@ func (d *infoDirEntry) Hashes() string {
 }
 
 func (d *infoDirEntry) Users(right access.Right) string {
-	users := userListToString(usersWithAccess(state.client, d.access, right))
+	users := userListToString(d.state.usersWithAccess(d.state.client, d.access, right))
 	if users == d.lastUsers {
 		return "(same)"
 	}
@@ -82,7 +82,7 @@ func (d *infoDirEntry) Users(right access.Right) string {
 
 func (d *infoDirEntry) WhichAccess() string {
 	var acc *access.Access
-	accEntry, err := whichAccessFollowLinks(state.client, d.Name)
+	accEntry, err := d.state.whichAccessFollowLinks(d.Name)
 	if err != nil {
 		return err.Error()
 	}
@@ -92,11 +92,11 @@ func (d *infoDirEntry) WhichAccess() string {
 		acc, err = access.New(d.Name)
 		if err != nil {
 			// Can't happen, since the name must be valid.
-			exitf("%q: %s", d.Name, err)
+			d.state.exitf("%q: %s", d.Name, err)
 		}
 	} else {
 		accFile = string(accEntry.Name)
-		data, err := read(state.client, accEntry.Name)
+		data, err := read(d.state.client, accEntry.Name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
 		}
@@ -113,17 +113,18 @@ func (d *infoDirEntry) WhichAccess() string {
 // the entry, including the users that have permission to access it.
 // TODO: Present this more neatly.
 // TODO: Present group information.
-func printInfo(entry *upspin.DirEntry) {
+func (state *State) printInfo(entry *upspin.DirEntry) {
 	infoDir := &infoDirEntry{
+		state:    state,
 		DirEntry: entry,
 	}
 	writer := tabwriter.NewWriter(os.Stdout, 4, 4, 1, ' ', 0)
 	err := infoTmpl.Execute(writer, infoDir)
 	if err != nil {
-		exitf("executing info template: %v", err)
+		state.exitf("executing info template: %v", err)
 	}
 	if writer.Flush() != nil {
-		exitf("flushing template output: %v", err)
+		state.exitf("flushing template output: %v", err)
 	}
 }
 

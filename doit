@@ -1,0 +1,23 @@
+set -e
+set -x
+
+upspin mkdir r@google.com
+echo THIS IS X | upspin put r@google.com/x
+upspin link r@google.com/x r@google.com/y
+upspin ls -l r@google.com
+upspin get r@google.com/x
+upspin get r@google.com/y
+echo DO DIR
+upspin mkdir r@google.com/foo
+echo THIS IS FOO/X | upspin put r@google.com/foo/x
+upspin ls -l r@google.com
+upspin link r@google.com/foo r@google.com/bar
+upspin link r@google.com/bar r@google.com/zot
+upspin ls -l r@google.com
+upspin get r@google.com/foo/x
+upspin get r@google.com/zot/x
+upspin glob r@google.com/*
+upspin glob r@google.com/*/*
+upspin link r@google.com/ r@google.com/foo/home
+upspin glob r@google.com/foo/*
+upspin glob r@google.com/foo/home/*
