@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6523123b_d904f376",
+        "filename": "doit",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-29T01:37:19Z",
+      "side": 1,
+      "message": "accidentally included?",
+      "revId": "aa20e86f8b5d60a323ecd58a0cd969f95089841c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
