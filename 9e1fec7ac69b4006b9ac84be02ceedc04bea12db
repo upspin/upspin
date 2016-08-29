@@ -79,6 +79,24 @@
     },
     {
       "key": {
+        "uuid": "650f92e3_5c9631e5",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T20:48:30Z",
+      "side": 1,
+      "message": "Dave is right though. We\u0027re not converting from SeqIgnore and SeqNotExist to SeqBase. For files, we need to do this here. For dirs, the Tree takes care of that.\n\nFixed.",
+      "parentUuid": "6523123b_b916df4e",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6523123b_591c636d",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -96,6 +114,24 @@
     },
     {
       "key": {
+        "uuid": "650f92e3_fc5d8554",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T20:48:30Z",
+      "side": 1,
+      "message": "But the error is different for roots. The test above is more restrictive.",
+      "parentUuid": "6523123b_591c636d",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6523123b_7919277c",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -107,6 +143,24 @@
       "writtenOn": "2016-08-29T20:34:51Z",
       "side": 1,
       "message": "s/Exist/IsDir/ ?",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "650f92e3_dc624112",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T20:48:30Z",
+      "side": 1,
+      "message": "No, this is checking whether we\u0027re overwriting an existing file with a new directory.",
+      "parentUuid": "6523123b_7919277c",
       "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
