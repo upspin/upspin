@@ -139,7 +139,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 
 	if useCache {
 		// Configure the cache connection and confirm the user.
-		serverUser, err := authClient.CacheConfigure(context, e)
+		serverUser, err := authClient.ConfigureProxy(context, e)
 		if err != nil {
 			return nil, err
 		}
