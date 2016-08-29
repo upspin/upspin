@@ -34,6 +34,24 @@
       "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_d9563363",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-29T03:13:29Z",
+      "side": 1,
+      "message": "I believe this does what you ask except for the issue of information leakage,\nwhich is easy to resolve but I would like to do in a separate CL as this one is\nlarge enough already.",
+      "parentUuid": "6523123b_b9f1ff95",
+      "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
