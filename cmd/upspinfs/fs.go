@@ -709,17 +709,17 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 
 // Getxattr implements fs.NodeGetxattrer.Getxattr.
 func (n *node) Getxattr(ctx gContext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
-	return fuse.ErrNoXattr
+	return notSupported("getxattr")
 }
 
 // Listxattr implements fs.NodeListxattrer.Listxattr.
 func (n *node) Listxattr(ctx gContext.Context, req *fuse.ListxattrRequest, resp *fuse.ListxattrResponse) error {
-	return nil
+	return notSupported("listxattr")
 }
 
 // Setxattr implements fs.NodeSetxattrer.Setxattr.
 func (n *node) Setxattr(ctx gContext.Context, req *fuse.SetxattrRequest) error {
-	return nil
+	return notSupported("setxattr")
 }
 
 // Removexattr implements fs.NodeRemovexattrer.Removexattr.

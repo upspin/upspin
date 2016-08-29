@@ -35,6 +35,7 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"strings"
 	"time"
 
 	gContext "golang.org/x/net/context"
@@ -86,6 +87,10 @@ type SecureServer interface {
 
 	// GRPCServer returns the underlying grpc server.
 	GRPCServer() *grpc.Server
+
+	// ConfigureProxy remembers the endpoint being proxied and returns
+	// a response with any authentication request fulfilled.
+	ConfigureProxy(gctx gContext.Context, ctx upspin.Context, req *proto.ConfigureRequest) (resp *proto.ConfigureResponse)
 }
 
 // NewSecureServer returns a new SecureServer that serves GRPC.
@@ -260,4 +265,50 @@ func verifySignature(key upspin.PublicKey, hash []byte, r, s *big.Int) error {
 		return nil
 	}
 	return errors.Str("signature fails to validate using the provided key")
+}
+
+// ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
+// to ensure that the proxy is running as our upspin user identity.
+func (s *secureServerImpl) ConfigureProxy(gctx gContext.Context, ctx upspin.Context, req *proto.ConfigureRequest) (resp *proto.ConfigureResponse) {
+	var endpoint *upspin.Endpoint
+	resp = &proto.ConfigureResponse{}
+
+	session, err := s.GetSessionFromContext(gctx)
+	if err != nil {
+		resp.Error = errors.MarshalError(err)
+		return
+	}
+
+	for _, o := range req.Options {
+		e := strings.TrimPrefix(o, "endpoint=")
+		if e != o {
+			var err error
+			endpoint, err = upspin.ParseEndpoint(e)
+			if err != nil {
+				resp.Error = errors.MarshalError(err)
+				return
+			}
+			session.SetProxiedEndpoint(*endpoint)
+			continue
+		}
+		e = strings.TrimPrefix(o, "authenticate=")
+		if e != o {
+			resp.UserName = string(ctx.UserName())
+			sig, err := ctx.Factotum().UserSign([]byte(resp.UserName + " Authenticate " + e))
+			if err != nil {
+				resp.Error = errors.MarshalError(err)
+				return
+			}
+			resp.Signature = &proto.Signature{
+				R: sig.R.String(),
+				S: sig.S.String(),
+			}
+			continue
+		}
+		// TODO(p): Do we want to do anything about unrecognized options?
+	}
+	if session.ProxiedEndpoint().Transport == upspin.Unassigned {
+		resp.Error = errors.MarshalError(errors.Str("no endpoint provided for cache connection"))
+	}
+	return
 }
