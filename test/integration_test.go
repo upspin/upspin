@@ -24,11 +24,11 @@ package test
 import (
 	"fmt"
 	"log"
-	"strings"
 	"testing"
 
 	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/path"
 	"upspin.io/test/testenv"
@@ -48,17 +48,14 @@ const (
 	contentsOfFile2     = "contents of file 2..."
 	contentsOfFile3     = "===PDF PDF PDF=="
 	genericFileContents = "contents"
-	dirAlreadyExists    = "directory already exists" // TODO: make this a global error in /upspin/errors.go?
-
-	hasLocation = true
-)
-
-const (
-	ownerName  = "upspin-test@google.com"
-	readerName = "upspin-friend-test@google.com"
+	hasLocation         = true
+	ownerName           = "upspin-test@google.com"
+	readerName          = "upspin-friend-test@google.com"
 )
 
 var (
+	errExist      = errors.E(errors.Exist)
+	errNotExist   = errors.E(errors.NotExist)
 	setupTemplate = testenv.Setup{
 		Tree: testenv.Tree{
 			testenv.E("/dir1/", ""),
@@ -81,8 +78,8 @@ func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-		t.Errorf("Expected error contains %q, got %q", access.ErrPermissionDenied, err)
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Errorf("err = %v, want = %v", err, access.ErrPermissionDenied)
 	}
 	// But the owner can still read it.
 	data, err := env.Client.Get(fileName)
@@ -115,9 +112,9 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 	if err == nil {
 		t.Errorf("Get(%q) succeeded, expected an error", file)
 	}
-	// TODO: the error differs between GCP and InProcess. The reason is
-	// GCP Dir returns the DirEntry with Location and Packdata zeroed out,
-	// while InProcess returns permission denied.
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
+	}
 }
 
 func testAllowReadAccess(t *testing.T, env *testenv.Env) {
@@ -217,15 +214,12 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 	}
 	checkDirs("reader", dir2Pat, dirs, 0)
 
-	/* TODO: GCP has a bug in complex Glob expressions and Access file matching.
-	                 Test disabled for now until new DirServer is ready.
-		// Without list access to the root, the reader can't glob /dir*.
-		dirs, err = readerClient.Glob(bothPat)
-		if err != nil {
-			t.Fatal(err)
-		}
-		checkDirs("reader", bothPat, dirs, 0)
-	*/
+	// Without list access to the root, the reader can't glob /dir*.
+    dirs, err = readerClient.Glob(bothPat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkDirs("reader", bothPat, dirs, 0)
 
 	// Give the reader list access to the root.
 	_, err = env.Client.Put(ownerName+"/Access", []byte("l:"+readerName+"\n*:"+ownerName))
@@ -252,7 +246,7 @@ func testGlobWithPattern(t *testing.T, env *testenv.Env) {
 	for i := 0; i <= 10; i++ {
 		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", ownerName, i))
 		_, err := c.MakeDirectory(dirPath)
-		if err != nil && !strings.Contains(err.Error(), dirAlreadyExists) {
+		if err != nil && !errors.Match(errExist, err) {
 			t.Fatal(err)
 		}
 	}
@@ -286,8 +280,8 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	if err == nil {
 		t.Fatalf("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), "not exist") {
-		t.Errorf("Expected error contains not exist, got %s", err)
+	if !errors.Match(errNotExist, err) {
+		t.Errorf("err = %v, want = %v", err, errNotExist)
 	}
 	// But I can't delete files in dir1, since I lack permission.
 	pathName = upspin.PathName(ownerName + "/dir1/file1.txt")
@@ -295,8 +289,8 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-		t.Errorf("Expected error %s, got %s", access.ErrPermissionDenied, err)
+	if !errors.Match(access.ErrPermissionDenied, err) {
+		t.Errorf("err = %v, want = %v", err, access.ErrPermissionDenied)
 	}
 	// But we can always remove the Access file.
 	accessPathName := upspin.PathName(ownerName + "/dir1/Access")
@@ -308,55 +302,6 @@ func testDelete(t *testing.T, env *testenv.Env) {
 	_, err = dir.Delete(pathName)
 	if err != nil {
 		t.Fatal(err)
-	}
-}
-
-func testSharing(t *testing.T, env *testenv.Env) {
-	const (
-		sharedContent = "Hey man, whatup?"
-	)
-	var (
-		sharedDir      = path.Join(ownerName, "mydir")
-		sharedFilePath = path.Join(sharedDir, "sharedfile")
-	)
-	c := env.Client
-
-	// Put an Access file where no one has access (this forces updating the parent dir with no access).
-	accessFile := "r,c,w,d,l:" + ownerName // all rights to the owner.
-	_, err := c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Put a new file under a previously created dir.
-	_, err = c.Put(sharedFilePath, []byte(sharedContent))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Use the other user to read the file and get told no.
-	data, err := readerClient.Get(sharedFilePath)
-	if err == nil {
-		t.Fatal("Expected Get to fail, but it didn't")
-	}
-
-	// Put an Access file first, giving our friend read access. The owner retains all rights.
-	accessFile = fmt.Sprintf("r: %s\nr,c,w,d,l:%s", readerName, ownerName)
-	_, err = c.Put(path.Join(sharedDir, "Access"), []byte(accessFile))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Re-write file, so we wrap keys for our friend.
-	_, err = c.Put(sharedFilePath, []byte(sharedContent))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Now become some other user again and verify that he has access now.
-	data, err = readerClient.Get(sharedFilePath)
-	// And this should not fail under any packing.
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != sharedContent {
-		t.Errorf("Expected %s, got %s", sharedContent, data)
 	}
 }
 
