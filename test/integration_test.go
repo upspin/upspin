@@ -24,11 +24,16 @@ package test
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
 	"upspin.io/access"
 	"upspin.io/bind"
+	"upspin.io/client"
+	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/path"
 	"upspin.io/test/testenv"
@@ -71,48 +76,154 @@ var (
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   cleanup,
 	}
-	readerClient upspin.Client
+	readerClient  upspin.Client
+	readerContext upspin.Context
 )
 
+type testRunner struct {
+	Entry   *upspin.DirEntry
+	Entries []*upspin.DirEntry
+	Data    string
+
+	user    upspin.UserName
+	clients map[upspin.UserName]upspin.Client
+
+	err     error
+	errFile string
+	errLine int
+	lastErr error // used by Diag
+}
+
+func newRunner() *testRunner {
+	return &testRunner{clients: make(map[upspin.UserName]upspin.Client)}
+}
+
+func (r *testRunner) setErr(err error) {
+	if r.err != nil {
+		return
+	}
+	r.err = err
+	_, r.errFile, r.errLine, _ = runtime.Caller(2)
+}
+
+func (r *testRunner) AddUser(ctx upspin.Context) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	r.clients[ctx.UserName()] = client.New(ctx)
+	return r
+}
+
+func (r *testRunner) As(u upspin.UserName) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	c := r.clients[u]
+	if c == nil {
+		r.setErr(errors.E(errors.NotExist, u))
+		return r
+	}
+	r.user = u
+	return r
+}
+
+func (r *testRunner) Get(p upspin.PathName) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	data, err := r.clients[r.user].Get(p)
+	r.Data = string(data)
+	r.setErr(err)
+	return r
+}
+
+func (r *testRunner) Put(p upspin.PathName) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	entry, err := r.clients[r.user].Put(p, []byte(r.Data))
+	r.Entry = entry
+	r.setErr(err)
+	return r
+}
+
+func (r *testRunner) Glob(pattern string) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	entries, err := r.clients[r.user].Glob(pattern)
+	r.Entries = entries
+	r.setErr(err)
+	return r
+}
+
+func (r *testRunner) In(s string) *testRunner {
+	if r.err != nil {
+		return r
+	}
+	r.Data = s
+	return r
+}
+
+func (r *testRunner) Err() error {
+	err := r.err
+	r.err = nil
+	r.lastErr = err
+	return err
+}
+
+func (r *testRunner) Diag() string {
+	if r.lastErr == nil {
+		return "<nil>"
+	}
+	if r.errFile == "" {
+		return r.lastErr.Error()
+	}
+	return fmt.Sprintf("%v:%v: %v", filepath.Base(r.errFile), r.errLine, r.lastErr)
+}
+
 func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
-	var err error
+	r := newRunner().AddUser(env.Context).AddUser(readerContext)
+
 	fileName := upspin.PathName(ownerName + "/dir1/file1.txt")
-	_, err = readerClient.Get(fileName)
+
+	r.As(readerName).Get(fileName)
+	err := r.Err()
 	if err == nil {
 		t.Fatal("Expected error")
 	}
 	if !strings.Contains(err.Error(), access.ErrPermissionDenied.Error()) {
-		t.Errorf("Expected error contains %q, got %q", access.ErrPermissionDenied, err)
+		t.Errorf("Expected error %q, got %v", access.ErrPermissionDenied, r.Diag())
 	}
 	// But the owner can still read it.
-	data, err := env.Client.Get(fileName)
-	if err != nil {
-		t.Fatal(err)
+	r.As(ownerName).Get(fileName)
+	if err := r.Err(); err != nil {
+		t.Fatal(r.Diag())
 	}
-	if string(data) != contentsOfFile1 {
-		t.Errorf("Expected contents %q, got %q", contentsOfFile1, data)
+	if r.Data != contentsOfFile1 {
+		t.Errorf("Expected contents %q, got %q", contentsOfFile1, r.Data)
 	}
 }
 
 func testAllowListAccess(t *testing.T, env *testenv.Env) {
-	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l:"+readerName))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Now check that readerClient can list file1, but can't read and therefore the Location is zeroed out.
+	r := newRunner().AddUser(env.Context).AddUser(readerContext)
+
+	r.As(ownerName).In("l:" + readerName).Put(ownerName + "/dir1/Access")
+
+	// Check that readerClient can list file1, but can't read and therefore the Location is zeroed out.
 	file := ownerName + "/dir1/file1.txt"
-	dirs, err := readerClient.Glob(file)
-	if err != nil {
-		t.Fatal(err)
+	r.As(readerName).Glob(file)
+	if err := r.Err(); err != nil {
+		t.Fatal(r.Diag())
 	}
-	if len(dirs) != 1 {
-		t.Fatalf("Expected 1 entry, got %d", len(dirs))
+	if len(r.Entries) != 1 {
+		t.Fatalf("Expected 1 entry, got %d", len(r.Entries))
 	}
-	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), !hasLocation, 0)
+	checkDirEntry(t, r.Entries[0], upspin.PathName(ownerName+"/dir1/file1.txt"), !hasLocation, 0)
 
 	// Ensure we can't read the data.
-	_, err = readerClient.Get(upspin.PathName(file))
-	if err == nil {
+	r.As(readerName).Get(upspin.PathName(file))
+	if err := r.Err(); err == nil {
 		t.Errorf("Get(%q) succeeded, expected an error", file)
 	}
 	// TODO: the error differs between GCP and InProcess. The reason is
@@ -121,22 +232,21 @@ func testAllowListAccess(t *testing.T, env *testenv.Env) {
 }
 
 func testAllowReadAccess(t *testing.T, env *testenv.Env) {
+	r := newRunner().AddUser(env.Context).AddUser(readerContext)
+
 	// Owner has no delete permission (assumption tested in testDelete).
-	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l,r:"+readerName+"\nc,w,l,r:"+ownerName))
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.As(ownerName)
+	r.In("l,r:" + readerName + "\nc,w,l,r:" + ownerName).Put(ownerName + "/dir1/Access")
 	// Put file back again so we force keys to be re-wrapped.
-	_, err = env.Client.Put(ownerName+"/dir1/file1.txt", []byte(contentsOfFile1))
-	if err != nil {
-		t.Fatal(err)
+	r.In(contentsOfFile1).Put(ownerName + "/dir1/file1.txt")
+
+	// Now try reading as the reader.
+	r.As(readerName).Get(upspin.PathName(ownerName + "/dir1/file1.txt"))
+	if err := r.Err(); err != nil {
+		t.Fatal(r.Diag())
 	}
-	data, err := readerClient.Get(upspin.PathName(ownerName + "/dir1/file1.txt"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != contentsOfFile1 {
-		t.Errorf("Expected contents %q, got %q", contentsOfFile1, data)
+	if r.Data != contentsOfFile1 {
+		t.Errorf("Expected contents %q, got %q", contentsOfFile1, r.Data)
 	}
 }
 
@@ -368,7 +478,7 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	readerClient, _, err = env.NewUser(readerName)
+	readerClient, readerContext, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,7 +506,8 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 }
 
 func TestIntegration(t *testing.T) {
-	for _, kind := range []string{"inprocess", "gcp"} {
+	for _, kind := range []string{"inprocess"} {
+		//for _, kind := range []string{"inprocess", "gcp"} {
 		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
 			setup := setupTemplate
 			setup.Kind = kind
@@ -486,4 +597,13 @@ func cleanup(env *testenv.Env) error {
 		}
 	}
 	return firstErr
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("test/testenv: no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
