@@ -16,6 +16,24 @@
       "revId": "cf22fb103de12ec7717b31aeb93ae53f0f3d5ba9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "650f92e3_d90c1313",
+        "filename": "dir/server/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T19:40:46Z",
+      "side": 1,
+      "message": "Honestly, I don\u0027t know because I didn\u0027t measure. It might be small, but it\u0027s an allocation and it happens on every operation if the user does not have an access file. Inprocess does this too and so did GCP.",
+      "parentUuid": "650f92e3_79fd0703",
+      "revId": "cf22fb103de12ec7717b31aeb93ae53f0f3d5ba9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
