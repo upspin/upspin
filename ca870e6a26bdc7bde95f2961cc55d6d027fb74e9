@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6523123b_f9b45797",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-29T04:00:41Z",
+      "side": 1,
+      "message": "the renaming of the variable is gratuitous",
+      "revId": "ca870e6a26bdc7bde95f2961cc55d6d027fb74e9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
