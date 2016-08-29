@@ -58,6 +58,58 @@
       "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_b916df4e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-29T20:34:51Z",
+      "side": 1,
+      "message": "I think it\u0027s probably OK.",
+      "parentUuid": "650f92e3_5cde3104",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_591c636d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-29T20:34:51Z",
+      "side": 1,
+      "message": "this test achieves the same as the one above.",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6523123b_7919277c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-29T20:34:51Z",
+      "side": 1,
+      "message": "s/Exist/IsDir/ ?",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
