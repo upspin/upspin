@@ -22,6 +22,13 @@ type Session interface {
 
 	// Expires returns the expiration time of the session, in UTC.
 	Expires() time.Time
+
+	// ProxiedEndpoint returns the endpoint for which this session is a proxy.
+	// If we aren't proxying it returns an Unassigned endpoint.
+	ProxiedEndpoint() upspin.Endpoint
+
+	// SetProxiedEndpoint sets the endpoint this session is a proxy for.
+	SetProxiedEndpoint(upspin.Endpoint)
 }
 
 // sessionCacheSize is the max number of sessions to remember. Small values will limit parallelism and
@@ -66,6 +73,7 @@ type sessionImpl struct {
 	authToken string
 	err       error
 	expires   time.Time
+	endpoint  upspin.Endpoint
 }
 
 var _ Session = (*sessionImpl)(nil)
@@ -83,6 +91,16 @@ func (s *sessionImpl) Err() error {
 // Expires implements Session.
 func (s *sessionImpl) Expires() time.Time {
 	return s.expires
+}
+
+// ProxiedEndpoint inplements Session.
+func (s *sessionImpl) ProxiedEndpoint() upspin.Endpoint {
+	return s.endpoint
+}
+
+// SetProxiedEndpoint inplements Session.
+func (s *sessionImpl) SetProxiedEndpoint(e upspin.Endpoint) {
+	s.endpoint = e
 }
 
 func init() {
