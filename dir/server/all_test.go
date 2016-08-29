@@ -22,6 +22,7 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/key/inprocess"
+	"upspin.io/log"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/inprocess"
@@ -342,6 +343,24 @@ func TestGlob(t *testing.T) {
 		}
 	}
 
+	// Try globbing a specific file.
+	log.Printf("====== reading file1.txt")
+	ents, err = s.Glob(userName + "/file1.txt")
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	expected = []upspin.PathName{
+		userName + "/file1.txt",
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for i, e := range ents {
+		if got, want := e.Name, expected[i]; got != want {
+			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
+		}
+	}
+
 	//
 	// Second subtest: globber has Read permissions and Glob is more complex.
 	//
@@ -393,6 +412,23 @@ func TestGlob(t *testing.T) {
 		}
 		if len(e.Packdata) == 0 {
 			t.Errorf("len(e.Packdata) = %d, want > 0", len(e.Packdata))
+		}
+	}
+
+	// Try globbing a specific directory not directly in the root.
+	ents, err = s.Glob(userName + "/dir/foo")
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	expected = []upspin.PathName{
+		userName + "/dir/foo",
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for i, e := range ents {
+		if got, want := e.Name, expected[i]; got != want {
+			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
 		}
 	}
 

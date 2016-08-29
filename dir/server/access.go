@@ -12,15 +12,15 @@ import (
 	"upspin.io/access"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
-// whichAccessNoCache implements DirServer.WhichAccess without doing any
-// caching of Access files.
+// whichAccess implements DirServer.WhichAccess.
 // userLock must be held for p.User().
-func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
-	o, ss := subspan("whichAccessNoCache", opts)
+func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
+	o, ss := subspan("whichAccess", opts)
 	defer ss.End()
 
 	tree, err := s.loadTreeFor(p.User(), o)
@@ -68,28 +68,6 @@ func (s *server) whichAccessNoCache(p path.Parsed, opts ...options) (*upspin.Dir
 	}
 }
 
-// whichAccess returns the DirEntry of the ruling Access file on a path or a
-// DirEntry of the link if ErrFollowLink is returned.
-// userLock must be held for p.User().
-func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
-	o, ss := subspan("whichAccess", opts)
-	defer ss.End()
-
-	// TODO: check the cache and negcache for an access dir entry for this path.
-
-	entry, err := s.whichAccessNoCache(p, o)
-	if err == upspin.ErrFollowLink {
-		return entry, err
-	}
-	if err != nil {
-		// TODO: if not found, record that fact in a negative cache.
-		return nil, err
-	}
-
-	// TODO: add acc to a cache.
-	return entry, nil
-}
-
 // loadAccess loads and processes an Access file from its DirEntry.
 func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Access, error) {
 	defer span(opts).StartSpan("loadAccess").End()
@@ -101,17 +79,12 @@ func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Ac
 }
 
 // loadPath loads a name from the Store, if its entry can be resolved by this
-// DirServer. Intended for use with access.Can. The userLock for the current
-// user must be held.
+// DirServer. Intended for use with access.Can. The userLock for the user in
+// name must be held.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(err)
-	}
-	// TODO: relax this constraint, possibly using Client in a goroutine.
-	// https://github.com/googleprivate/upspin/issues/37
-	if p.User() != s.userName {
-		return nil, errors.E(name, errors.Str("can't fetch other user's Access/Group files"))
 	}
 	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
@@ -131,6 +104,8 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	o, ss := subspan("hasRight", opts)
 	defer ss.End()
 
+	log.Printf("hasRight: checking whether %q has right %v on %q", s.userName, right, p)
+
 	entry, err := s.whichAccess(p, o)
 	if err == upspin.ErrFollowLink {
 		return false, entry, upspin.ErrFollowLink
@@ -146,11 +121,24 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 			return false, nil, err
 		}
 	} else {
-		acc = s.defaultAccess
+		// No Access file exists anywhere. Use an implicit one.
+		// Get the implicit one from the defaultAccess cache.
+		cacheEntry, found := s.defaultAccess.Get(p.User())
+		if !found {
+			// Create one now and add to the cache.
+			acc, err = access.New(upspin.PathName(p.User() + "/"))
+			if err != nil {
+				return false, nil, err
+			}
+			s.defaultAccess.Add(p.User(), acc)
+		} else {
+			acc = cacheEntry.(*access.Access) // can't fail.
+		}
 	}
 	can, err := acc.Can(s.userName, right, p.Path(), s.loadPath)
 	if err != nil {
 		return false, nil, errors.E(err)
 	}
+	log.Printf("hasRight: done checking whether %q has right %v on %q: %v (%v)", s.userName, right, p, can, err)
 	return can, nil, nil
 }
