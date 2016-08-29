@@ -61,8 +61,9 @@ type server struct {
 	access *cache.LRU
 
 	// defaultAccess is the empty Access file that implicitly exists at the
-	// root if one is not found.
-	defaultAccess *access.Access
+	// root of every user's tree, if one is not found. It's indexed by the
+	// username.
+	defaultAccess *cache.LRU
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -140,6 +141,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		logDir:        logDir,
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
+		defaultAccess: cache.NewLRU(accessCacheSize),
 	}, nil
 }
 
@@ -398,14 +400,18 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	// Look for the longest prefix that does not contain a metacharacter, so
 	// we know which level we need to apply Glob and where to start looking
 	// for Access files.
-	firstMeta := p.NElem()
-	for i := 0; i < firstMeta; i++ {
+	firstMeta := p.NElem() - 1
+	if firstMeta < 0 {
+		firstMeta = 0
+	}
+	for i := 0; i < p.NElem(); i++ {
 		if strings.ContainsAny(p.Elem(i), "*?[]^") {
 			firstMeta = i
 			break
 		}
 	}
 
+	log.Printf("==== firstMeta: %d %q", firstMeta, p)
 	var errFollowLink error
 	var entries []*upspin.DirEntry
 	toList := []path.Parsed{p.First(firstMeta)}
@@ -452,6 +458,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 					} else {
 						// Make a shallow copy, since we need to clean
 						// the entry.
+						log.Printf("hasRight: user %q: zeroing out entry for %q", s.userName, e.Name)
 						eCopy := *e
 						eCopy.Packdata = nil
 						eCopy.Blocks = nil
@@ -565,13 +572,14 @@ func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, er
 	}
 
 	cp := *s // copy of the generator instance.
-	// Override userName and defaultAccess (rest is "global").
+	// Override userName (rest is "global").
 	cp.userName = ctx.UserName()
-	var err error
-	cp.defaultAccess, err = access.New(upspin.PathName(cp.userName + "/"))
+	// create a default Access file for this user and cache it.
+	defaultAccess, err := access.New(upspin.PathName(cp.userName + "/"))
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	cp.defaultAccess.Add(cp.userName, defaultAccess)
 	return &cp, nil
 }
 
