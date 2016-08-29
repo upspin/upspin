@@ -80,6 +80,8 @@ func main() {
 		setupTestUser(key)
 	}
 
+	setupFakeFSUser(key)
+
 	authConfig := auth.Config{Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 		user, err := key.Lookup(userName)
 		if err != nil {
@@ -115,6 +117,25 @@ func isLocal(addr string) bool {
 		}
 	}
 	return true
+}
+
+func setupFakeFSUser(key upspin.KeyServer) {
+	user := upspin.UserName("fakefs@upspin.io")
+	f, err := factotum.New("/Users/adg/upspin/fakefs")
+	if err != nil {
+		log.Fatalf("unable to initialize factotum for %q: %v", user, err)
+	}
+	userStruct := &upspin.User{
+		Name:      user,
+		PublicKey: f.PublicKey(),
+		Dirs: []upspin.Endpoint{
+			{Transport: upspin.Remote, NetAddr: "localhost:8000"},
+		},
+	}
+	err = key.Put(userStruct)
+	if err != nil {
+		log.Fatalf("Put %q failed: %v", *testUser, err)
+	}
 }
 
 func setupTestUser(key upspin.KeyServer) {
