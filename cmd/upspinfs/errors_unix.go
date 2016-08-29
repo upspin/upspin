@@ -60,6 +60,10 @@ var kindToErrno = map[errors.Kind]syscall.Errno{
 	errors.Syntax:     syscall.ENOENT,
 }
 
+func notSupported(s string) *errnoError {
+	return &errnoError{syscall.ENOSYS, errors.Str(s)}
+}
+
 // e2e converts an upspin error into a fuse one.
 func e2e(err error) *errnoError {
 	errno := syscall.EIO
