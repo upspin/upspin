@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "65c79282_42d2035a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T15:32:51Z",
+      "side": 1,
+      "message": "Yes, it does. Modulo the same TODO you have here, where we might leak the existence of a link in some cases. I will go over that TODO this week to ensure it\u0027s fixed (but there are other higher priority bugs to fix first).",
+      "revId": "15b7a7fcdad70427dedd77f45de093f497a575c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6523123b_39c5ef39",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 1
