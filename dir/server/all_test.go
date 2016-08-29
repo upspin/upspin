@@ -342,6 +342,23 @@ func TestGlob(t *testing.T) {
 		}
 	}
 
+	// Try globbing a specific file.
+	ents, err = s.Glob(userName + "/file1.txt")
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	expected = []upspin.PathName{
+		userName + "/file1.txt",
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for i, e := range ents {
+		if got, want := e.Name, expected[i]; got != want {
+			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
+		}
+	}
+
 	//
 	// Second subtest: globber has Read permissions and Glob is more complex.
 	//
@@ -396,6 +413,23 @@ func TestGlob(t *testing.T) {
 		}
 	}
 
+	// Try globbing a specific directory not directly in the root.
+	ents, err = s.Glob(userName + "/dir/foo")
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	expected = []upspin.PathName{
+		userName + "/dir/foo",
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for i, e := range ents {
+		if got, want := e.Name, expected[i]; got != want {
+			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
+		}
+	}
+
 	//
 	// Third subtest: More complex regex.
 	//
@@ -447,6 +481,23 @@ func TestGlob(t *testing.T) {
 	expected = []upspin.PathName{
 		userName + "/dir/subdir/sub",
 		userName + "/dir/sublinkdir", // Causes ErrFollowLink above.
+	}
+	for _, e := range ents {
+		t.Logf("got: %q", e.Name)
+	}
+	if got, want := len(ents), len(expected); got != want {
+		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	}
+	for i, e := range ents {
+		if got, want := e.Name, expected[i]; got != want {
+			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
+		}
+	}
+
+	// Glob the link itself.
+	ents, err = sOwner.Glob(userName + "/dir/sublinkdir")
+	expected = []upspin.PathName{
+		userName + "/dir/sublinkdir",
 	}
 	for _, e := range ents {
 		t.Logf("got: %q", e.Name)
