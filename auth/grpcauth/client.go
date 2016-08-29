@@ -200,6 +200,7 @@ func (ac *AuthClientService) GRPCConn() *grpc.ClientConn {
 }
 
 func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
+	log.Debug.Printf("dialWithKeepAlive")
 	c, err := net.DialTimeout("tcp", target, timeout)
 	if err != nil {
 		return nil, err
@@ -284,9 +285,9 @@ func (ac *AuthClientService) Close() {
 	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
 }
 
-// CacheConfigure uses the Configure command to tell the cache the endpoint it is caching for and
-// to ensure that the cache is running as our upspin user identity.
-func (ac *AuthClientService) CacheConfigure(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
+// ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
+// to ensure that the proxy is running as our upspin user identity.
+func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
 	op := "Configure"
 	gCtx, err := ac.NewAuthContext()
 	if err != nil {
