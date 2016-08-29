@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "650f92e3_1c89591f",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-29T20:04:22Z",
+      "side": 1,
+      "message": "Looks like the put of a nonexistent file can have any Sequence number including negative.  Do we really wan that?",
+      "range": {
+        "startLine": 336,
+        "startChar": 1,
+        "endLine": 340,
+        "endChar": 3
+      },
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
