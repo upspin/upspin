@@ -48,7 +48,9 @@ func TestMakeRoot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = checkDirEntry("TestMakeRoot", deLookup, de)
+	deExpected := *de
+	deExpected.Sequence = upspin.SeqBase
+	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,10 +89,11 @@ func TestMakeRootNoSlash(t *testing.T) {
 func TestPut(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
-		Name:    userName + "/file1.txt",
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
+		Name:     userName + "/file1.txt",
+		Attr:     upspin.AttrNone,
+		Writer:   userName,
+		Sequence: upspin.SeqNotExist,
+		Packing:  upspin.PlainPack,
 	}
 	_, err := s.Put(de)
 	if err != nil {
@@ -100,7 +103,9 @@ func TestPut(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = checkDirEntry("TestPut", de2, de)
+	deExpected := *de
+	deExpected.Sequence = upspin.SeqBase
+	err = checkDirEntry("TestPut", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +127,9 @@ func TestMakeDirectory(t *testing.T) {
 	if de2.Attr != upspin.AttrDirectory {
 		t.Errorf("de2.Att = %v, want = %v", de2.Attr, upspin.AttrDirectory)
 	}
-	err = checkDirEntry("TestMakeDirectory", de2, de)
+	deExpected := *de
+	deExpected.Sequence = upspin.SeqBase
+	err = checkDirEntry("TestMakeDirectory", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -632,6 +639,26 @@ func TestPermissionDenied(t *testing.T) {
 	}
 }
 
+func TestOverwriteFileWithWrongSequence(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	_, err := putAccessFile(t, s, userName+"/Access", "*:"+userName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	de := &upspin.DirEntry{
+		Name:     userName + "/some_new_file.txt",
+		Attr:     upspin.AttrNone,
+		Writer:   userName,
+		Packing:  upspin.PlainPack,
+		Sequence: 99,
+	}
+	_, err = s.Put(de)
+	expectedErr := errors.E(errors.Invalid, errors.Str("sequence number"))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+}
+
 func TestMain(m *testing.M) {
 	// So we don't see a ton of "Metric channel is full" messages
 	metric.RegisterSaver(&sinkSaver{})
@@ -684,6 +711,9 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 	}
 	if got.Packing != want.Packing {
 		return errors.Errorf("%s: got.Packing = %q, want = %q", testName, got.Packing, want.Packing)
+	}
+	if got.Sequence != want.Sequence {
+		return errors.Errorf("%s: got.Sequence = %d, want = %d", testName, got.Sequence, want.Sequence)
 	}
 	return nil
 }
