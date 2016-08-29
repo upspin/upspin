@@ -299,7 +299,7 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 		Writer:   s.userName,
 		Packing:  s.serverContext.Packing(),
 		Time:     upspin.Now(),
-		Sequence: upspin.SeqBase,
+		Sequence: 0, // Tree will increment when flushed.
 	}
 	const canWrite = true
 
@@ -338,6 +338,10 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		if !canCreate {
 			return nil, errors.E(op, p.Path(), access.ErrPermissionDenied)
 		}
+		// New file should have a valid sequence number, if user didn't pick one already.
+		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
+			entry.Sequence = upspin.SeqBase
+		}
 	} else if err != nil {
 		// Some unexpected error happened looking up path. Abort.
 		return nil, errors.E(op, err)
@@ -358,6 +362,21 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		if !canWrite {
 			return nil, errors.E(op, p.Path(), access.ErrPermissionDenied)
 		}
+		// If the file is expected not to be there, it's an error.
+		if entry.Sequence == upspin.SeqNotExist {
+			return nil, errors.E(op, entry.Name, errors.Exist)
+		}
+		// We also must have the correct sequence number or SeqIgnore.
+		if entry.Sequence != upspin.SeqIgnore {
+			if entry.Sequence != existingEntry.Sequence {
+				return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("sequence number"))
+			}
+		}
+		// Note: sequence number updates for directories is maintained
+		// by the Tree since directory entries are never Put by the
+		// user explicitly. Here we adjust the dir entries that the user
+		// sent us (those representing files only).
+		entry.Sequence = existingEntry.Sequence + 1
 	}
 
 	entry, err = tree.Put(p, entry)

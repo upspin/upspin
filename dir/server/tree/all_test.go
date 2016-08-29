@@ -114,6 +114,16 @@ func TestPutNodes(t *testing.T) {
 		t.Errorf("de.Name = %v, want %v", de.Name, want)
 	}
 
+	// Verify that the entry for the directory now has an incremented
+	// sequence number.
+	de, _, err = tree.Lookup(mkpath(t, userName+"dir/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
+		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	}
+
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
 	tree2, err := New(context, log, logIndex)
 	if err != nil {
