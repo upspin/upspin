@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65c79282_e21b5727",
+        "filename": "cmd/upspinfs/sh_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T15:39:28Z",
+      "side": 1,
+      "message": "Is this necessary because we don\u0027t want to run it during a simple go test ./... or because it only runs on Mac? If the latter, I thought it worked the same on mac and linux now? If it\u0027s a matter of the shell script adjusting, perhaps it (the shell script) should test for uname and do things slightly different on each case?\n\nJust a thought.",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65c79282_c26733b9",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T15:39:28Z",
+      "side": 1,
+      "message": "I\u0027d recommend running shellcheck to ensure simple bugs are uncovered (often things need to be double-quoted to prevent bogus expansions) and style is consistent throughout our codebase.\n\nYou can run shellcheck online: https://www.shellcheck.net/",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65c79282_827a5b4c",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T15:39:28Z",
+      "side": 1,
+      "message": "empty spaces.",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
