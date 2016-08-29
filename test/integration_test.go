@@ -24,6 +24,8 @@ package test
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"upspin.io/access"
@@ -68,241 +70,163 @@ var (
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   cleanup,
 	}
-	readerClient upspin.Client
+	readerClient  upspin.Client
+	readerContext upspin.Context
 )
 
-func testNoReadersAllowed(t *testing.T, env *testenv.Env) {
-	var err error
+func testNoReadersAllowed(t *testing.T, r *testRunner) {
 	fileName := upspin.PathName(ownerName + "/dir1/file1.txt")
-	_, err = readerClient.Get(fileName)
-	if err == nil {
-		t.Fatal("Expected error")
-	}
-	if !errors.Match(access.ErrPermissionDenied, err) {
-		t.Errorf("err = %v, want = %v", err, access.ErrPermissionDenied)
-	}
+
+	r.As(readerName).Get(fileName)
+	r.Match(t, access.ErrPermissionDenied)
+
 	// But the owner can still read it.
-	data, err := env.Client.Get(fileName)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != contentsOfFile1 {
-		t.Errorf("Expected contents %q, got %q", contentsOfFile1, data)
+	r.As(ownerName).Get(fileName)
+	r.Check(t)
+	if r.Data != contentsOfFile1 {
+		t.Errorf("Expected contents %q, got %q", contentsOfFile1, r.Data)
 	}
 }
 
-func testAllowListAccess(t *testing.T, env *testenv.Env) {
-	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l:"+readerName))
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Now check that readerClient can list file1, but can't read and therefore the Location is zeroed out.
+func testAllowListAccess(t *testing.T, r *testRunner) {
+	r.As(ownerName).Put(ownerName+"/dir1/Access", "l:"+readerName)
+
+	// Check that readerClient can list file1, but can't read and therefore the Location is zeroed out.
 	file := ownerName + "/dir1/file1.txt"
-	dirs, err := readerClient.Glob(file)
-	if err != nil {
-		t.Fatal(err)
+	r.As(readerName).Glob(file)
+	r.Check(t)
+	if len(r.Entries) != 1 {
+		t.Fatalf("Expected 1 entry, got %d", len(r.Entries))
 	}
-	if len(dirs) != 1 {
-		t.Fatalf("Expected 1 entry, got %d", len(dirs))
-	}
-	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), !hasLocation, 0)
+	checkDirEntry(t, r.Entry, upspin.PathName(ownerName+"/dir1/file1.txt"), !hasLocation, 0)
 
 	// Ensure we can't read the data.
-	_, err = readerClient.Get(upspin.PathName(file))
-	if err == nil {
-		t.Errorf("Get(%q) succeeded, expected an error", file)
-	}
-	if !errors.Match(access.ErrPermissionDenied, err) {
-		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
-	}
+	r.As(readerName).Get(upspin.PathName(file))
+	r.Match(t, access.ErrPermissionDenied)
 }
 
-func testAllowReadAccess(t *testing.T, env *testenv.Env) {
+func testAllowReadAccess(t *testing.T, r *testRunner) {
 	// Owner has no delete permission (assumption tested in testDelete).
-	_, err := env.Client.Put(ownerName+"/dir1/Access", []byte("l,r:"+readerName+"\nc,w,l,r:"+ownerName))
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.As(ownerName)
+	r.Put(ownerName+"/dir1/Access", "l,r:"+readerName+"\nc,w,l,r:"+ownerName)
 	// Put file back again so we force keys to be re-wrapped.
-	_, err = env.Client.Put(ownerName+"/dir1/file1.txt", []byte(contentsOfFile1))
-	if err != nil {
-		t.Fatal(err)
-	}
-	data, err := readerClient.Get(upspin.PathName(ownerName + "/dir1/file1.txt"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != contentsOfFile1 {
-		t.Errorf("Expected contents %q, got %q", contentsOfFile1, data)
+	r.Put(ownerName+"/dir1/file1.txt", contentsOfFile1)
+
+	// Now try reading as the reader.
+	r.As(readerName).Get(upspin.PathName(ownerName + "/dir1/file1.txt"))
+	r.Check(t)
+	if r.Data != contentsOfFile1 {
+		t.Errorf("Expected contents %q, got %q", contentsOfFile1, r.Data)
 	}
 }
 
-func testCreateAndOpen(t *testing.T, env *testenv.Env) {
+func testCreateAndOpen(t *testing.T, r *testRunner) {
 	filePath := upspin.PathName(path.Join(ownerName, "myotherfile.txt"))
-	c := env.Client
 
-	f, err := c.Create(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	n, err := f.Write([]byte(genericFileContents))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if n != len(genericFileContents) {
-		t.Fatalf("Expected to write %d bytes, got %d", len(genericFileContents), n)
-	}
-	err = f.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	f, err = c.Open(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	buf := make([]byte, 30)
-	n, err = f.Read(buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if n != len(genericFileContents) {
-		t.Fatalf("Expected to read %d bytes, got %d", len(genericFileContents), n)
-	}
-	buf = buf[:n]
-	if string(buf) != genericFileContents {
-		t.Errorf("Expected to read %q, got %q", genericFileContents, buf)
+	r.As(ownerName)
+	r.Put(filePath, genericFileContents)
+	r.Get(filePath)
+	r.Check(t)
+	if r.Data != genericFileContents {
+		t.Errorf("file content = %q, want %q", r.Data, genericFileContents)
 	}
 }
 
-func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
+func testGlobWithLimitedAccess(t *testing.T, r *testRunner) {
 	dir1Pat := ownerName + "/dir1/*.txt"
 	dir2Pat := ownerName + "/dir2/*.txt"
 	bothPat := ownerName + "/dir*/*.txt"
 
-	checkDirs := func(context, pat string, dirs []*upspin.DirEntry, want int) {
-		got := len(dirs)
+	checkDirs := func(context, pat string, want int) {
+		if r.Failed() {
+			t.Fatalf("%v globbing %v: %v", context, pat, r.Diag())
+		}
+		got := len(r.Entries)
 		if got == want {
 			return
 		}
-		for _, d := range dirs {
+		for _, d := range r.Entries {
 			t.Log("got:", d.Name)
 		}
 		t.Fatalf("%v globbing %v saw %v dirs, want %v", context, pat, got, want)
 	}
 
 	// Owner sees both files.
-	dirs, err := env.Client.Glob(bothPat)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkDirs("owner", bothPat, dirs, 2)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
-	checkDirEntry(t, dirs[1], upspin.PathName(ownerName+"/dir2/file2.txt"), hasLocation, len(contentsOfFile2))
+	r.As(ownerName)
+	r.Glob(bothPat)
+	checkDirs("owner", bothPat, 2)
+	checkDirEntry(t, r.Entries[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	checkDirEntry(t, r.Entries[1], upspin.PathName(ownerName+"/dir2/file2.txt"), hasLocation, len(contentsOfFile2))
 
 	// readerClient should be able to see /dir1/
-	dirs, err = readerClient.Glob(dir1Pat)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkDirs("reader", dir1Pat, dirs, 1)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	r.As(readerName)
+	r.Glob(dir1Pat)
+	checkDirs("reader", dir1Pat, 1)
+	checkDirEntry(t, r.Entry, upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 
 	// but not /dir2/
-	dirs, err = readerClient.Glob(dir2Pat)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkDirs("reader", dir2Pat, dirs, 0)
+	r.Glob(dir2Pat)
+	checkDirs("reader", dir2Pat, 0)
 
 	// Without list access to the root, the reader can't glob /dir*.
-    dirs, err = readerClient.Glob(bothPat)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkDirs("reader", bothPat, dirs, 0)
+	r.Glob(bothPat)
+	checkDirs("reader", bothPat, 0)
 
 	// Give the reader list access to the root.
-	_, err = env.Client.Put(ownerName+"/Access", []byte("l:"+readerName+"\n*:"+ownerName))
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.As(ownerName)
+	r.Put(ownerName+"/Access", "l:"+readerName+"\n*:"+ownerName)
 	// But don't give any access to /dir2/.
-	_, err = env.Client.Put(ownerName+"/dir2/Access", []byte("*:"+ownerName))
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.Put(ownerName+"/dir2/Access", "*:"+ownerName)
+
 	// Then try globbing the root again.
-	dirs, err = readerClient.Glob(bothPat)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkDirs("reader after access", bothPat, dirs, 1)
-	checkDirEntry(t, dirs[0], upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
+	r.As(readerName)
+	r.Glob(bothPat)
+	checkDirs("reader after access", bothPat, 1)
+	checkDirEntry(t, r.Entry, upspin.PathName(ownerName+"/dir1/file1.txt"), hasLocation, len(contentsOfFile1))
 }
 
-func testGlobWithPattern(t *testing.T, env *testenv.Env) {
-	c := env.Client
-
+func testGlobWithPattern(t *testing.T, r *testRunner) {
+	r.As(ownerName)
 	for i := 0; i <= 10; i++ {
-		dirPath := upspin.PathName(fmt.Sprintf("%s/mydir%d", ownerName, i))
-		_, err := c.MakeDirectory(dirPath)
-		if err != nil && !errors.Match(errExist, err) {
-			t.Fatal(err)
-		}
+		r.Mkdir(upspin.PathName(fmt.Sprintf("%s/mydir%d", ownerName, i)))
 	}
-	dirEntries, err := c.Glob(ownerName + "/mydir[0-1]*")
-	if err != nil {
-		t.Fatal(err)
+	r.Glob(ownerName + "/mydir[0-1]*")
+	r.Check(t)
+	if len(r.Entries) != 3 {
+		t.Fatalf("Expected 3 paths, got %d", len(r.Entries))
 	}
-	if len(dirEntries) != 3 {
-		t.Fatalf("Expected 3 paths, got %d", len(dirEntries))
+	if string(r.Entries[0].Name) != ownerName+"/mydir0" {
+		t.Errorf("Expected mydir0, got %s", r.Entries[0].Name)
 	}
-	if string(dirEntries[0].Name) != ownerName+"/mydir0" {
-		t.Errorf("Expected mydir0, got %s", dirEntries[0].Name)
+	if string(r.Entries[1].Name) != ownerName+"/mydir1" {
+		t.Errorf("Expected mydir1, got %s", r.Entries[1].Name)
 	}
-	if string(dirEntries[1].Name) != ownerName+"/mydir1" {
-		t.Errorf("Expected mydir1, got %s", dirEntries[1].Name)
-	}
-	if string(dirEntries[2].Name) != ownerName+"/mydir10" {
-		t.Errorf("Expected mydir10, got %s", dirEntries[2].Name)
+	if string(r.Entries[2].Name) != ownerName+"/mydir10" {
+		t.Errorf("Expected mydir10, got %s", r.Entries[2].Name)
 	}
 }
 
-func testDelete(t *testing.T, env *testenv.Env) {
+func testDelete(t *testing.T, r *testRunner) {
 	pathName := upspin.PathName(ownerName + "/dir2/file3.pdf")
-	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = dir.Delete(pathName)
+
+	r.As(ownerName)
+	r.Delete(pathName)
+
 	// Check it really deleted it (and is not being cached in memory).
-	_, err = env.Client.Get(pathName)
-	if err == nil {
-		t.Fatalf("Expected error, got none")
-	}
-	if !errors.Match(errNotExist, err) {
-		t.Errorf("err = %v, want = %v", err, errNotExist)
-	}
+	r.Get(pathName)
+	r.Match(t, errNotExist)
+
 	// But I can't delete files in dir1, since I lack permission.
 	pathName = upspin.PathName(ownerName + "/dir1/file1.txt")
-	_, err = dir.Delete(pathName)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !errors.Match(access.ErrPermissionDenied, err) {
-		t.Errorf("err = %v, want = %v", err, access.ErrPermissionDenied)
-	}
+	r.Delete(pathName)
+	r.Match(t, access.ErrPermissionDenied)
+
 	// But we can always remove the Access file.
-	accessPathName := upspin.PathName(ownerName + "/dir1/Access")
-	_, err = dir.Delete(accessPathName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.Delete(upspin.PathName(ownerName + "/dir1/Access"))
+
 	// Now delete file1.txt
-	_, err = dir.Delete(pathName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	r.Delete(pathName)
+	r.Check(t)
 }
 
 func testAllOnePacking(t *testing.T, setup testenv.Setup) {
@@ -313,15 +237,17 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	readerClient, _, err = env.NewUser(readerName)
+	readerClient, readerContext, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	r := newRunner().AddUser(env.Context).AddUser(readerContext)
+
 	// The ordering here is important as each test adds state to the tree.
 	for _, test := range []struct {
 		name string
-		fn   func(*testing.T, *testenv.Env)
+		fn   func(*testing.T, *testRunner)
 	}{
 		{"NoReadersAllowed", testNoReadersAllowed},
 		{"AllowListAccess", testAllowListAccess},
@@ -331,7 +257,7 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 		{"GlobWithPattern", testGlobWithPattern},
 		{"Delete", testDelete},
 	} {
-		t.Run(test.name, func(t *testing.T) { test.fn(t, env) })
+		t.Run(test.name, func(t *testing.T) { test.fn(t, r) })
 	}
 
 	err = env.Exit()
@@ -431,4 +357,13 @@ func cleanup(env *testenv.Env) error {
 		}
 	}
 	return firstErr
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("test/testenv: no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
