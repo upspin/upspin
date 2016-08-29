@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "65c79282_a5b569c8",
+        "filename": "cmd/upspinfs/sh_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-29T16:14:53Z",
+      "side": 1,
+      "message": "The problem is the su that is required on linux to mount which is cased in the sh script.  I can take this out.  Just don\u0027t be surprised when it asks you to login.",
+      "parentUuid": "65c79282_e21b5727",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "65c79282_c26733b9",
         "filename": "cmd/upspinfs/test.sh",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "65c79282_050ad57f",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-29T16:14:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65c79282_c26733b9",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "65c79282_827a5b4c",
         "filename": "cmd/upspinfs/test.sh",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-29T15:39:28Z",
       "side": 1,
       "message": "empty spaces.",
+      "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65c79282_45c56d38",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-29T16:14:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65c79282_827a5b4c",
       "revId": "d5dad3883e05bbf7e3f1b5327dcbd1d78e84148e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
