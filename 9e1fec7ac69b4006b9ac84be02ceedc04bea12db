@@ -40,6 +40,24 @@
       "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "650f92e3_5cde3104",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T20:15:53Z",
+      "side": 1,
+      "message": "Oh, and I think we should accept any random number if the user really wants to start at 123, I think it\u0027s fine. But I\u0027m happy to add a check if that\u0027s not fine. (I think we allow it so the user can create backups and stuff like that).",
+      "parentUuid": "650f92e3_9cf7298a",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
