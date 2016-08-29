@@ -412,7 +412,7 @@ func SortDirEntries(slice []*DirEntry, unique bool) []*DirEntry {
 	}
 	result := make([]*DirEntry, 0, len(slice))
 	for i, entry := range slice {
-		if i == 0 || entry.Name != result[i-1].Name {
+		if i == 0 || entry.Name != slice[i-1].Name {
 			result = append(result, entry)
 		}
 	}
