@@ -22,6 +22,24 @@
       "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "650f92e3_9cf7298a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-29T20:14:10Z",
+      "side": 1,
+      "message": "Line 319 calls valid.DirEntry and that verifies that:\n\nif entry.Sequence \u003c 0 \u0026\u0026 entry.Sequence !\u003d upspin.SeqNotExist {\n\t\treturn errors.E(op, entry.Name, errors.Errorf(\"negative sequence number %d\", entry.Sequence))\n\t}",
+      "parentUuid": "650f92e3_1c89591f",
+      "revId": "9e1fec7ac69b4006b9ac84be02ceedc04bea12db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
