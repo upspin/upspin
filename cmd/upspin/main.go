@@ -34,33 +34,33 @@ import (
 	_ "upspin.io/store/transports"
 )
 
-var commands = map[string]func(...string){
-	"countersign": countersign,
-	"get":         get,
-	"glob":        glob,
-	"info":        info,
-	"link":        link,
-	"ls":          ls,
-	"mkdir":       mkdir,
-	"put":         put,
-	"rotate":      rotate,
-	"rm":          rm,
-	"share":       share,
-	"user":        user,
-	"whichaccess": whichAccess,
+var commands = map[string]func(*State, ...string){
+	"countersign": (*State).countersign,
+	"get":         (*State).get,
+	"glob":        (*State).glob,
+	"info":        (*State).info,
+	"link":        (*State).link,
+	"ls":          (*State).ls,
+	"mkdir":       (*State).mkdir,
+	"put":         (*State).put,
+	"rotate":      (*State).rotate,
+	"rm":          (*State).rm,
+	"share":       (*State).share,
+	"user":        (*State).user,
+	"whichaccess": (*State).whichAccess,
 }
-
-var (
-	op          string  // The subcommand we are running.
-	interactive = false // Whether we are running the shell.
-)
 
 type State struct {
-	client  upspin.Client
-	context upspin.Context
+	op            string // Name of the subcommand we are running.
+	client        upspin.Client
+	dirServer     upspin.DirServer
+	keyServer     upspin.KeyServer
+	context       upspin.Context
+	sharer        *Sharer
+	countersigner *Countersigner
+	exitCode      int // Exit with non-zero status for minor problems.
+	interactive   bool
 }
-
-var state State
 
 func main() {
 	flag.Usage = usage
@@ -70,22 +70,23 @@ func main() {
 		usage()
 	}
 
-	state.client, state.context = newClient()
+	state := newState()
 
 	args := flag.Args()[1:]
-	op = strings.ToLower(flag.Arg(0))
+	state.op = strings.ToLower(flag.Arg(0))
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
-	if op == "shell" {
-		shell(args...)
+	if state.op == "shell" {
+		state.shell(args...)
 		return
 	}
-	fn := commands[op]
+	fn := commands[state.op]
 	if fn == nil {
 		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", flag.Arg(0))
 		usage()
 	}
-	fn(args...)
+	fn(state, args...)
+	os.Exit(state.exitCode)
 }
 
 func usage() {
@@ -110,18 +111,18 @@ func usage() {
 // If we are interactive, it pops up to the interpreter.
 // We don't use log (although the packages we call do) because the errors
 // are for regular people.
-func exitf(format string, args ...interface{}) {
-	format = fmt.Sprintf("upspin: %s: %s\n", op, format)
+func (s *State) exitf(format string, args ...interface{}) {
+	format = fmt.Sprintf("upspin: %s: %s\n", s.op, format)
 	fmt.Fprintf(os.Stderr, format, args...)
-	if interactive {
+	if s.interactive {
 		panic("exit")
 	}
 	os.Exit(1)
 }
 
-// exit calls exitf with the error.
-func exit(err error) {
-	exitf("%s", err)
+// exit calls s.exitf with the error.
+func (s *State) exit(err error) {
+	s.exitf("%s", err)
 }
 
 func subUsage(fs *flag.FlagSet, msg string) func() {
@@ -138,36 +139,36 @@ func subUsage(fs *flag.FlagSet, msg string) func() {
 	}
 }
 
-func countersign(args ...string) {
+func (s *State) countersign(args ...string) {
 	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "countersign")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
-	countersigner.init()
-	countersigner.countersignCommand()
+	s.countersigner = newCountersigner(s)
+	s.countersignCommand()
 }
 
-func get(args ...string) {
+func (s *State) get(args ...string) {
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
 	fs.Usage = subUsage(fs, "get [-out=outputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
 		os.Exit(2)
 	}
 
-	data, err := state.client.Get(upspin.PathName(fs.Arg(0)))
+	data, err := s.client.Get(upspin.PathName(fs.Arg(0)))
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	// Write to outfile or to stdout if none set
 	var output *os.File
@@ -176,32 +177,32 @@ func get(args ...string) {
 	} else {
 		output, err = os.Create(*outFile)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 		defer output.Close()
 	}
 	_, err = output.Write(data)
 	if err != nil {
-		exitf("Copying to output failed: %v", err)
+		s.exitf("Copying to output failed: %v", err)
 	}
 }
 
-func glob(args ...string) {
+func (s *State) glob(args ...string) {
 	fs := flag.NewFlagSet("glob", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
 	fs.Usage = subUsage(fs, "glob [-l] pattern...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
 		os.Exit(2)
 	}
 	for i := 0; i < fs.NArg(); i++ {
-		de, err := state.client.Glob(fs.Arg(i))
+		de, err := s.client.Glob(fs.Arg(i))
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 
 		if *longFormat {
@@ -212,12 +213,12 @@ func glob(args ...string) {
 	}
 }
 
-func info(args ...string) {
+func (s *State) info(args ...string) {
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "info path...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -226,26 +227,22 @@ func info(args ...string) {
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
 		// We don't want to follow links, so don't use Client.
-		dir, err := bind.DirServer(state.context, state.context.DirEndpoint())
+		entry, err := s.DirServer().Lookup(name)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
-		entry, err := dir.Lookup(name)
-		if err != nil {
-			exit(err)
-		}
-		printInfo(entry)
+		s.printInfo(entry)
 	}
 }
 
-func link(args ...string) {
+func (s *State) link(args ...string) {
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
 	fs.Usage = subUsage(fs, "link original_path link_path")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 2 {
 		fs.Usage()
@@ -253,19 +250,19 @@ func link(args ...string) {
 	}
 	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
 	linkPath := path.Clean(upspin.PathName(fs.Arg(1)))
-	_, err = state.client.PutLink(originalPath, linkPath)
+	_, err = s.client.PutLink(originalPath, linkPath)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 }
 
-func ls(args ...string) {
+func (s *State) ls(args ...string) {
 	fs := flag.NewFlagSet("ls", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
 	fs.Usage = subUsage(fs, "ls [-l] path...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -276,16 +273,16 @@ func ls(args ...string) {
 		// Note: this follows links. This is not what Unix ls does.
 		// If you want to know about the link itself, info will tell you.
 		// TODO: Is this what we want?
-		entry, err := state.client.Lookup(name, false)
+		entry, err := s.client.Lookup(name, false)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 
 		var de []*upspin.DirEntry
 		if entry.IsDir() {
-			de, err = state.client.Glob(string(entry.Name) + "/*")
+			de, err = s.client.Glob(string(entry.Name) + "/*")
 			if err != nil {
-				exit(err)
+				s.exit(err)
 			}
 		} else {
 			de = []*upspin.DirEntry{entry}
@@ -299,92 +296,88 @@ func ls(args ...string) {
 	}
 }
 
-func mkdir(args ...string) {
+func (s *State) mkdir(args ...string) {
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "mkdir directory...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
 	for i := 0; i < fs.NArg(); i++ {
-		_, err := state.client.MakeDirectory(upspin.PathName(fs.Arg(i)))
+		_, err := s.client.MakeDirectory(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 	}
 }
 
-func put(args ...string) {
+func (s *State) put(args ...string) {
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
 	fs.Usage = subUsage(fs, "put [-in=inputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
 		os.Exit(2)
 	}
-	data := readAll(*inFile)
-	_, err = state.client.Put(upspin.PathName(fs.Arg(0)), data)
+	data := s.readAll(*inFile)
+	_, err = s.client.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 }
 
-func rotate(args ...string) {
+func (s *State) rotate(args ...string) {
 	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "rotate")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 0 {
 		fs.Usage()
 		os.Exit(2)
 	}
-	ctx := state.context
+	ctx := s.context
 	f := ctx.Factotum()      // save new key
 	ctx.SetFactotum(f.Pop()) // ctx now defaults to old key
-	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-	if err != nil {
-		exit(err)
-	}
+	keyServer := s.KeyServer()
 	u, err := keyServer.Lookup(ctx.UserName())
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	u.PublicKey = f.PublicKey()
 	err = keyServer.Put(u)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 }
 
-func rm(args ...string) {
+func (s *State) rm(args ...string) {
 	fs := flag.NewFlagSet("rm", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "rm path...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
 	for i := 0; i < fs.NArg(); i++ {
-		err := state.client.Delete(upspin.PathName(fs.Arg(i)))
+		err := s.client.Delete(upspin.PathName(fs.Arg(i)))
 		if err != nil {
-			// TODO: client must implement Delete so links work.
-			exit(err)
+			s.exit(err)
 		}
 	}
 }
 
-func user(args ...string) {
+func (s *State) user(args ...string) {
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
 	put := fs.Bool("put", false, "write new user record")
 	inFile := fs.String("in", "", "input file (default standard input)")
@@ -393,29 +386,26 @@ func user(args ...string) {
 	fs.Usage = subUsage(fs, "user [-put [-in=inputfile] [-force]] [username...]")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
-	keyServer, err := bind.KeyServer(state.context, state.context.KeyEndpoint())
-	if err != nil {
-		exit(err)
-	}
+	keyServer := s.KeyServer()
 	if *put {
 		if fs.NArg() != 0 {
 			fs.Usage()
 			os.Exit(2)
 		}
-		putUser(keyServer, *inFile, *force)
+		s.putUser(keyServer, *inFile, *force)
 		return
 	}
 	if *inFile != "" {
-		exitf("-in only available with -put")
+		s.exitf("-in only available with -put")
 	}
 	if *force {
-		exitf("-force only available with -put")
+		s.exitf("-force only available with -put")
 	}
 	var userNames []upspin.UserName
 	if fs.NArg() == 0 {
-		userNames = append(userNames, state.context.UserName())
+		userNames = append(userNames, s.context.UserName())
 	} else {
 		for i := 0; i < fs.NArg(); i++ {
 			userNames = append(userNames, upspin.UserName(fs.Arg(i)))
@@ -424,45 +414,45 @@ func user(args ...string) {
 	for _, name := range userNames {
 		u, err := keyServer.Lookup(name)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 		blob, err := json.MarshalIndent(u, "", "\t")
 		if err != nil {
 			// TODO(adg): better error message?
-			exit(err)
+			s.exit(err)
 		}
 		fmt.Printf("%s\n", blob)
 	}
 }
 
-func putUser(keyServer upspin.KeyServer, inFile string, force bool) {
-	data := readAll(inFile)
+func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
+	data := s.readAll(inFile)
 	user := new(upspin.User)
 	err := json.Unmarshal(data, user)
 	if err != nil {
 		// TODO(adg): better error message?
-		exit(err)
+		s.exit(err)
 	}
 	// Validate public key.
 	if user.PublicKey == "" && !force {
-		exitf("An empty public key will prevent user from accessing services. To override use -force.")
+		s.exitf("An empty public key will prevent user from accessing services. To override use -force.")
 	}
 	_, _, err = factotum.ParsePublicKey(user.PublicKey)
 	if err != nil && !force {
-		exitf("invalid public key, to override use -force: %s", err.Error())
+		s.exitf("invalid public key, to override use -force: %s", err.Error())
 	}
 	// Validate username
 	_, _, err = path.UserAndDomain(user.Name)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	err = keyServer.Put(user)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 }
 
-func share(args ...string) {
+func (s *State) share(args ...string) {
 	fs := flag.NewFlagSet("share", flag.ExitOnError)
 	fix := fs.Bool("fix", false, "repair incorrect share settings")
 	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
@@ -472,7 +462,7 @@ func share(args ...string) {
 	fs.Usage = subUsage(fs, "share path...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
@@ -483,30 +473,30 @@ func share(args ...string) {
 	if *force {
 		*fix = true
 	}
-	sharer.init()
-	sharer.fix = *fix
-	sharer.force = *force
-	sharer.isDir = *isDir
-	sharer.recur = *recur
-	sharer.quiet = *quiet
-	sharer.shareCommand(fs.Args())
+	s.sharer = newSharer(s)
+	s.sharer.fix = *fix
+	s.sharer.force = *force
+	s.sharer.isDir = *isDir
+	s.sharer.recur = *recur
+	s.sharer.quiet = *quiet
+	s.shareCommand(fs.Args())
 }
 
-func whichAccess(args ...string) {
+func (s *State) whichAccess(args ...string) {
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
 	fs.Usage = subUsage(fs, "whichaccess path...")
 	err := fs.Parse(args)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
-		acc, err := whichAccessFollowLinks(state.client, name)
+		acc, err := s.whichAccessFollowLinks(name)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 		if acc == nil {
 			fmt.Printf("%s: owner only\n", name)
@@ -516,11 +506,11 @@ func whichAccess(args ...string) {
 	}
 }
 
-func whichAccessFollowLinks(client upspin.Client, name upspin.PathName) (*upspin.DirEntry, error) {
+func (s *State) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, error) {
 	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
-		dir, err := client.DirServer(name)
+		dir, err := s.client.DirServer(name)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 		entry, err := dir.WhichAccess(name)
 		if err == upspin.ErrFollowLink {
@@ -532,7 +522,7 @@ func whichAccessFollowLinks(client upspin.Client, name upspin.PathName) (*upspin
 		}
 		return entry, nil
 	}
-	exitf("%s: link loop", name)
+	s.exitf("%s: link loop", name)
 	return nil, nil
 }
 
@@ -610,7 +600,7 @@ func sizeOf(e *upspin.DirEntry) int64 {
 
 // readAll reads all contents from an input file name or from stdin if
 // the input file name is empty
-func readAll(fileName string) []byte {
+func (s *State) readAll(fileName string) []byte {
 	var input *os.File
 	var err error
 	if fileName == "" {
@@ -618,27 +608,54 @@ func readAll(fileName string) []byte {
 	} else {
 		input, err = os.Open(fileName)
 		if err != nil {
-			exit(err)
+			s.exit(err)
 		}
 		defer input.Close()
 	}
 
 	data, err := ioutil.ReadAll(input)
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
 	return data
 }
 
-func newClient() (upspin.Client, upspin.Context) {
+func newState() *State {
+	s := &State{
+		op: "init",
+	}
 	f, err := os.Open(flags.Context)
 	if err != nil {
-		exitf("reading context: %v", err)
+		s.exitf("reading context: %v", err)
 	}
 	ctx, err := context.InitContext(f)
 	f.Close()
 	if err != nil {
-		exit(err)
+		s.exit(err)
 	}
-	return client.New(ctx), ctx
+	s.client = client.New(ctx)
+	s.context = ctx
+	return s
+}
+
+func (s *State) DirServer() upspin.DirServer {
+	if s.dirServer == nil {
+		dir, err := bind.DirServer(s.context, s.context.DirEndpoint())
+		if err != nil {
+			s.exit(err)
+		}
+		s.dirServer = dir
+	}
+	return s.dirServer
+}
+
+func (s *State) KeyServer() upspin.KeyServer {
+	if s.keyServer == nil {
+		key, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
+		if err != nil {
+			s.exit(err)
+		}
+		s.keyServer = key
+	}
+	return s.keyServer
 }
