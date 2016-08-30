@@ -106,6 +106,17 @@ func (r *testRunner) Put(p upspin.PathName, data string) {
 	r.setErr(err)
 }
 
+// PutLink performs a PutLink request as the current user
+// and populates the Runner's Entry field with the result.
+func (r *testRunner) PutLink(oldName, linkName upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	entry, err := r.clients[r.user].PutLink(oldName, linkName)
+	r.Entry = entry
+	r.setErr(err)
+}
+
 // MakeDirectory performs a MakeDirectory request as the current user
 // and populates the Runner's Entry field with the result.
 func (r *testRunner) MakeDirectory(p upspin.PathName) {
@@ -137,6 +148,21 @@ func (r *testRunner) Glob(pattern string) {
 	r.setErr(err)
 }
 
+// TODO
+func (r *testRunner) DirLookup(p upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	dir, err := r.clients[r.user].DirServer(p)
+	if err != nil {
+		r.setErr(err)
+		return
+	}
+	entry, err := dir.Lookup(p)
+	r.Entry = entry
+	r.setErr(err)
+}
+
 // Err returns the current error state and clears it.
 func (r *testRunner) Err() error {
 	err := r.err
@@ -157,7 +183,7 @@ func (r *testRunner) Failed() bool {
 // otherwise it clears the error.
 func (r *testRunner) Match(want error) bool {
 	got := r.Err()
-	if errors.Match(want, got) {
+	if want == got || errors.Match(want, got) {
 		return true
 	}
 	if got == nil {

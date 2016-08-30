@@ -257,14 +257,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	const op = "client.Get"
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinalLink)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	if entry.IsDir() {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
 	data, err := clientutil.ReadAll(c.context, entry)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	return data, nil
 }
