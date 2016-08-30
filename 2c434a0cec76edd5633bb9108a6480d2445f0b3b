@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5762283_956d2436",
+        "filename": "test/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "this might be nicer broken down a bit, either using variables or maybe just a newline after the comma. it\u0027s messy as is.\nthroughout.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_f52ad8e0",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "needs comments throughout. plus needs a good high-level comment about how it\u0027s used.\n\nalso you might as well call this TestRunner; it\u0027s going to be exported eventually",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_1530344e",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "multiple lines please. it\u0027s complicated.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_352d30f7",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "// If a client already exists for that user, it is replaced with a new one.\n\nor you could check otherwise and set error. but decide and document.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_553aac2d",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "s/,//",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_7537a844",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_95044476",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "ditto\n\nalso should be MakeDirectory",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_b509408d",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "s/,$//",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_d5febc53",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "no, don\u0027t do that. don\u0027t mix it up.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_151914d6",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "delete this block",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_351610a7",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "should be called NoError. \u0027Check\u0027 is an ambiguous word.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_55138cb5",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "t.Fatal(r.Diag)",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_751088a8",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T04:10:49Z",
+      "side": 1,
+      "message": "\"last checked error\" is hard to understand.\nmaybe \"most recent saved error\"?\nit would be clearer if we had docs for testRunner",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
