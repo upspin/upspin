@@ -41,7 +41,7 @@ type Setup struct {
 	// OwnerName is the name of the directory tree owner.
 	OwnerName upspin.UserName
 
-	// Kind is what kind of servers to use, "inprocess" or "GCP".
+	// Kind is what kind of servers to use, "inprocess" or "remote".
 	Kind string
 
 	// Packing is the desired packing for the tree.
@@ -176,8 +176,8 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, 
 
 	var client upspin.Client
 	switch k := e.Setup.Kind; k {
-	case "gcp":
-		client, err = gcpClient(ctx)
+	case "remote":
+		client, err = remoteClient(ctx)
 	case "inprocess":
 		client, err = inProcessClient(ctx)
 	default:
@@ -196,9 +196,9 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Client, upspin.Context, 
 	return client, ctx, nil
 }
 
-// gcpClient returns a Client pointing to the GCP test instances on upspin.io given a Context partially initialized
-// with a user and keys.
-func gcpClient(context upspin.Context) (upspin.Client, error) {
+// remoteClient returns a Client pointing to the remote test instances on
+// upspin.io given a Context partially initialized with a user and keys.
+func remoteClient(context upspin.Context) (upspin.Client, error) {
 	// Use a test GCP StoreServer...
 	endpointStore := upspin.Endpoint{
 		Transport: upspin.Remote,

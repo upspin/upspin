@@ -3,29 +3,13 @@
 // license that can be found in the LICENSE file.
 
 // Package test contains an integration test for all of Upspin.
-// This particular integration test runs on GCP and as such we disable it
-// from normal 'go test ./...' runs since it's too
-// expensive. To run it, do 'go test -tags integration'
-//
-// Note: if this test fails with "directory already exists" it means a bad run of it left data behind.
-// For now, the quickest way to recover is to manually erase everything under
-// gs://upspin-test-dir/upspin-test@google.com and restart the test servers. This will do both:
-//
-// gsutil rm -R gs://upspin-test-dir/upspin-test@google.com
-// cd <your_upspin_srcdir>/cmd/admin
-// ./deploy-servers.sh -t -r directory
-//
-// None of this is needed if the tests complete normally.
-
-// +build integration
 
 package test
 
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
+	"sort"
 	"testing"
 
 	"upspin.io/access"
@@ -45,7 +29,6 @@ import (
 )
 
 const (
-	unauthorizedUser    = "sally@unauthorized.com"
 	contentsOfFile1     = "contents of file 1"
 	contentsOfFile2     = "contents of file 2..."
 	contentsOfFile3     = "===PDF PDF PDF=="
@@ -56,7 +39,6 @@ const (
 )
 
 var (
-	errExist      = errors.E(errors.Exist)
 	errNotExist   = errors.E(errors.NotExist)
 	setupTemplate = testenv.Setup{
 		Tree: testenv.Tree{
@@ -70,7 +52,6 @@ var (
 		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
 		Cleanup:                   cleanup,
 	}
-	readerClient  upspin.Client
 	readerContext upspin.Context
 )
 
@@ -258,7 +239,32 @@ func testDelete(t *testing.T, r *testRunner) {
 	}
 }
 
-func testAllOnePacking(t *testing.T, setup testenv.Setup) {
+// testSuites contains all tests and their names. Order is important, hence
+// test names include their ordering.
+var testSuites = map[string]func(*testing.T, *testRunner){
+	"01.NoReadersAllowed":      testNoReadersAllowed,
+	"02.AllowListAccess":       testAllowListAccess,
+	"03.AllowReadAccess":       testAllowReadAccess,
+	"04.CreateAndOpen":         testCreateAndOpen,
+	"05.GlobWithLimitedAccess": testGlobWithLimitedAccess,
+	"06.GlobWithPattern":       testGlobWithPattern,
+	"07.Delete":                testDelete,
+}
+
+func allTests() []string {
+	var allTests sort.StringSlice
+	for k := range testSuites {
+		allTests = append(allTests, k)
+	}
+	sort.Sort(allTests) // order is important.
+	var tests []string
+	for _, t := range allTests {
+		tests = append(tests, t)
+	}
+	return tests
+}
+
+func testSelectedOnePacking(t *testing.T, setup testenv.Setup, testNames []string) {
 	usercache.ResetGlobal()
 
 	env, err := testenv.New(&setup)
@@ -266,7 +272,7 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	readerClient, readerContext, err = env.NewUser(readerName)
+	_, readerContext, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -276,19 +282,10 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 	r.AddUser(readerContext)
 
 	// The ordering here is important as each test adds state to the tree.
-	for _, test := range []struct {
-		name string
-		fn   func(*testing.T, *testRunner)
-	}{
-		{"NoReadersAllowed", testNoReadersAllowed},
-		{"AllowListAccess", testAllowListAccess},
-		{"AllowReadAccess", testAllowReadAccess},
-		{"CreateAndOpen", testCreateAndOpen},
-		{"GlobWithLimitedAccess", testGlobWithLimitedAccess},
-		{"GlobWithPattern", testGlobWithPattern},
-		{"Delete", testDelete},
-	} {
-		t.Run(test.name, func(t *testing.T) { test.fn(t, r) })
+	for _, name := range testNames {
+		if fn, found := testSuites[name]; found {
+			t.Run(name, func(t *testing.T) { fn(t, r) })
+		}
 	}
 
 	err = env.Exit()
@@ -298,26 +295,39 @@ func testAllOnePacking(t *testing.T, setup testenv.Setup) {
 }
 
 func TestIntegration(t *testing.T) {
-	for _, kind := range []string{"inprocess", "gcp"} {
-		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
-			setup := setupTemplate
-			setup.Kind = kind
-			for _, p := range []struct {
-				packing upspin.Packing
-				curve   string
-			}{
-				{packing: upspin.PlainPack, curve: "p256"},
-				{packing: upspin.DebugPack, curve: "p256"},
-				{packing: upspin.EEPack, curve: "p256"},
-				//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
-			} {
-				setup.Packing = p.packing
-				t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
-					testAllOnePacking(t, setup)
-				})
-			}
-		})
-	}
+	kind := "inprocess"
+
+	t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
+		setup := setupTemplate
+		setup.Kind = kind
+		for _, p := range []struct {
+			packing upspin.Packing
+			curve   string
+		}{
+			{packing: upspin.PlainPack, curve: "p256"},
+			{packing: upspin.DebugPack, curve: "p256"},
+			{packing: upspin.EEPack, curve: "p256"},
+			//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
+		} {
+			setup.Packing = p.packing
+			t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
+				testSelectedOnePacking(t, setup, allTests())
+			})
+		}
+	})
+
+}
+
+// TestQuickRemoteTest runs a quick testsuite remotely.
+func TestQuickRemoteTest(t *testing.T) {
+	setup := setupTemplate
+	setup.Kind = "remote"
+	setup.Packing = upspin.PlainPack
+	selectedTests := []string{"CreateAndOpen", "Delete"}
+
+	t.Run(fmt.Sprintf("packing=%v/curve=%v", setup.Packing, "256"), func(t *testing.T) {
+		testSelectedOnePacking(t, setup, selectedTests)
+	})
 }
 
 // checkDirEntry verifies a dir entry against expectations. size == 0 for don't check.
@@ -388,13 +398,4 @@ func cleanup(env *testenv.Env) error {
 		}
 	}
 	return firstErr
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("test/testenv: no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
