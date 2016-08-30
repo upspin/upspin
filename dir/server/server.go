@@ -571,9 +571,6 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	// Check whether the user has Any right on p.
 	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
 	if err == upspin.ErrFollowLink {
-		// TODO: We may have more work to do. We may need to check
-		// whether the user has Any right on the link itself.
-		// https://github.com/googleprivate/upspin/issues/39
 		return link, err
 	}
 	if err != nil {
