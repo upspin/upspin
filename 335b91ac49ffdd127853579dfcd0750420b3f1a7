@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b146316a_03eb8ea1",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-30T19:58:22Z",
+      "side": 1,
+      "message": "You can use context.FromFile(flags.Context) instead of this block from 41-48.",
+      "revId": "335b91ac49ffdd127853579dfcd0750420b3f1a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
