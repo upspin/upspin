@@ -109,7 +109,21 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 
 	entry, err := s.whichAccess(p, o)
 	if err == upspin.ErrFollowLink {
-		return false, entry, upspin.ErrFollowLink
+		// We have more work to do. We need to check whether the user
+		// has Any right on the link itself.
+		linkPath, err := path.Parse(entry.Name)
+		if err != nil {
+			return false, nil, err
+		}
+		if hasAny, _, err := s.hasRight(access.AnyRight, linkPath, o); err != nil {
+			// Some error other than ErrFollowLink.
+			return false, nil, err
+		} else if hasAny {
+			// User has Any right on the link. Let them follow it.
+			return false, entry, upspin.ErrFollowLink
+		}
+		// Denied. User has no right on link. Pretend it doesn't exist.
+		return false, nil, errors.E(p.Path(), errors.NotExist)
 	}
 	if err != nil {
 		return false, nil, err
