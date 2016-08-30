@@ -167,7 +167,7 @@ func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 	const op = "dir/inprocess.MakeDirectory"
 	e, err := s.canPut(op, directoryName, true)
 	if err != nil {
-		return e, err
+		return s.errLink(op, e, err)
 	}
 
 	parsed, err := path.Parse(directoryName)
@@ -209,7 +209,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	}
 	e, err := s.canPut(op, entry.Name, false)
 	if err != nil {
-		return e, err
+		return s.errLink(op, e, err)
 	}
 
 	s.db.mu.Lock()
@@ -271,7 +271,7 @@ func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*u
 			return nil, errors.E(op, name, err)
 		}
 		if !canCreate {
-			return nil, errors.E(op, name, access.ErrPermissionDenied)
+			return nil, s.errPerm(op, parsed)
 		}
 		return nil, nil
 	}
@@ -281,7 +281,7 @@ func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*u
 		return nil, errors.E(op, name, err)
 	}
 	if !canWrite {
-		return nil, errors.E(op, name, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, parsed)
 	}
 	return nil, nil
 }
@@ -385,7 +385,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	// Does the item exist?
 	entry, err := s.lookup(op, parsed, true)
 	if err == upspin.ErrFollowLink { // TODO: Is this leaking information?
-		return entry, err
+		return s.errLink(op, entry, err)
 	}
 	if errors.Match(err, notExist) {
 		// The parent must exist.
@@ -453,7 +453,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	entry, err := s.lookup(op, parsed, false) // File must exist, but may have intermediate link.
 	if err != nil {
-		return entry, err
+		return s.errLink(op, entry, err)
 	}
 
 	// There are no links.
@@ -462,7 +462,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canDelete {
-		return nil, errors.E(op, pathName, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, parsed)
 	}
 	if parsed.IsRoot() {
 		return nil, errors.E(op, pathName, errors.Str("cannot delete user root")) // Should be done in User service.
@@ -500,7 +500,7 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	entry, err := s.lookup(op, parsed, true)
 	if err != nil {
-		return entry, err
+		return s.errLink(op, entry, err)
 	}
 	// There were no links.
 	canRead, err := s.can(access.Read, parsed)
@@ -508,7 +508,7 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		return nil, errors.E(op, pathName, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, parsed)
 	}
 	return entry, nil
 }
@@ -566,12 +566,21 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(op, upspin.PathName(pattern), errors.NotExist, errors.Str("no such user"))
 	}
 
-	// The pattern might be a literal file name and represent a link. If so, stop now.
-	// The invariant in the loop below is that there are no links in the "this" list.
-	// A rare case but get it right.
-	entry, err := s.lookup(op, parsed, false)
+	// If the pattern contains a link before the first metacharacter,
+	// do no processing and return the link.
+	firstGlob := 0
+	for ; firstGlob < parsed.NElem(); firstGlob++ {
+		if isGlobPattern(parsed.Elem(firstGlob)) {
+			break
+		}
+	}
+	entry, err := s.lookup(op, parsed.First(firstGlob), false)
 	if err == nil && entry.IsLink() {
-		return []*upspin.DirEntry{entry}, upspin.ErrFollowLink
+		entry, err = s.errLink(op, entry, upspin.ErrFollowLink)
+		if entry == nil {
+			return nil, err
+		}
+		return []*upspin.DirEntry{entry}, err
 	}
 
 	// Loop elementwise along the path, growing the list of candidates breadth-first.
@@ -606,7 +615,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			// Fetch the directory's contents.
 			payload, err := s.readAll(s.db.dirContext, ent)
 			if err != nil {
-				return nil, errors.E(op, ent.Name, errors.Str("internal error: invalid reference: "+err.Error()))
+				return nil, errors.E(op, ent.Name, errors.Internal, errors.Str("invalid reference: "+err.Error()))
 			}
 			for len(payload) > 0 {
 				var nextEntry upspin.DirEntry
@@ -683,6 +692,42 @@ func (s *server) can(right access.Right, parsed path.Parsed) (bool, error) {
 		accessFile = s.rootAccessFile(parsed)
 	}
 	return accessFile.Can(s.context.UserName(), right, parsed.Path(), s.load)
+}
+
+// errPerm checks whether the user has any right to the
+// given path, and if so returns a Permission error.
+// Otherwise it returns a NotExist error.
+// This is used to prevent probing of the name space.
+func (s *server) errPerm(op string, parsed path.Parsed) error {
+	canKnow, err := s.can(access.AnyRight, parsed)
+	if err != nil {
+		return errors.E(op, parsed.Path(), err)
+	}
+	if !canKnow {
+		return errors.E(op, parsed.Path(), errors.NotExist)
+	}
+	return errors.E(op, parsed.Path(), errors.Permission)
+}
+
+// errLink checks whether the user has any right to the
+// given entry, and if so returns the entry and the original error.
+// If the provided error is not ErrFollowLink no rights are checked.
+func (s *server) errLink(op string, entry *upspin.DirEntry, errArg error) (*upspin.DirEntry, error) {
+	if errArg != upspin.ErrFollowLink {
+		return entry, errArg
+	}
+	parsed, err := path.Parse(entry.Name)
+	if err != nil {
+		return nil, errors.E(op, errors.Internal, entry.Name, err)
+	}
+	canKnow, err := s.can(access.AnyRight, parsed)
+	if err != nil {
+		return nil, errors.E(op, errors.Internal, parsed.Path(), err)
+	}
+	if !canKnow {
+		return nil, errors.E(op, parsed.Path(), errors.NotExist)
+	}
+	return entry, errArg
 }
 
 // load is a helper for Access.Can that gets the entire contents of the named item.
