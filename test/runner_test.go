@@ -106,6 +106,17 @@ func (r *testRunner) Put(p upspin.PathName, data string) {
 	r.setErr(err)
 }
 
+// PutLink performs a PutLink request as the current user
+// and populates the Runner's Entry field with the result.
+func (r *testRunner) PutLink(oldName, linkName upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	entry, err := r.clients[r.user].PutLink(oldName, linkName)
+	r.Entry = entry
+	r.setErr(err)
+}
+
 // MakeDirectory performs a MakeDirectory request as the current user
 // and populates the Runner's Entry field with the result.
 func (r *testRunner) MakeDirectory(p upspin.PathName) {
@@ -137,6 +148,21 @@ func (r *testRunner) Glob(pattern string) {
 	r.setErr(err)
 }
 
+// TODO
+func (r *testRunner) DirLookup(p upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	dir, err := r.clients[r.user].DirServer(p)
+	if err != nil {
+		r.setErr(err)
+		return
+	}
+	entry, err := dir.Lookup(p)
+	r.Entry = entry
+	r.setErr(err)
+}
+
 // Err returns the current error state and clears it.
 func (r *testRunner) Err() error {
 	err := r.err
@@ -157,13 +183,56 @@ func (r *testRunner) Failed() bool {
 // otherwise it clears the error.
 func (r *testRunner) Match(want error) bool {
 	got := r.Err()
-	if errors.Match(want, got) {
+	if want == got || errorMatch(want, got) {
 		return true
 	}
 	if got == nil {
 		r.lastErr = errors.Errorf("got nil error, want %q", want)
 	} else {
 		r.lastErr = errors.Errorf("got error:\n\t%v\nwant:\n\t%v", got, want)
+	}
+	return false
+}
+
+func errorMatch(err1, err2 error) bool {
+	e1, ok := err1.(*errors.Error)
+	if !ok {
+		return false
+	}
+	e2, ok := err2.(*errors.Error)
+	if !ok {
+		return false
+	}
+	if e1.Path != "" && !errHas(e2, func(e *errors.Error) bool { return e1.Path == e.Path }) {
+		return false
+	}
+	if e1.User != "" && !errHas(e2, func(e *errors.Error) bool { return e1.User == e.User }) {
+		return false
+	}
+	if e1.Op != "" && !errHas(e2, func(e *errors.Error) bool { return e1.Op == e.Op }) {
+		return false
+	}
+	if e1.Kind != errors.Other && !errHas(e2, func(e *errors.Error) bool { return e1.Kind == e.Kind }) {
+		return false
+	}
+	if e1.Err != nil {
+		if e2.Err == nil || e2.Err.Error() != e1.Err.Error() {
+			return false
+		}
+	}
+	return true
+}
+
+func errHas(err error, fn func(*errors.Error) bool) bool {
+	for err != nil {
+		ee, ok := err.(*errors.Error)
+		if !ok {
+			return false
+		}
+		if fn(ee) {
+			return true
+		}
+		err = ee.Err
 	}
 	return false
 }
