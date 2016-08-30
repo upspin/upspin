@@ -8,7 +8,6 @@ package test
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"upspin.io/access"
@@ -59,7 +58,7 @@ func testNoReadersAllowed(t *testing.T, r *testRunner) {
 
 	r.As(readerName)
 	r.Get(fileName)
-	if !r.Match(access.ErrPermissionDenied) {
+	if !r.Match(errors.E(errors.NotExist)) {
 		t.Fatal(r.Diag())
 	}
 
@@ -243,6 +242,11 @@ var integrationTests = []struct {
 	name string
 	fn   func(*testing.T, *testRunner)
 }{
+	// These tests may be run independently.
+	{"GetErrors", testGetErrors},
+	{"GetLinkErrors", testGetLinkErrors},
+
+	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
 	{"AllowListAccess", testAllowListAccess},
 	{"AllowReadAccess", testAllowReadAccess},
@@ -341,36 +345,28 @@ func cleanup(env *testenv.Env) error {
 		return err
 	}
 
-	fileSet1, err := dir.Glob(ownerName + "/*/*")
-	if err != nil {
+	return deleteAll(dir, ownerName)
+}
+
+func deleteAll(dir upspin.DirServer, path upspin.PathName) error {
+	if _, err := dir.Delete(path + "/Access"); err != nil {
+		if !errors.Match(errors.E(errors.NotExist), err) {
+			return err
+		}
+	}
+	entries, err := dir.Glob(string(path + "/*"))
+	if err != nil && err != upspin.ErrFollowLink {
 		return err
 	}
-	fileSet2, err := dir.Glob(ownerName + "/*")
-	if err != nil {
-		return err
-	}
-	entries := append(fileSet1, fileSet2...)
-	var firstErr error
-	deleteNow := func(name upspin.PathName) {
-		_, err = dir.Delete(name)
-		if err != nil {
-			if firstErr == nil {
-				firstErr = err
+	for _, e := range entries {
+		if e.IsDir() {
+			if err := deleteAll(dir, e.Name); err != nil {
+				return err
 			}
-			log.Printf("cleanup: error deleting %q: %v", name, err)
+		}
+		if _, err := dir.Delete(e.Name); err != nil {
+			return err
 		}
 	}
-	// First, delete all Access files,
-	// so we don't lock ourselves out if our tests above remove delete rights.
-	for _, entry := range entries {
-		if access.IsAccessFile(entry.Name) {
-			deleteNow(entry.Name)
-		}
-	}
-	for _, entry := range entries {
-		if !access.IsAccessFile(entry.Name) {
-			deleteNow(entry.Name)
-		}
-	}
-	return firstErr
+	return nil
 }

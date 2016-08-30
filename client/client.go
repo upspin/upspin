@@ -191,16 +191,6 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 	// for the last successful call to WhichAccess.
 	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: name}, whichAccessLookupFn, followFinalLink)
 	if err != nil {
-		if e, ok := err.(*errors.Error); ok && e.Kind == errors.NotExist {
-			// If WhichAccess returns a "not found" error then
-			// either the destination directory doesn't exist or we don't
-			// have permission to probe that name space.
-			// Either way, we don't have permission to write here
-			// so return a permission error.
-			// This tweak guarantees that the error message from
-			// Put is independent of the packing.
-			e.Kind = errors.Permission
-		}
 		return errors.E(op, err)
 	}
 	var readers []upspin.UserName
@@ -257,14 +247,14 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	const op = "client.Get"
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinalLink)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	if entry.IsDir() {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
 	data, err := clientutil.ReadAll(c.context, entry)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	return data, nil
 }

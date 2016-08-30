@@ -84,7 +84,7 @@ func (r *testRunner) As(u upspin.UserName) {
 	r.user = u
 }
 
-// Get performs a Get request as the current user
+// Get performs a Get request as the user
 // and populates the Runner's Data field with the result.
 func (r *testRunner) Get(p upspin.PathName) {
 	if r.err != nil {
@@ -95,7 +95,7 @@ func (r *testRunner) Get(p upspin.PathName) {
 	r.setErr(err)
 }
 
-// Put performs a Put request as the current user
+// Put performs a Put request as the user
 // and populates the Runner's Entry field with the result.
 func (r *testRunner) Put(p upspin.PathName, data string) {
 	if r.err != nil {
@@ -106,7 +106,18 @@ func (r *testRunner) Put(p upspin.PathName, data string) {
 	r.setErr(err)
 }
 
-// MakeDirectory performs a MakeDirectory request as the current user
+// PutLink performs a PutLink request as the user
+// and populates the Runner's Entry field with the result.
+func (r *testRunner) PutLink(oldName, linkName upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	entry, err := r.clients[r.user].PutLink(oldName, linkName)
+	r.Entry = entry
+	r.setErr(err)
+}
+
+// MakeDirectory performs a MakeDirectory request as the user
 // and populates the Runner's Entry field with the result.
 func (r *testRunner) MakeDirectory(p upspin.PathName) {
 	if r.err != nil {
@@ -117,7 +128,7 @@ func (r *testRunner) MakeDirectory(p upspin.PathName) {
 	r.setErr(err)
 }
 
-// Delete performs a Delete request as the current user.
+// Delete performs a Delete request as the user.
 func (r *testRunner) Delete(p upspin.PathName) {
 	if r.err != nil {
 		return
@@ -126,7 +137,7 @@ func (r *testRunner) Delete(p upspin.PathName) {
 	r.setErr(err)
 }
 
-// Glob performs a Glob request as the current user,
+// Glob performs a Glob request as the user,
 // and populates the Runner's Entries field with the result.
 func (r *testRunner) Glob(pattern string) {
 	if r.err != nil {
@@ -134,6 +145,22 @@ func (r *testRunner) Glob(pattern string) {
 	}
 	entries, err := r.clients[r.user].Glob(pattern)
 	r.Entries = entries
+	r.setErr(err)
+}
+
+// DirLookup performs a Lookup request to the user's underlying DirServer
+// and populates the Runner's Entry field with the result.
+func (r *testRunner) DirLookup(p upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	dir, err := r.clients[r.user].DirServer(p)
+	if err != nil {
+		r.setErr(err)
+		return
+	}
+	entry, err := dir.Lookup(p)
+	r.Entry = entry
 	r.setErr(err)
 }
 
@@ -157,7 +184,7 @@ func (r *testRunner) Failed() bool {
 // otherwise it clears the error.
 func (r *testRunner) Match(want error) bool {
 	got := r.Err()
-	if errors.Match(want, got) {
+	if want == got || errors.Match(want, got) {
 		return true
 	}
 	if got == nil {
