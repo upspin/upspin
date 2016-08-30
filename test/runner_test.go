@@ -163,7 +163,7 @@ func (r *testRunner) Match(want error) bool {
 	if got == nil {
 		r.lastErr = errors.Errorf("got nil error, want %q", want)
 	} else {
-		r.lastErr = errors.Errorf("got error %q, want %q", got, want)
+		r.lastErr = errors.Errorf("got error:\n\t%v\nwant:\n\t%v", got, want)
 	}
 	return false
 }
