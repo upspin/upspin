@@ -5,11 +5,7 @@
 package inprocess
 
 // This test uses an in-process StoreServer for the underlying
-// storage. To run this test against a GCP Store, start a GCP store
-// locally and run this test with flag
-// -use_gcp_store=http://localhost:8080. It may take up to a minute
-// to run.
-
+// storage.
 import (
 	"bytes"
 	"fmt"

@@ -215,7 +215,7 @@ func testGlobWithLimitedAccess(t *testing.T, env *testenv.Env) {
 	checkDirs("reader", dir2Pat, dirs, 0)
 
 	// Without list access to the root, the reader can't glob /dir*.
-    dirs, err = readerClient.Glob(bothPat)
+	dirs, err = readerClient.Glob(bothPat)
 	if err != nil {
 		t.Fatal(err)
 	}

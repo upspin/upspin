@@ -13,7 +13,6 @@ import (
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/dir/filesystem"
-	"upspin.io/dir/gcp"
 	"upspin.io/dir/inprocess"
 	"upspin.io/dir/server"
 	"upspin.io/errors"
@@ -64,8 +63,6 @@ func main() {
 	switch flags.ServerKind {
 	case "inprocess":
 		dir = inprocess.New(ctx)
-	case "gcp":
-		dir, err = gcp.New(ctx, flags.Config...)
 	case "filesystem":
 		dir, err = filesystem.New(ctx, flags.Config...)
 	case "server":
