@@ -508,9 +508,20 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		return nil, errors.E(op, pathName, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, parsed)
 	}
 	return entry, nil
+}
+
+func (s *server) errPerm(op string, parsed path.Parsed) error {
+	canKnow, err := s.can(access.AnyRight, parsed)
+	if err != nil {
+		return errors.E(op, parsed.Path(), err)
+	}
+	if !canKnow {
+		return errors.E(op, parsed.Path(), errors.NotExist)
+	}
+	return errors.E(op, parsed.Path(), errors.Permission)
 }
 
 // lookup is the internal version of lookup; it does not do any Access checks.

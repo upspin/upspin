@@ -29,7 +29,6 @@ import (
 	"testing"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/path"
@@ -51,8 +50,6 @@ const (
 	contentsOfFile3     = "===PDF PDF PDF=="
 	genericFileContents = "contents"
 	hasLocation         = true
-	ownerName           = "upspin-test@google.com"
-	readerName          = "upspin-friend-test@google.com"
 )
 
 var (
@@ -348,46 +345,6 @@ func locationOf(entry *upspin.DirEntry) upspin.Location {
 		return upspin.Location{}
 	}
 	return entry.Blocks[0].Location
-}
-
-func cleanup(env *testenv.Env) error {
-	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
-	if err != nil {
-		return err
-	}
-
-	fileSet1, err := dir.Glob(ownerName + "/*/*")
-	if err != nil {
-		return err
-	}
-	fileSet2, err := dir.Glob(ownerName + "/*")
-	if err != nil {
-		return err
-	}
-	entries := append(fileSet1, fileSet2...)
-	var firstErr error
-	deleteNow := func(name upspin.PathName) {
-		_, err = dir.Delete(name)
-		if err != nil {
-			if firstErr == nil {
-				firstErr = err
-			}
-			log.Printf("cleanup: error deleting %q: %v", name, err)
-		}
-	}
-	// First, delete all Access files,
-	// so we don't lock ourselves out if our tests above remove delete rights.
-	for _, entry := range entries {
-		if access.IsAccessFile(entry.Name) {
-			deleteNow(entry.Name)
-		}
-	}
-	for _, entry := range entries {
-		if !access.IsAccessFile(entry.Name) {
-			deleteNow(entry.Name)
-		}
-	}
-	return firstErr
 }
 
 // repo returns the local pathname of a file in the upspin repository.
