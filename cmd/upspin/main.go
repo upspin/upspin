@@ -256,6 +256,8 @@ func (s *State) link(args ...string) {
 func (s *State) ls(args ...string) {
 	fs := flag.NewFlagSet("ls", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
+	followLinks := fs.Bool("L", false, "follow links")
+	recur := fs.Bool("R", false, "recur into subdirectories")
 	fs.Usage = subUsage(fs, "ls [-l] path...")
 	err := fs.Parse(args)
 	if err != nil {
@@ -265,30 +267,44 @@ func (s *State) ls(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		name := upspin.PathName(fs.Arg(i))
-		// Note: this follows links. This is not what Unix ls does.
-		// If you want to know about the link itself, info will tell you.
-		// TODO: Is this what we want?
-		entry, err := s.client.Lookup(name, false)
+	// The done map marks a directory we have listed, so we don't recur endlessly
+	// when given a chain of links with -L.
+	done := map[upspin.PathName]bool{}
+	for _, arg := range fs.Args() {
+		s.list(upspin.PathName(arg), done, *longFormat, *followLinks, *recur)
+	}
+}
+
+func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
+	entry, err := s.client.Lookup(name, followLinks)
+	if err != nil {
+		s.exit(err)
+	}
+
+	var dirContents []*upspin.DirEntry
+	if entry.IsDir() {
+		dirContents, err = s.client.Glob(string(entry.Name) + "/*")
 		if err != nil {
 			s.exit(err)
 		}
+	} else {
+		dirContents = []*upspin.DirEntry{entry}
+	}
 
-		var de []*upspin.DirEntry
-		if entry.IsDir() {
-			de, err = s.client.Glob(string(entry.Name) + "/*")
-			if err != nil {
-				s.exit(err)
-			}
-		} else {
-			de = []*upspin.DirEntry{entry}
-		}
+	if longFormat {
+		printLongDirEntries(dirContents)
+	} else {
+		printShortDirEntries(dirContents)
+	}
 
-		if *longFormat {
-			printLongDirEntries(de)
-		} else {
-			printShortDirEntries(de)
+	if !recur {
+		return
+	}
+	for _, entry := range dirContents {
+		if entry.IsDir() && !done[name] {
+			done[name] = true
+			fmt.Printf("\n%s:\n", entry.Name)
+			s.list(entry.Name, done, longFormat, followLinks, recur)
 		}
 	}
 }
