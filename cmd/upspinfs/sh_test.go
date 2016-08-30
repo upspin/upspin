@@ -9,12 +9,20 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"syscall"
 	"testing"
 
 	"upspin.io/context"
 	"upspin.io/upspin"
 )
+
+// unmountHelper exists because (on Linux at least) you need an suid
+// program to unmount.
+func umountHelper(mountpoint string) error {
+	cmd := exec.Command("umount", mountpoint)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
 
 // testSetup creates a temporary user context with inprocess services.
 func testSetup(name string) (ctx upspin.Context, err error) {
@@ -57,7 +65,7 @@ func TestShell(t *testing.T) {
 		// No free mountpoint found. Just pick one and hope we aren't
 		// breaking another test.
 		mountpoint = fmt.Sprintf("/tmp/upspinfstest%d", i)
-		syscall.Unmount(mountpoint, 0)
+		umountHelper(mountpoint)
 		os.RemoveAll(mountpoint)
 		if err = os.Mkdir(mountpoint, 0777); err == nil {
 			found = true
@@ -85,7 +93,7 @@ func TestShell(t *testing.T) {
 	err = cmd.Run()
 
 	// Unmount.
-	syscall.Unmount(mountpoint, 0)
+	umountHelper(mountpoint)
 	os.RemoveAll(mountpoint)
 
 	// Report error.
