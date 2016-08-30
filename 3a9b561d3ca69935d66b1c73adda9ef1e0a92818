@@ -16,6 +16,24 @@
       "revId": "3a9b561d3ca69935d66b1c73adda9ef1e0a92818",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_15511437",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-30T05:54:32Z",
+      "side": 1,
+      "message": "Client never returns ErrFollowLink.",
+      "parentUuid": "059176ce_0d565d60",
+      "revId": "3a9b561d3ca69935d66b1c73adda9ef1e0a92818",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
