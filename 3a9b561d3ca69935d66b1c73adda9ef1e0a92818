@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "059176ce_0d565d60",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-30T05:19:44Z",
+      "side": 1,
+      "message": "Is this guaranteed not to return ErrFollowLink? I think so, since it came back after following links. Right?",
+      "revId": "3a9b561d3ca69935d66b1c73adda9ef1e0a92818",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
