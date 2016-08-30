@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_9581a4af",
+        "filename": "test/integration_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_956d2436",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_f52ad8e0",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_154bd4b9",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_1530344e",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_352d30f7",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -64,6 +100,24 @@
       "writtenOn": "2016-08-30T04:10:49Z",
       "side": 1,
       "message": "// If a client already exists for that user, it is replaced with a new one.\n\nor you could check otherwise and set error. but decide and document.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_3548d0ba",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_352d30f7",
       "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_55454ca1",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_553aac2d",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_7537a844",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -98,6 +170,24 @@
       "writtenOn": "2016-08-30T04:10:49Z",
       "side": 1,
       "message": "ditto",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_7542489c",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_7537a844",
       "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_95afe443",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_95044476",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_b509408d",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -132,6 +240,24 @@
       "writtenOn": "2016-08-30T04:10:49Z",
       "side": 1,
       "message": "s/,$//",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_b5b4e096",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_b509408d",
       "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +281,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_d5b95c8d",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_d5febc53",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_151914d6",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -172,6 +316,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_f5be5872",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_151914d6",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5762283_351610a7",
         "filename": "test/runner_test.go",
         "patchSetId": 3
@@ -183,6 +345,24 @@
       "writtenOn": "2016-08-30T04:10:49Z",
       "side": 1,
       "message": "should be called NoError. \u0027Check\u0027 is an ambiguous word.",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_b5ddc0de",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "So you\u0027re on board with this one line helpers?\nI backed them out in this revision of the change,\nso we can compare before and after.",
+      "parentUuid": "e5762283_351610a7",
       "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -217,6 +397,24 @@
       "writtenOn": "2016-08-30T04:10:49Z",
       "side": 1,
       "message": "\"last checked error\" is hard to understand.\nmaybe \"most recent saved error\"?\nit would be clearer if we had docs for testRunner",
+      "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_55e70ca7",
+        "filename": "test/runner_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T04:47:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5762283_751088a8",
       "revId": "2c434a0cec76edd5633bb9108a6480d2445f0b3b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
