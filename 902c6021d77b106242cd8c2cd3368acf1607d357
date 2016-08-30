@@ -16,6 +16,24 @@
       "revId": "902c6021d77b106242cd8c2cd3368acf1607d357",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11829dcd_f634e098",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-30T23:05:49Z",
+      "side": 1,
+      "message": "I think this only applies to Group files. I can\u0027t \"link\" to someone else\u0027s Access file. Meaning, there will never be updates to Access files that this dir server doesn\u0027t know about. (We don\u0027t cache other server\u0027s Access files because that\u0027s their problem).\n\nGroup files are cached in Access.\n\nWhat we should do is re-load Group files from time to time. Added a TODO for that instead.",
+      "parentUuid": "11829dcd_b669888d",
+      "revId": "902c6021d77b106242cd8c2cd3368acf1607d357",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
