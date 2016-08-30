@@ -30,6 +30,7 @@ import (
 const (
 	userName   = "fred@flintstone.org"
 	serverName = "dirserver@server.com"
+	otherUser  = "somedude@somewhere.com"
 )
 
 var testDir string
@@ -211,6 +212,13 @@ func TestLink(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Get a server for otherUser, who has no right to see the link.
+	sOther := newDirServerForTesting(t, otherUser)
+	de2, err = sOther.Lookup(userName + "/mylink/cant_see_link")
+	if !errors.Match(errNotExist, err) {
+		t.Errorf("err = %v, want = %v", err, errNotExist)
+	}
+
 	// Deletion of the link itself is tested in TestDelete (we need it
 	// around for other tests, sadly).
 }
@@ -301,18 +309,16 @@ func TestHasRight(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
-	const globberUser = "somedude@somewhere.com"
-
 	sOwner := newDirServerForTesting(t, userName)
 
 	// Put an Access file that has List permissions for newUser.
-	_, err := putAccessFile(t, sOwner, userName+"/Access", "*:"+userName+"\nl:"+globberUser)
+	_, err := putAccessFile(t, sOwner, userName+"/Access", "*:"+userName+"\nl:"+otherUser)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Get a server for globberUser.
-	s := newDirServerForTesting(t, globberUser)
+	// Get a server for otherUser.
+	s := newDirServerForTesting(t, otherUser)
 
 	//
 	// First subtest: list someone else's root without Read rights.
@@ -371,7 +377,7 @@ func TestGlob(t *testing.T) {
 	//
 
 	// Put an Access file where globber has Read permissions.
-	_, err = putAccessFile(t, sOwner, userName+"/dir/Access", "*:"+userName+"\nl,r:"+globberUser)
+	_, err = putAccessFile(t, sOwner, userName+"/dir/Access", "*:"+userName+"\nl,r:"+otherUser)
 	if err != nil {
 		t.Fatal(err)
 	}
