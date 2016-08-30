@@ -263,7 +263,7 @@ func makeRoot(context upspin.Context) error {
 	dir := context.DirServer(path)
 	// Make the root to be sure it's there.
 	_, err := dir.MakeDirectory(path)
-	if err != nil && !errors.Match(errors.E(errors.IsDir), err) {
+	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
 		return err
 	}
 	return nil

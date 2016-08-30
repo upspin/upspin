@@ -260,7 +260,8 @@ func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*u
 		return existing, err
 	}
 	if existing != nil && existing.IsDir() {
-		return nil, errors.E(op, name, errors.IsDir) // Cannot overwrite directory.
+		// TODO: figure out whether this should be Exist or NotDir
+		return nil, errors.E(op, name, errors.Exist) // Cannot overwrite directory.
 	}
 	// We know the full path has no links.
 	if existing == nil {
