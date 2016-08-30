@@ -377,6 +377,12 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		// user explicitly. Here we adjust the dir entries that the user
 		// sent us (those representing files only).
 		entry.Sequence = existingEntry.Sequence + 1
+
+		// If we're updating an Access file, remove the old one from the
+		// accessCache. Let the new one be loaded lazily.
+		if access.IsAccessFile(entry.Name) {
+			s.access.Remove(entry.Name)
+		}
 	}
 
 	entry, err = tree.Put(p, entry)
@@ -530,17 +536,21 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, access.ErrPermissionDenied)
 	}
 
-	// Load the entry so we can check whether it's a dir.
+	// Load the tree for this user.
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	entry, _, err := tree.Lookup(p)
+	wasAccess := access.IsAccessFile(p.Path())
+	entry, err := tree.Delete(p)
 	if err != nil {
-		// This could be ErrFollowLink so return the entry as well.
-		return entry, err
+		return entry, err // could be ErrFollowLink.
 	}
-	return tree.Delete(p)
+	// If we just deleted an Access file, remove it from the accessCache too.
+	if wasAccess {
+		s.access.Remove(p.Path())
+	}
+	return entry, nil
 }
 
 // WhichAccess implements upspin.DirServer.
