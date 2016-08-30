@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_950e0443",
+        "filename": "test/integration_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T06:15:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "059176ce_cdb47598",
+      "revId": "803eaed711d9723f36962944d40d3bcda827903a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "059176ce_0dbf3d70",
         "filename": "test/runner_test.go",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "e5762283_151af482",
+        "filename": "test/runner_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T06:15:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "059176ce_0dbf3d70",
+      "revId": "803eaed711d9723f36962944d40d3bcda827903a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "059176ce_6dce0130",
         "filename": "test/runner_test.go",
         "patchSetId": 6
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-30T05:29:22Z",
       "side": 1,
       "message": "%q %q %v would be better to read, plus, easier for go vet to check.",
+      "revId": "803eaed711d9723f36962944d40d3bcda827903a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5762283_3517f05b",
+        "filename": "test/runner_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-08-30T06:15:18Z",
+      "side": 1,
+      "message": "we don\u0027t want to quote the file and line, because editors can use filename:lineno to jump to those values.\nhowever, i will use %s:%d: %s",
+      "parentUuid": "059176ce_6dce0130",
       "revId": "803eaed711d9723f36962944d40d3bcda827903a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
