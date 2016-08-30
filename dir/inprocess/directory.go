@@ -236,7 +236,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*upspin.DirEntry, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	if makeDirectory && parsed.IsRoot() {
 		// We're fine.
@@ -263,20 +263,23 @@ func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*u
 		return nil, errors.E(op, name, errors.IsDir) // Cannot overwrite directory.
 	}
 	// We know the full path has no links.
-	canCreate := true // Allowed if file exists as it's not creating.
 	if existing == nil {
 		// New file, need create permission.
-		canCreate, err = s.can(access.Create, parsed)
+		canCreate, err := s.can(access.Create, parsed)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, errors.E(op, name, err)
 		}
+		if !canCreate {
+			return nil, errors.E(op, name, access.ErrPermissionDenied)
+		}
+		return nil, nil
 	}
 
 	canWrite, err := s.can(access.Write, parsed)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
-	if !canWrite && !canCreate {
+	if !canWrite {
 		return nil, errors.E(op, name, access.ErrPermissionDenied)
 	}
 	return nil, nil
