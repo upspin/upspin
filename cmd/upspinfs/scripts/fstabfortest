@@ -1,0 +1,13 @@
+#!/bin/bash
+# Copyright 2016 The Upspin Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Add the 4 entries to the fstab.
+for i in 1 2 3 4
+do
+	if ! grep -q /tmp/upspinfstest$i /etc/fstab
+	then
+		echo "echo upspin /tmp/upspinfstest$i fuse.fs user,noauto 0 0 >> /etc/fstab" | sudo bash
+	fi
+done

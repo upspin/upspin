@@ -730,6 +730,7 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	if err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
+	log.Debug.Printf("Symlink target %q", target)
 	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(target)), time.Now())
 	nn.link = target
 	if err := n.f.cache.putRedirect(nn, target); err != nil {
@@ -790,4 +791,53 @@ func (n *node) exists() {
 // delay exists for testing.  We can insert a call to it anywhere we want to fake a delay.
 func delay() {
 	time.Sleep(200 * time.Millisecond)
+}
+
+// debug is used by the FUSE library to output error messages.
+func debug(msg interface{}) {
+	log.Debug.Printf("FUSE %v", msg)
+}
+
+// do is called both by main and testing to mount a FUSE file system. It exits on failure
+// and returns when the file system has been mounted and is ready for requests.
+func do(ctx upspin.Context, mountpoint string) chan bool {
+	if log.Level() == "debug" {
+		fuse.Debug = debug
+	}
+
+	f := newUpspinFS(ctx, mountpoint)
+
+	c, err := fuse.Mount(
+		mountpoint,
+		fuse.FSName("upspin"),
+		fuse.Subtype("fs"),
+		fuse.LocalVolume(),
+		fuse.VolumeName(string(f.context.UserName())),
+		fuse.DaemonTimeout("240"),
+		//fuse.OSXDebugFuseKernel(),
+		fuse.NoAppleDouble(),
+		fuse.NoAppleXattr(),
+	)
+	if err != nil {
+		log.Debug.Fatal(err)
+	}
+
+	// Check if the mount process has an error to report
+	<-c.Ready
+	if err := c.MountError; err != nil {
+		log.Debug.Fatal(err)
+	}
+
+	// Serve in a go routine.
+	done := make(chan bool)
+	go func() {
+		err = fs.Serve(c, f)
+		if err != nil {
+			log.Debug.Fatal(err)
+		}
+		close(done)
+	}()
+
+	// At this point the file system is mounted.
+	return done
 }
