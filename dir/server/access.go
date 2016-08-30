@@ -114,31 +114,68 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	if err != nil {
 		return false, nil, err
 	}
-	// TODO: look up in accessCache.
 	var acc *access.Access
 	if entry != nil {
-		acc, err = s.loadAccess(entry, o)
-		if err != nil {
-			return false, nil, err
-		}
+		// We have the Access file entry. Get the contents.
+		acc, err = s.getAccess(entry, o)
 	} else {
 		// No Access file exists anywhere. Use an implicit one.
 		// Get the implicit one from the defaultAccess cache.
-		cacheEntry, found := s.defaultAccess.Get(p.User())
-		if !found {
-			// Create one now and add to the cache.
-			acc, err = access.New(upspin.PathName(p.User() + "/"))
-			if err != nil {
-				return false, nil, err
-			}
-			s.defaultAccess.Add(p.User(), acc)
-		} else {
-			acc = cacheEntry.(*access.Access) // can't fail.
-		}
+		acc, err = s.getDefaultAccess(p.User())
+	}
+	if err != nil {
+		return false, nil, err
 	}
 	can, err := acc.Can(s.userName, right, p.Path(), s.loadPath)
 	if err != nil {
 		return false, nil, errors.E(err)
 	}
 	return can, nil, nil
+}
+
+// getAccess returns the parsed contents of the Access file described by entry.
+func (s *server) getAccess(entry *upspin.DirEntry, opts ...options) (*access.Access, error) {
+	o, ss := subspan("getAccess", opts)
+	defer ss.End()
+
+	// Sanity check: is this really an Access file?
+	if !access.IsAccessFile(entry.Name) {
+		return nil, errors.E(errors.Internal, entry.Name, errors.Str("not an Access file"))
+	}
+
+	// Is it in the cache?
+	if acc, found := s.access.Get(entry.Name); found {
+		if a, ok := acc.(*access.Access); ok {
+			return a, nil
+		}
+		return nil, errors.E(errors.Internal, errors.Str("invalid accessCache entry"))
+	}
+	// Not in cache, load from the Store.
+	acc, err := s.loadAccess(entry, o)
+	if err != nil {
+		return nil, err
+	}
+	// Add to the cache.
+	s.access.Add(entry.Name, acc)
+	return acc, nil
+}
+
+// getDefaultAccess returns the implicit Access file for a user.
+func (s *server) getDefaultAccess(userName upspin.UserName) (acc *access.Access, err error) {
+	cacheEntry, found := s.defaultAccess.Get(userName)
+	if !found {
+		// Create one now and add to the cache.
+		acc, err = access.New(upspin.PathName(userName + "/"))
+		if err != nil {
+			return
+		}
+		s.defaultAccess.Add(userName, acc)
+	} else {
+		var ok bool
+		acc, ok = cacheEntry.(*access.Access)
+		if !ok {
+			return nil, errors.E(errors.Internal, errors.Str("not an Access file"))
+		}
+	}
+	return
 }
