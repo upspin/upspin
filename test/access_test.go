@@ -67,7 +67,7 @@ func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, er
 	} else if err == nil {
 		r.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
 	} else if s := err.Error(); !strings.Contains(s, errStr) {
-		r.Errorf("%s: %s %q for user %q failed with error: %q, want error %q", r.state, op, file, user, err, errStr)
+		r.Errorf("%s: %s %q for user %q failed with error:\n\t%v\nwant:\n\t%v", r.state, op, file, user, err, errStr)
 	}
 }
 
@@ -141,12 +141,12 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(owner, privateFile, success)
 	r.read(owner, publicFile, success)
 
-	// With no access files, no item is readable by user.
-	r.read(user, "", permission)
-	r.read(user, privateDir, permission)
-	r.read(user, privateDir, permission)
-	r.read(user, publicDir, permission)
-	r.read(user, publicFile, permission)
+	// With no access files, no item is visible to user.
+	r.read(user, "", notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, publicDir, notExist)
+	r.read(user, publicFile, notExist)
 
 	// Add /public/Access, granting Read to user and write to owner.
 	const accessFile = "/public/Access"
@@ -160,10 +160,10 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(owner, privateFile, success)
 	r.read(owner, publicFile, success)
 
-	// With Access file, only public items are readable by user.
-	r.read(user, "", permission)
-	r.read(user, privateDir, permission)
-	r.read(user, privateDir, permission)
+	// With Access file, only public items are visible to user.
+	r.read(user, "", notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, privateDir, notExist)
 	// r.read(user, publicFile, success) TODO: Unpack: could not find wrapped key
 
 	// The only way to update the keys for the file using the Client interface is to use Put,
@@ -178,12 +178,12 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.state = "With no user in Access file"
 	r.write(owner, accessFile, noUserAccessText, success)
 
-	r.read(user, "", permission)
-	r.read(user, privateDir, permission)
-	r.read(user, privateDir, permission)
-	r.read(user, publicDir, permission)
-	r.read(user, publicFile, permission)
-	r.write(user, publicFile, "will not succeed", permission)
+	r.read(user, "", notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, publicDir, notExist)
+	r.read(user, publicFile, notExist)
+	r.write(user, publicFile, "will not succeed", notExist)
 
 	// Now create a group and put user in it and make owner a writer.
 	const groupFile = "/Group/mygroup"
@@ -195,9 +195,9 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.write(owner, accessFile, groupAccessText, success)
 	r.write(owner, groupFile, groupText, success)
 
-	r.read(user, "", permission)
-	r.read(user, privateDir, permission)
-	r.read(user, privateDir, permission)
+	r.read(user, "", notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, privateDir, notExist)
 	r.read(user, publicFile, success)
 
 	r.write(owner, publicFile, contentsOfPublic, success) // Put file again to trigger sharing.
@@ -210,11 +210,11 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.state = "With no user in Group file"
 	r.write(owner, groupFile, noUserGroupText, success)
 
-	r.read(user, "", permission)
-	r.read(user, privateDir, permission)
-	r.read(user, privateDir, permission)
-	r.read(user, publicDir, permission)
-	r.read(user, publicFile, permission)
+	r.read(user, "", notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, privateDir, notExist)
+	r.read(user, publicDir, notExist)
+	r.read(user, publicFile, notExist)
 }
 
 func testWhichAccess(t *testing.T, packing upspin.Packing) {
