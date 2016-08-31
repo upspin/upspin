@@ -21,6 +21,13 @@ import (
 	"upspin.io/valid"
 )
 
+// Constants used for identifying and processing snapshot entries.
+const (
+	SnapshotPrefix     = "snapshot"
+	SnapshotDateFormat = "2006/01/02"
+	SnapshotFormat     = "/" + SnapshotPrefix + "/" + SnapshotDateFormat
+)
+
 // node is an internal representation of a node in the tree.
 // All node accesses must be protected the tree's mutex.
 type node struct {
@@ -209,6 +216,36 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 	return node, nil
 }
 
+// PutDir makes a copy of a non-root entry representing a directory already
+// loaded with kids in its DirBlocks into path dst.
+func (t *Tree) xPutDir(dst path.Parsed, de *upspin.DirEntry) error {
+	const op = "dir/server/tree.CopyDir"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if dst.IsRoot() {
+		// TODO: handle this later? Might come in handy for reinstating an old root.
+		return errors.E(op, errors.Invalid, errors.Str("can't copy the root"))
+	}
+
+	node, err := t.put(dst, de)
+	if err == upspin.ErrFollowLink {
+		return errors.E(op, errors.Invalid, dst.Path(), errors.Str("can't copy to a path that contains a link"))
+	}
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.loadKids(node)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.flush() // Flush now to create a new root.
+	if err != nil {
+		return errors.E(op, err)
+	}
+	return nil
+}
+
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
 func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
@@ -307,9 +344,8 @@ func (t *Tree) loadPath(p path.Parsed) (*node, error) {
 // The node must be known to be a directory and cannot be a link.
 // t.mu must be held.
 func (t *Tree) loadDir(dir *node) error {
-	// Must load from store if kids are not loaded. However, if it's dirty,
-	// we have the most recent version, so no point in loading it.
-	if dir.kids == nil && !dir.dirty {
+	// Must load from store if kids are not loaded.
+	if dir.kids == nil && len(dir.entry.Blocks) > 0 {
 		err := t.loadKids(dir)
 		if err != nil {
 			return err
@@ -734,4 +770,11 @@ func printNode(n *node, buf *bytes.Buffer) {
 	for _, kid := range n.kids {
 		printNode(kid, buf)
 	}
+}
+
+func isSnapshot(p path.Parsed) bool {
+	if p.NElem() < 1 {
+		return false
+	}
+	return p.Elem(0) == SnapshotPrefix
 }

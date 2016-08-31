@@ -31,6 +31,8 @@ const (
 	// needs to look at the dir entry's references and therefore whether the
 	// tree must be flushed if a dirty dir entry is found.
 	entryMustBeClean = true
+
+	canWrite = true
 )
 
 // server implements upspin.DirServer.
@@ -265,6 +267,42 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	return nil, err
 }
 
+// PutDir implements upspin.DirServer.
+func (s *server) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/server.Put"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	p, err := path.Parse(entry.Name)
+	if err != nil {
+		return nil, errors.E(op, entry.Name, err)
+	}
+
+	if !entry.IsDir() {
+		return nil, errors.E(op, errors.NotDir, p.Path())
+	}
+
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Check access permissions and etc.
+	canCreate, link, err := s.hasRight(access.Create, p, o)
+	if err == upspin.ErrFollowLink {
+		return link, err
+	}
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if !canCreate {
+		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
+	}
+
+	// Attempt to put this new dir entry. We know we canCreate & !canWrite.
+	return s.put(op, p, entry, canCreate, !canWrite, o)
+	return nil, nil
+}
+
 // MakeDirectory implements upspin.DirServer.
 func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.MakeDirectory"
@@ -304,7 +342,6 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 		Time:     upspin.Now(),
 		Sequence: 0, // Tree will increment when flushed.
 	}
-	const canWrite = true
 
 	// Attempt to put this new dir entry. We know we canCreate & !canWrite.
 	return s.put(op, p, de, canCreate, !canWrite, o)

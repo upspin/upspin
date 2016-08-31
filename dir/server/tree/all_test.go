@@ -382,7 +382,8 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	// Now we crash and restart.
-	// file2 and file_in_dir must exist after recovery and file1 must not.
+	// /file2.txt and /dir1/file_in_dir must exist after recovery and /file1
+	// must not.
 	tree, err = New(context, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
