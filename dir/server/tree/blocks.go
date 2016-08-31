@@ -7,6 +7,8 @@ package tree
 // This file implements block reading and writing.
 
 import (
+	"strings"
+
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -108,7 +110,12 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
-	if n.dirty {
+	entryPath, err := path.Parse(n.entry.Name)
+	if err != nil {
+		return errors.E(err)
+	}
+	snapshot := isSnapshot(entryPath)
+	if n.dirty && !snapshot {
 		err := errors.E(errors.Internal, n.entry.Name,
 			errors.Str("trying to load a block from storage when the node is dirty"))
 		log.Error.Print(err)
@@ -130,11 +137,10 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		block = remaining
 	}
 	// Load children for this node.
-	dePath, err := path.Parse(n.entry.Name)
-	if err != nil {
-		return errors.E(err)
+	elemPos := entryPath.NElem()
+	if snapshot {
+		elemPos -= strings.Count(SnapshotFormat, "/") // remove prefix elements: "/snapshot/YYYY/MM/DD"
 	}
-	elemPos := dePath.NElem()
 	for _, dir := range dirs {
 		p, err := path.Parse(dir.Name)
 		if err != nil {
