@@ -209,6 +209,26 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 	return node, nil
 }
 
+func (t *Tree) PutSpecial(p path.Parsed, de *upspin.DirEntry) error {
+	const op = "dir/server/tree.PutSpecial"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	node, err := t.put(p, de)
+	if err == upspin.ErrFollowLink {
+		return errors.E(op, errors.Invalid, errors.Str("can't PutSpecial in a linked path"))
+	}
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.loadKids(node)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.flush()
+	return err
+}
+
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
 func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
@@ -344,7 +364,7 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
+	log.Printf("XXXX Loading kids from Store for %q", parent.entry.Name)
 	data, err := clientutil.ReadAll(t.context, &parent.entry)
 	if err != nil {
 		return err
@@ -447,7 +467,18 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	dirty := node.dirty
 	var entries []*upspin.DirEntry
 	for _, n := range node.kids {
-		entries = append(entries, &n.entry)
+		// If we're listing inside a snapshot, mangle the names.
+		if prefix.IsSnapshot() && prefix.NElem() >= 4 { // 4 = "/snapshot/YYYY/MM/DD"
+			suffix, err := path.Parse(n.entry.Name)
+			if err != nil {
+				return nil, false, errors.E(op, err)
+			}
+			newEntry := n.entry
+			newEntry.Name = path.Join(prefix.Path(), suffix.FilePath())
+			entries = append(entries, &newEntry)
+		} else {
+			entries = append(entries, &n.entry)
+		}
 	}
 	return entries, dirty, nil
 }
