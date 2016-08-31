@@ -36,6 +36,18 @@ then
 fi
 cmp ./test.sh $USERROOT/cow.sh
 
+# Rename a file (target doesn't exist).
+cp ./test.sh $USERROOT/oldname.sh
+mv $USERROOT/oldname.sh $USERROOT/newname.sh
+cmp ./test.sh $USERROOT/newname.sh
+test ! -e $USERROOT/oldname.sh
+
+# Rename a file (target does exist).
+echo sdfasdasdf > $USERROOT/newname.sh
+cp ./test.sh $USERROOT/oldname.sh
+mv $USERROOT/oldname.sh $USERROOT/newname.sh
+cmp ./test.sh $USERROOT/newname.sh
+
 # Sym links.
 ln -s cow.sh $USERROOT/sym.sh
 cmp $USERROOT/cow.sh $USERROOT/sym.sh
