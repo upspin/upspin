@@ -47,6 +47,7 @@ var commands = map[string]func(*State, ...string){
 	"share":       (*State).share,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
+	"snapshot":    (*State).snapshot,
 }
 
 type State struct {
@@ -148,6 +149,26 @@ func (s *State) countersign(args ...string) {
 	}
 	s.countersigner = newCountersigner(s)
 	s.countersignCommand()
+}
+
+func (s *State) snapshot(args ...string) {
+	fs := flag.NewFlagSet("snapshot", flag.ExitOnError)
+	fs.Usage = subUsage(fs, "snapshot dst_path src_path")
+	err := fs.Parse(args)
+	if err != nil {
+		s.exit(err)
+	}
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+	src, err := s.DirServer().Lookup(upspin.PathName((fs.Arg(1))))
+	if err != nil {
+		s.exit(err)
+	}
+	_, err = s.DirServer().PutDir(upspin.PathName(fs.Arg(0)), src)
+	if err != nil {
+		s.exit(err)
+	}
 }
 
 func (s *State) get(args ...string) {
@@ -281,6 +302,7 @@ func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFo
 	if err != nil {
 		s.exit(err)
 	}
+	fmt.Printf("entry=%+v\n", entry)
 
 	var dirContents []*upspin.DirEntry
 	if entry.IsDir() {

@@ -31,6 +31,8 @@ const (
 	// needs to look at the dir entry's references and therefore whether the
 	// tree must be flushed if a dirty dir entry is found.
 	entryMustBeClean = true
+
+	canWrite = true
 )
 
 // server implements upspin.DirServer.
@@ -169,6 +171,7 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	log.Printf("==== lookup: got entry for %q: %+v", name, entry)
 
 	// Check for Read access permission.
 	canRead, _, err := s.hasRight(access.Read, p, o)
@@ -251,6 +254,38 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	defer mu.Unlock()
 
 	return s.put(op, p, entry, o)
+}
+
+// PutDir implements upspin.DirServer.
+func (s *server) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/server.PutDir"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
+	if !entry.IsDir() {
+		return nil, errors.E(op, errors.NotDir, p.Path())
+	}
+	err = valid.DirEntry(entry)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Since dir is not the root, the user must have a tree already.
+	// Load it now.
+	tree, err := s.loadTreeFor(p.User(), o)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	return tree.PutDir(p, entry)
 }
 
 // MakeDirectory implements upspin.DirServer.
