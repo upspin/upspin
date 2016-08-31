@@ -412,9 +412,12 @@ func getBytes(b []byte) (data, remaining []byte) {
 // for expected errors in tests. Both arguments must have underlying
 // type *Error or Match will return false. Otherwise it returns true
 // iff every non-zero element of the first error is equal to the
-// corresponding element of the second. For the Err field, it compares
-// the string returned by its Error method. Elements that are in the
-// second argument but not present in the first are ignored.
+// corresponding element of the second.
+// If the Err field is a *Error, Match recurs on that field;
+// otherwise it compares the string returned by the Error method.
+// Elements that are in the second argument but not present in
+// the first are ignored.
+//
 // For example,
 //	Match(errors.E(upspin.UserName("joe@schmoe.com"), errors.Permission), err)
 // tests whether err is an Error with Kind=Permission and User=joe@schmoe.com.
@@ -440,6 +443,9 @@ func Match(err1, err2 error) bool {
 		return false
 	}
 	if e1.Err != nil {
+		if _, ok := e1.Err.(*Error); ok {
+			return Match(e1.Err, e2.Err)
+		}
 		if e2.Err == nil || e2.Err.Error() != e1.Err.Error() {
 			return false
 		}
