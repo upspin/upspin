@@ -16,6 +16,24 @@
       "revId": "9484246e8ebf9d1b2d33511c5929b02c0c16c99a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1bf25c0_97e5a6fc",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-31T20:24:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11829dcd_76dd3063",
+      "revId": "9484246e8ebf9d1b2d33511c5929b02c0c16c99a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
