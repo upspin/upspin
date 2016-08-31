@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "f141897a_eca8b379",
+        "filename": "test/error_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-08-31T16:23:09Z",
+      "side": 1,
+      "message": "This check is too strict. Or maybe errors.Match is not comparing just the Kind and the Path. Look at what I get on a perfect valid error:\n\n           \terror_test.go:148: error_test.go:146: got error:\n            \t\t\tdir/remote.Lookup: item does not exist:\n            \t\t\tdir/server.Lookup:\n            \t\t\tupspin-test@google.com/get-link-errors/src/link\n            \t\twant:\n            \t\t\tupspin-test@google.com/get-link-errors/src/link: item does not exist\n\nThe two errors are equivalent, but mine has nested errors, partially due to dir/remote in the middle, but also because I have one extra layer in the \"op\".",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f141897a_a617ec4e",
         "filename": "test/integration_test.go",
         "patchSetId": 5
