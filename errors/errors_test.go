@@ -126,6 +126,10 @@ var matchTests = []matchTest{
 	{E(path1), E(path2), false},
 	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, john, path1), false},
 	{E(path1, Str("something")), E(path1), false}, // Test nil error on rhs.
+	// Nested *Errors.
+	{E("Op1", E(path1)), E("Op1", john, E("Op2", jane, path1)), true},
+	{E("Op1", path1), E("Op1", john, E("Op2", jane, path1)), false},
+	{E("Op1", E(path1)), E("Op1", john, Str(E("Op2", jane, path1).Error())), false},
 }
 
 func TestMatch(t *testing.T) {
