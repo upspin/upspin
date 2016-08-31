@@ -39,6 +39,12 @@ func (*unassigned) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
+// PutDir implements upspin.DirServer.
+func (*unassigned) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/unassigned.PutDir"
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
+}
+
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (*unassigned) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/unassigned.WhichAccess"

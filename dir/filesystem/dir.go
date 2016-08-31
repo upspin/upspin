@@ -251,6 +251,11 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	return nil, errors.E(op, errReadOnly)
 }
 
+func (s *server) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/filesystem.PutDir"
+	return nil, errors.E(op, errReadOnly)
+}
+
 // Methods that do not apply to this server.
 
 func (s *server) Configure(options ...string) (upspin.UserName, error) {
