@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f141897a_a60a4c7c",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-08-31T05:20:53Z",
+      "side": 1,
+      "message": "s/string/strings/\ns/method/methods/",
+      "revId": "e24a39fffe3944137f56f24ece285e64554a127e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
