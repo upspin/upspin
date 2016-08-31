@@ -205,6 +205,9 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ..
 			return nil, errors.E(op, errors.Internal, errors.Str("flush didn't clean entry"))
 		}
 	}
+	if entry.IsLink() {
+		return entry, upspin.ErrFollowLink
+	}
 	return entry, nil
 }
 
@@ -450,7 +453,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				break
 			}
 			canList, _, err := s.hasRight(access.List, dir, o)
-			if err != nil {
+			if err != nil && !errors.Match(errNotExist, err) {
 				return nil, errors.E(op, err)
 			}
 			if !canList {
@@ -475,7 +478,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				if d == p.NElem()-1 {
 					// If we can't read, strip Packdata and Location information.
 					canRead, _, err := s.hasRight(access.Read, dir, o)
-					if err != nil {
+					if err != nil && !errors.Match(errNotExist, err) {
 						return nil, errors.E(op, err)
 					}
 					if canRead {
