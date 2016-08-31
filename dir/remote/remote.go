@@ -90,9 +90,30 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	req := &proto.DirPutRequest{
+		Name:  string(entry.Name),
 		Entry: b,
 	}
 	resp, err := r.dirClient.Put(gCtx, req)
+	r.LastActivity()
+	return entryError(op, resp, err)
+}
+
+// PutDir implements upspin.DirServer.PutDir.
+func (r *remote) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/remote.PutDir"
+	gCtx, err := r.NewAuthContext()
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	b, err := entry.Marshal()
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	req := &proto.DirPutRequest{
+		Name:  string(name),
+		Entry: b,
+	}
+	resp, err := r.dirClient.PutDir(gCtx, req)
 	r.LastActivity()
 	return entryError(op, resp, err)
 }

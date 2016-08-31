@@ -282,6 +282,16 @@ func TestWhichAccess(t *testing.T) {
 	if err := checkDirEntry("TestWhichAccess.4", accEntry, de); err != nil {
 		t.Fatal(err)
 	}
+
+	// WhichAccess for the Access file?
+	accEntry, err = s.WhichAccess(userName + "/Access")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The Access file for the Access file is itself (the one for the parent (de)).
+	if err := checkDirEntry("TestWhichAccess.5", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestHasRight(t *testing.T) {
@@ -574,6 +584,59 @@ func TestGlob(t *testing.T) {
 	expectErr := errors.E(errors.Syntax)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("err = %q, want = %q", err, expectErr)
+	}
+}
+
+func TestPutDir(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	sOther := newDirServerForTesting(t, otherUser)
+	putAccessFile(t, s, userName+"/Access", "*:"+userName+","+otherUser)
+
+	// Create a little tree for otherUser.
+	for _, dir := range []upspin.PathName{
+		"/",
+		"/snapshots",
+		"/snapshots/yesterday",
+	} {
+		_, err := sOther.MakeDirectory(otherUser + dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Create a snapshot of the user's root onto otherUser's snapshot dir.
+	entry, err := s.Lookup(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = sOther.PutDir(otherUser+"/snapshots/yesterday", entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	orig, err := s.Lookup(userName + "/file1.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now get something known to exist inside the snapshot directory.
+	entry, err = sOther.Lookup(otherUser + "/snapshots/yesterday/file1.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = checkDirEntry("TestPutDir", orig, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Mkdir a new dir in the userName's root, ensure it is not seen in the
+	// snapshot.
+	_, err = s.MakeDirectory(userName + "/newdir")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = sOther.Lookup(otherUser + "/snapshots/yesterday/newdir")
+	if !errors.Match(errNotExist, err) {
+		t.Fatalf("err = %v, want = %v", err, errNotExist)
 	}
 }
 

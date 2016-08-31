@@ -306,6 +306,9 @@ type DirServer interface {
 	// succeeded or not.
 	Put(entry *DirEntry) (*DirEntry, error)
 
+	// PutDir puts a dir. Bla blah.
+	PutDir(name PathName, entry *DirEntry) (*DirEntry, error)
+
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
 	// name must already exist and be directories.

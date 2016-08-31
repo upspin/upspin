@@ -86,6 +86,23 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 	return op.entryError(dir.Put(entry))
 }
 
+// PutDir implements proto.DirServer.
+func (s *server) PutDir(ctx gContext.Context, req *proto.DirPutRequest) (*proto.EntryError, error) {
+	entry, err := proto.UpspinDirEntry(req.Entry)
+	if err != nil {
+		return &proto.EntryError{Error: errors.MarshalError(err)}, nil
+	}
+	name := upspin.PathName(req.Name)
+	op := logf("PutDir %q %q", name, entry.Name)
+
+	dir, err := s.dirFor(ctx)
+	if err != nil {
+		return op.entryError(nil, err)
+	}
+
+	return op.entryError(dir.PutDir(name, entry))
+}
+
 // MakeDirectory implements proto.DirServer.
 func (s *server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectoryRequest) (*proto.EntryError, error) {
 	op := logf("MakeDirectory %q", req.Name)
