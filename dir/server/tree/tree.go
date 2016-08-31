@@ -10,6 +10,7 @@ package tree
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"sync"
 
 	"upspin.io/client/clientutil"
@@ -19,6 +20,13 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/valid"
+)
+
+// Constants used for identifying and processing snapshot entries.
+const (
+	SnapshotPrefix     = "snapshot"
+	SnapshotDateFormat = "2006/01/02"
+	SnapshotFormat     = "/" + SnapshotPrefix + "/" + SnapshotDateFormat
 )
 
 // node is an internal representation of a node in the tree.
@@ -149,6 +157,11 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 	if err != nil {
 		return nil, false, errors.E(op, err)
 	}
+	if isSnapshot(p) {
+		patchedEntry := node.entry
+		patchedEntry.Name = p.Path()
+		return &patchedEntry, node.dirty, nil
+	}
 	return &node.entry, node.dirty, nil
 }
 
@@ -207,6 +220,36 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 		return nil, err
 	}
 	return node, nil
+}
+
+// CopyDir makes a copy of a non-root entry representing a directory already
+// loaded with kids in its DirBlocks into path dst.
+func (t *Tree) CopyDir(dst path.Parsed, de *upspin.DirEntry) error {
+	const op = "dir/server/tree.CopyDir"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if dst.IsRoot() {
+		// TODO: handle this later? Might come in handy for reinstating an old root.
+		return errors.E(op, errors.Invalid, errors.Str("can't copy the root"))
+	}
+
+	node, err := t.put(dst, de)
+	if err == upspin.ErrFollowLink {
+		return errors.E(op, errors.Invalid, dst.Path(), errors.Str("can't copy to a path that contains a link"))
+	}
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.loadKids(node)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.flush() // Flush now to create a new root.
+	if err != nil {
+		return errors.E(op, err)
+	}
+	return nil
 }
 
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
@@ -447,7 +490,18 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	dirty := node.dirty
 	var entries []*upspin.DirEntry
 	for _, n := range node.kids {
-		entries = append(entries, &n.entry)
+		// If we're listing inside a snapshot, unmangle the names.
+		if isSnapshot(prefix) && prefix.NElem() >= strings.Count(SnapshotFormat, "/") { // >= "/snapshot/YYYY/MM/DD"
+			suffix, err := path.Parse(n.entry.Name)
+			if err != nil {
+				return nil, false, errors.E(op, err)
+			}
+			patchedEntry := n.entry
+			patchedEntry.Name = path.Join(prefix.Path(), suffix.FilePath())
+			entries = append(entries, &patchedEntry)
+		} else {
+			entries = append(entries, &n.entry)
+		}
 	}
 	return entries, dirty, nil
 }
@@ -734,4 +788,11 @@ func printNode(n *node, buf *bytes.Buffer) {
 	for _, kid := range n.kids {
 		printNode(kid, buf)
 	}
+}
+
+func isSnapshot(p path.Parsed) bool {
+	if p.NElem() < 1 {
+		return false
+	}
+	return p.Elem(0) == SnapshotPrefix
 }
