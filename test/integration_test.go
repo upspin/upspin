@@ -9,7 +9,6 @@ package test
 import (
 	"fmt"
 	"log"
-	"sort"
 	"testing"
 
 	"upspin.io/access"
@@ -239,32 +238,21 @@ func testDelete(t *testing.T, r *testRunner) {
 	}
 }
 
-// testSuites contains all tests and their names. Order is important, hence
-// test names include their ordering.
-var testSuites = map[string]func(*testing.T, *testRunner){
-	"01.NoReadersAllowed":      testNoReadersAllowed,
-	"02.AllowListAccess":       testAllowListAccess,
-	"03.AllowReadAccess":       testAllowReadAccess,
-	"04.CreateAndOpen":         testCreateAndOpen,
-	"05.GlobWithLimitedAccess": testGlobWithLimitedAccess,
-	"06.GlobWithPattern":       testGlobWithPattern,
-	"07.Delete":                testDelete,
+// integrationTests list all tests and their names. Order is important.
+var integrationTests = []struct {
+	name string
+	fn   func(*testing.T, *testRunner)
+}{
+	{"NoReadersAllowed", testNoReadersAllowed},
+	{"AllowListAccess", testAllowListAccess},
+	{"AllowReadAccess", testAllowReadAccess},
+	{"CreateAndOpen", testCreateAndOpen},
+	{"GlobWithLimitedAccess", testGlobWithLimitedAccess},
+	{"GlobWithPattern", testGlobWithPattern},
+	{"Delete", testDelete},
 }
 
-func allTests() []string {
-	var allTests sort.StringSlice
-	for k := range testSuites {
-		allTests = append(allTests, k)
-	}
-	sort.Sort(allTests) // order is important.
-	var tests []string
-	for _, t := range allTests {
-		tests = append(tests, t)
-	}
-	return tests
-}
-
-func testSelectedOnePacking(t *testing.T, setup testenv.Setup, testNames []string) {
+func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	usercache.ResetGlobal()
 
 	env, err := testenv.New(&setup)
@@ -282,10 +270,8 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup, testNames []strin
 	r.AddUser(readerContext)
 
 	// The ordering here is important as each test adds state to the tree.
-	for _, name := range testNames {
-		if fn, found := testSuites[name]; found {
-			t.Run(name, func(t *testing.T) { fn(t, r) })
-		}
+	for _, test := range integrationTests {
+		t.Run(test.name, func(t *testing.T) { test.fn(t, r) })
 	}
 
 	err = env.Exit()
@@ -294,40 +280,29 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup, testNames []strin
 	}
 }
 
+var integrationTestKinds = []string{"inprocess"}
+
 func TestIntegration(t *testing.T) {
-	kind := "inprocess"
-
-	t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
-		setup := setupTemplate
-		setup.Kind = kind
-		for _, p := range []struct {
-			packing upspin.Packing
-			curve   string
-		}{
-			{packing: upspin.PlainPack, curve: "p256"},
-			{packing: upspin.DebugPack, curve: "p256"},
-			{packing: upspin.EEPack, curve: "p256"},
-			//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
-		} {
-			setup.Packing = p.packing
-			t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
-				testSelectedOnePacking(t, setup, allTests())
-			})
-		}
-	})
-
-}
-
-// TestQuickRemoteTest runs a quick testsuite remotely.
-func TestQuickRemoteTest(t *testing.T) {
-	setup := setupTemplate
-	setup.Kind = "remote"
-	setup.Packing = upspin.PlainPack
-	selectedTests := []string{"CreateAndOpen", "Delete"}
-
-	t.Run(fmt.Sprintf("packing=%v/curve=%v", setup.Packing, "256"), func(t *testing.T) {
-		testSelectedOnePacking(t, setup, selectedTests)
-	})
+	for _, kind := range integrationTestKinds {
+		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
+			setup := setupTemplate
+			setup.Kind = kind
+			for _, p := range []struct {
+				packing upspin.Packing
+				curve   string
+			}{
+				{packing: upspin.PlainPack, curve: "p256"},
+				{packing: upspin.DebugPack, curve: "p256"},
+				{packing: upspin.EEPack, curve: "p256"},
+				//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
+			} {
+				setup.Packing = p.packing
+				t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
+					testSelectedOnePacking(t, setup)
+				})
+			}
+		})
+	}
 }
 
 // checkDirEntry verifies a dir entry against expectations. size == 0 for don't check.
