@@ -10,6 +10,7 @@ package tree
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"sync"
 
 	"upspin.io/client/clientutil"
@@ -19,6 +20,12 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/valid"
+)
+
+// Constants used for identifying and processing snapshot entries.
+const (
+	SnapshotPrefix  = "snapshot"
+	SnapshotPathLen = 4 // = "/snapshot/YYYY/MM/DD"
 )
 
 // node is an internal representation of a node in the tree.
@@ -149,6 +156,11 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 	if err != nil {
 		return nil, false, errors.E(op, err)
 	}
+	if isSnapshot(p.Path()) {
+		patchedEntry := node.entry
+		patchedEntry.Name = p.Path()
+		return &patchedEntry, node.dirty, nil
+	}
 	return &node.entry, node.dirty, nil
 }
 
@@ -207,6 +219,32 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 		return nil, err
 	}
 	return node, nil
+}
+
+// SpliceDir inserts a directory entry representing a directory already loaded
+// with kids in its DirBlocks into path p. This call is meant for use with
+func (t *Tree) SpliceDir(p path.Parsed, de *upspin.DirEntry) error {
+	const op = "dir/server/tree.SpliceDir"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if p.IsRoot() {
+		return errors.E(op, errors.Invalid, errors.Str("can't SpliceDir on the root"))
+	}
+
+	node, err := t.put(p, de)
+	if err == upspin.ErrFollowLink {
+		return errors.E(op, errors.Invalid, errors.Str("can't SpliceDir in a path containing a link"))
+	}
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.loadKids(node)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.flush() // Flush now to create a new root.
+	return err
 }
 
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
@@ -447,7 +485,18 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	dirty := node.dirty
 	var entries []*upspin.DirEntry
 	for _, n := range node.kids {
-		entries = append(entries, &n.entry)
+		// If we're listing inside a snapshot, unmangle the names.
+		if isSnapshot(prefix.Path()) && prefix.NElem() >= SnapshotPathLen { // >= "/snapshot/YYYY/MM/DD"
+			suffix, err := path.Parse(n.entry.Name)
+			if err != nil {
+				return nil, false, errors.E(op, err)
+			}
+			patchedEntry := n.entry
+			patchedEntry.Name = path.Join(prefix.Path(), suffix.FilePath())
+			entries = append(entries, &patchedEntry)
+		} else {
+			entries = append(entries, &n.entry)
+		}
 	}
 	return entries, dirty, nil
 }
@@ -734,4 +783,8 @@ func printNode(n *node, buf *bytes.Buffer) {
 	for _, kid := range n.kids {
 		printNode(kid, buf)
 	}
+}
+
+func isSnapshot(name upspin.PathName) bool {
+	return strings.HasSuffix(string(path.FirstPath(name, 1)), SnapshotPrefix)
 }

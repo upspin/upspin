@@ -108,7 +108,12 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
-	if n.dirty {
+	dePath, err := path.Parse(n.entry.Name)
+	if err != nil {
+		return errors.E(err)
+	}
+	snapshot := isSnapshot(dePath.Path())
+	if n.dirty && !snapshot {
 		err := errors.E(errors.Internal, n.entry.Name,
 			errors.Str("trying to load a block from storage when the node is dirty"))
 		log.Error.Print(err)
@@ -120,6 +125,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		return err
 	}
 	var dirs []upspin.DirEntry
+	log.Printf("=== loading block, len=%d", len(block))
 	for len(block) > 0 {
 		var dir upspin.DirEntry
 		remaining, err := dir.Unmarshal(block)
@@ -130,11 +136,10 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		block = remaining
 	}
 	// Load children for this node.
-	dePath, err := path.Parse(n.entry.Name)
-	if err != nil {
-		return errors.E(err)
-	}
 	elemPos := dePath.NElem()
+	if snapshot {
+		elemPos -= SnapshotPathLen // remove prefix elements: "/snapshot/YYYY/MM/DD"
+	}
 	for _, dir := range dirs {
 		p, err := path.Parse(dir.Name)
 		if err != nil {
@@ -156,6 +161,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 			log.Error.Print(err)
 			return err
 		}
+		log.Printf("=== p=%q: adding kid for %q: %q", p, n.entry.Name, dir.Name)
 		n.kids[elem] = &node{
 			entry: dir,
 		}
