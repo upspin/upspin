@@ -333,6 +333,7 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 	return h, nil
 }
 
+// directoryLookup return the DirServer and DirEntry for the given name.
 func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry, error) {
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, nil, errors.E(errors.NotDir, n.uname)
@@ -655,6 +656,15 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	return nn, nil
 }
 
+// matchKind returns true if the error is of the given kind
+func matchKind(err error, kind errors.Kind) bool {
+	e, ok := err.(*errors.Error)
+	if !ok {
+		return false
+	}
+	return e.Kind == kind
+}
+
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
 	const op = "upspinfs/Fuse Rename"
@@ -671,9 +681,23 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 	}
 	f.Unlock()
 	newPath := path.Join(newDir.(*node).uname, req.NewName)
-	err := n.f.client.Rename(oldPath, newPath)
-	if err != nil {
-		return e2e(errors.E(op, oldPath, err))
+	if err := n.f.client.Rename(oldPath, newPath); err != nil {
+		// FUSE semantics state that a rename should
+		// remove the target it it exists.
+		if !matchKind(err, errors.Exist) {
+			return e2e(errors.E(op, oldPath, err))
+		}
+		// Remove target and try again.
+		dir, _, err := n.directoryLookup(newPath)
+		if err != nil {
+			return e2e(errors.E(op, newPath, err))
+		}
+		if _, err := dir.Delete(newPath); err != nil {
+			return e2e(errors.E(op, oldPath, err))
+		}
+		if err := n.f.client.Rename(oldPath, newPath); err != nil {
+			return e2e(errors.E(op, oldPath, err))
+		}
 	}
 	f.Lock()
 	delete(f.nodeMap, oldPath)
