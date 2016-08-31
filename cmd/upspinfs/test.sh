@@ -35,6 +35,18 @@ then
 	exit 1
 fi
 
+# Rename a file (target doesn't exist).
+cp ./test.sh $USERROOT/oldname.sh
+mv $USERROOT/oldname.sh $USERROOT/newname.sh
+cmp ./test.sh $USERROOT/newname.sh
+test ! -e $USERROOT/oldname.sh
+
+# Rename a file (target does exist).
+echo sdfasdasdf > $USERROOT/newname.sh
+cp ./test.sh $USERROOT/oldname.sh
+mv $USERROOT/oldname.sh $USERROOT/newname.sh
+cmp ./test.sh $USERROOT/newname.sh
+
 # Hard links are not working in Linux right now.  Avoid until this is fixed.
 case $(uname) in
 Linux) exit 0 ;;
