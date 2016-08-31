@@ -282,6 +282,28 @@ func TestWhichAccess(t *testing.T) {
 	if err := checkDirEntry("TestWhichAccess.4", accEntry, de); err != nil {
 		t.Fatal(err)
 	}
+
+	// WhichAccess for the Access file?
+	accEntry, err = s.WhichAccess(userName + "/Access")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The Access file for the Access file is itself (the one for the parent (de)).
+	if err := checkDirEntry("TestWhichAccess.5", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
+
+	// Get a server for another user.
+	sOther := newDirServerForTesting(t, otherUser)
+	// WhichAccess for the Access file?
+	accEntry, err = sOther.WhichAccess(userName + "/Access")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The Access file for the Access file is itself (the one for the parent (de)).
+	if err := checkDirEntry("TestWhichAccess.6", accEntry, de); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestHasRight(t *testing.T) {

@@ -924,3 +924,8 @@ func (s *server) Authenticate(upspin.Context) error {
 	// TODO
 	return nil
 }
+
+// PutDir implements upspin.DirServer.
+func (s *server) PutDir(name upspin.PathName, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return nil, errors.E("dir/inprocess.PutDir", errors.Str("not implemented"))
+}

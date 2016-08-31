@@ -18,6 +18,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"fmt"
 	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/store/inprocess"
@@ -382,7 +383,8 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	// Now we crash and restart.
-	// file2 and file_in_dir must exist after recovery and file1 must not.
+	// /file2.txt and /dir1/file_in_dir must exist after recovery and /file1
+	// must not.
 	tree, err = New(context, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
@@ -628,6 +630,101 @@ func TestList(t *testing.T) {
 	}
 	if len(entries) != 3 {
 		t.Fatalf("len(entries) = %d, want = %d", len(entries), 3)
+	}
+}
+
+func TestSnapshots(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Build a simple tree.
+	for _, dir := range []upspin.PathName{"/", "/orig", "/orig/sub1", "/orig/sub2", "/orig/sub1/subsub", "/snapshot", "/snapshot/new", "/other"} {
+		p, de := newDirEntry(dir, isDir, context)
+		_, err = tree.Put(p, de)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Flush, to ensure we're snapshotting a dir that has blocks.
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("Tree:\n%s\n", tree)
+
+	// Lookup orig, which we'll snapshot under /snapshot/new.
+	entry, _, err := tree.Lookup(mkpath(t, userName+"/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The last element in the path is lost. It is replaced by entry.
+	_, err = tree.PutDir(mkpath(t, userName+"/snapshot/new"), entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("Tree:\n%s\n", tree)
+
+	/*
+		tree, err = New(context, log, logIndex)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Printf("Fresh Tree:\n%s\n", tree)
+	*/
+
+	// List snapshot.
+	entries, _, err := tree.List(mkpath(t, userName+"/snapshot/new"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := map[upspin.PathName]bool{
+		userName + "/orig": true,
+	}
+	fmt.Printf("len(entries)=%d", len(entries))
+	for _, e := range entries {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want = one-of {%v}", e.Name, expected)
+		}
+	}
+
+	fmt.Printf("Tree:\n%s\n", tree)
+
+	// List inside snapshot.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]bool{
+		userName + "/orig/sub1": true,
+		userName + "/orig/sub2": true,
+	}
+	for _, e := range entries {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want = one-of {%v}", e.Name, expected)
+		}
+	}
+
+	// Go deeper into snapshot.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig/sub1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]bool{
+		userName + "/orig/sub1/subsub": true,
+	}
+	for _, e := range entries {
+		if _, found := expected[e.Name]; !found {
+			t.Errorf("e.Name = %q, want = one-of {%v}", e.Name, expected)
+		}
 	}
 }
 
