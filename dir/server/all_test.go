@@ -150,8 +150,8 @@ func TestLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	de2, err := s.Lookup(de.Name)
-	if err != nil {
-		t.Fatal(err)
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
 	}
 	err = checkDirEntry("TestLink", de2, de)
 	if err != nil {

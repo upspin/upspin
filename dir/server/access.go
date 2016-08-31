@@ -138,9 +138,19 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	if err != nil {
 		return false, nil, err
 	}
+	// Check if the user can know about the file at all. If not, to prevent
+	// leaking its existence, return NotExist.
+	canKnow, err := acc.Can(s.userName, access.AnyRight, p.Path(), s.loadPath)
+	if err != nil {
+		return false, nil, err
+	}
+	if !canKnow {
+		return false, nil, errors.E(p.Path(), errors.NotExist)
+	}
+	// Finally, check whether the user has the requested right.
 	can, err := acc.Can(s.userName, right, p.Path(), s.loadPath)
 	if err != nil {
-		return false, nil, errors.E(err)
+		return false, nil, err
 	}
 	return can, nil, nil
 }
