@@ -16,6 +16,24 @@
       "revId": "84d7cc27ae427dd0bf14d699c6d7b282439f8158",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1bf25c0_b79aa2be",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-08-31T20:04:39Z",
+      "side": 1,
+      "message": "Because I misread the code for it... Done.",
+      "parentUuid": "d1bf25c0_772d6a9b",
+      "revId": "84d7cc27ae427dd0bf14d699c6d7b282439f8158",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
