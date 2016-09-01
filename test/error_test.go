@@ -59,7 +59,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// Give the reader the a specific (non-read) right and
+	// Give the reader a specific (non-read) right and
 	// it should see a permission error.
 	for _, right := range []string{"list", "write", "create", "delete"} {
 		r.As(ownerName)
@@ -288,8 +288,101 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-func testPutLinkErrors(t *testing.T, r *testenv.Runner)           {}
-func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner)     {}
+// TODO
+func testPutLinkErrors(t *testing.T, r *testenv.Runner) {}
+
+func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
+	// Create a simple tree.
+	const (
+		base   = ownerName + "/makedirectory-errors"
+		dir    = base + "/dir"
+		subdir = dir + "/subdir"
+		access = dir + "/Access"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(dir)
+	r.MakeDirectory(subdir)
+	r.DirLookup(subdir)
+	r.Delete(subdir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// We expect a "not exist" error for a writer that has no rights
+	// to the directory, as they cannot even know that it exists.
+	r.As(writerName)
+	r.MakeDirectory(subdir)
+	if !r.Match(errors.E(errors.NotExist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put in an access file for the owner only
+	// and try the same writer check again.
+	r.As(ownerName)
+	r.Put(access, "*:"+ownerName)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.As(writerName)
+	r.MakeDirectory(subdir)
+	if !r.Match(errors.E(errors.NotExist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the writer a specific (non-create) right and
+	// it should see a permission error.
+	for _, right := range []string{"list", "read", "write", "delete"} {
+		r.As(ownerName)
+		r.Put(access, right+":"+writerName)
+		if r.Failed() {
+			t.Fatal(r.Diag())
+		}
+		r.As(writerName)
+		r.MakeDirectory(subdir)
+		if !r.Match(errors.E(errors.Permission)) {
+			t.Fatalf("%s: %s", right, r.Diag())
+		}
+	}
+
+	// Give the reader the "create" right and it works.
+	r.As(ownerName)
+	r.Put(access, "*:"+ownerName+"\ncreate:"+writerName)
+	r.As(writerName)
+	r.MakeDirectory(subdir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	// Try to make it again, and it should fail.
+	r.MakeDirectory(subdir)
+	if !r.Match(errors.E(errors.Exist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Lookup should fail as the writer.
+	r.DirLookup(subdir)
+	if !r.Match(errors.E(errors.Permission)) {
+		t.Fatal(r.Diag())
+	}
+
+	// But should succeed as the owner.
+	r.As(ownerName)
+	r.DirLookup(subdir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the writer read access, and lookup should succeed.
+	r.As(ownerName)
+	r.Put(access, "*:"+ownerName+"\nread:"+writerName)
+	r.As(writerName)
+	r.DirLookup(subdir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
+
+// TODO
 func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {}
 func testWhichAccessErrors(t *testing.T, r *testenv.Runner)       {}
 func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner)   {}
