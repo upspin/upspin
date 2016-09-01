@@ -21,7 +21,6 @@ const writerName = readerName
 // is that users should receive 'not exist' for any path
 // to which they have no rights.
 func testGetErrors(t *testing.T, r *testenv.Runner) {
-	// Create a simple tree.
 	const (
 		base    = ownerName + "/get-errors"
 		dir     = base + "/dir"
@@ -88,7 +87,6 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 // testGetLinkErrors is like testGetErrors but checks the
 // behavior of Get when links are present.
 func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
-	// Create a simple tree.
 	const (
 		base      = ownerName + "/get-link-errors"
 		srcDir    = base + "/src"
@@ -188,7 +186,6 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 }
 
 func testPutErrors(t *testing.T, r *testenv.Runner) {
-	// Create a simple tree.
 	const (
 		base    = ownerName + "/put-errors"
 		dir     = base + "/dir"
@@ -292,7 +289,6 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 func testPutLinkErrors(t *testing.T, r *testenv.Runner) {}
 
 func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
-	// Create a simple tree.
 	const (
 		base   = ownerName + "/makedirectory-errors"
 		dir    = base + "/dir"
@@ -384,7 +380,100 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 
 // TODO
 func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {}
-func testWhichAccessErrors(t *testing.T, r *testenv.Runner)       {}
-func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner)   {}
-func testGlobErrors(t *testing.T, r *testenv.Runner)              {}
-func testGlobLinkErrors(t *testing.T, r *testenv.Runner)          {}
+
+func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base       = ownerName + "/whichaccess-errors"
+		dir        = base + "/dir"
+		file       = dir + "/file"
+		baseAccess = base + "/Access"
+		dirAccess  = dir + "/Access"
+		content    = "hello, gophers"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(dir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// The owner should get nil and no error
+	// with no access file present.
+	r.DirWhichAccess(file)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Entry != nil {
+		t.Fatalf("got entry %q, expected nil", r.Entry.Name)
+	}
+
+	// A reader with no rights should get 'not exist' for the same.
+	r.As(readerName)
+	r.DirWhichAccess(file)
+	if !r.Match(errors.E(errors.NotExist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put in an access file in the root, the owner should see it.
+	r.As(ownerName)
+	r.Put(baseAccess, "*:"+ownerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(baseAccess) {
+		t.Fatal(r.Diag())
+	}
+
+	// While the reader should still get not exist.
+	r.As(readerName)
+	r.DirWhichAccess(file)
+	if !r.Match(errors.E(errors.NotExist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put an access file in dir, we should get that one.
+	r.As(ownerName)
+	r.Put(dirAccess, "*:"+ownerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(dirAccess) {
+		t.Fatal(r.Diag())
+	}
+
+	// The reader still gets bupkis.
+	r.As(readerName)
+	r.DirWhichAccess(file)
+	if !r.Match(errors.E(errors.NotExist)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put the reader into (and take the owner out of) the dir access file.
+	// The owner should still see the access file (since they own it).
+	r.As(ownerName)
+	r.Put(dirAccess, "*:"+readerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(dirAccess) {
+		t.Fatal(r.Diag())
+	}
+	r.As(readerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(dirAccess) {
+		t.Fatal(r.Diag())
+	}
+
+	// Do the same, but for the base access file.
+	r.As(ownerName)
+	r.Delete(dirAccess)
+	r.Put(baseAccess, "*:"+readerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(baseAccess) {
+		t.Fatal(r.Diag())
+	}
+	r.As(readerName)
+	r.DirWhichAccess(file)
+	if !r.GotEntry(baseAccess) {
+		t.Fatal(r.Diag())
+	}
+}
+
+// TODO
+func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {}
+func testGlobErrors(t *testing.T, r *testenv.Runner)            {}
+func testGlobLinkErrors(t *testing.T, r *testenv.Runner)        {}
