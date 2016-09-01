@@ -98,17 +98,13 @@ func setupTestContext(t *testing.T) upspin.Context {
 		SetPacking(upspin.EEPack).
 		SetFactotum(f)
 
-	key, err := bind.KeyServer(context, context.KeyEndpoint())
-	if err != nil {
-		t.Fatal(err)
-	}
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
 		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
 		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
 		PublicKey: f.PublicKey(),
 	}
-	err = key.Put(user)
+	err = context.KeyServer().Put(user)
 	if err != nil {
 		t.Fatal(err)
 	}

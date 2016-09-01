@@ -124,10 +124,7 @@ func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.Pat
 	if err != nil {
 		return nil, err
 	}
-	store, err := bind.StoreServer(context, context.StoreEndpoint())
-	if err != nil {
-		return nil, err
-	}
+	store := context.StoreServer()
 	ref, err := store.Put(ciphertext)
 	if err != nil {
 		return nil, err

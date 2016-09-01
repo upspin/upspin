@@ -34,6 +34,10 @@ func (ctx *simpleContext) StoreServer() upspin.StoreServer {
 	return nil
 }
 
+func (ctx *simpleContext) StoreServerFor(upspin.Endpoint) (upspin.StoreServer, error) {
+	return nil, nil
+}
+
 // UserName implements upspin.Context.
 func (ctx *simpleContext) UserName() upspin.UserName {
 	return ctx.userName

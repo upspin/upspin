@@ -586,21 +586,12 @@ type Context interface {
 	// SetKeyEndpoint sets the KeyEndpoint.
 	SetKeyEndpoint(Endpoint) Context
 
-	// KeyServer returns a KeyServer instance bound to KeyEndpoint.  In the event of an
-	// error binding, all subsequent calls on the KeyServer will return errors.
-	KeyServer() KeyServer
-
 	// DirEndpoint is the endpoint of the DirServer in which to place new data items.  It is
 	// usually the location of the user's root.
 	DirEndpoint() Endpoint
 
 	// SetDirEndpoint sets the DirEndpoint.
 	SetDirEndpoint(Endpoint) Context
-
-	// DirServer returns a DirServer instance responsible for the path. If the path is
-	// empty, it will return a DirServer service bound to DirEndpoint. In the
-	// event of an error binding, all subsequent calls on the DirServer will return errors.
-	DirServer(PathName) DirServer
 
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
@@ -614,12 +605,28 @@ type Context interface {
 	// SetStoreCacheEndpoint sets the StoreEndpoint.
 	SetStoreCacheEndpoint(Endpoint) Context
 
-	// StoreServer returns a StoreServer instance bound to StoreEndpoint.  In the event of an
-	// error binding, all subsequent calls on the StoreServer will return errors.
-	StoreServer() StoreServer
-
 	// Copy creates a copy of the receiver context.
 	Copy() Context
+
+	// KeyServer returns a KeyServer instance bound to KeyEndpoint.
+	// In the event of an error binding, all subsequent calls on the
+	// KeyServer will return errors.
+	KeyServer() KeyServer
+
+	// StoreServer returns a StoreServer instance bound to StoreEndpoint.
+	// In the event of an error binding, all subsequent calls on the
+	// StoreServer will return errors.
+	StoreServer() StoreServer
+
+	// StoreServerFor returns a StoreServer instance bound to the given Endpoint.
+	StoreServerFor(Endpoint) (StoreServer, error)
+
+	// DirServer returns a DirServer instance responsible for the path.
+	// If the path is empty, it will return a DirServer service bound to
+	// DirEndpoint.
+	// In the event of an error binding, all subsequent calls on the
+	// DirServer will return errors.
+	DirServer(PathName) DirServer
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
