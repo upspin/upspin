@@ -16,6 +16,24 @@
       "revId": "f30b5f5dfcbc28c992db8cf348f8f9ad40e31cec",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_1e81112f",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T04:43:59Z",
+      "side": 1,
+      "message": "Yes, we do. We\u0027re filling them out one by one.",
+      "parentUuid": "31f241e7_1e5c7178",
+      "revId": "f30b5f5dfcbc28c992db8cf348f8f9ad40e31cec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
