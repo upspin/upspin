@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "31f241e7_920e1a43",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-01T00:53:30Z",
+      "side": 1,
+      "message": "// errLink is intended to prevent probing of the name space\n// using links. If errArg is not ErrFollowLink, the arguments\n// are just returned. Otherwise, it checks whether the user\n// has any right to the given entry, and if so returns the entry\n// and ErrFollowLink. If the use has no rights, it returns a\n// NotExist error.",
+      "parentUuid": "31f241e7_4f912d52",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f141897a_c61af878",
         "filename": "test/error_test.go",
         "patchSetId": 5
