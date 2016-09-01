@@ -10,7 +10,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/upspin"
 
@@ -38,27 +37,21 @@ func checkTransport(s upspin.Service) {
 }
 
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
-	context := newContext(userName)
-	key, err := bind.KeyServer(context, context.KeyEndpoint())
-	if err != nil {
-		panic(err)
-	}
+	ctx := newContext(userName)
+	key := ctx.KeyServer()
 	checkTransport(key)
-	dir, err := bind.DirServer(context, context.DirEndpoint())
-	if err != nil {
-		panic(err)
-	}
+	dir := ctx.DirServer("")
 	checkTransport(dir)
 	if publicKey == "" {
 		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	}
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: publicKey,
 	}
-	err = key.Put(user)
+	err := key.Put(user)
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +59,7 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context 
 	if err != nil {
 		panic(err)
 	}
-	return context
+	return ctx
 }
 
 // TODO: End of copied code.

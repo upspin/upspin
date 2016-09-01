@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/upspin"
 
@@ -30,14 +29,10 @@ var (
 
 func setup(t *testing.T) upspin.KeyServer {
 	c := context.New().SetUserName(user.Name)
-	k, err := bind.KeyServer(c, inProcessEndpoint)
-	if err != nil {
-		t.Fatal(err)
-	}
 	c.SetKeyEndpoint(inProcessEndpoint)
 	c.SetStoreEndpoint(inProcessEndpoint)
 	c.SetDirEndpoint(inProcessEndpoint)
-	return k
+	return c.KeyServer()
 }
 
 func TestInstallAndLookup(t *testing.T) {
