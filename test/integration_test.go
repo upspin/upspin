@@ -245,6 +245,14 @@ var integrationTests = []struct {
 	// These tests may be run independently.
 	{"GetErrors", testGetErrors},
 	{"GetLinkErrors", testGetLinkErrors},
+	{"PutErrors", testPutErrors},
+	{"PutLinkErrors", testPutLinkErrors},
+	{"MakeDirectoryErrors", testMakeDirectoryErrors},
+	{"MakeDirectoryLinkErrors", testMakeDirectoryLinkErrors},
+	{"WhichAccessErrors", testWhichAccessErrors},
+	{"WhichAccessLinkErrors", testWhichAccessLinkErrors},
+	{"GlobErrors", testGlobErrors},
+	{"GlobLinkErrors", testGlobLinkErrors},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},

@@ -189,22 +189,11 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 	// We do this before "Store contents", so an error return wastes little.
 	// evalEntry will contain the argument (most importantly the name)
 	// for the last successful call to WhichAccess.
-	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: name}, whichAccessLookupFn, followFinalLink)
+	readers, evalEntry, err := c.getReaders(op, name)
 	if err != nil {
-		return errors.E(op, err)
+		return errors.E(op, name, err)
 	}
-	var readers []upspin.UserName
-	if accessEntry != nil {
-		accessData, err := c.Get(accessEntry.Name)
-		if err != nil {
-			return errors.E(op, err)
-		}
-		acc, err := access.Parse(accessEntry.Name, accessData)
-		if err != nil {
-			return errors.E(op, err)
-		}
-		readers, err = acc.Users(access.Read, c.Get)
-	}
+
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
 	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
@@ -229,6 +218,53 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 	// follow the links again.
 	entry.Name = evalEntry.Name
 	return nil
+}
+
+// getReaders returns the list of intended readers for the given name
+// according to the Access file.
+// If the Access file cannot be read because of lack of permissions,
+// it returns the owner of the file (but only if we are not the owner).
+// It also returns the link-expanded DirEntry for name.
+func (c *Client) getReaders(op string, name upspin.PathName) ([]upspin.UserName, *upspin.DirEntry, error) {
+	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: name}, whichAccessLookupFn, followFinalLink)
+	if err != nil {
+		return nil, nil, err
+	}
+	if accessEntry == nil {
+		// No Access file present, therefore we must be the owner.
+		return nil, evalEntry, nil
+	}
+	accessData, err := c.Get(accessEntry.Name)
+	if errors.Match(errors.E(errors.NotExist), err) || errors.Match(errors.E(errors.Permission), err) {
+		// If we failed to get the Access file for access-control
+		// reasons, then we must not have read access and thus
+		// cannot know the list of readers.
+		// Instead, just return the owner as the only reader.
+		parsed, err := path.Parse(name)
+		if err != nil {
+			return nil, nil, err
+		}
+		owner := parsed.User()
+		if owner == c.context.UserName() {
+			// We are the owner, but the caller always
+			// adds the us, so return an empty list.
+			return nil, evalEntry, nil
+		}
+		return []upspin.UserName{owner}, evalEntry, nil
+	} else if err != nil {
+		// We failed to fetch the Access file for some unexpected reason,
+		// so bubble the error up.
+		return nil, nil, err
+	}
+	acc, err := access.Parse(accessEntry.Name, accessData)
+	if err != nil {
+		return nil, nil, err
+	}
+	readers, err := acc.Users(access.Read, c.Get)
+	if err != nil {
+		return nil, nil, err
+	}
+	return readers, evalEntry, nil
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
