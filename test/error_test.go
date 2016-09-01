@@ -41,7 +41,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 	// to the file, as they cannot even know that it exists.
 	r.As(readerName)
 	r.Get(file)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -54,7 +54,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(readerName)
 	r.Get(file)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -68,7 +68,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		}
 		r.As(readerName)
 		r.Get(file)
-		if !r.Match(errors.E(errors.Permission)) {
+		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
 	}
@@ -122,11 +122,11 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	// we should get a 'not exist' error.
 	r.As(readerName)
 	r.Get(link)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 	r.DirLookup(link)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -207,7 +207,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	// to the directory, as they cannot even know that it exists.
 	r.As(writerName)
 	r.Put(file, content)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -220,7 +220,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(writerName)
 	r.Put(file, content)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -234,7 +234,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 		}
 		r.As(writerName)
 		r.Put(file, content)
-		if !r.Match(errors.E(errors.Permission)) {
+		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
 	}
@@ -249,7 +249,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	}
 	// Try to overwrite, and it should fail.
 	r.Put(file, content)
-	if !r.Match(errors.E(errors.Permission)) {
+	if !r.Match(errPermission) {
 		t.Fatal(r.Diag())
 	}
 
@@ -264,7 +264,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 
 	// Get should fail as the writer.
 	r.Get(file)
-	if !r.Match(errors.E(errors.Permission)) {
+	if !r.Match(errPermission) {
 		t.Fatal(r.Diag())
 	}
 
@@ -309,7 +309,7 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	// to the directory, as they cannot even know that it exists.
 	r.As(writerName)
 	r.MakeDirectory(subdir)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -322,7 +322,7 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(writerName)
 	r.MakeDirectory(subdir)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -336,7 +336,7 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 		}
 		r.As(writerName)
 		r.MakeDirectory(subdir)
-		if !r.Match(errors.E(errors.Permission)) {
+		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
 	}
@@ -351,13 +351,13 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	}
 	// Try to make it again, and it should fail.
 	r.MakeDirectory(subdir)
-	if !r.Match(errors.E(errors.Exist)) {
+	if !r.Match(errExist) {
 		t.Fatal(r.Diag())
 	}
 
 	// Lookup should fail as the writer.
 	r.DirLookup(subdir)
-	if !r.Match(errors.E(errors.Permission)) {
+	if !r.Match(errPermission) {
 		t.Fatal(r.Diag())
 	}
 
@@ -410,7 +410,7 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	// A reader with no rights should get 'not exist' for the same.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -425,7 +425,7 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	// While the reader should still get not exist.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -440,7 +440,7 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	// The reader still gets bupkis.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -475,5 +475,153 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 
 // TODO
 func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {}
-func testGlobErrors(t *testing.T, r *testenv.Runner)            {}
-func testGlobLinkErrors(t *testing.T, r *testenv.Runner)        {}
+
+func testGlobErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base       = ownerName + "/glob-errors"
+		dir        = base + "/dir"
+		baseFile   = base + "/file"
+		dirFile    = dir + "/file"
+		baseAccess = base + "/Access"
+		dirAccess  = dir + "/Access"
+		content    = "hello, gophers"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(dir)
+	r.Put(baseFile, content)
+	r.Put(dirFile, content)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Owner should be able to glob them all.
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, dir, baseFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.GotEntries(true, dirFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// The reader should get an error
+	// because they can't see the base of the glob.
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give a reader list rights and they can see
+	// all files but no block data.
+	r.As(ownerName)
+	r.Put(baseAccess, "list:"+readerName)
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(false, baseAccess, dir, baseFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.GotEntries(false, dirFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// With read rights they can see everything.
+	r.As(ownerName)
+	r.Put(baseAccess, "list,read:"+readerName)
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, baseAccess, dir, baseFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.GotEntries(true, dirFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Deny the reader access to the dir,
+	// they can still see the root but not the dir.
+	r.As(ownerName)
+	r.Put(dirAccess, "*:"+ownerName)
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, baseAccess, dir, baseFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.GotEntries(false) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader list access to the dir, they can still see the root
+	// (with blocks) and the dir (without blocks).
+	r.As(ownerName)
+	r.Put(dirAccess, "list:"+readerName)
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, baseAccess, dir, baseFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.GotEntries(false, dirAccess, dirFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Remove the root access file and the reader should
+	// still be able to glob the directory, given its name.
+	r.As(ownerName)
+	r.Delete(baseAccess)
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/*/*")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(dir + "/*")
+	if !r.GotEntries(false, dirAccess, dirFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Now add a second directory, and give the reader list and read rights
+	// to it, and also give them list rights to the root. With one glob file
+	// that matches both directories, the reader should the file in dir with
+	// no blocks, and the file in dir2 with blocks.
+	const (
+		dir2       = base + "/dir2"
+		dir2File   = dir2 + "/file"
+		dir2Access = dir2 + "/Access"
+	)
+	r.As(ownerName)
+	r.Put(baseAccess, "*:"+ownerName+"\nlist:"+readerName)
+	r.MakeDirectory(dir2)
+	r.Put(dir2File, content)
+	r.Put(dir2Access, "list,read:"+readerName)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.As(readerName)
+	r.Glob(base + "/*/f*")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if n := len(r.Entries); n != 2 {
+		t.Fatalf("got %d files, want %d", n, 2)
+	}
+	if e := r.Entries[0]; e.Name != dirFile || len(e.Blocks) != 0 {
+		t.Fatalf("got %q with %d blocks, want %q with 0 blocks", e.Name, len(e.Blocks), dirFile)
+	}
+	if e := r.Entries[1]; e.Name != dir2File || len(e.Blocks) == 0 {
+		t.Fatalf("got %q with 0 blocks, want %q with blocks", e.Name, dirFile)
+	}
+}
+
+// TODO
+func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {}

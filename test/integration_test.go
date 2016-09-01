@@ -37,7 +37,10 @@ const (
 )
 
 var (
+	errExist      = errors.E(errors.Exist)
 	errNotExist   = errors.E(errors.NotExist)
+	errPermission = errors.E(errors.Permission)
+
 	setupTemplate = testenv.Setup{
 		Tree: testenv.Tree{
 			testenv.E("/dir1/", ""),
@@ -58,7 +61,7 @@ func testNoReadersAllowed(t *testing.T, r *testenv.Runner) {
 
 	r.As(readerName)
 	r.Get(fileName)
-	if !r.Match(errors.E(errors.NotExist)) {
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 
@@ -165,11 +168,15 @@ func testGlobWithLimitedAccess(t *testing.T, r *testenv.Runner) {
 
 	// but not /dir2/
 	r.Glob(dir2Pat)
-	checkDirs("reader", dir2Pat, 0)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
 	// Without list access to the root, the reader can't glob /dir*.
 	r.Glob(bothPat)
-	checkDirs("reader", bothPat, 0)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
 	// Give the reader list access to the root.
 	r.As(ownerName)
@@ -360,7 +367,7 @@ func cleanup(env *testenv.Env) error {
 // provided DirServer, first deleting path/Access and then path/*.
 func deleteAll(dir upspin.DirServer, path upspin.PathName) error {
 	if _, err := dir.Delete(path + "/Access"); err != nil {
-		if !errors.Match(errors.E(errors.NotExist), err) {
+		if !errors.Match(errNotExist, err) {
 			return err
 		}
 	}
