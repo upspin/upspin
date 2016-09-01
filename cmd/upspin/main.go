@@ -486,7 +486,6 @@ func (s *State) share(args ...string) {
 	if *force {
 		*fix = true
 	}
-	s.sharer = newSharer(s)
 	s.sharer.fix = *fix
 	s.sharer.force = *force
 	s.sharer.isDir = *isDir
@@ -643,6 +642,7 @@ func newState() *State {
 	}
 	s.client = client.New(ctx)
 	s.context = ctx
+	s.sharer = newSharer(s)
 	return s
 }
 
