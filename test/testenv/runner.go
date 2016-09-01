@@ -148,6 +148,22 @@ func (r *Runner) Glob(pattern string) {
 	r.setErr(err)
 }
 
+// DirWhichAccess performs a WhichAccess request to the user's underlying
+// DirServer and populates the Runner's Entry field with the result.
+func (r *Runner) DirWhichAccess(p upspin.PathName) {
+	if r.err != nil {
+		return
+	}
+	dir, err := r.clients[r.user].DirServer(p)
+	if err != nil {
+		r.setErr(err)
+		return
+	}
+	entry, err := dir.WhichAccess(p)
+	r.Entry = entry
+	r.setErr(err)
+}
+
 // DirLookup performs a Lookup request to the user's underlying DirServer
 // and populates the Runner's Entry field with the result.
 func (r *Runner) DirLookup(p upspin.PathName) {
@@ -164,7 +180,25 @@ func (r *Runner) DirLookup(p upspin.PathName) {
 	r.setErr(err)
 }
 
-// Err returns the current error state and clears it.
+// GotEntry reports whether the Entry has the given name
+// and if not notes the discrepancy as the last error state.
+func (r *Runner) GotEntry(p upspin.PathName) bool {
+	if r.Failed() {
+		return false
+	}
+	if r.Entry != nil && r.Entry.Name == p {
+		return true
+	}
+	if r.Entry == nil {
+		r.lastErr = errors.Errorf("got nil entry, want %q", p)
+	} else {
+		r.lastErr = errors.Errorf("got entry %q, want %q", r.Entry.Name, p)
+	}
+	_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	return false
+}
+
+// Err returns the error state and clears it.
 func (r *Runner) Err() error {
 	err := r.err
 	r.err = nil
@@ -172,15 +206,15 @@ func (r *Runner) Err() error {
 	return err
 }
 
-// Failed reports whether the current error state is non-nil,
+// Failed reports whether the error state is non-nil,
 // saves the error for use by the Diag method,
 // and clears the error state.
 func (r *Runner) Failed() bool {
 	return r.Err() != nil
 }
 
-// Match checks whether the current error state matches the given error,
-// and if not it notes the discrepancy as the last error state,
+// Match checks whether the error state matches the given error
+// and if not it notes the discrepancy as the last error state;
 // otherwise it clears the error.
 func (r *Runner) Match(want error) bool {
 	got := r.Err()
