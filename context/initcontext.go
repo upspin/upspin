@@ -279,6 +279,11 @@ func (ctx *contextImpl) StoreServer() upspin.StoreServer {
 	return u
 }
 
+// StoreServerFor implements upspin.Context.
+func (ctx *contextImpl) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
+	return bind.StoreServer(ctx, ep)
+}
+
 // UserName implements upspin.Context.
 func (ctx *contextImpl) UserName() upspin.UserName {
 	return ctx.userName

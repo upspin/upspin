@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/path"
@@ -340,12 +339,7 @@ func locationOf(entry *upspin.DirEntry) upspin.Location {
 }
 
 func cleanup(env *testenv.Env) error {
-	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
-	if err != nil {
-		return err
-	}
-
-	return deleteAll(dir, ownerName)
+	return deleteAll(env.Context.DirServer(""), ownerName)
 }
 
 // deleteAll recursively deletes the directory named by path through the

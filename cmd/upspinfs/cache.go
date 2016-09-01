@@ -16,7 +16,6 @@ import (
 	"bazil.org/fuse"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/client"
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
@@ -182,7 +181,7 @@ Blocks:
 		where := []upspin.Location{block.Location}
 		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 			loc := where[i]
-			store, err := bind.StoreServer(n.f.context, loc.Endpoint)
+			store, err := n.f.context.StoreServerFor(loc.Endpoint)
 			if isError(err) {
 				continue
 			}

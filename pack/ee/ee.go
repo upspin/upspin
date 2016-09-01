@@ -26,7 +26,6 @@ import (
 
 	"golang.org/x/crypto/hkdf"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -232,11 +231,8 @@ func (bp *blockPacker) Close() error {
 	if owner == ctx.UserName() {
 		wrap = wrap[:1]
 	} else {
-		userConn, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-		if err != nil {
-			return errors.E(op, name, owner, err)
-		}
-		u, err := userConn.Lookup(owner)
+		keyServer := ctx.KeyServer()
+		u, err := keyServer.Lookup(owner)
 		if err != nil {
 			return errors.E(op, name, owner, err)
 		}
@@ -854,11 +850,8 @@ func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, erro
 	if string(user) == string(ctx.UserName()) {
 		return ctx.Factotum().PublicKey(), nil
 	}
-	userService, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-	if err != nil {
-		return "", err
-	}
-	u, err := userService.Lookup(user)
+	keyServer := ctx.KeyServer()
+	u, err := keyServer.Lookup(user)
 	if err != nil {
 		return "", err
 	}

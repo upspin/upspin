@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/client/file"
 	"upspin.io/errors"
@@ -124,10 +123,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 
 	// Start the I/O.
-	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
-	if err != nil {
-		return nil, err
-	}
+	store := c.context.StoreServer()
 	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
 		return nil, err
@@ -447,28 +443,7 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 
 // DirServer implements upspin.Client.
 func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	var endpoints []upspin.Endpoint
-	if parsed.User() == c.context.UserName() {
-		endpoints = append(endpoints, c.context.DirEndpoint())
-	}
-	if u, err := c.context.KeyServer().Lookup(parsed.User()); err == nil {
-		endpoints = append(endpoints, u.Dirs...)
-	}
-	var dir upspin.DirServer
-	for _, e := range endpoints {
-		dir, err = bind.DirServer(c.context, e)
-		if dir != nil {
-			return dir, nil
-		}
-	}
-	if err == nil {
-		err = errors.Errorf("client: no DirServer endpoint for user %q", parsed.User())
-	}
-	return nil, err
+	return c.context.DirServer(name), nil
 }
 
 // PutDuplicate implements upspin.Client.
