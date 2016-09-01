@@ -7,7 +7,6 @@ package testenv
 import (
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -36,10 +35,7 @@ func TestInProcess(t *testing.T) {
 	}
 
 	// Now check the tree was setup correctly
-	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := env.Context.DirServer("")
 	de, err := dir.Glob(userName + "/*")
 	if err != nil {
 		t.Fatal(err)

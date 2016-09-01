@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -135,10 +134,7 @@ func TestPack(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	key, err := bind.KeyServer(globalContext, inProcess)
-	if err != nil {
-		log.Fatalf("error binding KeyServer: %v", err)
-	}
+	key := globalContext.KeyServer()
 	if t := key.Endpoint().Transport; t != upspin.InProcess {
 		log.Fatalf("bad transport for KeyServer: %v, want inprocess", t)
 	}
@@ -148,7 +144,7 @@ func TestMain(m *testing.M) {
 		Stores:    []upspin.Endpoint{inProcess},
 		PublicKey: "a key",
 	}
-	err = key.Put(user)
+	err := key.Put(user)
 	if err != nil {
 		panic(err)
 	}
