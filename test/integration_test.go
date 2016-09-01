@@ -53,7 +53,7 @@ var (
 	readerContext upspin.Context
 )
 
-func testNoReadersAllowed(t *testing.T, r *testRunner) {
+func testNoReadersAllowed(t *testing.T, r *testenv.Runner) {
 	fileName := upspin.PathName(ownerName + "/dir1/file1.txt")
 
 	r.As(readerName)
@@ -73,7 +73,7 @@ func testNoReadersAllowed(t *testing.T, r *testRunner) {
 	}
 }
 
-func testAllowListAccess(t *testing.T, r *testRunner) {
+func testAllowListAccess(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
 	r.Put(ownerName+"/dir1/Access", "l:"+readerName)
 
@@ -97,7 +97,7 @@ func testAllowListAccess(t *testing.T, r *testRunner) {
 	}
 }
 
-func testAllowReadAccess(t *testing.T, r *testRunner) {
+func testAllowReadAccess(t *testing.T, r *testenv.Runner) {
 	// Owner has no delete permission (assumption tested in testDelete).
 	r.As(ownerName)
 	r.Put(ownerName+"/dir1/Access",
@@ -117,7 +117,7 @@ func testAllowReadAccess(t *testing.T, r *testRunner) {
 	}
 }
 
-func testCreateAndOpen(t *testing.T, r *testRunner) {
+func testCreateAndOpen(t *testing.T, r *testenv.Runner) {
 	filePath := upspin.PathName(path.Join(ownerName, "myotherfile.txt"))
 
 	r.As(ownerName)
@@ -131,7 +131,7 @@ func testCreateAndOpen(t *testing.T, r *testRunner) {
 	}
 }
 
-func testGlobWithLimitedAccess(t *testing.T, r *testRunner) {
+func testGlobWithLimitedAccess(t *testing.T, r *testenv.Runner) {
 	dir1Pat := ownerName + "/dir1/*.txt"
 	dir2Pat := ownerName + "/dir2/*.txt"
 	bothPat := ownerName + "/dir*/*.txt"
@@ -185,7 +185,7 @@ func testGlobWithLimitedAccess(t *testing.T, r *testRunner) {
 	checkDirEntry(t, r.Entries[0], ownerName+"/dir1/file1.txt", hasLocation, len(contentsOfFile1))
 }
 
-func testGlobWithPattern(t *testing.T, r *testRunner) {
+func testGlobWithPattern(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
 	for i := 0; i <= 10; i++ {
 		r.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/mydir%d", ownerName, i)))
@@ -208,7 +208,7 @@ func testGlobWithPattern(t *testing.T, r *testRunner) {
 	}
 }
 
-func testDelete(t *testing.T, r *testRunner) {
+func testDelete(t *testing.T, r *testenv.Runner) {
 	pathName := upspin.PathName(ownerName + "/dir2/file3.pdf")
 
 	r.As(ownerName)
@@ -240,7 +240,7 @@ func testDelete(t *testing.T, r *testRunner) {
 // integrationTests list all tests and their names. Order is important.
 var integrationTests = []struct {
 	name string
-	fn   func(*testing.T, *testRunner)
+	fn   func(*testing.T, *testenv.Runner)
 }{
 	// These tests may be run independently.
 	{"GetErrors", testGetErrors},
@@ -269,7 +269,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	r := newRunner()
+	r := testenv.NewRunner()
 	r.AddUser(env.Context)
 	r.AddUser(readerContext)
 
