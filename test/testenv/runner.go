@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package test
+package testenv
 
 import (
 	"fmt"
@@ -14,12 +14,12 @@ import (
 	"upspin.io/upspin"
 )
 
-// testRunner (name to be changed) is a helper for writing tests that interact
-// with Upspin trees. It can perform actions as multiple users in tandem. It
-// reduces error handling boilerplate by tracking error state and skipping all
-// actions between where an error occurs and where it is checked.
+// Runner is a helper for writing tests that interact with Upspin trees.
+// It can perform actions as multiple users in tandem. It reduces error
+// handling boilerplate by tracking error state and skipping all actions
+// between where an error occurs and where it is checked.
 //
-// 	r := newRunner()
+// 	r := testenv.NewRunner()
 // 	r.AddUser(context)
 // 	r.As(username)
 // 	r.Put("user@host/foo", "content")
@@ -27,7 +27,7 @@ import (
 // 	if r.Failed() {
 // 		t.Fatal(r.Diag())
 // 	}
-type testRunner struct {
+type Runner struct {
 	// Entry holds the result of the most recent Put or MakeDirectory operation.
 	Entry *upspin.DirEntry
 
@@ -46,13 +46,13 @@ type testRunner struct {
 	lastErr error // used by Diag
 }
 
-func newRunner() *testRunner {
-	return &testRunner{
+func NewRunner() *Runner {
+	return &Runner{
 		clients: make(map[upspin.UserName]upspin.Client),
 	}
 }
 
-func (r *testRunner) setErr(err error) {
+func (r *Runner) setErr(err error) {
 	if r.err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (r *testRunner) setErr(err error) {
 // AddUser adds the user in the given context to the Runner's
 // internal state, and creates a client for use as that user.
 // If a client already exists for that user, it is replaced with a new one.
-func (r *testRunner) AddUser(ctx upspin.Context) {
+func (r *Runner) AddUser(ctx upspin.Context) {
 	if r.err != nil {
 		return
 	}
@@ -72,7 +72,7 @@ func (r *testRunner) AddUser(ctx upspin.Context) {
 
 // As instructs the Runner to perform subsequent actions as the specified user.
 // It must have been first added with AddUser.
-func (r *testRunner) As(u upspin.UserName) {
+func (r *Runner) As(u upspin.UserName) {
 	if r.err != nil {
 		return
 	}
@@ -86,7 +86,7 @@ func (r *testRunner) As(u upspin.UserName) {
 
 // Get performs a Get request as the user
 // and populates the Runner's Data field with the result.
-func (r *testRunner) Get(p upspin.PathName) {
+func (r *Runner) Get(p upspin.PathName) {
 	if r.err != nil {
 		return
 	}
@@ -97,7 +97,7 @@ func (r *testRunner) Get(p upspin.PathName) {
 
 // Put performs a Put request as the user
 // and populates the Runner's Entry field with the result.
-func (r *testRunner) Put(p upspin.PathName, data string) {
+func (r *Runner) Put(p upspin.PathName, data string) {
 	if r.err != nil {
 		return
 	}
@@ -108,7 +108,7 @@ func (r *testRunner) Put(p upspin.PathName, data string) {
 
 // PutLink performs a PutLink request as the user
 // and populates the Runner's Entry field with the result.
-func (r *testRunner) PutLink(oldName, linkName upspin.PathName) {
+func (r *Runner) PutLink(oldName, linkName upspin.PathName) {
 	if r.err != nil {
 		return
 	}
@@ -119,7 +119,7 @@ func (r *testRunner) PutLink(oldName, linkName upspin.PathName) {
 
 // MakeDirectory performs a MakeDirectory request as the user
 // and populates the Runner's Entry field with the result.
-func (r *testRunner) MakeDirectory(p upspin.PathName) {
+func (r *Runner) MakeDirectory(p upspin.PathName) {
 	if r.err != nil {
 		return
 	}
@@ -129,7 +129,7 @@ func (r *testRunner) MakeDirectory(p upspin.PathName) {
 }
 
 // Delete performs a Delete request as the user.
-func (r *testRunner) Delete(p upspin.PathName) {
+func (r *Runner) Delete(p upspin.PathName) {
 	if r.err != nil {
 		return
 	}
@@ -139,7 +139,7 @@ func (r *testRunner) Delete(p upspin.PathName) {
 
 // Glob performs a Glob request as the user
 // and populates the Runner's Entries field with the result.
-func (r *testRunner) Glob(pattern string) {
+func (r *Runner) Glob(pattern string) {
 	if r.err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (r *testRunner) Glob(pattern string) {
 
 // DirLookup performs a Lookup request to the user's underlying DirServer
 // and populates the Runner's Entry field with the result.
-func (r *testRunner) DirLookup(p upspin.PathName) {
+func (r *Runner) DirLookup(p upspin.PathName) {
 	if r.err != nil {
 		return
 	}
@@ -165,7 +165,7 @@ func (r *testRunner) DirLookup(p upspin.PathName) {
 }
 
 // Err returns the current error state and clears it.
-func (r *testRunner) Err() error {
+func (r *Runner) Err() error {
 	err := r.err
 	r.err = nil
 	r.lastErr = err
@@ -175,14 +175,14 @@ func (r *testRunner) Err() error {
 // Failed reports whether the current error state is non-nil,
 // saves the error for use by the Diag method,
 // and clears the error state.
-func (r *testRunner) Failed() bool {
+func (r *Runner) Failed() bool {
 	return r.Err() != nil
 }
 
 // Match checks whether the current error state matches the given error,
 // and if not it notes the discrepancy as the last error state,
 // otherwise it clears the error.
-func (r *testRunner) Match(want error) bool {
+func (r *Runner) Match(want error) bool {
 	got := r.Err()
 	if want == got || errors.Match(want, got) {
 		return true
@@ -197,7 +197,7 @@ func (r *testRunner) Match(want error) bool {
 
 // Diag returns a string containing the most recent saved error
 // and the file and line at which the error occurred.
-func (r *testRunner) Diag() string {
+func (r *Runner) Diag() string {
 	if r.lastErr == nil {
 		return "<nil>"
 	}

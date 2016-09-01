@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"upspin.io/errors"
+	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
 
@@ -17,7 +18,7 @@ import (
 // unauthorized users to probe the name space. The rule of thumb
 // is that users should receive 'not exist' for any path
 // to which they have no rights.
-func testGetErrors(t *testing.T, r *testRunner) {
+func testGetErrors(t *testing.T, r *testenv.Runner) {
 	// Create a simple tree.
 	const (
 		base    = ownerName + "/get-errors"
@@ -84,7 +85,7 @@ func testGetErrors(t *testing.T, r *testRunner) {
 
 // testGetLinkErrors is like testGetErrors but checks the
 // behavior of Get when links are present.
-func testGetLinkErrors(t *testing.T, r *testRunner) {
+func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	// Create a simple tree.
 	const (
 		base      = ownerName + "/get-link-errors"
