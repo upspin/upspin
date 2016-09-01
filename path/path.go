@@ -19,6 +19,10 @@ import (
 	"upspin.io/upspin"
 )
 
+// SnapshotPrefix is the prefix of a special directory in the root that contains
+// periodic snapshots (copy-on-write backups).
+const SnapshotPrefix = "snapshot"
+
 // Parsed represents a successfully parsed path name.
 type Parsed struct {
 	// The parsed path is just a clean string. We compute what we need in the methods.
@@ -174,6 +178,11 @@ func FirstPath(pathName upspin.PathName, n int) upspin.PathName {
 func (p Parsed) IsRoot() bool {
 	str := string(p.path)
 	return strings.IndexByte(str, '/') == len(str)-1
+}
+
+// IsSnapshot reports whether a parsed name refers to a snapshot path.
+func (p Parsed) IsSnapshot() bool {
+	return strings.HasSuffix(string(FirstPath(p.path, 1)), SnapshotPrefix)
 }
 
 // Equal reports whether the two parsed path names are equal.

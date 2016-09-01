@@ -11,27 +11,38 @@ import (
 	"upspin.io/upspin"
 )
 
+const (
+	isRoot     = true
+	isSnapshot = true
+)
+
 type parseTest struct {
-	path      upspin.PathName
-	cleanPath upspin.PathName
-	isRoot    bool
+	path       upspin.PathName
+	cleanPath  upspin.PathName
+	isRoot     bool
+	isSnapshot bool
 }
 
 var goodParseTests = []parseTest{
-	{"u@google.com", "u@google.com/", true},
-	{"u@google.com/", "u@google.com/", true},
-	{"u@google.com///", "u@google.com/", true},
-	{"u@google.com/a", "u@google.com/a", false},
-	{"u@google.com/a////", "u@google.com/a", false},
-	{"u@google.com/a///b/c/d/", "u@google.com/a/b/c/d", false},
+	{"u@google.com", "u@google.com/", isRoot, !isSnapshot},
+	{"u@google.com/", "u@google.com/", isRoot, !isSnapshot},
+	{"u@google.com///", "u@google.com/", isRoot, !isSnapshot},
+	{"u@google.com/a", "u@google.com/a", !isRoot, !isSnapshot},
+	{"u@google.com/a////", "u@google.com/a", !isRoot, !isSnapshot},
+	{"u@google.com/a///b/c/d/", "u@google.com/a/b/c/d", !isRoot, !isSnapshot},
+	{"u@google.com/a/snapshot///", "u@google.com/a/snapshot", !isRoot, !isSnapshot},
+	{"u@google.com/snapshot///b/c/d/", "u@google.com/snapshot/b/c/d", !isRoot, isSnapshot},
+	{"u@google.com/snapshotnot/b/c/d/", "u@google.com/snapshotnot/b/c/d", !isRoot, !isSnapshot},
+	{"u@google.com/snapshot", "u@google.com/snapshot", !isRoot, isSnapshot},
+	{"u@google.com/a/snapshot", "u@google.com/a/snapshot", !isRoot, !isSnapshot},
 	// Dot.
-	{"u@google.com/.", "u@google.com/", true},
-	{"u@google.com/a/../b", "u@google.com/b", false},
-	{"u@google.com/./a///b/./c/d/./.", "u@google.com/a/b/c/d", false},
+	{"u@google.com/.", "u@google.com/", isRoot, !isSnapshot},
+	{"u@google.com/a/../b", "u@google.com/b", !isRoot, !isSnapshot},
+	{"u@google.com/./a///b/./c/d/./.", "u@google.com/a/b/c/d", !isRoot, !isSnapshot},
 	// Dot-Dot.
-	{"u@google.com/..", "u@google.com/", true},
-	{"u@google.com/a/../b", "u@google.com/b", false},
-	{"u@google.com/../a///b/../c/d/..", "u@google.com/a/c", false},
+	{"u@google.com/..", "u@google.com/", isRoot, !isSnapshot},
+	{"u@google.com/a/../b", "u@google.com/b", !isRoot, !isSnapshot},
+	{"u@google.com/../a///b/../c/d/..", "u@google.com/a/c", !isRoot, !isSnapshot},
 }
 
 func TestParse(t *testing.T) {
@@ -47,6 +58,9 @@ func TestParse(t *testing.T) {
 		}
 		if test.isRoot != p.IsRoot() {
 			t.Errorf("%q: expected IsRoot %v, got %v", test.path, test.isRoot, p.IsRoot())
+		}
+		if test.isSnapshot != p.IsSnapshot() {
+			t.Errorf("%q: expected IsSnapshot %v, got %v", test.path, test.isSnapshot, p.IsSnapshot())
 		}
 	}
 }
