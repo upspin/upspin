@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f1c8a9e8_e52796ba",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-01T21:51:31Z",
+      "side": 1,
+      "message": "This comment is wrong. FirsPath returns a path name with all but the first n elements dropped.",
+      "range": {
+        "startLine": 154,
+        "startChar": 3,
+        "endLine": 154,
+        "endChar": 12
+      },
+      "revId": "04933d9cba16346dbd9ad7dc49bb60c16d44b1ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f1c8a9e8_a52d9ea0",
+        "filename": "path/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-01T21:51:31Z",
+      "side": 1,
+      "message": "What if the first element is \"thisisnotasnapshot\".  Wouldn\u0027t that match?",
+      "revId": "04933d9cba16346dbd9ad7dc49bb60c16d44b1ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
