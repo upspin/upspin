@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "b179d140_0b8e9d31",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:32:24Z",
+      "side": 1,
+      "message": "\"list of *intended* readers for a given name, according to the ruling Access file for it.\"\n(or one could think you\u0027re unwrapping the packdata to find who has read keys wrapped).",
+      "revId": "f30b5f5dfcbc28c992db8cf348f8f9ad40e31cec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_ee7b1f1b",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:32:24Z",
+      "side": 1,
+      "message": "s/the //",
+      "revId": "f30b5f5dfcbc28c992db8cf348f8f9ad40e31cec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_8e805bf9",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:32:24Z",
+      "side": 1,
+      "message": "create too?",
+      "revId": "f30b5f5dfcbc28c992db8cf348f8f9ad40e31cec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_1e5c7178",
         "filename": "test/error_test.go",
         "patchSetId": 1
