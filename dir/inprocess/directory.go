@@ -568,13 +568,13 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 
 	// If the pattern contains a link before the first metacharacter,
 	// do no processing and return the link.
-	firstGlob := 0
-	for ; firstGlob < parsed.NElem(); firstGlob++ {
-		if isGlobPattern(parsed.Elem(firstGlob)) {
+	firstGlobElem := 0
+	for ; firstGlobElem < parsed.NElem(); firstGlobElem++ {
+		if isGlobPattern(parsed.Elem(firstGlobElem)) {
 			break
 		}
 	}
-	entry, err := s.lookup(op, parsed.First(firstGlob), false)
+	entry, err := s.lookup(op, parsed.First(firstGlobElem), false)
 	if err == nil && entry.IsLink() {
 		entry, err = s.errLink(op, entry, upspin.ErrFollowLink)
 		if entry == nil {
@@ -609,6 +609,13 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				if ok, err := s.can(access.List, p); err != nil {
 					return nil, errors.E(op, upspin.PathName(pattern), err)
 				} else if !ok {
+					// If this is the first glob element in
+					// the path and we have no list permission,
+					// return a permission error.
+					if i == firstGlobElem {
+						return nil, s.errPerm(op, parsed.First(i))
+					}
+					// Otherwise, skip this entry when matching.
 					continue
 				}
 			}

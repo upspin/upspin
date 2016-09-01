@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"upspin.io/client"
 	"upspin.io/errors"
@@ -196,6 +197,49 @@ func (r *Runner) GotEntry(p upspin.PathName) bool {
 	}
 	_, r.errFile, r.errLine, _ = runtime.Caller(1)
 	return false
+}
+
+// GotEntries reports whether the names of the Entries match the provided
+// list (in order). It also checks that the presence of block data in
+// those entries matches the boolean.
+// If not, it notes the discrepancy as the last error state.
+func (r *Runner) GotEntries(wantBlockData bool, ps ...upspin.PathName) bool {
+	if r.Failed() {
+		return false
+	}
+	if got, want := len(r.Entries), len(ps); got != want {
+		var names string
+		if len(r.Entries) > 0 {
+			var ns []string
+			for _, e := range r.Entries {
+				ns = append(ns, string(e.Name))
+			}
+			names = "; got entries:\n\t" + strings.Join(ns, "\n\t")
+		}
+		r.lastErr = errors.Errorf("got %d entries, want %d%s", got, want, names)
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	for i, want := range ps {
+		got := r.Entries[i].Name
+		if got != want {
+			r.lastErr = errors.Errorf("got entry %d = %q, want %q", i, got, want)
+			_, r.errFile, r.errLine, _ = runtime.Caller(1)
+			return false
+		}
+		nBlocks := len(r.Entries[i].Blocks)
+		if nBlocks > 0 == wantBlockData {
+			continue
+		}
+		if wantBlockData {
+			r.lastErr = errors.Errorf("got entry %q with 0 blocks, want some", got)
+		} else {
+			r.lastErr = errors.Errorf("got entry %q with %d blocks, want none", got, nBlocks)
+		}
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	return true
 }
 
 // Err returns the error state and clears it.
