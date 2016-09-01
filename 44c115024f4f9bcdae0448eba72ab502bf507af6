@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "f1c8a9e8_452e6afd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T21:30:32Z",
+      "side": 1,
+      "message": "this means the size of the tree grows exponentially, instead of linearly. seems troublesome to me.",
+      "parentUuid": "b179d140_6bdde1fe",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_b82b3840",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Yes. The client will need to be aware of them. My suggestion is for the client to allow read only and verify the signature using the mangled name (snapshot prefix stripped).",
       "parentUuid": "31f241e7_b82b3840",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f1c8a9e8_c5f89a68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T21:30:32Z",
+      "side": 1,
+      "message": "so we push the awareness of snapshots onto the client, and all future client implementations? i\u0027m not very comfortable with this. look forward to discussing it more in the meeting.",
+      "parentUuid": "b179d140_6b24011d",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
