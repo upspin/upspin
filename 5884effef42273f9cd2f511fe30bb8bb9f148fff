@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f1c8a9e8_45daeadf",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T21:35:45Z",
+      "side": 1,
+      "message": "next cl",
+      "parentUuid": "b179d140_ce9d035e",
+      "revId": "5884effef42273f9cd2f511fe30bb8bb9f148fff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b179d140_eea23f9d",
         "filename": "test/error_test.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "f1c8a9e8_a5e59e9f",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T21:35:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b179d140_eea23f9d",
+      "revId": "5884effef42273f9cd2f511fe30bb8bb9f148fff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b179d140_4eb273ee",
         "filename": "test/error_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-09-01T18:36:34Z",
       "side": 1,
       "message": "How about combinations? You could simply append the new right onto the previous ones.",
+      "revId": "5884effef42273f9cd2f511fe30bb8bb9f148fff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f1c8a9e8_e5df96c9",
+        "filename": "test/error_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T21:35:45Z",
+      "side": 1,
+      "message": "could do, but i don\u0027t think it buys us anything really.\nmaybe in a future cl",
+      "parentUuid": "b179d140_4eb273ee",
       "revId": "5884effef42273f9cd2f511fe30bb8bb9f148fff",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
