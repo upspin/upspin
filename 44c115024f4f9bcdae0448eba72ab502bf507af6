@@ -1,0 +1,633 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31f241e7_9811940e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "How does this exclude existing snapshots from future snapshots?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b82b3840",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "This breaks the signatures, doesn\u0027t it?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_386aa881",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "i\u0027d call this file \u0027snapshot.go\u0027. at least, \u0027snapshotter\u0027 is an awkward word and (as discussed below) you probably don\u0027t need the snapshotter type at all",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_d8acbcfa",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "I don\u0027t see this constant used in this file. Delete?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b8b1f852",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "per tree?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_58c1ec8e",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "I don\u0027t see this used in this file",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_78b4b03e",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "this should take a time.Duration, and the argument should be \u0027interval\u0027\nthe daily constant above, if it\u0027s used, should be time.Hour * 24",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_1876c46c",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "I don\u0027t think the snapshotter type is really pulling its weight here\nyou might be better off writing this here:\n\ngo func() {\n  t :\u003d time.NewTicker(interval)\n  defer t.Stop()\n  for {\n    \u003c-t\n    s.server.takeSnapshot()\n  }\n}()\n\n(this is a very common go idiom)\n\nI suggest the Ticker because it\u0027ll tick once per interval, rather than once per interval+timetotakesnapshot.",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b8ffb8c5",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "\"takeSnapshot\" sounds like something that happens once\nI\u0027d instead name it \"snapshotLoop\", or \"takeSnapshots\"",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_d8fa7cd7",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "check and log the error",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_38be281f",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "s/at this point in time/\nthe sentence is already in present tense, so this is implied",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_188a4474",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "date :\u003d time.Now().UTC().Format(\"2006/01/02\")",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b888d878",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "newEntry.Blocks \u003d append([]upspin.DirBlock(nil), root.Blocks...)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_989e34b4",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "this just copies the slice data back into itself\nyou want\nnewEntry.Packdata \u003d append([]byte(nil), root.Packdata...)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_789b90c5",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "this shouldn\u0027t be necessary? unless you mean s/entry.Name/name/ ?\nbut given the semantics we discussed in the meeting, i\u0027m not sure that\u0027s right",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_5898ccc6",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "you use mu for this more often than not (6 occurrences of mu vs 1 occurrence of lock), be consistent throughout.",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_3895088d",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "why do you need this loop? it looks like you can call makeSnapshotPath after you have taken the user lock. then you don\u0027t need to worry about a concurrent process coming along and stealing the path name",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_f8f540e7",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "\"safe\" is vague in this context. i\u0027d go with something like mkdirIfNotExist\nbut in this context, the function barely seems worth it. i\u0027d put inline in the loop. (the 6 lines of error checking you do after calling this func could just do what this func does)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_18f124fc",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "match against the error you return. it should be one or the other, right?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_d86f1c8c",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "snapshot_test.go ?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_f87ae04f",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "TestMakeSnapshotPath",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b8745861",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "s/Forcefully t/T/",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_78871046",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "why take more than one? what does taking multiple snapshots here test that the test above does not?\n\nto test the actual snapshot stuff, maybe you should take a snapshot, then put data in, then take another snapshot, and compare",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_181da424",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "s/upspin.PathName/string/",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_988ab44e",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "instead of this, i\u0027d test for those specific snapshot names (use a constant) and ignore them\n\nif you disagree, this should at least be\n\nif i \u003c 2 {\n  continue\n}\n\nbut even better would be for each test to clean up after itself, so you needn\u0027t rely on the state of the previous test. otherwise this test breaks if you run \u0027go test -run\u003d^TestSnapshot$\u0027. a great shame",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_3881882f",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "name :\u003d string(e.Name) + \"/*\"\nt.Logf(\"Glob(%q)\", name)\nssEntries, err :\u003d s.Glob(name)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_d826fc77",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "\"/\"+expectedEntries[j]",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_f8dc2069",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "entryPath? to mirror the name \"entry\"",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_38c3c881",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "you can compute this from the time format string\n\nvar SnapshotPathLen \u003d 2 + strings.Count(SnapshotTimeFormat, \"/\")\n\nthat way if the time format changes (to include hours or seconds, for example) the path len will still be correct",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b8d69843",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "you could also put the time format string in here\nSnapshotTimeFormat \u003d \"2006/01/02\"\nand then use that in the call to time.Format elsewhere",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_184fe434",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "for use with? don\u0027t keep me hangin\u0027!",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_f85300de",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "the word \"splice\" implies connecting two things, but what it\u0027s really doing is making a copy. CopyDir ?\n\nthe argument p should be called \"dest\" or similar",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b85d78eb",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "this is interesting. why can\u0027t it copy to a root? I know that\u0027s not the use case here, but it\u0027s not obvious to me why this function can\u0027t do that",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_9863d4ae",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "\"cannot copy to a path that contains a link\"\nalso include the node.Name in there, so it\u0027s clear which entry is the link",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_786030a1",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "include op in the error",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_586d6c97",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "\"unmangle\" is pretty vague for what\u0027s happening here\nbut I thought what we agreed in the meeting was that we\u0027d just return the original names in the entries. if we don\u0027t, won\u0027t all the signatures be broken?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_78c950a1",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T12:17:56Z",
+      "side": 1,
+      "message": "name.Elem(1) \u003d\u003d SnapshotPrefix ?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
