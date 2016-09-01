@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_6bdde1fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Huh? It doesn\u0027t. It costs nothing. Yes, it might create an infinite loop such as u@b.com/snapshot/2016/09/01/snapshot/2016/09/01/snapshot/... but there are worse things than this, one can construct a ./../../ path arbitrarily long.\n\nAnyway, we can limit recusive deferences in the dir server, when (if?) I get to it.",
+      "parentUuid": "31f241e7_9811940e",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_b82b3840",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "This breaks the signatures, doesn\u0027t it?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_6b24011d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Yes. The client will need to be aware of them. My suggestion is for the client to allow read only and verify the signature using the mangled name (snapshot prefix stripped).",
+      "parentUuid": "31f241e7_b82b3840",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4b0ee594",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_386aa881",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_d8acbcfa",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "I don\u0027t see this constant used in this file. Delete?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_0b08dd83",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "It will be used in the next CL. It\u0027s here to help reviewers understand what I\u0027m doing. Much like the empty tests you had in a recent CL.",
+      "parentUuid": "31f241e7_d8acbcfa",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_2b05996a",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_b8b1f852",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_58c1ec8e",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "I don\u0027t see this used in this file",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_eb655145",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Next CL.",
+      "parentUuid": "31f241e7_58c1ec8e",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_8b6a8d14",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_78b4b03e",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_1876c46c",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "I don\u0027t think the snapshotter type is really pulling its weight here\nyou might be better off writing this here:\n\ngo func() {\n  t :\u003d time.NewTicker(interval)\n  defer t.Stop()\n  for {\n    \u003c-t\n    s.server.takeSnapshot()\n  }\n}()\n\n(this is a very common go idiom)\n\nI suggest the Ticker because it\u0027ll tick once per interval, rather than once per interval+timetotakesnapshot.",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_ab6f4923",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_1876c46c",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_6b52c169",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_b8ffb8c5",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_d8fa7cd7",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "check and log the error",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_0b5f7d70",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_d8fa7cd7",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_eb4c71c7",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_38be281f",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_188a4474",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -200,6 +398,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "date :\u003d time.Now().UTC().Format(\"2006/01/02\")",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_6b39612f",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done. When I tried that with 2016 it didn\u0027t work. I see all examples are 2006, so maybe there\u0027s something special about it?",
+      "parentUuid": "31f241e7_188a4474",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_cbbe5585",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_b888d878",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_989e34b4",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -234,6 +468,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "this just copies the slice data back into itself\nyou want\nnewEntry.Packdata \u003d append([]byte(nil), root.Packdata...)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_8bc84d1a",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_989e34b4",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_abe4299f",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "This is correct. name is what I ask, entry.Name is what I get (maybe with a \".1\" or \".2\" appended).",
+      "parentUuid": "31f241e7_789b90c5",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_5898ccc6",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -268,6 +538,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "you use mu for this more often than not (6 occurrences of mu vs 1 occurrence of lock), be consistent throughout.",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_4bfa653f",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_5898ccc6",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -291,6 +579,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_2b8839cb",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "It\u0027s not for concurrency issues. Currently, if the user decides to mkdir /snapshot/2016/09/hello or /snapshot/2016/09/01.17 he/she can. I do not parse the file names to find the next sequence (yet, but could in a future CL). So, I just assume len(entries) tells me the next one. It\u0027s possible to get it wrong, specially if the user puts next+1 in there himself. So I try 3 times and if I get it wrong, no snapshot is created and it\u0027s the user\u0027s fault. Next time around it could work.\n\nThis is mostly a no-op for 24-hour intervals as the day will change.",
+      "parentUuid": "31f241e7_3895088d",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_f8f540e7",
         "filename": "dir/server/snapshotter.go",
         "patchSetId": 5
@@ -302,6 +608,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "\"safe\" is vague in this context. i\u0027d go with something like mkdirIfNotExist\nbut in this context, the function barely seems worth it. i\u0027d put inline in the loop. (the 6 lines of error checking you do after calling this func could just do what this func does)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_8badad3e",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done (code reads better with a new function).",
+      "parentUuid": "31f241e7_f8f540e7",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -325,6 +649,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4b56e525",
+        "filename": "dir/server/snapshotter.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "It can be both if the user puts a file in there with the same name. (Yes, we can prohibit that, but it\u0027s not in this CL and I\u0027d rather be safe).",
+      "parentUuid": "31f241e7_18f124fc",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_d86f1c8c",
         "filename": "dir/server/snapshotter_test.go",
         "patchSetId": 5
@@ -336,6 +678,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "snapshot_test.go ?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_0bc69d90",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_d86f1c8c",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -359,6 +719,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_2bc35981",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_f87ae04f",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_b8745861",
         "filename": "dir/server/snapshotter_test.go",
         "patchSetId": 5
@@ -370,6 +748,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "s/Forcefully t/T/",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_cb4e5537",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_b8745861",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -393,6 +789,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_ab5d09eb",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "So we get 2016/09/01, 2016/09/01.1, 2016/09/01.2, etc.",
+      "parentUuid": "31f241e7_78871046",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_181da424",
         "filename": "dir/server/snapshotter_test.go",
         "patchSetId": 5
@@ -404,6 +818,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "s/upspin.PathName/string/",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_2b06f9bf",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_181da424",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -427,6 +859,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4b6345af",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "This whole package has tests in this format already. Making them hermetic is a TODO.",
+      "parentUuid": "31f241e7_988ab44e",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_3881882f",
         "filename": "dir/server/snapshotter_test.go",
         "patchSetId": 5
@@ -438,6 +888,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "name :\u003d string(e.Name) + \"/*\"\nt.Logf(\"Glob(%q)\", name)\nssEntries, err :\u003d s.Glob(name)",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_2b6a7981",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_3881882f",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -461,6 +929,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_eb7a3150",
+        "filename": "dir/server/snapshotter_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_d826fc77",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_f8dc2069",
         "filename": "dir/server/tree/blocks.go",
         "patchSetId": 5
@@ -472,6 +958,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "entryPath? to mirror the name \"entry\"",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_0b50dd24",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_f8dc2069",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -495,6 +999,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_8b6fed8c",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_38c3c881",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_b8d69843",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
@@ -506,6 +1028,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "you could also put the time format string in here\nSnapshotTimeFormat \u003d \"2006/01/02\"\nand then use that in the call to time.Format elsewhere",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_ab742961",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_b8d69843",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -529,6 +1069,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4b8a6551",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_184fe434",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_f85300de",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
@@ -540,6 +1098,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "the word \"splice\" implies connecting two things, but what it\u0027s really doing is making a copy. CopyDir ?\n\nthe argument p should be called \"dest\" or similar",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_cb43b5f5",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_f85300de",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -563,6 +1139,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4b38258d",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Roots are special. I could possibly handle it here with a slightly bigger if block and more tests. It might trigger some complex edge cases though and since it\u0027s not the use case here and this CL is just the first one, I\u0027m deferring this. It might come in handy when one wants to completely replace his/her root with an older snapshot. \n\nAdded a TODO.",
+      "parentUuid": "31f241e7_b85d78eb",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_9863d4ae",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
@@ -574,6 +1168,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "\"cannot copy to a path that contains a link\"\nalso include the node.Name in there, so it\u0027s clear which entry is the link",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_6b35e191",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_9863d4ae",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -597,6 +1209,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_8bf4cdba",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31f241e7_786030a1",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_586d6c97",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
@@ -614,6 +1244,24 @@
     },
     {
       "key": {
+        "uuid": "b179d140_4bffc595",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "TBD. Dave prefers this way. Eric mentioned he would think about the right solution.",
+      "parentUuid": "31f241e7_586d6c97",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "31f241e7_78c950a1",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
@@ -625,6 +1273,24 @@
       "writtenOn": "2016-09-01T12:17:56Z",
       "side": 1,
       "message": "name.Elem(1) \u003d\u003d SnapshotPrefix ?",
+      "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b179d140_6bfc01a0",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-01T18:24:42Z",
+      "side": 1,
+      "message": "Sure, but this was using a PathName, not a path.Parsed.\n\nDone.",
+      "parentUuid": "31f241e7_78c950a1",
       "revId": "44c115024f4f9bcdae0448eba72ab502bf507af6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
