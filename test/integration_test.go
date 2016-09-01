@@ -269,7 +269,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	r := newRunner()
+	r := testenv.NewRunner()
 	r.AddUser(env.Context)
 	r.AddUser(readerContext)
 
