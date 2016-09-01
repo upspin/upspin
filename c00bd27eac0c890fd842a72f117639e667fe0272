@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31f241e7_b55ea815",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-01T02:44:00Z",
+      "side": 1,
+      "message": "NewRunner",
+      "revId": "c00bd27eac0c890fd842a72f117639e667fe0272",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
