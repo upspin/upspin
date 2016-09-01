@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "31f241e7_4f912d52",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T00:16:00Z",
+      "side": 1,
+      "message": "I don\u0027t know what you mean. Feel free to rephrase",
+      "parentUuid": "f141897a_66168457",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f141897a_c61af878",
         "filename": "test/error_test.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-31T06:53:15Z",
       "side": 1,
       "message": "these functions could use overview comments",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_b280fef8",
+        "filename": "test/error_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T00:16:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f141897a_c61af878",
       "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "31f241e7_52af9282",
+        "filename": "test/error_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T00:16:00Z",
+      "side": 1,
+      "message": "I\u0027ll leave these tests as-is here, and I\u0027ll get you to relax the tests in your CL?",
+      "parentUuid": "f141897a_eca8b379",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f141897a_a617ec4e",
         "filename": "test/integration_test.go",
         "patchSetId": 5
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "31f241e7_f29d665d",
+        "filename": "test/integration_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T00:16:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f141897a_a617ec4e",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f141897a_062500b8",
         "filename": "test/runner_test.go",
         "patchSetId": 5
@@ -81,6 +153,24 @@
       "writtenOn": "2016-08-31T06:53:15Z",
       "side": 1,
       "message": "s/,$//",
+      "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31f241e7_d2c9424f",
+        "filename": "test/runner_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-01T00:16:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f141897a_062500b8",
       "revId": "32e3c440560343147292079ba2e2a5b9360db80e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
