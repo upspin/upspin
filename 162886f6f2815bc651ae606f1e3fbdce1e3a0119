@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31f241e7_b841fd8d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-02T02:53:07Z",
+      "side": 1,
+      "message": "do we still need this? it\u0027s not a problem but it\u0027s just a convenience function really.\nit can stay for now but i have my eye on it.",
+      "revId": "162886f6f2815bc651ae606f1e3fbdce1e3a0119",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
