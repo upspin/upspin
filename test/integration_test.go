@@ -41,19 +41,27 @@ var (
 	errPermission = errors.E(errors.Permission)
 
 	setupTemplate = testenv.Setup{
-		Tree: testenv.Tree{
-			testenv.E("/dir1/", ""),
-			testenv.E("/dir2/", ""),
-			testenv.E("/dir1/file1.txt", contentsOfFile1),
-			testenv.E("/dir2/file2.txt", contentsOfFile2),
-			testenv.E("/dir2/file3.pdf", contentsOfFile3),
-		},
-		OwnerName:                 ownerName,
-		IgnoreExistingDirectories: false, // left-over Access files would be a problem.
-		Cleanup:                   cleanup,
+		OwnerName: ownerName,
+		Cleanup:   cleanup,
 	}
 	readerContext upspin.Context
 )
+
+func makeIntegrationTestTree(t *testing.T, r *testenv.Runner) {
+	// TODO(adg): The tests in this file rely on this directory tree
+	// existing at the root when they begin. We should probably consolidate
+	// these tests into a single test, as they cannot be run in isolation
+	// anyway.
+	r.As(ownerName)
+	r.MakeDirectory(ownerName + "/dir1")
+	r.MakeDirectory(ownerName + "/dir2")
+	r.Put(ownerName+"/dir1/file1.txt", contentsOfFile1)
+	r.Put(ownerName+"/dir2/file2.txt", contentsOfFile2)
+	r.Put(ownerName+"/dir2/file3.pdf", contentsOfFile3)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
 
 func testNoReadersAllowed(t *testing.T, r *testenv.Runner) {
 	fileName := upspin.PathName(ownerName + "/dir1/file1.txt")
@@ -278,7 +286,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	_, readerContext, err = env.NewUser(readerName)
+	readerContext, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -286,6 +294,9 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	r := testenv.NewRunner()
 	r.AddUser(env.Context)
 	r.AddUser(readerContext)
+
+	// Build the test tree (for the tests in this file).
+	makeIntegrationTestTree(t, r)
 
 	// The ordering here is important as each test adds state to the tree.
 	for _, test := range integrationTests {
