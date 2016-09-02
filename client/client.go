@@ -24,7 +24,6 @@ import (
 // Client implements upspin.Client.
 type Client struct {
 	context upspin.Context
-	user    upspin.KeyServer
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -36,11 +35,20 @@ const (
 	doNotFollowFinalLink = false
 )
 
-// New creates a Client. The client finds the servers according to the given Context.
+// New creates a Client that uses the given Context to
+// access the various Upspin servers.
+// It uses a global user cache to reduce round trip times.
 func New(context upspin.Context) upspin.Client {
 	return &Client{
 		context: usercache.Global(context),
 	}
+}
+
+// NewWithoutCache creates a Client that uses the given Context to
+// access the various Upspin servers.
+// It does no caching, and should be used only by tests.
+func NewWithoutCache(context upspin.Context) upspin.Client {
+	return &Client{context: context}
 }
 
 // PutLink implements upspin.Client.
