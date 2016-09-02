@@ -285,8 +285,125 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-// TODO
-func testPutLinkErrors(t *testing.T, r *testenv.Runner) {}
+func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base      = ownerName + "/put-link-errors"
+		srcDir    = base + "/src"
+		dstDir    = base + "/dst"
+		srcAccess = srcDir + "/Access"
+		dstAccess = dstDir + "/Access"
+		file      = dstDir + "/file"
+
+		fileLink            = srcDir + "/file-link"
+		fileTarget          = file
+		fileThroughFileLink = fileLink
+
+		dirLink            = srcDir + "/dir-link"
+		dirTarget          = dstDir
+		fileThroughDirLink = dirLink + "/file"
+
+		content = "hello, gophers"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(srcDir)
+	r.MakeDirectory(dstDir)
+	r.PutLink(fileTarget, fileLink)
+	r.PutLink(dirTarget, dirLink)
+	r.Put(fileThroughFileLink, content)
+	r.Get(fileTarget)
+	r.Delete(fileTarget)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != content {
+		t.Fatalf("link content = %q, want %q", r.Data, content)
+	}
+	r.Put(fileThroughDirLink, content)
+	r.Get(fileTarget)
+	r.Delete(fileTarget)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != content {
+		t.Fatalf("link content = %q, want %q", r.Data, content)
+	}
+
+	cases := []struct {
+		op                    string
+		link, fileThroughLink upspin.PathName
+	}{
+		{"file link:", fileLink, fileThroughFileLink},
+		{"dir link:", dirLink, fileThroughDirLink},
+	}
+	for _, c := range cases {
+		// As a user with no rights over the link,
+		// we should get a 'not exist' error.
+		r.As(writerName)
+		r.Put(c.fileThroughLink, content)
+		if !r.Match(errNotExist) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Give the user rights over the destination file
+		// but still no rights over the link. The user should
+		// not be able to put the file, because the link is hidden.
+		r.As(ownerName)
+		r.Put(dstAccess, "*:"+ownerName+"\n*:"+writerName)
+		r.As(writerName)
+		r.Put(file, content)
+		r.Delete(file)
+		if r.Failed() {
+			t.Fatal(c.op, r.Diag())
+		}
+		r.Put(c.fileThroughLink, content)
+		if !r.Match(errors.E(errors.NotExist, errors.E(upspin.PathName(c.link)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Give the user one right over the link and Put should work
+		// as the client will now be able to follow the link.
+		for _, right := range []string{"list", "create", "write", "read", "delete"} {
+			r.As(ownerName)
+			r.Put(srcAccess, right+":"+writerName)
+			r.As(writerName)
+			r.Put(c.fileThroughLink, content)
+			r.Delete(file)
+			if r.Failed() {
+				t.Fatalf("right = %q: %s", right, r.Diag())
+			}
+		}
+
+		// Remove the user's rights to the file, now a put through the
+		// link should fail with 'not exist' for the file.
+		r.As(ownerName)
+		r.Put(srcAccess, "list:"+writerName)
+		r.Delete(dstAccess)
+		r.As(writerName)
+		r.Put(c.fileThroughLink, content)
+		if !r.Match(errors.E(errors.NotExist, errors.E(upspin.PathName(file)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Add a non-read permission for the file,
+		// now a get of the link should fail with 'permission' for the file.
+		r.As(ownerName)
+		r.Put(dstAccess, "*:"+ownerName+"\nlist:"+writerName)
+		r.As(writerName)
+		r.Put(c.fileThroughLink, content)
+		if !r.Match(errors.E(errors.Permission, errors.E(upspin.PathName(file)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Clean up before next loop iteration.
+		r.As(ownerName)
+		r.Delete(srcAccess)
+		r.Delete(dstAccess)
+		if r.Failed() {
+			t.Fatal(c.op, r.Diag())
+		}
+	}
+}
 
 func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	const (
