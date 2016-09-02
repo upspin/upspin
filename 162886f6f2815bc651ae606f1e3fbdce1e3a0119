@@ -16,6 +16,24 @@
       "revId": "162886f6f2815bc651ae606f1e3fbdce1e3a0119",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f1c8a9e8_6e3c23cf",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-02T03:14:07Z",
+      "side": 1,
+      "message": "I think might drop it.\nNot in this CL though.",
+      "parentUuid": "31f241e7_b841fd8d",
+      "revId": "162886f6f2815bc651ae606f1e3fbdce1e3a0119",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
