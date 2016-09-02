@@ -126,11 +126,11 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	// Start the I/O.
 	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	for len(data) > 0 {
 		n := len(data)
@@ -345,7 +345,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 			return resultEntry, entry, nil
 		}
 		if err != upspin.ErrFollowLink {
-			return resultEntry, nil, err
+			return resultEntry, nil, errors.E(op, err)
 		}
 		// We have a link.
 		// First, allocate a new entry if necessary so we don't overwrite user's memory.
