@@ -24,7 +24,6 @@ import (
 // Client implements upspin.Client.
 type Client struct {
 	context upspin.Context
-	user    upspin.KeyServer
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -41,6 +40,11 @@ func New(context upspin.Context) upspin.Client {
 	return &Client{
 		context: usercache.Global(context),
 	}
+}
+
+// NewWithoutCache creates a Client. TODO
+func NewWithoutCache(context upspin.Context) upspin.Client {
+	return &Client{context: context}
 }
 
 // PutLink implements upspin.Client.
