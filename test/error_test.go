@@ -386,7 +386,7 @@ func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
 		}
 
 		// Add a non-read permission for the file,
-		// now a get of the link should fail with 'permission' for the file.
+		// now a put of the link should fail with 'permission' for the file.
 		r.As(ownerName)
 		r.Put(dstAccess, "*:"+ownerName+"\nlist:"+writerName)
 		r.As(writerName)
@@ -495,8 +495,113 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-// TODO
-func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {}
+func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base      = ownerName + "/makedirectory-link-errors"
+		srcDir    = base + "/src"
+		dstDir    = base + "/dst"
+		srcAccess = srcDir + "/Access"
+		dstAccess = dstDir + "/Access"
+		dir       = dstDir + "/dir"
+
+		directLink           = srcDir + "/direct-link"
+		directTarget         = dir
+		dirThroughDirectLink = directLink
+
+		indirectLink           = srcDir + "/indirect-link"
+		indirectTarget         = dstDir
+		dirThroughIndirectLink = indirectLink + "/dir"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(srcDir)
+	r.MakeDirectory(dstDir)
+	r.PutLink(directTarget, directLink)
+	r.PutLink(indirectTarget, indirectLink)
+	r.MakeDirectory(dirThroughDirectLink)
+	r.Delete(dir)
+	r.MakeDirectory(dirThroughIndirectLink)
+	r.Delete(dir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	cases := []struct {
+		op                   string
+		link, dirThroughLink upspin.PathName
+	}{
+		{"direct link:", directLink, dirThroughDirectLink},
+		{"indirect link:", indirectLink, dirThroughIndirectLink},
+	}
+	for _, c := range cases {
+		// As a user with no rights over the link,
+		// we should get a 'not exist' error.
+		r.As(writerName)
+		r.MakeDirectory(c.dirThroughLink)
+		if !r.Match(errNotExist) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Give the user rights over the destination directory
+		// but still no rights over the link. The user should
+		// not be able to make the directory, because the link is hidden.
+		r.As(ownerName)
+		r.Put(dstAccess, "*:"+ownerName+"\n*:"+writerName)
+		r.As(writerName)
+		r.MakeDirectory(dir)
+		r.Delete(dir)
+		if r.Failed() {
+			t.Fatal(c.op, r.Diag())
+		}
+		r.MakeDirectory(c.dirThroughLink)
+		if !r.Match(errors.E(errors.NotExist, errors.E(upspin.PathName(c.link)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Give the user one right over the link and MakeDirectory should work
+		// as the client will now be able to follow the link.
+		for _, right := range []string{"list", "create", "write", "read", "delete"} {
+			r.As(ownerName)
+			r.Put(srcAccess, right+":"+writerName)
+			r.As(writerName)
+			r.MakeDirectory(c.dirThroughLink)
+			r.Delete(dir)
+			if r.Failed() {
+				t.Fatalf("right = %q: %s", right, r.Diag())
+			}
+		}
+
+		// Remove the user's rights to the directory, now a
+		// MakeDirectory through the link should fail with 'not
+		// exist' for the dir.
+		r.As(ownerName)
+		r.Put(srcAccess, "list:"+writerName)
+		r.Delete(dstAccess)
+		r.As(writerName)
+		r.MakeDirectory(c.dirThroughLink)
+		if !r.Match(errors.E(errors.NotExist, errors.E(upspin.PathName(dir)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Add a non-read permission for the directory,
+		// now a mkdir of the link should fail with 'permission' for the dir.
+		r.As(ownerName)
+		r.Put(dstAccess, "*:"+ownerName+"\nlist:"+writerName)
+		r.As(writerName)
+		r.MakeDirectory(c.dirThroughLink)
+		if !r.Match(errors.E(errors.Permission, errors.E(upspin.PathName(dir)))) {
+			t.Fatal(c.op, r.Diag())
+		}
+
+		// Clean up before next loop iteration.
+		r.As(ownerName)
+		r.Delete(srcAccess)
+		r.Delete(dstAccess)
+		if r.Failed() {
+			t.Fatal(c.op, r.Diag())
+		}
+	}
+}
 
 func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	const (
