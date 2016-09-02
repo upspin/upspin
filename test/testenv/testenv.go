@@ -16,13 +16,16 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
+	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 
 	// Potential transports, selected by the Setup's Kind field.
-	_ "upspin.io/dir/inprocess"
+
+	dirserver "upspin.io/dir/inprocess"
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
+
 	_ "upspin.io/dir/remote"
-	_ "upspin.io/key/inprocess"
-	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
 )
 
@@ -65,15 +68,29 @@ func New(setup *Setup) (*Env, error) {
 	env := &Env{
 		Setup: setup,
 	}
+	baseCtx := context.New()
+	if setup.Kind == "inprocess" {
+		baseCtx = testfixtures.ServiceContext{
+			Context: baseCtx,
+			Key:     keyserver.New(),
+			Store:   storeserver.New(),
+		}
+		dir := dirserver.New(baseCtx)
+		baseCtx = testfixtures.ServiceContext{
+			Context: baseCtx,
+			Dir:     dir,
+		}
+	}
+	env.Context = baseCtx
 	ctx, err := env.NewUser(setup.OwnerName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	env.Context = ctx
-	env.Client = client.New(ctx)
 	if err := makeRootIfNotExist(ctx); err != nil {
 		return nil, errors.E(op, err)
 	}
+	env.Client = client.NewWithoutCache(ctx)
 	if setup.Verbose {
 		log.Printf("Tree: All entries created.")
 	}
@@ -101,7 +118,7 @@ func (e *Env) Exit() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	const op = "testenv.NewUser"
-	ctx := context.New().SetUserName(userName).SetPacking(e.Setup.Packing)
+	ctx := e.Context.Copy().SetUserName(userName).SetPacking(e.Setup.Packing)
 
 	// Get keys for user.
 	user, _, err := path.UserAndDomain(userName)
@@ -138,8 +155,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("bad server kind %q", k))
 	}
 
-	// Register user with key server.
-	err = registerUserWithKeyServer(userName, ctx)
+	err = registerUserWithKeyServer(ctx, ctx.UserName())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -148,14 +164,14 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 }
 
 // registerUserWithKeyServer registers userName's context with the inProcess keyServer.
-func registerUserWithKeyServer(userName upspin.UserName, context upspin.Context) error {
-	key := context.KeyServer()
+func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) error {
+	key := ctx.KeyServer()
 	// Install the registered user.
 	user := &upspin.User{
 		Name:      userName,
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
-		PublicKey: context.Factotum().PublicKey(),
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		PublicKey: ctx.Factotum().PublicKey(),
 	}
 	if err := key.Put(user); err != nil {
 		return errors.E(err)
