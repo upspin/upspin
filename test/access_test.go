@@ -10,12 +10,16 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/client"
 	"upspin.io/path"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/unassigned"
 )
+
+// TODO(adg, r): use testenv.Runner to run these tests,
+// instead of the ad hoc 'runner' type.
 
 // Arguments for errStr in helpers.
 const (
@@ -97,6 +101,7 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	var (
 		user  = newUserName()
 		owner = newUserName()
+		root  = upspin.PathName(owner) + "/"
 	)
 	const (
 		groupDir         = "Group"
@@ -106,17 +111,12 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
+
 	testSetup := &testenv.Setup{
-		OwnerName: upspin.UserName(owner),
+		OwnerName: owner,
 		Packing:   packing,
 		Kind:      "inprocess",
-		Tree: testenv.Tree{
-			testenv.E(groupDir+"/", success),
-			testenv.E(publicDir+"/", success),
-			testenv.E(publicFile, contentsOfPublic),
-			testenv.E(privateDir+"/", success),
-			testenv.E(privateFile, "private"),
-		},
+		Cleanup:   cleanup,
 	}
 
 	env, err := testenv.New(testSetup)
@@ -124,10 +124,24 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 		t.Fatal(err)
 	}
 
-	userClient, _, err := env.NewUser(user)
+	// Build test tree.
+	tr := testenv.NewRunner()
+	tr.AddUser(env.Context)
+	tr.As(owner)
+	tr.MakeDirectory(root + groupDir)
+	tr.MakeDirectory(root + publicDir)
+	tr.Put(root+publicFile, contentsOfPublic)
+	tr.MakeDirectory(root + privateDir)
+	tr.Put(root+privateFile, "private")
+	if tr.Failed() {
+		t.Fatal(tr.Diag())
+	}
+
+	userContext, err := env.NewUser(user)
 	if err != nil {
 		t.Fatalf("NewUser: %v", err)
 	}
+	userClient := client.New(userContext)
 
 	r := runner{
 		env:        env,
@@ -221,6 +235,7 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 	var (
 		user  = newUserName()
 		owner = newUserName()
+		root  = upspin.PathName(owner) + "/"
 	)
 	const (
 		publicDir        = "public"
@@ -230,15 +245,9 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		contentsOfPublic = "public file"
 	)
 	testSetup := &testenv.Setup{
-		OwnerName: upspin.UserName(owner),
+		OwnerName: owner,
 		Packing:   packing,
 		Kind:      "inprocess",
-		Tree: testenv.Tree{
-			testenv.E(publicDir+"/", success),
-			testenv.E(publicFile, contentsOfPublic),
-			testenv.E(privateDir+"/", success),
-			testenv.E(privateFile, "private"),
-		},
 	}
 
 	env, err := testenv.New(testSetup)
@@ -246,10 +255,23 @@ func testWhichAccess(t *testing.T, packing upspin.Packing) {
 		t.Fatal(err)
 	}
 
-	userClient, _, err := env.NewUser(user)
+	// Build test tree.
+	tr := testenv.NewRunner()
+	tr.AddUser(env.Context)
+	tr.As(owner)
+	tr.MakeDirectory(root + publicDir)
+	tr.Put(root+publicFile, contentsOfPublic)
+	tr.MakeDirectory(root + privateDir)
+	tr.Put(root+privateFile, "private")
+	if tr.Failed() {
+		t.Fatal(tr.Diag())
+	}
+
+	userContext, err := env.NewUser(user)
 	if err != nil {
 		t.Fatalf("NewUser: %v", err)
 	}
+	userClient := client.New(userContext)
 
 	r := runner{
 		env:        env,
