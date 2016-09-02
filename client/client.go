@@ -274,7 +274,7 @@ func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspi
 // MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "client.MakeDirectory"
-	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, makeDirectoryLookupFn, doNotFollowFinalLink)
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, makeDirectoryLookupFn, followFinalLink)
 	return entry, err
 }
 
