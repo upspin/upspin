@@ -262,7 +262,7 @@ func (r *Runner) Failed() bool {
 // otherwise it clears the error.
 func (r *Runner) Match(want error) bool {
 	got := r.Err()
-	if want == got || errors.Match(want, got) {
+	if want == got || errorMatch(want, got) {
 		return true
 	}
 	if got == nil {
