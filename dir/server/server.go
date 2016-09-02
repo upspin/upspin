@@ -159,19 +159,48 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	// Check access permission.
-	canRead, link, err := s.hasRight(access.Read, p, o)
+	entry, err := s.lookup(op, p, entryMustBeClean, o)
+
+	// Check if the user can know about the file at all. If not, to prevent
+	// leaking its existence, return NotExist.
 	if err == upspin.ErrFollowLink {
-		return link, err
+		// We have more work to do. We need to check whether the user
+		// has Any right on the link itself.
+		log.Printf("=== Lookup: HasAnyRight on link: %q", entry.Name)
+		linkPath, err := path.Parse(entry.Name)
+		if err != nil {
+			return nil, err
+		}
+		if hasAny, _, err := s.hasRight(access.AnyRight, linkPath, o); err != nil {
+			// Some error other than ErrFollowLink.
+			return nil, err
+		} else if hasAny {
+			// User has Any right on the link. Let them follow it.
+			log.Printf("=== Lookup: HasAnyRight on link: %q: YES. Follow", entry.Name)
+			return entry, upspin.ErrFollowLink
+		}
+		log.Printf("=== Lookup: HasAnyRight on link: %q: NO. NotExist", entry.Name)
+		// Denied. User has no right on link. Pretend it doesn't exist.
+		return nil, errors.E(p.Path(), errors.NotExist)
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	if !canRead {
-		return nil, errors.E(op, name, access.ErrPermissionDenied)
-	}
 
-	return s.lookup(op, p, entryMustBeClean, o)
+	// Check for Read access permission.
+	log.Printf("=== Lookup: HasReadRight: %q", p)
+	canRead, _, err := s.hasRight(access.Read, p, o)
+	if err == upspin.ErrFollowLink {
+		return nil, errors.E(op, errors.Internal, p.Path(), errors.Str("can't be link at this point"))
+	}
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	log.Printf("=== Lookup: %q: canRead: %v", p, canRead)
+	if !canRead {
+		return s.errPerm(op, p, o)
+	}
+	return entry, nil
 }
 
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
@@ -254,7 +283,8 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canWrite && !canCreate {
-		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
+		// Can know?
+		return s.errPerm(op, p, o)
 	}
 
 	link, err = s.put(op, p, entry, canCreate, canWrite, o)
@@ -710,6 +740,23 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	// Add to the cache and return
 	s.userTrees.Add(user, tree)
 	return tree, nil
+}
+
+// errPerm checks whether the user has any right to the given path, and if so
+// returns a Permission error. Otherwise it returns a NotExist error.
+// This is used to prevent probing of the name space.
+func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
+	// Before returning, check that the user has the right to know,
+	// to prevent leaking the name space.
+	if hasAny, _, err := s.hasRight(access.AnyRight, p, opts); err != nil {
+		// Some error other than ErrFollowLink.
+		return nil, errors.E(op, err)
+	} else if !hasAny {
+		// User has Any right on the link. Let them follow it.
+		log.Printf("=== HasAnyRight on file: %q: NO.", p.Path())
+		return nil, errors.E(op, p.Path(), errors.NotExist)
+	}
+	return nil, errors.E(op, p.Path(), access.ErrPermissionDenied)
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
