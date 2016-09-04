@@ -159,19 +159,29 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	// Check access permission.
-	canRead, link, err := s.hasRight(access.Read, p, o)
+	entry, err := s.lookup(op, p, entryMustBeClean, o)
+
+	// Check if the user can know about the file at all. If not, to prevent
+	// leaking its existence, return NotExist.
 	if err == upspin.ErrFollowLink {
-		return link, err
+		return entry, s.errLink(op, entry, o)
+	}
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Check for Read access permission.
+	canRead, _, err := s.hasRight(access.Read, p, o)
+	if err == upspin.ErrFollowLink {
+		return nil, errors.E(op, errors.Internal, p.Path(), errors.Str("can't be link at this point"))
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		return nil, errors.E(op, name, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, p, o)
 	}
-
-	return s.lookup(op, p, entryMustBeClean, o)
+	return entry, nil
 }
 
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
@@ -240,24 +250,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// First round of access checks: can user write or create? If not,
-	// reject early.
-	canWrite, link, err := s.hasRight(access.Write, p, o)
-	if err == upspin.ErrFollowLink {
-		return link, err
-	}
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	canCreate, _, err := s.hasRight(access.Create, p, o) // ErrFollowLink won't happen here.
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	if !canWrite && !canCreate {
-		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
-	}
-
-	link, err = s.put(op, p, entry, canCreate, canWrite, o)
+	link, err := s.put(op, p, entry, o)
 	if err == upspin.ErrFollowLink {
 		// Should never happen, since hasRight does this check already.
 		return link, err
@@ -284,17 +277,6 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 		return nil, errors.E(op, errors.Invalid, errors.Str("cannot make directory named Access or Group"))
 	}
 
-	// Check access permissions.
-	canCreate, link, err := s.hasRight(access.Create, p, o)
-	if err == upspin.ErrFollowLink {
-		return link, err
-	}
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	if !canCreate {
-		return nil, errors.E(op, s.userName, p.Path(), access.ErrPermissionDenied)
-	}
 	// Create a new dir entry for this new dir.
 	de := &upspin.DirEntry{
 		Name:     p.Path(),
@@ -304,15 +286,14 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 		Time:     upspin.Now(),
 		Sequence: 0, // Tree will increment when flushed.
 	}
-	const canWrite = true
 
 	// Attempt to put this new dir entry. We know we canCreate & !canWrite.
-	return s.put(op, p, de, canCreate, !canWrite, o)
+	return s.put(op, p, de, o)
 }
 
 // put implements the common functionality between Put and MakeDirectory.
 // userLock must be held for p.User().
-func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate, canWrite bool, opts ...options) (*upspin.DirEntry, error) {
+func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("put", opts)
 	defer ss.End()
 
@@ -333,13 +314,20 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 	// Check for links along the path.
 	existingEntry, err := s.lookup(op, p, !entryMustBeClean, o)
 	if err == upspin.ErrFollowLink {
-		return existingEntry, err
+		return existingEntry, s.errLink(op, existingEntry, o)
 	}
 
 	if errors.Match(errNotExist, err) {
 		// OK; entry not found as expected. Can we create it?
+		canCreate, _, err := s.hasRight(access.Create, p, o)
+		if err == upspin.ErrFollowLink {
+			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
+		}
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 		if !canCreate {
-			return nil, errors.E(op, p.Path(), access.ErrPermissionDenied)
+			return nil, s.errPerm(op, p, o)
 		}
 		// New file should have a valid sequence number, if user didn't pick one already.
 		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
@@ -356,14 +344,21 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, canCreate
 		}
 		// Check if we can overwrite.
 		if existingEntry.IsDir() {
-			return nil, errors.E(op, p.Path(), errors.IsDir, errors.Str("can't overwrite directory"))
+			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("can't overwrite directory"))
 		}
 		if entry.IsDir() {
 			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("can't overwrite file with directory"))
 		}
 		// To overwrite a file, we need Write permission.
+		canWrite, _, err := s.hasRight(access.Write, p, o)
+		if err == upspin.ErrFollowLink {
+			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
+		}
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 		if !canWrite {
-			return nil, errors.E(op, p.Path(), access.ErrPermissionDenied)
+			return nil, s.errPerm(op, p, o)
 		}
 		// If the file is expected not to be there, it's an error.
 		if entry.Sequence == upspin.SeqNotExist {
@@ -457,6 +452,9 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				return nil, errors.E(op, err)
 			}
 			if !canList {
+				if d == firstMeta {
+					return nil, s.errPerm(op, p.First(d))
+				}
 				continue
 			}
 			ents, _, err := tree.List(dir)
@@ -530,7 +528,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 
 	canDelete, link, err := s.hasRight(access.Delete, p, o)
 	if err == upspin.ErrFollowLink {
-		return link, err
+		return link, s.errLink(op, link, o)
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -710,6 +708,42 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	// Add to the cache and return
 	s.userTrees.Add(user, tree)
 	return tree, nil
+}
+
+// errPerm checks whether the user has any right to the given path, and if so
+// returns a Permission error. Otherwise it returns a NotExist error.
+// This is used to prevent probing of the name space.
+func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
+	// Before returning, check that the user has the right to know,
+	// to prevent leaking the name space.
+	if hasAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
+		// Some error other than ErrFollowLink.
+		return errors.E(op, err)
+	} else if !hasAny {
+		// User has Any right on the link. Let them follow it.
+		return errors.E(op, p.Path(), errors.NotExist)
+	}
+	return errors.E(op, p.Path(), access.ErrPermissionDenied)
+}
+
+// errLink checks whether the user has any right to the given entry, and if so
+// returns  the entry and ErrFollowLink. If the use has no rights, it returns a
+// NotExist error. This is used to prevent probing of the name space using
+// links.
+func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) error {
+	p, err := path.Parse(link.Name)
+	if err != nil {
+		return errors.E(op, errors.Internal, link.Name, err)
+	}
+	if hasAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
+		// Some error other than ErrFollowLink.
+		return errors.E(op, err)
+	} else if hasAny {
+		// User has Any right on the link. Let them follow it.
+		return upspin.ErrFollowLink
+	}
+	// Denied. User has no right on link. Pretend it doesn't exist.
+	return errors.E(op, p.Path(), errors.NotExist)
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
