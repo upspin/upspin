@@ -570,7 +570,7 @@ func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
 			r.MakeDirectory(c.dirThroughLink)
 			r.Delete(dir)
 			if r.Failed() {
-				t.Fatalf("right = %q: %s", right, r.Diag())
+				t.Fatalf("%s right = %q: %s", c.op, right, r.Diag())
 			}
 		}
 

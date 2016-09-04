@@ -214,9 +214,23 @@ func TestLink(t *testing.T) {
 
 	// Get a server for otherUser, who has no right to see the link.
 	sOther := newDirServerForTesting(t, otherUser)
-	de2, err = sOther.Lookup(userName + "/mylink/cant_see_link")
+	de2, err = sOther.Lookup(userName + "/mylink")
 	if !errors.Match(errNotExist, err) {
 		t.Errorf("err = %v, want = %v", err, errNotExist)
+	}
+
+	// Now give otherUser some right.
+	_, err = putAccessFile(t, s, userName+"/Access", "*:"+userName+"\nc:"+otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	de2, err = sOther.Lookup(userName + "/mylink")
+	if err != upspin.ErrFollowLink {
+		t.Errorf("err = %v, want = %v", err, upspin.ErrFollowLink)
+	}
+	err = checkDirEntry("TestLink.LookupOther", de2, de)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	// Deletion of the link itself is tested in TestDelete (we need it
@@ -706,6 +720,9 @@ func putAccessFile(t *testing.T, s *server, name upspin.PathName, contents strin
 // checkDirEntry compares the main fields in dir entries got and want and
 // reports their differences.
 func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
+	if got == nil {
+		return errors.Errorf("%s: got nil entry", testName)
+	}
 	if got.Name != want.Name {
 		return errors.Errorf("%s: got.Name = %q, want = %q", testName, got.Name, want.Name)
 	}
