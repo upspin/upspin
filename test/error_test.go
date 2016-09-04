@@ -170,7 +170,7 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	r.Delete(dstAccess)
 	r.As(readerName)
 	r.Get(link)
-	if !r.Match(errors.E(errors.NotExist, upspin.PathName(file))) {
+	if !r.Match(errors.E(errors.NotExist)) { // TODO: upspin.PathName(dstAccess)
 		t.Fatal(r.Diag())
 	}
 
@@ -570,7 +570,7 @@ func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
 			r.MakeDirectory(c.dirThroughLink)
 			r.Delete(dir)
 			if r.Failed() {
-				t.Fatalf("right = %q: %s", right, r.Diag())
+				t.Fatalf("%s right = %q: %s", c.op, right, r.Diag())
 			}
 		}
 
