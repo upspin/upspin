@@ -35,8 +35,16 @@ const (
 
 var (
 	inProcess     = upspin.Endpoint{Transport: upspin.InProcess}
-	globalContext = context.New().SetUserName(userName).SetPacking(upspin.DebugPack).SetKeyEndpoint(inProcess)
+	globalContext upspin.Context
 )
+
+func init() {
+	c := context.New()
+	c = context.SetUserName(c, userName)
+	c = context.SetPacking(c, upspin.DebugPack)
+	c = context.SetKeyEndpoint(c, inProcess)
+	globalContext = c
+}
 
 // The values returned by PackLen and UnpackLen should be exact,
 // but that is not a requirement for the Packer interface in general.

@@ -30,12 +30,12 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = context.New().
-		SetUserName(upspin.UserName(name)).
-		SetPacking(upspin.DebugPack).
-		SetKeyEndpoint(endpoint).
-		SetDirEndpoint(endpoint).
-		SetStoreEndpoint(endpoint)
+	ctx = context.New()
+	ctx = context.SetUserName(ctx, upspin.UserName(name))
+	ctx = context.SetPacking(ctx, upspin.DebugPack)
+	ctx = context.SetKeyEndpoint(ctx, endpoint)
+	ctx = context.SetDirEndpoint(ctx, endpoint)
+	ctx = context.SetStoreEndpoint(ctx, endpoint)
 	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))
 	user := &upspin.User{
 		Name:      upspin.UserName(name),
