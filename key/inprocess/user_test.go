@@ -28,10 +28,11 @@ var (
 )
 
 func setup(t *testing.T) upspin.KeyServer {
-	c := context.New().SetUserName(user.Name)
-	c.SetKeyEndpoint(inProcessEndpoint)
-	c.SetStoreEndpoint(inProcessEndpoint)
-	c.SetDirEndpoint(inProcessEndpoint)
+	c := context.New()
+	c = context.SetUserName(c, user.Name)
+	c = context.SetKeyEndpoint(c, inProcessEndpoint)
+	c = context.SetStoreEndpoint(c, inProcessEndpoint)
+	c = context.SetDirEndpoint(c, inProcessEndpoint)
 	return c.KeyServer()
 }
 

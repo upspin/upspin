@@ -26,8 +26,13 @@ func newContext(name upspin.UserName) upspin.Context {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	context := context.New().SetUserName(name).SetPacking(upspin.DebugPack).SetKeyEndpoint(inProcess).SetDirEndpoint(inProcess).SetStoreEndpoint(inProcess)
-	return context
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, name)
+	ctx = context.SetPacking(ctx, upspin.DebugPack)
+	ctx = context.SetKeyEndpoint(ctx, inProcess)
+	ctx = context.SetDirEndpoint(ctx, inProcess)
+	ctx = context.SetStoreEndpoint(ctx, inProcess)
+	return ctx
 }
 
 func checkTransport(s upspin.Service) {

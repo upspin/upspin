@@ -39,12 +39,12 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = context.New().
-		SetUserName(name).
-		SetPacking(upspin.DebugPack).
-		SetKeyEndpoint(endpoint).
-		SetDirEndpoint(endpoint).
-		SetStoreEndpoint(endpoint)
+	ctx = context.New()
+	ctx = context.SetUserName(ctx, name)
+	ctx = context.SetPacking(ctx, upspin.DebugPack)
+	ctx = context.SetKeyEndpoint(ctx, endpoint)
+	ctx = context.SetDirEndpoint(ctx, endpoint)
+	ctx = context.SetStoreEndpoint(ctx, endpoint)
 	key = inprocessKey.New()
 	store = inprocessStore.New()
 	dir = New(ctx)
