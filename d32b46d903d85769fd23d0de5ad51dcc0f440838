@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "36907709_625498f9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36907709_422e3499",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36907709_2229b08f",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-04T22:53:27Z",
       "side": 1,
       "message": "this comment is out of date",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36907709_82599c30",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36907709_2229b08f",
       "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "36907709_225e9017",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36907709_e242e83e",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36907709_02402c34",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-04T22:53:27Z",
       "side": 1,
       "message": "errant space after \u0027returns\u0027.\nalso this comment describes what the function should do, but it doesn\u0027t (return two values)",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36907709_426394e0",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36907709_02402c34",
       "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "36907709_02458c3d",
+        "filename": "test/error_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "It didn\u0027t fix everything. This doesn\u0027t pass even with InProcess. Here\u0027s the error for line 172 below. But you\u0027re right that the other two tests now pass. And the InProcess error is a client error and it\u0027s the same one for DirServer and InProcess, so one fix fits all. It should be done in another CL, when I discover the right fix.\n\nDone.\n\n--- FAIL: TestIntegration (157.10s)\n    --- FAIL: TestIntegration/kind\u003dinprocess (0.16s)\n        --- FAIL: TestIntegration/kind\u003dinprocess/packing\u003dplain/curve\u003dp256 (0.05s)\n            --- FAIL: TestIntegration/kind\u003dinprocess/packing\u003dplain/curve\u003dp256/GetLinkErrors (0.00s)\n            \terror_test.go:174: error_test.go:172: got error:\n            \t\t\tupspin-test@google.com/get-link-errors/src/link: client.Get: item does not exist:\n            \t\t\tclient.Get:\n            \t\t\tupspin-test@google.com/get-link-errors/dst/file: dir/inprocess.Lookup\n            \t\twant:\n            \t\t\tupspin-test@google.com/get-link-errors/dst/Access: item does not exist",
+      "parentUuid": "36907709_622fb897",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36907709_82343ced",
         "filename": "test/error_test.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-04T22:53:27Z",
       "side": 1,
       "message": "op already has a colon in it",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36907709_e2474846",
+        "filename": "test/error_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T00:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36907709_82343ced",
       "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
