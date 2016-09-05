@@ -8,6 +8,7 @@ package test
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	"upspin.io/access"
@@ -295,6 +296,10 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	r.AddUser(env.Context)
 	r.AddUser(readerContext)
 
+	if err := cleanup(env); err != nil {
+		t.Fatal("cleanup:", err)
+	}
+
 	// Build the test tree (for the tests in this file).
 	makeIntegrationTestTree(t, r)
 
@@ -309,7 +314,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	}
 }
 
-var integrationTestKinds = []string{"inprocess"}
+var integrationTestKinds = []string{"inprocess", "server"}
 
 func TestIntegration(t *testing.T) {
 	for _, kind := range integrationTestKinds {
@@ -386,6 +391,7 @@ func deleteAll(dir upspin.DirServer, path upspin.PathName) error {
 				return err
 			}
 		}
+		log.Println("deleteAll: Delete", e.Name)
 		if _, err := dir.Delete(e.Name); err != nil {
 			return err
 		}
