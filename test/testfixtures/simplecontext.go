@@ -13,10 +13,8 @@ type simpleContext struct {
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
 // NewSimpleContext returns a context with nothing but a user name.
-func NewSimpleContext() upspin.Context {
-	return &simpleContext{
-		userName: "noone@nowhere.org",
-	}
+func NewSimpleContext(u upspin.UserName) upspin.Context {
+	return &simpleContext{userName: u}
 }
 
 // KeyServer implements upspin.Context.
@@ -43,20 +41,9 @@ func (ctx *simpleContext) UserName() upspin.UserName {
 	return ctx.userName
 }
 
-// SetUserName implements upspin.Context.
-func (ctx *simpleContext) SetUserName(u upspin.UserName) upspin.Context {
-	ctx.userName = u
-	return ctx
-}
-
 // Factotum implements upspin.Context.
 func (ctx *simpleContext) Factotum() upspin.Factotum {
 	return nil
-}
-
-// SetFactotum implements upspin.Context.
-func (ctx *simpleContext) SetFactotum(f upspin.Factotum) upspin.Context {
-	return ctx
 }
 
 // Packing implements upspin.Context.
@@ -64,19 +51,9 @@ func (ctx *simpleContext) Packing() upspin.Packing {
 	return upspin.PlainPack
 }
 
-// SetPacking implements upspin.Context.
-func (ctx *simpleContext) SetPacking(p upspin.Packing) upspin.Context {
-	return ctx
-}
-
 // UserEndpoint implements upspin.Context.
 func (ctx *simpleContext) KeyEndpoint() upspin.Endpoint {
 	return ep0
-}
-
-// SetUserEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetKeyEndpoint(e upspin.Endpoint) upspin.Context {
-	return ctx
 }
 
 // DirEndpoint implements upspin.Context.
@@ -84,33 +61,12 @@ func (ctx *simpleContext) DirEndpoint() upspin.Endpoint {
 	return ep0
 }
 
-// SetEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetDirEndpoint(e upspin.Endpoint) upspin.Context {
-	return ctx
-}
-
 // StoreEndpoint implements upspin.Context.
 func (ctx *simpleContext) StoreEndpoint() upspin.Endpoint {
 	return ep0
 }
 
-// SetStoreEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetStoreEndpoint(e upspin.Endpoint) upspin.Context {
-	return ctx
-}
-
-// Copy implements upspin.Context.
-func (ctx *simpleContext) Copy() upspin.Context {
-	c := *ctx
-	return &c
-}
-
 // StoreCacheEndpoint implements upspin.Context.
 func (ctx *simpleContext) StoreCacheEndpoint() upspin.Endpoint {
 	return ep0
-}
-
-// SetStoreCacheEndpoint implements upspin.Context.
-func (ctx *simpleContext) SetStoreCacheEndpoint(e upspin.Endpoint) upspin.Context {
-	return ctx
 }

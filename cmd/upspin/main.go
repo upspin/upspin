@@ -357,11 +357,14 @@ func (s *State) rotate(args ...string) {
 		fs.Usage()
 		os.Exit(2)
 	}
-	ctx := s.context
-	f := ctx.Factotum()      // save new key
-	ctx.SetFactotum(f.Pop()) // ctx now defaults to old key
+
+	f := s.context.Factotum() // save latest factotum
+	lastCtx := s.context
+	s.context = context.SetFactotum(s.context, f.Pop()) // context now defaults to old key
+	defer func() { s.context = lastCtx }()
+
 	keyServer := s.KeyServer()
-	u, err := keyServer.Lookup(ctx.UserName())
+	u, err := keyServer.Lookup(s.context.UserName())
 	if err != nil {
 		s.exit(err)
 	}

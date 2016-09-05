@@ -563,50 +563,26 @@ type Context interface {
 	// The name of the user requesting access.
 	UserName() UserName
 
-	// SetUserName sets the UserName.
-	SetUserName(UserName) Context
-
 	// Factotum holds the user's cryptographic keys and encapsulates crypto operations.
 	Factotum() Factotum
-
-	// SetFactotum sets Factotum.
-	SetFactotum(Factotum) Context
 
 	// Packing is the default Packing to use when creating new data items.
 	// It may be overridden by circumstances such as preferences related
 	// to the directory.
 	Packing() Packing
 
-	// SetPacking sets the Packing.
-	SetPacking(Packing) Context
-
 	// KeyEndpoint is the endpoint of the KeyServer to contact to retrieve keys.
 	KeyEndpoint() Endpoint
-
-	// SetKeyEndpoint sets the KeyEndpoint.
-	SetKeyEndpoint(Endpoint) Context
 
 	// DirEndpoint is the endpoint of the DirServer in which to place new data items.  It is
 	// usually the location of the user's root.
 	DirEndpoint() Endpoint
 
-	// SetDirEndpoint sets the DirEndpoint.
-	SetDirEndpoint(Endpoint) Context
-
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
-	// SetStoreEndpoint sets the StoreEndpoint.
-	SetStoreEndpoint(Endpoint) Context
-
 	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreCacheEndpoint() Endpoint
-
-	// SetStoreCacheEndpoint sets the StoreEndpoint.
-	SetStoreCacheEndpoint(Endpoint) Context
-
-	// Copy creates a copy of the receiver context.
-	Copy() Context
 
 	// KeyServer returns a KeyServer instance bound to KeyEndpoint.
 	// In the event of an error binding, all subsequent calls on the
