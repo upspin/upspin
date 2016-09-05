@@ -309,7 +309,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	}
 }
 
-var integrationTestKinds = []string{"inprocess"}
+var integrationTestKinds = []string{"inprocess", "server"}
 
 func TestIntegration(t *testing.T) {
 	for _, kind := range integrationTestKinds {
