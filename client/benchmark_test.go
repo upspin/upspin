@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"upspin.io/context"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -87,16 +88,16 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 		b.Fatalf("No such key for packing: %d", packing)
 	}
 
-	context := setup(userName, pub)
+	ctx := setup(userName, pub)
 	if packing == upspin.EEPack {
-		context.SetPacking(packing)
+		ctx = context.SetPacking(ctx, packing)
 		f, err := factotum.New(repo(keyDir))
 		if err != nil {
 			b.Fatal(err)
 		}
-		context.SetFactotum(f)
+		ctx = context.SetFactotum(ctx, f)
 	}
-	return New(context), block
+	return New(ctx), block
 }
 
 // repo returns the local pathname of a file in the upspin repository.

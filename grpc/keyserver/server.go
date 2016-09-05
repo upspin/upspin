@@ -12,6 +12,7 @@ import (
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -54,7 +55,7 @@ func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(s.context.Copy().SetUserName(session.User()), s.key.Endpoint())
+	svc, err := s.key.Dial(context.SetUserName(s.context, session.User()), s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}

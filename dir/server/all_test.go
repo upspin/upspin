@@ -752,13 +752,13 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	ctx := context.New().
-		SetFactotum(factotum).
-		SetUserName(serverName).
-		SetStoreEndpoint(endpointInProcess).
-		SetKeyEndpoint(endpointInProcess).
-		SetDirEndpoint(endpointInProcess).
-		SetPacking(upspin.EEPack)
+	ctx := context.New()
+	ctx = context.SetFactotum(ctx, factotum)
+	ctx = context.SetUserName(ctx, serverName)
+	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
+	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
+	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
+	ctx = context.SetPacking(ctx, upspin.EEPack)
 	key := ctx.KeyServer()
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
@@ -774,7 +774,9 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 
 	// Set the public key for the user, since EE Pack requires the dir owner
 	// to have a wrapped key.
-	userCtx := context.New().SetUserName(userName).SetDirEndpoint(ctx.DirEndpoint())
+	userCtx := context.New()
+	userCtx = context.SetUserName(userCtx, userName)
+	userCtx = context.SetDirEndpoint(userCtx, ctx.DirEndpoint())
 	user = &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{userCtx.DirEndpoint()},

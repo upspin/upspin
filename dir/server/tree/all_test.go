@@ -693,18 +693,18 @@ func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	context := context.New().
-		SetFactotum(factotum).
-		SetUserName(serverName).
-		SetStoreEndpoint(endpointInProcess).
-		SetKeyEndpoint(endpointInProcess).
-		SetPacking(upspin.EEPack)
-	key := context.KeyServer()
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, serverName)
+	ctx = context.SetFactotum(ctx, factotum)
+	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
+	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
+	ctx = context.SetPacking(ctx, upspin.EEPack)
+	key := ctx.KeyServer()
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
 		Name:      serverName,
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: factotum.PublicKey(),
 	}
 	err = key.Put(user)
@@ -717,8 +717,8 @@ func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
 	// rogue or fails, the user can always run a dir server locally as himself and retrieve dir blocks.
 	user = &upspin.User{
 		Name:      userName,
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: factotum.PublicKey(),
 	}
 	err = key.Put(user)
@@ -740,7 +740,7 @@ func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return context, log, logIndex
+	return ctx, log, logIndex
 }
 
 // repo returns the local pathname of a file in the upspin repository.

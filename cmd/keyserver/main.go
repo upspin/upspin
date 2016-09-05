@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	ctx := context.New().SetUserName(serverName)
+	ctx := context.SetUserName(context.New(), serverName)
 
 	// Create a new store implementation.
 	var key upspin.KeyServer
