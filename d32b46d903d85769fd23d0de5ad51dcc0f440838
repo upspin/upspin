@@ -195,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "36907709_22d3f058",
+        "filename": "test/error_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-05T03:00:11Z",
+      "side": 1,
+      "message": "Mine passes too without -tags remote. But both tests fail when they run \"together\". I\u0027ve checked I\u0027m at the head of the git repo.\n\nI\u0027ve reverted that and we can solve that in another CL. It does not seem related to this one.",
+      "parentUuid": "36907709_e29e68b4",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36907709_82343ced",
         "filename": "test/error_test.go",
         "patchSetId": 2
