@@ -90,25 +90,25 @@ func setupTestContext(t *testing.T) upspin.Context {
 	if err != nil {
 		t.Fatal(err)
 	}
-	context := context.New().
-		SetUserName(userName).
-		SetDirEndpoint(inProcess).
-		SetKeyEndpoint(inProcess).
-		SetStoreEndpoint(inProcess).
-		SetPacking(upspin.EEPack).
-		SetFactotum(f)
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, userName)
+	ctx = context.SetDirEndpoint(ctx, inProcess)
+	ctx = context.SetKeyEndpoint(ctx, inProcess)
+	ctx = context.SetStoreEndpoint(ctx, inProcess)
+	ctx = context.SetPacking(ctx, upspin.EEPack)
+	ctx = context.SetFactotum(ctx, f)
 
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
+		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: f.PublicKey(),
 	}
-	err = context.KeyServer().Put(user)
+	err = ctx.KeyServer().Put(user)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return context
+	return ctx
 }
 
 // repo returns the local pathname of a file in the upspin repository.

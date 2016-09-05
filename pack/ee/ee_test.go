@@ -222,7 +222,7 @@ func TestSharing(t *testing.T) {
 		keyToReturn: []upspin.PublicKey{joectx.Factotum().PublicKey()},
 	}
 	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	joectx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	joectx = context.SetKeyEndpoint(joectx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
@@ -248,7 +248,7 @@ func TestSharing(t *testing.T) {
 
 	// Now load Bob as the current user.
 	bobctx, packer := setup(bobsUserName)
-	bobctx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	bobctx = context.SetKeyEndpoint(bobctx, upspin.Endpoint{Transport: upspin.InProcess})
 	clear := unpackBlob(t, bobctx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
@@ -261,7 +261,7 @@ func TestSharing(t *testing.T) {
 
 	// Load Carla as the current user.
 	carlactx, packer := setup(carlasUserName)
-	carlactx.SetKeyEndpoint(upspin.Endpoint{Transport: upspin.InProcess})
+	carlactx = context.SetKeyEndpoint(carlactx, upspin.Endpoint{Transport: upspin.InProcess})
 	clear = unpackBlob(t, carlactx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
@@ -288,11 +288,9 @@ func TestBadSharing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.SetFactotum(f)
+	ctx = context.SetFactotum(ctx, f)
 	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	ctx.SetKeyEndpoint(upspin.Endpoint{
-		Transport: upspin.InProcess,
-	})
+	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name: pathName,
@@ -303,12 +301,12 @@ func TestBadSharing(t *testing.T) {
 	// Don't share with Bob (do nothing).
 
 	// Now load Bob as the current user.
-	ctx.SetUserName(bobsUserName)
+	ctx = context.SetUserName(ctx, bobsUserName)
 	f, err = factotum.New(repo("key/testdata/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx.SetFactotum(f)
+	ctx = context.SetFactotum(ctx, f)
 
 	// Bob can't unpack.
 	_, err = packer.Unpack(ctx, d)
@@ -321,7 +319,7 @@ func TestBadSharing(t *testing.T) {
 }
 
 func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
-	ctx := context.New().SetUserName(name)
+	ctx := context.SetUserName(context.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
@@ -331,7 +329,7 @@ func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
-	ctx.SetFactotum(f)
+	ctx = context.SetFactotum(ctx, f)
 	return ctx, packer
 }
 

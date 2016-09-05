@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"upspin.io/auth/grpcauth"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -51,7 +52,7 @@ func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(s.context.Copy().SetUserName(session.User()), s.dir.Endpoint())
+	svc, err := s.dir.Dial(context.SetUserName(s.context, session.User()), s.dir.Endpoint())
 	if err != nil {
 		return nil, err
 	}

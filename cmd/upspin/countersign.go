@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 
+	"upspin.io/context"
 	"upspin.io/pack/ee"
 	"upspin.io/upspin"
 
@@ -46,9 +47,11 @@ func newCountersigner(s *State) *Countersigner {
 // countersignCommand is the main function for the countersign subcommand.
 func (s *State) countersignCommand() {
 	newF := s.context.Factotum()
-	oldF := newF.Pop()
-	s.context.SetFactotum(oldF) // so calls to servers Authenticate using old key
-	defer s.context.SetFactotum(newF)
+
+	lastCtx := s.context
+	s.context = context.SetFactotum(s.context, s.context.Factotum().Pop())
+	defer func() { s.context = lastCtx }()
+
 	root := upspin.PathName(string(s.context.UserName()) + "/")
 	c := s.countersigner
 	entries := c.entriesFromDirectory(root)

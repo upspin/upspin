@@ -12,6 +12,7 @@ import (
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -51,7 +52,7 @@ func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.store.Dial(s.context.Copy().SetUserName(session.User()), s.store.Endpoint())
+	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), s.store.Endpoint())
 	if err != nil {
 		return nil, err
 	}
