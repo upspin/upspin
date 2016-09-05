@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "36907709_e29e68b4",
+        "filename": "test/error_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-05T01:28:47Z",
+      "side": 1,
+      "message": "On my system with a clean git checkout at master/HEAD,\nthe integration tests pass fine:\n\n$ git rev-parse head\n65f0b34975a524742ab2d24cd19b0dc4aec61296\n~/src/upspin.io/test (master) $ go test 2\u003e/dev/null\nPASS\nok  \tupspin.io/test\t0.210s\n\nCan you please check your environment?",
+      "parentUuid": "36907709_02458c3d",
+      "revId": "d32b46d903d85769fd23d0de5ad51dcc0f440838",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36907709_82343ced",
         "filename": "test/error_test.go",
         "patchSetId": 2
