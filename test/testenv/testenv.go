@@ -7,7 +7,7 @@
 package testenv
 
 import (
-	"log"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -15,18 +15,25 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 
-	// Potential transports, selected by the Setup's Kind field.
-
-	dirserver "upspin.io/dir/inprocess"
+	// Implementations that are instantiated explicitly by New.
+	dirserver_inprocess "upspin.io/dir/inprocess"
+	dirserver_server "upspin.io/dir/server"
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
 
+	// Transports that are selected implicitly by bind.
 	_ "upspin.io/dir/remote"
 	_ "upspin.io/store/remote"
+)
+
+const (
+	TestStoreServer = "store.test.upspin.io:443"
+	TestDirServer   = "dir.test.upspin.io:443"
 )
 
 // Setup is a configuration structure that contains a directory tree and other optional flags.
@@ -59,6 +66,7 @@ type Env struct {
 	// Setup contains the original setup options.
 	Setup *Setup
 
+	tmpDir     string
 	exitCalled bool
 }
 
@@ -69,48 +77,133 @@ func New(setup *Setup) (*Env, error) {
 		Setup: setup,
 	}
 	baseCtx := context.New()
-	if setup.Kind == "inprocess" {
+
+	// All tests use an in-process key server.
+	inprocess := upspin.Endpoint{Transport: upspin.InProcess}
+	baseCtx = context.SetKeyEndpoint(baseCtx, inprocess)
+	baseCtx = testfixtures.ServiceContext{
+		Context: baseCtx,
+		Key:     keyserver.New(),
+	}
+
+	switch k := setup.Kind; k {
+	case "inprocess", "server":
+		// Test either the dir/inprocess or dir/server implementations
+		// entire in-memory and offline.
+
+		// Set endpoints.
+		baseCtx = context.SetDirEndpoint(baseCtx, inprocess)
+		baseCtx = context.SetStoreEndpoint(baseCtx, inprocess)
+
+		// Set up a StoreServer instance. Just use the inprocess
+		// version for offline tests; the store/gcp implementation
+		// isn't interesting when run offline.
 		baseCtx = testfixtures.ServiceContext{
 			Context: baseCtx,
-			Key:     keyserver.New(),
 			Store:   storeserver.New(),
 		}
-		dir := dirserver.New(baseCtx)
+
+		// Set up DirServer instance.
+		var dir upspin.DirServer
+		switch k {
+		case "inprocess":
+			dir = dirserver_inprocess.New(baseCtx)
+		case "server":
+			// Set up user and factotum.
+			baseCtx = context.SetUserName(baseCtx, "upspin-test@google.com")
+			f, err := factotum.New(repo("key/testdata/upspin-test"))
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			baseCtx = context.SetFactotum(baseCtx, f)
+
+			// Create temporary directory for DirServer storage.
+			logDir, err := ioutil.TempDir("", "testenv-dirserver")
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			env.tmpDir = logDir
+			dir, err = dirserver_server.New(baseCtx, "logDir="+logDir)
+			if err != nil {
+				env.rmTmpDir()
+				return nil, errors.E(op, err)
+			}
+		}
 		baseCtx = testfixtures.ServiceContext{
 			Context: baseCtx,
 			Dir:     dir,
 		}
+
+	case "remote":
+		baseCtx = context.SetStoreEndpoint(baseCtx, upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   TestStoreServer,
+		})
+		baseCtx = context.SetDirEndpoint(baseCtx, upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   TestDirServer,
+		})
+
+	default:
+		return nil, errors.E(op, errors.Errorf("bad kind %q", k))
 	}
+
+	// Set the context to use the endpoints we created above.
 	env.Context = baseCtx
+
+	// Create a testuser, and set the context to the one for the user.
 	ctx, err := env.NewUser(setup.OwnerName)
 	if err != nil {
+		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
 	env.Context = ctx
+
 	if err := makeRootIfNotExist(ctx); err != nil {
+		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
+
 	env.Client = client.NewWithoutCache(ctx)
-	if setup.Verbose {
-		log.Printf("Tree: All entries created.")
-	}
 	return env, nil
 }
 
 // Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
 func (e *Env) Exit() error {
 	const op = "testenv.Exit"
+
 	if e.exitCalled {
 		return errors.E(op, errors.Invalid, errors.Str("exit already called"))
 	}
 	e.exitCalled = true
-	if e.Setup.Cleanup != nil {
-		err := e.Setup.Cleanup(e)
-		if err != nil {
-			return errors.E(op, err)
+
+	var firstErr error
+	check := func(err error) {
+		if err == nil {
+			return
 		}
+		if firstErr == nil {
+			firstErr = err
+		}
+		log.Debug.Println(op, err)
 	}
-	return nil
+
+	if e.Setup.Cleanup != nil {
+		check(e.Setup.Cleanup(e))
+	}
+
+	check(e.rmTmpDir())
+
+	return firstErr
+}
+
+func (e *Env) rmTmpDir() error {
+	if e.tmpDir == "" {
+		return nil
+	}
+	d := e.tmpDir
+	e.tmpDir = ""
+	return os.RemoveAll(d)
 }
 
 // NewUser creates a new client for a user.  The new user will not
@@ -121,7 +214,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	ctx := context.SetUserName(e.Context, userName)
 	ctx = context.SetPacking(ctx, e.Setup.Packing)
 
-	// Get keys for user.
+	// Set up a factotum for the user.
 	user, _, err := path.UserAndDomain(userName)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -132,30 +225,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	}
 	ctx = context.SetFactotum(ctx, f)
 
-	// Set up endpoints.
-	inProcessEndpoint := upspin.Endpoint{
-		Transport: upspin.InProcess,
-		NetAddr:   "", // ignored
-	}
-	ctx = context.SetKeyEndpoint(ctx, inProcessEndpoint)
-
-	switch k := e.Setup.Kind; k {
-	case "remote":
-		ctx = context.SetStoreEndpoint(ctx, upspin.Endpoint{
-			Transport: upspin.Remote,
-			NetAddr:   "store.test.upspin.io:443", // Test store server.
-		})
-		ctx = context.SetDirEndpoint(ctx, upspin.Endpoint{
-			Transport: upspin.Remote,
-			NetAddr:   "dir.test.upspin.io:443", // Test dir server.
-		})
-	case "inprocess":
-		ctx = context.SetStoreEndpoint(ctx, inProcessEndpoint)
-		ctx = context.SetDirEndpoint(ctx, inProcessEndpoint)
-	default:
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("bad server kind %q", k))
-	}
-
+	// Register the user with the key server.
 	err = registerUserWithKeyServer(ctx, ctx.UserName())
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -175,7 +245,7 @@ func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) err
 		PublicKey: ctx.Factotum().PublicKey(),
 	}
 	if err := key.Put(user); err != nil {
-		return errors.E(err)
+		return err
 	}
 	return nil
 }
