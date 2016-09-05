@@ -228,7 +228,7 @@ func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, er
 	const op = "dir/filesystem.Dial"
 
 	dialed := *s
-	dialed.user = ctx.Copy()
+	dialed.user = ctx
 	return &dialed, nil
 }
 

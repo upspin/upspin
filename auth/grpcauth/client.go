@@ -119,7 +119,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	}
 	ac := &AuthClientService{
 		grpcConn:          conn,
-		context:           context.Copy(),
+		context:           context,
 		keepAliveInterval: keepAliveInterval,
 		closeKeepAlive:    make(chan bool, 1),
 	}

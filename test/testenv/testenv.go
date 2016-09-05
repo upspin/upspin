@@ -120,7 +120,8 @@ func (e *Env) Exit() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	const op = "testenv.NewUser"
-	ctx := e.Context.Copy().SetUserName(userName).SetPacking(e.Setup.Packing)
+	ctx := context.SetUserName(e.Context, userName)
+	ctx = context.SetPacking(ctx, e.Setup.Packing)
 
 	// Get keys for user.
 	user, _, err := path.UserAndDomain(userName)
@@ -131,33 +132,33 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
-	ctx.SetFactotum(f)
+	ctx = context.SetFactotum(ctx, f)
 
 	// Set up endpoints.
 	inProcessEndpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx.SetKeyEndpoint(inProcessEndpoint)
+	ctx = context.SetKeyEndpoint(ctx, inProcessEndpoint)
 
 	switch k := e.Setup.Kind; k {
 	case "remote":
-		ctx.SetStoreEndpoint(upspin.Endpoint{
+		ctx = context.SetStoreEndpoint(ctx, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   "store.test.upspin.io:443", // Test store server.
 		})
-		ctx.SetDirEndpoint(upspin.Endpoint{
+		ctx = context.SetDirEndpoint(ctx, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   "dir.test.upspin.io:443", // Test dir server.
 		})
 	case "inprocess":
-		ctx.SetStoreEndpoint(inProcessEndpoint)
-		ctx.SetDirEndpoint(inProcessEndpoint)
+		ctx = context.SetStoreEndpoint(ctx, inProcessEndpoint)
+		ctx = context.SetDirEndpoint(ctx, inProcessEndpoint)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("bad server kind %q", k))
 	}
 
-	err = registerUserWithKeyServer(ctx, ctx.UserName())
+	err = registerUserWithKeyServer(ctx, userName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

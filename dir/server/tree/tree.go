@@ -116,7 +116,7 @@ func New(context upspin.Context, log *Log, logIndex *LogIndex) (*Tree, error) {
 	}
 	t := &Tree{
 		user:     log.User(),
-		context:  context.Copy(),
+		context:  context,
 		packer:   packer,
 		log:      log,
 		logIndex: logIndex,

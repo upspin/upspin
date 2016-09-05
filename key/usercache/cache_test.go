@@ -48,8 +48,10 @@ func init() {
 
 // setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, d time.Duration, user string) (upspin.Context, upspin.Context, *service) {
-	c := context.New().SetUserName(upspin.UserName(user)).SetPacking(upspin.DebugPack)
-	c.SetKeyEndpoint(keyService.endpoint)
+	c := context.New()
+	c = context.SetUserName(c, upspin.UserName(user))
+	c = context.SetPacking(c, upspin.DebugPack)
+	c = context.SetKeyEndpoint(c, keyService.endpoint)
 	keyService.context = c
 	keyService.dialed = 0
 
@@ -169,9 +171,9 @@ func (s *service) Put(user *upspin.User) error {
 	panic("userCacheTest.Service.Put not implemented")
 }
 
-func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	s.dialed++
-	s.context = context.Copy()
+	s.context = ctx
 	s.endpoint = e
 	return s, nil
 }
