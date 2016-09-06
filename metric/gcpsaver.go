@@ -29,6 +29,7 @@ type gcpSaver struct {
 	api          traceSaver
 	saverQueue   chan *Metric
 	staticLabels map[string]string
+	processed    int
 }
 
 var _ Saver = (*gcpSaver)(nil)
@@ -67,6 +68,10 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 func (g *gcpSaver) Register(queue chan *Metric) {
 	g.saverQueue = queue
 	go g.saverLoop()
+}
+
+func (g *gcpSaver) NumProcessed() int {
+	return g.processed
 }
 
 func (g *gcpSaver) saverLoop() {
@@ -110,6 +115,7 @@ func (g *gcpSaver) save(m *Metric) error {
 		},
 	}
 	err := g.api.Save(traces)
+	g.processed++
 	return err
 }
 
