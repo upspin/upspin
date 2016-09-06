@@ -152,7 +152,10 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 
-	return dir.Put(entry)
+	if e, err := dir.Put(entry); err != nil {
+		return e, err
+	}
+	return entry, nil
 }
 
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer) error {
