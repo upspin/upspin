@@ -13,11 +13,14 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/factotum"
 	"upspin.io/flags"
+	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -57,6 +60,7 @@ type State struct {
 	countersigner *Countersigner
 	exitCode      int // Exit with non-zero status for minor problems.
 	interactive   bool
+	metricsSaver  metric.Saver
 }
 
 func main() {
@@ -66,7 +70,6 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
-
 	state := newState()
 
 	args := flag.Args()[1:]
@@ -83,6 +86,7 @@ func main() {
 		usage()
 	}
 	fn(state, args...)
+	state.cleanup()
 	os.Exit(state.exitCode)
 }
 
@@ -114,6 +118,7 @@ func (s *State) exitf(format string, args ...interface{}) {
 	if s.interactive {
 		panic("exit")
 	}
+	s.cleanup()
 	os.Exit(1)
 }
 
@@ -646,6 +651,7 @@ func newState() *State {
 	s.client = client.New(ctx)
 	s.context = ctx
 	s.sharer = newSharer(s)
+	s.maybeEnableMetrics()
 	return s
 }
 
@@ -655,4 +661,36 @@ func (s *State) DirServer() upspin.DirServer {
 
 func (s *State) KeyServer() upspin.KeyServer {
 	return s.context.KeyServer()
+}
+
+// end terminates any necessary state.
+func (s *State) cleanup() {
+	s.finishMetricsIfEnabled()
+}
+
+func (s *State) maybeEnableMetrics() {
+	gcloudProject := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+	if strings.Contains(gcloudProject, "upspin-test") {
+		gcloudProject = "upspin-test"
+	} else if strings.Contains(gcloudProject, "upspin-prod") {
+		gcloudProject = "upspin-prod"
+	} else {
+		return
+	}
+	var err error
+	if s.metricsSaver, err = metric.NewGCPSaver(gcloudProject, "app", "cmd/upspin"); err == nil {
+		metric.RegisterSaver(s.metricsSaver)
+	} else {
+		log.Error.Printf("Can't save metrics: %q", err)
+	}
+}
+
+func (s *State) finishMetricsIfEnabled() {
+	if s.metricsSaver == nil {
+		return
+	}
+	// Allow time for metrics to propagate.
+	for i := 0; metric.NumProcessed() > s.metricsSaver.NumProcessed() && i < 10; i++ {
+		time.Sleep(100 * time.Millisecond)
+	}
 }

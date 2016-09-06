@@ -13,6 +13,8 @@ import (
 	"golang.org/x/oauth2/google"
 	trace "google.golang.org/api/cloudtrace/v1"
 
+	"sync/atomic"
+
 	"upspin.io/errors"
 	"upspin.io/log"
 )
@@ -29,6 +31,7 @@ type gcpSaver struct {
 	api          traceSaver
 	saverQueue   chan *Metric
 	staticLabels map[string]string
+	processed    int32
 }
 
 var _ Saver = (*gcpSaver)(nil)
@@ -67,6 +70,10 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 func (g *gcpSaver) Register(queue chan *Metric) {
 	g.saverQueue = queue
 	go g.saverLoop()
+}
+
+func (g *gcpSaver) NumProcessed() int32 {
+	return atomic.LoadInt32(&g.processed)
 }
 
 func (g *gcpSaver) saverLoop() {
@@ -110,6 +117,7 @@ func (g *gcpSaver) save(m *Metric) error {
 		},
 	}
 	err := g.api.Save(traces)
+	atomic.AddInt32(&g.processed, 1)
 	return err
 }
 
