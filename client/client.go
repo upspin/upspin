@@ -106,7 +106,14 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	name = parsed.Path() // Make sure it's clean.
+
+	// Find the Access file that applies. This will also cause us to evaluate links in the path,
+	// and if we do, evalEntry will contain the true file name of the Put operation we will do.
+	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: parsed.Path()}, whichAccessLookupFn, followFinalLink)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	name = evalEntry.Name
 
 	var packer upspin.Packer
 	if access.IsAccessFile(name) || access.IsGroupFile(name) {
@@ -130,11 +137,24 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		Attr:     upspin.AttrNone,
 	}
 
+	if err := c.pack(entry, data, packer); err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	if err := c.addReaders(op, entry, accessEntry, packer); err != nil {
+		return nil, err
+	}
+
+	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
+	return entry, err
+}
+
+func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer) error {
 	// Start the I/O.
 	store := c.context.StoreServer()
 	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return err
 	}
 	for len(data) > 0 {
 		n := len(data)
@@ -143,12 +163,12 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		}
 		cipher, err := bp.Pack(data[:n])
 		if err != nil {
-			return nil, errors.E(op, err)
+			return err
 		}
 		data = data[n:]
 		ref, err := store.Put(cipher)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return err
 		}
 		bp.SetLocation(
 			upspin.Location{
@@ -157,19 +177,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 			},
 		)
 	}
-	err = bp.Close()
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	if err := c.addReaders(op, entry, entry.Name); err != nil {
-		return nil, err
-	}
-
-	// Record directory entry. Its Name field may have been
-	// updated by addReaders.
-	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
-	return entry, err
+	return bp.Close()
 }
 
 func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
@@ -180,20 +188,19 @@ func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.
 // This call, if successful, will replace entry.Name with the value, after any
 // link evaluation, from the final call to WhichAccess. The caller may then
 // use that name or entry to avoid evaluating the links again.
-func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathName) error {
-	if entry.Packing != upspin.EEPack {
+func (c *Client) addReaders(op string, entry, accessEntry *upspin.DirEntry, packer upspin.Packer) error {
+	if packer.Packing() != upspin.EEPack {
 		return nil
 	}
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return errors.E(op, errors.Errorf("unrecognized Packing %d", entry.Packing))
-	}
+
+	name := entry.Name
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
+	// TODO: No we don't!
 	// evalEntry will contain the argument (most importantly the name)
 	// for the last successful call to WhichAccess.
-	readers, evalEntry, err := c.getReaders(op, name)
+	readers, err := c.getReaders(op, name, accessEntry)
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -217,10 +224,6 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 	packdata := make([]*[]byte, 1)
 	packdata[0] = &entry.Packdata
 	packer.Share(c.context, readersPublicKey, packdata)
-	// The call to WhichAccess succeeded for evalEntry, so update
-	// the incoming entry to that point, avoiding the need to
-	// follow the links again.
-	entry.Name = evalEntry.Name
 	return nil
 }
 
@@ -228,15 +231,10 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 // according to the Access file.
 // If the Access file cannot be read because of lack of permissions,
 // it returns the owner of the file (but only if we are not the owner).
-// It also returns the link-expanded DirEntry for name.
-func (c *Client) getReaders(op string, name upspin.PathName) ([]upspin.UserName, *upspin.DirEntry, error) {
-	accessEntry, evalEntry, err := c.lookup(op, &upspin.DirEntry{Name: name}, whichAccessLookupFn, followFinalLink)
-	if err != nil {
-		return nil, nil, err
-	}
+func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
 	if accessEntry == nil {
 		// No Access file present, therefore we must be the owner.
-		return nil, evalEntry, nil
+		return nil, nil
 	}
 	accessData, err := c.Get(accessEntry.Name)
 	if errors.Match(errors.E(errors.NotExist), err) || errors.Match(errors.E(errors.Permission), err) {
@@ -246,29 +244,29 @@ func (c *Client) getReaders(op string, name upspin.PathName) ([]upspin.UserName,
 		// Instead, just return the owner as the only reader.
 		parsed, err := path.Parse(name)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		owner := parsed.User()
 		if owner == c.context.UserName() {
 			// We are the owner, but the caller always
 			// adds the us, so return an empty list.
-			return nil, evalEntry, nil
+			return nil, nil
 		}
-		return []upspin.UserName{owner}, evalEntry, nil
+		return []upspin.UserName{owner}, nil
 	} else if err != nil {
 		// We failed to fetch the Access file for some unexpected reason,
 		// so bubble the error up.
-		return nil, nil, err
+		return nil, err
 	}
 	acc, err := access.Parse(accessEntry.Name, accessData)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	readers, err := acc.Users(access.Read, c.Get)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return readers, evalEntry, nil
+	return readers, nil
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
@@ -545,7 +543,11 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, err)
 	}
 	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
-		if err := c.addReaders(op, entry, entry.Name); err != nil {
+		accessEntry, _, err := c.lookup(op, entry, whichAccessLookupFn, followFinalLink)
+		if err != nil {
+			return nil, errors.E(op, trueOldName, err)
+		}
+		if err := c.addReaders(op, entry, accessEntry, packer); err != nil {
 			return nil, errors.E(trueOldName, err)
 		}
 	}
