@@ -286,9 +286,6 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 }
 
 func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
-	// TODO(r): fix issue 53
-	t.Skip("broken until issue #53 is fixed")
-
 	const (
 		base      = ownerName + "/put-link-errors"
 		srcDir    = base + "/src"
