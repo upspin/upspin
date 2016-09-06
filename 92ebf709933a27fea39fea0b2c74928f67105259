@@ -52,6 +52,24 @@
       "revId": "92ebf709933a27fea39fea0b2c74928f67105259",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_7f6a9715",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-06T23:21:47Z",
+      "side": 1,
+      "message": "I expected the right DirEntry and an ErrFollowLink is exactly what you\u0027d want in a race.  It tells you that someone stepped on you and exactly what the stepping was.\n\nI\u0027ll submit this to fix the build and if you want different semantics, just do another CL.",
+      "parentUuid": "b6f54793_940c8af2",
+      "revId": "92ebf709933a27fea39fea0b2c74928f67105259",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
