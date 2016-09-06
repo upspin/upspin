@@ -60,8 +60,6 @@ var (
 )
 
 // CheckPacking verifies that the DirEntry matches the packing type for Pack and Packlen.
-// It must not be nil, and if meta.Packdata is not nil, its zeroth entry must be correct for
-// the Packer.
 func CheckPacking(p upspin.Packer, entry *upspin.DirEntry) error {
 	if entry.Packing != p.Packing() {
 		return ErrBadPacking
