@@ -54,7 +54,7 @@ var (
 	Info  = newLogger(info, logging.Info)
 	Error = newLogger(errors, logging.Error)
 
-	currentLevel  level
+	currentLevel  = info
 	client        *logging.Client
 	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
