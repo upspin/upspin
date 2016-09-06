@@ -834,4 +834,8 @@ func (s *sinkSaver) Register(ch chan *metric.Metric) {
 	}()
 }
 
+func (s *sinkSaver) NumProcessed() int {
+	return 0
+}
+
 var _ metric.Saver = (*sinkSaver)(nil)
