@@ -16,6 +16,24 @@
       "revId": "92ebf709933a27fea39fea0b2c74928f67105259",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_147c1a4a",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-06T22:54:29Z",
+      "side": 1,
+      "message": "If there\u0027s a race, you could get ErrFollowLink and the right link. Not sure that matters.",
+      "parentUuid": "b6f54793_945e4ae2",
+      "revId": "92ebf709933a27fea39fea0b2c74928f67105259",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
