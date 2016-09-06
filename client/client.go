@@ -7,6 +7,7 @@
 package client
 
 import (
+	"fmt"
 	"strings"
 
 	"upspin.io/access"
@@ -14,6 +15,7 @@ import (
 	"upspin.io/client/file"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
+	"upspin.io/metric"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -93,6 +95,8 @@ func putLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
 	const op = "client.Put"
+	m, s := newMetric(op)
+	defer m.Done()
 
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -129,11 +133,13 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 	for len(data) > 0 {
+		ss := s.StartSpan("pack")
 		n := len(data)
 		if n > maxBlockSize {
 			n = maxBlockSize
 		}
 		cipher, err := bp.Pack(data[:n])
+		ss.End()
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -154,9 +160,20 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 
+	ss := s.StartSpan("addReaders")
 	if err := c.addReaders(op, entry, entry.Name); err != nil {
+		ss.End()
 		return nil, err
 	}
+	ss.End()
+
+	// Annotate metric with the size Put.
+	// TODO: add location approximation based on IP address?
+	size, err := entry.Size()
+	if err != nil {
+		return nil, err
+	}
+	s.SetAnnotation(fmt.Sprintf("bytes=%d", size))
 
 	// Record directory entry. Its Name field may have been
 	// updated by addReaders.
@@ -270,6 +287,9 @@ func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspi
 // MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "client.MakeDirectory"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, makeDirectoryLookupFn, followFinalLink)
 	return entry, err
 }
@@ -277,6 +297,9 @@ func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 // Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	const op = "client.Get"
+	m, s := newMetric(op)
+	defer m.Done()
+
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinalLink)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -288,6 +311,15 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
+
+	// Annotate metric with the size retrieved.
+	// TODO: add location approximation based on IP address?
+	size, err := entry.Size()
+	if err != nil {
+		return nil, err
+	}
+	s.SetAnnotation(fmt.Sprintf("bytes=%d", size))
+
 	return data, nil
 }
 
@@ -298,6 +330,9 @@ func lookupLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEn
 // Lookup implements upspin.Client.
 func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
 	const op = "client.Lookup"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, followFinal)
 	return entry, err
 }
@@ -383,6 +418,9 @@ func deleteLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEn
 // Delete implements upspin.Client.
 func (c *Client) Delete(name upspin.PathName) error {
 	const op = "client.Delete"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	_, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, deleteLookupFn, doNotFollowFinalLink)
 	return err
 }
@@ -390,6 +428,9 @@ func (c *Client) Delete(name upspin.PathName) error {
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "client.Glob"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	var results []*upspin.DirEntry
 	var this []string
 	next := []string{pattern}
@@ -486,12 +527,18 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 // If one of the two files is later modified, the copy and the original will differ.
 func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "client.PutDuplicate"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	return c.dupOrRename(op, oldName, newName, false)
 }
 
 // Rename implements upspin.Client.
 func (c *Client) Rename(oldName, newName upspin.PathName) error {
 	const op = "client.Rename"
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	_, err := c.dupOrRename(op, oldName, newName, true)
 	return err
 }
@@ -559,4 +606,10 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		}
 	}
 	return entry, nil
+}
+
+func newMetric(op string) (*metric.Metric, *metric.Span) {
+	m := metric.New("Client")
+	s := m.StartSpan(op).SetKind(metric.Client)
+	return m, s
 }

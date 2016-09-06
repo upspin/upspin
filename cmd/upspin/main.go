@@ -13,11 +13,14 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/factotum"
 	"upspin.io/flags"
+	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
@@ -66,7 +69,11 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
-
+	if saver, err := metric.NewGCPSaver("upspin-prod", "app", "cmd/upspin"); err != nil {
+		log.Error.Printf("Can't save metrics: %q", err)
+	} else {
+		metric.RegisterSaver(saver)
+	}
 	state := newState()
 
 	args := flag.Args()[1:]
@@ -83,6 +90,11 @@ func main() {
 		usage()
 	}
 	fn(state, args...)
+	// Allow time for metrics to propagate.
+	// TODO: not happy about this. runtime.GoSched() didn't suffice because
+	// it requires a network round-trip. I'm not sure 1 second is enough for
+	// folks in Australia. 500 ms was too short even for MTV.
+	time.Sleep(time.Second)
 	os.Exit(state.exitCode)
 }
 
