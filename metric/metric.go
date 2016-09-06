@@ -34,11 +34,14 @@ type Span struct {
 }
 
 // Saver is the common interface that all implementation-specific backends must implement
-// for saving a Metric to a backend. A Saver must continously process Metrics sent over a channel, set
+// for saving a Metric to a backend. A Saver must continuously process Metrics sent over a channel, set
 // during registration.
 type Saver interface {
 	// Register informs the Saver that new Metrics will be added to queue.
 	Register(queue chan *Metric)
+
+	// NumProcessed returns the number of metrics processed by the saver.
+	NumProcessed() int
 }
 
 // Kind represents where the trace was taken: Server, Client or Other.
@@ -65,7 +68,10 @@ func New(name string) *Metric {
 	}
 }
 
-var registered int32 // read/written atomically
+var (
+	registered int32 // read/written atomically
+	processed  int32
+)
 
 // RegisterSaver registers a Saver for storing Metrics onto a backend. Only one Saver may exist or it panics.
 // Hence, RegisterSaver is not concurrency-safe.
@@ -117,6 +123,7 @@ func (m *Metric) Done() {
 	select {
 	case saveQueue <- m:
 		// Sent
+		atomic.AddInt32(&processed, 1)
 	default:
 		// Warn if channel is full.
 		log.Error.Printf("Metric channel is full. Dropping metric %q.", m.name)
@@ -158,4 +165,9 @@ func (s *Span) SetKind(kind Kind) *Span {
 func (s *Span) SetAnnotation(annotation string) *Span {
 	s.annotation = annotation
 	return s
+}
+
+// NumProcessed returns the number of metrics sent to the saver for storage.
+func NumProcessed() int {
+	return int(processed)
 }
