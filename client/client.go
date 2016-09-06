@@ -130,11 +130,39 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		Attr:     upspin.AttrNone,
 	}
 
+	if err := c.pack(entry, data, packer); err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	if err := c.addReaders(op, entry, packer); err != nil {
+		return nil, err
+	}
+
+	// If the Name field changed, we went through a link and must
+	// redo everything to get the right signature, which includes the name.
+	// TODO: This is ridiculously expensive. Can we find a more efficient way?
+	if entry.Name != name {
+		entry.Blocks = nil
+		if err := c.pack(entry, data, packer); err != nil {
+			return nil, errors.E(op, err)
+		}
+		if err := c.addReaders(op, entry, packer); err != nil {
+			return nil, err
+		}
+	}
+
+	// Record directory entry. Its Name field may have been
+	// updated by addReaders.
+	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
+	return entry, err
+}
+
+func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer) error {
 	// Start the I/O.
 	store := c.context.StoreServer()
 	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return err
 	}
 	for len(data) > 0 {
 		n := len(data)
@@ -143,12 +171,12 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		}
 		cipher, err := bp.Pack(data[:n])
 		if err != nil {
-			return nil, errors.E(op, err)
+			return err
 		}
 		data = data[n:]
 		ref, err := store.Put(cipher)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return err
 		}
 		bp.SetLocation(
 			upspin.Location{
@@ -157,19 +185,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 			},
 		)
 	}
-	err = bp.Close()
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	if err := c.addReaders(op, entry, entry.Name); err != nil {
-		return nil, err
-	}
-
-	// Record directory entry. Its Name field may have been
-	// updated by addReaders.
-	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink)
-	return entry, err
+	return bp.Close()
 }
 
 func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.DirEntry, error) {
@@ -180,17 +196,15 @@ func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry) (*upspin.
 // This call, if successful, will replace entry.Name with the value, after any
 // link evaluation, from the final call to WhichAccess. The caller may then
 // use that name or entry to avoid evaluating the links again.
-func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathName) error {
-	if entry.Packing != upspin.EEPack {
+func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Packer) error {
+	name := entry.Name
+	if packer.Packing() == upspin.PlainPack {
 		return nil
-	}
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return errors.E(op, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
 
 	// Add other readers to Packdata.
 	// We do this before "Store contents", so an error return wastes little.
+	// TODO: No we don't!
 	// evalEntry will contain the argument (most importantly the name)
 	// for the last successful call to WhichAccess.
 	readers, evalEntry, err := c.getReaders(op, name)
@@ -213,14 +227,14 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, name upspin.PathN
 			n++
 		}
 	}
-	readersPublicKey = readersPublicKey[:n]
-	packdata := make([]*[]byte, 1)
-	packdata[0] = &entry.Packdata
-	packer.Share(c.context, readersPublicKey, packdata)
 	// The call to WhichAccess succeeded for evalEntry, so update
 	// the incoming entry to that point, avoiding the need to
 	// follow the links again.
 	entry.Name = evalEntry.Name
+	readersPublicKey = readersPublicKey[:n]
+	packdata := make([]*[]byte, 1)
+	packdata[0] = &entry.Packdata
+	packer.Share(c.context, readersPublicKey, packdata)
 	return nil
 }
 
@@ -545,7 +559,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, err)
 	}
 	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
-		if err := c.addReaders(op, entry, entry.Name); err != nil {
+		if err := c.addReaders(op, entry, packer); err != nil {
 			return nil, errors.E(trueOldName, err)
 		}
 	}

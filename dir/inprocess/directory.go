@@ -45,7 +45,7 @@ func New(context upspin.Context) upspin.DirServer {
 // Used to store directory entries.
 // All directories are encoded with this packing.
 var (
-	dirPacking = upspin.DebugPack
+	dirPacking = upspin.PlainPack
 	dirPacker  = pack.Lookup(dirPacking)
 )
 
