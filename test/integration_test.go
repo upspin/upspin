@@ -317,16 +317,18 @@ func TestIntegration(t *testing.T) {
 			setup := setupTemplate
 			setup.Kind = kind
 			for _, p := range []struct {
-				packing upspin.Packing
-				curve   string
+				packing  upspin.Packing
+				remoteOK bool
 			}{
-				{packing: upspin.PlainPack, curve: "p256"},
-				{packing: upspin.DebugPack, curve: "p256"},
-				{packing: upspin.EEPack, curve: "p256"},
-				//{packing: upspin.EEPack, curve: "p521"}, // TODO: figure out if and how to test p521.
+				{upspin.PlainPack, false},
+				{upspin.DebugPack, false},
+				{upspin.EEPack, true}, // Only run this test against remote.
 			} {
 				setup.Packing = p.packing
-				t.Run(fmt.Sprintf("packing=%v/curve=%v", p.packing, p.curve), func(t *testing.T) {
+				t.Run(fmt.Sprintf("packing=%v", p.packing), func(t *testing.T) {
+					if kind == "remote" && !p.remoteOK {
+						t.Skip("skipping test against remote")
+					}
 					testSelectedOnePacking(t, setup)
 				})
 			}
