@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_945e4ae2",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-06T22:53:32Z",
+      "side": 1,
+      "message": "I don\u0027t see why we should return the entry if there\u0027s an error, here. It\u0027s not defined either way in the Client interface though.",
+      "revId": "92ebf709933a27fea39fea0b2c74928f67105259",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
