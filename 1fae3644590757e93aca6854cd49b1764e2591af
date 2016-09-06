@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "36907709_a8935f52",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-06T06:27:28Z",
+      "side": 1,
+      "message": "I think you should just be doing a straight put here, rather than calling lookup. Either we\u0027re putting this in the right place, or more links have been introduced and we\u0027ve given the entry the wrong name",
+      "revId": "1fae3644590757e93aca6854cd49b1764e2591af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "36907709_c8902348",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-06T06:27:28Z",
+      "side": 1,
+      "message": "fix",
+      "revId": "1fae3644590757e93aca6854cd49b1764e2591af",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
