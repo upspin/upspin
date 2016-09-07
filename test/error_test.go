@@ -696,7 +696,7 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 
 func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {
 	const (
-		base       = ownerName + "/whichaccesslink-errors"
+		base       = ownerName + "/whichaccess-link-errors"
 		link       = base + "/link"
 		linkTarget = "user@example.org/path"
 		access     = base + "/Access"
@@ -899,5 +899,120 @@ func testGlobErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-// TODO
-func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {}
+func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
+	/*
+
+		/
+		/dir1
+		/dir1/file
+		/dir1/dir2-link -> /dir2
+		/dir1/dir2-file-link -> /dir2/file
+		/dir1/dir3-file-link -> /dir3/file
+		/dir2
+		/dir2/file
+		/dir3
+		/dir3/file
+
+	*/
+	const (
+		base         = ownerName + "/glob-link-errors"
+		dir1         = base + "/dir1"
+		dir2         = base + "/dir2"
+		dir3         = base + "/dir3"
+		dir1access   = dir1 + "/Access"
+		dir1file     = dir1 + "/file"
+		dir2link     = dir1 + "/dir2-link"
+		dir2filelink = dir1 + "/dir2-file-link"
+		dir3link     = dir1 + "/dir3-link"
+		dir2access   = dir2 + "/Access"
+		dir2file     = dir2 + "/file"
+		dir3access   = dir3 + "/Access"
+		dir3file     = dir3 + "/file"
+		content      = "hello, gophers"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(dir1)
+	r.MakeDirectory(dir2)
+	r.MakeDirectory(dir3)
+	r.Put(dir1file, content)
+	r.PutLink(dir2, dir2link)
+	r.PutLink(dir2file, dir2filelink)
+	r.PutLink(dir3, dir3link)
+	r.Put(dir2file, content)
+	r.Put(dir3file, content)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// The owner can glob everywhere.
+	r.Glob(base + "/*/file")
+	if !r.GotEntries(true, dir1file, dir2file, dir3file) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/dir1/*")
+	if !r.GotEntries(true, dir2filelink, dir2link, dir3link, dir1file) {
+		t.Fatal(r.Diag())
+	}
+	// Including traversing links.
+	r.Glob(base + "/dir1/*link/file")
+	if !r.GotEntries(true, dir2file, dir3file) {
+		t.Fatal(r.Diag())
+	}
+
+	// The reader can see nothing.
+	r.As(readerName)
+	r.Glob(base + "/*/file")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/dir1/*")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(base + "/dir1/*link/file")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader all rights to /dir1.
+	r.As(ownerName)
+	r.Put(dir1access, "*:"+readerName)
+	r.As(readerName)
+	// The reader cannot list the root, so they still get 'not exist'.
+	r.Glob(base + "/*/file")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	// The reader can list /dir1, so they see its contents.
+	r.Glob(base + "/dir1/*")
+	if !r.GotEntries(true, dir1access, dir2filelink, dir2link, dir3link, dir1file) {
+		t.Fatal(r.Diag())
+	}
+	// If the glob follows a link, but the reader doesn't have access to
+	// its target, the glob result does not include the target.
+	r.Glob(base + "/dir1/*link/file")
+	if !r.GotEntries(true) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader all rights to one of the target directories
+	// and they should see the matching file for which they have access.
+	r.As(ownerName)
+	r.Put(dir2access, "*:"+readerName)
+	r.As(readerName)
+	r.Glob(base + "/dir1/*link/file")
+	if !r.GotEntries(true, dir2file) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader all rights over both target directories
+	// and they can see all matching files.
+	r.As(ownerName)
+	r.Put(dir3access, "*:"+readerName)
+	r.As(readerName)
+	r.Glob(base + "/dir1/*link/file")
+	if !r.GotEntries(true, dir2file, dir3file) {
+		t.Fatal(r.Diag())
+	}
+}
