@@ -5,8 +5,7 @@
 package testfixtures
 
 import (
-	"log"
-
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -35,29 +34,44 @@ type ServiceContext struct {
 
 func (c ServiceContext) KeyServer() upspin.KeyServer {
 	if c.Key != nil {
-		return c.Key
+		svc, err := c.Key.Dial(c, c.KeyEndpoint())
+		if err != nil {
+			panic("ServiceContext: KeyServer: " + err.Error())
+		}
+		return svc.(upspin.KeyServer)
 	}
 	return c.Context.KeyServer()
 }
 
 func (c ServiceContext) StoreServer() upspin.StoreServer {
 	if c.Store != nil {
-		return c.Store
+		svc, err := c.Store.Dial(c, c.StoreEndpoint())
+		if err != nil {
+			panic("ServiceContext: StoreServer: " + err.Error())
+		}
+		return svc.(upspin.StoreServer)
 	}
 	return c.Context.StoreServer()
 }
 
 func (c ServiceContext) StoreServerFor(e upspin.Endpoint) (upspin.StoreServer, error) {
 	if c.Store != nil {
-		return c.Store, nil
+		svc, err := c.Store.Dial(c, e)
+		if err != nil {
+			return nil, errors.Errorf("ServiceContext: StoreServerFor: %v", err)
+		}
+		return svc.(upspin.StoreServer), nil
 	}
 	return c.Context.StoreServerFor(e)
 }
 
 func (c ServiceContext) DirServer(p upspin.PathName) upspin.DirServer {
-	log.Println("ServiceContext.DirServer", p)
 	if c.Dir != nil {
-		return c.Dir
+		svc, err := c.Dir.Dial(c, c.DirEndpoint())
+		if err != nil {
+			panic("ServiceContext: DirServer: " + err.Error())
+		}
+		return svc.(upspin.DirServer)
 	}
 	return c.Context.DirServer(p)
 }

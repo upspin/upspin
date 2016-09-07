@@ -67,6 +67,10 @@ type Env struct {
 	// Setup contains the original setup options.
 	Setup *Setup
 
+	keyServer   upspin.KeyServer
+	storeServer upspin.StoreServer
+	dirServer   upspin.DirServer
+
 	tmpDir     string
 	exitCalled bool
 }
@@ -82,9 +86,10 @@ func New(setup *Setup) (*Env, error) {
 	// All tests use an in-process key server.
 	inprocess := upspin.Endpoint{Transport: upspin.InProcess}
 	ctx = context.SetKeyEndpoint(ctx, inprocess)
+	env.keyServer = keyserver.New()
 	ctx = testfixtures.ServiceContext{
 		Context: ctx,
-		Key:     keyserver.New(),
+		Key:     env.keyServer,
 	}
 
 	switch k := setup.Kind; k {
@@ -99,16 +104,16 @@ func New(setup *Setup) (*Env, error) {
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/gcp implementation
 		// isn't interesting when run offline.
+		env.storeServer = storeserver.New()
 		ctx = testfixtures.ServiceContext{
 			Context: ctx,
-			Store:   storeserver.New(),
+			Store:   env.storeServer,
 		}
 
 		// Set up DirServer instance.
-		var dir upspin.DirServer
 		switch k {
 		case "inprocess":
-			dir = dirserver_inprocess.New(ctx)
+			env.dirServer = dirserver_inprocess.New(ctx)
 		case "server":
 			// Set up user and factotum.
 			ctx = context.SetUserName(ctx, "upspin-test@google.com")
@@ -124,7 +129,7 @@ func New(setup *Setup) (*Env, error) {
 				return nil, errors.E(op, err)
 			}
 			env.tmpDir = logDir
-			dir, err = dirserver_server.New(ctx, "logDir="+logDir)
+			env.dirServer, err = dirserver_server.New(ctx, "logDir="+logDir)
 			if err != nil {
 				env.rmTmpDir()
 				return nil, errors.E(op, err)
@@ -132,7 +137,7 @@ func New(setup *Setup) (*Env, error) {
 		}
 		ctx = testfixtures.ServiceContext{
 			Context: ctx,
-			Dir:     dir,
+			Dir:     env.dirServer,
 		}
 
 	case "remote":
@@ -195,6 +200,16 @@ func (e *Env) Exit() error {
 
 	check(e.rmTmpDir())
 
+	if e.dirServer != nil {
+		e.dirServer.Close()
+	}
+	if e.storeServer != nil {
+		e.storeServer.Close()
+	}
+	if e.keyServer != nil {
+		e.keyServer.Close()
+	}
+
 	return firstErr
 }
 
@@ -226,6 +241,15 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	}
 	ctx = context.SetFactotum(ctx, f)
 
+	// Re-wrap this context with the test services,
+	// so that the wrapped services see the new user.
+	ctx = testfixtures.ServiceContext{
+		Context: ctx,
+		Key:     e.keyServer,
+		Store:   e.storeServer,
+		Dir:     e.dirServer,
+	}
+
 	// Register the user with the key server.
 	err = registerUserWithKeyServer(ctx, ctx.UserName())
 	if err != nil {
@@ -251,9 +275,9 @@ func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) err
 	return nil
 }
 
-func makeRootIfNotExist(context upspin.Context) error {
-	path := upspin.PathName(context.UserName()) + "/"
-	dir := context.DirServer(path)
+func makeRootIfNotExist(ctx upspin.Context) error {
+	path := upspin.PathName(ctx.UserName()) + "/"
+	dir := ctx.DirServer(path)
 	_, err := dir.MakeDirectory(path)
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
 		return err
