@@ -92,11 +92,11 @@ func setupTestContext(t *testing.T) upspin.Context {
 	}
 	ctx := context.New()
 	ctx = context.SetUserName(ctx, userName)
-	ctx = context.SetDirEndpoint(ctx, inProcess)
-	ctx = context.SetKeyEndpoint(ctx, inProcess)
-	ctx = context.SetStoreEndpoint(ctx, inProcess)
 	ctx = context.SetPacking(ctx, upspin.EEPack)
 	ctx = context.SetFactotum(ctx, f)
+	ctx = context.SetKeyEndpoint(ctx, inProcess)
+	ctx = context.SetStoreEndpoint(ctx, inProcess)
+	ctx = context.SetDirEndpoint(ctx, inProcess)
 
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),

@@ -15,8 +15,9 @@ import (
 
 	_ "upspin.io/dir/inprocess"
 	_ "upspin.io/key/inprocess"
-	_ "upspin.io/pack/debug"
 	_ "upspin.io/store/inprocess"
+
+	_ "upspin.io/pack/debug"
 )
 
 // TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.
@@ -30,8 +31,8 @@ func newContext(name upspin.UserName) upspin.Context {
 	ctx = context.SetUserName(ctx, name)
 	ctx = context.SetPacking(ctx, upspin.DebugPack)
 	ctx = context.SetKeyEndpoint(ctx, inProcess)
-	ctx = context.SetDirEndpoint(ctx, inProcess)
 	ctx = context.SetStoreEndpoint(ctx, inProcess)
+	ctx = context.SetDirEndpoint(ctx, inProcess)
 	return ctx
 }
 
