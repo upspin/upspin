@@ -25,25 +25,36 @@ import (
 
 var inTest = false // Generate errors instead of logs for certain problems.
 
-// contextImpl implements upspin.Context.
-// The fields are pointers so that a nil indicates the field is unset.
-// If a field is unset and base is non-nil, an access of that field will
-// be delegated to the underlying base context.
-type contextImpl struct {
-	userName           *upspin.UserName
-	packing            *upspin.Packing
-	keyEndpoint        *upspin.Endpoint
-	dirEndpoint        *upspin.Endpoint
-	storeEndpoint      *upspin.Endpoint
-	storeCacheEndpoint *upspin.Endpoint
-	factotum           upspin.Factotum
+// base implements upspin.Context, returning default values for all operations.
+type base struct{}
 
-	base upspin.Context
+func (base) UserName() upspin.UserName           { return defaultUserName }
+func (base) Factotum() upspin.Factotum           { return nil }
+func (base) Packing() upspin.Packing             { return defaultPacking }
+func (base) KeyEndpoint() upspin.Endpoint        { return ep0 }
+func (base) DirEndpoint() upspin.Endpoint        { return ep0 }
+func (base) StoreEndpoint() upspin.Endpoint      { return ep0 }
+func (base) StoreCacheEndpoint() upspin.Endpoint { return ep0 }
+
+func (ctx base) KeyServer() upspin.KeyServer {
+	return keyServer(ctx)
+}
+
+func (ctx base) StoreServer() upspin.StoreServer {
+	return storeServer(ctx)
+}
+
+func (ctx base) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
+	return storeServerFor(ctx, ep)
+}
+
+func (ctx base) DirServer(name upspin.PathName) upspin.DirServer {
+	return dirServer(ctx, name)
 }
 
 // New returns a context with all fields set as defaults.
 func New() upspin.Context {
-	return &contextImpl{}
+	return base{}
 }
 
 var (
@@ -187,10 +198,9 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 	pack := packer.Packing()
 
-	ctx := &contextImpl{
-		userName: &user,
-		packing:  &pack,
-	}
+	ctx := New()
+	ctx = SetUserName(ctx, user)
+	ctx = SetPacking(ctx, pack)
 
 	var err error
 	dir := vals[secrets]
@@ -207,14 +217,14 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		ctx.factotum = f
+		ctx = SetFactotum(ctx, f)
 		// This must be done before bind so that keys are ready for authenticating to servers.
 	}
 
-	ctx.keyEndpoint = parseEndpoint(op, vals, keyserver, &err)
-	ctx.storeEndpoint = parseEndpoint(op, vals, storeserver, &err)
-	ctx.storeCacheEndpoint = parseEndpoint(op, vals, storecache, &err)
-	ctx.dirEndpoint = parseEndpoint(op, vals, dirserver, &err)
+	ctx = SetKeyEndpoint(ctx, parseEndpoint(op, vals, keyserver, &err))
+	ctx = SetStoreEndpoint(ctx, parseEndpoint(op, vals, storeserver, &err))
+	ctx = SetStoreCacheEndpoint(ctx, parseEndpoint(op, vals, storecache, &err))
+	ctx = SetDirEndpoint(ctx, parseEndpoint(op, vals, dirserver, &err))
 	return ctx, err
 }
 
@@ -224,10 +234,10 @@ var ErrNoFactotum = errors.Str("Factotum not initialized: no secrets provided")
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
-func parseEndpoint(op string, vals map[string]string, key string, errorp *error) *upspin.Endpoint {
+func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
 	text, ok := vals[key]
 	if !ok || text == "" {
-		return nil
+		return ep0
 	}
 	ep, err := upspin.ParseEndpoint(text)
 	if err != nil {
@@ -236,13 +246,154 @@ func parseEndpoint(op string, vals map[string]string, key string, errorp *error)
 		if *errorp == nil {
 			*errorp = err
 		}
-		return nil
+		return ep0
 	}
-	return ep
+	return *ep
 }
 
-// KeyServer implements upspin.Context.
-func (ctx *contextImpl) KeyServer() upspin.KeyServer {
+type ctxUserName struct {
+	upspin.Context
+	userName upspin.UserName
+}
+
+func (ctx ctxUserName) UserName() upspin.UserName {
+	return ctx.userName
+}
+
+// SetUserName returns a context derived from the given context
+// with the given user name.
+func SetUserName(ctx upspin.Context, u upspin.UserName) upspin.Context {
+	return ctxUserName{
+		Context:  ctx,
+		userName: u,
+	}
+}
+
+type ctxFactotum struct {
+	upspin.Context
+	factotum upspin.Factotum
+}
+
+func (ctx ctxFactotum) Factotum() upspin.Factotum {
+	return ctx.factotum
+}
+
+// SetFactotum returns a context derived from the given context
+// with the given factotum.
+func SetFactotum(ctx upspin.Context, f upspin.Factotum) upspin.Context {
+	return ctxFactotum{
+		Context:  ctx,
+		factotum: f,
+	}
+}
+
+type ctxPacking struct {
+	upspin.Context
+	packing upspin.Packing
+}
+
+func (ctx ctxPacking) Packing() upspin.Packing {
+	return ctx.packing
+}
+
+// SetPacking returns a context derived from the given context
+// with the given factotum.
+func SetPacking(ctx upspin.Context, p upspin.Packing) upspin.Context {
+	return ctxPacking{
+		Context: ctx,
+		packing: p,
+	}
+}
+
+type ctxKeyEndpoint struct {
+	upspin.Context
+	keyEndpoint upspin.Endpoint
+}
+
+func (ctx ctxKeyEndpoint) KeyEndpoint() upspin.Endpoint {
+	return ctx.keyEndpoint
+}
+
+func (ctx ctxKeyEndpoint) KeyServer() upspin.KeyServer {
+	return keyServer(ctx)
+}
+
+// SetKeyEndpoint returns a context derived from the given context
+// with the given key endpoint.
+func SetKeyEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+	return ctxKeyEndpoint{
+		Context:     ctx,
+		keyEndpoint: e,
+	}
+}
+
+type ctxStoreEndpoint struct {
+	upspin.Context
+	storeEndpoint upspin.Endpoint
+}
+
+func (ctx ctxStoreEndpoint) StoreEndpoint() upspin.Endpoint {
+	return ctx.storeEndpoint
+}
+
+func (ctx ctxStoreEndpoint) StoreServer() upspin.StoreServer {
+	return storeServer(ctx)
+}
+
+func (ctx ctxStoreEndpoint) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
+	return storeServerFor(ctx, ep)
+}
+
+// SetStoreEndpoint returns a context derived from the given context
+// with the given store endpoint.
+func SetStoreEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+	return ctxStoreEndpoint{
+		Context:       ctx,
+		storeEndpoint: e,
+	}
+}
+
+type ctxStoreCacheEndpoint struct {
+	upspin.Context
+	storeCacheEndpoint upspin.Endpoint
+}
+
+func (ctx ctxStoreCacheEndpoint) StoreCacheEndpoint() upspin.Endpoint {
+	return ctx.storeCacheEndpoint
+}
+
+// SetStoreCacheEndpoint returns a context derived from the given context
+// with the given store cache endpoint.
+func SetStoreCacheEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+	return ctxStoreCacheEndpoint{
+		Context:            ctx,
+		storeCacheEndpoint: e,
+	}
+}
+
+type ctxDirEndpoint struct {
+	upspin.Context
+	dirEndpoint upspin.Endpoint
+}
+
+func (ctx ctxDirEndpoint) DirEndpoint() upspin.Endpoint {
+	return ctx.dirEndpoint
+}
+
+func (ctx ctxDirEndpoint) DirServer(name upspin.PathName) upspin.DirServer {
+	return dirServer(ctx, name)
+}
+
+// SetDirEndpoint returns a context derived from the given context
+// with the given dir endpoint.
+func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+	return ctxDirEndpoint{
+		Context:     ctx,
+		dirEndpoint: e,
+	}
+}
+
+func keyServer(ctx upspin.Context) upspin.KeyServer {
 	u, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		u, _ = bind.KeyServer(ctx, ep0)
@@ -250,8 +401,7 @@ func (ctx *contextImpl) KeyServer() upspin.KeyServer {
 	return u
 }
 
-// DirServer implements upspin.Context.
-func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
+func dirServer(ctx upspin.Context, name upspin.PathName) upspin.DirServer {
 	if len(name) == 0 {
 		// If name is empty, just return the directory at ctx.DirEndpoint().
 		d, err := bind.DirServer(ctx, ctx.DirEndpoint())
@@ -282,8 +432,7 @@ func (ctx *contextImpl) DirServer(name upspin.PathName) upspin.DirServer {
 	return d
 }
 
-// StoreServer implements upspin.Context.
-func (ctx *contextImpl) StoreServer() upspin.StoreServer {
+func storeServer(ctx upspin.Context) upspin.StoreServer {
 	u, err := bind.StoreServer(ctx, ctx.StoreEndpoint())
 	if err != nil {
 		u, _ = bind.StoreServer(ctx, ep0)
@@ -291,149 +440,8 @@ func (ctx *contextImpl) StoreServer() upspin.StoreServer {
 	return u
 }
 
-// StoreServerFor implements upspin.Context.
-func (ctx *contextImpl) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
+func storeServerFor(ctx upspin.Context, ep upspin.Endpoint) (upspin.StoreServer, error) {
 	return bind.StoreServer(ctx, ep)
-}
-
-// UserName implements upspin.Context.
-func (ctx *contextImpl) UserName() upspin.UserName {
-	if ctx.userName != nil {
-		return *ctx.userName
-	}
-	if ctx.base != nil {
-		return ctx.base.UserName()
-	}
-	return defaultUserName
-}
-
-// SetUserName returns a context derived from the given context
-// with the given user name.
-func SetUserName(ctx upspin.Context, u upspin.UserName) upspin.Context {
-	return &contextImpl{
-		base:     ctx,
-		userName: &u,
-	}
-}
-
-// Factotum implements upspin.Context.
-func (ctx *contextImpl) Factotum() upspin.Factotum {
-	if ctx.factotum != nil {
-		return ctx.factotum
-	}
-	if ctx.base != nil {
-		return ctx.base.Factotum()
-	}
-	return nil
-}
-
-// SetFactotum returns a context derived from the given context
-// with the given factotum.
-func SetFactotum(ctx upspin.Context, f upspin.Factotum) upspin.Context {
-	return &contextImpl{
-		base:     ctx,
-		factotum: f,
-	}
-}
-
-// Packing implements upspin.Context.
-func (ctx *contextImpl) Packing() upspin.Packing {
-	if ctx.packing != nil {
-		return *ctx.packing
-	}
-	if ctx.base != nil {
-		return ctx.base.Packing()
-	}
-	return defaultPacking
-}
-
-// SetPacking returns a context derived from the given context
-// with the given factotum.
-func SetPacking(ctx upspin.Context, p upspin.Packing) upspin.Context {
-	return &contextImpl{
-		base:    ctx,
-		packing: &p,
-	}
-}
-
-// KeyEndpoint implements upspin.Context.
-func (ctx *contextImpl) KeyEndpoint() upspin.Endpoint {
-	if ctx.keyEndpoint != nil {
-		return *ctx.keyEndpoint
-	}
-	if ctx.base != nil {
-		return ctx.base.KeyEndpoint()
-	}
-	return ep0
-}
-
-// SetKeyEndpoint returns a context derived from the given context
-// with the given key endpoint.
-func SetKeyEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
-	return &contextImpl{
-		base:        ctx,
-		keyEndpoint: &e,
-	}
-}
-
-// DirEndpoint implements upspin.Context.
-func (ctx *contextImpl) DirEndpoint() upspin.Endpoint {
-	if ctx.dirEndpoint != nil {
-		return *ctx.dirEndpoint
-	}
-	if ctx.base != nil {
-		return ctx.base.DirEndpoint()
-	}
-	return ep0
-}
-
-// SetDirEndpoint returns a context derived from the given context
-// with the given dir endpoint.
-func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
-	return &contextImpl{
-		base:        ctx,
-		dirEndpoint: &e,
-	}
-}
-
-// StoreEndpoint implements upspin.Context.
-func (ctx *contextImpl) StoreEndpoint() upspin.Endpoint {
-	if ctx.storeEndpoint != nil {
-		return *ctx.storeEndpoint
-	}
-	if ctx.base != nil {
-		return ctx.base.StoreEndpoint()
-	}
-	return ep0
-}
-
-// SetStoreEndpoint returns a context derived from the given context
-// with the given store endpoint.
-func SetStoreEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
-	return &contextImpl{
-		base:          ctx,
-		storeEndpoint: &e,
-	}
-}
-
-// StoreCacheEndpoint implements upspin.Context.
-func (ctx *contextImpl) StoreCacheEndpoint() upspin.Endpoint {
-	if ctx.storeCacheEndpoint != nil {
-		return *ctx.storeCacheEndpoint
-	}
-	if ctx.base != nil {
-		return ctx.base.StoreCacheEndpoint()
-	}
-	return ep0
-}
-
-// SetStoreCacheEndpoint returns a context derived from the given context
-// with the given store cache endpoint.
-func SetStoreCacheEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
-	return &contextImpl{
-		base:               ctx,
-		storeCacheEndpoint: &e,
-	}
 }
 
 func homedir() (string, error) {
