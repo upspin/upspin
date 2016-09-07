@@ -8,6 +8,7 @@ package metric
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"upspin.io/log"
@@ -64,15 +65,14 @@ func New(name string) *Metric {
 	}
 }
 
-var registered bool
+var registered int32 // read/written atomically
 
 // RegisterSaver registers a Saver for storing Metrics onto a backend. Only one Saver may exist or it panics.
 // Hence, RegisterSaver is not concurrency-safe.
 func RegisterSaver(saver Saver) {
-	if registered {
+	if !atomic.CompareAndSwapInt32(&registered, 0, 1) {
 		panic("already registered.")
 	}
-	registered = true
 	saver.Register(saveQueue)
 }
 
@@ -107,11 +107,18 @@ func (m *Metric) Done() {
 		}
 	}
 	m.mu.Unlock()
-	// Warn if channel is full.
+
+	if atomic.LoadInt32(&registered) == 0 {
+		// No saver registered,
+		// don't send any metrics.
+		return
+	}
+
 	select {
 	case saveQueue <- m:
 		// Sent
 	default:
+		// Warn if channel is full.
 		log.Error.Printf("Metric channel is full. Dropping metric %q.", m.name)
 	}
 }
