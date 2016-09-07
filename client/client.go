@@ -314,7 +314,7 @@ func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntr
 }
 
 // A lookupFn is called by the evaluation loop in lookup. It calls the underlying
-// DirServer operationg and may return ErrFollowLink, some other error, or success.
+// DirServer operation and may return ErrFollowLink, some other error, or success.
 // If it is ErrFollowLink, lookup will step through the link and try again.
 type lookupFn func(upspin.DirServer, *upspin.DirEntry) (*upspin.DirEntry, error)
 

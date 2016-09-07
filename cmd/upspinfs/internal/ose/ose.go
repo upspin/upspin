@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !windows
+
 /*
 Package ose is a version of the file ops from the os package using encrypted files.
 This version uses on disk files with a simple block encryption scheme to allow
