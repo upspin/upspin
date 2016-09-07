@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_652e8a99",
+        "filename": "test/error_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-07T04:20:23Z",
+      "side": 1,
+      "message": "can delete comment.",
+      "revId": "578fc59a7ff436b85e540a7482bf90ae3f63e8f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
