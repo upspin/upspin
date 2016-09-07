@@ -749,12 +749,12 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 		NetAddr:   "",
 	}
 	ctx := context.New()
-	ctx = context.SetFactotum(ctx, factotum)
 	ctx = context.SetUserName(ctx, serverName)
-	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
-	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
-	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
 	ctx = context.SetPacking(ctx, upspin.EEPack)
+	ctx = context.SetFactotum(ctx, factotum)
+	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
+	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
+	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
 	key := ctx.KeyServer()
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{

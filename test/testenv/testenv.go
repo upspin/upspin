@@ -98,8 +98,8 @@ func New(setup *Setup) (*Env, error) {
 		// entire in-memory and offline.
 
 		// Set endpoints.
-		ctx = context.SetDirEndpoint(ctx, inprocess)
 		ctx = context.SetStoreEndpoint(ctx, inprocess)
+		ctx = context.SetDirEndpoint(ctx, inprocess)
 
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/gcp implementation

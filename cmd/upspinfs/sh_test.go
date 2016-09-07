@@ -36,8 +36,9 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 	ctx = context.SetUserName(ctx, upspin.UserName(name))
 	ctx = context.SetPacking(ctx, upspin.DebugPack)
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
-	ctx = context.SetDirEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)
+	ctx = context.SetDirEndpoint(ctx, endpoint)
+
 	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))
 	user := &upspin.User{
 		Name:      upspin.UserName(name),
@@ -46,6 +47,7 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 		PublicKey: publicKey,
 	}
 	err = ctx.KeyServer().Put(user)
+
 	return
 }
 
