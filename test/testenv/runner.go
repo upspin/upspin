@@ -223,12 +223,12 @@ func (r *Runner) GotEntries(wantBlockData bool, ps ...upspin.PathName) bool {
 	for i, want := range ps {
 		got := r.Entries[i].Name
 		if got != want {
-			r.lastErr = errors.Errorf("got entry %d = %q, want %q", i, got, want)
+			r.lastErr = errors.Errorf("got entry %d:\n\t%q\nwant:\n\t%q", i, got, want)
 			_, r.errFile, r.errLine, _ = runtime.Caller(1)
 			return false
 		}
 		nBlocks := len(r.Entries[i].Blocks)
-		if nBlocks > 0 == wantBlockData {
+		if nBlocks > 0 == wantBlockData || r.Entries[i].IsLink() {
 			continue
 		}
 		if wantBlockData {
