@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_ff84c742",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:07:50Z",
+      "side": 1,
+      "message": "should gather metrics for each of these calls store.Put",
+      "revId": "4fcb29edda562a0660b6ada68c8a8547acdaf5d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_1f21d361",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:07:50Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "4fcb29edda562a0660b6ada68c8a8547acdaf5d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
