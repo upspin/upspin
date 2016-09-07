@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_a62766d6",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "It gets closed automatically by the deferred m.Done() above.",
+      "parentUuid": "b6f54793_5a9b691d",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_ba7fedb3",
         "filename": "client/client.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "same here",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_862ceab9",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "same.",
+      "parentUuid": "b6f54793_ba7fedb3",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_c636e209",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_9aa5d154",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_3a5add54",
         "filename": "client/client.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "ss :\u003d s.StartSpan(\"lookup\")\ndefer ss.End()",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_2605361f",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_3a5add54",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_860a2a28",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_1a5f2145",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_da7479c8",
         "filename": "client/client.go",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "pass the metric in here",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_261a5679",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Having the outer one suffices for now. We can add more when we learn more. Let\u0027s not over instrument things yet until we know we need it.",
+      "parentUuid": "b6f54793_da7479c8",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_a62e4698",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Let\u0027s see if we need it. I\u0027m more interested in details for Get/Put right now and we have the top Glob number.",
+      "parentUuid": "b6f54793_3a43fd68",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_da4d998c",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "I\u0027d put the os.Exit in the end method, too.\nand maybe call the method \u0027exit\u0027",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_86334a04",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_da4d998c",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_e6283e8e",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_5a424961",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_ba56cd23",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "I\u0027d just name this \u0027startMetrics\u0027,\nand document that it\u0027s a no-op if it\u0027s not enabled.",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_463af2d2",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "The name is fine.",
+      "parentUuid": "b6f54793_ba56cd23",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_a653e610",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "fine as is.",
+      "parentUuid": "b6f54793_9a531134",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_7a32a518",
         "filename": "metric/gcpsaver.go",
         "patchSetId": 5
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "16cc53f8_06459a3d",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "It\u0027s not just the definition site that matters, but the call site. Processed could be confused with a boolean. I think the current name helps.",
+      "parentUuid": "b6f54793_7a32a518",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_9a183190",
         "filename": "metric/metric.go",
         "patchSetId": 5
@@ -217,6 +433,24 @@
       "writtenOn": "2016-09-07T00:53:32Z",
       "side": 1,
       "message": "why is this a global?\nand what is guarding it from being accessed concurrently?\nif i\u0027m reading the code correctly, metric.mu is for any metric\n\nwhat\u0027s it for anyway? why is there a global processed count that\u0027d different from the saver\u0027s?",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_066e3abd",
+        "filename": "metric/metric.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T23:55:08Z",
+      "side": 1,
+      "message": "So that we can check when the saver is done (when both counts are the same).\n\nIt\u0027s global because there\u0027s always only one saver and one metric per binary.",
+      "parentUuid": "b6f54793_9a183190",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
