@@ -16,6 +16,24 @@
       "revId": "eeecd9b9debe02c7122261d586d779e4fc350925",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16cc53f8_66dc4eda",
+        "filename": "metric/metric.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T23:30:49Z",
+      "side": 1,
+      "message": "It\u0027s your comment. I just moved it ;-)",
+      "parentUuid": "16cc53f8_864d0ac3",
+      "revId": "eeecd9b9debe02c7122261d586d779e4fc350925",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
