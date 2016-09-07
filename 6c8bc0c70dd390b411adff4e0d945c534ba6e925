@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_05b6a6f7",
+        "filename": "cmd/upspinfs/sh_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-07T07:09:02Z",
+      "side": 1,
+      "message": "I\u0027m confused about why ordering is important here.  You want to ensure that when DirServer is called that KeyEndpoint and StoreEndpoint are set.  However, ordering doesn\u0027t do that, not forgetting to set them does that. If you really want to ensure that, make setting any without setting dependent ones an error.  However, I think this is silly in both cases.",
+      "revId": "6c8bc0c70dd390b411adff4e0d945c534ba6e925",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
