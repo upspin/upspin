@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_3ac49d36",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "while I like the one liner here, I think it should be after the call to c.DirServer. While in most cases that should be instantaneous, we want to see when it is not.",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_3a9f7d56",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "just put ss.End once before the if statement",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_7a99056d",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_5ad369fe",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "just once, before the if",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_bab7edd4",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "just once, before the if",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_ba252d1d",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "If you start and end the lookup span at the top of this function, then you can remove the spans you have placed around the calls to the lookup method in other functions.",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_1a1721b6",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "I know this is asking you to do yet more in this cl, but I think this would work a lot better if you plumb the metric into the lookupFunc itself, and then the lookupFunc can use the name of the actual API call it is making.",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_3a12ddc5",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:25:46Z",
+      "side": 1,
+      "message": "just once, before the if",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
