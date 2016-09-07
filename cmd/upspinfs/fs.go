@@ -107,7 +107,7 @@ func newUpspinFS(context upspin.Context, mountpoint string) *upspinFS {
 	if len(homeDir) == 0 {
 		homeDir = "/etc"
 	}
-	f.cache = newCache(context, homeDir+"/upspin/cache")
+	f.cache = newCache(context, homeDir+"/upspin/fscache")
 	// Preallocate root node.
 	f.root = f.allocNode(nil, "", 0500|os.ModeDir, 0, time.Now())
 	return f
@@ -839,10 +839,14 @@ func do(ctx upspin.Context, mountpoint string) chan bool {
 		log.Debug.Fatal(err)
 	}
 
-	// Check if the mount process has an error to report
-	<-c.Ready
-	if err := c.MountError; err != nil {
-		log.Debug.Fatal(err)
+	// Check if the mount process has an error to report.  The timer is
+	// a hack that works with older versions of the OS X FUSE extension.
+	select {
+	case <-c.Ready:
+		if err := c.MountError; err != nil {
+			log.Debug.Fatal(err)
+		}
+	case <-time.After(500 * time.Millisecond):
 	}
 
 	// Serve in a go routine.
