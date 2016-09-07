@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6f54793_5a9b691d",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "will these spans be automatically ended when the outer span ends?\nor do you need to move the c.pack call out of the if statement and call ss.End before handling the error?",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_ba7fedb3",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_9aa5d154",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "delete this one",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_3a5add54",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "ss :\u003d s.StartSpan(\"lookup\")\ndefer ss.End()",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_1a5f2145",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "s/ s/ ss/",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_da7479c8",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "pass the metric in here",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_3a43fd68",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "wrap this with a span",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_da4d998c",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "I\u0027d put the os.Exit in the end method, too.\nand maybe call the method \u0027exit\u0027",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_5a424961",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "just put this in newState",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_ba56cd23",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "I\u0027d just name this \u0027startMetrics\u0027,\nand document that it\u0027s a no-op if it\u0027s not enabled.",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_9a531134",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "endMetrics",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_7a32a518",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "I\u0027d just name this Processed. it\u0027s obviously a number :)",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_9a183190",
+        "filename": "metric/metric.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-07T00:53:32Z",
+      "side": 1,
+      "message": "why is this a global?\nand what is guarding it from being accessed concurrently?\nif i\u0027m reading the code correctly, metric.mu is for any metric\n\nwhat\u0027s it for anyway? why is there a global processed count that\u0027d different from the saver\u0027s?",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
