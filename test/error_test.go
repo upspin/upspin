@@ -610,7 +610,6 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 		file       = dir + "/file"
 		baseAccess = base + "/Access"
 		dirAccess  = dir + "/Access"
-		content    = "hello, gophers"
 	)
 	r.As(ownerName)
 	r.MakeDirectory(base)
@@ -695,8 +694,63 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-// TODO
-func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {}
+func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base       = ownerName + "/whichaccesslink-errors"
+		link       = base + "/link"
+		linkTarget = "user@example.org/path"
+		access     = base + "/Access"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.PutLink(linkTarget, link)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// The owner should see the link with no access file present.
+	r.DirWhichAccess(link)
+	if !r.Match(upspin.ErrFollowLink) {
+		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
+	}
+
+	// A reader with no rights should get 'not exist'.
+	r.As(readerName)
+	r.DirWhichAccess(link)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put an access file in the root;
+	// the owner should now be able to see the link.
+	r.As(ownerName)
+	r.Put(access, "*:"+ownerName)
+	r.DirWhichAccess(link)
+	if !r.Match(upspin.ErrFollowLink) {
+		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
+	}
+
+	// The reader should still get not exist.
+	r.As(readerName)
+	r.DirWhichAccess(link)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put the reader into (and take the owner out of) the access file.
+	// The owner should still see the link and now the reader can also.
+	r.As(ownerName)
+	r.Put(access, "*:"+readerName)
+	r.DirWhichAccess(link)
+	if !r.Match(upspin.ErrFollowLink) {
+		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
+	}
+	r.As(readerName)
+	r.DirWhichAccess(link)
+	if !r.Match(upspin.ErrFollowLink) {
+		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
+	}
+}
 
 func testGlobErrors(t *testing.T, r *testenv.Runner) {
 	const (
