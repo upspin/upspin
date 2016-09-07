@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b6f54793_7ac8e517",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_3ac49d36",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_3a9f7d56",
         "filename": "client/client.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-07T00:25:46Z",
       "side": 1,
       "message": "just put ss.End once before the if statement",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_5acd2926",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_3a9f7d56",
       "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "b6f54793_bad1adc6",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_7a99056d",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_5ad369fe",
         "filename": "client/client.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-07T00:25:46Z",
       "side": 1,
       "message": "just once, before the if",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_9ace7120",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_5ad369fe",
       "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "b6f54793_fadb35e0",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_bab7edd4",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_ba252d1d",
         "filename": "client/client.go",
         "patchSetId": 4
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-07T00:25:46Z",
       "side": 1,
       "message": "If you start and end the lookup span at the top of this function, then you can remove the spans you have placed around the calls to the lookup method in other functions.",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_dad8f9e6",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_ba252d1d",
       "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "b6f54793_3ae77da9",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_1a1721b6",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_3a12ddc5",
         "filename": "client/client.go",
         "patchSetId": 4
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-07T00:25:46Z",
       "side": 1,
       "message": "just once, before the if",
+      "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f54793_1aec4188",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-07T00:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6f54793_3a12ddc5",
       "revId": "114b6219bebf6e5170a89828ed97ea2a4593851e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
