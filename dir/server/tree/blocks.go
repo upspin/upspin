@@ -7,6 +7,7 @@ package tree
 // This file implements block reading and writing.
 
 import (
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -21,7 +22,10 @@ const blockSize = 1024 * 1024 // 1MB
 func (t *Tree) store(n *node) error {
 
 	// Get our store server.
-	storeServer := t.context.StoreServer()
+	storeServer, err := bind.StoreServer(t.context, t.context.StoreEndpoint())
+	if err != nil {
+		return err
+	}
 
 	// Use our preferred packing
 	packer := t.packer
