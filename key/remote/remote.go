@@ -12,6 +12,7 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/key/usercache"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -118,5 +119,5 @@ const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
-	bind.RegisterKeyServer(transport, r)
+	bind.RegisterKeyServer(transport, usercache.Global(r))
 }

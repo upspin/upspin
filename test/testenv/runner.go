@@ -68,7 +68,7 @@ func (r *Runner) AddUser(ctx upspin.Context) {
 	if r.err != nil {
 		return
 	}
-	r.clients[ctx.UserName()] = client.NewWithoutCache(ctx)
+	r.clients[ctx.UserName()] = client.New(ctx)
 }
 
 // As instructs the Runner to perform subsequent actions as the specified user.
