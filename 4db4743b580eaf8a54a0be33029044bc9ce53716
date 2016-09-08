@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "cb0212f7_9c7365db",
+        "filename": "dir/unassigned/unassigned.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "see the CL description.\nI don\u0027t see any compelling reason to rename the file.\nThat\u0027s just more churn (and we lose history)",
+      "parentUuid": "b69387d9_448bdf52",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_846c079d",
         "filename": "key/unassigned/unassigned.go",
         "patchSetId": 7
@@ -155,6 +173,24 @@
     },
     {
       "key": {
+        "uuid": "cb0212f7_7c40995b",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "Golint isn\u0027t perfect, and its author doesn\u0027t think you should strive ofr a lint-clean codebase. Adding obvious comments for no reason is just noise.\n\nIf you insist, I\u0027ll add them here, but I\u0027ll also file a bug against golint.",
+      "parentUuid": "b69387d9_848fa72b",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_a48ca337",
         "filename": "test/servermux/mux.go",
         "patchSetId": 7
@@ -200,6 +236,24 @@
       "writtenOn": "2016-09-08T21:58:35Z",
       "side": 1,
       "message": "Will this be used?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_5c45dd69",
+        "filename": "valid/valid.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "yes?",
+      "parentUuid": "b69387d9_44103f09",
       "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
