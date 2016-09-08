@@ -7,10 +7,13 @@
 package testenv
 
 import (
+	"crypto/rand"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -75,6 +78,35 @@ type Env struct {
 	exitCalled bool
 }
 
+var (
+	keyServerMux   *testfixtures.DialMux
+	storeServerMux *testfixtures.DialMux
+	dirServerMux   *testfixtures.DialMux
+)
+
+func init() {
+	var key upspin.KeyServer
+	keyServerMux, key = testfixtures.NewKeyServerMux()
+	bind.RegisterKeyServer(upspin.InProcess, key)
+
+	var store upspin.StoreServer
+	storeServerMux, store = testfixtures.NewStoreServerMux()
+	bind.RegisterStoreServer(upspin.InProcess, store)
+
+	var dir upspin.DirServer
+	dirServerMux, dir = testfixtures.NewDirServerMux()
+	bind.RegisterDirServer(upspin.InProcess, dir)
+}
+
+func randomEndpoint(prefix string) upspin.Endpoint {
+	b := make([]byte, 64)
+	rand.Read(b)
+	return upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   upspin.NetAddr(fmt.Sprintf("%s-%x", prefix, b)),
+	}
+}
+
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
 	const op = "testenv.New"
@@ -84,13 +116,10 @@ func New(setup *Setup) (*Env, error) {
 	ctx := context.New()
 
 	// All tests use an in-process key server.
-	inprocess := upspin.Endpoint{Transport: upspin.InProcess}
-	ctx = context.SetKeyEndpoint(ctx, inprocess)
+	keyEndpoint := randomEndpoint("key")
+	ctx = context.SetKeyEndpoint(ctx, keyEndpoint)
 	env.keyServer = keyserver.New()
-	ctx = testfixtures.ServiceContext{
-		Context: ctx,
-		Key:     env.keyServer,
-	}
+	keyServerMux.Register(keyEndpoint, env.keyServer)
 
 	switch k := setup.Kind; k {
 	case "inprocess", "server":
@@ -98,17 +127,16 @@ func New(setup *Setup) (*Env, error) {
 		// entire in-memory and offline.
 
 		// Set endpoints.
-		ctx = context.SetStoreEndpoint(ctx, inprocess)
-		ctx = context.SetDirEndpoint(ctx, inprocess)
+		storeEndpoint := randomEndpoint("store")
+		ctx = context.SetStoreEndpoint(ctx, storeEndpoint)
+		dirEndpoint := randomEndpoint("dir")
+		ctx = context.SetDirEndpoint(ctx, dirEndpoint)
 
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/gcp implementation
 		// isn't interesting when run offline.
 		env.storeServer = storeserver.New()
-		ctx = testfixtures.ServiceContext{
-			Context: ctx,
-			Store:   env.storeServer,
-		}
+		storeServerMux.Register(storeEndpoint, env.storeServer)
 
 		// Set up DirServer instance.
 		switch k {
@@ -135,10 +163,7 @@ func New(setup *Setup) (*Env, error) {
 				return nil, errors.E(op, err)
 			}
 		}
-		ctx = testfixtures.ServiceContext{
-			Context: ctx,
-			Dir:     env.dirServer,
-		}
+		dirServerMux.Register(dirEndpoint, env.dirServer)
 
 	case "remote":
 		ctx = context.SetStoreEndpoint(ctx, upspin.Endpoint{
@@ -241,15 +266,6 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	}
 	ctx = context.SetFactotum(ctx, f)
 
-	// Re-wrap this context with the test services,
-	// so that the wrapped services see the new user.
-	ctx = testfixtures.ServiceContext{
-		Context: ctx,
-		Key:     e.keyServer,
-		Store:   e.storeServer,
-		Dir:     e.dirServer,
-	}
-
 	// Register the user with the key server.
 	err = registerUserWithKeyServer(ctx, ctx.UserName())
 	if err != nil {
@@ -261,7 +277,10 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 
 // registerUserWithKeyServer registers userName's context with the inProcess keyServer.
 func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) error {
-	key := ctx.KeyServer()
+	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		return err
+	}
 	// Install the registered user.
 	user := &upspin.User{
 		Name:      userName,
@@ -277,8 +296,11 @@ func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) err
 
 func makeRootIfNotExist(ctx upspin.Context) error {
 	path := upspin.PathName(ctx.UserName()) + "/"
-	dir := ctx.DirServer(path)
-	_, err := dir.MakeDirectory(path)
+	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
+	if err != nil {
+		return err
+	}
+	_, err = dir.MakeDirectory(path)
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
 		return err
 	}

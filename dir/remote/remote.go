@@ -7,6 +7,8 @@
 package remote
 
 import (
+	"log"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
@@ -163,6 +165,7 @@ func (r *remote) Configure(options ...string) (upspin.UserName, error) {
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/remote.Dial"
+	log.Println(op, context.UserName())
 	if e.Transport != upspin.Remote {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}

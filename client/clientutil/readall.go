@@ -7,6 +7,7 @@
 package clientutil
 
 import (
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/upspin"
@@ -65,7 +66,7 @@ Blocks:
 		where := []upspin.Location{block.Location}
 		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 			loc := where[i]
-			store, err := ctx.StoreServerFor(loc.Endpoint)
+			store, err := bind.StoreServer(ctx, loc.Endpoint)
 			if isError(err) {
 				continue
 			}
