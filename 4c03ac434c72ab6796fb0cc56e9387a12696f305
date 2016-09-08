@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0212f7_5cfddd54",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-08T08:02:22Z",
+      "side": 1,
+      "message": "not sure what multi-request means but i think you can drop it anyway.",
+      "revId": "4c03ac434c72ab6796fb0cc56e9387a12696f305",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
