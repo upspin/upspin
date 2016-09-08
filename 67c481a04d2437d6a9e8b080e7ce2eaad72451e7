@@ -22,6 +22,24 @@
       "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_5cbb9d7a",
+        "filename": "key/usercache/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T21:52:47Z",
+      "side": 1,
+      "message": "https://upspin-review.googlesource.com/c/5042/",
+      "parentUuid": "b69387d9_44e75f03",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
