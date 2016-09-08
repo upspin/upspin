@@ -9,7 +9,6 @@ package testenv
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"upspin.io/client"
 	"upspin.io/context"
@@ -117,7 +116,7 @@ func New(setup *Setup) (*Env, error) {
 		case "server":
 			// Set up user and factotum.
 			ctx = context.SetUserName(ctx, "upspin-test@google.com")
-			f, err := factotum.New(repo("key/testdata/upspin-test"))
+			f, err := factotum.New(factotum.NewTestKeyStore("upspin-test"))
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
@@ -235,7 +234,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	f, err := factotum.New(repo("key/testdata/" + string(user)))
+	f, err := factotum.New(factotum.NewTestKeyStore(string(user)))
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
@@ -283,13 +282,4 @@ func makeRootIfNotExist(ctx upspin.Context) error {
 		return err
 	}
 	return nil
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("test/testenv: no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

@@ -9,8 +9,6 @@ import (
 	"flag"
 	"net"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -122,7 +120,7 @@ func setupTestUser(key upspin.KeyServer) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := factotum.New(repo("key/testdata/" + user))
+	f, err := factotum.New(factotum.NewTestKeyStore(user))
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %q: %v", user, err)
 	}
@@ -134,14 +132,4 @@ func setupTestUser(key upspin.KeyServer) {
 	if err != nil {
 		log.Fatalf("Put %q failed: %v", *testUser, err)
 	}
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-// For support of the testuser flag only.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

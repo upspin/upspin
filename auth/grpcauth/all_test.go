@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
 	"testing"
 
 	gContext "golang.org/x/net/context"
@@ -141,7 +140,7 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 }
 
 func startClient(port string) {
-	f, err := factotum.New(repo("key/testdata/joe"))
+	f, err := factotum.New(factotum.NewTestKeyStore("joe"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -218,13 +217,4 @@ func TestMain(m *testing.M) {
 	// Report test results.
 	log.Printf("Finishing e2e tests: %d", code)
 	os.Exit(code)
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

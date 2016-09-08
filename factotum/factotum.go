@@ -23,6 +23,25 @@ import (
 	"upspin.io/upspin"
 )
 
+// KeyStore is used by Factotum to retrieve user keys.
+type KeyStore interface {
+	// Public returns an unprocessed public key.
+	Public() ([]byte, error)
+
+	// Private returns an unprocessed private key.
+	Private() ([]byte, error)
+
+	// Archived returns previously-used, unprocessed keys.
+	Archived() ([]byte, error)
+}
+
+// keyStore implements KeyStore for reading keys from files.
+// It reads Private from file secret.upspinkey; Public from public.upspinkey and
+// Archived from secret2.upspinkey.
+type keyStore struct {
+	dir string
+}
+
 type factotumKey struct {
 	keyHash      []byte
 	public       upspin.PublicKey
@@ -49,19 +68,35 @@ func KeyHash(p upspin.PublicKey) []byte {
 	return keyHash[:]
 }
 
+// NewKeyStore returns a key store that reads keys from a given directory.
+func NewKeyStore(dir string) KeyStore {
+	return &keyStore{
+		dir: dir,
+	}
+}
+
+// NewTestKeyStore returns a local pathname of a key file name in the upspin
+// repository under directory key/testdata.
+func NewTestKeyStore(name string) KeyStore {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("factotum/NewTestKeyStore: no GOPATH")
+	}
+	return NewKeyStore(filepath.Join(gopath, filepath.Join("src/upspin.io/key/testdata", name)))
+}
+
 // New returns a new Factotum providing all needed private key operations,
-// loading keys from dir/*.upspinkey.
+// loading keys from the KeyStore.
 // Our desired end state is that Factotum is implemented on each platform by the
 // best local means of protecting private keys.  Please do not break the abstraction
 // by hand coding direct generation or use of private keys.
-func New(dir string) (upspin.Factotum, error) {
-	op := "NewFactotum"
-	privBytes, err := readFile(op, dir, "secret.upspinkey")
+func New(keyStore KeyStore) (upspin.Factotum, error) {
+	privBytes, err := keyStore.Private()
 	if err != nil {
 		return nil, err
 	}
 	privBytes = stripCR(privBytes)
-	pubBytes, err := readFile(op, dir, "public.upspinkey")
+	pubBytes, err := keyStore.Public()
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +121,14 @@ func New(dir string) (upspin.Factotum, error) {
 	// then old secret.upspinkey, and repeat.  This should be cleaned up someday
 	// when we have a better idea of what other kinds of keys we need to save.
 	// For now, it is cavalier about bailing out at first little mistake.
-	s2, err := readFile(op, dir, "secret2.upspinkey")
+	s2, err := keyStore.Archived()
 	if err != nil {
-		return f, nil
+		if errors.Match(errors.E(errors.NotExist), err) {
+			// Intentionally returning non-error, since Archived
+			// keys are optional.
+			return f, nil
+		}
+		return nil, err
 	}
 	s2 = stripCR(s2)
 	lines := strings.Split(string(s2), "\n")
@@ -270,4 +310,22 @@ func readFile(op, dir, name string) ([]byte, error) {
 		return nil, errors.E(op, errors.IO, err)
 	}
 	return b, nil
+}
+
+// Public implements KeyStore.
+func (k *keyStore) Public() ([]byte, error) {
+	const op = "factotum/keyStore.Public"
+	return readFile(op, k.dir, "public.upspinkey")
+}
+
+// Private implements KeyStore.
+func (k *keyStore) Private() ([]byte, error) {
+	const op = "factotum/keyStore.Private"
+	return readFile(op, k.dir, "secret.upspinkey")
+}
+
+// Archived implements KeyStore.
+func (k *keyStore) Archived() ([]byte, error) {
+	const op = "factotum/keyStore.Archived"
+	return readFile(op, k.dir, "secret2.upspinkey")
 }

@@ -10,7 +10,6 @@ package server
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"upspin.io/access"
@@ -750,7 +749,7 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 var generatorInstance upspin.DirServer
 
 func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
-	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
+	factotum, err := factotum.New(factotum.NewTestKeyStore("upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -817,13 +816,4 @@ func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location
 		Endpoint:  store.Endpoint(),
 		Reference: ref,
 	}
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
