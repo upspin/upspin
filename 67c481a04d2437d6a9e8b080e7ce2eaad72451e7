@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cb0212f7_5c5efd47",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "I\u0027ve separated the renamed dependencies from the unnamed ones throughout.\nWhen there are a few, they sort oddly if intermingled.",
+      "parentUuid": "b69387d9_e716adb7",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_c711b1c2",
         "filename": "client/clientutil/all_test.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-08T21:58:35Z",
       "side": 1,
       "message": "suggest moving to bottom",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_3c633114",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "This should be right next to the import statement, because it\u0027s the only time the import is used. It\u0027s important to signal up front that we have imported the inprocess keyserver and are registering it as the inprocess service.",
+      "parentUuid": "b69387d9_c711b1c2",
       "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "cb0212f7_1c6875ec",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "see my rationale from the earlier file",
+      "parentUuid": "b69387d9_27217510",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_67237d17",
         "filename": "dir/server/all_test.go",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-08T21:58:35Z",
       "side": 1,
       "message": "move to bottom?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_fc6ca902",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "b69387d9_67237d17",
       "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -122,6 +194,24 @@
       "writtenOn": "2016-09-08T21:58:35Z",
       "side": 1,
       "message": "one block above?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_dc69edf0",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:08:14Z",
+      "side": 1,
+      "message": "It looks really gross.",
+      "parentUuid": "b69387d9_67b0dde4",
       "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
