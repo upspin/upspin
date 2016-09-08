@@ -15,7 +15,6 @@ import (
 	"upspin.io/client/clientutil"
 	"upspin.io/client/file"
 	"upspin.io/errors"
-	"upspin.io/key/usercache"
 	"upspin.io/metric"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -40,17 +39,7 @@ const (
 
 // New creates a Client that uses the given Context to
 // access the various Upspin servers.
-// It uses a global user cache to reduce round trip times.
 func New(context upspin.Context) upspin.Client {
-	return &Client{
-		context: usercache.Global(context),
-	}
-}
-
-// NewWithoutCache creates a Client that uses the given Context to
-// access the various Upspin servers.
-// It does no caching, and should be used only by tests.
-func NewWithoutCache(context upspin.Context) upspin.Client {
 	return &Client{context: context}
 }
 
