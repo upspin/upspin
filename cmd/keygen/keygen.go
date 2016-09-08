@@ -62,7 +62,7 @@ func createKeys() {
 	}
 	err = private.Chmod(0600)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%s\n\nWARNING!  Unable to read-protect %s.  Fix the permissions manually.\n\n\n", err, private.Name())
 	}
 	public, err := os.Create(filepath.Join(keydir(), "public.upspinkey"))
 	if err != nil {
@@ -105,7 +105,7 @@ func saveKeys() {
 	archive, err := os.OpenFile(filepath.Join(keydir(), "secret2.upspinkey"),
 		os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
-		log.Fatal(err) // We don't have permission to archive old keys?
+		fmt.Fprintf(os.Stderr, "%s\n\nWARNING!  Unable to read-protect %s.  Fix the permissions manually.\n\n\n", err, archive.Name())
 	}
 	_, err = archive.Write([]byte("# EE \n")) // TODO(ehg) add file date
 	if err != nil {
