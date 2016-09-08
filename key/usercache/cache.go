@@ -7,9 +7,12 @@
 // context's KeyServer.
 package usercache
 
+// TODO(adg): this is currently broken. fix it.
+
 import (
 	"time"
 
+	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -82,7 +85,11 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	}
 
 	// Not found, look it up.
-	u, err := c.Context.KeyServer().Lookup(name)
+	key, err := bind.KeyServer(c.Context, c.Context.KeyEndpoint())
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	u, err := key.Lookup(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

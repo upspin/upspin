@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"upspin.io/errors"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -75,7 +76,7 @@ type dialCache map[dialKey]*dialedService
 var (
 	mu sync.Mutex // Guards the variables below.
 
-	userMap      = make(map[upspin.Transport]upspin.KeyServer)
+	keyMap       = make(map[upspin.Transport]upspin.KeyServer)
 	directoryMap = make(map[upspin.Transport]upspin.DirServer)
 	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
 
@@ -92,15 +93,15 @@ const allowOverwrite = true // for documentation purposes
 
 // RegisterKeyServer registers a KeyServer interface for the transport.
 // There must be no previous registration.
-func RegisterKeyServer(transport upspin.Transport, user upspin.KeyServer) error {
+func RegisterKeyServer(transport upspin.Transport, key upspin.KeyServer) error {
 	const op = "bind.RegisterKeyServer"
 	mu.Lock()
 	defer mu.Unlock()
-	_, ok := userMap[transport]
+	_, ok := keyMap[transport]
 	if ok {
 		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
 	}
-	userMap[transport] = user
+	keyMap[transport] = key
 	return nil
 }
 
@@ -136,7 +137,7 @@ func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) e
 func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
 	const op = "bind.KeyServer"
 	mu.Lock()
-	u, ok := userMap[e.Transport]
+	u, ok := keyMap[e.Transport]
 	mu.Unlock()
 	if !ok {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
@@ -178,6 +179,47 @@ func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
 		return nil, err
 	}
 	return x.(upspin.DirServer), nil
+}
+
+// DirServer returns a DirServer interface bound to the endpoint that serves the given name.
+func DirServerFor(cc upspin.Context, name upspin.PathName) (upspin.DirServer, error) {
+	const op = "bind.DirServerFor"
+	if len(name) == 0 {
+		// If name is empty just return the directory at ctx.DirEndpoint().
+		d, err := DirServer(cc, cc.DirEndpoint())
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		return d, nil
+	}
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	var endpoints []upspin.Endpoint
+	if parsed.User() == cc.UserName() {
+		endpoints = append(endpoints, cc.DirEndpoint())
+	}
+	key, err := KeyServer(cc, cc.KeyEndpoint())
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	u, err := key.Lookup(parsed.User())
+	if err == nil {
+		endpoints = append(endpoints, u.Dirs...)
+	}
+	var firstErr error
+	for _, e := range endpoints {
+		d, err := DirServer(cc, e)
+		if err == nil {
+			return d, nil
+		}
+		if firstErr == nil {
+			firstErr = err
+		}
+	}
+	return nil, errors.E(op, err)
+
 }
 
 // Release closes the service and releases all resources associated with it.

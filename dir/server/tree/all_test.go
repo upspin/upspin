@@ -12,16 +12,23 @@ import (
 	"reflect"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/ee"
-	_ "upspin.io/store/inprocess"
+
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
 )
+
+func init() {
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+}
 
 const (
 	userName   = "user@domain.com"
@@ -699,7 +706,10 @@ func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
 	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
 	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
 	ctx = context.SetPacking(ctx, upspin.EEPack)
-	key := ctx.KeyServer()
+	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
 		Name:      serverName,

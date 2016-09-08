@@ -19,9 +19,14 @@ import (
 	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/plain"
+
+	keyserver "upspin.io/key/inprocess"
 )
+
+func init() {
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+}
 
 const (
 	userName = "bob@smith.com"
@@ -104,7 +109,11 @@ func setupTestContext(t *testing.T) upspin.Context {
 		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: f.PublicKey(),
 	}
-	err = ctx.KeyServer().Put(user)
+	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = key.Put(user)
 	if err != nil {
 		t.Fatal(err)
 	}

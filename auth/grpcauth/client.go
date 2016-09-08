@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -305,7 +306,11 @@ func (ac *AuthClientService) CacheConfigure(ctx upspin.Context, e upspin.Endpoin
 	}
 
 	// Get user's public keys.
-	u, err := ctx.KeyServer().Lookup(upspin.UserName(resp.UserName))
+	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	u, err := keyServer.Lookup(upspin.UserName(resp.UserName))
 	if err != nil {
 		return "", errors.E(op, err)
 	}

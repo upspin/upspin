@@ -13,13 +13,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/pack"
-	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -35,22 +33,6 @@ func (base) KeyEndpoint() upspin.Endpoint        { return ep0 }
 func (base) DirEndpoint() upspin.Endpoint        { return ep0 }
 func (base) StoreEndpoint() upspin.Endpoint      { return ep0 }
 func (base) StoreCacheEndpoint() upspin.Endpoint { return ep0 }
-
-func (ctx base) KeyServer() upspin.KeyServer {
-	return keyServer(ctx)
-}
-
-func (ctx base) StoreServer() upspin.StoreServer {
-	return storeServer(ctx)
-}
-
-func (ctx base) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
-	return storeServerFor(ctx, ep)
-}
-
-func (ctx base) DirServer(name upspin.PathName) upspin.DirServer {
-	return dirServer(ctx, name)
-}
 
 // New returns a context with all fields set as defaults.
 func New() upspin.Context {
@@ -314,10 +296,6 @@ func (ctx ctxKeyEndpoint) KeyEndpoint() upspin.Endpoint {
 	return ctx.keyEndpoint
 }
 
-func (ctx ctxKeyEndpoint) KeyServer() upspin.KeyServer {
-	return keyServer(ctx)
-}
-
 // SetKeyEndpoint returns a context derived from the given context
 // with the given key endpoint.
 func SetKeyEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
@@ -334,14 +312,6 @@ type ctxStoreEndpoint struct {
 
 func (ctx ctxStoreEndpoint) StoreEndpoint() upspin.Endpoint {
 	return ctx.storeEndpoint
-}
-
-func (ctx ctxStoreEndpoint) StoreServer() upspin.StoreServer {
-	return storeServer(ctx)
-}
-
-func (ctx ctxStoreEndpoint) StoreServerFor(ep upspin.Endpoint) (upspin.StoreServer, error) {
-	return storeServerFor(ctx, ep)
 }
 
 // SetStoreEndpoint returns a context derived from the given context
@@ -380,10 +350,6 @@ func (ctx ctxDirEndpoint) DirEndpoint() upspin.Endpoint {
 	return ctx.dirEndpoint
 }
 
-func (ctx ctxDirEndpoint) DirServer(name upspin.PathName) upspin.DirServer {
-	return dirServer(ctx, name)
-}
-
 // SetDirEndpoint returns a context derived from the given context
 // with the given dir endpoint.
 func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
@@ -391,57 +357,6 @@ func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
 		Context:     ctx,
 		dirEndpoint: e,
 	}
-}
-
-func keyServer(ctx upspin.Context) upspin.KeyServer {
-	u, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-	if err != nil {
-		u, _ = bind.KeyServer(ctx, ep0)
-	}
-	return u
-}
-
-func dirServer(ctx upspin.Context, name upspin.PathName) upspin.DirServer {
-	if len(name) == 0 {
-		// If name is empty, just return the directory at ctx.DirEndpoint().
-		d, err := bind.DirServer(ctx, ctx.DirEndpoint())
-		if err != nil {
-			d, _ = bind.DirServer(ctx, ep0)
-		}
-		return d
-	}
-	parsed, err := path.Parse(name)
-	if err != nil {
-		d, _ := bind.DirServer(ctx, ep0)
-		return d
-	}
-	var endpoints []upspin.Endpoint
-	if parsed.User() == ctx.UserName() {
-		endpoints = append(endpoints, ctx.DirEndpoint())
-	}
-	if u, err := ctx.KeyServer().Lookup(parsed.User()); err == nil {
-		endpoints = append(endpoints, u.Dirs...)
-	}
-	for _, e := range endpoints {
-		d, _ := bind.DirServer(ctx, e)
-		if d != nil {
-			return d
-		}
-	}
-	d, _ := bind.DirServer(ctx, ep0)
-	return d
-}
-
-func storeServer(ctx upspin.Context) upspin.StoreServer {
-	u, err := bind.StoreServer(ctx, ctx.StoreEndpoint())
-	if err != nil {
-		u, _ = bind.StoreServer(ctx, ep0)
-	}
-	return u
-}
-
-func storeServerFor(ctx upspin.Context, ep upspin.Endpoint) (upspin.StoreServer, error) {
-	return bind.StoreServer(ctx, ep)
 }
 
 func homedir() (string, error) {
