@@ -567,7 +567,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	// Check whether the user has Any right on p.
 	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
 	if err == upspin.ErrFollowLink {
-		return link, err
+		return s.errLink(op, link, o)
 	}
 	if err != nil {
 		// TODO: this could leak the existence of name. But the attacker

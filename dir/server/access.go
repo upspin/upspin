@@ -35,19 +35,9 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 		}
 		entry, _, err := tree.Lookup(accPath)
 		if err == upspin.ErrFollowLink {
-			// If we got ErrFollowLink in the first iteration of the
-			// look, it's because we're trying to look up a link,
-			// say ".../link/Access". In this case, we need to go
-			// one level up since the access file for the link
-			// in an ancestor of the path.
-			if entry.Name != p.Path() {
-				// The link is not what we're looking up.
-				return entry, upspin.ErrFollowLink
-			}
-			// Drop and continue (it's safe to drop because roots
-			// are never links, so we're definitely not at the root.
-			p = p.Drop(1)
-			continue
+			// WhichAccess(link) always returns the link
+			// and ErrFollowLink.
+			return entry, err
 		}
 		if errors.Match(errNotExist, err) {
 			if p.IsRoot() {
@@ -107,7 +97,13 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 
 	entry, err := s.whichAccess(p, o)
 	if err == upspin.ErrFollowLink {
-		return false, entry, err
+		// If we need to follow a link to get to p
+		// return that link.
+		if entry.Name != p.Path() {
+			return false, entry, err
+		}
+		// If p is the link then find the Access file for p.
+		entry, err = s.whichAccess(p.Drop(1), o)
 	}
 	if err != nil {
 		return false, nil, err
