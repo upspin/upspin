@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b69387d9_b0d21e24",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T20:44:07Z",
+      "side": 1,
+      "message": "Why not log.Error.Printf(...)?\n\nIf you don\u0027t like that, maybe fmt.Fprintf(os.Stderr, ...) would be good too.",
+      "revId": "039fb6c84d9f5bb70f78a7a12800115a0c28c1ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
