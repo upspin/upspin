@@ -169,10 +169,10 @@ func TestEndpoint(t *testing.T) {
 		t.Fatal("no error for bad transport")
 	}
 	restore()
-	// One last check for network address for inprocess.
-	endpoint.Transport = upspin.InProcess
+	// One last check for network address for unassigned.
+	endpoint.Transport = upspin.Unassigned
 	if err := Endpoint(endpoint); err == nil {
-		t.Fatal("no error for network address with InProcess transport")
+		t.Fatal("no error for network address with Unassigned transport")
 	}
 }
 

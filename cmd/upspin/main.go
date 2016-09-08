@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/factotum"
@@ -650,9 +651,17 @@ func newState() *State {
 }
 
 func (s *State) DirServer() upspin.DirServer {
-	return s.context.DirServer("")
+	dir, err := bind.DirServer(s.context, s.context.DirEndpoint())
+	if err != nil {
+		s.exit(err)
+	}
+	return dir
 }
 
 func (s *State) KeyServer() upspin.KeyServer {
-	return s.context.KeyServer()
+	key, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
+	if err != nil {
+		s.exit(err)
+	}
+	return key
 }

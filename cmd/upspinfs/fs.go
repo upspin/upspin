@@ -19,6 +19,7 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -159,8 +160,8 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 }
 
 // dirLookup returns a bound directory for user 'name'.
-func (f *upspinFS) dirLookup(name upspin.UserName) upspin.DirServer {
-	return f.context.DirServer(upspin.PathName(name))
+func (f *upspinFS) dirLookup(name upspin.UserName) (upspin.DirServer, error) {
+	return bind.DirServerFor(f.context, upspin.PathName(name))
 }
 
 var handleID int
@@ -260,7 +261,10 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
-	dir := n.f.dirLookup(nn.user)
+	dir, err := n.f.dirLookup(nn.user)
+	if err != nil {
+		return nil, e2e(errors.E(op, err))
+	}
 	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
 		// TODO: implement links.
 		// TODO(p): remove from directory cache and retry?
@@ -303,7 +307,10 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 		n.de = de
 		return h, nil
 	}
-	dir := n.f.dirLookup(n.user)
+	dir, err := n.f.dirLookup(n.user)
+	if err != nil {
+		return nil, e2e(errors.E(op, err))
+	}
 	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
 	log.Debug.Printf("Glob returned %s", err)
@@ -348,7 +355,10 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 	if n.t == rootNode {
 		user = upspin.UserName(uname)
 	}
-	dir := f.dirLookup(user)
+	dir, err := n.f.dirLookup(user)
+	if err != nil {
+		return nil, nil, err
+	}
 	de, err := dir.Lookup(uname)
 	if err != nil {
 		// TODO: implement links.
@@ -365,7 +375,10 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 		}
 		// Any other error may imply that our directory connection is
 		// stale.  Forget the cached value and try again.
-		dir = f.dirLookup(user)
+		dir, err = n.f.dirLookup(user)
+		if err != nil {
+			return nil, nil, err
+		}
 		de, err = dir.Lookup(uname)
 		if err != nil {
 			// TODO: implement links.

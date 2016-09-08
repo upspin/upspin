@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/upspin"
@@ -73,7 +74,11 @@ func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) (up
 	const op = "auth.PublicUserKeyService"
 	ctx = usercache.Global(ctx)
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
-		u, err := ctx.KeyServer().Lookup(userName)
+		key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+		if err != nil {
+			return "", errors.E(op, err)
+		}
+		u, err := key.Lookup(userName)
 		if err != nil {
 			return "", errors.E(op, err)
 		}
