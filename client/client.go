@@ -410,7 +410,11 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		for _, pattern := range this {
 			files, links, err := c.globOnePattern(pattern)
 			if err != nil {
-				return nil, err
+				first := len(this) == 1 && len(next) == 0
+				if first || !benignGlobError(err) {
+					return nil, err
+				}
+				continue
 			}
 			results = append(results, files...)
 			if len(links) == 0 {
@@ -447,6 +451,14 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	results = upspin.SortDirEntries(results, true)
 	return results, nil
+}
+
+// benignGlobError reports whether the provided error can be
+// safely ignored as part of a multi-request glob operation.
+func benignGlobError(err error) bool {
+	return errors.Match(errors.E(errors.NotExist), err) ||
+		errors.Match(errors.E(errors.Permission), err)
+
 }
 
 func (c *Client) globOnePattern(pattern string) (entries, links []*upspin.DirEntry, err error) {
