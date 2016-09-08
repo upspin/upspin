@@ -309,11 +309,14 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	}
 }
 
-var integrationTestKinds = []string{"inprocess", "server"}
+var integrationTestKinds = []string{"inprocess", "server", "remote"}
 
 func TestIntegration(t *testing.T) {
 	for _, kind := range integrationTestKinds {
 		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
+			if testing.Short() && kind == "remote" {
+				t.Skip("skipping network-based tests while -test.short specified")
+			}
 			setup := setupTemplate
 			setup.Kind = kind
 			for _, p := range []struct {
