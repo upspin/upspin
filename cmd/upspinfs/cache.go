@@ -18,6 +18,7 @@ import (
 	"bazil.org/fuse"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client"
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
@@ -110,7 +111,10 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 
 	// At this point we may have the reference cached but we first need to look in
 	// the directory to see what the reference is.
-	dir := n.f.dirLookup(n.user)
+	dir, err := n.f.dirLookup(n.user)
+	if err != nil {
+		return err
+	}
 	entry, err := dir.Lookup(name)
 	if err != nil {
 		// TODO: implement links.
@@ -183,7 +187,7 @@ Blocks:
 		where := []upspin.Location{block.Location}
 		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 			loc := where[i]
-			store, err := n.f.context.StoreServerFor(loc.Endpoint)
+			store, err := bind.StoreServer(n.f.context, loc.Endpoint)
 			if isError(err) {
 				continue
 			}

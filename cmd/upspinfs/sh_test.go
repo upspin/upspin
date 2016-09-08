@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/upspin"
 )
@@ -46,8 +47,11 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: publicKey,
 	}
-	err = ctx.KeyServer().Put(user)
-
+	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		return nil, err
+	}
+	err = key.Put(user)
 	return
 }
 
