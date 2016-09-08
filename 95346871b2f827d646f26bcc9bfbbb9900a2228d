@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b69387d9_bb33e703",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:38:46Z",
+      "side": 1,
+      "message": "cleanup is probably a better name, and it should be in the exitf function too",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_fb148f4f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:38:46Z",
+      "side": 1,
+      "message": "you should have some kind of timeout here, otherwise this can block forever if something has gone wrong with the metrics",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_5b3d83c8",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:38:46Z",
+      "side": 1,
+      "message": "these accesses also need to be protected by some kind of synchronization mechanism",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_db28b38e",
+        "filename": "metric/metric.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:38:46Z",
+      "side": 1,
+      "message": "need to do an atomic load here too",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
