@@ -128,8 +128,17 @@ func TestExpiration(t *testing.T) {
 // try looks up a name through the cached and uncached KeyServers and
 // compares the results.
 func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
-	su, serr := unc.KeyServer().Lookup(upspin.UserName(name))
-	cu, cerr := c.KeyServer().Lookup(upspin.UserName(name))
+	keyUncached, err := bind.KeyServer(unc, unc.KeyEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyCached, err := bind.KeyServer(c, c.KeyEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	su, serr := keyUncached.Lookup(upspin.UserName(name))
+	cu, cerr := keyCached.Lookup(upspin.UserName(name))
 
 	if !reflect.DeepEqual(su.Dirs, cu.Dirs) {
 		t.Errorf("for %s got %v expect %v", name, cu.Dirs, su.Dirs)

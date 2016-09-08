@@ -14,16 +14,23 @@ import (
 	"sync/atomic"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
-	inprocessKey "upspin.io/key/inprocess"
 	"upspin.io/pack"
 	"upspin.io/path"
-	inprocessStore "upspin.io/store/inprocess"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/debug"
+
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
 )
+
+func init() {
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+}
 
 var (
 	userNumber int32 // Updated atomically
@@ -45,8 +52,9 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)
 	ctx = context.SetDirEndpoint(ctx, endpoint)
-	key = inprocessKey.New()
-	store = inprocessStore.New()
+
+	key, _ = bind.KeyServer(ctx, ctx.KeyEndpoint())
+	store, _ = bind.StoreServer(ctx, ctx.KeyEndpoint())
 	dir = New(ctx)
 	return
 }
@@ -107,7 +115,11 @@ func readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		if !ok {
 			break
 		}
-		ciphertext, locs, err := context.StoreServer().Get(block.Location.Reference)
+		store, err := bind.StoreServer(context, context.StoreEndpoint())
+		if err != nil {
+			return nil, err
+		}
+		ciphertext, locs, err := store.Get(block.Location.Reference)
 		if err != nil {
 			return nil, err
 		}

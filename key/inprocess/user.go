@@ -10,7 +10,6 @@ package inprocess
 import (
 	"sync"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 	"upspin.io/valid"
@@ -113,8 +112,4 @@ func (s *server) Close() {
 // Authenticate implements upspin.server.
 func (s *server) Authenticate(upspin.Context) error {
 	return nil
-}
-
-func init() {
-	bind.RegisterKeyServer(upspin.InProcess, New())
 }

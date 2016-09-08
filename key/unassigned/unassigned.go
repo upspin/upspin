@@ -11,65 +11,65 @@ import (
 	"upspin.io/upspin"
 )
 
-// unassigned implements upspin.KeyServer.
-type unassigned struct {
+// Server implements upspin.KeyServer.
+type Server struct {
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.KeyServer = (*unassigned)(nil)
+var _ upspin.KeyServer = Server{}
 
-var unassignedErr = errors.Str("request to unassigned service")
+var ServerErr = errors.Str("request to Server service")
 
 // Lookup implements upspin.KeysServer.Lookup.
-func (*unassigned) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/unassigned.Lookup"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Lookup(name upspin.UserName) (*upspin.User, error) {
+	const op = "key/Server.Lookup"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Put implements upspin.KeysServer.Put.
-func (*unassigned) Put(user *upspin.User) error {
-	const op = "key/unassigned.Put"
-	return errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Put(user *upspin.User) error {
+	const op = "key/Server.Put"
+	return errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Endpoint implements upspin.Service.
-func (u *unassigned) Endpoint() upspin.Endpoint {
+func (u Server) Endpoint() upspin.Endpoint {
 	return u.endpoint
 }
 
 // Configure implements upspin.Service.
-func (*unassigned) Configure(options ...string) (upspin.UserName, error) {
-	const op = "key/unassigned.Configure"
-	return "", errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Configure(options ...string) (upspin.UserName, error) {
+	const op = "key/Server.Configure"
+	return "", errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Close implements upspin.Service.
-func (*unassigned) Close() {
+func (Server) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (*unassigned) Authenticate(context upspin.Context) error {
-	const op = "key/unassigned.Authenticate"
-	return errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Authenticate(context upspin.Context) error {
+	const op = "key/Server.Authenticate"
+	return errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Ping implements upspin.Service.
-func (*unassigned) Ping() bool {
+func (Server) Ping() bool {
 	return true
 }
 
 // Dial implements upspin.Service.
-func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "key/unassigned.Dial"
+func (Server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "key/Server.Dial"
 	if e.Transport != upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	return &unassigned{e}, nil
+	return Server{e}, nil
 }
 
 const transport = upspin.Unassigned
 
 func init() {
-	bind.RegisterKeyServer(transport, &unassigned{})
+	bind.RegisterKeyServer(transport, Server{})
 }
