@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b69387d9_a4966398",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Usually these are listed in the block above, ending on line 23.",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_c4efef14",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "this can be moved to the very end (just boilerplate).",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_e4f4ebed",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "up?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_04fab7d6",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "down?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_448bdf52",
+        "filename": "dir/unassigned/unassigned.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "why exported?\n\nAlso, if you\u0027re going to rename the type, might as well rename the file too (either way, it\u0027s fine, but since this change is for consistency with other servers, it makes sense to go all the way)",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_846c079d",
+        "filename": "key/unassigned/unassigned.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Why is this exported?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_e4206b60",
+        "filename": "store/unassigned/unassigned.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "unexport?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_640d3bec",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "block above?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_848fa72b",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Document (for golint purposes. I\u0027m trying to get our codebase all lint-clean where possible).",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_a48ca337",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Document",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_c775312a",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Document",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_44103f09",
+        "filename": "valid/valid.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Will this be used?",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
