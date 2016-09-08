@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "b69387d9_e716adb7",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "move up in the block above (line 21)?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_c711b1c2",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "suggest moving to bottom",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_27217510",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "block up?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_67237d17",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "move to bottom?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_44e75f03",
         "filename": "key/usercache/cache.go",
         "patchSetId": 8
@@ -37,6 +105,57 @@
       "side": 1,
       "message": "https://upspin-review.googlesource.com/c/5042/",
       "parentUuid": "b69387d9_44e75f03",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_67b0dde4",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "one block above?",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_279ed555",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "suggest moving to bottom.",
+      "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_27d33500",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T21:58:35Z",
+      "side": 1,
+      "message": "Oh, I see where that\u0027s used. Nevermind.",
       "revId": "67c481a04d2437d6a9e8b080e7ce2eaad72451e7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
