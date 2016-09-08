@@ -97,7 +97,9 @@ func DirBlock(block upspin.DirBlock) error {
 func Endpoint(endpoint upspin.Endpoint) error {
 	const op = "valid.Endpoint"
 	switch endpoint.Transport {
-	case upspin.InProcess, upspin.Unassigned:
+	case upspin.InProcess:
+		// OK if there is a netaddr, or not.
+	case upspin.Unassigned:
 		if endpoint.NetAddr != "" {
 			return errors.E(op, errors.Errorf("%q: extraneous network address", endpoint))
 		}
