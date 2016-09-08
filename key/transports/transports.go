@@ -8,7 +8,14 @@
 package transports
 
 import (
-	_ "upspin.io/key/inprocess"
+	"upspin.io/bind"
+	"upspin.io/key/inprocess"
+	"upspin.io/upspin"
+
 	_ "upspin.io/key/remote"
 	_ "upspin.io/key/unassigned"
 )
+
+func init() {
+	bind.RegisterKeyServer(upspin.InProcess, inprocess.New())
+}

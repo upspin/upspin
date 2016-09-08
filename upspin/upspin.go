@@ -583,26 +583,6 @@ type Context interface {
 
 	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreCacheEndpoint() Endpoint
-
-	// KeyServer returns a KeyServer instance bound to KeyEndpoint.
-	// In the event of an error binding, all subsequent calls on the
-	// KeyServer will return errors.
-	KeyServer() KeyServer
-
-	// StoreServer returns a StoreServer instance bound to StoreEndpoint.
-	// In the event of an error binding, all subsequent calls on the
-	// StoreServer will return errors.
-	StoreServer() StoreServer
-
-	// StoreServerFor returns a StoreServer instance bound to the given Endpoint.
-	StoreServerFor(Endpoint) (StoreServer, error)
-
-	// DirServer returns a DirServer instance responsible for the path.
-	// If the path is empty, it will return a DirServer service bound to
-	// DirEndpoint.
-	// In the event of an error binding, all subsequent calls on the
-	// DirServer will return errors.
-	DirServer(PathName) DirServer
 }
 
 // Dialer defines how to connect and authenticate to a server. Each

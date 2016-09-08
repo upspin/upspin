@@ -8,8 +8,15 @@
 package transports
 
 import (
+	"upspin.io/bind"
+	"upspin.io/store/inprocess"
+	"upspin.io/upspin"
+
 	_ "upspin.io/store/https"
-	_ "upspin.io/store/inprocess"
 	_ "upspin.io/store/remote"
 	_ "upspin.io/store/unassigned"
 )
+
+func init() {
+	bind.RegisterStoreServer(upspin.InProcess, inprocess.New())
+}

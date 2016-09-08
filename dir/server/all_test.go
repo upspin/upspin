@@ -14,17 +14,24 @@ import (
 	"testing"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/key/inprocess"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/inprocess"
+
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
 )
+
+func init() {
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+}
 
 const (
 	userName   = "fred@flintstone.org"
@@ -755,7 +762,12 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
 	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
 	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
-	key := ctx.KeyServer()
+
+	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
 		Name:      serverName,
@@ -798,7 +810,10 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 }
 
 func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location {
-	store := ctx.StoreServer()
+	store, err := bind.StoreServer(ctx, ctx.StoreEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
 	ref, err := store.Put(data)
 	if err != nil {
 		t.Fatal(err)
