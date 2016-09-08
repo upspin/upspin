@@ -7,8 +7,6 @@ package client
 import (
 	"crypto/rand"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"upspin.io/context"
@@ -91,20 +89,11 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 	ctx := setup(userName, pub)
 	if packing == upspin.EEPack {
 		ctx = context.SetPacking(ctx, packing)
-		f, err := factotum.New(repo(keyDir))
+		f, err := factotum.New(factotum.NewTestKeyStore(keyDir))
 		if err != nil {
 			b.Fatal(err)
 		}
 		ctx = context.SetFactotum(ctx, f)
 	}
 	return New(ctx), block
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
