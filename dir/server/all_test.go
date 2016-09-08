@@ -273,13 +273,14 @@ func TestWhichAccess(t *testing.T) {
 	}
 
 	// Check that links work.
-	accEntry, err = s.WhichAccess(userName + "/mylink")
-	if err != nil {
-		t.Fatal(err)
+	link := upspin.PathName(userName + "/mylink")
+	accEntry, err = s.WhichAccess(link)
+	if err != upspin.ErrFollowLink {
+		t.Fatal("want ErrFollowLink, got", err)
 	}
-	// The Access file for the link is the one for the parent (de).
-	if err := checkDirEntry("TestWhichAccess.4", accEntry, de); err != nil {
-		t.Fatal(err)
+	// WhichAccess should return the link itself for a link.
+	if accEntry.Name != link {
+		t.Fatal("WhichAccess(link) returned %q, want %q", accEntry.Name, link)
 	}
 }
 
