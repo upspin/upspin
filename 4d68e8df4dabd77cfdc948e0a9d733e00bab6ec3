@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b69387d9_8aded327",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:14:25Z",
+      "side": 1,
+      "message": "The problem I was worried about does not occur anymore. Here\u0027s the test if you want to add in this CL:\n\n\t// Test that Access files don\u0027t cause weird loops.\n\taccEntry, err \u003d s.WhichAccess(userName + \"/dir/Access\")\n\tif err !\u003d nil {\n\t\tt.Fatal(err)\n\t}\n\tif err :\u003d checkDirEntry(\"TestWhichAccess.4\", accEntry, de2); err !\u003d nil {\n\t\tt.Fatal(err)\n\t}",
+      "revId": "4d68e8df4dabd77cfdc948e0a9d733e00bab6ec3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
