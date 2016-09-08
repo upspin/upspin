@@ -10,43 +10,50 @@ import (
 	"math/rand"
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/upspin"
 
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/key/inprocess"
-	_ "upspin.io/store/inprocess"
+	dirserver "upspin.io/dir/inprocess"
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
 
 	_ "upspin.io/pack/debug"
 )
 
-// TODO: Copied from directory/inprocess/all_test.go. Make this publicly available.
+var baseCtx upspin.Context
 
-func newContext(name upspin.UserName) upspin.Context {
+func init() {
 	inProcess := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx := context.New()
-	ctx = context.SetUserName(ctx, name)
-	ctx = context.SetPacking(ctx, upspin.DebugPack)
-	ctx = context.SetKeyEndpoint(ctx, inProcess)
-	ctx = context.SetStoreEndpoint(ctx, inProcess)
-	ctx = context.SetDirEndpoint(ctx, inProcess)
-	return ctx
+
+	baseCtx = context.New()
+	baseCtx = context.SetPacking(baseCtx, upspin.DebugPack)
+	baseCtx = context.SetKeyEndpoint(baseCtx, inProcess)
+	baseCtx = context.SetStoreEndpoint(baseCtx, inProcess)
+	baseCtx = context.SetDirEndpoint(baseCtx, inProcess)
+
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+	bind.RegisterDirServer(upspin.InProcess, dirserver.New(baseCtx))
 }
 
 func checkTransport(s upspin.Service) {
+	if s == nil {
+		panic(fmt.Sprintf("nil service"))
+	}
 	if t := s.Endpoint().Transport; t != upspin.InProcess {
 		panic(fmt.Sprintf("bad transport %v, want inprocess", t))
 	}
 }
 
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
-	ctx := newContext(userName)
-	key := ctx.KeyServer()
+	ctx := context.SetUserName(baseCtx, userName)
+	key, _ := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	checkTransport(key)
-	dir := ctx.DirServer("")
+	dir, _ := bind.DirServer(ctx, ctx.DirEndpoint())
 	checkTransport(dir)
 	if publicKey == "" {
 		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))

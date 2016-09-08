@@ -11,90 +11,90 @@ import (
 	"upspin.io/upspin"
 )
 
-// unassigned implements upspin.DirServer.
-type unassigned struct {
+// Server implements upspin.DirServer.
+type Server struct {
 	endpoint upspin.Endpoint
 }
 
-var _ upspin.DirServer = (*unassigned)(nil)
+var _ upspin.DirServer = Server{}
 
-var unassignedErr = errors.Str("request to unassigned service")
+var ServerErr = errors.Str("request to Server service")
 
 // Glob implements upspin.DirServer.Glob.
-func (*unassigned) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "dir/unassigned.Glob"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "dir/Server.Glob"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (*unassigned) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/unassigned.MakeDirectory"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/Server.MakeDirectory"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Put implements upspin.DirServer.Put.
 // Directories are created with MakeDirectory. Roots are anyway. TODO?.
-func (*unassigned) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "dir/unassigned.Put"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/Server.Put"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
-func (*unassigned) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/unassigned.WhichAccess"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/Server.WhichAccess"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Delete implements upspin.DirServer.Delete.
-func (*unassigned) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/unassigned.Delete"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/Server.Delete"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
-func (*unassigned) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/unassigned.Lookup"
-	return nil, errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
+	const op = "dir/Server.Lookup"
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Endpoint implements upspin.Service.
-func (u *unassigned) Endpoint() upspin.Endpoint {
+func (u Server) Endpoint() upspin.Endpoint {
 	return u.endpoint
 }
 
 // Configure implements upspin.Service.
-func (*unassigned) Configure(options ...string) (upspin.UserName, error) {
-	const op = "dir/unassigned.Configure"
-	return "", errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Configure(options ...string) (upspin.UserName, error) {
+	const op = "dir/Server.Configure"
+	return "", errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Close implements upspin.Service.
-func (*unassigned) Close() {
+func (Server) Close() {
 }
 
 // Authenticate implements upspin.Service.
-func (*unassigned) Authenticate(context upspin.Context) error {
-	const op = "dir/unassigned.Authenticate"
-	return errors.E(op, errors.Invalid, unassignedErr)
+func (Server) Authenticate(context upspin.Context) error {
+	const op = "dir/Server.Authenticate"
+	return errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Ping implements upspin.Service.
-func (*unassigned) Ping() bool {
+func (Server) Ping() bool {
 	return true
 }
 
 // Dial implements upspin.Service.
-func (u *unassigned) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "dir/unassigned.Dial"
+func (Server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "dir/Server.Dial"
 	if e.Transport != upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	return &unassigned{e}, nil
+	return Server{e}, nil
 }
 
 const transport = upspin.Unassigned
 
 func init() {
-	bind.RegisterDirServer(transport, &unassigned{})
+	bind.RegisterDirServer(transport, Server{})
 }

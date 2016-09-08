@@ -33,7 +33,7 @@ func setup(t *testing.T) upspin.KeyServer {
 	c = context.SetKeyEndpoint(c, inProcessEndpoint)
 	c = context.SetStoreEndpoint(c, inProcessEndpoint)
 	c = context.SetDirEndpoint(c, inProcessEndpoint)
-	return c.KeyServer()
+	return New()
 }
 
 func TestInstallAndLookup(t *testing.T) {
