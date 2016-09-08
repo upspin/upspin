@@ -191,6 +191,24 @@
     },
     {
       "key": {
+        "uuid": "cb0212f7_fc538930",
+        "filename": "test/servermux/mux.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T22:10:20Z",
+      "side": 1,
+      "message": "From the golint docs:\n\n\"The suggestions made by golint are exactly that: suggestions. Golint is not perfect, and has both false positives and false negatives. Do not treat its output as a gold standard. We will not be adding pragmas or other knobs to suppress specific warnings, so do not expect or require code to be completely \"lint-free\".\"",
+      "parentUuid": "cb0212f7_7c40995b",
+      "revId": "4db4743b580eaf8a54a0be33029044bc9ce53716",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_a48ca337",
         "filename": "test/servermux/mux.go",
         "patchSetId": 7
