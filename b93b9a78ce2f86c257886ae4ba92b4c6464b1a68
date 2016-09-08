@@ -16,6 +16,41 @@
       "revId": "b93b9a78ce2f86c257886ae4ba92b4c6464b1a68",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_5e37313b",
+        "filename": "cloud/storage/gcs/gcs_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T01:22:42Z",
+      "side": 1,
+      "message": "actually we already have -short for  this.\ni forgot",
+      "parentUuid": "b69387d9_be1675b6",
+      "revId": "b93b9a78ce2f86c257886ae4ba92b4c6464b1a68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_7e34ed35",
+        "filename": "cloud/storage/gcs/gcs_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T01:22:42Z",
+      "side": 1,
+      "message": "here",
+      "revId": "b93b9a78ce2f86c257886ae4ba92b4c6464b1a68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
