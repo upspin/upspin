@@ -532,7 +532,7 @@ func (s *server) lookup(op string, parsed path.Parsed, followFinal bool) (*upspi
 			return entry, upspin.ErrFollowLink
 		}
 		if !entry.IsDir() {
-			return nil, errors.E(op, parsed.Path(), errors.NotDir)
+			return nil, errors.E(op, parsed.Path(), errors.NotExist)
 		}
 		dirEntry = entry
 	}
@@ -571,13 +571,16 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			break
 		}
 	}
-	entry, err := s.lookup(op, parsed.First(firstGlobElem), false)
+	basePath := parsed.First(firstGlobElem)
+	entry, err := s.lookup(op, basePath, false)
 	if err == nil && entry.IsLink() {
 		entry, err = s.errLink(op, entry, upspin.ErrFollowLink)
 		if entry == nil {
 			return nil, err
 		}
 		return []*upspin.DirEntry{entry}, err
+	} else if err != nil {
+		return nil, errors.E(op, err)
 	}
 
 	// Loop elementwise along the path, growing the list of candidates breadth-first.
