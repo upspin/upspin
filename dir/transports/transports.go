@@ -8,7 +8,15 @@
 package transports
 
 import (
-	_ "upspin.io/dir/inprocess"
+	"upspin.io/bind"
+	"upspin.io/context"
+	"upspin.io/dir/inprocess"
+	"upspin.io/upspin"
+
 	_ "upspin.io/dir/remote"
 	_ "upspin.io/dir/unassigned"
 )
+
+func init() {
+	bind.RegisterDirServer(upspin.InProcess, inprocess.New(context.New()))
+}

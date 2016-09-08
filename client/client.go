@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/client/file"
 	"upspin.io/errors"
@@ -160,7 +161,10 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer) error {
 	// Start the I/O.
-	store := c.context.StoreServer()
+	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
+	if err != nil {
+		return err
+	}
 	bp, err := packer.Pack(c.context, entry)
 	if err != nil {
 		return err
@@ -214,7 +218,11 @@ func (c *Client) addReaders(op string, entry, accessEntry *upspin.DirEntry, pack
 	readersPublicKey[0] = c.context.Factotum().PublicKey()
 	n := 1
 	for _, r := range readers {
-		u, err := c.context.KeyServer().Lookup(r)
+		key, err := bind.KeyServer(c.context, c.context.KeyEndpoint())
+		if err != nil {
+			return errors.E(op, err)
+		}
+		u, err := key.Lookup(r)
 		if err != nil || len(u.PublicKey) == 0 {
 			// TODO warn that we can't process one of the readers?
 			continue
@@ -502,7 +510,12 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 
 // DirServer implements upspin.Client.
 func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
-	return c.context.DirServer(name), nil
+	const op = "Client.DirServer"
+	dir, err := bind.DirServerFor(c.context, name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return dir, nil
 }
 
 // PutDuplicate implements upspin.Client.
