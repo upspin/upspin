@@ -102,6 +102,6 @@ func (d *dummySaver) Register(queue chan *Metric) {
 	}()
 }
 
-func (d *dummySaver) NumProcessed() int {
+func (d *dummySaver) NumProcessed() int32 {
 	return 0
 }
