@@ -2,17 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package usercache pushes a new Context onto an old. It passes all operations except KeyServer
-// to the underlying context. KeyServer returns a pointer to a cached version of the underlying
-// context's KeyServer.
+// Package usercache provides a caching keyserver implementation.
+// It passes all operations except Lookup to the underlying keyserver.
 package usercache
-
-// TODO(adg): this is currently broken. fix it.
 
 import (
 	"time"
 
-	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -23,10 +19,12 @@ type entry struct {
 	user    *upspin.User
 }
 
-type userCacheContext struct {
-	upspin.Context
+type userCacheServer struct {
+	upspin.KeyServer
 	cache *userCache
 }
+
+var _ upspin.KeyServer = (*userCacheServer)(nil)
 
 type userCache struct {
 	entries  *cache.LRU
@@ -37,31 +35,11 @@ const defaultDuration = 15 * time.Minute
 
 var globalCache = userCache{entries: cache.NewLRU(256), duration: defaultDuration}
 
-// Private pushes a new user cache onto a context. If duration is non-zero
-// it specifies the lifetime of cache entries.
-func Private(context upspin.Context, duration time.Duration) upspin.Context {
-	if duration == 0 {
-		duration = defaultDuration
-	}
-	return &userCacheContext{
-		Context: context,
-		cache: &userCache{
-			entries:  cache.NewLRU(256),
-			duration: duration,
-		},
-	}
-}
-
-// Global pushes a global user cache onto a context.
-func Global(context upspin.Context) upspin.Context {
-	if c, ok := context.(*userCacheContext); ok {
-		if c.cache == &globalCache {
-			return c
-		}
-	}
-	return &userCacheContext{
-		Context: context,
-		cache:   &globalCache,
+// Global returns the provided key server wrapped in a global user cache.
+func Global(s upspin.KeyServer) upspin.KeyServer {
+	return &userCacheServer{
+		KeyServer: s,
+		cache:     &globalCache,
 	}
 }
 
@@ -71,7 +49,7 @@ func ResetGlobal() {
 }
 
 // Lookup implements upspin.KeyServer.
-func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
+func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/usercache.Lookup"
 	v, ok := c.cache.entries.Get(name)
 
@@ -85,11 +63,7 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	}
 
 	// Not found, look it up.
-	key, err := bind.KeyServer(c.Context, c.Context.KeyEndpoint())
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	u, err := key.Lookup(name)
+	u, err := c.KeyServer.Lookup(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -101,43 +75,12 @@ func (c *userCacheContext) Lookup(name upspin.UserName) (*upspin.User, error) {
 	return u, nil
 }
 
-// Put implements upspin.KeyServer.
-func (c *userCacheContext) Put(user *upspin.User) error {
-	const op = "key/usercache.Put"
-	return errors.E(op, errors.Syntax, errors.Str("not implemented"))
-}
-
-// Dial implements upspin.Service.
-func (c *userCacheContext) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	return c, nil
-}
-
-// Configure implements upspin.Service.
-func (c *userCacheContext) Configure(options ...string) (upspin.UserName, error) {
-	panic("unimplemented")
-}
-
-// Endpoint implements upspin.Service.
-func (c *userCacheContext) Endpoint() upspin.Endpoint {
-	panic("unimplemented")
-}
-
-// Ping implements upspin.Service.
-func (c *userCacheContext) Ping() bool {
-	return true
-}
-
-// Close implements upspin.Service.
-func (c *userCacheContext) Close() {
-	c.cache.entries = nil
-}
-
-// Authenticate implements upspin.Service.
-func (c *userCacheContext) Authenticate(upspin.Context) error {
-	return nil
-}
-
-// KeyServer implements upspin.Context. It returns a pointer to the caching user service.
-func (c *userCacheContext) KeyServer() upspin.KeyServer {
-	return c
+// Dial implements upspin.Dialer.
+func (c *userCacheServer) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	const op = "key/usercache.Dial"
+	svc, err := c.KeyServer.Dial(ctx, e)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return &userCacheServer{svc.(upspin.KeyServer), c.cache}, nil
 }
