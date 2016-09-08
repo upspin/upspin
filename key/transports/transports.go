@@ -3,13 +3,14 @@
 // license that can be found in the LICENSE file.
 
 // Package transports is a helper package that aggregates the user imports.
-// It has no functionality itself; it is meant to be imported, using an "underscore"
-// import, as a convenient way to link with all the transport implementations.
+// It is meant to be imported, using an "underscore" import, as a convenient
+// way to link with all the transport implementations.
 package transports
 
 import (
 	"upspin.io/bind"
 	"upspin.io/key/inprocess"
+	"upspin.io/key/usercache"
 	"upspin.io/upspin"
 
 	_ "upspin.io/key/remote"
@@ -17,5 +18,5 @@ import (
 )
 
 func init() {
-	bind.RegisterKeyServer(upspin.InProcess, inprocess.New())
+	bind.RegisterKeyServer(upspin.InProcess, usercache.Global(inprocess.New()))
 }
