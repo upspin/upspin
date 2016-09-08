@@ -14,9 +14,6 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/upspin"
-
-	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/store/inprocess"
 )
 
 // service is a KeyServer implementation that counts lookups.
@@ -26,7 +23,6 @@ type service struct {
 
 	context  upspin.Context
 	endpoint upspin.Endpoint
-	dialed   int
 }
 
 var keyService = &service{
@@ -47,21 +43,21 @@ func init() {
 }
 
 // setup returns contexts with the KeyServer uncached and cached.
-func setup(t *testing.T, d time.Duration, user string) (upspin.Context, upspin.Context, *service) {
+func setup(t *testing.T, d time.Duration, user string) (uncached, cached upspin.KeyServer) {
 	c := context.New()
 	c = context.SetUserName(c, upspin.UserName(user))
 	c = context.SetPacking(c, upspin.DebugPack)
 	c = context.SetKeyEndpoint(c, keyService.endpoint)
 	keyService.context = c
-	keyService.dialed = 0
 
-	return c, Private(c, d), keyService
+	ResetGlobal()
+	return keyService, Global(keyService)
 }
 
 // TestCache tests the User cache for equivalence with the uncached version and
 // for efficacy of the cached version.
 func TestCache(t *testing.T) {
-	unc, c, s := setup(t, 0, "TestCache@nowhere.com")
+	unc, c := setup(t, 0, "TestCache@nowhere.com")
 
 	// Compare the 4 names twixt cached and uncached.
 	try(t, unc, c, "a@a.com")
@@ -69,11 +65,7 @@ func TestCache(t *testing.T) {
 	try(t, unc, c, "c@c.com")
 	try(t, unc, c, "d@d.com")
 
-	if s.dialed != 1 {
-		t.Errorf("Expected 1 dial. Got %d", s.dialed)
-	}
-
-	sofar := s.lookups
+	sofar := keyService.lookups
 
 	// Check for consistency between cached and uncached.
 	loops := 200
@@ -84,14 +76,9 @@ func TestCache(t *testing.T) {
 		try(t, unc, c, "d@d.com")
 	}
 
-	// No new cache misses, so no new dials.
-	if s.dialed != 1 {
-		t.Errorf("Expected no new dials, just the original 1. Got %d", s.dialed)
-	}
-
 	// If the cache worked, we should only have 1 uncached access per try() in the loop.
-	if s.lookups != sofar+4*loops {
-		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+4*loops)
+	if keyService.lookups != sofar+4*loops {
+		t.Errorf("uncached loookups, got %d, expected %d", keyService.lookups, sofar+4*loops)
 	}
 }
 
@@ -100,14 +87,14 @@ func TestExpiration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Expiration tests skipped in short mode")
 	}
-	unc, c, s := setup(t, time.Second, "TestExpiration@nowhere.com")
+	unc, c := setup(t, time.Second, "TestExpiration@nowhere.com")
 
 	// Cache the 4 names.
 	try(t, unc, c, "a@a.com")
 	try(t, unc, c, "b@b.com")
 	try(t, unc, c, "c@c.com")
 	try(t, unc, c, "d@d.com")
-	sofar := s.lookups
+	sofar := keyService.lookups
 
 	time.Sleep(2 * time.Second)
 
@@ -116,29 +103,16 @@ func TestExpiration(t *testing.T) {
 	try(t, unc, c, "b@b.com")
 	try(t, unc, c, "c@c.com")
 	try(t, unc, c, "d@d.com")
-	if s.lookups != sofar+2*4 {
-		t.Errorf("uncached loookups, got %d, expected %d", s.lookups, sofar+2*4)
-	}
-
-	if s.dialed != 1 {
-		t.Errorf("Expected 1 dial, got %d", s.dialed)
+	if keyService.lookups != sofar+2*4 {
+		t.Errorf("uncached loookups, got %d, expected %d", keyService.lookups, sofar+2*4)
 	}
 }
 
 // try looks up a name through the cached and uncached KeyServers and
 // compares the results.
-func try(t *testing.T, unc upspin.Context, c upspin.Context, name string) {
-	keyUncached, err := bind.KeyServer(unc, unc.KeyEndpoint())
-	if err != nil {
-		t.Fatal(err)
-	}
-	keyCached, err := bind.KeyServer(c, c.KeyEndpoint())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	su, serr := keyUncached.Lookup(upspin.UserName(name))
-	cu, cerr := keyCached.Lookup(upspin.UserName(name))
+func try(t *testing.T, uncached, cached upspin.KeyServer, name string) {
+	su, serr := uncached.Lookup(upspin.UserName(name))
+	cu, cerr := cached.Lookup(upspin.UserName(name))
 
 	if !reflect.DeepEqual(su.Dirs, cu.Dirs) {
 		t.Errorf("for %s got %v expect %v", name, cu.Dirs, su.Dirs)
@@ -181,7 +155,6 @@ func (s *service) Put(user *upspin.User) error {
 }
 
 func (s *service) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	s.dialed++
 	s.context = ctx
 	s.endpoint = e
 	return s, nil

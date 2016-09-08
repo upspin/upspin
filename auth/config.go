@@ -12,7 +12,6 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/key/usercache"
 	"upspin.io/upspin"
 )
 
@@ -72,7 +71,6 @@ func NewDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, erro
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) (upspin.PublicKey, error) {
 	const op = "auth.PublicUserKeyService"
-	ctx = usercache.Global(ctx)
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
 		key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {

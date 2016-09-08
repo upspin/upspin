@@ -198,7 +198,7 @@ func New(setup *Setup) (*Env, error) {
 		return nil, errors.E(op, err)
 	}
 
-	env.Client = client.NewWithoutCache(ctx)
+	env.Client = client.New(ctx)
 	return env, nil
 }
 

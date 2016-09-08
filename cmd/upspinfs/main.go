@@ -15,7 +15,6 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/flags"
-	"upspin.io/key/usercache"
 	"upspin.io/log"
 
 	_ "upspin.io/dir/transports"
@@ -44,7 +43,6 @@ func main() {
 	if err != nil {
 		log.Debug.Fatal(err)
 	}
-	ctx = usercache.Global(ctx)
 
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
