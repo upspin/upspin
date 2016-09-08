@@ -8,7 +8,6 @@ package inprocess
 import (
 	"sync"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/upspin"
@@ -25,17 +24,11 @@ type service struct {
 
 var _ upspin.StoreServer = (*service)(nil)
 
-const transport = upspin.InProcess
-
-func init() {
-	bind.RegisterStoreServer(transport, New())
-}
-
 func New() upspin.StoreServer {
 	return &service{
 		data: &dataService{
 			endpoint: upspin.Endpoint{
-				Transport: transport,
+				Transport: upspin.InProcess,
 				NetAddr:   "", // Ignored.
 			},
 			blob: make(map[upspin.Reference][]byte),
