@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_6f51992a",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:02:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b69387d9_bb33e703",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_fb148f4f",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-08T00:38:46Z",
       "side": 1,
       "message": "you should have some kind of timeout here, otherwise this can block forever if something has gone wrong with the metrics",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_8f4ee585",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:02:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b69387d9_fb148f4f",
       "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,42 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_eaf917e3",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:02:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b69387d9_5b3d83c8",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_cf154d55",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:02:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b69387d9_5b3d83c8",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b69387d9_db28b38e",
         "filename": "metric/metric.go",
         "patchSetId": 8
@@ -64,6 +136,24 @@
       "writtenOn": "2016-09-08T00:38:46Z",
       "side": 1,
       "message": "need to do an atomic load here too",
+      "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_0aff23c6",
+        "filename": "metric/metric.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T18:02:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b69387d9_db28b38e",
       "revId": "95346871b2f827d646f26bcc9bfbbb9900a2228d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
