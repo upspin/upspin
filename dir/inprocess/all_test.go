@@ -322,17 +322,18 @@ type globTest struct {
 	// Strings all miss the leading "user@google.com" for brevity.
 	pattern string
 	files   []string
+	err     error
 }
 
 var globTests = []globTest{
-	{"", []string{""}},
-	{"*", []string{"ten", "twenty", "thirty"}},
-	{"ten/eleven/thirteen", []string{}},
-	{"ten/twelve/thirteen", []string{"ten/twelve/thirteen"}},
-	{"ten/*", []string{"ten/twelve", "ten/eleven"}},
-	{"ten/twelve/*", []string{"ten/twelve/thirteen"}},
-	{"twenty/tw*", []string{"twenty/twentyone", "twenty/twentytwo"}},
-	{"*/*", []string{"ten/twelve", "ten/eleven", "twenty/twentyone", "twenty/twentytwo"}},
+	{"", []string{""}, nil},
+	{"*", []string{"ten", "twenty", "thirty"}, nil},
+	{"ten/eleven/thirteen", []string{}, errors.E(errors.NotExist)},
+	{"ten/twelve/thirteen", []string{"ten/twelve/thirteen"}, nil},
+	{"ten/*", []string{"ten/twelve", "ten/eleven"}, nil},
+	{"ten/twelve/*", []string{"ten/twelve/thirteen"}, nil},
+	{"twenty/tw*", []string{"twenty/twentyone", "twenty/twentytwo"}, nil},
+	{"*/*", []string{"ten/twelve", "ten/eleven", "twenty/twentyone", "twenty/twentytwo"}, nil},
 }
 
 func TestGlob(t *testing.T) {
@@ -371,6 +372,12 @@ func TestGlob(t *testing.T) {
 		t.Logf("%d: pattern %q expect %q", i, test.pattern, test.files)
 		name := fmt.Sprintf("%s/%s", user, test.pattern)
 		entries, err := directory.Glob(name)
+		if test.err != nil {
+			if !errors.Match(test.err, err) {
+				t.Errorf("%s: got error %q, want %q", err, test.err)
+			}
+			continue
+		}
 		if err != nil {
 			t.Errorf("%s: %v\n", test.pattern, err)
 			continue
