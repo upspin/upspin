@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b69387d9_47268128",
+        "filename": "key/usercache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-08T21:56:39Z",
+      "side": 1,
+      "message": "What happens if we lose our connection to the keyserver?  The old code used to redial if the service was no longer reachable.  The new code doesn\u0027t.",
+      "range": {
+        "startLine": 66,
+        "startChar": 13,
+        "endLine": 66,
+        "endChar": 22
+      },
+      "revId": "b1e6f875f3c46a54d32e790234f2559542fc458a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
