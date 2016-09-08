@@ -212,6 +212,24 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_db1b53dd",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:10:27Z",
+      "side": 1,
+      "message": "well, I mean you\u0027re *this* close to having all the external API calls in the client traced. not sure why you wouldn\u0027t add the 6 lines to instrument glob also",
+      "parentUuid": "16cc53f8_261a5679",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_3a43fd68",
         "filename": "client/client.go",
         "patchSetId": 5
@@ -247,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_fbf9ef69",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:10:27Z",
+      "side": 1,
+      "message": "I\u0027m definitely interested and would use this right away",
+      "parentUuid": "16cc53f8_a62e4698",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_da4d998c",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -276,6 +312,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "b6f54793_da4d998c",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_3b519764",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:10:27Z",
+      "side": 1,
+      "message": "if you\u0027re going to accept the suggestion to move the os.Exit call to the method, you really should rename the method to exit. That\u0027s an important signal to the programmer that anything after the method call will never be executed.",
+      "parentUuid": "16cc53f8_86334a04",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -451,6 +505,24 @@
       "side": 1,
       "message": "So that we can check when the saver is done (when both counts are the same).\n\nIt\u0027s global because there\u0027s always only one saver and one metric per binary.",
       "parentUuid": "b6f54793_9a183190",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_1bb85bc3",
+        "filename": "metric/metric.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-08T00:10:27Z",
+      "side": 1,
+      "message": "shouldn\u0027t the exported NumProcessed just call the registered Saver\u0027s NumProcessed method, then?\nwhere is this used?\nyou also didn\u0027t answer my questions about concurrent usage.\nthere can be many concurrent metrics updating this thing",
+      "parentUuid": "16cc53f8_066e3abd",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
