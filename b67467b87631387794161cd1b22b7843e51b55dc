@@ -336,6 +336,24 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_fb41ef5c",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T00:31:17Z",
+      "side": 1,
+      "message": "There is an exit method already. Since this is a suggestion, I moved it back because otherwise I need to also clean up various state.exit and os.Exit, which should not be done in this CL.",
+      "parentUuid": "b69387d9_3b519764",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6f54793_5a424961",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 5
@@ -523,6 +541,24 @@
       "side": 1,
       "message": "shouldn\u0027t the exported NumProcessed just call the registered Saver\u0027s NumProcessed method, then?\nwhere is this used?\nyou also didn\u0027t answer my questions about concurrent usage.\nthere can be many concurrent metrics updating this thing",
       "parentUuid": "16cc53f8_066e3abd",
+      "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_9b270bd7",
+        "filename": "metric/metric.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-08T00:31:17Z",
+      "side": 1,
+      "message": "It\u0027s used in cmd/upspin. It\u0027s in this CL. \n\nJust calling the other one does not tell me there\u0027s something pending. \n\nThere are other ways of doing this, but this is one way.\n\nI\u0027m using an atomic counter now, so the concurrency thing won\u0027t be a problem.",
+      "parentUuid": "b69387d9_1bb85bc3",
       "revId": "b67467b87631387794161cd1b22b7843e51b55dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
