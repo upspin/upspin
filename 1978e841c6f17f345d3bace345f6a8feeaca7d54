@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0212f7_1c3ab5ec",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-09T00:11:26Z",
+      "side": 1,
+      "message": "one newline is enough at the end of the line.",
+      "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
