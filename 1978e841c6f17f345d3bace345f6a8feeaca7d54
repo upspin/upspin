@@ -52,6 +52,24 @@
       "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_183db4ed",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-09T03:15:57Z",
+      "side": 1,
+      "message": "From the documentation, it would seem that Chmod from x/sys/windows would do what I want, and I could return to log.Fatal(err) here.\n\nAdvice on the best way to express different Chmod on different platform builds?",
+      "parentUuid": "b69387d9_bd42f261",
+      "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
