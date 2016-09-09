@@ -16,6 +16,24 @@
       "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_9c25a5cb",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-09T00:12:39Z",
+      "side": 1,
+      "message": "and no !.\nhow about\n\n\"%s: WARNING: Unable to read-protect file: %s\\n\", private.Name(), err",
+      "parentUuid": "cb0212f7_1c3ab5ec",
+      "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
