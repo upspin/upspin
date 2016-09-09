@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0212f7_3c0fb13d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-09T01:54:27Z",
+      "side": 1,
+      "message": "Fixes #something.",
+      "revId": "8882482fb8a4a7cb7ada38f78852e4eaefb477f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
