@@ -34,6 +34,24 @@
       "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_bd42f261",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-09T00:39:14Z",
+      "side": 1,
+      "message": "I realize that the multiple newlines and CAPS WARNING and ! is like shouting, which is just rude.  But it makes me very nervous that this error message will get overlooked as just another junk line to ignore.  It matters.  If you ignore this, you\u0027ve probably wrecked the security of your upspin files for all time.\n\nI intend to replace it with something better, just not ready to buy into hexane/go-acl until discussing with you.\n\nOne reason I haven\u0027t merged yet is I\u0027m hoping to think of something better.",
+      "parentUuid": "cb0212f7_1c3ab5ec",
+      "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
