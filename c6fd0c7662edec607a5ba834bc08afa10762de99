@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0212f7_9c36c5ea",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-09T02:37:33Z",
+      "side": 1,
+      "message": "Eric: These messages are very noisy.\nHow important are they to general debugging?\nCan I disable them behind \"if false {}\" blocks?",
+      "revId": "c6fd0c7662edec607a5ba834bc08afa10762de99",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
