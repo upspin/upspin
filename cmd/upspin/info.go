@@ -157,5 +157,5 @@ const infoText = `{{.Name}}
 	{{end -}}
 	Block#	Offset	Size	Location
 	{{range $index, $block := .Blocks -}}
-	{{$index}} {{.Offset}} {{.Size}} {{.Location}}
+	{{$index}}	{{.Offset}}	{{.Size}}	{{.Location}}
 	{{end}}`
