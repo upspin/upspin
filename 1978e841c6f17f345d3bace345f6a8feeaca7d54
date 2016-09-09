@@ -70,6 +70,23 @@
       "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0bb0aabd_067ffa06",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-09T03:40:08Z",
+      "side": 1,
+      "message": "use %q",
+      "revId": "1978e841c6f17f345d3bace345f6a8feeaca7d54",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
