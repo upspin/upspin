@@ -7,11 +7,14 @@
 package remote
 
 import (
+	"fmt"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -33,17 +36,18 @@ var _ upspin.StoreServer = (*remote)(nil)
 
 // Get implements upspin.StoreServer.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	const op = "store/remote.Get"
+	op := opf("Get", "%q", ref)
+
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, op.error(err)
 	}
 	req := &proto.StoreGetRequest{
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Get(gCtx, req)
 	if err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
+		return nil, nil, op.error(errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
@@ -55,38 +59,40 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 // Put implements upspin.StoreServer.Put.
 // Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
-	const op = "store/remote.Put"
+	op := opf("Put", "%v bytes", len(data))
+
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return "", err
+		return "", op.error(err)
 	}
 	req := &proto.StorePutRequest{
 		Data: data,
 	}
 	resp, err := r.storeClient.Put(gCtx, req)
 	if err != nil {
-		return "", errors.E(op, errors.IO, err)
+		return "", op.error(errors.IO, err)
 	}
 	r.LastActivity()
-	return upspin.Reference(resp.Reference), errors.UnmarshalError(resp.Error)
+	return upspin.Reference(resp.Reference), op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Delete implements upspin.StoreServer.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
-	const op = "store/remote.Delete"
+	op := opf("Delete", "%q", ref)
+
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return err
+		return op.error(err)
 	}
 	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Delete(gCtx, req)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return op.error(errors.IO, err)
 	}
 	r.LastActivity()
-	return errors.UnmarshalError(resp.Error)
+	return op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -96,23 +102,24 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) (upspin.UserName, error) {
-	const op = "store/remote.Configure"
+	op := opf("Configure", "%v", options)
+
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
 	resp, err := r.storeClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return "", errors.E(op, errors.IO, err)
+		return "", op.error(errors.IO, err)
 	}
-	return "", errors.UnmarshalError(resp.Error)
+	return "", op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "store/remote.Dial"
+	op := opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	var err error
@@ -130,7 +137,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		authClient, err = grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
 	}
 	if err != nil {
-		return nil, errors.E(op, errors.IO, e, err)
+		return nil, op.error(errors.IO, e, err)
 	}
 
 	// The connection is closed when this service is released (see Bind.Release)
@@ -141,10 +148,10 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 		// Configure the cache connection and confirm the user.
 		serverUser, err := authClient.CacheConfigure(context, e)
 		if err != nil {
-			return nil, err
+			return nil, op.error(err)
 		}
 		if serverUser != context.UserName() {
-			return nil, errors.E("Dial", errors.Invalid, serverUser, errors.Errorf("incorrect cache user"))
+			return nil, op.error(errors.Invalid, serverUser, errors.Errorf("incorrect cache user"))
 		}
 	}
 
@@ -165,4 +172,35 @@ const transport = upspin.Remote
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterStoreServer(transport, r)
+}
+
+func opf(method string, format string, args ...interface{}) *operation {
+	op := &operation{"store/remote." + method, fmt.Sprintf(format, args...)}
+	log.Debug.Print(op)
+	return op
+}
+
+type operation struct {
+	op   string
+	args string
+}
+
+func (op *operation) String() string {
+	return fmt.Sprintf("%s(%s)", op.op, op.args)
+}
+
+func (op *operation) error(args ...interface{}) error {
+	if len(args) == 0 {
+		panic("error called with zero args")
+	}
+	if len(args) == 1 {
+		if e, ok := args[0].(error); ok && e == upspin.ErrFollowLink {
+			return e
+		}
+		if args[0] == nil {
+			return nil
+		}
+	}
+	log.Debug.Printf("%v error: %v", op, errors.E(args...))
+	return errors.E(append([]interface{}{op.op}, args...)...)
 }
