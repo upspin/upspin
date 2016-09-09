@@ -51,7 +51,7 @@ type keyHashArray [sha256.Size]byte // sometimes we need the array
 func ecdsaKeyHash(p *ecdsa.PublicKey) []byte {
 	name, ok := ellipticNames[p.Curve.Params().Name]
 	if !ok { // supposedly can't construct such an ecdsa.PublicKey
-		log.Printf("unrecognized key type: %s", p.Curve.Params().Name)
+		log.Error.Printf("pack/ee: unrecognized key type: %s", p.Curve.Params().Name)
 		return nil
 	}
 	keyBytes := upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", name, p.X.String(), p.Y.String()))
@@ -242,7 +242,7 @@ func (bp *blockPacker) Close() error {
 		}
 		ownerKey := u.PublicKey
 		if ownerKey == ctx.Factotum().PublicKey() {
-			log.Debug.Printf("Is it surprising that %s != %s but they have the same keys?", owner, ctx.UserName())
+			log.Debug.Printf("pack/ee: %q != %q, but they have the same keys. odd?", owner, ctx.UserName())
 			wrap = wrap[:1]
 		} else {
 			p, _, err = factotum.ParsePublicKey(ownerKey)
@@ -314,9 +314,9 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 	dkey := make([]byte, aesKeyLen)
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
-	log.Debug.Printf("Unpack for %x\n", rhash)
+	log.Debug.Printf("pack/ee: unpack for %x", rhash)
 	for _, w := range wrap {
-		log.Debug.Printf("           %x\n", w.keyHash)
+		log.Debug.Printf("pack/ee:        key %x\n", w.keyHash)
 		if !bytes.Equal(rhash, w.keyHash) {
 			continue
 		}
@@ -423,7 +423,7 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
 		sig, sig2, wrap, cipherSum, err := pdUnmarshal(*d)
 		if err != nil {
-			log.Printf("eePack: pdUnmarshal failed in Share: %v", err)
+			log.Error.Printf("pack/ee.Share: pdUnmarshal failed: %v", err)
 			for jj := j; j < len(packdata); jj++ {
 				packdata[jj] = nil
 			}
@@ -440,7 +440,7 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 			}
 			dkey, err = aesUnwrap(ctx.Factotum(), w)
 			if err != nil {
-				log.Printf("dkey unwrap failed: %v", err)
+				log.Error.Printf("pack/ee: dkey unwrap failed: %v", err)
 				break
 			}
 		}
@@ -533,14 +533,12 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 		}
 	}
 	if !wrapFound {
-		log.Printf("unwrap failed: %s", errNoWrappedKey)
 		return errors.E(op, d.Name, errNoWrappedKey)
 	}
 
 	// Decode my wrapped key using my private key
 	dkey, err = aesUnwrap(ctx.Factotum(), w)
 	if err != nil {
-		log.Printf("unwrap failed: %s", err)
 		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
 
@@ -549,7 +547,6 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
-		log.Println("verify failed")
 		return errors.E(op, d.Name, errVerify)
 	}
 
@@ -702,19 +699,16 @@ func aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	strong := make([]byte, aesKeyLen)
 	_, err = io.ReadFull(hkdf, strong)
 	if err != nil {
-		log.Printf("Error reading from hkdf: %v", err)
 		return
 	}
 
 	// Step 3. Decrypt dkey.
 	block, err := aes.NewCipher(strong)
 	if err != nil {
-		log.Printf("Error in creating new cipher block: %v", err)
 		return
 	}
 	aead, err := cipher.NewGCM(block)
 	if err != nil {
-		log.Printf("Error in creating new GCM block: %v", err)
 		return
 	}
 	dkey = make([]byte, 0, aesKeyLen)
