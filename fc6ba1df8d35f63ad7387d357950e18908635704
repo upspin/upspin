@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0212f7_dc020d17",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-09T00:34:30Z",
+      "side": 1,
+      "message": "Should this interface also cover writing to and updating keys (the stuff that the upspin command does)? I feel like it should.\n\nAnd if that\u0027s the case, maybe the interface should be in package \"key/store\"?\n\nThese can be TODOs, but we should think about it now.",
+      "revId": "fc6ba1df8d35f63ad7387d357950e18908635704",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb0212f7_fc05c920",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-09T00:34:30Z",
+      "side": 1,
+      "message": "I think the name of this (and its underlying implementation) should reference the fact that it\u0027s reading a file from disk. NewFileKeyStore/fileKeyStore? NewDirKeyStore/dirKeyStore/?",
+      "revId": "fc6ba1df8d35f63ad7387d357950e18908635704",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
