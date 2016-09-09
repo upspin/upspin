@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b69387d9_d8e6ecaa",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-09T02:47:44Z",
+      "side": 1,
+      "message": "Or   \"pack/ee: %q and %q have the same keys\"",
+      "parentUuid": "cb0212f7_5c5cbd1d",
+      "revId": "c6fd0c7662edec607a5ba834bc08afa10762de99",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb0212f7_9c36c5ea",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-09T02:37:33Z",
       "side": 1,
       "message": "Eric: These messages are very noisy.\nHow important are they to general debugging?\nCan I disable them behind \"if false {}\" blocks?",
+      "revId": "c6fd0c7662edec607a5ba834bc08afa10762de99",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b69387d9_f8eba86f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-09T02:47:44Z",
+      "side": 1,
+      "message": "I haven\u0027t seen problems with the key search lately, so ok to delete this and the one below.",
+      "parentUuid": "cb0212f7_9c36c5ea",
       "revId": "c6fd0c7662edec607a5ba834bc08afa10762de99",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
