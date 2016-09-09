@@ -7,12 +7,15 @@
 package remote
 
 import (
+	"fmt"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
+	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -34,38 +37,47 @@ var _ upspin.KeyServer = (*remote)(nil)
 
 // Lookup implements upspin.Key.Lookup.
 func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/remote.Lookup"
+	op := opf("Lookup", "%q", name)
+
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),
 	}
 	resp, err := r.keyClient.Lookup(gContext.Background(), req)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, op.error(errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
-		return nil, errors.UnmarshalError(resp.Error)
+		return nil, op.error(errors.UnmarshalError(resp.Error))
 	}
 	return proto.UpspinUser(resp.User), nil
 }
 
+func userName(user *upspin.User) string {
+	if user == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%q", user.Name)
+}
+
 // Put implements upspin.Key.Put.
 func (r *remote) Put(user *upspin.User) error {
-	const op = "key/remote.Put"
+	op := opf("Put", "%v", userName(user))
+
 	gCtx, err := r.NewAuthContext()
 	if err != nil {
-		return err
+		return op.error(err)
 	}
 	req := &proto.KeyPutRequest{
 		User: proto.UserProto(user),
 	}
 	resp, err := r.keyClient.Put(gCtx, req)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return op.error(errors.IO, err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
-		return errors.UnmarshalError(resp.Error)
+		return op.error(errors.UnmarshalError(resp.Error))
 	}
 	return nil
 }
@@ -77,27 +89,29 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 // Configure implements upspin.Service.
 func (r *remote) Configure(options ...string) (upspin.UserName, error) {
-	const op = "key/remote.Configure"
+	op := opf("Configure", "%v", options)
+
 	req := &proto.ConfigureRequest{
 		Options: options,
 	}
 	resp, err := r.keyClient.Configure(gContext.Background(), req)
 	if err != nil {
-		return "", errors.E(op, errors.IO, err)
+		return "", op.error(errors.IO, err)
 	}
-	return "", errors.UnmarshalError(resp.Error)
+	return "", op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Dial implements upspin.Service.
 func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "key/remote.Dial"
+	op := opf("Dial", "%q, %q", context.UserName(), e)
+
 	if e.Transport != upspin.Remote {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, e, err)
+		return nil, op.error(errors.IO, e, err)
 	}
 
 	// The connection is closed when this service is released (see Bind.Release)
@@ -120,4 +134,35 @@ const transport = upspin.Remote
 func init() {
 	r := &remote{} // uninitialized until Dial time.
 	bind.RegisterKeyServer(transport, usercache.Global(r))
+}
+
+func opf(method string, format string, args ...interface{}) *operation {
+	op := &operation{"key/remote." + method, fmt.Sprintf(format, args...)}
+	log.Debug.Print(op)
+	return op
+}
+
+type operation struct {
+	op   string
+	args string
+}
+
+func (op *operation) String() string {
+	return fmt.Sprintf("%s(%s)", op.op, op.args)
+}
+
+func (op *operation) error(args ...interface{}) error {
+	if len(args) == 0 {
+		panic("error called with zero args")
+	}
+	if len(args) == 1 {
+		if e, ok := args[0].(error); ok && e == upspin.ErrFollowLink {
+			return e
+		}
+		if args[0] == nil {
+			return nil
+		}
+	}
+	log.Debug.Printf("%v error: %v", op, errors.E(args...))
+	return errors.E(append([]interface{}{op.op}, args...)...)
 }
