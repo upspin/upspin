@@ -284,6 +284,10 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
+	if err := cleanup(env); err != nil {
+		t.Fatal(err)
+	}
+
 	readerContext, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
