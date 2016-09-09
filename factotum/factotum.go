@@ -55,25 +55,25 @@ func KeyHash(p upspin.PublicKey) []byte {
 // best local means of protecting private keys.  Please do not break the abstraction
 // by hand coding direct generation or use of private keys.
 func New(dir string) (upspin.Factotum, error) {
-	op := "NewFactotum"
+	const op = "factotum.New"
 	privBytes, err := readFile(op, dir, "secret.upspinkey")
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	privBytes = stripCR(privBytes)
 	pubBytes, err := readFile(op, dir, "public.upspinkey")
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	pubBytes = stripCR(pubBytes)
 	pfk, err := makeKey(upspin.PublicKey(pubBytes), string(privBytes))
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	fm := make(map[keyHashArray]factotumKey)
 	var h keyHashArray
 	copy(h[:], pfk.keyHash)
-	log.Debug.Printf("factotum %x %q\n", h, pubBytes)
+	log.Debug.Printf("%s(%q): %x", op, dir, h)
 	fm[h] = *pfk
 	f := &factotum{
 		current:  h,
@@ -106,11 +106,11 @@ func New(dir string) (upspin.Factotum, error) {
 		// lines[4] "8220...5934" private D
 		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4])
 		if err != nil {
-			break
+			return f, errors.E(op, err)
 		}
 		var h keyHashArray
 		copy(h[:], pfk.keyHash)
-		log.Debug.Printf("factotum %x %q\n", h, lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n")
+		log.Debug.Printf("%s(%q): %x (older)", op, dir, h)
 		_, ok := f.keys[h]
 		if ok { // Duplicate.
 			continue // TODO Should we warn?
@@ -119,7 +119,7 @@ func New(dir string) (upspin.Factotum, error) {
 		f.previous = h
 		lines = lines[5:]
 	}
-	return f, err
+	return f, nil
 }
 
 // stripCR removes \r.
