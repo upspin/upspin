@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6becc60a_d115c4a9",
+        "filename": "auth/session.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "here and on line 101 s/inplements/implements/",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_911f3cc8",
+        "filename": "cmd/storecacheserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "s/storate/storage/\ns/it/itself/",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_b16c8033",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "want package comment only once.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_312f70fd",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "s/cache/storeCache/",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_112c6c04",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "s/sofr/soft/\nalso s/, not a hard//",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_3106507b",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "first mention that there is a cache file involved.\nthe package comment should mention that.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_d1fca45b",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "what is the lock invariant on entry? on return?",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_f1f7a874",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "s/  / /\ns/till/until/\ns/its/it\u0027s/",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_b1f12082",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_91f61c76",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_11034c6b",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "check error?\nlog or exit on error?",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_f1620840",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_d167044e",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "see below - should be an atomic.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_710cd89c",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "this feels like it should be an atomic read rather than two lock operations.\ni know it\u0027s not implemented here but still.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_91717c09",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "want package comment only once",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_5122f414",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "what is byteLimit? total size over all requests or just one? you have a helpful comment on refLimit.",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_7125f81a",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-11T01:51:32Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "bc1cbceefe5031e13b62f873c2d1a448fcc0f4fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
