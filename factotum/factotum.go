@@ -49,8 +49,36 @@ func KeyHash(p upspin.PublicKey) []byte {
 	return keyHash[:]
 }
 
+// NewFromDir returns a new Factotum providing all needed private key operations,
+// loading keys from a directory containing *.upspinkey files.
+// Our desired end state is that Factotum is implemented on each platform by the
+// best local means of protecting private keys.  Please do not break the abstraction
+// by hand coding direct generation or use of private keys.
+func NewFromDir(dir string) (upspin.Factotum, error) {
+	const op = "factotum.NewFromDir"
+	privBytes, err := readFile(op, dir, "secret.upspinkey")
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	privBytes = stripCR(privBytes)
+	pubBytes, err := readFile(op, dir, "public.upspinkey")
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	pubBytes = stripCR(pubBytes)
+
+	// Read older key pairs.
+	s2, err := readFile(op, dir, "secret2.upspinkey")
+	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		return nil, err
+	}
+	s2 = stripCR(s2)
+
+	return newFactotum(fmt.Sprintf("%s(%q)", op, dir), pubBytes, privBytes, s2)
+}
+
 // newFactotum creates a new Factotum using the given keys. It is called from
-// new.go and new_mobile.go.
+// new_mobile.go.
 func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, error) {
 	pfk, err := makeKey(upspin.PublicKey(public), string(private))
 	if err != nil {

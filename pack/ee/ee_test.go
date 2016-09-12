@@ -284,7 +284,7 @@ func TestBadSharing(t *testing.T) {
 		userToMatch: []upspin.UserName{bobsUserName, joesUserName},
 		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
 	}
-	f, err := factotum.New(repo("key/testdata/joe"))
+	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -302,7 +302,7 @@ func TestBadSharing(t *testing.T) {
 
 	// Now load Bob as the current user.
 	ctx = context.SetUserName(ctx, bobsUserName)
-	f, err = factotum.New(repo("key/testdata/bob"))
+	f, err = factotum.NewFromDir(repo("key/testdata/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -325,7 +325,7 @@ func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	if j < 0 {
 		log.Fatalf("malformed username %s", name)
 	}
-	f, err := factotum.New(repo("key/testdata/" + string(name[:j])))
+	f, err := factotum.NewFromDir(repo("key/testdata/" + string(name[:j])))
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
