@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_f437ad36",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-12T20:56:55Z",
+      "side": 1,
+      "message": "Ah, good point. I had different func names originally but then changed them. Now I\u0027ve put them each in a separate file.",
+      "parentUuid": "cbbf72c0_74e8fda6",
+      "revId": "a85b7de64f5279995d18f467986718e2dea1260f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbbf72c0_b488d521",
         "filename": "factotum/factotum_mobile.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-12T20:46:35Z",
       "side": 1,
       "message": "s/from where can read/suitable for reading/",
+      "revId": "a85b7de64f5279995d18f467986718e2dea1260f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_1435092f",
+        "filename": "factotum/factotum_mobile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-12T20:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbbf72c0_b488d521",
       "revId": "a85b7de64f5279995d18f467986718e2dea1260f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
