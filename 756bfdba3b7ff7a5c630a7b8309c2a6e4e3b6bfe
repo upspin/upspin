@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6becc60a_f14c4842",
+        "filename": "user/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-12T21:58:42Z",
+      "side": 1,
+      "message": "this is out of date",
+      "revId": "756bfdba3b7ff7a5c630a7b8309c2a6e4e3b6bfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
