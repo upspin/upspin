@@ -174,6 +174,57 @@
       "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_315530ec",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:05:00Z",
+      "side": 1,
+      "message": "log this error\nalthough maybe it should be returned and handled\nso we want cache failures to be soft or hard failures?",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_11522c04",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:05:00Z",
+      "side": 1,
+      "message": "log",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_f17d6877",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:05:00Z",
+      "side": 1,
+      "message": "log. this is a particularly weird error, right?",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
