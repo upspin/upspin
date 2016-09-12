@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6becc60a_51cb149d",
+        "filename": "factotum/new.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-12T21:54:15Z",
+      "side": 1,
+      "message": "the parenthetical is not grammatical. maybe\n\nfrom a directory, which should contain *.upspinkey files.",
+      "revId": "4800c4bb087303fbe1bf65f8444b8287e9b6c0a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
