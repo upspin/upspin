@@ -141,7 +141,7 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 }
 
 func startClient(port string) {
-	f, err := factotum.New(repo("key/testdata/joe"))
+	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {
 		log.Fatal(err)
 	}

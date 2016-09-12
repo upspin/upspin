@@ -91,7 +91,7 @@ func setupTestContext(t *testing.T) upspin.Context {
 		tLocs = append(tLocs, loc)
 	}
 
-	f, err := factotum.New(repo("bob"))
+	f, err := factotum.NewFromDir(repo("bob"))
 	if err != nil {
 		t.Fatal(err)
 	}

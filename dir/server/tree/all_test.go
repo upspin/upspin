@@ -692,7 +692,7 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
 func newConfigForTesting(t *testing.T) (upspin.Context, *Log, *LogIndex) {
-	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
+	factotum, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
