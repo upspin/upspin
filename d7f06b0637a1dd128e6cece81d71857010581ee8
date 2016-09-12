@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_ceb1474e",
+        "filename": "cmd/storecacheserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T02:57:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_91485cb3",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_713e1819",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-11T22:12:41Z",
       "side": 1,
       "message": "write-through",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_8eb02f4c",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T02:57:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_713e1819",
       "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_aeb40b3f",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T02:57:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_513b1427",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_31389028",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-11T22:12:41Z",
       "side": 1,
       "message": "comment that this does not need mutex. maybe move it above the mutex; the tradition is to put the mutex above all the fields it protects.",
+      "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_6eabd3e3",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T02:57:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_31389028",
       "revId": "d7f06b0637a1dd128e6cece81d71857010581ee8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
