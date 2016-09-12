@@ -19,6 +19,42 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_9e021ae0",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_d116e45c",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_dee3b22d",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_d116e45c",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_b10b6037",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -30,6 +66,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "s/more or less/approximately/\nit\u0027s longer but easier to parse",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_decad297",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_b10b6037",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_9e45bafb",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_7106182e",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_5103141c",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -64,6 +136,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "return an error",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_5eeec2ed",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_5103141c",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_fe8f8e2d",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "fine by me.",
+      "parentUuid": "6becc60a_11fd8cff",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_912a9c85",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -98,6 +206,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "you should just return the file path from this func, and the one place you actually use the dir you can use filepath.Dir(file)",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_919beb63",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_912a9c85",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +247,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_112c3b05",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "predictable isn\u0027t a problem. Not sufficiently spread will indeed leave me with large directories. Should it happen it is just a matter of performance, not correctness. Less than two characters will be a problem. I should at least check...",
+      "parentUuid": "6becc60a_f1044821",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_d13024f7",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -132,6 +276,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "// The loop terminates either by returning the cached data\n// or while holding the cachedRef\u0027s Lock, ready to fetch\n// the data for that reference and populate the cache.",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_f105ff6e",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_d13024f7",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +317,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_b1562759",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Yes.  I\u0027m happy with that. Two reads of the same file at the same time will usually go slower if not serialized.",
+      "parentUuid": "6becc60a_f15688fd",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_1120eca7",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -166,6 +346,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "// Could not read the cached data.\n// Invalidate the cachedRef so that it will be fetched again.",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_d153a367",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_1120eca7",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_b1d0e7be",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Getting is costly enough that I\u0027m happy passing it.",
+      "parentUuid": "6becc60a_313ad0d2",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_71405838",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -217,6 +433,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "filepath.Dir(file)",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_71448f9e",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_71405838",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -240,6 +474,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_51bb137a",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_1137cce8",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_b10ec03d",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -251,6 +503,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "can you choose a more descriptive name for this method?\nremoveOldest ? flushOldest?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_d1a6435f",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_b10ec03d",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -274,6 +544,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_11a19b44",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_71197882",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_d15b8425",
         "filename": "grpc/storecacheserver/cache.go",
         "patchSetId": 8
@@ -285,6 +573,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "It also means the file will never be deleted from local disk, right?\nseems bad",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_515eb347",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Which is why it is logged.",
+      "parentUuid": "6becc60a_d15b8425",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -308,6 +614,24 @@
     },
     {
       "key": {
+        "uuid": "cbbf72c0_91684bef",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6becc60a_b16000d7",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6becc60a_511c3481",
         "filename": "grpc/storecacheserver/server.go",
         "patchSetId": 8
@@ -319,6 +643,24 @@
       "writtenOn": "2016-09-12T07:02:48Z",
       "side": 1,
       "message": "The purpose of the grpc/storeserver package is to abstract away the wrapper that turns an upspin.StoreServer into a proto.StoreServer.\n\nI think your cmd/storecacheserver should take an upspin.StoreServer that is the cache and use grpc/storeserver to serve it. So basically you\u0027d implement the proxying layer as an upspin.StoreServer itself.\n\nDoes this make sense?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_9e2bfa89",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-12T19:40:34Z",
+      "side": 1,
+      "message": "It is true that the interface to the grpc cache server is the same syntactically as the store server, i.e., both proto.storeserver and there is much commonality between the 50 lines or so of both commands.  In fact, my first version did exactly that.\n\nHowever, the networking (which includes the initial authentication)  is intentionally different which is why I didn\u0027t do it.  To capture that, I\u0027d have to make a new ServerKind that was gcpcache or some similar name and then stick conditionals in the storeserver/main.go to start the networking differently.  I figured the code reuse wasn\u0027t worth the added overloading.\n\nAlso, I want to eventually make this both the store and directory server which would make me have to split it out anyways.",
+      "parentUuid": "6becc60a_511c3481",
       "revId": "bd6575ade581d76290250be6006ead463f330849",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
