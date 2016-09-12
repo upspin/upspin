@@ -24,9 +24,9 @@ import (
 	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/metric"
-	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 
 	// Load required transports
 	_ "upspin.io/key/transports"
@@ -118,7 +118,7 @@ func isLocal(addr string) bool {
 }
 
 func setupTestUser(key upspin.KeyServer) {
-	user, _, err := path.UserAndDomain(upspin.UserName(*testUser))
+	user, _, err := user.Parse(upspin.UserName(*testUser))
 	if err != nil {
 		log.Fatal(err)
 	}

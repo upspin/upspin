@@ -9,18 +9,19 @@ import (
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 // UserName verifies that the name is a syntactically valid user's email address.
 // It also requires that the domain name be lower-cased to avoid ambiguity.
-func UserName(user upspin.UserName) error {
+func UserName(userName upspin.UserName) error {
 	const op = "valid.UserName"
-	u, d, err := path.UserAndDomain(user)
+	u, d, err := user.Parse(userName)
 	if err != nil {
 		return errors.E(op, err)
 	}
-	if string(user) != u+"@"+d {
-		return errors.E(op, user, "not canonically formatted")
+	if string(userName) != u+"@"+d {
+		return errors.E(op, userName, "not canonically formatted")
 	}
 	return nil
 }
