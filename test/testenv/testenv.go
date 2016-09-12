@@ -148,7 +148,7 @@ func New(setup *Setup) (*Env, error) {
 		case "server":
 			// Set up user and factotum.
 			ctx = context.SetUserName(ctx, "upspin-test@google.com")
-			f, err := factotum.New(repo("key/testdata/upspin-test"))
+			f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
@@ -263,7 +263,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	f, err := factotum.New(repo("key/testdata/" + string(user)))
+	f, err := factotum.NewFromDir(repo("key/testdata/" + string(user)))
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
