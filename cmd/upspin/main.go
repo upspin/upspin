@@ -24,6 +24,7 @@ import (
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 
 	// Load useful packers
 
@@ -449,26 +450,26 @@ func (s *State) user(args ...string) {
 
 func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	data := s.readAll(inFile)
-	user := new(upspin.User)
-	err := json.Unmarshal(data, user)
+	userStrct := new(upspin.User)
+	err := json.Unmarshal(data, userStrct)
 	if err != nil {
 		// TODO(adg): better error message?
 		s.exit(err)
 	}
 	// Validate public key.
-	if user.PublicKey == "" && !force {
+	if userStrct.PublicKey == "" && !force {
 		s.exitf("An empty public key will prevent user from accessing services. To override use -force.")
 	}
-	_, _, err = factotum.ParsePublicKey(user.PublicKey)
+	_, _, err = factotum.ParsePublicKey(userStrct.PublicKey)
 	if err != nil && !force {
 		s.exitf("invalid public key, to override use -force: %s", err.Error())
 	}
 	// Validate username
-	_, _, err = path.UserAndDomain(user.Name)
+	_, _, err = user.Parse(userStrct.Name)
 	if err != nil {
 		s.exit(err)
 	}
-	err = keyServer.Put(user)
+	err = keyServer.Put(userStrct)
 	if err != nil {
 		s.exit(err)
 	}
