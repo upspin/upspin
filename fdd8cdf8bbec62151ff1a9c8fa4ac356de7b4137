@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbbf72c0_34b68593",
+        "filename": "factotum/new.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-12T21:15:45Z",
+      "side": 1,
+      "message": "With this reshuffle of the code, stripCR needs to deal with nil s2.  That\u0027s a change from before.",
+      "revId": "fdd8cdf8bbec62151ff1a9c8fa4ac356de7b4137",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
