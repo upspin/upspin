@@ -19,9 +19,9 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
-	"upspin.io/path"
 	"upspin.io/test/servermux"
 	"upspin.io/upspin"
+	"upspin.io/user"
 
 	// Implementations that are instantiated explicitly by New.
 	dirserver_inprocess "upspin.io/dir/inprocess"
@@ -259,7 +259,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	ctx = context.SetPacking(ctx, e.Setup.Packing)
 
 	// Set up a factotum for the user.
-	user, _, err := path.UserAndDomain(userName)
+	user, _, err := user.Parse(userName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

@@ -27,6 +27,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 const (
@@ -215,7 +216,7 @@ func newAccess(pathName upspin.PathName) (*Access, *path.Parsed, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	_, domain, err := path.UserAndDomain(parsed.User())
+	_, domain, err := user.Parse(parsed.User())
 	// We don't expect an error since it's been parsed, but check anyway.
 	if err != nil {
 		return nil, nil, err
@@ -736,7 +737,7 @@ func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
 		return nil, err
 	}
 	access.owner = access.parsed.User()
-	_, access.domain, err = path.UserAndDomain(access.parsed.User())
+	_, access.domain, err = user.Parse(access.parsed.User())
 	if err != nil {
 		return nil, err
 	}
@@ -747,7 +748,7 @@ func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
 // If we encounter a new group in the list, we add it the list of groups to check and will
 // process it in another call from Can.
 func (a *Access) inList(requester path.Parsed, list []path.Parsed, groupsToCheck []path.Parsed) (bool, []path.Parsed) {
-	_, domain, err := path.UserAndDomain(requester.User())
+	_, domain, err := user.Parse(requester.User())
 	// We don't expect an error since it's been parsed, but check anyway.
 	if err != nil {
 		return false, nil

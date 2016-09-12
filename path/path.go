@@ -15,8 +15,8 @@ import (
 
 	gopath "path"
 
-	"upspin.io/errors"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 // Parsed represents a successfully parsed path name.
@@ -98,14 +98,14 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	const op = "path.Parse"
 	name := string(pathName)
 	// Pull off the user name.
-	var user string
+	var userName string
 	slash := strings.IndexByte(name, '/')
 	if slash < 0 {
-		user = name
+		userName = name
 	} else {
-		user = name[:slash]
+		userName = name[:slash]
 	}
-	if _, _, err := UserAndDomain(upspin.UserName(user)); err != nil {
+	if _, _, err := user.Parse(upspin.UserName(userName)); err != nil {
 		// Bad user name.
 		return Parsed{}, err
 	}
@@ -188,8 +188,8 @@ func (p Parsed) Compare(q Parsed) int {
 	if p.path == q.path {
 		return 0
 	}
-	pUser, pDomain, _ := UserAndDomain(p.User()) // Ignoring errors.
-	qUser, qDomain, _ := UserAndDomain(q.User()) // Ignoring errors.
+	pUser, pDomain, _ := user.Parse(p.User()) // Ignoring errors.
+	qUser, qDomain, _ := user.Parse(q.User()) // Ignoring errors.
 	switch {
 	case pDomain < qDomain:
 		return -1
@@ -259,7 +259,7 @@ func Clean(path upspin.PathName) upspin.PathName {
 		userPart = path
 		filePart = "/"
 	}
-	_, _, err := UserAndDomain(upspin.UserName(userPart))
+	_, _, err := user.Parse(upspin.UserName(userPart))
 	if err != nil {
 		// No user name at all, so just call Go's clean. Probably won't happen
 		// outside of tests, but one could imagine calling it on the file part
@@ -275,131 +275,4 @@ func Clean(path upspin.PathName) upspin.PathName {
 		return path
 	}
 	return userPart + cleanFilePart
-}
-
-// UserAndDomain splits an upspin.UserName into user and domain and returns the pair.
-// It also validates the name as an e-mail address and lower-cases the  domain
-// so it is canonical.
-// TODO: Need to think about Unicode user names.
-//
-// The rules are:
-//
-// <name> := <user name>@<domain name>
-//
-// <domain name> :=
-//
-// - each . separated token < 64 characters
-// - character set for tokens [a-z0-9\-]
-// - final token at least two characters
-// - whole name < 254 characters
-// - characters are case insensitive
-// - final period is OK.
-//
-// We ignore the rules of punycode, which is defined in https://tools.ietf.org/html/rfc3490 .
-//
-// <user name> :=
-//
-// Names are are constrained by what SMTP will allow, so these should be good:
-//
-// - upper and lower case A-Z, case matters.
-// - 0-9  !#$%&'*+-/=?^_{|}~
-// - utf // TODO.
-// - spaces
-//
-// Spaces may be problematic for us but we allow them here. TODO?
-//
-// Facebook and Google constrain you to [a-zA-Z0-9+-.],
-// ignoring the period and, in Google only, ignoring everything
-// from a plus sign onwards. We accept this set but do not follow
-// the ignore rules.
-//
-func UserAndDomain(userName upspin.UserName) (user string, domain string, err error) {
-	name := string(userName)
-	if len(userName) >= 254 {
-		return errUserName(userName, "name too long")
-	}
-	if strings.Count(name, "@") != 1 {
-		return errUserName(userName, "user name must contain one @ symbol")
-	}
-	at := strings.IndexByte(name, '@')
-	user, domain = name[:at], name[at+1:]
-	if user == "" {
-		return errUserName(userName, "missing user name")
-	}
-	if domain == "" {
-		return errUserName(userName, "missing domain name")
-	}
-	if strings.Count(domain, ".") == 0 {
-		return errUserName(userName, "domain name must contain a period")
-	}
-	// Valid user name?
-	for _, c := range user {
-		if !okUserNameChar(c) {
-			return errUserName(userName, "bad symbol in user name")
-		}
-	}
-	// Valid domain name?
-	period := -1 // First time through loop will fail if first byte is a period.
-	isUpper := false
-	for i, c := range domain {
-		if !okDomainChar(c) {
-			return errUserName(userName, "bad symbol in domain name")
-		}
-		if c == '.' {
-			if i-1 >= period+64 {
-				return errUserName(userName, "invalid domain name element")
-			}
-			if i-1 == period || i-1 >= period+64 {
-				return errUserName(userName, "invalid domain name element")
-			}
-			period = i
-		}
-		if 'A' <= c && c <= 'Z' {
-			isUpper = true
-		}
-	}
-	// Last domain element must be at least two bytes  (".co")
-	if period+2 >= len(domain) {
-		return errUserName(userName, "invalid domain name")
-	}
-	// Lower-case the domain name if necessary.
-	if isUpper {
-		domain = strings.ToLower(domain)
-	}
-	return user, domain, nil
-}
-
-func errUserName(user upspin.UserName, msg string) (string, string, error) {
-	const op = "path.UserAndDomain"
-	return "", "", errors.E(op, errors.Syntax, user, errors.Str(msg))
-}
-
-// See the comments for UserAndDomain.
-func okUserNameChar(r rune) bool {
-	switch {
-	case 'a' <= r && r <= 'z':
-		return true
-	case 'A' <= r && r <= 'Z':
-		return true
-	case '0' <= r && r <= '9':
-		return true
-	case strings.ContainsRune("!#$%&'*.+-/=?^_{|}~", r):
-		return true
-	}
-	return false
-}
-
-// See the comments for UserAndDomain.
-func okDomainChar(r rune) bool {
-	switch {
-	case 'a' <= r && r <= 'z':
-		return true
-	case 'A' <= r && r <= 'Z':
-		return true
-	case '0' <= r && r <= '9':
-		return true
-	case strings.ContainsRune("+-.", r):
-		return true
-	}
-	return false
 }
