@@ -11,9 +11,10 @@ package factotum
 
 import "upspin.io/upspin"
 
-// New returns a new Factotum by providing it with the raw representation of
-// an Upspin user's public, private and optionally, archived keys.
-func New(public, private, archived []byte) (upspin.Factotum, error) {
-	const op = "factotum.New(mobile)"
+// NewFromKeys returns a new Factotum by providing it with the raw
+// representation of an Upspin user's public, private and optionally, archived
+// keys.
+func NewFromKeys(public, private, archived []byte) (upspin.Factotum, error) {
+	const op = "factotum.NewFromKeys"
 	return newFactotum(op, public, private, archived)
 }
