@@ -122,7 +122,7 @@ func setupTestUser(key upspin.KeyServer) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := factotum.New(repo("key/testdata/" + user))
+	f, err := factotum.NewFromDir(repo("key/testdata/" + user))
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %q: %v", user, err)
 	}

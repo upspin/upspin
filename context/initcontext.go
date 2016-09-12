@@ -195,7 +195,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	if dir == "none" {
 		err = ErrNoFactotum
 	} else {
-		f, err := factotum.New(dir)
+		f, err := factotum.NewFromDir(dir)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
