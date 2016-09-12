@@ -1,0 +1,327 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6becc60a_d116e45c",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "s/ref/Ref",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_b10b6037",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "s/more or less/approximately/\nit\u0027s longer but easier to parse",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_7106182e",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "this should return an error. for instance, the directory could be a file",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_5103141c",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "return an error",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_11fd8cff",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "this will also remove the root. is that what we want?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_912a9c85",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "you should just return the file path from this func, and the one place you actually use the dir you can use filepath.Dir(file)",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_f1044821",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "references are not necessarily hashes, so this directory naming strategy could backfire if the prefixes are predictable. add a TODO?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_d13024f7",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "// The loop terminates either by returning the cached data\n// or while holding the cachedRef\u0027s Lock, ready to fetch\n// the data for that reference and populate the cache.",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_f15688fd",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "doesn\u0027t this serialize reads to the on-disk cached file?\nthat seems sub-optimal",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_1120eca7",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "// Could not read the cached data.\n// Invalidate the cachedRef so that it will be fetched again.",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_513d54c8",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "if you make this a method on cachedRef it can be symmetrical with saveToCacheFile and validate that it is of the expected size.",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_313ad0d2",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "being a method on cachedRef, this method already knows how to get the file path. i suggest removing the arg",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_71405838",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "filepath.Dir(file)",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_1137cce8",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "you must check the error on f.Close, because that may fail if there\u0027s a write error. i suggest not using defer, and write a helper like\n\ncleanup :\u003d func() {\n  f.Close()\n  if err :\u003d os.Remove(tmpName); err !\u003d nil {\n    // etc\n  }\n}\n\nthen in each of the following two error checks you can call\n\ncleanup()\nreturn err",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_b10ec03d",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "can you choose a more descriptive name for this method?\nremoveOldest ? flushOldest?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_71197882",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "check the error and log it",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_d15b8425",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "It also means the file will never be deleted from local disk, right?\nseems bad",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_b16000d7",
+        "filename": "grpc/storecacheserver/cache.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "check and log error",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_511c3481",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-12T07:02:48Z",
+      "side": 1,
+      "message": "The purpose of the grpc/storeserver package is to abstract away the wrapper that turns an upspin.StoreServer into a proto.StoreServer.\n\nI think your cmd/storecacheserver should take an upspin.StoreServer that is the cache and use grpc/storeserver to serve it. So basically you\u0027d implement the proxying layer as an upspin.StoreServer itself.\n\nDoes this make sense?",
+      "revId": "bd6575ade581d76290250be6006ead463f330849",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
