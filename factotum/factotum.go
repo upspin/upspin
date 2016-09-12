@@ -49,31 +49,17 @@ func KeyHash(p upspin.PublicKey) []byte {
 	return keyHash[:]
 }
 
-// New returns a new Factotum providing all needed private key operations,
-// loading keys from dir/*.upspinkey.
-// Our desired end state is that Factotum is implemented on each platform by the
-// best local means of protecting private keys.  Please do not break the abstraction
-// by hand coding direct generation or use of private keys.
-func New(dir string) (upspin.Factotum, error) {
-	const op = "factotum.New"
-	privBytes, err := readFile(op, dir, "secret.upspinkey")
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	privBytes = stripCR(privBytes)
-	pubBytes, err := readFile(op, dir, "public.upspinkey")
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	pubBytes = stripCR(pubBytes)
-	pfk, err := makeKey(upspin.PublicKey(pubBytes), string(privBytes))
+// newFactotum creates a new Factotum using the given keys. It is called from
+// new.go and new_mobile.go.
+func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, error) {
+	pfk, err := makeKey(upspin.PublicKey(public), string(private))
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	fm := make(map[keyHashArray]factotumKey)
 	var h keyHashArray
 	copy(h[:], pfk.keyHash)
-	log.Debug.Printf("%s(%q): %x", op, dir, h)
+	log.Debug.Printf("%s: %x", op, h)
 	fm[h] = *pfk
 	f := &factotum{
 		current:  h,
@@ -81,17 +67,11 @@ func New(dir string) (upspin.Factotum, error) {
 		keys:     fm,
 	}
 
-	// Read older key pairs.
 	// Current file format is "# EE date" concatenated with old public.upspinkey
 	// then old secret.upspinkey, and repeat.  This should be cleaned up someday
 	// when we have a better idea of what other kinds of keys we need to save.
 	// For now, it is cavalier about bailing out at first little mistake.
-	s2, err := readFile(op, dir, "secret2.upspinkey")
-	if err != nil {
-		return f, nil
-	}
-	s2 = stripCR(s2)
-	lines := strings.Split(string(s2), "\n")
+	lines := strings.Split(string(archived), "\n")
 	for {
 		if len(lines) < 5 {
 			break // This is not enough for a complete key pair.
@@ -110,7 +90,7 @@ func New(dir string) (upspin.Factotum, error) {
 		}
 		var h keyHashArray
 		copy(h[:], pfk.keyHash)
-		log.Debug.Printf("%s(%q): %x (older)", op, dir, h)
+		log.Debug.Printf("%s: %x (older)", op, h)
 		_, ok := f.keys[h]
 		if ok { // Duplicate.
 			continue // TODO Should we warn?
