@@ -91,7 +91,7 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 	ctx := setup(userName, pub)
 	if packing == upspin.EEPack {
 		ctx = context.SetPacking(ctx, packing)
-		f, err := factotum.New(repo(keyDir))
+		f, err := factotum.NewFromDir(repo(keyDir))
 		if err != nil {
 			b.Fatal(err)
 		}

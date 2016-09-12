@@ -757,7 +757,7 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 var generatorInstance upspin.DirServer
 
 func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
-	factotum, err := factotum.New(repo("key/testdata/upspin-test"))
+	factotum, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
