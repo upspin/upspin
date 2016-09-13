@@ -6,6 +6,9 @@ package usercache
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -14,12 +17,14 @@ import (
 	"upspin.io/cache"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/upspin"
 )
 
 // service is a KeyServer implementation that counts lookups.
 type service struct {
 	lookups int
+	dials   int
 	entries map[string]*upspin.User
 
 	context  upspin.Context
@@ -43,6 +48,12 @@ func init() {
 	}
 }
 
+var (
+	testDirEndpoint   = upspin.Endpoint{upspin.InProcess, "dir"}
+	testStoreEndpoint = upspin.Endpoint{upspin.InProcess, "store"}
+	testPublicKey     upspin.PublicKey
+)
+
 // setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, d time.Duration, user string) (uncached, cached upspin.KeyServer) {
 	c := context.New()
@@ -52,13 +63,116 @@ func setup(t *testing.T, d time.Duration, user string) (uncached, cached upspin.
 	keyService.context = c
 
 	cache := &userCacheServer{
-		KeyServer: keyService,
+		base: keyService,
 		cache: &userCache{
 			entries:  cache.NewLRU(256),
 			duration: d,
 		},
 	}
-	return keyService, cache
+
+	if user == "upspin-test@google.com" {
+		c = context.SetDirEndpoint(c, testDirEndpoint)
+		c = context.SetStoreEndpoint(c, testStoreEndpoint)
+		f, err := factotum.New(repo("key/testdata/upspin-test"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		c = context.SetFactotum(c, f)
+		testPublicKey = f.PublicKey()
+	}
+
+	svc, err := cache.Dial(c, keyService.endpoint)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return keyService, svc.(upspin.KeyServer)
+}
+
+// TestDial tests that we don't Dial the underlying
+// service if the Lookup is for the user in the
+// Dialed context, and that we dial just once for
+// Lookups of other users.
+func TestDial(t *testing.T) {
+	const name = "upspin-test@google.com"
+	_, svc := setup(t, 10*time.Second, name)
+
+	keyService.dials = 0
+
+	// Try asking for the user in the dialed context.
+	// We should get it back without doing any actual dials.
+	got, err := svc.Lookup(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := keyService.dials; n != 0 {
+		t.Fatalf("underlying key service dialed %d times, want 0", n)
+	}
+	want := &upspin.User{
+		Name:      name,
+		Dirs:      []upspin.Endpoint{testDirEndpoint},
+		Stores:    []upspin.Endpoint{testStoreEndpoint},
+		PublicKey: testPublicKey,
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("Lookup(%q) returned %#v, want %#v", name, got, want)
+	}
+
+	// While asking for other users should do a single dial.
+	if _, err = svc.Lookup("a@a.com"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = svc.Lookup("b@b.com"); err != nil {
+		t.Fatal(err)
+	}
+	if n := keyService.dials; n != 1 {
+		t.Fatalf("underlying key service dialed %d times, want 1", n)
+	}
+
+	// Asking for the context user again should still return the same data.
+	got, err = svc.Lookup(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("Lookup(%q) returned %#v, want %#v", name, got, want)
+	}
+}
+
+// TestPut tests that a Put through the cache reaches the
+// underlying cache and invalidates the cache.
+func TestPut(t *testing.T) {
+	const name = "user@example.com"
+	keyService.add(name)
+
+	uncached, svc := setup(t, 10*time.Second, name)
+
+	u, err := svc.Lookup(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := *u
+	want.Dirs = []upspin.Endpoint{testDirEndpoint}
+	want.Stores = []upspin.Endpoint{testStoreEndpoint}
+
+	if err := svc.Put(&want); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := svc.Lookup(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(*got, want) {
+		t.Fatalf("Lookup(%q) returned %#v, want %#v", name, *got, want)
+	}
+	got, err = uncached.Lookup(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(*got, want) {
+		t.Fatalf("Lookup(%q) returned %#v, want %#v", name, *got, want)
+	}
 }
 
 // TestCache tests the User cache for equivalence with the uncached version and
@@ -121,14 +235,14 @@ func try(t *testing.T, uncached, cached upspin.KeyServer, name string) {
 	su, serr := uncached.Lookup(upspin.UserName(name))
 	cu, cerr := cached.Lookup(upspin.UserName(name))
 
+	if !reflect.DeepEqual(serr, cerr) {
+		t.Fatalf("for %s got %v expect %v", name, cerr, serr)
+	}
 	if !reflect.DeepEqual(su.Dirs, cu.Dirs) {
 		t.Errorf("for %s got %v expect %v", name, cu.Dirs, su.Dirs)
 	}
 	if cu.PublicKey != su.PublicKey {
 		t.Errorf("for %s got %q expect %q", name, cu.PublicKey, su.PublicKey)
-	}
-	if !reflect.DeepEqual(serr, cerr) {
-		t.Errorf("for %s got %v expect %v", name, cerr, serr)
 	}
 }
 
@@ -152,16 +266,20 @@ func (s *service) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/usercache.service.Lookup"
 	s.lookups++
 	if u, ok := s.entries[string(name)]; ok {
-		return u, nil
+		u2 := *u // Copy to avoid problems.
+		return &u2, nil
 	}
 	return nil, errors.E(op, name, errors.NotExist)
 }
 
 func (s *service) Put(user *upspin.User) error {
-	panic("userCacheTest.Service.Put not implemented")
+	u := *user // Copy to avoid problems.
+	s.entries[string(user.Name)] = &u
+	return nil
 }
 
 func (s *service) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	s.dials++
 	s.context = ctx
 	s.endpoint = e
 	return s, nil
@@ -184,4 +302,13 @@ func (s *service) Close() {
 
 func (s *service) Authenticate(upspin.Context) error {
 	return nil
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("test/testenv: no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
