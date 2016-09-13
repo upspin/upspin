@@ -8,14 +8,14 @@
 // This package is experimental and is NOT an official upspin.Client
 // implementation. Its definition may change or break without warning.
 
-// +build mobile
+// +build disabled
 
 package gobind
 
 // To regenerate the .aar archive for Android Java, run:
 //	go generate
 
-//go:generate gomobile bind -target -tags mobile android upspin.io/client/gobind
+//go:generate gomobile bind -target android upspin.io/client/gobind
 
 import (
 	"upspin.io/client"
@@ -123,30 +123,28 @@ func (c *Client) Put(name string, data []byte) (string, error) {
 
 // NewClient returns a new Client for a given user's configuration.
 func NewClient(config *ClientConfig) (*Client, error) {
-	ctx := context.New()
-	context.SetUserName(ctx, upspin.UserName(config.UserName))
-	context.SetPacking(ctx, upspin.EEPack)
-	f, err := factotum.NewFromKeys([]byte(config.PublicKey), []byte(config.PrivateKey), nil)
+	ctx := context.New().SetUserName(upspin.UserName(config.UserName)).SetPacking(upspin.EEPack)
+	f, err := factotum.DeprecatedNew(upspin.PublicKey(config.PublicKey), config.PrivateKey)
 	if err != nil {
 		log.Error.Printf("Error creating factotum: %s", err)
 		return nil, err
 	}
-	context.SetFactotum(ctx, f)
+	ctx.SetFactotum(f)
 	se := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.StoreNetAddr),
 	}
-	context.SetStoreEndpoint(ctx, se)
+	ctx.SetStoreEndpoint(se)
 	de := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.DirNetAddr),
 	}
-	context.SetDirEndpoint(ctx, de)
+	ctx.SetDirEndpoint(de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.KeyNetAddr),
 	}
-	context.SetKeyEndpoint(ctx, ue)
+	ctx.SetKeyEndpoint(ue)
 	return &Client{
 		c: client.New(ctx),
 	}, nil
