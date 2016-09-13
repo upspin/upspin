@@ -621,12 +621,6 @@ func (s *server) Ping() bool {
 	return true
 }
 
-// Authenticate implements upspin.Service.
-func (s *server) Authenticate(upspin.Context) error {
-	// Authentication is handled by higher layers elsewhere.
-	return nil
-}
-
 // Close implements upspin.Service.
 func (s *server) Close() {
 	const op = "dir/server.Close"

@@ -220,11 +220,6 @@ func (s *server) Close() {
 	}
 }
 
-// Authenticate implements upspin.Service.
-func (s *server) Authenticate(upspin.Context) error {
-	return errors.Str("store/gcp: Authenticate should not be called")
-}
-
 // Configure implements upspin.Service.
 func (s *server) Configure(options ...string) (upspin.UserName, error) {
 	return "", errors.Str("store/gcp: Configure should not be called")
