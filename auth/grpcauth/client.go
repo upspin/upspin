@@ -27,8 +27,6 @@ import (
 
 // GRPCCommon is an interface that all GRPC services implement for authentication and ping as part of upspin.Service.
 type GRPCCommon interface {
-	// Authenticate is the GRPC call for Authenticate.
-	Authenticate(ctx gContext.Context, in *proto.AuthenticateRequest, opts ...grpc.CallOption) (*proto.AuthenticateResponse, error)
 	// Ping is the GRPC call for Ping.
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
 	// Configure is the GRPC call for Configure.
@@ -37,16 +35,17 @@ type GRPCCommon interface {
 
 // AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.
 type AuthClientService struct {
-	grpcCommon       GRPCCommon
-	grpcConn         *grpc.ClientConn
-	context          upspin.Context
-	authToken        string
-	lastTokenRefresh time.Time
+	grpcCommon GRPCCommon
+	grpcConn   *grpc.ClientConn
+	context    upspin.Context
 
 	keepAliveInterval time.Duration // interval of keep-alive packets.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
-	mu                sync.Mutex    // protects the field below.
-	lastNetActivity   time.Time     // last known time of some network activity.
+
+	mu               sync.Mutex // protects the field below.
+	authToken        string
+	lastTokenRefresh time.Time
+	lastNetActivity  time.Time // last known time of some network activity.
 }
 
 // SecurityLevel defines the security required of a GRPC connection.
@@ -154,7 +153,7 @@ func (ac *AuthClientService) keepAlive() {
 	for {
 		select {
 		case <-time.After(sleepFor):
-			lastIdleness := time.Since(ac.lastNetActivity)
+			lastIdleness := time.Since(ac.lastActivity())
 			if lastIdleness < ac.keepAliveInterval {
 				sleepFor = ac.keepAliveInterval - lastIdleness
 				log.Debug.Printf("New ping in %v", sleepFor)
@@ -165,7 +164,7 @@ func (ac *AuthClientService) keepAlive() {
 				log.Error.Printf("grpcauth: keepAlive: ping failed")
 			}
 			log.Debug.Printf("grpcAuth: keepAlive: ping okay")
-			ac.SetLastActivity()
+			ac.setLastActivity()
 		case <-ac.closeKeepAlive:
 			log.Debug.Printf("grpcauth: keepAlive: exiting keep alive routine")
 			return
@@ -173,16 +172,16 @@ func (ac *AuthClientService) keepAlive() {
 	}
 }
 
-// LastActivity reports the time of the last known network activity.
-func (ac *AuthClientService) LastActivity() time.Time {
+// lastActivity reports the time of the last known network activity.
+func (ac *AuthClientService) lastActivity() time.Time {
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 	return ac.lastNetActivity
 }
 
-// SetLastActivity sets the current time as the last known network acitivity. This is useful
+// setLastActivity sets the current time as the last known network acitivity. This is useful
 // when using application pings, to prevent unnecessarily frequent pings.
-func (ac *AuthClientService) SetLastActivity() {
+func (ac *AuthClientService) setLastActivity() {
 	ac.mu.Lock()
 	ac.lastNetActivity = time.Now()
 	ac.mu.Unlock()
@@ -215,30 +214,6 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	return c, nil
 }
 
-func (ac *AuthClientService) authenticate(ctx upspin.Context) error {
-	req := &proto.AuthenticateRequest{
-		UserName: string(ctx.UserName()),
-		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
-	}
-	sig, err := ctx.Factotum().UserSign([]byte(string(req.UserName) + " Authenticate " + req.Now))
-	if err != nil {
-		return err
-	}
-	req.Signature = &proto.Signature{
-		R: sig.R.String(),
-		S: sig.S.String(),
-	}
-	resp, err := ac.grpcCommon.Authenticate(gContext.Background(), req)
-	if err != nil {
-		return err
-	}
-	ac.authToken = resp.Token
-	now := time.Now()
-	ac.lastTokenRefresh = now
-	ac.lastNetActivity = now
-	return nil
-}
-
 // Ping implements upspin.Service.
 func (ac *AuthClientService) Ping() bool {
 	seq := rand.Int31()
@@ -251,24 +226,79 @@ func (ac *AuthClientService) Ping() bool {
 	if err != nil {
 		log.Printf("Ping error: %s", err)
 	}
-	ac.lastNetActivity = time.Now()
+	ac.setLastActivity()
 	return err == nil && resp.PingSequence == seq
 }
 
 func (ac *AuthClientService) isAuthTokenExpired() bool {
+	ac.mu.Lock()
+	defer ac.mu.Unlock()
 	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
 }
 
-// NewAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
-// is done if necessary.
-func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
+// NewAuthContext sets up a gContext, GRPC CallOption, and validate function
+// for authenticating GRPC requests. If a request token is available, it puts
+// that token in the context as GRPC metadata. If the request token is not
+// available or has expired, it puts authentication request data in the
+// context, and sets up a GRPC Call Option and validate function for retrieving
+// the authentication response from the GRPC response headers.
+//
+// Example usage:
+// 	ctx, callOpt, validate, err := ac.NewAuthContext()
+// 	// handle err
+// 	req := &proto.RequestMessage{ ... }
+// 	resp, err := c.grpcClient.DoATrump(ctx, req, callOpt)
+// 	// handle err
+// 	if err := validate(); err != nil {
+// 		// handle err
+// 	}
+func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, validate func() error, err error) {
 	const op = "auth/grpcauth.AuthClientService"
-	if ac.isAuthTokenExpired() {
-		if err := ac.authenticate(ac.context); err != nil {
-			return nil, errors.E(op, err)
+
+	ctx = gContext.Background()
+
+	var header metadata.MD
+	opt = grpc.Header(&header)
+
+	if !ac.isAuthTokenExpired() {
+		ac.mu.Lock()
+		token := ac.authToken
+		ac.mu.Unlock()
+		ctx = metadata.NewContext(ctx, metadata.Pairs(authTokenKey, token))
+		validate = func() error {
+			ac.setLastActivity()
+			return nil
 		}
+		return
 	}
-	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
+
+	user := string(ac.context.UserName())
+	now := time.Now().UTC().Format(time.ANSIC) // to discourage signature replay
+	sig, err := ac.context.Factotum().UserSign([]byte(user + " Authenticate " + now))
+	if err != nil {
+		return nil, nil, nil, errors.E(op, err)
+	}
+	ctx = metadata.NewContext(ctx, metadata.MD{authRequestKey: []string{
+		user,
+		now,
+		sig.R.String(),
+		sig.S.String(),
+	}})
+	validate = func() error {
+		token, ok := header[authTokenKey]
+		if !ok || len(token) != 1 {
+			return errors.Str("no auth token in response header")
+		}
+		now := time.Now()
+
+		ac.mu.Lock()
+		defer ac.mu.Unlock()
+		ac.authToken = token[0]
+		ac.lastTokenRefresh = now
+		ac.lastNetActivity = now
+		return nil
+	}
+	return
 }
 
 // Close implements upspin.Service.
@@ -285,10 +315,11 @@ func (ac *AuthClientService) Close() {
 // ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
 // to ensure that the proxy is running as our upspin user identity.
 func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
-	op := "Configure"
-	gCtx, err := ac.NewAuthContext()
+	const op = "auth/grpcauth.ConfigureProxy"
+
+	gCtx, callOpt, validate, err := ac.NewAuthContext()
 	if err != nil {
-		return "", err
+		return "", errors.E(op, err)
 	}
 
 	token, err := generateRandomToken()
@@ -298,8 +329,11 @@ func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoin
 	req := &proto.ConfigureRequest{
 		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
 	}
-	resp, err := ac.grpcCommon.Configure(gCtx, req)
+	resp, err := ac.grpcCommon.Configure(gCtx, req, callOpt)
 	if err != nil {
+		return "", errors.E(op, err)
+	}
+	if err := validate(); err != nil {
 		return "", errors.E(op, err)
 	}
 
