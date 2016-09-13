@@ -458,9 +458,15 @@ func TestSequencing(t *testing.T) {
 		seq = entry.Sequence
 	}
 	// Now check it updates if we set the sequence correctly.
-	entry := storeData(t, context, []byte("first seq version"), fileName)
+	// Ditto for the directory.
+	entry, err := directory.Lookup(upspin.PathName(user))
+	if err != nil {
+		t.Fatalf("lookup root: %v", err)
+	}
+	dirSeq := entry.Sequence
+	entry = storeData(t, context, []byte("first seq version"), fileName)
 	entry.Sequence = seq
-	_, err := directory.Put(entry)
+	_, err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -469,7 +475,14 @@ func TestSequencing(t *testing.T) {
 		t.Fatalf("lookup file: %v", err)
 	}
 	if entry.Sequence != seq+1 {
-		t.Fatalf("wrong sequence: expected %d got %d", seq+1, entry.Sequence)
+		t.Fatalf("wrong sequence for file: expected %d got %d", seq+1, entry.Sequence)
+	}
+	entry, err = directory.Lookup(upspin.PathName(user))
+	if err != nil {
+		t.Fatalf("lookup root: %v", err)
+	}
+	if entry.Sequence != dirSeq+1 {
+		t.Fatalf("wrong sequence for directory: expected %d got %d", dirSeq+1, entry.Sequence)
 	}
 	// Now check it fails if we don't.
 	entry = storeData(t, context, []byte("second seq version"), fileName)
