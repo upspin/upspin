@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "cbbf72c0_2cbf191b",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T15:55:34Z",
+      "side": 1,
+      "message": "Differentiate between upspin.Context and gContext.\n\nNot clear what a CallOption is. Maybe call it GRPCHeader? GRPCMetadata?",
+      "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbbf72c0_665770fb",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 4
@@ -37,6 +54,57 @@
       "side": 1,
       "message": "Yes, that would work.\nI\u0027m interested to hear your plan, though.\nI\u0027ve been looking closely at GRPC to see if there are hooks we can use to detect the reconnection.",
       "parentUuid": "cbbf72c0_665770fb",
+      "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_4cee1518",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T15:55:34Z",
+      "side": 1,
+      "message": "The body of this if branch is very long and should be a separate helper function. It would make this code easier to read. It looks like you only need to pass md to it.",
+      "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_6cf3d102",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T15:55:34Z",
+      "side": 1,
+      "message": "This comment is no longer needed or relevant. In fact, if you could delete config.AllowUnauthenticatedRequests from Config, that would be appreciated. It\u0027s not used anywhere in the codebase.",
+      "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_acfde9ce",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T15:55:34Z",
+      "side": 1,
+      "message": "Comment no longer applies.",
       "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
