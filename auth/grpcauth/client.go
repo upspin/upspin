@@ -28,8 +28,6 @@ import (
 
 // GRPCCommon is an interface that all GRPC services implement for authentication and ping as part of upspin.Service.
 type GRPCCommon interface {
-	// Authenticate is the GRPC call for Authenticate.
-	Authenticate(ctx gContext.Context, in *proto.AuthenticateRequest, opts ...grpc.CallOption) (*proto.AuthenticateResponse, error)
 	// Ping is the GRPC call for Ping.
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
 	// Configure is the GRPC call for Configure.
@@ -220,32 +218,6 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	return c, nil
 }
 
-func (ac *AuthClientService) authenticate(ctx upspin.Context) error {
-	op := opf("authenticate", "%q, %q", ac.netAddr, ctx.UserName())
-
-	req := &proto.AuthenticateRequest{
-		UserName: string(ctx.UserName()),
-		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
-	}
-	sig, err := ctx.Factotum().UserSign([]byte(string(req.UserName) + " Authenticate " + req.Now))
-	if err != nil {
-		return op.error(err)
-	}
-	req.Signature = &proto.Signature{
-		R: sig.R.String(),
-		S: sig.S.String(),
-	}
-	resp, err := ac.grpcCommon.Authenticate(gContext.Background(), req)
-	if err != nil {
-		return op.error(err)
-	}
-	ac.authToken = resp.Token
-	now := time.Now()
-	ac.lastTokenRefresh = now
-	ac.lastNetActivity = now
-	return nil
-}
-
 // Ping implements upspin.Service.
 func (ac *AuthClientService) Ping() bool {
 	op := opf("Ping", "%q", ac.netAddr)
@@ -270,14 +242,47 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 
 // NewAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
 // is done if necessary.
-func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
-	op := opf("NewAuthContext", "%q", ac.netAddr)
-	if ac.isAuthTokenExpired() {
-		if err := ac.authenticate(ac.context); err != nil {
-			return nil, op.error(err)
-		}
+func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, validate func() error, err error) {
+	op := opf("NewAuthContext", "%q, %q", ac.netAddr)
+
+	ctx = gContext.Background()
+
+	var header metadata.MD
+	opt = grpc.Header(&header)
+
+	if !ac.isAuthTokenExpired() {
+		ctx = metadata.NewContext(ctx, metadata.Pairs(authTokenKey, ac.authToken))
+		validate = func() error { return nil }
+		return
 	}
-	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
+
+	user := string(ac.context.UserName())
+	now := time.Now().UTC().Format(time.ANSIC) // to discourage signature replay
+	sig, err := ac.context.Factotum().UserSign([]byte(user + " Authenticate " + now))
+	if err != nil {
+		return nil, nil, nil, op.error(err)
+	}
+	ctx = metadata.NewContext(ctx, metadata.MD{authRequestKey: []string{
+		user,
+		now,
+		sig.R.String(),
+		sig.S.String(),
+	}})
+	validate = func() error {
+		token, ok := header[authTokenKey]
+		if !ok || len(token) != 1 {
+			return errors.Str("no auth token in response header")
+		}
+		now := time.Now()
+
+		ac.mu.Lock()
+		defer ac.mu.Unlock()
+		ac.authToken = token[0]
+		ac.lastTokenRefresh = now
+		ac.lastNetActivity = now
+		return nil
+	}
+	return
 }
 
 // Close implements upspin.Service.
@@ -296,7 +301,7 @@ func (ac *AuthClientService) Close() {
 func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
 	op := opf("ConfigureProxy", "%q, %q, %q", ac.netAddr, ctx.UserName(), e)
 
-	gCtx, err := ac.NewAuthContext()
+	gCtx, callOpt, validate, err := ac.NewAuthContext()
 	if err != nil {
 		return "", op.error(err)
 	}
@@ -308,8 +313,11 @@ func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoin
 	req := &proto.ConfigureRequest{
 		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
 	}
-	resp, err := ac.grpcCommon.Configure(gCtx, req)
+	resp, err := ac.grpcCommon.Configure(gCtx, req, callOpt)
 	if err != nil {
+		return "", op.error(err)
+	}
+	if err := validate(); err != nil {
 		return "", op.error(err)
 	}
 

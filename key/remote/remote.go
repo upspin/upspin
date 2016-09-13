@@ -64,16 +64,19 @@ func userName(user *upspin.User) string {
 func (r *remote) Put(user *upspin.User) error {
 	op := opf("Put", "%v", userName(user))
 
-	gCtx, err := r.NewAuthContext()
+	gCtx, callOpt, validate, err := r.NewAuthContext()
 	if err != nil {
 		return op.error(err)
 	}
 	req := &proto.KeyPutRequest{
 		User: proto.UserProto(user),
 	}
-	resp, err := r.keyClient.Put(gCtx, req)
+	resp, err := r.keyClient.Put(gCtx, req, callOpt)
 	if err != nil {
 		return op.error(errors.IO, err)
+	}
+	if err := validate(); err != nil {
+		return op.error(err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
