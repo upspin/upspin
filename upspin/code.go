@@ -154,8 +154,17 @@ func (d *DirEntry) Marshal() ([]byte, error) {
 func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	var tmp [16]byte // For use by PutVarint and PutUvarint.
 
+	if d.Name == "" {
+		return nil, fmt.Errorf("empty Name field")
+	}
+	if d.SignedName == "" {
+		return nil, fmt.Errorf("empty SignedName field")
+	}
+
 	// Name: count n followed by n bytes.
 	b = appendString(b, string(d.Name))
+
+	// SignedName, if different than Name, is added at the end.
 
 	// Packing: One byte.
 	b = append(b, byte(d.Packing))
@@ -191,6 +200,11 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 
 	// Writer.
 	b = appendString(b, string(d.Writer))
+
+	// SignedName
+	if d.Name != d.SignedName {
+		b = appendString(b, string(d.SignedName))
+	}
 
 	return b, nil
 }
@@ -290,6 +304,15 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		return nil, ErrTooShort
 	}
 	d.Writer = UserName(bytes)
+
+	if len(b) == 0 {
+		// If there are no remaining bytes, SignedName == Name.
+		d.SignedName = d.Name
+	} else {
+		// If there are remaining bytes, it must be SignedName.
+		bytes, b = getBytes(b)
+		d.SignedName = PathName(bytes)
+	}
 
 	return b, nil
 }
