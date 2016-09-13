@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6becc60a_f49b1666",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-13T05:10:30Z",
+      "side": 1,
+      "message": "nice though this sort of thing is, you\u0027re doing several allocations on every call and then probably not using any of it. i want to discourage that.",
+      "revId": "bfadb7518cc84f5eff5f7eeaadcfd14929bac3d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
