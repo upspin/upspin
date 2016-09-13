@@ -11,9 +11,7 @@ It is generated from these files:
 It has these top-level messages:
 	Endpoint
 	Location
-	AuthenticateRequest
 	Signature
-	AuthenticateResponse
 	ConfigureRequest
 	ConfigureResponse
 	EndpointRequest
@@ -91,24 +89,6 @@ func (m *Location) GetEndpoint() *Endpoint {
 	return nil
 }
 
-type AuthenticateRequest struct {
-	UserName  string     `protobuf:"bytes,1,opt,name=user_name,json=userName" json:"user_name,omitempty"`
-	Now       string     `protobuf:"bytes,2,opt,name=now" json:"now,omitempty"`
-	Signature *Signature `protobuf:"bytes,3,opt,name=signature" json:"signature,omitempty"`
-}
-
-func (m *AuthenticateRequest) Reset()                    { *m = AuthenticateRequest{} }
-func (m *AuthenticateRequest) String() string            { return proto1.CompactTextString(m) }
-func (*AuthenticateRequest) ProtoMessage()               {}
-func (*AuthenticateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *AuthenticateRequest) GetSignature() *Signature {
-	if m != nil {
-		return m.Signature
-	}
-	return nil
-}
-
 type Signature struct {
 	R string `protobuf:"bytes,1,opt,name=r" json:"r,omitempty"`
 	S string `protobuf:"bytes,2,opt,name=s" json:"s,omitempty"`
@@ -117,17 +97,7 @@ type Signature struct {
 func (m *Signature) Reset()                    { *m = Signature{} }
 func (m *Signature) String() string            { return proto1.CompactTextString(m) }
 func (*Signature) ProtoMessage()               {}
-func (*Signature) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
-
-type AuthenticateResponse struct {
-	Token string `protobuf:"bytes,1,opt,name=token" json:"token,omitempty"`
-	Error []byte `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-}
-
-func (m *AuthenticateResponse) Reset()                    { *m = AuthenticateResponse{} }
-func (m *AuthenticateResponse) String() string            { return proto1.CompactTextString(m) }
-func (*AuthenticateResponse) ProtoMessage()               {}
-func (*AuthenticateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*Signature) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 type ConfigureRequest struct {
 	Options []string `protobuf:"bytes,1,rep,name=options" json:"options,omitempty"`
@@ -136,7 +106,7 @@ type ConfigureRequest struct {
 func (m *ConfigureRequest) Reset()                    { *m = ConfigureRequest{} }
 func (m *ConfigureRequest) String() string            { return proto1.CompactTextString(m) }
 func (*ConfigureRequest) ProtoMessage()               {}
-func (*ConfigureRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*ConfigureRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 type ConfigureResponse struct {
 	Error     []byte     `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
@@ -147,7 +117,7 @@ type ConfigureResponse struct {
 func (m *ConfigureResponse) Reset()                    { *m = ConfigureResponse{} }
 func (m *ConfigureResponse) String() string            { return proto1.CompactTextString(m) }
 func (*ConfigureResponse) ProtoMessage()               {}
-func (*ConfigureResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*ConfigureResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *ConfigureResponse) GetSignature() *Signature {
 	if m != nil {
@@ -162,7 +132,7 @@ type EndpointRequest struct {
 func (m *EndpointRequest) Reset()                    { *m = EndpointRequest{} }
 func (m *EndpointRequest) String() string            { return proto1.CompactTextString(m) }
 func (*EndpointRequest) ProtoMessage()               {}
-func (*EndpointRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*EndpointRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 type EndpointResponse struct {
 	Endpoint *Endpoint `protobuf:"bytes,1,opt,name=endpoint" json:"endpoint,omitempty"`
@@ -171,7 +141,7 @@ type EndpointResponse struct {
 func (m *EndpointResponse) Reset()                    { *m = EndpointResponse{} }
 func (m *EndpointResponse) String() string            { return proto1.CompactTextString(m) }
 func (*EndpointResponse) ProtoMessage()               {}
-func (*EndpointResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*EndpointResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *EndpointResponse) GetEndpoint() *Endpoint {
 	if m != nil {
@@ -187,7 +157,7 @@ type PingRequest struct {
 func (m *PingRequest) Reset()                    { *m = PingRequest{} }
 func (m *PingRequest) String() string            { return proto1.CompactTextString(m) }
 func (*PingRequest) ProtoMessage()               {}
-func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 type PingResponse struct {
 	PingSequence int32 `protobuf:"varint,1,opt,name=ping_sequence,json=pingSequence" json:"ping_sequence,omitempty"`
@@ -196,7 +166,7 @@ type PingResponse struct {
 func (m *PingResponse) Reset()                    { *m = PingResponse{} }
 func (m *PingResponse) String() string            { return proto1.CompactTextString(m) }
 func (*PingResponse) ProtoMessage()               {}
-func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 type StoreGetRequest struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
@@ -205,7 +175,7 @@ type StoreGetRequest struct {
 func (m *StoreGetRequest) Reset()                    { *m = StoreGetRequest{} }
 func (m *StoreGetRequest) String() string            { return proto1.CompactTextString(m) }
 func (*StoreGetRequest) ProtoMessage()               {}
-func (*StoreGetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*StoreGetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 type StoreGetResponse struct {
 	Data      []byte      `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
@@ -216,7 +186,7 @@ type StoreGetResponse struct {
 func (m *StoreGetResponse) Reset()                    { *m = StoreGetResponse{} }
 func (m *StoreGetResponse) String() string            { return proto1.CompactTextString(m) }
 func (*StoreGetResponse) ProtoMessage()               {}
-func (*StoreGetResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*StoreGetResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *StoreGetResponse) GetLocations() []*Location {
 	if m != nil {
@@ -232,7 +202,7 @@ type StorePutRequest struct {
 func (m *StorePutRequest) Reset()                    { *m = StorePutRequest{} }
 func (m *StorePutRequest) String() string            { return proto1.CompactTextString(m) }
 func (*StorePutRequest) ProtoMessage()               {}
-func (*StorePutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*StorePutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
 type StorePutResponse struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
@@ -242,7 +212,7 @@ type StorePutResponse struct {
 func (m *StorePutResponse) Reset()                    { *m = StorePutResponse{} }
 func (m *StorePutResponse) String() string            { return proto1.CompactTextString(m) }
 func (*StorePutResponse) ProtoMessage()               {}
-func (*StorePutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (*StorePutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 type StoreDeleteRequest struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
@@ -251,7 +221,7 @@ type StoreDeleteRequest struct {
 func (m *StoreDeleteRequest) Reset()                    { *m = StoreDeleteRequest{} }
 func (m *StoreDeleteRequest) String() string            { return proto1.CompactTextString(m) }
 func (*StoreDeleteRequest) ProtoMessage()               {}
-func (*StoreDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (*StoreDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 type StoreDeleteResponse struct {
 	Error []byte `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
@@ -260,7 +230,7 @@ type StoreDeleteResponse struct {
 func (m *StoreDeleteResponse) Reset()                    { *m = StoreDeleteResponse{} }
 func (m *StoreDeleteResponse) String() string            { return proto1.CompactTextString(m) }
 func (*StoreDeleteResponse) ProtoMessage()               {}
-func (*StoreDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (*StoreDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 type User struct {
 	Name      string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -272,7 +242,7 @@ type User struct {
 func (m *User) Reset()                    { *m = User{} }
 func (m *User) String() string            { return proto1.CompactTextString(m) }
 func (*User) ProtoMessage()               {}
-func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 func (m *User) GetDirs() []*Endpoint {
 	if m != nil {
@@ -295,7 +265,7 @@ type KeyLookupRequest struct {
 func (m *KeyLookupRequest) Reset()                    { *m = KeyLookupRequest{} }
 func (m *KeyLookupRequest) String() string            { return proto1.CompactTextString(m) }
 func (*KeyLookupRequest) ProtoMessage()               {}
-func (*KeyLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+func (*KeyLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
 type KeyLookupResponse struct {
 	User  *User  `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
@@ -305,7 +275,7 @@ type KeyLookupResponse struct {
 func (m *KeyLookupResponse) Reset()                    { *m = KeyLookupResponse{} }
 func (m *KeyLookupResponse) String() string            { return proto1.CompactTextString(m) }
 func (*KeyLookupResponse) ProtoMessage()               {}
-func (*KeyLookupResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (*KeyLookupResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *KeyLookupResponse) GetUser() *User {
 	if m != nil {
@@ -321,7 +291,7 @@ type KeyPutRequest struct {
 func (m *KeyPutRequest) Reset()                    { *m = KeyPutRequest{} }
 func (m *KeyPutRequest) String() string            { return proto1.CompactTextString(m) }
 func (*KeyPutRequest) ProtoMessage()               {}
-func (*KeyPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+func (*KeyPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 func (m *KeyPutRequest) GetUser() *User {
 	if m != nil {
@@ -337,7 +307,7 @@ type KeyPutResponse struct {
 func (m *KeyPutResponse) Reset()                    { *m = KeyPutResponse{} }
 func (m *KeyPutResponse) String() string            { return proto1.CompactTextString(m) }
 func (*KeyPutResponse) ProtoMessage()               {}
-func (*KeyPutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+func (*KeyPutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 type EntryError struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry,omitempty"`
@@ -347,7 +317,7 @@ type EntryError struct {
 func (m *EntryError) Reset()                    { *m = EntryError{} }
 func (m *EntryError) String() string            { return proto1.CompactTextString(m) }
 func (*EntryError) ProtoMessage()               {}
-func (*EntryError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+func (*EntryError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 type EntriesError struct {
 	Entries [][]byte `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
@@ -357,7 +327,7 @@ type EntriesError struct {
 func (m *EntriesError) Reset()                    { *m = EntriesError{} }
 func (m *EntriesError) String() string            { return proto1.CompactTextString(m) }
 func (*EntriesError) ProtoMessage()               {}
-func (*EntriesError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
+func (*EntriesError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
 type DirLookupRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -366,7 +336,7 @@ type DirLookupRequest struct {
 func (m *DirLookupRequest) Reset()                    { *m = DirLookupRequest{} }
 func (m *DirLookupRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirLookupRequest) ProtoMessage()               {}
-func (*DirLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
+func (*DirLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 type DirPutRequest struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry,omitempty"`
@@ -375,7 +345,7 @@ type DirPutRequest struct {
 func (m *DirPutRequest) Reset()                    { *m = DirPutRequest{} }
 func (m *DirPutRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirPutRequest) ProtoMessage()               {}
-func (*DirPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
+func (*DirPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
 type DirMakeDirectoryRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -384,7 +354,7 @@ type DirMakeDirectoryRequest struct {
 func (m *DirMakeDirectoryRequest) Reset()                    { *m = DirMakeDirectoryRequest{} }
 func (m *DirMakeDirectoryRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirMakeDirectoryRequest) ProtoMessage()               {}
-func (*DirMakeDirectoryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
+func (*DirMakeDirectoryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
 type DirGlobRequest struct {
 	Pattern string `protobuf:"bytes,1,opt,name=pattern" json:"pattern,omitempty"`
@@ -393,7 +363,7 @@ type DirGlobRequest struct {
 func (m *DirGlobRequest) Reset()                    { *m = DirGlobRequest{} }
 func (m *DirGlobRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirGlobRequest) ProtoMessage()               {}
-func (*DirGlobRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
+func (*DirGlobRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
 type DirDeleteRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -402,7 +372,7 @@ type DirDeleteRequest struct {
 func (m *DirDeleteRequest) Reset()                    { *m = DirDeleteRequest{} }
 func (m *DirDeleteRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirDeleteRequest) ProtoMessage()               {}
-func (*DirDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
+func (*DirDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
 type DirWhichAccessRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -411,14 +381,12 @@ type DirWhichAccessRequest struct {
 func (m *DirWhichAccessRequest) Reset()                    { *m = DirWhichAccessRequest{} }
 func (m *DirWhichAccessRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirWhichAccessRequest) ProtoMessage()               {}
-func (*DirWhichAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
+func (*DirWhichAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
 
 func init() {
 	proto1.RegisterType((*Endpoint)(nil), "proto.Endpoint")
 	proto1.RegisterType((*Location)(nil), "proto.Location")
-	proto1.RegisterType((*AuthenticateRequest)(nil), "proto.AuthenticateRequest")
 	proto1.RegisterType((*Signature)(nil), "proto.Signature")
-	proto1.RegisterType((*AuthenticateResponse)(nil), "proto.AuthenticateResponse")
 	proto1.RegisterType((*ConfigureRequest)(nil), "proto.ConfigureRequest")
 	proto1.RegisterType((*ConfigureResponse)(nil), "proto.ConfigureResponse")
 	proto1.RegisterType((*EndpointRequest)(nil), "proto.EndpointRequest")
@@ -458,7 +426,6 @@ const _ = grpc.SupportPackageIsVersion3
 
 type StoreClient interface {
 	// Service methods:
-	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error)
 	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
@@ -473,15 +440,6 @@ type storeClient struct {
 
 func NewStoreClient(cc *grpc.ClientConn) StoreClient {
 	return &storeClient{cc}
-}
-
-func (c *storeClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
-	out := new(AuthenticateResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Authenticate", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *storeClient) Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error) {
@@ -542,7 +500,6 @@ func (c *storeClient) Delete(ctx context.Context, in *StoreDeleteRequest, opts .
 
 type StoreServer interface {
 	// Service methods:
-	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	Configure(context.Context, *ConfigureRequest) (*ConfigureResponse, error)
 	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
@@ -553,24 +510,6 @@ type StoreServer interface {
 
 func RegisterStoreServer(s *grpc.Server, srv StoreServer) {
 	s.RegisterService(&_Store_serviceDesc, srv)
-}
-
-func _Store_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthenticateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Authenticate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Authenticate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Authenticate(ctx, req.(*AuthenticateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Store_Configure_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -686,10 +625,6 @@ var _Store_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*StoreServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Authenticate",
-			Handler:    _Store_Authenticate_Handler,
-		},
-		{
 			MethodName: "Configure",
 			Handler:    _Store_Configure_Handler,
 		},
@@ -722,7 +657,6 @@ var _Store_serviceDesc = grpc.ServiceDesc{
 
 type KeyClient interface {
 	// Service methods:
-	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error)
 	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
@@ -736,15 +670,6 @@ type keyClient struct {
 
 func NewKeyClient(cc *grpc.ClientConn) KeyClient {
 	return &keyClient{cc}
-}
-
-func (c *keyClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
-	out := new(AuthenticateResponse)
-	err := grpc.Invoke(ctx, "/proto.Key/Authenticate", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *keyClient) Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error) {
@@ -796,7 +721,6 @@ func (c *keyClient) Put(ctx context.Context, in *KeyPutRequest, opts ...grpc.Cal
 
 type KeyServer interface {
 	// Service methods:
-	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	Configure(context.Context, *ConfigureRequest) (*ConfigureResponse, error)
 	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
@@ -806,24 +730,6 @@ type KeyServer interface {
 
 func RegisterKeyServer(s *grpc.Server, srv KeyServer) {
 	s.RegisterService(&_Key_serviceDesc, srv)
-}
-
-func _Key_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthenticateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeyServer).Authenticate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Key/Authenticate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeyServer).Authenticate(ctx, req.(*AuthenticateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Key_Configure_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -921,10 +827,6 @@ var _Key_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*KeyServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Authenticate",
-			Handler:    _Key_Authenticate_Handler,
-		},
-		{
 			MethodName: "Configure",
 			Handler:    _Key_Configure_Handler,
 		},
@@ -953,7 +855,6 @@ var _Key_serviceDesc = grpc.ServiceDesc{
 
 type DirClient interface {
 	// Service methods:
-	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error)
 	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
@@ -971,15 +872,6 @@ type dirClient struct {
 
 func NewDirClient(cc *grpc.ClientConn) DirClient {
 	return &dirClient{cc}
-}
-
-func (c *dirClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
-	out := new(AuthenticateResponse)
-	err := grpc.Invoke(ctx, "/proto.Dir/Authenticate", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *dirClient) Configure(ctx context.Context, in *ConfigureRequest, opts ...grpc.CallOption) (*ConfigureResponse, error) {
@@ -1067,7 +959,6 @@ func (c *dirClient) WhichAccess(ctx context.Context, in *DirWhichAccessRequest, 
 
 type DirServer interface {
 	// Service methods:
-	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	Configure(context.Context, *ConfigureRequest) (*ConfigureResponse, error)
 	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
@@ -1081,24 +972,6 @@ type DirServer interface {
 
 func RegisterDirServer(s *grpc.Server, srv DirServer) {
 	s.RegisterService(&_Dir_serviceDesc, srv)
-}
-
-func _Dir_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthenticateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Authenticate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Authenticate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Authenticate(ctx, req.(*AuthenticateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Dir_Configure_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1268,10 +1141,6 @@ var _Dir_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*DirServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Authenticate",
-			Handler:    _Dir_Authenticate_Handler,
-		},
-		{
 			MethodName: "Configure",
 			Handler:    _Dir_Configure_Handler,
 		},
@@ -1315,65 +1184,61 @@ var _Dir_serviceDesc = grpc.ServiceDesc{
 func init() { proto1.RegisterFile("upspin.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 953 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe4, 0x55, 0xdd, 0x72, 0xdb, 0x44,
-	0x14, 0x8e, 0x22, 0xe7, 0xc7, 0x27, 0x4e, 0xe3, 0x6c, 0x12, 0xa2, 0xba, 0x05, 0x32, 0xdb, 0xe9,
-	0xcf, 0x10, 0x9a, 0x16, 0xb7, 0xc3, 0xf4, 0xa6, 0xd0, 0x50, 0x85, 0x0c, 0xa4, 0x30, 0x19, 0x65,
-	0x3a, 0x5c, 0x66, 0x14, 0xfb, 0x34, 0xd9, 0x71, 0xba, 0x12, 0xbb, 0x2b, 0x18, 0x3f, 0x01, 0x4f,
-	0xc5, 0xdb, 0xf0, 0x12, 0xdc, 0x31, 0xab, 0x5d, 0x49, 0x2b, 0x59, 0x31, 0xed, 0x75, 0xaf, 0xec,
-	0x73, 0xf6, 0x7c, 0xe7, 0xff, 0x7c, 0x82, 0x5e, 0x96, 0xca, 0x94, 0xf1, 0x83, 0x54, 0x24, 0x2a,
-	0x21, 0x4b, 0xf9, 0x0f, 0x7d, 0x0d, 0xab, 0x47, 0x7c, 0x9c, 0x26, 0x8c, 0x2b, 0x72, 0x17, 0xba,
-	0x4a, 0xc4, 0x5c, 0xa6, 0x89, 0x50, 0x81, 0xb7, 0xe7, 0x3d, 0x5a, 0x8a, 0x2a, 0x05, 0xb9, 0x0d,
-	0xab, 0x1c, 0xd5, 0x79, 0x3c, 0x1e, 0x8b, 0x60, 0x71, 0xcf, 0x7b, 0xd4, 0x8d, 0x56, 0x38, 0xaa,
-	0xc3, 0xf1, 0x58, 0xd0, 0xb7, 0xb0, 0xfa, 0x26, 0x19, 0xc5, 0x8a, 0x25, 0x9c, 0xec, 0xc3, 0x2a,
-	0x5a, 0x87, 0xb9, 0x8f, 0xb5, 0xe1, 0x86, 0x89, 0x78, 0x50, 0xc4, 0x89, 0x4a, 0x03, 0x1d, 0x51,
-	0xe0, 0x3b, 0x14, 0xc8, 0x47, 0x68, 0x9d, 0x56, 0x0a, 0xaa, 0x60, 0xeb, 0x30, 0x53, 0x57, 0xc8,
-	0x15, 0x1b, 0xc5, 0x0a, 0x23, 0xfc, 0x3d, 0x43, 0xa9, 0xc8, 0x1d, 0xe8, 0x66, 0x12, 0xc5, 0x39,
-	0x8f, 0xdf, 0x63, 0x1e, 0xa2, 0x1b, 0xad, 0x6a, 0xc5, 0xaf, 0xf1, 0x7b, 0x24, 0x7d, 0xf0, 0x79,
-	0xf2, 0xa7, 0xf5, 0xa5, 0xff, 0x92, 0x03, 0xe8, 0x4a, 0x76, 0xc9, 0x63, 0x95, 0x09, 0x0c, 0xfc,
-	0x3c, 0xa3, 0xbe, 0xcd, 0xe8, 0xac, 0xd0, 0x47, 0x95, 0x09, 0x7d, 0x08, 0xdd, 0x52, 0x4f, 0x7a,
-	0xe0, 0x09, 0x1b, 0xc3, 0x13, 0x5a, 0x92, 0xd6, 0xb5, 0x27, 0xe9, 0x0f, 0xb0, 0x5d, 0x4f, 0x4f,
-	0xa6, 0x09, 0x97, 0x48, 0xb6, 0x61, 0x49, 0x25, 0x13, 0xe4, 0x16, 0x67, 0x04, 0xad, 0x45, 0x21,
-	0x12, 0xd3, 0xbb, 0x5e, 0x64, 0x04, 0xfa, 0x35, 0xf4, 0x5f, 0x27, 0xfc, 0x1d, 0xbb, 0xd4, 0x49,
-	0xd8, 0xfa, 0x02, 0x58, 0x49, 0x52, 0xdd, 0x4b, 0x19, 0x78, 0x7b, 0xbe, 0xee, 0xb3, 0x15, 0xe9,
-	0x1f, 0xb0, 0xe9, 0x58, 0x57, 0xe1, 0x8c, 0x63, 0xcf, 0x71, 0x5c, 0x6f, 0xd2, 0x62, 0xa3, 0x49,
-	0x1f, 0xdb, 0x92, 0x4d, 0xd8, 0x28, 0x87, 0x67, 0x92, 0xa4, 0xdf, 0x43, 0xbf, 0x52, 0xd9, 0x4c,
-	0x3e, 0x66, 0xf4, 0x74, 0x08, 0x6b, 0xa7, 0x8c, 0x5f, 0x16, 0x45, 0xdf, 0x83, 0xf5, 0x94, 0xf1,
-	0xcb, 0x73, 0xa9, 0x65, 0xbd, 0x0d, 0x66, 0xff, 0x7a, 0x5a, 0x79, 0x66, 0x75, 0xf4, 0x19, 0xf4,
-	0x0c, 0xc6, 0x06, 0xfc, 0x20, 0xd0, 0x13, 0xd8, 0x38, 0x53, 0x89, 0xc0, 0x63, 0x2c, 0x92, 0xaf,
-	0xaf, 0x9d, 0xd7, 0x5c, 0xbb, 0x09, 0xf4, 0x2b, 0x80, 0x8d, 0x44, 0xa0, 0x33, 0x8e, 0x55, 0x6c,
-	0x7b, 0x9c, 0xff, 0x27, 0x8f, 0xa1, 0x7b, 0x6d, 0xb7, 0x5e, 0x6f, 0x85, 0xef, 0xd4, 0x5b, 0x5c,
-	0x43, 0x54, 0x59, 0x54, 0x73, 0xf2, 0xdd, 0x05, 0xb8, 0x6f, 0xb3, 0x3b, 0xcd, 0xca, 0xec, 0x5a,
-	0x62, 0xd1, 0x1f, 0x6d, 0x4e, 0xb9, 0x99, 0xcd, 0x69, 0x6e, 0x15, 0x37, 0xec, 0xdb, 0x10, 0x48,
-	0xee, 0x27, 0xc4, 0x6b, 0xac, 0x2e, 0x6a, 0x7e, 0x3f, 0xf6, 0x61, 0xab, 0x86, 0x99, 0xb7, 0x77,
-	0xf4, 0x2f, 0x0f, 0x3a, 0x6f, 0x25, 0x0a, 0x5d, 0x85, 0x73, 0xa0, 0xf9, 0x7f, 0x72, 0x0f, 0x3a,
-	0x63, 0x26, 0x9a, 0xcd, 0x2a, 0x97, 0x23, 0x7f, 0x24, 0x0f, 0x61, 0x59, 0xea, 0x70, 0x32, 0xf0,
-	0xdb, 0xcd, 0xec, 0x33, 0xf9, 0x1c, 0x20, 0xcd, 0x2e, 0xae, 0xd9, 0xe8, 0x7c, 0x82, 0xd3, 0xa0,
-	0x63, 0xd2, 0x36, 0x9a, 0x13, 0x9c, 0xd2, 0x27, 0xd0, 0x3f, 0xc1, 0xe9, 0x9b, 0x24, 0x99, 0x64,
-	0xe9, 0x87, 0x50, 0x07, 0xfd, 0x19, 0x36, 0x1d, 0x80, 0xad, 0xf2, 0x4b, 0xe8, 0x68, 0x03, 0xbb,
-	0xcf, 0x6b, 0x36, 0x17, 0x5d, 0x61, 0x94, 0x3f, 0xdc, 0xd0, 0xe7, 0xa7, 0xb0, 0x7e, 0x82, 0x53,
-	0x67, 0xa8, 0xff, 0xe7, 0x87, 0x3e, 0x80, 0x5b, 0x05, 0x62, 0x6e, 0x83, 0x5f, 0x00, 0x1c, 0x71,
-	0x25, 0xa6, 0x47, 0xf9, 0x99, 0x6b, 0x1b, 0x2d, 0x95, 0x36, 0x5a, 0xb8, 0x21, 0xa7, 0xef, 0xa0,
-	0xa7, 0x91, 0x0c, 0xa5, 0xc1, 0x06, 0xb0, 0x82, 0x46, 0xce, 0x79, 0xa6, 0x17, 0x15, 0xe2, 0x0d,
-	0xf8, 0x07, 0xd0, 0x0f, 0x99, 0xa8, 0x37, 0xb4, 0x65, 0xca, 0xf4, 0x3e, 0xac, 0x87, 0x4c, 0x38,
-	0xb5, 0xb7, 0x26, 0x49, 0x1f, 0xc3, 0x6e, 0xc8, 0xc4, 0x2f, 0xf1, 0x04, 0x43, 0x26, 0x70, 0xa4,
-	0x12, 0x31, 0x9d, 0xe7, 0xf5, 0x2b, 0xb8, 0x15, 0x32, 0x71, 0x7c, 0x9d, 0x5c, 0x38, 0x3c, 0x99,
-	0xc6, 0x4a, 0xa1, 0x28, 0x98, 0xb6, 0x10, 0x6d, 0xa6, 0xf5, 0x1d, 0x6f, 0xf3, 0xb9, 0x0f, 0x3b,
-	0x21, 0x13, 0xbf, 0x5d, 0xb1, 0xd1, 0xd5, 0xe1, 0x68, 0x84, 0x52, 0xce, 0x31, 0x1e, 0xfe, 0xed,
-	0xc3, 0x52, 0x7e, 0x07, 0xe4, 0x27, 0xe8, 0xb9, 0xc4, 0x4f, 0x06, 0x76, 0x9a, 0x2d, 0x1f, 0xab,
-	0xc1, 0x9d, 0xd6, 0x37, 0x33, 0x61, 0xba, 0x40, 0x5e, 0x41, 0xb7, 0x64, 0x74, 0xb2, 0x6b, 0x6d,
-	0x9b, 0x5f, 0x84, 0x41, 0x30, 0xfb, 0x50, 0x7a, 0x78, 0xe9, 0x7c, 0xc0, 0x3f, 0x6b, 0x9e, 0x8a,
-	0xc5, 0xef, 0xce, 0xe8, 0x4b, 0xf8, 0x37, 0xd0, 0xd1, 0x94, 0x4a, 0x88, 0x35, 0x71, 0x38, 0x79,
-	0xb0, 0x55, 0xd3, 0x95, 0x90, 0x17, 0xe0, 0x1f, 0x63, 0x15, 0xac, 0x41, 0xae, 0x65, 0xb0, 0x26,
-	0x87, 0x1a, 0xe4, 0x69, 0xd6, 0x40, 0x56, 0x7b, 0x52, 0x47, 0x3a, 0x97, 0x40, 0x17, 0xc8, 0x21,
-	0x2c, 0x9b, 0x71, 0x92, 0xdb, 0xae, 0x51, 0x6d, 0xc4, 0x83, 0x41, 0xdb, 0x53, 0xe1, 0x62, 0xf8,
-	0xef, 0x22, 0xf8, 0x27, 0x38, 0xfd, 0xd4, 0xa7, 0xf7, 0x12, 0x96, 0xcd, 0x09, 0x97, 0x09, 0x37,
-	0x59, 0xb2, 0x4c, 0x78, 0x86, 0x0d, 0xe9, 0x02, 0x79, 0x6e, 0x46, 0xb8, 0x5d, 0x99, 0x38, 0x03,
-	0xdc, 0x69, 0x68, 0xcb, 0xde, 0xff, 0xd3, 0x01, 0x3f, 0x64, 0xe2, 0x53, 0xef, 0xfd, 0xb7, 0x33,
-	0xbd, 0x6f, 0x12, 0xea, 0x60, 0xb3, 0x0c, 0x58, 0x70, 0x3c, 0x5d, 0x20, 0x4f, 0xeb, 0x4d, 0xaf,
-	0xb1, 0x6b, 0x3b, 0x22, 0x84, 0xf5, 0x1a, 0xb3, 0x92, 0x2f, 0x2a, 0x6c, 0x1b, 0xe5, 0xb6, 0x7b,
-	0x79, 0x0e, 0x1d, 0x4d, 0xb8, 0x64, 0xa7, 0x02, 0x3b, 0x04, 0x5c, 0x56, 0xe9, 0x7e, 0x55, 0x4c,
-	0x95, 0xf6, 0x56, 0x9d, 0x2a, 0xeb, 0x97, 0xda, 0x1a, 0xed, 0x15, 0xac, 0x39, 0x54, 0x4c, 0xee,
-	0x56, 0xe0, 0x59, 0x86, 0x6e, 0xf5, 0x70, 0xb1, 0x9c, 0xeb, 0x9e, 0xfd, 0x17, 0x00, 0x00, 0xff,
-	0xff, 0xae, 0xc9, 0xb0, 0x92, 0xea, 0x0c, 0x00, 0x00,
+	// 895 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xd4, 0x55, 0xdd, 0x4e, 0xdc, 0x46,
+	0x14, 0xc6, 0xac, 0x81, 0xf5, 0x61, 0x09, 0xcb, 0x24, 0x14, 0x67, 0x9b, 0xb6, 0x68, 0xa2, 0xfc,
+	0xa8, 0x34, 0x24, 0xdd, 0x44, 0x55, 0x6e, 0xd2, 0x06, 0xc5, 0x14, 0xa9, 0xa4, 0x15, 0x32, 0x8a,
+	0x7a, 0x89, 0xcc, 0xee, 0x09, 0x19, 0x41, 0xc6, 0xee, 0xcc, 0xb8, 0xd2, 0x3e, 0x41, 0x9f, 0xa1,
+	0x2f, 0xd1, 0x87, 0xeb, 0x13, 0x54, 0xe3, 0x19, 0xdb, 0x63, 0xaf, 0xd9, 0x26, 0x97, 0x5c, 0xb1,
+	0xe7, 0xf8, 0x7c, 0xe7, 0x7c, 0xe7, 0x67, 0x3e, 0x60, 0x90, 0x67, 0x32, 0x63, 0x7c, 0x3f, 0x13,
+	0xa9, 0x4a, 0xc9, 0x4a, 0xf1, 0x87, 0xbe, 0x81, 0xfe, 0x21, 0x9f, 0x66, 0x29, 0xe3, 0x8a, 0xdc,
+	0x83, 0x40, 0x89, 0x84, 0xcb, 0x2c, 0x15, 0x2a, 0xf4, 0x76, 0xbd, 0xc7, 0x2b, 0x71, 0xed, 0x20,
+	0x77, 0xa1, 0xcf, 0x51, 0x9d, 0x25, 0xd3, 0xa9, 0x08, 0x97, 0x77, 0xbd, 0xc7, 0x41, 0xbc, 0xc6,
+	0x51, 0x1d, 0x4c, 0xa7, 0x82, 0xbe, 0x83, 0xfe, 0xdb, 0x74, 0x92, 0x28, 0x96, 0x72, 0xb2, 0x07,
+	0x7d, 0xb4, 0x09, 0x8b, 0x1c, 0xeb, 0xe3, 0x4d, 0x53, 0x71, 0xbf, 0xac, 0x13, 0x57, 0x01, 0xba,
+	0xa2, 0xc0, 0xf7, 0x28, 0x90, 0x4f, 0xd0, 0x26, 0xad, 0x1d, 0xf4, 0x11, 0x04, 0xa7, 0xec, 0x82,
+	0x27, 0x2a, 0x17, 0x48, 0x06, 0xe0, 0x89, 0x22, 0x61, 0x10, 0x7b, 0x42, 0x5b, 0xd2, 0x02, 0x3c,
+	0x49, 0xbf, 0x83, 0xe1, 0x9b, 0x94, 0xbf, 0x67, 0x17, 0xb9, 0xc0, 0x18, 0xff, 0xc8, 0x51, 0x2a,
+	0x12, 0xc2, 0x5a, 0x9a, 0x69, 0x46, 0x32, 0xf4, 0x76, 0x7b, 0x9a, 0xad, 0x35, 0xe9, 0x9f, 0xb0,
+	0xe5, 0x44, 0xcb, 0x2c, 0xe5, 0x12, 0xc9, 0x1d, 0x58, 0x41, 0x21, 0x52, 0x53, 0x62, 0x10, 0x1b,
+	0x83, 0x7c, 0x09, 0x41, 0x2e, 0x51, 0x9c, 0xf1, 0xe4, 0x63, 0xc9, 0xaf, 0xaf, 0x1d, 0xbf, 0x25,
+	0x1f, 0x91, 0xec, 0x43, 0x20, 0x4b, 0x7a, 0x61, 0xaf, 0x68, 0x75, 0x68, 0x5b, 0xad, 0x68, 0xc7,
+	0x75, 0x08, 0xdd, 0x82, 0xcd, 0x6a, 0x04, 0x86, 0x24, 0xfd, 0x09, 0x86, 0xb5, 0xcb, 0x32, 0xf9,
+	0x9c, 0x01, 0xd2, 0x31, 0xac, 0x9f, 0x30, 0x7e, 0x51, 0x36, 0x7d, 0x1f, 0x36, 0x32, 0xc6, 0x2f,
+	0xce, 0xa4, 0xb6, 0xf5, 0x4c, 0xcd, 0x16, 0x07, 0xda, 0x79, 0x6a, 0x7d, 0xf4, 0x39, 0x0c, 0x0c,
+	0xc6, 0x16, 0xfc, 0x24, 0xd0, 0x53, 0xd8, 0x3c, 0x55, 0xa9, 0xc0, 0x23, 0x2c, 0xc9, 0x37, 0x97,
+	0xe7, 0xb5, 0x97, 0x77, 0x09, 0xc3, 0x1a, 0x60, 0x2b, 0x11, 0xf0, 0xa7, 0x89, 0x4a, 0xec, 0x8c,
+	0x8b, 0xdf, 0xe4, 0x09, 0x04, 0x57, 0xf6, 0x76, 0xf4, 0x46, 0x7b, 0x4e, 0xbf, 0xe5, 0x4d, 0xc5,
+	0x75, 0x44, 0xbd, 0xa7, 0x9e, 0xb3, 0x27, 0xfa, 0xc0, 0xb2, 0x3b, 0xc9, 0x2b, 0x76, 0x1d, 0xb5,
+	0xe8, 0xcf, 0x96, 0x53, 0x11, 0x66, 0x39, 0x2d, 0xec, 0xa2, 0x2e, 0xb7, 0xec, 0x96, 0x1b, 0x03,
+	0x29, 0xf2, 0x44, 0x78, 0x85, 0x0a, 0x3f, 0x6d, 0x1e, 0x7b, 0x70, 0xbb, 0x81, 0x59, 0x74, 0x77,
+	0xf4, 0x2f, 0x0f, 0xfc, 0x77, 0x12, 0x85, 0xee, 0xa2, 0xb8, 0x3d, 0x93, 0xae, 0xf8, 0x4d, 0xee,
+	0x83, 0x3f, 0x65, 0xa2, 0x3d, 0xac, 0xea, 0x38, 0x8a, 0x8f, 0xe4, 0x11, 0xac, 0x4a, 0x5d, 0x4e,
+	0x86, 0xbd, 0xee, 0x30, 0xfb, 0x99, 0x7c, 0x05, 0x90, 0xe5, 0xe7, 0x57, 0x6c, 0x72, 0x76, 0x89,
+	0xb3, 0xd0, 0x37, 0xb4, 0x8d, 0xe7, 0x18, 0x67, 0xf4, 0x29, 0x0c, 0x8f, 0x71, 0xf6, 0x36, 0x4d,
+	0x2f, 0xf3, 0xac, 0x6c, 0xb4, 0xf1, 0x2a, 0xbc, 0xe6, 0xab, 0xa0, 0xbf, 0xc0, 0x96, 0x03, 0xb0,
+	0x5d, 0x7e, 0x03, 0xbe, 0x0e, 0xb0, 0xf7, 0xbc, 0x6e, 0xb9, 0xe8, 0x0e, 0xe3, 0xe2, 0xc3, 0x35,
+	0x73, 0x7e, 0x06, 0x1b, 0xc7, 0x38, 0x73, 0x96, 0xfa, 0x7f, 0x79, 0xe8, 0x43, 0xb8, 0x55, 0x22,
+	0x16, 0x0e, 0xf8, 0x25, 0xc0, 0x21, 0x57, 0x62, 0x76, 0x58, 0x3c, 0x73, 0x1d, 0xa3, 0xad, 0x2a,
+	0x46, 0x1b, 0xd7, 0x70, 0xfa, 0x11, 0x06, 0x1a, 0xc9, 0x50, 0x1a, 0x6c, 0x08, 0x6b, 0x68, 0xec,
+	0x42, 0x67, 0x06, 0x71, 0x69, 0x5e, 0x83, 0x7f, 0x08, 0xc3, 0x88, 0x89, 0xe6, 0x40, 0x3b, 0xb6,
+	0x4c, 0x1f, 0xc0, 0x46, 0xc4, 0x84, 0xd3, 0x7b, 0x27, 0x49, 0xfa, 0x04, 0x76, 0x22, 0x26, 0x7e,
+	0x4d, 0x2e, 0x31, 0x62, 0x02, 0x27, 0x2a, 0x15, 0xb3, 0x45, 0x59, 0xbf, 0x85, 0x5b, 0x11, 0x13,
+	0x47, 0x57, 0xe9, 0xb9, 0xa3, 0x93, 0x59, 0xa2, 0x14, 0x0a, 0x6e, 0x03, 0x4b, 0xd3, 0x32, 0x6d,
+	0xde, 0x78, 0x57, 0xce, 0x3d, 0xd8, 0x8e, 0x98, 0xf8, 0xfd, 0x03, 0x9b, 0x7c, 0x38, 0x98, 0x4c,
+	0x50, 0xca, 0x05, 0xc1, 0xe3, 0x7f, 0x97, 0x61, 0xa5, 0x78, 0x07, 0xe4, 0x35, 0x04, 0x95, 0x0c,
+	0x93, 0x1d, 0xbb, 0xca, 0xb6, 0x8c, 0x8f, 0xc2, 0xf9, 0x0f, 0x66, 0xb1, 0x74, 0x89, 0xbc, 0x72,
+	0xfe, 0x77, 0x7d, 0xd1, 0xbe, 0x6f, 0x8b, 0xdf, 0x99, 0xf3, 0x57, 0xf0, 0xef, 0xc1, 0xd7, 0x3a,
+	0x48, 0x88, 0x0d, 0x71, 0x84, 0x74, 0x74, 0xbb, 0xe1, 0xab, 0x20, 0x2f, 0xa1, 0x77, 0x84, 0x75,
+	0xb1, 0x96, 0x22, 0x56, 0xc5, 0xda, 0xc2, 0x67, 0x90, 0x27, 0x79, 0x0b, 0x59, 0x2f, 0xb7, 0x89,
+	0x74, 0xce, 0x97, 0x2e, 0x91, 0x03, 0x58, 0x35, 0x3b, 0x20, 0x77, 0xdd, 0xa0, 0xc6, 0x5e, 0x46,
+	0xa3, 0xae, 0x4f, 0x65, 0x8a, 0xf1, 0x3f, 0xcb, 0xd0, 0x3b, 0xc6, 0xd9, 0x8d, 0x1c, 0xf9, 0x2b,
+	0x58, 0x35, 0x8f, 0xa5, 0x22, 0xdc, 0xd6, 0xa3, 0x8a, 0xf0, 0x9c, 0xee, 0xd0, 0x25, 0xf2, 0xc2,
+	0xcc, 0xfd, 0x4e, 0x1d, 0xe2, 0x4c, 0x7d, 0xbb, 0xe5, 0xad, 0x06, 0xf6, 0xb7, 0x0f, 0xbd, 0x88,
+	0x89, 0x1b, 0x39, 0xb0, 0x1f, 0xe6, 0x06, 0xd6, 0xd6, 0x9b, 0xd1, 0x56, 0x55, 0xb0, 0x94, 0x40,
+	0xba, 0x44, 0x9e, 0x35, 0x27, 0xd5, 0x10, 0x9f, 0x6e, 0x44, 0x04, 0x1b, 0x0d, 0xe1, 0x21, 0x5f,
+	0xd7, 0xd8, 0x2e, 0x45, 0xea, 0xce, 0xf2, 0x02, 0x7c, 0xad, 0x47, 0x64, 0xbb, 0x06, 0x3b, 0xfa,
+	0x54, 0x75, 0xe9, 0x8a, 0xae, 0xe9, 0xd2, 0xbe, 0x0a, 0xa7, 0xcb, 0xe6, 0x9b, 0xe8, 0xac, 0xf6,
+	0x1a, 0xd6, 0x1d, 0xa5, 0x22, 0xf7, 0x6a, 0xf0, 0xbc, 0x80, 0x75, 0x66, 0x38, 0x5f, 0x2d, 0x7c,
+	0xcf, 0xff, 0x0b, 0x00, 0x00, 0xff, 0xff, 0xfc, 0x77, 0x6d, 0xfc, 0x4f, 0x0b, 0x00, 0x00,
 }
