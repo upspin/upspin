@@ -869,7 +869,7 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 		}
 		dirData = append(dirData, data...)
 	}
-	entry, err := s.newDirEntry(dirName, dirData, 0)
+	entry, err := s.newDirEntry(dirName, dirData, dirEntry.Sequence+1)
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
