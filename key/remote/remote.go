@@ -63,7 +63,7 @@ func userName(user *upspin.User) string {
 func (r *remote) Put(user *upspin.User) error {
 	op := opf("Put", "%v", userName(user))
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, checkError, err := r.NewAuthContext()
 	if err != nil {
 		return op.error(err)
 	}
@@ -71,11 +71,9 @@ func (r *remote) Put(user *upspin.User) error {
 		User: proto.UserProto(user),
 	}
 	resp, err := r.keyClient.Put(gCtx, req, callOpt)
+	err = checkError(err)
 	if err != nil {
 		return op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return op.error(err)
 	}
 	if len(resp.Error) != 0 {
 		return op.error(errors.UnmarshalError(resp.Error))
