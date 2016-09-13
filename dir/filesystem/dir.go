@@ -257,10 +257,6 @@ func (s *server) Configure(options ...string) (upspin.UserName, error) {
 	return "", errors.Str("store/filesystem: Configure should not be called")
 }
 
-func (s *server) Authenticate(upspin.Context) error {
-	return errors.Str("store/filesystem: Authenticate should not be called")
-}
-
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
 }
