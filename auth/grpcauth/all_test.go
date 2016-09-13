@@ -123,7 +123,7 @@ type client struct {
 }
 
 func (c *client) TellTrump(t *testing.T, demand string) (response string) {
-	gCtx, callOpt, validate, err := c.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := c.NewAuthContext()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,10 +132,8 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 	}
 	log.Printf("Client: Telling Trump: %q", req.PeopleDemand)
 	resp, err := c.grpcClient.DoATrump(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
-		t.Fatal(err)
-	}
-	if err := validate(); err != nil {
 		t.Fatal(err)
 	}
 	c.demandCount++
