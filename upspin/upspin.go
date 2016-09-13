@@ -294,6 +294,16 @@ type DirServer interface {
 	// path name. If it is -1, Put will fail if there is already an item
 	// with that name.
 	//
+	// The Name field of the DirEntry identifies where in the directory
+	// tree the entry belongs. The SignedName field, which usually has the
+	// same value, is the name used to sign the DirEntry to guarantee its
+	// security. They may differ if an entry appears in multiple locations,
+	// such as in its original location plus within a second tree holding
+	// a snapshot of the original tree but starting from a different root.
+	//
+	// Most software will concern itself only with the Name field unless
+	// generating or validating the entry's signature.
+	//
 	// All but the last element of the path name must already exist
 	// and be directories or links. The final element, if it exists,
 	// must not be a directory. If something is already stored under
@@ -368,14 +378,16 @@ type Time int64
 // DirEntry represents the directory information for a file.
 // The blocks of a file represent contiguous data. There are no
 // holes and no overlaps and the first block always has offset 0.
+// Name and SignedName must not be empty. See comments in DirServer.Put.
 type DirEntry struct {
 	// Fields contributing to the signature.
-	Name     PathName   // The full path name of the file. Only the last element can be a link.
-	Packing  Packing    // Packing used for every block in file.
-	Time     Time       // Time associated with file; might be when it was last written.
-	Blocks   []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
-	Packdata []byte     // Information maintained by the packing algorithm.
-	Link     PathName   // The link target, iff the DirEntry has Attr=AttrLink.
+	Name       PathName   // The full path name of the file. Only the last element can be a link.
+	SignedName PathName   // The full path name of the file used for signing.
+	Packing    Packing    // Packing used for every block in file.
+	Time       Time       // Time associated with file; might be when it was last written.
+	Blocks     []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
+	Packdata   []byte     // Information maintained by the packing algorithm.
+	Link       PathName   // The link target, iff the DirEntry has Attr=AttrLink.
 
 	// Field determining the key used for the signature, hence also tamper-resistant.
 	Writer UserName // Writer of the file, often the same as owner.
