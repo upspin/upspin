@@ -105,7 +105,7 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 	} else {
 		userName = name[:slash]
 	}
-	if _, _, err := user.Parse(upspin.UserName(userName)); err != nil {
+	if _, _, _, err := user.Parse(upspin.UserName(userName)); err != nil {
 		// Bad user name.
 		return Parsed{}, err
 	}
@@ -188,8 +188,8 @@ func (p Parsed) Compare(q Parsed) int {
 	if p.path == q.path {
 		return 0
 	}
-	pUser, pDomain, _ := user.Parse(p.User()) // Ignoring errors.
-	qUser, qDomain, _ := user.Parse(q.User()) // Ignoring errors.
+	pUser, _, pDomain, _ := user.Parse(p.User()) // Ignoring errors.
+	qUser, _, qDomain, _ := user.Parse(q.User()) // Ignoring errors.
 	switch {
 	case pDomain < qDomain:
 		return -1
@@ -259,7 +259,7 @@ func Clean(path upspin.PathName) upspin.PathName {
 		userPart = path
 		filePart = "/"
 	}
-	_, _, err := user.Parse(upspin.UserName(userPart))
+	_, _, _, err := user.Parse(upspin.UserName(userPart))
 	if err != nil {
 		// No user name at all, so just call Go's clean. Probably won't happen
 		// outside of tests, but one could imagine calling it on the file part

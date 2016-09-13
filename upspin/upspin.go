@@ -12,7 +12,8 @@ import (
 
 // A UserName is just an e-mail address representing a user.
 // It is given a unique type so the API is clear.
-// Example: gopher@google.com
+// The user part may contain an optional suffix after a plus sign.
+// Examples: gopher@google.com, me+you@forever.com
 type UserName string
 
 // A PathName is just a string representing a full path name.

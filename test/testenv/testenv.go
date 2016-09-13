@@ -259,7 +259,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	ctx = context.SetPacking(ctx, e.Setup.Packing)
 
 	// Set up a factotum for the user.
-	user, _, err := user.Parse(userName)
+	user, _, _, err := user.Parse(userName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

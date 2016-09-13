@@ -11,10 +11,11 @@ import (
 	"upspin.io/upspin"
 )
 
-func TestUserAndDomain(t *testing.T) {
+func TestParse(t *testing.T) {
 	type cases struct {
 		userName upspin.UserName
 		user     string
+		suffix   string
 		domain   string
 		errStr   string
 	}
@@ -22,28 +23,38 @@ func TestUserAndDomain(t *testing.T) {
 	hugeBadName := strings.Repeat("b", 254-8)
 	hugeOKDomain := strings.Repeat("x", 63) + ".com"
 	hugeBadDomain := strings.Repeat("y", 64) + ".com"
+	// Constants to make the test cases a little easier to read.
+	const (
+		U = ""
+		S
+		D
+	)
 	var tests = []cases{
-		{upspin.UserName("me@here.com"), "me", "here.com", ""},
-		{upspin.UserName("me@HERE.com"), "me", "here.com", ""},                // Lower-case the domain.
-		{upspin.UserName(hugeOKName + "@foo.com"), hugeOKName, "foo.com", ""}, // Maximum accepted length, 254.
-		{upspin.UserName(hugeBadName + "@foo.com"), "", "", "name too long"},
-		{upspin.UserName("@"), "", "", "syntax error: missing user name"},
-		{upspin.UserName("user@" + hugeOKDomain), "user", hugeOKDomain, ""}, // Maximum domain element length, 63.
-		{upspin.UserName("user@" + hugeBadDomain), "", "", "invalid domain name element"},
-		{upspin.UserName("user@a..com"), "", "", "invalid domain name element"},
-		{upspin.UserName("a@bcom"), "", "", "domain name must contain a period"},
-		{upspin.UserName("a@b@.com"), "", "", "user name must contain one @ symbol"},
-		{upspin.UserName("a@%.com"), "", "", "bad symbol in domain name"},
-		{upspin.UserName("@bbc.com"), "", "", "missing user name"},
-		{upspin.UserName("abc.com@"), "", "", "missing domain name"},
-		{upspin.UserName("a@b.co"), "a", "b.co", ""},
-		{upspin.UserName("a@b.c"), "", "", "invalid domain name"},
-		{upspin.UserName("me@here/.com"), "", "", "bad symbol in domain name"},
-		{upspin.UserName("me@here.com."), "me", "here.com.", "invalid domain name"}, // We disallow the trailing dot.
-		{upspin.UserName("me@here.com.."), "", "", "invalid domain name"},
+		{upspin.UserName("me@here.com"), "me", S, "here.com", ""},
+		{upspin.UserName("me+you@here.com"), "me+you", "you", "here.com", ""},
+		{upspin.UserName("me@HERE.com"), "me", S, "here.com", ""},                // Lower-case the domain.
+		{upspin.UserName(hugeOKName + "@foo.com"), hugeOKName, S, "foo.com", ""}, // Maximum accepted length, 254.
+		{upspin.UserName(hugeBadName + "@foo.com"), U, S, D, "name too long"},
+		{upspin.UserName("@"), U, S, D, "syntax error: missing user name"},
+		{upspin.UserName("user@" + hugeOKDomain), "user", S, hugeOKDomain, ""}, // Maximum domain element length, 63.
+		{upspin.UserName("user@" + hugeBadDomain), U, S, D, "invalid domain name element"},
+		{upspin.UserName("user@a..com"), U, S, D, "invalid domain name element"},
+		{upspin.UserName("a@bcom"), U, S, D, "domain name must contain a period"},
+		{upspin.UserName("a@b@.com"), U, S, D, "user name must contain one @ symbol"},
+		{upspin.UserName("a@%.com"), U, S, D, "bad symbol in domain name"},
+		{upspin.UserName("@bbc.com"), U, S, D, "missing user name"},
+		{upspin.UserName("abc.com@"), U, S, D, "missing domain name"},
+		{upspin.UserName("a@b.co"), "a", S, "b.co", ""},
+		{upspin.UserName("a@b.c"), U, S, D, "invalid domain name"},
+		{upspin.UserName("me@here/.com"), U, S, D, "bad symbol in domain name"},
+		{upspin.UserName("me@here.com."), U, S, D, "invalid domain name"}, // We disallow the trailing dot.
+		{upspin.UserName("me@here.com.."), U, S, D, "invalid domain name"},
+		{upspin.UserName("me+@here.com"), U, S, D, "empty +suffix in user name"},
+		{upspin.UserName("me+a+b@here.com"), U, S, D, "multiple +suffixes in user name"},
+		{upspin.UserName("me+/x@here.com"), U, S, D, "bad symbol in +suffix"},
 	}
 	for _, test := range tests {
-		u, d, err := Parse(test.userName)
+		u, s, d, err := Parse(test.userName)
 		if test.errStr == "" {
 			if err != nil {
 				t.Errorf("%q: Expected no error, got %q", test.userName, err)
@@ -52,8 +63,11 @@ func TestUserAndDomain(t *testing.T) {
 			if u != test.user {
 				t.Errorf("%q: expected user %q, got %q", test.userName, test.user, u)
 			}
+			if s != test.suffix {
+				t.Errorf("%q: expected suffix %q, got %q", test.userName, test.suffix, s)
+			}
 			if d != test.domain {
-				t.Errorf("%q: expected domain %q, got %q", test.userName, test.domain, u)
+				t.Errorf("%q: expected domain %q, got %q", test.userName, test.domain, d)
 			}
 			continue
 		}

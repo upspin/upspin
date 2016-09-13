@@ -465,7 +465,7 @@ func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 		s.exitf("invalid public key, to override use -force: %s", err.Error())
 	}
 	// Validate username
-	_, _, err = user.Parse(userStrct.Name)
+	_, _, _, err = user.Parse(userStrct.Name)
 	if err != nil {
 		s.exit(err)
 	}

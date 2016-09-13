@@ -235,7 +235,7 @@ func TestHasAccessNoGroups(t *testing.T) {
 	check("not@a.person", AnyRight, "me@here.com/foo/bar", false)
 
 	// Wildcard that should match.
-	check("joe@nsa.gov", Read, "me@here.com/foo/bar", true)
+	check("joe@nsa.gov", Read, "me@here.com/foo/barx", true)
 
 	// Wildcard that should not match.
 	check("*@nasa.gov", Read, "me@here.com/foo/bar", false)
