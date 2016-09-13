@@ -108,8 +108,3 @@ func (s *server) Ping() bool {
 // Close implements upspin.server.
 func (s *server) Close() {
 }
-
-// Authenticate implements upspin.server.
-func (s *server) Authenticate(upspin.Context) error {
-	return nil
-}

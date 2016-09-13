@@ -154,11 +154,6 @@ func (s *Store) Close() {
 	// Nothing to do.
 }
 
-// Authenticate implements upspin.Service.
-func (s *Store) Authenticate(upspin.Context) error {
-	return nil
-}
-
 func newStoreError(op string, err string, ref upspin.Reference) error {
 	return errors.E(op, errors.Errorf("%v: %s", ref, err))
 }

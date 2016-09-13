@@ -47,12 +47,6 @@ func (Server) Configure(options ...string) (upspin.UserName, error) {
 func (Server) Close() {
 }
 
-// Authenticate implements upspin.Service.
-func (Server) Authenticate(context upspin.Context) error {
-	const op = "key/Server.Authenticate"
-	return errors.E(op, errors.Invalid, ServerErr)
-}
-
 // Ping implements upspin.Service.
 func (Server) Ping() bool {
 	return true
