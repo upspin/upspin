@@ -33,6 +33,24 @@
       "revId": "677726c1f00fb0769a313a4ac7270df83f48a15e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_fc958930",
+        "filename": "user/user_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-13T23:04:16Z",
+      "side": 1,
+      "message": "As discussed in person, it was decided that the current design is the right one, mostly because the suffixed name is the one most of the software will use.",
+      "parentUuid": "cbbf72c0_cc3a25ec",
+      "revId": "677726c1f00fb0769a313a4ac7270df83f48a15e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
