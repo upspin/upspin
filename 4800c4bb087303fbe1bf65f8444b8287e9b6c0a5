@@ -16,6 +16,23 @@
       "revId": "4800c4bb087303fbe1bf65f8444b8287e9b6c0a5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_51e1d4ed",
+        "filename": "factotum/new_mobile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-13T02:32:33Z",
+      "side": 1,
+      "message": "Why is this being excluded from build on mobile platforms?\nBuild tags should be used to prevent dependencies from creeping in where they\u0027re not wanted, or for providing alternate implementations.\n\nThis change should not have moved anything around, but instead added a new function \"NewRaw\" with the different signature.",
+      "revId": "4800c4bb087303fbe1bf65f8444b8287e9b6c0a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
