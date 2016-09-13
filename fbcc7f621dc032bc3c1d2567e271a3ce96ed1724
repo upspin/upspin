@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbbf72c0_665770fb",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-13T07:02:56Z",
+      "side": 1,
+      "message": "So if I want to make restarting servers work, I should just prematurely expire an auth token when the redial is done?  That is lock, ac.authToken \u003d \"\", unlock?",
+      "range": {
+        "startLine": 263,
+        "startChar": 8,
+        "endLine": 263,
+        "endChar": 26
+      },
+      "revId": "fbcc7f621dc032bc3c1d2567e271a3ce96ed1724",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
