@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_5cc2bd26",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-13T23:15:11Z",
+      "side": 1,
+      "message": "is there a good reason the comment shouldn\u0027t be here? it seems odd to have it on Put.",
+      "revId": "57ec051a8131cf2f8bb6834475f04a529f4e85d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
