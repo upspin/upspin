@@ -67,6 +67,23 @@
       "revId": "a5aaab209acf8983ad8ba2cb16570537308ab03e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_7caa1975",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-13T23:09:07Z",
+      "side": 1,
+      "message": "How about this.\n\nThe Name field of the DirEntry identifies where in the directory\ntree the entry belongs. The SignedName field, which usually has the\nsame value, is the name used to sign the DirEntry to guarantee its\nsecurity. They may differ if an entry appears in multiple locations,\nsuch as in its original location plus within a second tree holding\na snapshot of the original tree but starting from a different root.\n\nMost software will concern itself only with the Name field unless\ngenerating or validating the entry\u0027s signature.",
+      "revId": "a5aaab209acf8983ad8ba2cb16570537308ab03e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
