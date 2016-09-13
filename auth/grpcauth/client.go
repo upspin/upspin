@@ -215,8 +215,7 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	return c, nil
 }
 
-// Authenticate implements upspin.Service.
-func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
+func (ac *AuthClientService) authenticate(ctx upspin.Context) error {
 	req := &proto.AuthenticateRequest{
 		UserName: string(ctx.UserName()),
 		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
@@ -263,11 +262,10 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 // NewAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
 // is done if necessary.
 func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
-	var err error
+	const op = "auth/grpcauth.AuthClientService"
 	if ac.isAuthTokenExpired() {
-		err = ac.Authenticate(ac.context)
-		if err != nil {
-			return nil, err
+		if err := ac.authenticate(ac.context); err != nil {
+			return nil, errors.E(op, err)
 		}
 	}
 	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
