@@ -129,7 +129,7 @@ func (s *State) exit(err error) {
 	s.exitf("%s", err)
 }
 
-func subUsage(fs *flag.FlagSet, msg string) func() {
+func (s *State) subUsage(fs *flag.FlagSet, msg string) func() {
 	return func() {
 		fmt.Fprintf(os.Stderr, "Usage: upspin %s\n", msg)
 		// How many flags?
@@ -139,13 +139,16 @@ func subUsage(fs *flag.FlagSet, msg string) func() {
 			fmt.Fprintf(os.Stderr, "Flags:\n")
 			fs.PrintDefaults()
 		}
+		if s.interactive {
+			panic("exit")
+		}
 		os.Exit(2)
 	}
 }
 
 func (s *State) countersign(args ...string) {
 	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "countersign")
+	fs.Usage = s.subUsage(fs, "countersign")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -160,14 +163,13 @@ func (s *State) countersign(args ...string) {
 func (s *State) get(args ...string) {
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
-	fs.Usage = subUsage(fs, "get [-out=outputfile] path")
+	fs.Usage = s.subUsage(fs, "get [-out=outputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
-		os.Exit(2)
 	}
 
 	data, err := s.client.Get(upspin.PathName(fs.Arg(0)))
@@ -194,14 +196,13 @@ func (s *State) get(args ...string) {
 func (s *State) glob(args ...string) {
 	fs := flag.NewFlagSet("glob", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
-	fs.Usage = subUsage(fs, "glob [-l] pattern...")
+	fs.Usage = s.subUsage(fs, "glob [-l] pattern...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
-		os.Exit(2)
 	}
 	for i := 0; i < fs.NArg(); i++ {
 		de, err := s.client.Glob(fs.Arg(i))
@@ -219,14 +220,13 @@ func (s *State) glob(args ...string) {
 
 func (s *State) info(args ...string) {
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "info path...")
+	fs.Usage = s.subUsage(fs, "info path...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() == 0 {
 		fs.Usage()
-		os.Exit(2)
 	}
 	for i := 0; i < fs.NArg(); i++ {
 		name := upspin.PathName(fs.Arg(i))
@@ -243,14 +243,13 @@ func (s *State) link(args ...string) {
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
-	fs.Usage = subUsage(fs, "link original_path link_path")
+	fs.Usage = s.subUsage(fs, "link original_path link_path")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() != 2 {
 		fs.Usage()
-		os.Exit(2)
 	}
 	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
 	linkPath := path.Clean(upspin.PathName(fs.Arg(1)))
@@ -265,18 +264,19 @@ func (s *State) ls(args ...string) {
 	longFormat := fs.Bool("l", false, "long format")
 	followLinks := fs.Bool("L", false, "follow links")
 	recur := fs.Bool("R", false, "recur into subdirectories")
-	fs.Usage = subUsage(fs, "ls [-l] path...")
+	fs.Usage = s.subUsage(fs, "ls [-l] [path...]")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
+	done := map[upspin.PathName]bool{}
 	if fs.NArg() == 0 {
-		fs.Usage()
-		os.Exit(2)
+		userRoot := upspin.PathName(s.context.UserName())
+		s.list(userRoot, done, *longFormat, *followLinks, *recur)
+		return
 	}
 	// The done map marks a directory we have listed, so we don't recur endlessly
 	// when given a chain of links with -L.
-	done := map[upspin.PathName]bool{}
 	for _, arg := range fs.Args() {
 		s.list(upspin.PathName(arg), done, *longFormat, *followLinks, *recur)
 	}
@@ -318,7 +318,7 @@ func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFo
 
 func (s *State) mkdir(args ...string) {
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "mkdir directory...")
+	fs.Usage = s.subUsage(fs, "mkdir directory...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -337,14 +337,13 @@ func (s *State) mkdir(args ...string) {
 func (s *State) put(args ...string) {
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
-	fs.Usage = subUsage(fs, "put [-in=inputfile] path")
+	fs.Usage = s.subUsage(fs, "put [-in=inputfile] path")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() != 1 {
 		fs.Usage()
-		os.Exit(2)
 	}
 	data := s.readAll(*inFile)
 	_, err = s.client.Put(upspin.PathName(fs.Arg(0)), data)
@@ -355,14 +354,13 @@ func (s *State) put(args ...string) {
 
 func (s *State) rotate(args ...string) {
 	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "rotate")
+	fs.Usage = s.subUsage(fs, "rotate")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
 	if fs.NArg() != 0 {
 		fs.Usage()
-		os.Exit(2)
 	}
 
 	f := s.context.Factotum() // save latest factotum
@@ -384,7 +382,7 @@ func (s *State) rotate(args ...string) {
 
 func (s *State) rm(args ...string) {
 	fs := flag.NewFlagSet("rm", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "rm path...")
+	fs.Usage = s.subUsage(fs, "rm path...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -406,7 +404,7 @@ func (s *State) user(args ...string) {
 	inFile := fs.String("in", "", "input file (default standard input)")
 	force := fs.Bool("force", false, "force writing user record even if key is empty")
 	// TODO: the username is not accepted with -put. We may need two lines to fix this (like 'man printf').
-	fs.Usage = subUsage(fs, "user [-put [-in=inputfile] [-force]] [username...]")
+	fs.Usage = s.subUsage(fs, "user [-put [-in=inputfile] [-force]] [username...]")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -415,7 +413,6 @@ func (s *State) user(args ...string) {
 	if *put {
 		if fs.NArg() != 0 {
 			fs.Usage()
-			os.Exit(2)
 		}
 		s.putUser(keyServer, *inFile, *force)
 		return
@@ -482,7 +479,7 @@ func (s *State) share(args ...string) {
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
 	quiet := fs.Bool("q", false, "suppress output. Default is to show state for every file")
-	fs.Usage = subUsage(fs, "share path...")
+	fs.Usage = s.subUsage(fs, "share path...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -506,7 +503,7 @@ func (s *State) share(args ...string) {
 
 func (s *State) whichAccess(args ...string) {
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
-	fs.Usage = subUsage(fs, "whichaccess path...")
+	fs.Usage = s.subUsage(fs, "whichaccess path...")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
