@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_fc7e2908",
+        "filename": "factotum/new_mobile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-13T22:05:10Z",
+      "side": 1,
+      "message": "please move this to factotum.go and delete this file.\n\nthere\u0027s nothing mobile-specific about this, and there\u0027s no reason to conceal it at build time",
+      "revId": "bbd7c7f963d3ad34019a07bcca59b644af87157d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
