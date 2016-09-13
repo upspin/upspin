@@ -46,9 +46,9 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
-	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/valid"
 )
 
 // Errors returned in case of various authentication failure scenarios.
@@ -64,15 +64,15 @@ const (
 	// authTokenKey is the key in the context's metadata for the auth token.
 	authTokenKey = "upspinauthtoken" // must be all lower case.
 
+	// These keys are for inline auth token requests.
+	authRequestKey = "upspinauthrequest"
+
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
 )
 
 // A SecureServer is a grpc server that implements the Authenticate method as defined by the upspin proto.
 type SecureServer interface {
-	// Authenticate authenticates the calling user.
-	Authenticate(ctx gContext.Context, req *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error)
-
 	// Ping responds with the same.
 	Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
 
@@ -108,78 +108,6 @@ type secureServerImpl struct {
 
 var _ SecureServer = (*secureServerImpl)(nil)
 
-// Authenticate authenticates the calling user.
-func (s *secureServerImpl) Authenticate(ctx gContext.Context, req *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
-	const op = "auth/grpcauth.Authenticate"
-	log.Printf("Authenticate %q %q", req.UserName, req.Now)
-	// Must be a valid name.
-	parsed, err := path.Parse(upspin.PathName(req.UserName))
-	if err != nil {
-		log.Error.Printf("Authenticate %q: %v", req.UserName, err)
-		return nil, errors.E(op, err)
-	}
-
-	// Time should be sane.
-	reqNow, err := time.Parse(time.ANSIC, req.Now)
-	if err != nil {
-		log.Fatalf("time failed to parse: %q", req.Now)
-		return nil, errors.E(op, err)
-	}
-	var now time.Time
-	if s.config.TimeFunc == nil {
-		now = time.Now()
-	} else {
-		now = s.config.TimeFunc()
-	}
-	if reqNow.After(now.Add(30*time.Second)) || reqNow.Before(now.Add(-45*time.Second)) {
-		log.Printf("timestamp is far wrong, but proceeding anyway")
-		// TODO: watch logs for the message above and decide if we should fail here when
-		// s.config.AllowUnauthenticatedRequests is false.
-	}
-
-	// Get user's public key.
-	log.Printf("Authenticate: Looking up keys for user %q", parsed.User())
-	key, err := s.config.Lookup(parsed.User())
-	log.Printf("Authenticate: Done looking for key. Error: %v", err)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	// Parse signature
-	var rs, ss big.Int
-	_, ok := rs.SetString(req.Signature.R, 10)
-	if !ok {
-		return nil, errors.E(op, errMissingSignature)
-	}
-	_, ok = ss.SetString(req.Signature.S, 10)
-	if !ok {
-		return nil, errors.E(op, errMissingSignature)
-	}
-
-	// Validate signature.
-	err = verifySignature(key, []byte(string(req.UserName)+" Authenticate "+req.Now), &rs, &ss)
-	if err != nil {
-		err := errors.E(op, errors.Permission, upspin.UserName(req.UserName), errors.Errorf("invalid signature: %v", err))
-		log.Error.Print(err)
-		return nil, err
-	}
-
-	// Generate an auth token and bind it to a session for the user.
-	expiration := now.Add(authTokenDuration)
-	authToken, err := generateRandomToken()
-	if err != nil {
-		log.Error.Printf("Can't create auth token.")
-		return nil, errors.E(op, err)
-	}
-	_ = auth.NewSession(parsed.User(), expiration, authToken, nil) // session is cached, ignore return value
-
-	resp := &proto.AuthenticateResponse{
-		Token: authToken,
-	}
-
-	return resp, nil
-}
-
 // Ping responds with the same.
 func (s *secureServerImpl) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
 	log.Print("Ping")
@@ -201,22 +129,88 @@ func generateRandomToken() (string, error) {
 	return fmt.Sprintf("%X", buf), nil
 }
 
-// GetSessionFromContext returns a session from the context if there is one.
+// GetSessionFromContext looks for an authentication token or request in the
+// given context, finds or creates a session for that token or request,
+// and returns that session.
 func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
 	const op = "auth/grpcauth.GetSessionFromContext"
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Str("invalid metadata"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("invalid request metadata"))
 	}
-	data, ok := md[authTokenKey]
-	if !ok || len(data) != 1 {
-		return nil, errors.E(op, errors.Invalid, errors.Str("no auth token in metadata"))
+
+	token, ok := md[authTokenKey]
+	if !ok || len(token) != 1 {
+		// No token, so see if we're handling an auth request.
+
+		request, ok := md[authRequestKey]
+		if !ok || len(request) != 4 {
+			return nil, errors.E(op, errors.Invalid, errors.Str("no auth token or request in metadata"))
+		}
+		// This is an auth request.
+
+		// Validate the username.
+		user := upspin.UserName(request[0])
+		if err := valid.UserName(user); err != nil {
+			return nil, errors.E(op, user, err)
+		}
+
+		// Validate the time.
+		reqNow, err := time.Parse(time.ANSIC, request[1])
+		if err != nil {
+			return nil, errors.E(op, user, err)
+		}
+		var now time.Time
+		if s.config.TimeFunc == nil {
+			now = time.Now()
+		} else {
+			now = s.config.TimeFunc()
+		}
+		if reqNow.After(now.Add(30*time.Second)) || reqNow.Before(now.Add(-45*time.Second)) {
+			log.Printf("timestamp is far wrong, but proceeding anyway")
+			// TODO: watch logs for the message above and decide if we should fail here when
+			// s.config.AllowUnauthenticatedRequests is false.
+		}
+
+		// Get user's public key.
+		key, err := s.config.Lookup(user)
+		if err != nil {
+			return nil, errors.E(op, user, err)
+		}
+
+		// Parse signature
+		var rs, ss big.Int
+		if _, ok := rs.SetString(request[2], 10); !ok {
+			return nil, errors.E(op, errMissingSignature)
+		}
+		if _, ok := ss.SetString(request[3], 10); !ok {
+			return nil, errors.E(op, errMissingSignature)
+		}
+
+		// Validate signature.
+		err = verifySignature(key, []byte(string(user)+" Authenticate "+request[1]), &rs, &ss)
+		if err != nil {
+			return nil, errors.E(op, errors.Permission, user, errors.Errorf("invalid signature: %v", err))
+		}
+
+		// Generate an auth token and bind it to a session for the user.
+		expiration := now.Add(authTokenDuration)
+		authToken, err := generateRandomToken()
+		if err != nil {
+			log.Error.Printf("Can't create auth token.")
+			return nil, errors.E(op, err)
+		}
+		session := auth.NewSession(user, expiration, authToken, nil) // session is cached, ignore return value
+		if err := grpc.SendHeader(ctx, metadata.Pairs(authTokenKey, authToken)); err != nil {
+			return nil, errors.E(op, err)
+		}
+		return session, nil
 	}
-	authToken := data[0]
+
+	authToken := token[0]
 	if len(authToken) < authTokenEntropyLen {
 		return nil, errors.E(op, errors.Invalid, errors.Str("invalid auth token"))
 	}
-	log.Debug.Printf("Got authToken from context: %s", authToken)
 
 	// Get the session for this authToken
 	session := auth.GetSession(authToken)

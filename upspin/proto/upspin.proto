@@ -20,20 +20,9 @@ message Location {
 
 // The Service interface.
 
-message AuthenticateRequest {
-    string user_name = 1;
-    string now = 2;
-    Signature signature = 3;
-}
-
 message Signature {
     string r = 1;
     string s = 2;
-}
-
-message AuthenticateResponse {
-    string token = 1;
-    bytes error = 2;
 }
 
 message ConfigureRequest {
@@ -92,7 +81,6 @@ message StoreDeleteResponse {
 
 service Store {
     // Service methods:
-    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
@@ -130,7 +118,6 @@ message KeyPutResponse {
 
 service Key {
     // Service methods:
-    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
@@ -181,7 +168,6 @@ message DirWhichAccessRequest {
 
 service Dir{
     // Service methods:
-    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {}
     rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}

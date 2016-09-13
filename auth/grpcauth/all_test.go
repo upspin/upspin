@@ -34,7 +34,6 @@ var (
 )
 
 type server struct {
-	// Automatically handles authentication by implementing the Authenticate server method.
 	SecureServer
 	t         *testing.T
 	iteration int
@@ -101,10 +100,10 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 	return nil, nil // not reached
 }
 
-// COnfigure is defined in the proto file. The reason:
+// Configure is defined in the proto file. The reason:
 //
-// CacheConfig is a client method and does not go across the wire.  It does however use the GRCP Configure and
-// Authenticate from proto (not testproto) though.
+// CacheConfig is a client method and does not go across the wire.
+// It does however use the GRPC Configure from proto (not testproto) though.
 //
 // Because of the above I had to add Configure to the GRPCCommon interface required in auth/grpcauth/client.go i.e.,
 // it now has to have a proto GRPC Configure method in addition to Authenticate and Ping.  To make the TestServer
@@ -118,13 +117,13 @@ func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*
 }
 
 type client struct {
-	*AuthClientService // For handling Authenticate, Ping and Close.
+	*AuthClientService // For handling Ping and Close.
 	grpcClient         prototest.TestServiceClient
 	demandCount        int
 }
 
 func (c *client) TellTrump(t *testing.T, demand string) (response string) {
-	gCtx, err := c.NewAuthContext()
+	gCtx, callOpt, validate, err := c.NewAuthContext()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,8 +131,11 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 		PeopleDemand: demand,
 	}
 	log.Printf("Client: Telling Trump: %q", req.PeopleDemand)
-	resp, err := c.grpcClient.DoATrump(gCtx, req)
+	resp, err := c.grpcClient.DoATrump(gCtx, req, callOpt)
 	if err != nil {
+		t.Fatal(err)
+	}
+	if err := validate(); err != nil {
 		t.Fatal(err)
 	}
 	c.demandCount++
@@ -185,7 +187,7 @@ func TestAll(t *testing.T) {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.demandCount)
 	}
 
-	if cli.LastActivity().IsZero() {
+	if cli.lastActivity().IsZero() {
 		t.Errorf("Expected keep alive go routine to be alive.")
 	}
 }

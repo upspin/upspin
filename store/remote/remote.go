@@ -38,16 +38,19 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	op := opf("Get", "%q", ref)
 
-	gCtx, err := r.NewAuthContext()
+	gCtx, callOpt, validate, err := r.NewAuthContext()
 	if err != nil {
 		return nil, nil, op.error(err)
 	}
 	req := &proto.StoreGetRequest{
 		Reference: string(ref),
 	}
-	resp, err := r.storeClient.Get(gCtx, req)
+	resp, err := r.storeClient.Get(gCtx, req, callOpt)
 	if err != nil {
 		return nil, nil, op.error(errors.IO, err)
+	}
+	if err := validate(); err != nil {
+		return nil, nil, op.error(err)
 	}
 	r.LastActivity()
 	if len(resp.Error) != 0 {
@@ -61,16 +64,19 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	op := opf("Put", "%v bytes", len(data))
 
-	gCtx, err := r.NewAuthContext()
+	gCtx, callOpt, validate, err := r.NewAuthContext()
 	if err != nil {
 		return "", op.error(err)
 	}
 	req := &proto.StorePutRequest{
 		Data: data,
 	}
-	resp, err := r.storeClient.Put(gCtx, req)
+	resp, err := r.storeClient.Put(gCtx, req, callOpt)
 	if err != nil {
 		return "", op.error(errors.IO, err)
+	}
+	if err := validate(); err != nil {
+		return "", op.error(err)
 	}
 	r.LastActivity()
 	return upspin.Reference(resp.Reference), op.error(errors.UnmarshalError(resp.Error))
@@ -80,16 +86,19 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 func (r *remote) Delete(ref upspin.Reference) error {
 	op := opf("Delete", "%q", ref)
 
-	gCtx, err := r.NewAuthContext()
+	gCtx, callOpt, validate, err := r.NewAuthContext()
 	if err != nil {
 		return op.error(err)
 	}
 	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
-	resp, err := r.storeClient.Delete(gCtx, req)
+	resp, err := r.storeClient.Delete(gCtx, req, callOpt)
 	if err != nil {
 		return op.error(errors.IO, err)
+	}
+	if err := validate(); err != nil {
+		return op.error(err)
 	}
 	r.LastActivity()
 	return op.error(errors.UnmarshalError(resp.Error))
