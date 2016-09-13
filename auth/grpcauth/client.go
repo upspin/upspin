@@ -236,23 +236,21 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
 }
 
-// NewAuthContext sets up a gContext, GRPC CallOption, and validate function
+// NewAuthContext sets up a gContext, GRPC CallOption, and finishAuth function
 // for authenticating GRPC requests. If a request token is available, it puts
 // that token in the context as GRPC metadata. If the request token is not
 // available or has expired, it puts authentication request data in the
-// context, and sets up a GRPC Call Option and validate function for retrieving
+// context, and sets up a GRPC Call Option and finishAuth function for retrieving
 // the authentication response from the GRPC response headers.
 //
 // Example usage:
-// 	ctx, callOpt, validate, err := ac.NewAuthContext()
+// 	ctx, callOpt, finishAuth, err := ac.NewAuthContext()
 // 	// handle err
 // 	req := &proto.RequestMessage{ ... }
 // 	resp, err := c.grpcClient.DoATrump(ctx, req, callOpt)
+// 	err = finishAuth(err)
 // 	// handle err
-// 	if err := validate(); err != nil {
-// 		// handle err
-// 	}
-func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, validate func() error, err error) {
+func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, finishAuth func(error) error, err error) {
 	const op = "auth/grpcauth.AuthClientService"
 
 	ctx = gContext.Background()
@@ -265,9 +263,9 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		token := ac.authToken
 		ac.mu.Unlock()
 		ctx = metadata.NewContext(ctx, metadata.Pairs(authTokenKey, token))
-		validate = func() error {
+		finishAuth = func(err error) error {
 			ac.setLastActivity()
-			return nil
+			return err
 		}
 		return
 	}
@@ -284,7 +282,12 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		sig.R.String(),
 		sig.S.String(),
 	}})
-	validate = func() error {
+	finishAuth = func(err error) error {
+		ac.setLastActivity()
+		if err != nil {
+			return err
+		}
+
 		token, ok := header[authTokenKey]
 		if !ok || len(token) != 1 {
 			return errors.Str("no auth token in response header")
@@ -295,7 +298,6 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		defer ac.mu.Unlock()
 		ac.authToken = token[0]
 		ac.lastTokenRefresh = now
-		ac.lastNetActivity = now
 		return nil
 	}
 	return
@@ -317,7 +319,7 @@ func (ac *AuthClientService) Close() {
 func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
 	const op = "auth/grpcauth.ConfigureProxy"
 
-	gCtx, callOpt, validate, err := ac.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := ac.NewAuthContext()
 	if err != nil {
 		return "", errors.E(op, err)
 	}
@@ -330,10 +332,8 @@ func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoin
 		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
 	}
 	resp, err := ac.grpcCommon.Configure(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
-		return "", errors.E(op, err)
-	}
-	if err := validate(); err != nil {
 		return "", errors.E(op, err)
 	}
 
