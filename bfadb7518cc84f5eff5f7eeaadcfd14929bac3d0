@@ -16,6 +16,24 @@
       "revId": "bfadb7518cc84f5eff5f7eeaadcfd14929bac3d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6becc60a_74b046e2",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-13T05:21:20Z",
+      "side": 1,
+      "message": "This method actually goes away entirely in my subsequent CLs, but I\u0027m happy to abandon this approach in this package. It just helped me to see what was going on.",
+      "parentUuid": "6becc60a_f49b1666",
+      "revId": "bfadb7518cc84f5eff5f7eeaadcfd14929bac3d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
