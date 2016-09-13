@@ -308,10 +308,6 @@ func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dia
 	var err error
 	ds = new(dialedService)
 	ds.service, err = dialer.Dial(cc, key.endpoint)
-	if err == nil && !ds.ping() {
-		// The dial succeeded, but ping did not, so return an error.
-		err = errors.Str("Ping failed")
-	}
 
 	mu.Lock()
 	defer mu.Unlock()
