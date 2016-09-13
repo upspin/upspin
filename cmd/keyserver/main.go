@@ -118,7 +118,7 @@ func isLocal(addr string) bool {
 }
 
 func setupTestUser(key upspin.KeyServer) {
-	user, _, err := user.Parse(upspin.UserName(*testUser))
+	user, _, _, err := user.Parse(upspin.UserName(*testUser))
 	if err != nil {
 		log.Fatal(err)
 	}

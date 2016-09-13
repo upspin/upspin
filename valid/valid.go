@@ -16,7 +16,7 @@ import (
 // It also requires that the domain name be lower-cased to avoid ambiguity.
 func UserName(userName upspin.UserName) error {
 	const op = "valid.UserName"
-	u, d, err := user.Parse(userName)
+	u, _, d, err := user.Parse(userName)
 	if err != nil {
 		return errors.E(op, err)
 	}

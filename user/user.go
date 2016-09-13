@@ -13,8 +13,15 @@ import (
 )
 
 // Parse splits an upspin.UserName into user and domain and returns the pair.
-// It also validates the name as an e-mail address and lower-cases the  domain
+// It also returns the "+" suffix part of the user name, if it has one. For example,
+// given the user name
+//	joe+backup@blow.com
+// it would return the strings
+// 	"joe+backup" "backup" "blow.com"
+//
+// Parsed validates the name as an e-mail address and lower-cases the  domain
 // so it is canonical.
+//
 // TODO: Need to think about Unicode user names.
 //
 // The rules are:
@@ -43,12 +50,15 @@ import (
 //
 // Spaces may be problematic for us but we allow them here. TODO?
 //
+// The username suffix is still more constrained: It uses the same character
+// set as domains, but of course without the need for periods.
+//
 // Facebook and Google constrain you to [a-zA-Z0-9+-.],
 // ignoring the period and, in Google only, ignoring everything
 // from a plus sign onwards. We accept this set but do not follow
 // the ignore rules.
 //
-func Parse(userName upspin.UserName) (user string, domain string, err error) {
+func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	name := string(userName)
 	if len(userName) >= 254 {
 		return errUserName(userName, "name too long")
@@ -71,6 +81,24 @@ func Parse(userName upspin.UserName) (user string, domain string, err error) {
 	for _, c := range user {
 		if !okUserNameChar(c) {
 			return errUserName(userName, "bad symbol in user name")
+		}
+	}
+	// Valid +suffix (if any)?
+	if plus := strings.IndexByte(user, '+'); plus >= 0 {
+		if plus == 0 {
+			return errUserName(userName, "user name cannot start with +suffix")
+		}
+		suffix = user[plus+1:]
+		if suffix == "" {
+			return errUserName(userName, "empty +suffix in user name")
+		}
+		if strings.IndexByte(suffix, '+') > 0 {
+			return errUserName(userName, "multiple +suffixes in user name")
+		}
+		for _, c := range suffix {
+			if !okDomainChar(c) {
+				return errUserName(userName, "bad symbol in +suffix")
+			}
 		}
 	}
 	// Valid domain name?
@@ -101,12 +129,12 @@ func Parse(userName upspin.UserName) (user string, domain string, err error) {
 	if isUpper {
 		domain = strings.ToLower(domain)
 	}
-	return user, domain, nil
+	return user, suffix, domain, nil
 }
 
-func errUserName(user upspin.UserName, msg string) (string, string, error) {
+func errUserName(user upspin.UserName, msg string) (u, s, d string, err error) {
 	const op = "user.Parse"
-	return "", "", errors.E(op, errors.Syntax, user, errors.Str(msg))
+	return "", "", "", errors.E(op, errors.Syntax, user, errors.Str(msg))
 }
 
 // See the comments for UserAndDomain.
