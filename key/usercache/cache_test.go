@@ -181,7 +181,3 @@ func (s *service) Ping() bool {
 
 func (s *service) Close() {
 }
-
-func (s *service) Authenticate(upspin.Context) error {
-	return nil
-}

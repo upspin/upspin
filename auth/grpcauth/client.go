@@ -220,9 +220,8 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	return c, nil
 }
 
-// Authenticate implements upspin.Service.
-func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
-	op := opf("Authenticate", "%q, %q", ac.netAddr, ctx.UserName())
+func (ac *AuthClientService) authenticate(ctx upspin.Context) error {
+	op := opf("authenticate", "%q, %q", ac.netAddr, ctx.UserName())
 
 	req := &proto.AuthenticateRequest{
 		UserName: string(ctx.UserName()),
@@ -274,7 +273,7 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
 	op := opf("NewAuthContext", "%q", ac.netAddr)
 	if ac.isAuthTokenExpired() {
-		if err := ac.Authenticate(ac.context); err != nil {
+		if err := ac.authenticate(ac.context); err != nil {
 			return nil, op.error(err)
 		}
 	}

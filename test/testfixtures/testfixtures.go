@@ -57,11 +57,6 @@ func (d *dummyService) Configure(options ...string) (upspin.UserName, error) {
 	return "", nil
 }
 
-// Authenticate implements upspin.Service.
-func (d *dummyService) Authenticate(upspin.Context) error {
-	return nil
-}
-
 // Close implements upspin.Service.
 func (d *dummyService) Close() {
 }

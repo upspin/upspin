@@ -918,9 +918,3 @@ func (s *server) Ping() bool {
 func (s *server) Close() {
 	// TODO
 }
-
-// Authenticate implements upspin.Service.
-func (s *server) Authenticate(upspin.Context) error {
-	// TODO
-	return nil
-}
