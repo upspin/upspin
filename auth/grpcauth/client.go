@@ -6,6 +6,7 @@ package grpcauth
 
 import (
 	"crypto/tls"
+	"fmt"
 	"math/big"
 	"math/rand"
 	"net"
@@ -40,6 +41,7 @@ type AuthClientService struct {
 	grpcCommon       GRPCCommon
 	grpcConn         *grpc.ClientConn
 	context          upspin.Context
+	netAddr          upspin.NetAddr
 	authToken        string
 	lastTokenRefresh time.Time
 
@@ -80,10 +82,12 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // keep-alive packets.
 // The security level specifies the expected security guarantees of the connection.
 func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel) (*AuthClientService, error) {
-	const op = "auth/grpcauth.NewGRPCClient"
+	op := opf("NewGRPCClient", "%q", netAddr)
+
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
-		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
+		log.Info.Printf("auth/grpcauth: keepAliveInteral too short (%v)", keepAliveInterval)
 	}
+
 	addr := string(netAddr)
 	isHTTP := strings.HasPrefix(addr, "http://")
 	isHTTPS := strings.HasPrefix(addr, "https://")
@@ -104,7 +108,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
 		if !isLocal(addr[skip:]) {
-			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
+			return nil, op.error(errors.IO, errors.Errorf("insecure dial to non-loopback destination: %v", netAddr))
 		}
 		opts = append(opts, grpc.WithInsecure())
 	case Secure:
@@ -112,15 +116,16 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case InsecureAllowingSelfSignedCertificates:
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
 	default:
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
+		return nil, op.error(errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
 	}
 	conn, err := grpc.Dial(addr[skip:], opts...)
 	if err != nil {
-		return nil, err
+		return nil, op.error(err)
 	}
 	ac := &AuthClientService{
 		grpcConn:          conn,
 		context:           context,
+		netAddr:           netAddr,
 		keepAliveInterval: keepAliveInterval,
 		closeKeepAlive:    make(chan bool, 1),
 	}
@@ -217,13 +222,15 @@ func dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 
 // Authenticate implements upspin.Service.
 func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
+	op := opf("Authenticate", "%q, %q", ac.netAddr, ctx.UserName())
+
 	req := &proto.AuthenticateRequest{
 		UserName: string(ctx.UserName()),
 		Now:      time.Now().UTC().Format(time.ANSIC), // to discourage signature replay
 	}
 	sig, err := ctx.Factotum().UserSign([]byte(string(req.UserName) + " Authenticate " + req.Now))
 	if err != nil {
-		return err
+		return op.error(err)
 	}
 	req.Signature = &proto.Signature{
 		R: sig.R.String(),
@@ -231,7 +238,7 @@ func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
 	}
 	resp, err := ac.grpcCommon.Authenticate(gContext.Background(), req)
 	if err != nil {
-		return err
+		return op.error(err)
 	}
 	ac.authToken = resp.Token
 	now := time.Now()
@@ -242,6 +249,8 @@ func (ac *AuthClientService) Authenticate(ctx upspin.Context) error {
 
 // Ping implements upspin.Service.
 func (ac *AuthClientService) Ping() bool {
+	op := opf("Ping", "%q", ac.netAddr)
+
 	seq := rand.Int31()
 	req := &proto.PingRequest{
 		PingSequence: seq,
@@ -250,7 +259,7 @@ func (ac *AuthClientService) Ping() bool {
 	defer cancel()
 	resp, err := ac.grpcCommon.Ping(gctx, req)
 	if err != nil {
-		log.Printf("Ping error: %s", err)
+		op.error(err)
 	}
 	ac.lastNetActivity = time.Now()
 	return err == nil && resp.PingSequence == seq
@@ -263,11 +272,10 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 // NewAuthContext creates a new RPC context with the required authentication tokens set and ensures re-authentication
 // is done if necessary.
 func (ac *AuthClientService) NewAuthContext() (gContext.Context, error) {
-	var err error
+	op := opf("NewAuthContext", "%q", ac.netAddr)
 	if ac.isAuthTokenExpired() {
-		err = ac.Authenticate(ac.context)
-		if err != nil {
-			return nil, err
+		if err := ac.Authenticate(ac.context); err != nil {
+			return nil, op.error(err)
 		}
 	}
 	return metadata.NewContext(gContext.Background(), metadata.Pairs(authTokenKey, ac.authToken)), nil
@@ -287,32 +295,33 @@ func (ac *AuthClientService) Close() {
 // ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
 // to ensure that the proxy is running as our upspin user identity.
 func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
-	op := "Configure"
+	op := opf("ConfigureProxy", "%q, %q, %q", ac.netAddr, ctx.UserName(), e)
+
 	gCtx, err := ac.NewAuthContext()
 	if err != nil {
-		return "", err
+		return "", op.error(err)
 	}
 
 	token, err := generateRandomToken()
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", op.error(err)
 	}
 	req := &proto.ConfigureRequest{
 		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
 	}
 	resp, err := ac.grpcCommon.Configure(gCtx, req)
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", op.error(err)
 	}
 
 	// Get user's public keys.
 	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", op.error(err)
 	}
 	u, err := keyServer.Lookup(upspin.UserName(resp.UserName))
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", op.error(err)
 	}
 	key := u.PublicKey
 
@@ -320,17 +329,48 @@ func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoin
 	var rs, ss big.Int
 	_, ok := rs.SetString(resp.Signature.R, 10)
 	if !ok {
-		return "", errors.E(op, errors.Str("bad signature"))
+		return "", op.error(errors.Str("bad signature"))
 	}
 	_, ok = ss.SetString(resp.Signature.S, 10)
 	if !ok {
-		return "", errors.E(op, errors.Str("bad signature"))
+		return "", op.error(errors.Str("bad signature"))
 	}
 
 	// Validate signature.
 	err = verifySignature(key, []byte(resp.UserName+" Authenticate "+token), &rs, &ss)
 	if err != nil {
-		return "", errors.E(op, err)
+		return "", op.error(err)
 	}
 	return upspin.UserName(resp.UserName), nil
+}
+
+func opf(method string, format string, args ...interface{}) *operation {
+	op := &operation{"auth/grpcauth." + method, fmt.Sprintf(format, args...)}
+	log.Debug.Print(op)
+	return op
+}
+
+type operation struct {
+	op   string
+	args string
+}
+
+func (op *operation) String() string {
+	return fmt.Sprintf("%s(%s)", op.op, op.args)
+}
+
+func (op *operation) error(args ...interface{}) error {
+	if len(args) == 0 {
+		panic("error called with zero args")
+	}
+	if len(args) == 1 {
+		if e, ok := args[0].(error); ok && e == upspin.ErrFollowLink {
+			return e
+		}
+		if args[0] == nil {
+			return nil
+		}
+	}
+	log.Debug.Printf("%v error: %v", op, errors.E(args...))
+	return errors.E(append([]interface{}{op.op}, args...)...)
 }
