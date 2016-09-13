@@ -6,7 +6,6 @@ package bind
 
 import (
 	"math/rand"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -53,16 +52,6 @@ func TestSwitch(t *testing.T) {
 		t.Errorf("expected bind.StoreServer of undefined to fail")
 	}
 
-	// DirServer is never reachable (our dummyDirServer answers false to ping)
-	_, err := DirServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
-	if err == nil {
-		t.Error("Expected error")
-	}
-	const expectedError = "Ping failed"
-	if !strings.Contains(err.Error(), expectedError) {
-		t.Errorf("Expected %q error, got %q", expectedError, err)
-	}
-
 	// Test caching. dummyKey has a dial count.
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"}
 	u1, err := KeyServer(ctx, e) // Dials once.
@@ -88,8 +77,8 @@ func TestSwitch(t *testing.T) {
 	if du.dialed != 2 {
 		t.Errorf("Expected two dials. Got %d", du.dialed)
 	}
-	if u1.(*dummyKey).pingCount != 1 {
-		t.Errorf("Expected only one ping. Got %d", du.pingCount)
+	if u1.(*dummyKey).pingCount != 0 {
+		t.Errorf("Expected zero pings. Got %d", du.pingCount)
 	}
 
 	// Now check that Release works.
