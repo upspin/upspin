@@ -2,11 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package usercache provides a caching keyserver implementation.
-// It passes all operations except Lookup to the underlying keyserver.
+// Package usercache provides a KeyServer implementation that wraps
+// another and caches Lookups.
+// If a Lookup is made for the user that last Dialed the service,
+// data from that user's context will be provided instead of making
+// a request to the underlying server.
+// The caching KeyServer will defer Dialing the underlying service
+// until a Lookup or Put request needs to access that service.
 package usercache
 
 import (
+	"sync"
 	"time"
 
 	"upspin.io/cache"
@@ -20,8 +26,23 @@ type entry struct {
 }
 
 type userCacheServer struct {
-	upspin.KeyServer
 	cache *userCache
+
+	// TODO(adg): should this plumb through to the underlying key server?
+	// What would that mean?
+	upspin.NoConfiguration
+
+	// The underlying key server.
+	base upspin.KeyServer
+
+	// The following fields are used to defer dialing the underlying
+	// service until a Lookup or Put call requires it.
+	// If dialContext is non-nil, then the Dial method has been called.
+	// If dialed is non-nil, then the underlying service has been dialed.
+	mu           sync.Mutex
+	dialContext  upspin.Context
+	dialEndpoint upspin.Endpoint
+	dialed       upspin.KeyServer
 }
 
 var _ upspin.KeyServer = (*userCacheServer)(nil)
@@ -31,15 +52,23 @@ type userCache struct {
 	duration time.Duration
 }
 
-const defaultDuration = 15 * time.Minute
+const (
+	// defaultDuration is the default entry expiration time.
+	defaultDuration = 15 * time.Minute
+
+	// contextUserDuration is the expiration time of the dialing user's
+	// pre-populated record. This is set to a decade to ensure that we
+	// always use the context's values, unless overridden by a Put.
+	contextUserDuration = 3650 * 24 * time.Hour
+)
 
 var globalCache = userCache{entries: cache.NewLRU(256), duration: defaultDuration}
 
 // Global returns the provided key server wrapped in a global user cache.
 func Global(s upspin.KeyServer) upspin.KeyServer {
 	return &userCacheServer{
-		KeyServer: s,
-		cache:     &globalCache,
+		base:  s,
+		cache: &globalCache,
 	}
 }
 
@@ -51,10 +80,9 @@ func ResetGlobal() {
 // Lookup implements upspin.KeyServer.
 func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/usercache.Lookup"
-	v, ok := c.cache.entries.Get(name)
 
-	// If we have an unexpired binding, use it.
-	if ok {
+	// If we have an unexpired cache entry, use it.
+	if v, ok := c.cache.entries.Get(name); ok {
 		if !time.Now().After(v.(*entry).expires) {
 			e := v.(*entry)
 			return e.user, nil
@@ -63,7 +91,10 @@ func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 	}
 
 	// Not found, look it up.
-	u, err := c.KeyServer.Lookup(name)
+	if err := c.dial(); err != nil {
+		return nil, errors.E(op, err)
+	}
+	u, err := c.dialed.Lookup(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -75,12 +106,123 @@ func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 	return u, nil
 }
 
+// Put implements upspin.KeyServer.
+func (c *userCacheServer) Put(user *upspin.User) error {
+	const op = "key/usercache.Put"
+	if err := c.dial(); err != nil {
+		return errors.E(op, err)
+	}
+	if err := c.dialed.Put(user); err != nil {
+		return errors.E(op, err)
+	}
+	c.cache.entries.Remove(user.Name)
+	return nil
+}
+
+// Endpoint implements upspin.Service.
+func (c *userCacheServer) Endpoint() upspin.Endpoint {
+	// We don't want Endpoint to trigger a Dial.
+	// Just return the Endpoint for either the dialed or base service.
+	c.mu.Lock()
+	svc := c.dialed
+	c.mu.Unlock()
+	if svc == nil {
+		return svc.Endpoint()
+	}
+	return c.base.Endpoint()
+}
+
+// Ping implements upspin.Service.
+func (c *userCacheServer) Ping() bool {
+	// We don't want Ping to trigger a Dial.
+	// If we're not yet dialed, just return true.
+	c.mu.Lock()
+	svc := c.dialed
+	c.mu.Unlock()
+	if svc == nil {
+		return true
+	}
+	return svc.Ping()
+}
+
+// Authenticate implements upspin.Service.
+func (c *userCacheServer) Authenticate(upspin.Context) error {
+	return errors.Str("key/usercache.Authenticate: not implemented")
+}
+
+// Close implements upspin.Service.
+func (c *userCacheServer) Close() {
+	// If we're dialed, closed the dialed service.
+	c.mu.Lock()
+	svc := c.dialed
+	c.mu.Unlock()
+	if svc != nil {
+		svc.Close()
+		return
+	}
+
+	// Otherwise, close the underlying service.
+	c.base.Close()
+}
+
 // Dial implements upspin.Dialer.
 func (c *userCacheServer) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "key/usercache.Dial"
-	svc, err := c.KeyServer.Dial(ctx, e)
-	if err != nil {
-		return nil, errors.E(op, err)
+	c.cacheContextUser(ctx)
+
+	cc := *c
+	cc.mu = sync.Mutex{}
+	cc.dialed = nil
+	cc.dialContext = ctx
+	cc.dialEndpoint = e
+	return &cc, nil
+}
+
+// cacheContextUser puts the dialed user in the cache with an extra-long expiry
+// time, so that we don't hit the underlying cache for the current user and
+// instead use the values from their context.
+func (c *userCacheServer) cacheContextUser(ctx upspin.Context) {
+	if ctx == nil {
+		return
 	}
-	return &userCacheServer{svc.(upspin.KeyServer), c.cache}, nil
+	f := ctx.Factotum()
+	if f == nil {
+		return
+	}
+	name := ctx.UserName()
+	c.cache.entries.Add(name, &entry{
+		expires: time.Now().Add(contextUserDuration),
+		user: &upspin.User{
+			Name: name,
+			Dirs: []upspin.Endpoint{
+				ctx.DirEndpoint(),
+			},
+			Stores: []upspin.Endpoint{
+				ctx.StoreEndpoint(),
+			},
+			PublicKey: f.PublicKey(),
+		},
+	})
+}
+
+// dial dials the underlying key service using the arguments
+// provided to the previous invocation of Dial.
+// If Dial was not called, it returns an error.
+// If there is already a dialed service, it does nothing.
+func (c *userCacheServer) dial() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.dialed != nil {
+		return nil
+	}
+	if c.dialContext == nil {
+		return errors.Str("server not dialed")
+	}
+
+	svc, err := c.base.Dial(c.dialContext, c.dialEndpoint)
+	if err != nil {
+		return err
+	}
+	c.dialed = svc.(upspin.KeyServer)
+	return nil
 }
