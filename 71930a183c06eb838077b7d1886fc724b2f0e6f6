@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbbf72c0_4620b4a8",
+        "filename": "key/usercache/cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-13T06:26:37Z",
+      "side": 1,
+      "message": "Cache coherency is a bitch\n\nOne possibility is to just have the Dial() routine fill in the initial cache entry for UserName() from the context and mark that entry as never expiring.\n\nIt can also fire off a looping go routine that periodically gets the entry from the keyserver and refreshes the cached one if it has changed.  It has the advantage that all programs eventually refresh even that entry.  Also, the check in Lookup can go away since the dial context\u0027s user isn\u0027t special (other than having an infinite expiration time.\n\nIf you want, the program doing the put can immediately change c.dialContext so that it doesn\u0027t have to wait.\n\nWe would want whatever program updated the keyserver with a put to also rewrite the upspin/rc file...",
+      "range": {
+        "startLine": 127,
+        "startChar": 1,
+        "endLine": 127,
+        "endChar": 68
+      },
+      "revId": "71930a183c06eb838077b7d1886fc724b2f0e6f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
