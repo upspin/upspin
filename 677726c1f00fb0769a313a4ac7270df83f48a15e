@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbbf72c0_ec1e017b",
+        "filename": "user/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T14:48:59Z",
+      "side": 1,
+      "message": "See my comment on the unit test.",
+      "revId": "677726c1f00fb0769a313a4ac7270df83f48a15e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbbf72c0_cc3a25ec",
+        "filename": "user/user_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-13T14:48:59Z",
+      "side": 1,
+      "message": "I was thinking this should be \"me\" instead of \"me+you\". If there\u0027s a suffix, we need to append it back to make the current user, but it\u0027s easier to do that than to strip it again to figure out who the real user is.\n\nSay, I\u0027m doing snapshots, I need to know that edpin+snapshot is edpin. The presence of suffix tells me I can strip +snapshot from edpin+snapshot, but it less convenient than simply getting \"edpin\" and then later appending \"+\" + suffix to it.\n\nNot sure it\u0027s that important, but wanted to bring it up.",
+      "revId": "677726c1f00fb0769a313a4ac7270df83f48a15e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
