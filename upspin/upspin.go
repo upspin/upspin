@@ -369,12 +369,13 @@ type Time int64
 // holes and no overlaps and the first block always has offset 0.
 type DirEntry struct {
 	// Fields contributing to the signature.
-	Name     PathName   // The full path name of the file. Only the last element can be a link.
-	Packing  Packing    // Packing used for every block in file.
-	Time     Time       // Time associated with file; might be when it was last written.
-	Blocks   []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
-	Packdata []byte     // Information maintained by the packing algorithm.
-	Link     PathName   // The link target, iff the DirEntry has Attr=AttrLink.
+	Name       PathName   // The full path name of the file. Only the last element can be a link.
+	SignedName PathName   // The full path name of the file used for signing.
+	Packing    Packing    // Packing used for every block in file.
+	Time       Time       // Time associated with file; might be when it was last written.
+	Blocks     []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
+	Packdata   []byte     // Information maintained by the packing algorithm.
+	Link       PathName   // The link target, iff the DirEntry has Attr=AttrLink.
 
 	// Field determining the key used for the signature, hence also tamper-resistant.
 	Writer UserName // Writer of the file, often the same as owner.
