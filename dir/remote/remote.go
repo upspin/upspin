@@ -42,7 +42,7 @@ var _ upspin.DirServer = (*remote)(nil)
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	op := opf("Glob", "%q", pattern)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -50,11 +50,9 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Pattern: pattern,
 	}
 	resp, err := r.dirClient.Glob(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
 		return nil, op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return nil, op.error(err)
 	}
 
 	err = unmarshalError(resp.Error)
@@ -72,7 +70,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
 	op := opf("MakeDirectory", "%q", directoryName)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -80,7 +78,8 @@ func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 		Name: string(directoryName),
 	}
 	resp, err := r.dirClient.MakeDirectory(gCtx, req, callOpt)
-	return op.entryError(resp, err, validate)
+	err = finishAuth(err)
+	return op.entryError(resp, err)
 }
 
 func entryName(entry *upspin.DirEntry) string {
@@ -95,7 +94,7 @@ func entryName(entry *upspin.DirEntry) string {
 func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	op := opf("Put", "%s", entryName(entry))
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -107,14 +106,15 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		Entry: b,
 	}
 	resp, err := r.dirClient.Put(gCtx, req, callOpt)
-	return op.entryError(resp, err, validate)
+	err = finishAuth(err)
+	return op.entryError(resp, err)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := opf("WhichAccess", "%q", pathName)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -122,14 +122,15 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req, callOpt)
-	return op.entryError(resp, err, validate)
+	err = finishAuth(err)
+	return op.entryError(resp, err)
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := opf("Delete", "%q", pathName)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -137,14 +138,15 @@ func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Delete(gCtx, req, callOpt)
-	return op.entryError(resp, err, validate)
+	err = finishAuth(err)
+	return op.entryError(resp, err)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := opf("Lookup", "%q", pathName)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, op.error(err)
 	}
@@ -152,7 +154,8 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		Name: string(pathName),
 	}
 	resp, err := r.dirClient.Lookup(gCtx, req, callOpt)
-	return op.entryError(resp, err, validate)
+	err = finishAuth(err)
+	return op.entryError(resp, err)
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -253,12 +256,9 @@ func (op *operation) error(args ...interface{}) error {
 
 // entryError performs the common operation of converting an EntryError
 // protocol buffer into a directory entry and error pair.
-func (op *operation) entryError(p *proto.EntryError, err error, validate func() error) (*upspin.DirEntry, error) {
+func (op *operation) entryError(p *proto.EntryError, err error) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return nil, op.error(err)
 	}
 	err = unmarshalError(p.Error)
 	if err != nil && err != upspin.ErrFollowLink {

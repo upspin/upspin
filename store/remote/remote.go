@@ -38,7 +38,7 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	op := opf("Get", "%q", ref)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return nil, nil, op.error(err)
 	}
@@ -46,11 +46,9 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Get(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
 		return nil, nil, op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return nil, nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
 		return nil, nil, errors.UnmarshalError(resp.Error)
@@ -63,7 +61,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	op := opf("Put", "%v bytes", len(data))
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return "", op.error(err)
 	}
@@ -71,11 +69,9 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 		Data: data,
 	}
 	resp, err := r.storeClient.Put(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
 		return "", op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return "", op.error(err)
 	}
 	return upspin.Reference(resp.Reference), op.error(errors.UnmarshalError(resp.Error))
 }
@@ -84,7 +80,7 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 func (r *remote) Delete(ref upspin.Reference) error {
 	op := opf("Delete", "%q", ref)
 
-	gCtx, callOpt, validate, err := r.NewAuthContext()
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
 		return op.error(err)
 	}
@@ -92,11 +88,9 @@ func (r *remote) Delete(ref upspin.Reference) error {
 		Reference: string(ref),
 	}
 	resp, err := r.storeClient.Delete(gCtx, req, callOpt)
+	err = finishAuth(err)
 	if err != nil {
 		return op.error(errors.IO, err)
-	}
-	if err := validate(); err != nil {
-		return op.error(err)
 	}
 	return op.error(errors.UnmarshalError(resp.Error))
 }
