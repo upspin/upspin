@@ -15,7 +15,8 @@ import (
 func (s *State) shell(args ...string) {
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
 	promptFlag := fs.String("prompt", "u> ", "interactive prompt")
-	fs.Usage = subUsage(fs, "shell")
+	verbose := fs.Bool("v", false, "verbose; print to stderr each command before execution")
+	fs.Usage = s.subUsage(fs, "shell")
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
@@ -32,14 +33,14 @@ func (s *State) shell(args ...string) {
 	defer func() { s.interactive = false }()
 	scanner := bufio.NewScanner(os.Stdin)
 	for prompt(); scanner.Scan(); prompt() {
-		s.exec(scanner.Text())
+		s.exec(scanner.Text(), *verbose)
 	}
 	if scanner.Err() != nil {
 		s.exit(scanner.Err())
 	}
 }
 
-func (s *State) exec(line string) {
+func (s *State) exec(line string, verbose bool) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -64,6 +65,9 @@ func (s *State) exec(line string) {
 	if fn == nil {
 		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", words[0])
 		return
+	}
+	if verbose {
+		fmt.Println(" + " + strings.Join(words, " "))
 	}
 	fn(s, words[1:]...)
 }
