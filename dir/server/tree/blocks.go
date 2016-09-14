@@ -7,6 +7,8 @@ package tree
 // This file implements block reading and writing.
 
 import (
+	"strings"
+
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -112,10 +114,16 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
-	if n.dirty {
-		err := errors.E(errors.Internal, n.entry.Name,
-			errors.Str("trying to load a block from storage when the node is dirty"))
-		log.Error.Print(err)
+	entryPath, err := path.Parse(n.entry.Name)
+	if err != nil {
+		return errors.E(err)
+	}
+	if len(n.kids) > 0 {
+		// This means we're trying to load an existing DirEntry onto
+		// a directory that has content already. To allow it, we would
+		// need to check for name collisions. Disallow for now.
+		err := errors.E(errors.Invalid, entryPath.Path(), errors.Str("cannot hide existing contents of path with new block"))
+		log.Error.Printf("loadKidsFromBlock: %s", err)
 		return err
 	}
 	if n.entry.Name == "" {
@@ -134,25 +142,29 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		block = remaining
 	}
 	// Load children for this node.
-	dePath, err := path.Parse(n.entry.Name)
-	if err != nil {
-		return errors.E(err)
-	}
-	elemPos := dePath.NElem()
+	elemPos := entryPath.NElem()
 	for _, dir := range dirs {
 		p, err := path.Parse(dir.Name)
 		if err != nil {
 			return errors.E(err)
 		}
-		if p.NElem() <= elemPos {
-			// We should never have written a dirEntry whose path does not contain
-			// one more element than the parent.
-			err := errors.E(errors.Internal, n.entry.Name,
-				errors.Str("entry is inconsistent with parent"))
-			log.Error.Print(err)
-			return err
+		// elem is the next pathwise element to load. Normally, it's the
+		// next element in entryPath. But if it's a directory that
+		// doesn't conform with the parent name, we allow it, to support
+		// snapshots and other types of "redirected" directories.
+		var elem string
+		log.Printf("== path: %q, subdirName: %q", entryPath.Path(), p.Path())
+		if strings.HasPrefix(p.String(), entryPath.String()) {
+			elem = p.Elem(elemPos)
+			log.Printf("=== elem natural entry: %q", elem)
+		} else {
+			// If the block being loaded is not a prefix of the parent, then
+			// it's a "redirection" such as a snapshot entry.
+			elem = p.Elem(p.NElem() - 1)
+			// Patch the entry's Name, so it belongs to this tree.
+			dir.Name = path.Join(entryPath.Path(), elem)
+			log.Printf("=== elem redirection: %q. Patched name: %q. Node=%q", elem, dir.Name, n.entry.Name)
 		}
-		elem := p.Elem(elemPos)
 		if _, exists := n.kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
 			err := errors.E(errors.Internal, n.entry.Name,

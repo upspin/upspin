@@ -5,6 +5,7 @@
 package tree
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -389,7 +390,8 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	// Now we crash and restart.
-	// file2 and file_in_dir must exist after recovery and file1 must not.
+	// /file2.txt and /dir1/file_in_dir must exist after recovery and /file1
+	// must not.
 	tree, err = New(context, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
@@ -638,6 +640,147 @@ func TestList(t *testing.T) {
 	}
 }
 
+func TestPutDir(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Build a simple tree.
+	for _, dir := range []upspin.PathName{"/", "/orig", "/orig/sub1", "/orig/sub2",
+		"/orig/sub1/subsub", "/snapshot", "/other"} {
+		p, de := newDirEntry(dir, isDir, context)
+		_, err = tree.Put(p, de)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Flush, to ensure we have dirs that contain blocks.
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("Tree1:\n%s\n", tree)
+
+	// Lookup orig, which we'll PutDir under /snapshot/new.
+	entry, _, err := tree.Lookup(mkpath(t, userName+"/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The last element in the path is lost. It is replaced by entry.
+	_, err = tree.PutDir(mkpath(t, userName+"/snapshot/new"), entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("!!! ==========")
+
+	fmt.Printf("Tree2:\n%s\n", tree)
+
+	// List snapshot directory.
+	entries, _, err := tree.List(mkpath(t, userName+"/snapshot"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Expected maps Name to SignedName. This is a "natural" directory for
+	// this part of the tree, hence, Name == Signed.
+	expected := map[upspin.PathName]upspin.PathName{
+		userName + "/snapshot/new": userName + "/snapshot/new",
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// List snapshot.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Here we expect some "redirection" to happen.
+	expected = map[upspin.PathName]upspin.PathName{
+		userName + "/snapshot/new/sub1": userName + "/orig/sub1",
+		userName + "/snapshot/new/sub2": userName + "/orig/sub2",
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("Tree3:\n%s\n", tree)
+
+	// List inside snapshot.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]upspin.PathName{
+		userName + "/orig/sub1": "",
+		userName + "/orig/sub2": "",
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Go deeper into snapshot.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig/sub1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]upspin.PathName{
+		userName + "/orig/sub1/subsub": "",
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new entry in the original place, to ensure it's not
+	// reflected in the snapshot now.
+	_, err = tree.Put(newDirEntry("/orig/file.txt", !isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("Tree with new file:\n%s\n", tree)
+
+	// List inside snapshot again.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected = map[upspin.PathName]upspin.PathName{
+		userName + "/orig/sub1": "",
+		userName + "/orig/sub2": "",
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new tree (simulate a crash).
+	tree, err = New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// List inside snapshot again.
+	entries, _, err = tree.List(mkpath(t, userName+"/snapshot/new/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = checkDirList(entries, expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {
@@ -655,6 +798,24 @@ func TestMain(m *testing.M) {
 
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
+
+func checkDirList(got []*upspin.DirEntry, want map[upspin.PathName]upspin.PathName) error {
+	if len(got) != len(want) {
+		return errors.Errorf("len(got) = %d, want = %d", len(got), len(want))
+	}
+	for _, e := range got {
+		if signedName, found := want[e.Name]; !found {
+			var wantSlice []upspin.PathName
+			for k, _ := range want {
+				wantSlice = append(wantSlice, k)
+			}
+			return errors.Errorf("e.Name = %q, want = one-of %v", e.Name, wantSlice)
+		} else if e.SignedName != signedName {
+			return errors.Errorf("e.SignedName = %q, want = %q", e.SignedName, signedName)
+		}
+	}
+	return nil
+}
 
 func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 	p, err := path.Parse(pathName)
