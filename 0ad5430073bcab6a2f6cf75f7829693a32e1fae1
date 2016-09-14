@@ -160,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "cbfa12f2_dc7c0d7a",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T23:00:19Z",
+      "side": 1,
+      "message": "No? I thought that we still agreed marshal/unmarshal shouldn\u0027t do any validation. It should just encode or decode the entry as-is.",
+      "parentUuid": "cb55b2ad_55ef4b7a",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
