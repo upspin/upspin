@@ -361,7 +361,15 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 	}
 	de, err := dir.Lookup(uname)
 	if err != nil {
-		// TODO: implement links.
+		if err == upspin.ErrFollowLink {
+			// Since FUSE walks names a step at a time we shouldn't accidentally
+			// pass a link without noticing but this ensures it.
+			if de.Name == uname {
+				return dir, de, nil
+			}
+			f.enoent(uname)
+			return nil, nil, err
+		}
 		kind := classify(err)
 		if kind == errors.Permission {
 			// We act like a permission error didn't happen in the hopes that
@@ -369,21 +377,8 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 			de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
 			return dir, de, nil
 		}
-		if kind != errors.IO {
-			f.enoent(uname)
-			return nil, nil, err
-		}
-		// Any other error may imply that our directory connection is
-		// stale.  Forget the cached value and try again.
-		dir, err = n.f.dirLookup(user)
-		if err != nil {
-			return nil, nil, err
-		}
-		de, err = dir.Lookup(uname)
-		if err != nil {
-			// TODO: implement links.
-			return nil, nil, err
-		}
+		f.enoent(uname)
+		return nil, nil, err
 	}
 	return dir, de, nil
 }
