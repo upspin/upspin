@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "cbfa12f2_fc60e9d7",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:45:24Z",
+      "side": 1,
+      "message": "Currently, MarshalAppend does not do any validation of the data, so why do we start now? It should be okay to marshal and unmarshal an incomplete direntry. All that matters is that the data that goes in is what comes out again.\n\nTo do the de-duplication of name and signedname, you can use a single byte to indicates whether they are equivalent or not.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
