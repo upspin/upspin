@@ -681,11 +681,12 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		panic(err)
 	}
 	return p, &upspin.DirEntry{
-		Name:     p.Path(),
-		Attr:     attr,
-		Packing:  context.Packing(),
-		Writer:   writer,
-		Packdata: []byte("1234"),
+		Name:       p.Path(),
+		SignedName: p.Path(),
+		Attr:       attr,
+		Packing:    context.Packing(),
+		Writer:     writer,
+		Packdata:   []byte("1234"),
 	}
 }
 

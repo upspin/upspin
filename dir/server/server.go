@@ -274,12 +274,13 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 
 	// Create a new dir entry for this new dir.
 	de := &upspin.DirEntry{
-		Name:     p.Path(),
-		Attr:     upspin.AttrDirectory,
-		Writer:   s.userName,
-		Packing:  s.serverContext.Packing(),
-		Time:     upspin.Now(),
-		Sequence: 0, // Tree will increment when flushed.
+		Name:       p.Path(),
+		SignedName: p.Path(),
+		Attr:       upspin.AttrDirectory,
+		Writer:     s.userName,
+		Packing:    s.serverContext.Packing(),
+		Time:       upspin.Now(),
+		Sequence:   0, // Tree will increment when flushed.
 	}
 
 	// Attempt to put this new dir entry.

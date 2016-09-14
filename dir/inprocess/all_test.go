@@ -386,7 +386,7 @@ func TestGlob(t *testing.T) {
 		entries, err := directory.Glob(name)
 		if test.err != nil {
 			if !errors.Match(test.err, err) {
-				t.Errorf("%s: got error %q, want %q", err, test.err)
+				t.Errorf("%s: got error %q, want %q", name, err, test.err)
 			}
 			continue
 		}

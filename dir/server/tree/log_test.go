@@ -23,13 +23,14 @@ func TestMarshalUnmarshal(t *testing.T) {
 	entry := LogEntry{
 		Op: Delete,
 		Entry: upspin.DirEntry{
-			Name:     "foo@bar.com/dir/file.txt",
-			Writer:   "writer@bar.com",
-			Packing:  upspin.PlainPack,
-			Packdata: []byte("some pack data"),
-			Attr:     upspin.AttrLink,
-			Sequence: 17,
-			Time:     1234567890,
+			Name:       "foo@bar.com/dir/file.txt",
+			SignedName: "foo@bar.com/dir/file.txt",
+			Writer:     "writer@bar.com",
+			Packing:    upspin.PlainPack,
+			Packdata:   []byte("some pack data"),
+			Attr:       upspin.AttrLink,
+			Sequence:   17,
+			Time:       1234567890,
 		},
 	}
 	buf, err := entry.marshal()
@@ -132,13 +133,14 @@ func TestLogIndex(t *testing.T) {
 	}
 
 	root := upspin.DirEntry{
-		Name:     "foo@bar.com/dir/file.txt",
-		Writer:   "writer@bar.com",
-		Packing:  upspin.PlainPack,
-		Packdata: []byte("some pack data"),
-		Attr:     upspin.AttrLink,
-		Sequence: 17,
-		Time:     1234567890,
+		Name:       "foo@bar.com/dir/file.txt",
+		SignedName: "foo@bar.com/dir/file.txt",
+		Writer:     "writer@bar.com",
+		Packing:    upspin.PlainPack,
+		Packdata:   []byte("some pack data"),
+		Attr:       upspin.AttrLink,
+		Sequence:   17,
+		Time:       1234567890,
 	}
 	err = logIndex.SaveRoot(&root)
 	if err != nil {
@@ -180,9 +182,10 @@ func newLogEntry(path upspin.PathName) *LogEntry {
 	return &LogEntry{
 		Op: op,
 		Entry: upspin.DirEntry{
-			Name:     path,
-			Writer:   "foo@bar.com",
-			Sequence: seq,
+			Name:       path,
+			SignedName: path,
+			Writer:     "foo@bar.com",
+			Sequence:   seq,
 		},
 	}
 }

@@ -10,9 +10,10 @@ import (
 )
 
 var dirEnt = DirEntry{
-	Name:    "u@foo.com/a/directory",
-	Packing: EEPack,
-	Time:    123456,
+	Name:       "u@foo.com/a/directory",
+	SignedName: "u@foo.com/a/directory",
+	Packing:    EEPack,
+	Time:       123456,
 	Blocks: []DirBlock{
 		dirBlock1,
 		dirBlock2,
@@ -51,14 +52,15 @@ var dirBlock2 = DirBlock{
 }
 
 var linkDirEnt = DirEntry{
-	Name:     "u@foo.com/a/link",
-	Link:     "v@bar.com/b/foo",
-	Packing:  EEPack,
-	Time:     123456,
-	Packdata: []byte{1, 2, 3, 4},
-	Attr:     AttrLink,
-	Sequence: 1234,
-	Writer:   "u@foo.com",
+	Name:       "u@foo.com/a/link",
+	SignedName: "k@blah.com/some/other/stuff/for/testing/purposes",
+	Link:       "v@bar.com/b/foo",
+	Packing:    EEPack,
+	Time:       123456,
+	Packdata:   []byte{1, 2, 3, 4},
+	Attr:       AttrLink,
+	Sequence:   1234,
+	Writer:     "u@foo.com",
 }
 
 func TestDirEntryMarshal(t *testing.T) {

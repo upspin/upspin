@@ -68,13 +68,14 @@ func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, e
 	linkName = parsedLink.Path() // Make sure it's clean.
 
 	entry := &upspin.DirEntry{
-		Name:     linkName,
-		Packing:  upspin.PlainPack, // Unused but be explicit.
-		Time:     upspin.Now(),
-		Sequence: upspin.SeqIgnore,
-		Writer:   c.context.UserName(),
-		Link:     oldName,
-		Attr:     upspin.AttrLink,
+		Name:       linkName,
+		SignedName: linkName,
+		Packing:    upspin.PlainPack, // Unused but be explicit.
+		Time:       upspin.Now(),
+		Sequence:   upspin.SeqIgnore,
+		Writer:     c.context.UserName(),
+		Link:       oldName,
+		Attr:       upspin.AttrLink,
 	}
 
 	// Record directory entry.
@@ -126,13 +127,14 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 
 	entry := &upspin.DirEntry{
-		Name:     name,
-		Packing:  packer.Packing(),
-		Time:     upspin.Now(),
-		Sequence: upspin.SeqIgnore,
-		Writer:   c.context.UserName(),
-		Link:     "",
-		Attr:     upspin.AttrNone,
+		Name:       name,
+		SignedName: name,
+		Packing:    packer.Packing(),
+		Time:       upspin.Now(),
+		Sequence:   upspin.SeqIgnore,
+		Writer:     c.context.UserName(),
+		Link:       "",
+		Attr:       upspin.AttrNone,
 	}
 
 	ss := s.StartSpan("pack")
