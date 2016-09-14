@@ -1,3 +1,7 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package gobind provides experimental Go bindings for a simplified
 // Upspin Client and related data structures in such a way that languages
 // such as Java and Objective-C can handle and gomobile can export.
@@ -7,9 +11,6 @@
 // or roundings are silently ignored.
 // This package is experimental and is NOT an official upspin.Client
 // implementation. Its definition may change or break without warning.
-
-// +build disabled
-
 package gobind
 
 // To regenerate the .aar archive for Android Java, run:
@@ -123,28 +124,30 @@ func (c *Client) Put(name string, data []byte) (string, error) {
 
 // NewClient returns a new Client for a given user's configuration.
 func NewClient(config *ClientConfig) (*Client, error) {
-	ctx := context.New().SetUserName(upspin.UserName(config.UserName)).SetPacking(upspin.EEPack)
-	f, err := factotum.DeprecatedNew(upspin.PublicKey(config.PublicKey), config.PrivateKey)
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, upspin.UserName(config.UserName))
+	ctx = context.SetPacking(ctx, upspin.EEPack)
+	f, err := factotum.NewFromKeys([]byte(config.PublicKey), []byte(config.PrivateKey), nil)
 	if err != nil {
 		log.Error.Printf("Error creating factotum: %s", err)
 		return nil, err
 	}
-	ctx.SetFactotum(f)
+	ctx = context.SetFactotum(ctx, f)
 	se := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.StoreNetAddr),
 	}
-	ctx.SetStoreEndpoint(se)
+	ctx = context.SetStoreEndpoint(ctx, se)
 	de := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.DirNetAddr),
 	}
-	ctx.SetDirEndpoint(de)
+	ctx = context.SetDirEndpoint(ctx, de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(config.KeyNetAddr),
 	}
-	ctx.SetKeyEndpoint(ue)
+	ctx = context.SetKeyEndpoint(ctx, ue)
 	return &Client{
 		c: client.New(ctx),
 	}, nil
