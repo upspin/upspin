@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb55b2ad_01f8bddc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-14T18:30:54Z",
+      "side": 1,
+      "message": "This does indeed make the two cases equal but doesn\u0027t it now return not exist in both cases and not permissions?  Or am I just misunderstanding this message?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 17
+      },
+      "revId": "34b2d59fb0ca2421efb01b7801b6b6f5fa287d3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
