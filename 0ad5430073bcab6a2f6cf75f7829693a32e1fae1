@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_9a09728e",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-14T21:58:03Z",
+      "side": 1,
+      "message": "The oldname is not necessarily anything that was signed anyways, it could be another link so its kind of nebulous what SignedName would mean in that case. Or the target might not even exist.\n\nI would probably just leave it the empty string though that may break your everywhere empty string checks.  Lacking that, I think linkName would be acceptable although a lie.",
+      "parentUuid": "cbfa12f2_7c3a19d3",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_3c409137",
         "filename": "dir/server/all_test.go",
         "patchSetId": 2
