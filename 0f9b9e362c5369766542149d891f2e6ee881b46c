@@ -51,6 +51,24 @@
       "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_3f34f092",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-14T21:40:47Z",
+      "side": 1,
+      "message": "Its certainly better, my brain was in neutral. Not sure we need the invalidateToken routine since the dialer will be the only thing calling it so I just did the work there.\n\nSetting lastTokenRefresh is not really helpful since this isn\u0027t refreshing the token, the NewAuthContext that eventually refreshes the token is the time needed and it does set it.\n\nThis also answers Eduardo\u0027s comment.",
+      "parentUuid": "cbfa12f2_5c20fda8",
+      "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
