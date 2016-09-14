@@ -121,6 +121,9 @@ func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
+	if len(d.SignedName) == 0 {
+		d.SignedName = d.Name
+	}
 
 	// TODO(adg): support append; for now assume a new file.
 	d.Blocks = nil
@@ -207,7 +210,7 @@ func (bp *blockPacker) Close() error {
 		return err
 	}
 
-	name := bp.entry.Name
+	name := bp.entry.SignedName
 	ctx := bp.ctx
 
 	// Wrap keys.
@@ -327,7 +330,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			return nil, errors.E(op, d.Name, errKeyLength)
 		}
 		// Verify that this was signed with the writer's old or new public key.
-		vhash := factotum.VerHash(writerCurveName, path.Clean(d.Name), d.Time, dkey, hash)
+		vhash := factotum.VerHash(writerCurveName, path.Clean(d.SignedName), d.Time, dkey, hash)
 		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 			sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
@@ -541,7 +544,7 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.Name), d.Time, dkey, cipherSum)
+	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.SignedName), d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
@@ -614,7 +617,7 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	}
 
 	// Verify existing signature with oldKey.
-	name := path.Clean(d.Name)
+	name := path.Clean(d.SignedName)
 	vhash := factotum.VerHash(oldCurveName, name, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
 		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")

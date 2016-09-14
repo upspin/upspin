@@ -85,6 +85,9 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
 	}
+	if d.SignedName != d.Name {
+		t.Errorf("SignedName: expected %q; got %q", d.Name, d.SignedName)
+	}
 }
 
 func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
