@@ -94,9 +94,20 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case isHTTPS:
 		skip = 8
 	}
+	ac := &AuthClientService{
+		context:           context,
+		keepAliveInterval: keepAliveInterval,
+		closeKeepAlive:    make(chan bool, 1),
+	}
+	dialer := func(target string, timeout time.Duration) (net.Conn, error) {
+		ac.mu.Lock()
+		ac.authToken = ""
+		ac.mu.Unlock()
+		return dialWithKeepAlive(target, timeout)
+	}
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
-		grpc.WithDialer(dialWithKeepAlive),
+		grpc.WithDialer(dialer),
 		grpc.WithTimeout(3 * time.Second),
 	}
 	switch security {
@@ -113,15 +124,10 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
 	}
-	conn, err := grpc.Dial(addr[skip:], opts...)
+	var err error
+	ac.grpcConn, err = grpc.Dial(addr[skip:], opts...)
 	if err != nil {
 		return nil, err
-	}
-	ac := &AuthClientService{
-		grpcConn:          conn,
-		context:           context,
-		keepAliveInterval: keepAliveInterval,
-		closeKeepAlive:    make(chan bool, 1),
 	}
 	if keepAliveInterval != 0 {
 		go ac.keepAlive()
