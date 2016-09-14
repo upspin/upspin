@@ -22,6 +22,30 @@
       "revId": "34b2d59fb0ca2421efb01b7801b6b6f5fa287d3d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_21de192a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T19:15:52Z",
+      "side": 1,
+      "message": "Correct. ErrNotExist is how we answer when the root *does* exist but the user has zero rights to look something up. So, errnotexist is correct when the root does not exist because it\u0027s impossible to differentiate from exists but not allowed to you.\n\nDoes this make sense?",
+      "parentUuid": "cb55b2ad_01f8bddc",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 17
+      },
+      "revId": "34b2d59fb0ca2421efb01b7801b6b6f5fa287d3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
