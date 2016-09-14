@@ -40,7 +40,7 @@ func (d *DirBlock) Marshal() ([]byte, error) {
 // the returned slice will point to different storage than does the
 // input argument, as with the built-in append function.
 func (d *DirBlock) MarshalAppend(b []byte) ([]byte, error) {
-	var tmp [16]byte // For use by PutVarint and PutUvarint.
+	var tmp [16]byte // For use by PutVarint.
 
 	// Location:
 	// Location.Endpoint:
@@ -152,10 +152,10 @@ func (d *DirEntry) Marshal() ([]byte, error) {
 // the returned slice will point to different storage than does the
 // input argument, as with the built-in append function.
 func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
-	var tmp [16]byte // For use by PutVarint and PutUvarint.
+	var tmp [16]byte // For use by PutVarint.
 
-	// Name: count n followed by n bytes.
-	b = appendString(b, string(d.Name))
+	// SignedName: count n followed by n bytes.
+	b = appendString(b, string(d.SignedName))
 
 	// Packing: One byte.
 	b = append(b, byte(d.Packing))
@@ -165,8 +165,8 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, tmp[:n]...)
 
 	// Blocks.
-	// First a uvarint count, then the data.
-	n = binary.PutUvarint(tmp[:], uint64(len(d.Blocks)))
+	// First a varint count, then the data.
+	n = binary.PutVarint(tmp[:], int64(len(d.Blocks)))
 	b = append(b, tmp[:n]...)
 	for i := range d.Blocks {
 		var err error
@@ -182,6 +182,19 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	// Link.
 	b = appendString(b, string(d.Link))
 
+	// Writer.
+	b = appendString(b, string(d.Writer))
+
+	// Name: if different than SignedName, count n followed by n bytes.
+	// Otherwise, count zero with no bytes following.
+	if d.Name != d.SignedName {
+		b = appendString(b, string(d.Name))
+	} else {
+		// Encode a special -1 that denotes Name == SignedName.
+		n = binary.PutVarint(tmp[:], int64(-1))
+		b = append(b, tmp[:n]...)
+	}
+
 	// Attr: One byte.
 	b = append(b, byte(d.Attr))
 
@@ -189,23 +202,20 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	n = binary.PutVarint(tmp[:], d.Sequence)
 	b = append(b, tmp[:n]...)
 
-	// Writer.
-	b = appendString(b, string(d.Writer))
-
 	return b, nil
 }
 
 func appendString(b []byte, str string) []byte {
-	var tmp [16]byte // For use by PutUvarint.
-	n := binary.PutUvarint(tmp[:], uint64(len(str)))
+	var tmp [16]byte // For use by PutVarint.
+	n := binary.PutVarint(tmp[:], int64(len(str)))
 	b = append(b, tmp[:n]...)
 	b = append(b, str...)
 	return b
 }
 
 func appendBytes(b, bytes []byte) []byte {
-	var tmp [16]byte // For use by PutUvarint.
-	n := binary.PutUvarint(tmp[:], uint64(len(bytes)))
+	var tmp [16]byte // For use by PutVarint.
+	n := binary.PutVarint(tmp[:], int64(len(bytes)))
 	b = append(b, tmp[:n]...)
 	b = append(b, bytes...)
 	return b
@@ -218,12 +228,12 @@ var ErrTooShort = errors.New("Unmarshal buffer too short")
 // If successful, every field of d will be overwritten and the remaining
 // data will be returned.
 func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
-	// Name: count N followed by N bytes.
+	// SignedName: count N followed by N bytes.
 	bytes, b := getBytes(b)
 	if len(b) < 1 { // Check for packing here too.
 		return nil, ErrTooShort
 	}
-	d.Name = PathName(bytes)
+	d.SignedName = PathName(bytes)
 
 	// Packing: One byte.
 	d.Packing = Packing(b[0])
@@ -237,8 +247,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	d.Time = Time(time)
 	b = b[n:]
 
-	// Blocks. First a uvarint count, then the blocks.
-	nBlocks, n := binary.Uvarint(b)
+	// Blocks. First a varint count, then the blocks.
+	nBlocks, n := binary.Varint(b)
 	if n == 0 {
 		return nil, ErrTooShort
 	}
@@ -260,6 +270,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	if b == nil {
 		return nil, ErrTooShort
 	}
+
 	// Must copy the data for Packdata - can't return buffer's own contents.
 	// (Most other slices are turned into strings, so are intrinsically copied.)
 	d.Packdata = make([]byte, len(bytes))
@@ -268,6 +279,31 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	// Link: count N followed by N bytes.
 	bytes, b = getBytes(b)
 	d.Link = PathName(bytes) // Zero-length is OK here.
+
+	// Writer.
+	bytes, b = getBytes(b)
+	if len(b) < 1 { // At least one byte for Name.
+		return nil, ErrTooShort
+	}
+	d.Writer = UserName(bytes)
+
+	// Name: count N followed by N bytes. If N is zero Name equals
+	// SignedName.
+	length, n := binary.Varint(b)
+	if n == 0 {
+		return nil, ErrTooShort
+	}
+	b = b[n:]
+	if length == -1 {
+		// -1 is a special code that indicates Name == SignedName
+		d.Name = d.SignedName
+	} else {
+		bytes, b = getNBytes(b, int(length))
+		if bytes == nil {
+			return nil, ErrTooShort
+		}
+		d.Name = PathName(bytes)
+	}
 
 	// Attr: One byte.
 	if len(b) < 1 {
@@ -284,25 +320,28 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	d.Sequence = seq
 	b = b[n:]
 
-	// Writer.
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
-	d.Writer = UserName(bytes)
-
 	return b, nil
 }
 
-// getBytes unmarshals the byte slice at b (uvarint count followed by bytes)
+// getBytes unmarshals the byte slice at b (varint count followed by bytes)
 // and returns the slice followed by the remaining bytes.
 // If there is insufficient data, both return values will be nil.
 func getBytes(b []byte) (data, remaining []byte) {
-	u, n := binary.Uvarint(b)
+	u, n := binary.Varint(b)
 	if n == 0 || len(b) < n+int(u) {
 		return nil, nil
 	}
-	return b[n : n+int(u)], b[n+int(u):]
+	return getNBytes(b[n:], int(u))
+}
+
+// getNBytes unmarshals n bytes from b and returns the slice followed by the
+// remaining bytes. If there is insufficient data, both return values will be
+// nil.
+func getNBytes(b []byte, n int) (data, remaining []byte) {
+	if len(b) < n {
+		return nil, nil
+	}
+	return b[:n], b[n:]
 }
 
 // String returns a default string representation of the time,
