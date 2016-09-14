@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_5c52bd04",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-14T21:57:56Z",
+      "side": 1,
+      "message": "s/ruble/rubble/\nruble is a unit of currency.\nrubble is a pile of broken rocks.\n:)",
+      "revId": "4058294dfaa2539825603a1a2ece709ac34becc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_bc7dc178",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-14T21:57:56Z",
+      "side": 1,
+      "message": "the convention i\u0027ve been using, and it\u0027s kinda self-evident, is that if a function takes and op and returns an error, it\u0027s known to wrap the error.",
+      "revId": "4058294dfaa2539825603a1a2ece709ac34becc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
