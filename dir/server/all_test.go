@@ -96,11 +96,12 @@ func TestMakeRootNoSlash(t *testing.T) {
 func TestPut(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
-		Name:     userName + "/file1.txt",
-		Attr:     upspin.AttrNone,
-		Writer:   userName,
-		Sequence: upspin.SeqNotExist,
-		Packing:  upspin.PlainPack,
+		Name:       userName + "/file1.txt",
+		SignedName: userName + "/file1.txt",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Sequence:   upspin.SeqNotExist,
+		Packing:    upspin.PlainPack,
 	}
 	_, err := s.Put(de)
 	if err != nil {
@@ -145,11 +146,12 @@ func TestMakeDirectory(t *testing.T) {
 func TestLink(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
-		Name:    userName + "/mylink",
-		Attr:    upspin.AttrLink,
-		Writer:  userName,
-		Link:    "linkerdude@linkatron.lnk/target",
-		Packing: upspin.PlainPack,
+		Name:       userName + "/mylink",
+		SignedName: "linkerdude@linkatron.lnk/target",
+		Attr:       upspin.AttrLink,
+		Writer:     userName,
+		Link:       "linkerdude@linkatron.lnk/target",
+		Packing:    upspin.PlainPack,
 	}
 	_, err := s.Put(de)
 	if err != nil {
@@ -287,7 +289,7 @@ func TestWhichAccess(t *testing.T) {
 	}
 	// WhichAccess should return the link itself for a link.
 	if accEntry.Name != link {
-		t.Fatal("WhichAccess(link) returned %q, want %q", accEntry.Name, link)
+		t.Fatalf("WhichAccess(link) returned %q, want %q", accEntry.Name, link)
 	}
 
 	// Test that Access files don't cause weird loops.
@@ -505,11 +507,12 @@ func TestGlob(t *testing.T) {
 
 	// Owner Puts a link.
 	de := &upspin.DirEntry{
-		Name:    userName + "/dir/sublinkdir",
-		Attr:    upspin.AttrLink,
-		Writer:  userName,
-		Link:    "linkerdude@linkatron.lnk/target",
-		Packing: upspin.PlainPack,
+		Name:       userName + "/dir/sublinkdir",
+		SignedName: "linkerdude@linkatron.lnk/target",
+		Attr:       upspin.AttrLink,
+		Writer:     userName,
+		Link:       "linkerdude@linkatron.lnk/target",
+		Packing:    upspin.PlainPack,
 	}
 	_, err = sOwner.Put(de)
 	if err != nil {
@@ -642,10 +645,11 @@ func TestPermissionDenied(t *testing.T) {
 		t.Fatal(err)
 	}
 	de := &upspin.DirEntry{
-		Name:    userName + "/some_new_file.txt",
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
+		Name:       userName + "/some_new_file.txt",
+		SignedName: userName + "/some_new_file.txt",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
 	}
 	_, err = s.Put(de)
 	if !errors.Match(access.ErrPermissionDenied, err) {
@@ -682,11 +686,12 @@ func TestOverwriteFileWithWrongSequence(t *testing.T) {
 		t.Fatal(err)
 	}
 	de := &upspin.DirEntry{
-		Name:     userName + "/some_new_file.txt",
-		Attr:     upspin.AttrNone,
-		Writer:   userName,
-		Packing:  upspin.PlainPack,
-		Sequence: 99,
+		Name:       userName + "/some_new_file.txt",
+		SignedName: userName + "/some_new_file.txt",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
+		Sequence:   99,
 	}
 	_, err = s.Put(de)
 	expectedErr := errors.E(errors.Invalid, errors.Str("sequence number"))
@@ -714,10 +719,11 @@ func putAccessFile(t *testing.T, s *server, name upspin.PathName, contents strin
 	}
 	loc := writeToStore(t, s.serverContext, []byte(contents))
 	de := &upspin.DirEntry{
-		Name:    name,
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
+		Name:       name,
+		SignedName: name,
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
 		Blocks: []upspin.DirBlock{
 			{
 				Location: loc,
@@ -738,6 +744,9 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 	}
 	if got.Name != want.Name {
 		return errors.Errorf("%s: got.Name = %q, want = %q", testName, got.Name, want.Name)
+	}
+	if got.SignedName != want.SignedName {
+		return errors.Errorf("%s: got.SignedName = %q, want = %q", testName, got.SignedName, want.SignedName)
 	}
 	if got.Writer != want.Writer {
 		return errors.Errorf("%s: got.Writer = %q, want = %q", testName, got.Writer, want.Writer)

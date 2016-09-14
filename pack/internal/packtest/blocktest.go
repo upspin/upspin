@@ -33,9 +33,10 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Pac
 	}
 
 	de := &upspin.DirEntry{
-		Name:    pathName,
-		Writer:  userName,
-		Packing: packer.Packing(),
+		Name:       pathName,
+		SignedName: pathName,
+		Writer:     userName,
+		Packing:    packer.Packing(),
 	}
 
 	store := make(fakeStore)
