@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_fcaaa9de",
+        "filename": "upspin/code.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T23:59:56Z",
+      "side": 1,
+      "message": "I\u0027d swap the condition and the if/else bodies, so that the special case comes first. Then it mirrors the if/else block in unmarshal, too.\n\nAlso the comment above is out of date.",
+      "revId": "3a1762f0b3ff726edead36aebe0cefa80f9ea41e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_3cb5313a",
+        "filename": "upspin/marshal_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T23:59:56Z",
+      "side": 1,
+      "message": "I know this is just for testing, but it is misleading that you\u0027re doing this for the link entry, which is one kind of entry that will seldom have a differing signedname.\n\nI\u0027d make other entries for testing, that test the matrix of:\n\n           signed\u003d\"\" signed\u003d\"foo\"\nname\u003d\"\"    x         x\nname\u003d\"foo\" x         x  \nname\u003d\"bar\"           x",
+      "revId": "3a1762f0b3ff726edead36aebe0cefa80f9ea41e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
