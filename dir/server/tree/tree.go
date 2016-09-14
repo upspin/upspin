@@ -209,6 +209,46 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 	return node, nil
 }
 
+// PutDir puts a DirEntry representing an existing directory (with existing
+// DirBlocks) into the tree at the point represented by dst. The last
+// element of dst must not yet exist. dst must not cross a link nor be the root
+// directory. It returns the newly put entry.
+func (t *Tree) PutDir(dst path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
+	const op = "dir/server/tree.CopyDir"
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if dst.IsRoot() {
+		// TODO: handle this later. It might come in handy for reinstating an old root.
+		return nil, errors.E(op, errors.Invalid, errors.Str("can't PutDir at the root"))
+	}
+
+	// Create a synthetic node and load its kids.
+	existingEntryNode := &node{
+		entry: *de,
+	}
+	existingEntryNode.entry.Name = dst.Path()
+	err := t.loadKids(existingEntryNode)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Put the synthetic node into the tree at dst.
+	n, err := t.put(dst, &existingEntryNode.entry)
+	if err == upspin.ErrFollowLink {
+		return nil, errors.E(op, errors.Invalid, dst.Path(), errors.Str("path cannot contain a link"))
+	}
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	// Flush now to create a new version of the root.
+	err = t.flush() // TODO: avoid this. Create a log operation PutDir.
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return &n.entry, nil
+}
+
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
 // t.mu must be held.
 func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath path.Parsed) error {
@@ -235,8 +275,12 @@ func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath pa
 	}
 	// No need to check if it exists. Simply overwrite. DirServer checks these things.
 	parent.kids[nodePath.Elem(nElem)] = n
-	// Mark entire path as dirty.
-	return t.markDirty(nodePath)
+	// Mark entire path as dirty, from the point that needs to be re-packed
+	// and up to the root.
+	if n.entry.IsDir() && len(n.entry.Blocks) == 0 {
+		return t.markDirty(nodePath)
+	}
+	return t.markDirty(parentPath)
 }
 
 // markDirty marks the entire path from root to p as dirty.
@@ -265,7 +309,9 @@ func (t *Tree) markDirty(p path.Parsed) error {
 		// only their parents (directories), which have their kids'
 		// names and references packed in them.
 		if !n.entry.IsDir() {
-			continue
+			err := errors.E(errors.Internal, n.entry.Name, errors.Str("marking non-dir dirty"))
+			log.Error.Printf("%s", err)
+			return err
 		}
 		t.setNodeDirtyAt(i+1, n)
 	}
@@ -307,9 +353,8 @@ func (t *Tree) loadPath(p path.Parsed) (*node, error) {
 // The node must be known to be a directory and cannot be a link.
 // t.mu must be held.
 func (t *Tree) loadDir(dir *node) error {
-	// Must load from store if kids are not loaded. However, if it's dirty,
-	// we have the most recent version, so no point in loading it.
-	if dir.kids == nil && !dir.dirty {
+	// Must load from store if kids are not loaded.
+	if dir.kids == nil && len(dir.entry.Blocks) > 0 {
 		err := t.loadKids(dir)
 		if err != nil {
 			return err
@@ -438,7 +483,7 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 		return nil, false, errors.E(op, err)
 	}
 	if !node.entry.IsDir() {
-		return []*upspin.DirEntry{&node.entry}, node.dirty, err
+		return []*upspin.DirEntry{&node.entry}, node.dirty, nil
 	}
 	err = t.loadDir(node)
 	if err != nil {
@@ -702,7 +747,7 @@ func (t *Tree) recoverFromLog() error {
 		}
 	}
 	log.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
-	log.Debug.Printf("Tree:\n%s\n", t.String())
+	log.Debug.Printf("%s: Tree:\n%s\n", op, t)
 	return nil
 }
 
@@ -716,22 +761,34 @@ func (t *Tree) OnEviction(key interface{}) {
 }
 
 // String implements fmt.Stringer.
-// t.mu must be held.
 func (t *Tree) String() string {
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	var buf bytes.Buffer
 	t.loadRoot()
-	printNode(t.root, &buf)
+	t.printNode(t.root, 0, &buf)
 	return buf.String()
 }
 
 // printNode traverses the tree depth-first and appends each node to the buffer.
 // It supports method String.
-func printNode(n *node, buf *bytes.Buffer) {
+// t.mu must be held.
+func (t *Tree) printNode(n *node, level int, buf *bytes.Buffer) {
+	for i := 0; i < level; i++ {
+		buf.WriteString("\t")
+	}
+	buf.WriteString(string(n.entry.Name))
+	buf.WriteString("\n")
+	if n.entry.IsDir() && n.kids == nil {
+		err := t.loadKids(n)
+		if err != nil {
+			panic(err)
+		}
+	}
 	if len(n.kids) == 0 {
-		buf.WriteString(string(n.entry.Name) + "\n")
 		return
 	}
 	for _, kid := range n.kids {
-		printNode(kid, buf)
+		t.printNode(kid, level+1, buf)
 	}
 }
