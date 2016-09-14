@@ -196,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_109481eb",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T23:16:36Z",
+      "side": 1,
+      "message": "We can fix that though. It\u0027s more code and a tidbit more complex, but I\u0027m 99% done with it. I\u0027ll upload it shortly and if you don\u0027t like it, I\u0027ll revert to this version.",
+      "parentUuid": "cbfa12f2_1c6f95bd",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
