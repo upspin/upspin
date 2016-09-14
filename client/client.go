@@ -444,7 +444,7 @@ func (c *Client) Delete(name upspin.PathName) error {
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "client.Glob"
-	m, _ := newMetric(op)
+	m, s := newMetric(op)
 	defer m.Done()
 
 	var results []*upspin.DirEntry
@@ -454,7 +454,7 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		this, next = next, this
 		next = next[:0]
 		for _, pattern := range this {
-			files, links, err := c.globOnePattern(pattern)
+			files, links, err := c.globOnePattern(pattern, s)
 			if err != nil {
 				first := len(this) == 1 && len(next) == 0
 				if first || !benignGlobError(err) {
@@ -507,7 +507,8 @@ func benignGlobError(err error) bool {
 
 }
 
-func (c *Client) globOnePattern(pattern string) (entries, links []*upspin.DirEntry, err error) {
+func (c *Client) globOnePattern(pattern string, s *metric.Span) (entries, links []*upspin.DirEntry, err error) {
+	defer s.StartSpan("dir.Glob").End()
 	dir, err := c.DirServer(upspin.PathName(pattern))
 	if err != nil {
 		return nil, nil, err
