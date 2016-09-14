@@ -381,7 +381,6 @@ type Time int64
 // Name and SignedName must not be empty. See comments in DirServer.Put.
 type DirEntry struct {
 	// Fields contributing to the signature.
-	Name       PathName   // The full path name of the file. Only the last element can be a link.
 	SignedName PathName   // The full path name of the file used for signing.
 	Packing    Packing    // Packing used for every block in file.
 	Time       Time       // Time associated with file; might be when it was last written.
@@ -393,6 +392,7 @@ type DirEntry struct {
 	Writer UserName // Writer of the file, often the same as owner.
 
 	// Fields not included in the signature.
+	Name     PathName  // The full path name of the file. Only the last element can be a link.
 	Attr     Attribute // Attributes for the DirEntry.
 	Sequence int64     // The sequence (version) number of the item.
 }
