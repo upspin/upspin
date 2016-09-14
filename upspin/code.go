@@ -154,8 +154,11 @@ func (d *DirEntry) Marshal() ([]byte, error) {
 func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	var tmp [16]byte // For use by PutVarint and PutUvarint.
 
-	// Name: count n followed by n bytes.
-	b = appendString(b, string(d.Name))
+	// SignedName: count n followed by n bytes.
+	if d.SignedName == "" {
+		return nil, fmt.Errorf("empty SignedName field")
+	}
+	b = appendString(b, string(d.SignedName))
 
 	// Packing: One byte.
 	b = append(b, byte(d.Packing))
@@ -192,6 +195,17 @@ func (d *DirEntry) MarshalAppend(b []byte) ([]byte, error) {
 	// Writer.
 	b = appendString(b, string(d.Writer))
 
+	// Name: if different than SignedName, count n followed by n bytes.
+	// Otherwise, count zero with no bytes following.
+	if d.Name == "" {
+		return nil, fmt.Errorf("empty Name field")
+	}
+	if d.Name != d.SignedName {
+		b = appendString(b, string(d.Name))
+	} else {
+		b = appendString(b, "")
+	}
+
 	return b, nil
 }
 
@@ -218,12 +232,12 @@ var ErrTooShort = errors.New("Unmarshal buffer too short")
 // If successful, every field of d will be overwritten and the remaining
 // data will be returned.
 func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
-	// Name: count N followed by N bytes.
+	// SignedName: count N followed by N bytes.
 	bytes, b := getBytes(b)
 	if len(b) < 1 { // Check for packing here too.
 		return nil, ErrTooShort
 	}
-	d.Name = PathName(bytes)
+	d.SignedName = PathName(bytes)
 
 	// Packing: One byte.
 	d.Packing = Packing(b[0])
@@ -286,10 +300,22 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 
 	// Writer.
 	bytes, b = getBytes(b)
-	if b == nil {
+	if len(b) < 1 { // At least one byte for Name.
 		return nil, ErrTooShort
 	}
 	d.Writer = UserName(bytes)
+
+	// Name: count N followed by N bytes. If N is zero Name equals
+	// SignedName.
+	bytes, b = getBytes(b)
+	if b == nil {
+		return nil, ErrTooShort
+	}
+	if len(bytes) == 0 {
+		d.Name = d.SignedName
+	} else {
+		d.Name = PathName(bytes)
+	}
 
 	return b, nil
 }
