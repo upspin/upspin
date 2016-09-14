@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb55b2ad_c42ab386",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T19:50:51Z",
+      "side": 1,
+      "message": "Why not move these 3 lines into dialWithKeepAlive?",
+      "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
