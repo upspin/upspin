@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cbfa12f2_fcdd89d1",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T05:39:03Z",
+      "side": 1,
+      "message": "Yeah, you probably shouldn\u0027t mutate the field here either.",
+      "parentUuid": "cb55b2ad_599c6fba",
+      "revId": "f5faee0e1c491c119df249d3c70e8e61a778032b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb55b2ad_d987ff6a",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
