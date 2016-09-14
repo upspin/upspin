@@ -634,6 +634,17 @@ func TestClose(t *testing.T) {
 
 // Tests some error conditions too.
 
+// Ensures no one can figure out which users exist by looking them up and
+// differentiating a non-existing root from a permission-denied root.
+func TestCantProbeForExistence(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+
+	_, err := s.Lookup("barney@ruble.org/")
+	if !errors.Match(errNotExist, err) {
+		t.Fatalf("err = %v, want = %v", err, errNotExist)
+	}
+}
+
 func TestPermissionDenied(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	// Access file permits only List rights.

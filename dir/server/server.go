@@ -155,9 +155,9 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
-	lock := userLock(p.User())
-	lock.Lock()
-	defer lock.Unlock()
+	mu := userLock(p.User())
+	mu.Lock()
+	defer mu.Unlock()
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
 
@@ -167,7 +167,7 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return s.errLink(op, entry, o)
 	}
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err // s.lookup wraps err already.
 	}
 
 	// Check for Read access permission.
@@ -282,7 +282,7 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 		Sequence: 0, // Tree will increment when flushed.
 	}
 
-	// Attempt to put this new dir entry. We know we canCreate & !canWrite.
+	// Attempt to put this new dir entry.
 	return s.put(op, p, de, o)
 }
 
@@ -678,8 +678,12 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		}
 		// If user is allowed to create a root, let this proceed.
 		if s.userName != user {
-			return nil, errors.E(errors.Permission, s.userName,
-				errors.Str("can't create root for another user"))
+			// Always use NotExist to avoid attacks that
+			// differentiate between a user not having a root and
+			// having a root but not granting permissions to
+			// s.userName. This is similar to having no rights on
+			// path.
+			return nil, errNotExist
 		}
 		// Ok, let it proceed. The  user will still need to make the
 		// root, but we allow setting up a new tree for now.
