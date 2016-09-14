@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_5adbfa38",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T22:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb55b2ad_9a09728e",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_3c409137",
         "filename": "dir/server/all_test.go",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2016-09-14T21:37:31Z",
       "side": 1,
       "message": "This is wrong. The SignedName should be the same as Name for a link. They\u0027re not even signed.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_bac9ce78",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T22:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbfa12f2_3c409137",
       "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_7ae4b6ff",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T22:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbfa12f2_1c3dd5c9",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_fc60e9d7",
         "filename": "upspin/code.go",
         "patchSetId": 2
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_55ef4b7a",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T22:49:37Z",
+      "side": 1,
+      "message": "I think we agreed just now this is okay to be here, right?",
+      "parentUuid": "cbfa12f2_fc60e9d7",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
@@ -99,6 +171,24 @@
       "writtenOn": "2016-09-14T21:37:31Z",
       "side": 1,
       "message": "Can you please put these in the same order they appear in the struct?\n\nIt\u0027s correct up to this point.\nFrom here, it\u0027s Writer, Name, Attr, Sequence.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_f58e77e0",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T22:49:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbfa12f2_5c375de7",
       "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
