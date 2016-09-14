@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "cb55b2ad_d9f29ffe",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-14T05:41:25Z",
+      "side": 1,
+      "message": "Unless I missed something, client.go doesn\u0027t do this yet.  I almost put the assignment there, and am happy to do so if we\u0027re agreed that\u0027s the right place.   (Well, probably have to fix some tests as well;  I didn\u0027t look at that yet.)",
+      "parentUuid": "cb55b2ad_599c6fba",
+      "revId": "f5faee0e1c491c119df249d3c70e8e61a778032b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb55b2ad_d987ff6a",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
