@@ -22,6 +22,30 @@
       "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_24aaa774",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T19:14:56Z",
+      "side": 1,
+      "message": "You\u0027re right, this is only strictly necessary if I\u0027m looking at a \"required\" field that does not have a \"count\" leading it (and the next entry does have a count leading it).\n\nHowever, the pre-existing nil check is necessary because otherwise we could start reading the next dir entry in a big block (if there is a next one, say in a big dir block). Because dir entries begin with a name, we could unmarshal the *next* SignedName correctly into this entry\u0027s Name field. And if this error pattern persists, we\u0027d only get an error message at the very last block, which would make debugging harder.\n\nGiven that a nil check is necessary and we know we need at least a zero for the next entry, I think this is safer.\n\nI hope this makes sense.",
+      "parentUuid": "cb55b2ad_815eede0",
+      "range": {
+        "startLine": 303,
+        "startChar": 0,
+        "endLine": 305,
+        "endChar": 2
+      },
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
