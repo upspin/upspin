@@ -178,6 +178,24 @@
     },
     {
       "key": {
+        "uuid": "cbfa12f2_1c6f95bd",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-14T23:03:14Z",
+      "side": 1,
+      "message": "Eduardo is right. We can\u0027t accept an empty Name under our current rules because it will be unmarshaled into a different structure from the one that was marshaled.",
+      "parentUuid": "cbfa12f2_dc7c0d7a",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
