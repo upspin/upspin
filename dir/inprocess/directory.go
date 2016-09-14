@@ -91,13 +91,14 @@ var _ upspin.DirServer = (*server)(nil)
 // This is the general form of the method that follows, used in the tests.
 func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
-		Name:     name,
-		Packing:  packing,
-		Time:     upspin.Now(),
-		Attr:     attr,
-		Link:     link,
-		Sequence: seq,
-		Writer:   context.UserName(),
+		Name:       name,
+		SignedName: name, // TODO: snapshots.
+		Packing:    packing,
+		Time:       upspin.Now(),
+		Attr:       attr,
+		Link:       link,
+		Sequence:   seq,
+		Writer:     context.UserName(),
 	}
 	if (link != "") != (attr == upspin.AttrLink) {
 		return nil, errors.Errorf("inconsistent attribute (%v) and link (%q) fields", attr, link)

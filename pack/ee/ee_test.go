@@ -74,9 +74,11 @@ func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspi
 
 func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
-	d := &upspin.DirEntry{}
-	d.Name = name
-	d.Writer = ctx.UserName()
+	d := &upspin.DirEntry{
+		Name:       name,
+		SignedName: name,
+		Writer:     ctx.UserName(),
+	}
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
@@ -92,9 +94,11 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 
 func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
-	d := &upspin.DirEntry{}
-	d.Name = name
-	d.Writer = ctx.UserName()
+	d := &upspin.DirEntry{
+		Name:       name,
+		SignedName: name,
+		Writer:     ctx.UserName(),
+	}
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Name to newName.
@@ -228,7 +232,8 @@ func TestSharing(t *testing.T) {
 	joectx = context.SetKeyEndpoint(joectx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
-		Name: pathName,
+		Name:       pathName,
+		SignedName: pathName,
 	}
 	d.Writer = joectx.UserName()
 	cipher := packBlob(t, joectx, packer, d, []byte(text))
@@ -296,7 +301,8 @@ func TestBadSharing(t *testing.T) {
 	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
-		Name: pathName,
+		Name:       pathName,
+		SignedName: pathName,
 	}
 	d.Writer = ctx.UserName()
 	packBlob(t, ctx, packer, d, []byte(text))
