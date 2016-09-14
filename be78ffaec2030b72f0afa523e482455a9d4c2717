@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_bce3019c",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T05:36:37Z",
+      "side": 1,
+      "message": "It should be:\n\nctx \u003d context.SetFoo(ctx, ...)\n\nhere and elsewhere.\n\nDid you test this? :-)",
+      "revId": "be78ffaec2030b72f0afa523e482455a9d4c2717",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
