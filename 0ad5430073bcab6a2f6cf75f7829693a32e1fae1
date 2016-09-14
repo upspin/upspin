@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "cbfa12f2_7c3a19d3",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:37:31Z",
+      "side": 1,
+      "message": "This is wrong, I believe. A link DirEntry should have equivalent Name and SignedName fields. In fact, since we haven\u0027t implemented snapshots yet there is no place that a Name and SignedName should differ in our system.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_3c409137",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:37:31Z",
+      "side": 1,
+      "message": "This is wrong. The SignedName should be the same as Name for a link. They\u0027re not even signed.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_1c3dd5c9",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:37:31Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_5c375de7",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:37:31Z",
+      "side": 1,
+      "message": "Can you please put these in the same order they appear in the struct?\n\nIt\u0027s correct up to this point.\nFrom here, it\u0027s Writer, Name, Attr, Sequence.",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb55b2ad_815eede0",
         "filename": "upspin/code.go",
         "patchSetId": 2
@@ -43,6 +111,24 @@
         "endLine": 305,
         "endChar": 2
       },
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_bc5661fc",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:37:31Z",
+      "side": 1,
+      "message": "If you adopt my suggestion about ordering, above, I think this concern goes away.",
+      "parentUuid": "cb55b2ad_24aaa774",
       "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
