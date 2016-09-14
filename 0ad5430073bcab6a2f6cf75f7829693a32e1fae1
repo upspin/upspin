@@ -214,6 +214,24 @@
     },
     {
       "key": {
+        "uuid": "cbfa12f2_5c691db5",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T23:33:23Z",
+      "side": 1,
+      "message": "I think it would be great if marshal/unmarshal had no opinions about the content of the direntry. Data validation should happen at a different level.\n\nLooking forward to the next change set.",
+      "parentUuid": "cb55b2ad_109481eb",
+      "revId": "0ad5430073bcab6a2f6cf75f7829693a32e1fae1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbfa12f2_5c375de7",
         "filename": "upspin/code.go",
         "patchSetId": 2
