@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb55b2ad_599c6fba",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T05:36:25Z",
+      "side": 1,
+      "message": "I think you should error out instead. I\u0027m putting checks in marshal/unmarshal and valid to ensure this is never the case.",
+      "revId": "f5faee0e1c491c119df249d3c70e8e61a778032b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb55b2ad_d987ff6a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-14T05:36:25Z",
+      "side": 1,
+      "message": "Ah, yeah, I missed that segregation of fields. Thanks for fixing.",
+      "revId": "f5faee0e1c491c119df249d3c70e8e61a778032b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
