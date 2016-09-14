@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "cbfa12f2_bc2b018d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:20:59Z",
+      "side": 1,
+      "message": "remove the period at the end",
+      "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb55b2ad_c42ab386",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -13,6 +30,24 @@
       "writtenOn": "2016-09-14T19:50:51Z",
       "side": 1,
       "message": "Why not move these 3 lines into dialWithKeepAlive?",
+      "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_5c20fda8",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:20:59Z",
+      "side": 1,
+      "message": "I think because it encloses over ac, and dialWithKeepAlive does not.\n\nBut, there\u0027s a neater way to do this.\n\nfunc (ac *AuthClientService) dialer(target, timeout) (net.Conn, error) {\n  ac.invalidateToken()\n\n  c, err :\u003d net.DialTimeout(\"tcp\", target, timeout)\n  ...\n}\n\nfunc (ac *AuthClientService) invalidateToken() {\n  ac.mu.Lock()\n  ac.authToken \u003d \"\"\n  ac.lastTokenRefresh \u003d time.Time{}\n  ac.mu.Unlock()\n}\n\nthen use\n\ngrpc.WithDialer(ac.dialer)",
+      "parentUuid": "cb55b2ad_c42ab386",
       "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
