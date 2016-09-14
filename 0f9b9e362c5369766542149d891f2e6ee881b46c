@@ -69,6 +69,24 @@
       "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_3c4b7157",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-14T21:49:28Z",
+      "side": 1,
+      "message": "I like functions. It\u0027s got a nice name and makes it obvious what it does.\nI know it\u0027s not really helpful to set the refresh time, but since the token is invalid I thought it made sense to reset that field at the same time.",
+      "parentUuid": "cb55b2ad_3f34f092",
+      "revId": "0f9b9e362c5369766542149d891f2e6ee881b46c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
