@@ -218,7 +218,10 @@ func DirServerFor(cc upspin.Context, name upspin.PathName) (upspin.DirServer, er
 			firstErr = err
 		}
 	}
-	return nil, errors.E(op, err)
+	if firstErr != nil {
+		return nil, errors.E(op, firstErr)
+	}
+	return nil, errors.E(op, name, errors.Str("no directory endpoints found"))
 
 }
 
