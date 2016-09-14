@@ -187,7 +187,7 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 
 	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
 	if err != nil {
-		return nil, op.error(errors.IO, e, err)
+		return nil, op.error(errors.IO, err)
 	}
 
 	// The connection is closed when this service is released (see Bind.Release)
