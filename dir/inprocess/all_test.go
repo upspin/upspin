@@ -726,7 +726,7 @@ func TestLinkToFile(t *testing.T) {
 		t.Fatalf("err = %v; expected %v", err, upspin.ErrFollowLink)
 	}
 	if !equal(linkEntry, lookupEntry) {
-		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
+		t.Fatalf("lookup: expected\n\t%#v\ngot\n\t%#v", linkEntry, lookupEntry)
 	}
 
 	// Put through the link, should get ErrFollow link with the right path.

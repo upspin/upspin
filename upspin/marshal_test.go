@@ -98,6 +98,21 @@ func testDirEntryMarshal(t *testing.T, msg string, entry *DirEntry) {
 	}
 }
 
+func TestDirEntryMarshalClearsPackdata(t *testing.T) {
+	src, dst := linkDirEnt, dirEnt
+
+	data, err := src.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := dst.Unmarshal(data); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(src, dst) {
+		t.Errorf("bad result. got:\n\t%+v\nwant:\n\t%+v", dst, src)
+	}
+}
+
 // Was a bug that Unmarshal would not clear the Block field of the receiver
 // if the unmarshaled entry was of zero length.
 func TestDirEntryMarshalClearsBlocks(t *testing.T) {
