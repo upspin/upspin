@@ -5,6 +5,7 @@
 package upspin
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -53,32 +54,30 @@ var dirBlock2 = DirBlock{
 
 var linkDirEnt = DirEntry{
 	Name:       "u@foo.com/a/link",
-	SignedName: "k@blah.com/some/other/stuff/for/testing/purposes",
+	SignedName: "u@foo.com/a/link",
 	Link:       "v@bar.com/b/foo",
-	Packing:    EEPack,
+	Packing:    PlainPack,
 	Time:       123456,
-	Packdata:   []byte{1, 2, 3, 4},
+	Packdata:   nil, // Links have no packdata.
 	Attr:       AttrLink,
 	Sequence:   1234,
 	Writer:     "u@foo.com",
 }
 
-var emptyNamesEnt = DirEntry{
-	Name:       "",
-	SignedName: "",
-	Link:       "v@bar.com/b/foo",
-	Packing:    EEPack,
-	Time:       7654,
-	Packdata:   []byte{3, 1, 0, 1},
-	Attr:       AttrDirectory,
-	Sequence:   17,
-	Writer:     "u@meh.com",
+var nameCombinations = []DirEntry{
+	{Name: "", SignedName: ""},
+	{Name: "user@example.com/path", SignedName: ""},
+	{Name: "", SignedName: "user@example.com/path"},
+	{Name: "user@example.com/path", SignedName: "user@example.com/path"},
+	{Name: "user@example.com/path", SignedName: "user@example.com/different/path"},
 }
 
 func TestDirEntryMarshal(t *testing.T) {
 	testDirEntryMarshal(t, "regular file", &dirEnt)
 	testDirEntryMarshal(t, "link", &linkDirEnt)
-	testDirEntryMarshal(t, "emptyNames", &emptyNamesEnt)
+	for _, e := range nameCombinations {
+		testDirEntryMarshal(t, fmt.Sprintf("Name=%q SignedName=%q", e.Name, e.SignedName), &e)
+	}
 }
 
 func testDirEntryMarshal(t *testing.T, msg string, entry *DirEntry) {
@@ -95,10 +94,7 @@ func testDirEntryMarshal(t *testing.T, msg string, entry *DirEntry) {
 		t.Errorf("%s: data remains after unmarshal", msg)
 	}
 	if !reflect.DeepEqual(entry, &new) {
-		t.Errorf("%s: bad result. expected:", msg)
-		t.Errorf("%+v\n", entry)
-		t.Errorf("got:")
-		t.Errorf("%+v\n", &new)
+		t.Errorf("%s: bad result. got:\n\t%+v\nwant:\n\t%+v", msg, &new, entry)
 	}
 }
 

@@ -109,14 +109,15 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 	d.Size = size
 	b = b[n:]
 
-	// Must copy Packdata - can't return buffer's own contents.
-	// (All the other slices are turned into strings, so are intrinsically copied.)
 	bytes, b = getBytes(b)
 	if b == nil {
 		return nil, ErrTooShort
 	}
-	d.Packdata = make([]byte, len(bytes))
-	copy(d.Packdata, bytes)
+	if len(bytes) > 0 {
+		// Must copy Packdata - can't return buffer's own contents.
+		// (All the other slices are turned into strings, so are intrinsically copied.)
+		d.Packdata = append([]byte(nil), bytes...)
+	}
 
 	return b, nil
 }
@@ -270,11 +271,11 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	if b == nil {
 		return nil, ErrTooShort
 	}
-
-	// Must copy the data for Packdata - can't return buffer's own contents.
-	// (Most other slices are turned into strings, so are intrinsically copied.)
-	d.Packdata = make([]byte, len(bytes))
-	copy(d.Packdata, bytes)
+	if len(bytes) > 0 {
+		// Must copy the data for Packdata - can't return buffer's own contents.
+		// (Most other slices are turned into strings, so are intrinsically copied.)
+		d.Packdata = append([]byte(nil), bytes...)
+	}
 
 	// Link: count N followed by N bytes.
 	bytes, b = getBytes(b)
@@ -287,8 +288,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	d.Writer = UserName(bytes)
 
-	// Name: count N followed by N bytes. If N is zero Name equals
-	// SignedName.
+	// Name: count N followed by N bytes.
+	// If N is -1 Name equals SignedName.
 	length, n := binary.Varint(b)
 	if n == 0 {
 		return nil, ErrTooShort
