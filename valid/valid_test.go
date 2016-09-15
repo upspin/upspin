@@ -224,6 +224,12 @@ func TestDirEntry(t *testing.T) {
 		t.Fatal("no error for bad name")
 	}
 	restore()
+	// Mismatched names.
+	entry.SignedName = "curly@stooges.com/nyuk"
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for mismatched Name and SignedName")
+	}
+	restore()
 	// Bad attribute.
 	entry.Attr = upspin.AttrLink | upspin.AttrDirectory
 	if err := DirEntry(&entry); err == nil {
@@ -234,6 +240,19 @@ func TestDirEntry(t *testing.T) {
 	entry.Attr = upspin.AttrLink
 	if err := DirEntry(&entry); err == nil {
 		t.Fatal("no error for link with data")
+	}
+	restore()
+	// Data present for directory.
+	// TODO: Only important if MakeDirectory becomes a special case of DirServer.Put.
+	entry.Attr = upspin.AttrDirectory
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for directory with data")
+	}
+	restore()
+	// Link present for non-link
+	entry.Link = "moe@stooges.com/nyuk"
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for Link field set for non-link")
 	}
 	restore()
 	// Bad packing.

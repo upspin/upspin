@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 // Package valid does validation of various data types.
-// TODO(r): describe this is supposed to operate on interface inputs, not
-// necessarily as time-invariants.
+// For the most part, its functions are used by servers and enforce
+// stronger constraints than client code needs to follow.
 package valid
 
 import (
@@ -23,35 +23,34 @@ func UserName(userName upspin.UserName) error {
 		return errors.E(op, err)
 	}
 	if string(userName) != u+"@"+d {
-		return errors.E(op, userName, "not canonically formatted")
+		return errors.E(op, errors.Invalid, userName, "not canonically formatted")
 	}
 	return nil
 }
 
-// User verifies that the User struct is valid.
+// User verifies that the User struct is valid, that is, that all its fields are syntactically valid.
 func User(user *upspin.User) error {
 	const op = "valid.User"
 	if err := UserName(user.Name); err != nil {
-		return errors.E(op, err)
+		return errors.E(op, errors.Invalid, err)
 	}
 	for _, ep := range user.Dirs {
 		if err := Endpoint(ep); err != nil {
-			return errors.E(op, err)
+			return errors.E(op, errors.Invalid, err)
 		}
 	}
 	for _, ep := range user.Stores {
 		if err := Endpoint(ep); err != nil {
-			return errors.E(op, err)
+			return errors.E(op, errors.Invalid, err)
 		}
 	}
 	// TODO: Check public key?
 	return nil
 }
 
-// validPathName verifies that the name is valid, clean (no redundant slashes, no
-// .. elements, and so on) and canonically formatted. One important check is that
-// this function requires a user's root to have the trailing slash; path.Parse does
-// not.
+// validPathName verifies that the name is valid, clean and canonically formatted.
+// See upspin.io/path.Clean for the specification. One important check is that this
+// function requires a user's root to have the trailing slash; path.Parse does not.
 func validPathName(name upspin.PathName) error {
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -63,25 +62,27 @@ func validPathName(name upspin.PathName) error {
 	return nil
 }
 
-// DirBlock verifies that the block has a valid structure.
+// DirBlock verifies that the block is valid, that is, that it has a
+// non-negative Size, non-negative Offset, and valid Location.
 func DirBlock(block upspin.DirBlock) error {
 	const op = "valid.DirBlock"
 	if block.Size < 0 { // TODO: This be <= 0 but dir/inprocess creates empty blocks.
-		return errors.E(op, errors.Errorf("negative block size %d", block.Size))
+		return errors.E(op, errors.Invalid, errors.Errorf("negative block size %d", block.Size))
 	}
 	if block.Offset < 0 {
-		return errors.E(op, errors.Errorf("negative block offset %d", block.Offset))
+		return errors.E(op, errors.Invalid, errors.Errorf("negative block offset %d", block.Offset))
 	}
 	if err := Endpoint(block.Location.Endpoint); err != nil {
 		return err
 	}
 	if block.Location.Reference == "" {
-		return errors.E(op, errors.Str("empty reference in block"))
+		return errors.E(op, errors.Invalid, errors.Str("empty reference in block"))
 	}
 	return nil
 }
 
-// Endpoint verifies that the endpoint looks valid.
+// Endpoint verifies that the endpoint looks syntactically valid. It does not check that the
+// endpoint defines a reachable server.
 func Endpoint(endpoint upspin.Endpoint) error {
 	const op = "valid.Endpoint"
 	switch endpoint.Transport {
@@ -89,29 +90,38 @@ func Endpoint(endpoint upspin.Endpoint) error {
 		// OK if there is a netaddr, or not.
 	case upspin.Unassigned:
 		if endpoint.NetAddr != "" {
-			return errors.E(op, errors.Errorf("%q: extraneous network address", endpoint))
+			return errors.E(op, errors.Invalid, errors.Errorf("%q: extraneous network address", endpoint))
 		}
 	case upspin.Remote, upspin.HTTPS:
 		if endpoint.NetAddr == "" {
-			return errors.E(op, errors.Errorf("%q: missing network address", endpoint))
+			return errors.E(op, errors.Invalid, errors.Errorf("%q: missing network address", endpoint))
 		}
 	default:
-		return errors.E(op, errors.Errorf("%d unrecognized transport", endpoint.Transport))
+		return errors.E(op, errors.Invalid, errors.Errorf("%d unrecognized transport", endpoint.Transport))
 	}
 	return nil
 }
 
-// DirEntry verifies that the DirEntry is valid. It must have a valid
-// name, its data must be contiguous, and so on.
+// DirEntry verifies that the DirEntry is valid. It is intended for use by DirServer.Put,
+// and so constrains the entry more rigorously than, for instance, the DirEntries that
+// may be returned from servers. For example, it requires that a directory has no blocks,
+// but a DirEntry for a directory returned by a server may contain block data.
+// Rules:
+// - present and valid Name and SignedName
+// - Name is equal to SignedName
+// - blocks may be present only if Attr == AttrNone
+// - Link may be present only if Attr == AttrLink
+// - Packing must be known
+// - Sequence must have a known special value or be non-negative
 func DirEntry(entry *upspin.DirEntry) error {
 	const op = "valid.DirEntry"
 	// SignedName must be good.
 	if err := validPathName(entry.SignedName); err != nil {
-		return errors.E(op, entry.SignedName, err)
+		return errors.E(op, errors.Invalid, entry.SignedName, err)
 	}
 	// Name must match.
 	if entry.Name != entry.SignedName {
-		return errors.E(op, entry.Name, errors.Str("Name and SignedName must match"))
+		return errors.E(op, errors.Invalid, entry.Name, errors.Str("Name and SignedName must match"))
 	}
 
 	// Attribute must be valid and consistent with entry.
@@ -119,35 +129,43 @@ func DirEntry(entry *upspin.DirEntry) error {
 	case upspin.AttrNone, upspin.AttrDirectory:
 		// OK
 	case upspin.AttrLink:
-		if len(entry.Blocks) > 0 {
-			return errors.E(op, entry.Name, errors.Str("link cannot have data"))
-		}
 		if err := validPathName(entry.Link); err != nil {
-			return errors.E(op, entry.Name, err)
+			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
 	default:
-		return errors.E(op, entry.Name, errors.Errorf("invalid file attribute %d", entry.Attr))
+		return errors.E(op, errors.Invalid, entry.Name, errors.Errorf("invalid file attribute %d", entry.Attr))
 	}
+
+	// Blocks only for AttrNone
+	if entry.Attr != upspin.AttrNone && len(entry.Blocks) > 0 {
+		return errors.E(op, errors.Invalid, entry.Name, errors.Str("link or directory cannot have data"))
+	}
+
+	// Link only for AttrLink
+	if entry.Attr != upspin.AttrLink && entry.Link != "" {
+		return errors.E(op, errors.Invalid, entry.Name, errors.Str("only links can have Link set"))
+	}
+
 	// Packing must be valid.
 	switch entry.Packing {
 	case upspin.PlainPack, upspin.DebugPack, upspin.EEPack:
 		// OK
 	default:
-		return errors.E(op, entry.Name, errors.Errorf("invalid packing %d", entry.Packing))
+		return errors.E(op, errors.Invalid, entry.Name, errors.Errorf("invalid packing %d", entry.Packing))
 	}
 	// Sequence must be valid.
 	if entry.Sequence < 0 && entry.Sequence != upspin.SeqNotExist {
-		return errors.E(op, entry.Name, errors.Errorf("negative sequence number %d", entry.Sequence))
+		return errors.E(op, errors.Invalid, entry.Name, errors.Errorf("negative sequence number %d", entry.Sequence))
 	}
 	// There must be no holes or overlaps in blocks and blocks must be valid.
 	offset := int64(0)
 	for _, block := range entry.Blocks {
 		if block.Offset != offset {
-			return errors.E(op, entry.Name, errors.Str("data blocks are not contiguous"))
+			return errors.E(op, errors.Invalid, entry.Name, errors.Str("data blocks are not contiguous"))
 		}
 		offset += block.Size
 		if err := DirBlock(block); err != nil {
-			return errors.E(op, entry.Name, err)
+			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
 	}
 	return nil

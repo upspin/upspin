@@ -11,7 +11,6 @@ import (
 	"upspin.io/errors"
 	"upspin.io/pack"
 	"upspin.io/upspin"
-	"upspin.io/valid"
 )
 
 // ReadAll reads the entire contents of a DirEntry. The reader must have
@@ -20,10 +19,6 @@ import (
 func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 	const op = "clientutil.ReadAll"
 
-	// Validate the entry and its blocks.
-	if err := valid.DirEntry(entry); err != nil {
-		return nil, errors.E(op, err)
-	}
 	if entry.IsLink() {
 		return nil, errors.E(op, errors.Invalid, errors.Str("can't read a link entry"))
 	}
