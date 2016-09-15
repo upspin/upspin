@@ -54,8 +54,7 @@ func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.StoreServer, error
 	}, nil
 }
 
-// storeFor returns a StoreServer instance bound to the user specified in the context and the
-// destination server from the Configure grpc.
+// storeFor returns a StoreServer instance bound to the user and endpoint specified in the session.
 func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
@@ -149,14 +148,24 @@ func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 	return &deleteResponse, nil
 }
 
-// Configure implements upspin.Service.  It is used to learn the endpoint of the target
-// server and to answer any server authentication request.
-//
-// TODO(p): Consider passing any unused Configuration options to the server?
+// Configure implements proto.StoreServer.
 func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	logf("Configure %q", req.Options)
+	op := logf("Configure %q", req.Options)
 
-	return s.ConfigureProxy(ctx, s.ctx, req), nil
+	store, err := s.storeFor(ctx)
+	if err != nil {
+		op.log(err)
+		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
+	}
+
+	name, err := store.Configure(req.Options...)
+	if err != nil {
+		op.log(err)
+	}
+	return &proto.ConfigureResponse{
+		UserName: string(name),
+		Error:    errors.MarshalError(err),
+	}, nil
 }
 
 // Endpoint implements proto.StoreServer. It returns the endpoint of the remote server and not of the cache.
