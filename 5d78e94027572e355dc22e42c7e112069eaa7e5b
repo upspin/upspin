@@ -16,6 +16,91 @@
       "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_ff87ff0f",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:43:38Z",
+      "side": 1,
+      "message": "and mark proxy as not configured.",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_df843b0e",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:43:38Z",
+      "side": 1,
+      "message": "isProxy ?",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_bf91774a",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:43:38Z",
+      "side": 1,
+      "message": "now that we\u0027ve introduced proxyRequest, let\u0027s make these symmetrical\n\nauthRequest, ok :\u003d md[authRequestKey]\nif ok \u0026\u0026 len(authRequest) !\u003d 4 {\n  // invalid auth request\n}\nif authRequest \u003d\u003d nil {\n  // no auth token or request in metadata\n}\nreturn s.handleSessionRequest(...)\n\nthis also distinguishes between a missing auth request and an invalid one",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_9f8eb328",
+        "filename": "auth/session.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:43:38Z",
+      "side": 1,
+      "message": "delete this too",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_7f9d2f59",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:43:38Z",
+      "side": 1,
+      "message": "so is the plan to keep this around or not?",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
