@@ -74,11 +74,10 @@ func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspi
 
 func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
-	d := &upspin.DirEntry{
-		Name:       name,
-		SignedName: name,
-		Writer:     ctx.UserName(),
-	}
+	d := &upspin.DirEntry{}
+	d.Name = name
+	d.SignedName = name
+	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Now unpack.
@@ -94,11 +93,10 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 
 func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
-	d := &upspin.DirEntry{
-		Name:       name,
-		SignedName: name,
-		Writer:     ctx.UserName(),
-	}
+	d := &upspin.DirEntry{}
+	d.Name = name
+	d.SignedName = name
+	d.Writer = ctx.UserName()
 	cipher := packBlob(t, ctx, packer, d, text)
 
 	// Name to newName.
@@ -139,6 +137,7 @@ func TestName256(t *testing.T) {
 }
 
 func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
+	b.SetBytes(int64(fileSize))
 	const user upspin.UserName = "joe@upspin.io"
 	data := make([]byte, fileSize)
 	n, err := rand.Read(data)
@@ -153,9 +152,10 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	ctx, packer := setup(user)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
-			Name:    name,
-			Writer:  ctx.UserName(),
-			Packing: packer.Packing(),
+			Name:       name,
+			SignedName: name,
+			Writer:     ctx.UserName(),
+			Packing:    packer.Packing(),
 		}
 		bp, err := packer.Pack(ctx, d)
 		if err != nil {
