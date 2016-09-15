@@ -202,15 +202,16 @@ func TestDirEntry(t *testing.T) {
 	var entry upspin.DirEntry
 	restore := func() {
 		entry = upspin.DirEntry{
-			Name:     "curly@stooges.com/boink",
-			Packing:  upspin.PlainPack,
-			Time:     upspin.Now(),
-			Blocks:   []upspin.DirBlock{block0, block1},
-			Packdata: []byte("unused"),
-			Link:     "",
-			Writer:   "moe@stooges.com",
-			Attr:     upspin.AttrNone,
-			Sequence: 27,
+			Name:       "curly@stooges.com/boink",
+			SignedName: "curly@stooges.com/boink",
+			Packing:    upspin.PlainPack,
+			Time:       upspin.Now(),
+			Blocks:     []upspin.DirBlock{block0, block1},
+			Packdata:   []byte("unused"),
+			Link:       "",
+			Writer:     "moe@stooges.com",
+			Attr:       upspin.AttrNone,
+			Sequence:   27,
 		}
 	}
 	restore()

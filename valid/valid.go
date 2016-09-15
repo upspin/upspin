@@ -3,6 +3,8 @@
 // license that can be found in the LICENSE file.
 
 // Package valid does validation of various data types.
+// TODO(r): describe this is supposed to operate on interface inputs, not
+// necessarily as time-invariants.
 package valid
 
 import (
@@ -24,21 +26,6 @@ func UserName(userName upspin.UserName) error {
 		return errors.E(op, userName, "not canonically formatted")
 	}
 	return nil
-}
-
-// TODO: This is not a good check but it will serve for now.
-func okUserChar(r rune) bool {
-	switch {
-	case 'a' <= r && r <= 'z':
-		return true
-	case 'A' <= r && r <= 'Z':
-		return true
-	case '0' <= r && r <= '9':
-		return true
-	case r == '.' || r == '_' || r == '-':
-		return true
-	}
-	return false
 }
 
 // User verifies that the User struct is valid.
@@ -118,10 +105,15 @@ func Endpoint(endpoint upspin.Endpoint) error {
 // name, its data must be contiguous, and so on.
 func DirEntry(entry *upspin.DirEntry) error {
 	const op = "valid.DirEntry"
-	// Name must be good.
-	if err := validPathName(entry.Name); err != nil {
-		return errors.E(op, entry.Name, err)
+	// SignedName must be good.
+	if err := validPathName(entry.SignedName); err != nil {
+		return errors.E(op, entry.SignedName, err)
 	}
+	// Name must match.
+	if entry.Name != entry.SignedName {
+		return errors.E(op, entry.Name, errors.Str("Name and SignedName must match"))
+	}
+
 	// Attribute must be valid and consistent with entry.
 	switch entry.Attr {
 	case upspin.AttrNone, upspin.AttrDirectory:
