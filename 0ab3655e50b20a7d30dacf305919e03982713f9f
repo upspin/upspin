@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbfa12f2_dcd88d72",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T03:16:18Z",
+      "side": 1,
+      "message": "putting a TODO in a commit message doesn\u0027t really help\nnobody will see it again",
+      "revId": "0ab3655e50b20a7d30dacf305919e03982713f9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_9cde055d",
+        "filename": "valid/valid.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T03:16:18Z",
+      "side": 1,
+      "message": "this todo should be on DirEntry, not the package as a whole",
+      "revId": "0ab3655e50b20a7d30dacf305919e03982713f9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbfa12f2_fcd3c952",
+        "filename": "valid/valid_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T03:16:18Z",
+      "side": 1,
+      "message": "there should be a test for mismatched names, too",
+      "revId": "0ab3655e50b20a7d30dacf305919e03982713f9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
