@@ -26,9 +26,6 @@ type Session interface {
 	// ProxiedEndpoint returns the endpoint for which this session is a proxy.
 	// If we aren't proxying it returns an Unassigned endpoint.
 	ProxiedEndpoint() upspin.Endpoint
-
-	// SetProxiedEndpoint sets the endpoint this session is a proxy for.
-	SetProxiedEndpoint(upspin.Endpoint)
 }
 
 // sessionCacheSize is the max number of sessions to remember. Small values will limit parallelism and
@@ -38,12 +35,13 @@ const sessionCacheSize = 1000
 var sessionCache *cache.LRU // Caches <authToken, Session> Thread safe.
 
 // NewSession creates a new session with the given contents.
-func NewSession(user upspin.UserName, expiration time.Time, authToken string, err error) Session {
+func NewSession(user upspin.UserName, expiration time.Time, authToken string, proxyFor *upspin.Endpoint, err error) Session {
 	session := &sessionImpl{
 		user:      user,
 		expires:   expiration,
 		authToken: authToken,
 		err:       err,
+		endpoint:  *proxyFor,
 	}
 	sessionCache.Add(authToken, session)
 	return session
