@@ -58,9 +58,10 @@ func TestReadAll(t *testing.T) {
 		t.Fatal(err)
 	}
 	entry := &upspin.DirEntry{
-		Name:    userName + "/testfile",
-		Attr:    upspin.AttrNone,
-		Packing: upspin.PlainPack,
+		Name:       userName + "/testfile",
+		SignedName: userName + "/testfile",
+		Attr:       upspin.AttrNone,
+		Packing:    upspin.PlainPack,
 		Blocks: []upspin.DirBlock{
 			{
 				Offset:   0,

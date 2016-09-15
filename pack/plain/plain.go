@@ -126,6 +126,7 @@ func (p plainPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName u
 		return errors.E(op, err)
 	}
 	dirEntry.Name = parsed.Path()
+	dirEntry.SignedName = dirEntry.Name
 	return nil
 }
 

@@ -562,7 +562,8 @@ func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathNam
 		wrap = []wrappedKey{w}
 	}
 
-	// Compute new signature.
+	// Compute new signature, using the new name.
+	d.SignedName = newName
 	sig, err = ctx.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
 	if err != nil {
 		return errors.E(op, d.Name, err)

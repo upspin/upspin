@@ -176,10 +176,11 @@ func TestLink(t *testing.T) {
 	}
 	// Put file into linked destination
 	deAfterLink := &upspin.DirEntry{
-		Name:    userName + "/mylink/new_file.txt",
-		Attr:    upspin.AttrNone,
-		Writer:  userName,
-		Packing: upspin.PlainPack,
+		Name:       userName + "/mylink/new_file.txt",
+		SignedName: userName + "/mylink/new_file.txt",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
 	}
 	de2, err = s.Put(deAfterLink)
 	if err != upspin.ErrFollowLink {

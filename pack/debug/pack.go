@@ -287,6 +287,7 @@ func (testPack) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.Path
 	// Update directory entry and metadata with new name.
 	name := parsed.Path()
 	d.Name = name
+	d.SignedName = name
 	oldName, err := getPath(d)
 	if err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
