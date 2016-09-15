@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_5f794b1f",
+        "filename": "80",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-15T22:12:32Z",
+      "side": 1,
+      "message": "delete this",
+      "revId": "5d78e94027572e355dc22e42c7e112069eaa7e5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
