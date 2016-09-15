@@ -12,6 +12,7 @@ package inprocess
 // For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
 
 import (
+	"fmt"
 	goPath "path"
 
 	"strings"
@@ -200,6 +201,7 @@ func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry,
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/inprocess.Put"
 	if err := valid.DirEntry(entry); err != nil {
+		fmt.Println("DIE HERE")
 		return nil, errors.E(op, err)
 	}
 	e, err := s.canPut(op, entry.Name, false)
