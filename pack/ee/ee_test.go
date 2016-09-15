@@ -139,6 +139,7 @@ func TestName256(t *testing.T) {
 }
 
 func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
+	b.SetBytes(int64(fileSize))
 	const user upspin.UserName = "joe@upspin.io"
 	data := make([]byte, fileSize)
 	n, err := rand.Read(data)
@@ -153,9 +154,10 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	ctx, packer := setup(user)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
-			Name:    name,
-			Writer:  ctx.UserName(),
-			Packing: packer.Packing(),
+			Name:       name,
+			SignedName: name,
+			Writer:     ctx.UserName(),
+			Packing:    packer.Packing(),
 		}
 		bp, err := packer.Pack(ctx, d)
 		if err != nil {
