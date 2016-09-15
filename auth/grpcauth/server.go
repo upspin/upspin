@@ -35,7 +35,6 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	"strings"
 	"time"
 
 	gContext "golang.org/x/net/context"
@@ -67,6 +66,9 @@ const (
 	// These keys are for inline auth token requests.
 	authRequestKey = "upspinauthrequest"
 
+	// This key is for inline proxy configuration requests.
+	proxyRequestKey = "upspinproxyrequest"
+
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
 )
@@ -87,10 +89,6 @@ type SecureServer interface {
 
 	// GRPCServer returns the underlying grpc server.
 	GRPCServer() *grpc.Server
-
-	// ConfigureProxy remembers the endpoint being proxied and returns
-	// a response with any authentication request fulfilled.
-	ConfigureProxy(gctx gContext.Context, ctx upspin.Context, req *proto.ConfigureRequest) (resp *proto.ConfigureResponse)
 }
 
 // NewSecureServer returns a new SecureServer that serves GRPC.
@@ -141,8 +139,12 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Ses
 	if tok, ok := md[authTokenKey]; ok && len(tok) == 1 {
 		return s.validateToken(op, ctx, tok[0])
 	}
+	preq, ok := md[proxyRequestKey]
+	if ok && len(preq) != 1 {
+		return nil, errors.E(op, errors.Invalid, errors.Str("invalid proxy request in metadata"))
+	}
 	if req, ok := md[authRequestKey]; ok && len(req) == 4 {
-		return s.handleSessionRequest(op, ctx, req)
+		return s.handleSessionRequest(op, ctx, req, preq)
 	}
 	return nil, errors.E(op, errors.Invalid, errors.Str("no auth token or request in metadata"))
 }
@@ -174,7 +176,7 @@ func (s *secureServerImpl) validateToken(op string, ctx gContext.Context, authTo
 	return session, nil
 }
 
-func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context, request []string) (auth.Session, error) {
+func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context, request []string, prequest []string) (auth.Session, error) {
 	// Validate the username.
 	user := upspin.UserName(request[0])
 	if err := valid.UserName(user); err != nil {
@@ -224,7 +226,17 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 		log.Error.Printf("Can't create auth token.")
 		return nil, errors.E(op, err)
 	}
-	session := auth.NewSession(user, expiration, authToken, nil)
+
+	// If there is a proxy request, remember the proxy's endpoint.
+	var ep *upspin.Endpoint
+	if len(prequest) == 1 {
+		ep, err = upspin.ParseEndpoint(prequest[0])
+		if err != nil {
+			return nil, errors.E(op, prequest[0], errors.Errorf("invalid proxy endpoint: %v", err))
+		}
+	}
+
+	session := auth.NewSession(user, expiration, authToken, ep, nil)
 	if err := grpc.SendHeader(ctx, metadata.Pairs(authTokenKey, authToken)); err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -256,50 +268,4 @@ func verifySignature(key upspin.PublicKey, hash []byte, r, s *big.Int) error {
 		return nil
 	}
 	return errors.Str("signature fails to validate using the provided key")
-}
-
-// ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
-// to ensure that the proxy is running as our upspin user identity.
-func (s *secureServerImpl) ConfigureProxy(gctx gContext.Context, ctx upspin.Context, req *proto.ConfigureRequest) (resp *proto.ConfigureResponse) {
-	var endpoint *upspin.Endpoint
-	resp = &proto.ConfigureResponse{}
-
-	session, err := s.GetSessionFromContext(gctx)
-	if err != nil {
-		resp.Error = errors.MarshalError(err)
-		return
-	}
-
-	for _, o := range req.Options {
-		e := strings.TrimPrefix(o, "endpoint=")
-		if e != o {
-			var err error
-			endpoint, err = upspin.ParseEndpoint(e)
-			if err != nil {
-				resp.Error = errors.MarshalError(err)
-				return
-			}
-			session.SetProxiedEndpoint(*endpoint)
-			continue
-		}
-		e = strings.TrimPrefix(o, "authenticate=")
-		if e != o {
-			resp.UserName = string(ctx.UserName())
-			sig, err := ctx.Factotum().UserSign([]byte(resp.UserName + " Authenticate " + e))
-			if err != nil {
-				resp.Error = errors.MarshalError(err)
-				return
-			}
-			resp.Signature = &proto.Signature{
-				R: sig.R.String(),
-				S: sig.S.String(),
-			}
-			continue
-		}
-		// TODO(p): Do we want to do anything about unrecognized options?
-	}
-	if session.ProxiedEndpoint().Transport == upspin.Unassigned {
-		resp.Error = errors.MarshalError(errors.Str("no endpoint provided for cache connection"))
-	}
-	return
 }
