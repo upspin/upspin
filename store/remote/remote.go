@@ -114,18 +114,18 @@ func (r *remote) Configure(options ...string) (upspin.UserName, error) {
 	return "", op.error(errors.UnmarshalError(resp.Error))
 }
 
-func dialCache(context upspin.Context, e upspin.Endpoint) upspin.Service {
-	const op = "store/remote.dialCache"
-
+func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) upspin.Service {
 	// Are we using a Store cache?
 	ce := context.StoreCacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return nil
 	}
 
-	// Call the cache.  The cache is local so don't bother with TLS.
-	authClient, err := grpcauth.NewGRPCClient(context, ce.NetAddr, grpcauth.KeepAliveInterval, grpcauth.NoSecurity)
+	// Call the cache. The cache is local so don't bother with TLS.
+	authClient, err := grpcauth.NewGRPCClient(context, ce.NetAddr, grpcauth.KeepAliveInterval, grpcauth.NoSecurity, proxyFor)
 	if err != nil {
+		// On error dial direct.
+		op.error(errors.IO, ce, err)
 		return nil
 	}
 
@@ -133,19 +133,10 @@ func dialCache(context upspin.Context, e upspin.Endpoint) upspin.Service {
 	storeClient := proto.NewStoreClient(authClient.GRPCConn())
 	authClient.SetService(storeClient)
 
-	// Configure the cache connection and confirm the user.
-	serverUser, err := authClient.ConfigureProxy(context, e)
-	if err != nil {
-		return nil
-	}
-	if serverUser != context.UserName() {
-		return nil
-	}
-
 	return &remote{
 		AuthClientService: authClient,
 		ctx: dialContext{
-			endpoint: e,
+			endpoint: proxyFor,
 			userName: context.UserName(),
 		},
 		storeClient: storeClient,
@@ -161,13 +152,13 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 	}
 
 	// First try a cache
-	r := dialCache(context, e)
+	r := dialCache(op, context, e)
 	if r != nil {
 		return r, nil
 	}
 
 	// Call the server directly.
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure)
+	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, e, err)
 	}
