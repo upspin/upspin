@@ -6,7 +6,6 @@ package grpcauth
 
 import (
 	"crypto/tls"
-	"math/big"
 	"math/rand"
 	"net"
 	"strings"
@@ -18,7 +17,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -38,6 +36,7 @@ type AuthClientService struct {
 	grpcCommon GRPCCommon
 	grpcConn   *grpc.ClientConn
 	context    upspin.Context
+	proxyFor   upspin.Endpoint // the server is a proxy for this endpoint.
 
 	keepAliveInterval time.Duration // interval of keep-alive packets.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
@@ -46,6 +45,7 @@ type AuthClientService struct {
 	authToken        string
 	lastTokenRefresh time.Time
 	lastNetActivity  time.Time // last known time of some network activity.
+	proxyConfigured  bool
 }
 
 // SecurityLevel defines the security required of a GRPC connection.
@@ -78,7 +78,8 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // A keep alive interval indicates the amount of time to send ping requests to the server. A duration of 0 disables
 // keep-alive packets.
 // The security level specifies the expected security guarantees of the connection.
-func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel) (*AuthClientService, error) {
+// If proxyFor is an assigned endpoint, it indicates that this connection is being used to proxy request to that endpoint.
+func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel, proxyFor upspin.Endpoint) (*AuthClientService, error) {
 	const op = "auth/grpcauth.NewGRPCClient"
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
@@ -98,6 +99,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 		context:           context,
 		keepAliveInterval: keepAliveInterval,
 		closeKeepAlive:    make(chan bool, 1),
+		proxyFor:          proxyFor,
 	}
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
@@ -199,9 +201,10 @@ func (ac *AuthClientService) GRPCConn() *grpc.ClientConn {
 }
 
 func (ac *AuthClientService) dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
-	// Invalidate auth token.
+	// Invalidate auth token and mark proxy as not configured.
 	ac.mu.Lock()
 	ac.authToken = ""
+	ac.proxyConfigured = false
 	ac.mu.Unlock()
 
 	c, err := net.DialTimeout("tcp", target, timeout)
@@ -239,6 +242,19 @@ func (ac *AuthClientService) isAuthTokenExpired() bool {
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
+}
+
+func (ac *AuthClientService) isProxy() bool {
+	return ac.proxyFor.Transport != upspin.Unassigned
+}
+
+func (ac *AuthClientService) proxyNeedsConfiguration() bool {
+	if !ac.isProxy() {
+		return false
+	}
+	ac.mu.Lock()
+	defer ac.mu.Unlock()
+	return !ac.proxyConfigured
 }
 
 // NewAuthContext sets up a gContext, GRPC CallOption, and finishAuth function
@@ -281,12 +297,16 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 	if err != nil {
 		return nil, nil, nil, errors.E(op, err)
 	}
-	ctx = metadata.NewContext(ctx, metadata.MD{authRequestKey: []string{
+	md := metadata.MD{authRequestKey: []string{
 		user,
 		now,
 		sig.R.String(),
 		sig.S.String(),
-	}})
+	}}
+	if ac.proxyNeedsConfiguration() {
+		md[proxyRequestKey] = []string{ac.proxyFor.String()}
+	}
+	ctx = metadata.NewContext(ctx, md)
 	finishAuth = func(err error) error {
 		ac.setLastActivity()
 		if err != nil {
@@ -303,6 +323,7 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		defer ac.mu.Unlock()
 		ac.authToken = token[0]
 		ac.lastTokenRefresh = now
+		ac.proxyConfigured = ac.isProxy()
 		return nil
 	}
 	return
@@ -317,57 +338,4 @@ func (ac *AuthClientService) Close() {
 	}
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
 	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
-}
-
-// ConfigureProxy uses the Configure command to tell the proxy the endpoint it is proxying for and
-// to ensure that the proxy is running as our upspin user identity.
-func (ac *AuthClientService) ConfigureProxy(ctx upspin.Context, e upspin.Endpoint) (upspin.UserName, error) {
-	const op = "auth/grpcauth.ConfigureProxy"
-
-	gCtx, callOpt, finishAuth, err := ac.NewAuthContext()
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-
-	token, err := generateRandomToken()
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	req := &proto.ConfigureRequest{
-		Options: []string{"authenticate=" + token, "endpoint=" + e.String()},
-	}
-	resp, err := ac.grpcCommon.Configure(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-
-	// Get user's public keys.
-	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	u, err := keyServer.Lookup(upspin.UserName(resp.UserName))
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	key := u.PublicKey
-
-	// Parse signature
-	var rs, ss big.Int
-	_, ok := rs.SetString(resp.Signature.R, 10)
-	if !ok {
-		return "", errors.E(op, errors.Str("bad signature"))
-	}
-	_, ok = ss.SetString(resp.Signature.S, 10)
-	if !ok {
-		return "", errors.E(op, errors.Str("bad signature"))
-	}
-
-	// Validate signature.
-	err = verifySignature(key, []byte(resp.UserName+" Authenticate "+token), &rs, &ss)
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	return upspin.UserName(resp.UserName), nil
 }
