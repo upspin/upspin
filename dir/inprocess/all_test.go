@@ -96,6 +96,11 @@ func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name ups
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Our implementation stores a block for a zero-length file and newDirEntry sets that up,
+	// but dirServer.put does not allow that, so clear out the blocks here for an empty file.
+	if len(data) == 0 {
+		entry.Blocks = nil
+	}
 	return entry
 }
 
@@ -182,7 +187,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	// Create a hundred files.
 	locs := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
-		text := strings.Repeat(fmt.Sprint(i), i)
+		text := "X" + strings.Repeat(fmt.Sprint(i), i) // Need a non-empty file so we have a Location.
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
 		_, err := directory.Put(entry)
@@ -194,7 +199,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	// Read them all back in funny order.
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
-		text := strings.Repeat(fmt.Sprint(j), j)
+		text := "X" + strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
 		entry, err := directory.Lookup(fileName)
@@ -218,7 +223,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	// Create a hundred files.
 	href := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
-		text := strings.Repeat(fmt.Sprint(i), i)
+		text := "Y" + strings.Repeat(fmt.Sprint(i), i) // Need a non-empty file so we have a Location.
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
 		entry := storeData(t, context, []byte(text), fileName)
 		_, err := directory.Put(entry)
@@ -230,7 +235,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 	// Get them all back in funny order.
 	for i := 0; i < nFile; i++ {
 		j := 7 * i % nFile
-		text := strings.Repeat(fmt.Sprint(j), j)
+		text := "Y" + strings.Repeat(fmt.Sprint(j), j)
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, j))
 		// Fetch the data back and inspect it.
 		entry, err := directory.Lookup(fileName)
