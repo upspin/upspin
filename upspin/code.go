@@ -117,6 +117,8 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 		// Must copy Packdata - can't return buffer's own contents.
 		// (All the other slices are turned into strings, so are intrinsically copied.)
 		d.Packdata = append([]byte(nil), bytes...)
+	} else {
+		d.Packdata = nil
 	}
 
 	return b, nil
@@ -275,6 +277,8 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 		// Must copy the data for Packdata - can't return buffer's own contents.
 		// (Most other slices are turned into strings, so are intrinsically copied.)
 		d.Packdata = append([]byte(nil), bytes...)
+	} else {
+		d.Packdata = nil
 	}
 
 	// Link: count N followed by N bytes.
