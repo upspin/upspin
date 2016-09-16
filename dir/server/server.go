@@ -103,7 +103,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 	for _, opt := range options {
 		o := strings.Split(opt, "=")
 		if len(o) != 2 {
-			return nil, errors.E(op, errors.Syntax, errors.Errorf("invalid option format: %q", opt))
+			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid option format: %q", opt))
 		}
 		k, v := o[0], o[1]
 		switch k {
@@ -463,7 +463,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				// It's safe to request d+1 because we just listed a directory at level +1 from current.
 				matched, err := goPath.Match(p.First(d+1).String(), string(e.Name))
 				if err != nil {
-					return nil, errors.E(op, p.Path(), errors.Syntax, err)
+					return nil, errors.E(op, p.Path(), errors.Invalid, err)
 				}
 				if !matched {
 					continue

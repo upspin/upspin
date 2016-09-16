@@ -228,17 +228,17 @@ func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
 	if v, ok := opts.Opts[projectID]; ok {
 		gcs.projectID = v
 	} else {
-		return errors.E(op, errors.Syntax, errors.Str("Project ID argument is required"))
+		return errors.E(op, errors.Invalid, errors.Str("Project ID argument is required"))
 	}
 	if v, ok := opts.Opts[bucketName]; ok {
 		gcs.bucketName = v
 	} else {
-		return errors.E(op, errors.Syntax, errors.Str("Bucket name argument is required"))
+		return errors.E(op, errors.Invalid, errors.Str("Bucket name argument is required"))
 	}
 	if v, ok := opts.Opts[defaultACL]; ok {
 		gcs.defaultWriteACL = v
 	} else {
-		return errors.E(op, errors.Syntax, errors.Str("Default ACL argument is required"))
+		return errors.E(op, errors.Invalid, errors.Str("Default ACL argument is required"))
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and

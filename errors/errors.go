@@ -64,7 +64,6 @@ const (
 	Other      Kind = iota // Unclassified error. This value is not printed in the error message.
 	Invalid                // Invalid operation for this type of item.
 	Permission             // Permission denied.
-	Syntax                 // Ill-formed argument such as invalid file name.
 	IO                     // External I/O error such as network failure.
 	Exist                  // Item already exists.
 	NotExist               // Item does not exist.
@@ -82,8 +81,6 @@ func (k Kind) String() string {
 		return "invalid operation"
 	case Permission:
 		return "permission denied"
-	case Syntax:
-		return "syntax error"
 	case IO:
 		return "I/O error"
 	case Exist:

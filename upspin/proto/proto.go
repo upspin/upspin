@@ -57,7 +57,7 @@ func UpspinDirEntry(b []byte) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	if len(b) != 0 {
-		return nil, errors.E(op, errors.Syntax, errors.Str("extra data"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("extra data"))
 	}
 	return &d, nil
 }

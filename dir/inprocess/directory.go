@@ -635,7 +635,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				}
 				matched, err := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1))
 				if err != nil {
-					return nil, errors.E(op, upspin.PathName(pattern), errors.Syntax, err)
+					return nil, errors.E(op, upspin.PathName(pattern), errors.Invalid, err)
 				}
 				if !matched {
 					continue

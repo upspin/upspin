@@ -35,7 +35,7 @@ func TestParse(t *testing.T) {
 		{upspin.UserName("me@HERE.com"), "me", S, "here.com", ""},                // Lower-case the domain.
 		{upspin.UserName(hugeOKName + "@foo.com"), hugeOKName, S, "foo.com", ""}, // Maximum accepted length, 254.
 		{upspin.UserName(hugeBadName + "@foo.com"), U, S, D, "name too long"},
-		{upspin.UserName("@"), U, S, D, "syntax error: missing user name"},
+		{upspin.UserName("@"), U, S, D, "invalid operation: missing user name"},
 		{upspin.UserName("user@" + hugeOKDomain), "user", S, hugeOKDomain, ""}, // Maximum domain element length, 63.
 		{upspin.UserName("user@" + hugeBadDomain), U, S, D, "invalid domain name element"},
 		{upspin.UserName("user@a..com"), U, S, D, "invalid domain name element"},
@@ -57,7 +57,7 @@ func TestParse(t *testing.T) {
 		u, s, d, err := Parse(test.userName)
 		if test.errStr == "" {
 			if err != nil {
-				t.Errorf("%q: Expected no error, got %q", test.userName, err)
+				t.Errorf("%q: expected no error, got %q", test.userName, err)
 				continue
 			}
 			if u != test.user {
