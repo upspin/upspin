@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_df5c3beb",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T22:14:57Z",
+      "side": 1,
+      "message": "maybe s/userNamePattern/pattern/ ?\nit\u0027s called GlobUsers after all",
+      "revId": "6825c36e484040c7761814a2682f388f571622cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
