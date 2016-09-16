@@ -159,50 +159,50 @@ func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob [
 
 // MakeDirectory implements upspin.DirServer.MakeDirectory.
 func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/inprocess.MakeDirectory"
-	e, err := s.canPut(op, directoryName, true)
-	if err != nil {
-		return s.errLink(op, e, err)
-	}
-
 	parsed, err := path.Parse(directoryName)
 	if err != nil {
 		return nil, err
 	}
-
-	s.db.mu.Lock()
-	defer s.db.mu.Unlock()
-	if parsed.IsRoot() {
-		// Creating a root: easy!
-		// Only the onwer can create the root, but the check above is sufficient since a
-		// non-existent root has no Access file yet.
-		if _, present := s.db.root[parsed.User()]; present {
-			return nil, errors.E(op, directoryName, errors.Exist)
-		}
-		// We will have a zero-sized block here, which is odd but necessary to have
-		// a place to store the directory's Reference.
-		entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, upspin.SeqBase)
-		if err != nil {
-			return nil, err
-		}
-		s.db.root[parsed.User()] = entry
-		return entry, nil
+	// Can't use newDirEntry as it adds a block.
+	entry := &upspin.DirEntry{
+		Name:       parsed.Path(),
+		SignedName: parsed.Path(),
+		Attr:       upspin.AttrDirectory,
 	}
-	entry, err := s.newDirEntry(parsed.Path(), nil, upspin.SeqBase)
+	return s.Put(entry)
+}
+
+// makeRoot creates a new user root.
+// s.db is locked.
+func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
+	const op = "dir/inprocess.makeRoot"
+	// Creating a root: easy!
+	// Only the owner can create the root, but the canPut check is sufficient since a
+	// non-existent root has no Access file yet.
+	if _, present := s.db.root[parsed.User()]; present {
+		return nil, errors.E(op, parsed.Path(), errors.Exist)
+	}
+	// We will have a zero-sized block here, which is odd but necessary to have
+	// a place to store the directory's Reference.
+	entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, upspin.SeqBase)
 	if err != nil {
 		return nil, err
 	}
-	return s.put(op, entry, false)
+	s.db.root[parsed.User()] = entry
+	return entry, nil
 }
 
 // Put implements upspin.DirServer.Put.
-// Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/inprocess.Put"
 	if err := valid.DirEntry(entry); err != nil {
 		return nil, errors.E(op, err)
 	}
-	e, err := s.canPut(op, entry.Name, false)
+	parsed, err := path.Parse(entry.Name)
+	if err != nil {
+		return nil, errors.E(op, err) // Can't happen but be sure.
+	}
+	e, err := s.canPut(op, parsed, entry.IsDir())
 	if err != nil {
 		return s.errLink(op, e, err)
 	}
@@ -213,13 +213,20 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		if entry.Packing != upspin.PlainPack {
 			return nil, errors.E(op, entry.Name, errors.Str("Access or Group file must use plain packing"))
 		}
-		if entry.IsLink() {
+		if entry.IsLink() || entry.IsDir() {
 			return nil, errors.E(op, entry.Name, errors.Str("cannot create a link named Access or Group"))
 		}
 	}
-	entry, err = s.put(op, entry, false)
-	if err == nil {
-		return nil, nil // Successful Put returns no entry.
+
+	// Special case for making a root.
+	if entry.IsDir() {
+		if parsed.IsRoot() {
+			return s.makeRoot(parsed)
+		}
+	}
+	entry, err = s.put(op, entry, parsed, false)
+	if err == nil && !entry.IsDir() {
+		return nil, nil // Successful Put (but not MakeDirectory - TODO) returns no entry.
 	}
 	return entry, err
 }
@@ -228,11 +235,8 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 // It may return ErrFollowLink.
 // s.db.mu must not be held, which means races are possible
 // but they are not harmful (are they?).
-func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, errors.E(op, name, err)
-	}
+func (s *server) canPut(op string, parsed path.Parsed, makeDirectory bool) (*upspin.DirEntry, error) {
+	name := parsed.Path()
 	if makeDirectory && parsed.IsRoot() {
 		// We're fine.
 	} else {
@@ -281,18 +285,15 @@ func (s *server) canPut(op string, name upspin.PathName, makeDirectory bool) (*u
 	return nil, nil
 }
 
-// put is the underlying implementation of Put and MakeDirectory.
+// put is the underlying implementation of Put, including making links and directories..
 // If deleting, we expect the entry to already be present and skip it on the rewrite.
 // TODO: implement links.
 // TODO add Share?
-func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(entry.Name)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
+func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, deleting bool) (*upspin.DirEntry, error) {
 	pathName := parsed.Path()
 	if parsed.IsRoot() {
-		return nil, errors.E(op, pathName, errors.Errorf("cannot create root %s with Put; use MakeDirectory", parsed))
+		// Should not be here.
+		return nil, errors.E(op, pathName, errors.Internal, errors.Str("cannot create root with s.put"))
 	}
 	rootEntry, ok := s.db.root[parsed.User()]
 	if !ok {
@@ -318,8 +319,7 @@ func (s *server) put(op string, entry *upspin.DirEntry, deleting bool) (*upspin.
 		entries = append(entries, e)
 		rootEntry = e
 	}
-	var dirBlob []byte
-	rootEntry, dirBlob, err = s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
+	rootEntry, dirBlob, err := s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
 	if err != nil {
 		return nil, err
 	}
@@ -473,7 +473,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		}
 	}
 
-	return s.put(op, entry, true)
+	return s.put(op, entry, parsed, true)
 }
 
 func (s *server) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {

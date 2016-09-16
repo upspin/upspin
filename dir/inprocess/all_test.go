@@ -73,7 +73,7 @@ func setup() (upspin.Context, upspin.DirServer) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = dir.MakeDirectory(upspin.PathName(userName))
+	_, err = makeDirectory(dir, upspin.PathName(userName))
 	if err != nil {
 		panic(err)
 	}
@@ -138,6 +138,21 @@ func readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		data = append(data, cleartext...)
 	}
 	return data, nil
+}
+
+// makeDirectory calls s.Put to create a directory.
+func makeDirectory(dir upspin.DirServer, directoryName upspin.PathName) (*upspin.DirEntry, error) {
+	parsed, err := path.Parse(directoryName)
+	if err != nil {
+		return nil, err
+	}
+	// Can't use newDirEntry as it adds a block.
+	entry := &upspin.DirEntry{
+		Name:       parsed.Path(),
+		SignedName: parsed.Path(),
+		Attr:       upspin.AttrDirectory,
+	}
+	return dir.Put(entry)
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
@@ -257,28 +272,28 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	context, directory := setup()
 	user := context.UserName()
 	dirName := upspin.PathName(fmt.Sprintf("%s/foo", user))
-	entry, err := directory.MakeDirectory(dirName)
+	entry, err := makeDirectory(directory, dirName)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if entry == nil {
-		t.Fatal("nil entry from MakeDirectory")
+		t.Fatal("nil entry from makeDirectory")
 	}
 	if entry.Name != dirName {
-		t.Fatalf("entry from MakeDirectory(%q) is named %q", dirName, entry.Name)
+		t.Fatalf("entry from makeDirectory(%q) is named %q", dirName, entry.Name)
 	}
 	if entry.Attr != upspin.AttrDirectory {
-		t.Fatalf("entry from MakeDirectory(%q) has attr %v", dirName, entry.Attr)
+		t.Fatalf("entry from makeDirectory(%q) has attr %v", dirName, entry.Attr)
 	}
-	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
+	_, err = makeDirectory(directory, upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf", user)))
+	_, err = makeDirectory(directory, upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = directory.MakeDirectory(upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
+	_, err = makeDirectory(directory, upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot", user)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -371,7 +386,7 @@ func TestGlob(t *testing.T) {
 	}
 	for _, dir := range dirs {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, dir))
-		_, err := directory.MakeDirectory(name)
+		_, err := makeDirectory(directory, name)
 		if err != nil {
 			t.Fatalf("make directory: %s: %v", name, err)
 		}
@@ -585,7 +600,7 @@ func TestDeleteDirectory(t *testing.T) {
 	user := context.UserName()
 	dirName := upspin.PathName(user + "/dir")
 	fileName := dirName + "/file"
-	_, err := dir.MakeDirectory(dirName)
+	_, err := makeDirectory(dir, dirName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -636,11 +651,11 @@ func TestWhichAccess(t *testing.T) {
 	dir2Name := dir1Name + "/dir2"
 	fileName := dir2Name + "/file"
 	accessFileName := dir1Name + "/Access"
-	_, err := dir.MakeDirectory(dir1Name)
+	_, err := makeDirectory(dir, dir1Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = dir.MakeDirectory(dir2Name)
+	_, err = makeDirectory(dir, dir2Name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -696,12 +711,12 @@ func TestLinkToFile(t *testing.T) {
 	fileName := dirName + "/file"
 	linkName := upspin.PathName(user + "/link")
 	dirLinkName := upspin.PathName(user + "/dirlink")
-	e, err := dir.MakeDirectory(dirName)
+	e, err := makeDirectory(dir, dirName)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if e == nil {
-		t.Fatal("nil entry from MakeDirectory")
+		t.Fatal("nil entry from makeDirectory")
 	}
 	entry := storeData(t, context, []byte("hello"), fileName)
 	e, err = dir.Put(entry)
@@ -757,7 +772,7 @@ func TestLinkToFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Try to make a directory through the link, should get ErrFollowLink.
-	e, err = dir.MakeDirectory(dirLinkName + "/subdir")
+	e, err = makeDirectory(dir, dirLinkName+"/subdir")
 	if err != upspin.ErrFollowLink {
 		t.Fatalf("err = %v; expected %v", err, upspin.ErrFollowLink)
 	}
@@ -825,11 +840,11 @@ func TestWhichAccessLink(t *testing.T) {
 	publicLinkName := publicDirName + "/link" // Will point to the _private_file
 	privateAccessFileName := upspin.PathName(user + "/private/Access")
 	publicAccessFileName := upspin.PathName(user + "/public/Access")
-	_, err := dir.MakeDirectory(publicDirName)
+	_, err := makeDirectory(dir, publicDirName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = dir.MakeDirectory(privateDirName)
+	_, err = makeDirectory(dir, privateDirName)
 	if err != nil {
 		t.Fatal(err)
 	}
