@@ -197,7 +197,7 @@ func TestListUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !sameUsers(t, users, []upspin.UserName{"morihei+snapshot@ueshiba.jp"}) {
-		t.Fatal(err)
+		t.Fatal("users don't match")
 	}
 	// Glob for .jp users only.
 	users, err = ListUsers("*.jp", dir)
@@ -207,7 +207,7 @@ func TestListUsers(t *testing.T) {
 		"moriteru@ueshiba.jp",
 		"morihei@ueshiba.jp",
 	}) {
-		t.Fatal(err)
+		t.Fatal("users don't match")
 	}
 	// Glob for users with suffix only.
 	users, err = ListUsers("*+*@*", dir)
@@ -215,7 +215,7 @@ func TestListUsers(t *testing.T) {
 		"morihei+snapshot@ueshiba.jp",
 		"jose+photos@ortega.com",
 	}) {
-		t.Fatal(err)
+		t.Fatal("users don't match")
 	}
 }
 
