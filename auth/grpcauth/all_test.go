@@ -6,6 +6,7 @@ package grpcauth
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -141,14 +142,25 @@ func (c *client) TellTrump(t *testing.T, demand string) (response string) {
 }
 
 func startClient(port string) {
+	ctx := context.SetUserName(context.New(), user)
+
 	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx := context.SetUserName(context.New(), user)
 	ctx = context.SetFactotum(ctx, f)
 
-	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, InsecureAllowingSelfSignedCertificates, upspin.Endpoint{})
+	pem, err := ioutil.ReadFile("testdata/cert.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pool := ctx.CertPool()
+	if ok := pool.AppendCertsFromPEM(pem); !ok {
+		log.Fatal("could not add certificates to pool")
+	}
+	ctx = context.SetCertPool(ctx, pool)
+
+	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
 	if err != nil {
 		log.Fatal(err)
 	}
