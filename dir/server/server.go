@@ -64,6 +64,9 @@ type server struct {
 	// at the root of every user's tree, if an explicit one is not found.
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
+
+	// snapshotChan is a channel for shutting down the snapshotter.
+	snapshotChan chan bool
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -136,13 +139,16 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		logDir = dir
 	}
 
-	return &server{
+	s := &server{
 		serverContext: ctxt,
+		userName:      ctxt.UserName(),
 		logDir:        logDir,
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
 		defaultAccess: cache.NewLRU(accessCacheSize),
-	}, nil
+	}
+	s.startSnapshotLoop()
+	return s, nil
 }
 
 // Lookup implements upspin.DirServer.
@@ -263,15 +269,19 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 	if err != nil {
 		return nil, errors.E(op, dirName, err)
 	}
-
+	if access.IsAccessFile(dirName) || access.IsGroupFile(dirName) {
+		return nil, errors.E(op, errors.Invalid, errors.Str("cannot make directory named Access or Group"))
+	}
 	mu := userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
-	if access.IsAccessFile(dirName) || access.IsGroupFile(dirName) {
-		return nil, errors.E(op, errors.Invalid, errors.Str("cannot make directory named Access or Group"))
-	}
+	return s.makeDirectory(op, p, o)
+}
 
+// makeDirectory is a convenience function to make a directory.
+// userLock must be held for p.User().
+func (s *server) makeDirectory(op string, p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
 	// Create a new dir entry for this new dir.
 	de := &upspin.DirEntry{
 		Name:       p.Path(),
@@ -284,7 +294,7 @@ func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error
 	}
 
 	// Attempt to put this new dir entry.
-	return s.put(op, p, de, o)
+	return s.put(op, p, de, opts...)
 }
 
 // put implements the common functionality between Put and MakeDirectory.
@@ -645,6 +655,7 @@ func (s *server) Close() {
 	}
 
 	s.defaultAccess = nil
+	s.stopSnapshotLoop()
 }
 
 // loadTreeFor loads the user's tree, if it exists.
