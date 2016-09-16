@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "30f4ff40_7f752f5e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-16T22:17:19Z",
+      "side": 1,
+      "message": "userNamePattern is too long. just call it pattern.",
+      "revId": "6825c36e484040c7761814a2682f388f571622cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_df5c3beb",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -13,6 +30,40 @@
       "writtenOn": "2016-09-16T22:14:57Z",
       "side": 1,
       "message": "maybe s/userNamePattern/pattern/ ?\nit\u0027s called GlobUsers after all",
+      "revId": "6825c36e484040c7761814a2682f388f571622cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_5f7a6b4e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-16T22:17:19Z",
+      "side": 1,
+      "message": "i don\u0027t really think it\u0027s a Glob, just a Match. there\u0027s no recursion, just a simple flat list.",
+      "revId": "6825c36e484040c7761814a2682f388f571622cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_9f66b3bd",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-16T22:17:19Z",
+      "side": 1,
+      "message": "i would write this as sameUsers(t *testing.T, got, want []upspin.UserName) bool\nand if there is an error call t.Errorf and return false\nthen the check says\nif !sameUsers() { \n... t.Fatal(\"different users\")\n}\n\nthis reads well, gives good errors and gets the final one on the right line. i\u0027ve been using this style more often and like it.\n\nbut it\u0027s a pure style issue; what you have is OK.",
       "revId": "6825c36e484040c7761814a2682f388f571622cd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
