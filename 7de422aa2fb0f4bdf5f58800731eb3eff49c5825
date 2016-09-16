@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "2b2f2e72_d3a6b7c2",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-16T16:40:22Z",
+      "side": 1,
+      "message": "Do you mean systemCertPool here and drop the error checking (since it already panicked if it had to)?",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b2f2e72_33d1d3c2",
         "filename": "context/initcontext.go",
         "patchSetId": 3
