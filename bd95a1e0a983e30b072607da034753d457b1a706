@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_1f74e35e",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-16T22:56:46Z",
+      "side": 1,
+      "message": "err could be nil here. you want the err check after the call to users, then\ncall sameusers, then t.Fatal(\"incorrect result of ListUsers for *.jp\")",
+      "revId": "bd95a1e0a983e30b072607da034753d457b1a706",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
