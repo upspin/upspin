@@ -4,7 +4,11 @@
 
 package testfixtures
 
-import "upspin.io/upspin"
+import (
+	"crypto/x509"
+
+	"upspin.io/upspin"
+)
 
 type simpleContext struct {
 	userName upspin.UserName
@@ -69,4 +73,9 @@ func (ctx *simpleContext) StoreEndpoint() upspin.Endpoint {
 // StoreCacheEndpoint implements upspin.Context.
 func (ctx *simpleContext) StoreCacheEndpoint() upspin.Endpoint {
 	return ep0
+}
+
+// CertPool implements upspin.Context.
+func (ctx *simpleContext) CertPool() *x509.CertPool {
+	return x509.NewCertPool()
 }
