@@ -666,6 +666,15 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 			errors.Errorf("userTrees contained value of unexpected type %T", val))
 	}
 	// User is not in the cache. Load a tree from the logs, if they exist.
+	hasLog, err := tree.HasLog(user, s.logDir)
+	if err != nil {
+		return nil, err
+	}
+	if !hasLog && s.userName != user {
+		// Tree for user does not exist and the logged-in user is not
+		// allowed to create it.
+		return nil, errNotExist
+	}
 	log, logIndex, err := tree.NewLogs(user, s.logDir)
 	if err != nil {
 		return nil, err
@@ -676,15 +685,6 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		if !errors.Match(errNotExist, err) {
 			// No it's some other error. Abort.
 			return nil, err
-		}
-		// If user is allowed to create a root, let this proceed.
-		if s.userName != user {
-			// Always use NotExist to avoid attacks that
-			// differentiate between a user not having a root and
-			// having a root but not granting permissions to
-			// s.userName. This is similar to having no rights on
-			// path.
-			return nil, errNotExist
 		}
 		// Ok, let it proceed. The  user will still need to make the
 		// root, but we allow setting up a new tree for now.
