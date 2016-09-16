@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"strings"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -106,6 +107,24 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 	}
 	loggerFile.Close()
 	return true, nil
+}
+
+// GlobUsers applies userNamePattern to all known users in directory and returns
+// the matches. The format of the pattern is the same used by
+// path/filepath.Match. For example, to list all users name with suffix a valid
+// pattern could be "*+*@*".
+func GlobUsers(userNamePattern string, directory string) ([]upspin.UserName, error) {
+	const op = "dir/server/tree.GlobUsers"
+	prefix := logFile("", directory)
+	matches, err := filepath.Glob(logFile(upspin.UserName(userNamePattern), directory))
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	users := make([]upspin.UserName, len(matches))
+	for i, m := range matches {
+		users[i] = upspin.UserName(strings.TrimPrefix(m, prefix))
+	}
+	return users, nil
 }
 
 func logFile(user upspin.UserName, directory string) string {
