@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"sort"
 	"testing"
 
 	"upspin.io/errors"
@@ -169,6 +170,55 @@ func TestLogIndex(t *testing.T) {
 	}
 }
 
+func TestListUsers(t *testing.T) {
+	dir, err := ioutil.TempDir("", "TestListUsers")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	// Create a few test users.
+	for _, u := range []upspin.UserName{
+		"morihei@ueshiba.jp",
+		"kishomaru@ueshiba.jp",
+		"moriteru@ueshiba.jp",
+		"shiohira@shihan.com",
+		"jose+photos@ortega.com",
+		"morihei+snapshot@ueshiba.jp",
+	} {
+		_, _, err := NewLogs(u, dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Glob for snapshot users only.
+	users, err := ListUsers("*+snapshot@*", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !sameUsers(t, users, []upspin.UserName{"morihei+snapshot@ueshiba.jp"}) {
+		t.Fatal(err)
+	}
+	// Glob for .jp users only.
+	users, err = ListUsers("*.jp", dir)
+	if !sameUsers(t, users, []upspin.UserName{
+		"morihei+snapshot@ueshiba.jp",
+		"kishomaru@ueshiba.jp",
+		"moriteru@ueshiba.jp",
+		"morihei@ueshiba.jp",
+	}) {
+		t.Fatal(err)
+	}
+	// Glob for users with suffix only.
+	users, err = ListUsers("*+*@*", dir)
+	if !sameUsers(t, users, []upspin.UserName{
+		"morihei+snapshot@ueshiba.jp",
+		"jose+photos@ortega.com",
+	}) {
+		t.Fatal(err)
+	}
+}
+
 var seq int64
 
 func newLogEntry(path upspin.PathName) *LogEntry {
@@ -189,3 +239,26 @@ func newLogEntry(path upspin.PathName) *LogEntry {
 		},
 	}
 }
+
+func sameUsers(t *testing.T, got, want []upspin.UserName) bool {
+	if len(got) != len(want) {
+		t.Errorf("got %d users, want %d", len(got), len(want))
+		return false
+	}
+	sort.Sort(userNameSlice(got))
+	sort.Sort(userNameSlice(want))
+	for i, g := range got {
+		if g != want[i] {
+			t.Errorf("%d: got = %q, want = %q", i, g, want[i])
+			return false
+		}
+	}
+	return true
+}
+
+// For sorting a slice of upspin.UserName.
+type userNameSlice []upspin.UserName
+
+func (p userNameSlice) Len() int           { return len(p) }
+func (p userNameSlice) Less(i, j int) bool { return p[i] < p[j] }
+func (p userNameSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
