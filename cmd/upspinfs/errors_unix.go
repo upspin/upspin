@@ -57,7 +57,6 @@ var kindToErrno = map[errors.Kind]syscall.Errno{
 	errors.IsDir:      syscall.EISDIR,
 	errors.NotDir:     syscall.ENOTDIR,
 	errors.NotEmpty:   syscall.ENOTEMPTY,
-	errors.Syntax:     syscall.ENOENT,
 }
 
 func notSupported(s string) *errnoError {
