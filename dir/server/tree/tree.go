@@ -210,15 +210,15 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, error) {
 }
 
 // PutDir puts a DirEntry representing an existing directory (with existing
-// DirBlocks) into the tree at the point represented by dst. The last
-// element of dst must not yet exist. dst must not cross a link nor be the root
-// directory. It returns the newly put entry.
-func (t *Tree) PutDir(dst path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
+// DirBlocks) into the tree at the point represented by dstDir. The last
+// element of dstDir must not yet exist. dstDir must not cross a link nor be
+// the root directory. It returns the newly put entry.
+func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.CopyDir"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	if dst.IsRoot() {
+	if dstDir.IsRoot() {
 		// TODO: handle this later. It might come in handy for reinstating an old root.
 		return nil, errors.E(op, errors.Invalid, errors.Str("can't PutDir at the root"))
 	}
@@ -227,16 +227,16 @@ func (t *Tree) PutDir(dst path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, e
 	existingEntryNode := &node{
 		entry: *de,
 	}
-	existingEntryNode.entry.Name = dst.Path()
+	existingEntryNode.entry.Name = dstDir.Path()
 	err := t.loadKids(existingEntryNode)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
 	// Put the synthetic node into the tree at dst.
-	n, err := t.put(dst, &existingEntryNode.entry)
+	n, err := t.put(dstDir, &existingEntryNode.entry)
 	if err == upspin.ErrFollowLink {
-		return nil, errors.E(op, errors.Invalid, dst.Path(), errors.Str("path cannot contain a link"))
+		return nil, errors.E(op, errors.Invalid, dstDir.Path(), errors.Str("path cannot contain a link"))
 	}
 	if err != nil {
 		return nil, errors.E(op, err)

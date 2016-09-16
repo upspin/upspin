@@ -118,7 +118,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		log.Error.Print(err)
 		return err
 	}
-	entryPath, err := path.Parse(n.entry.Name)
+	nodePath, err := path.Parse(n.entry.Name)
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		// This means we're trying to load an existing DirEntry onto
 		// a directory that has content already. To allow it, we would
 		// need to check for name collisions. Disallow for now.
-		err := errors.E(errors.Invalid, entryPath.Path(), errors.Str("cannot hide existing contents of path with new block"))
+		err := errors.E(errors.Invalid, nodePath.Path(), errors.Str("cannot hide existing contents of path with new block"))
 		log.Error.Printf("loadKidsFromBlock: %s", err)
 		return err
 	}
@@ -135,20 +135,18 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		log.Error.Print(err)
 		return err
 	}
-	var dirs []upspin.DirEntry
+	// Load children for this node.
+	elemPos := nodePath.NElem()
 	for len(block) > 0 {
-		var dir upspin.DirEntry
-		remaining, err := dir.Unmarshal(block)
+		var entry upspin.DirEntry
+		remaining, err := entry.Unmarshal(block)
 		if err != nil {
 			return errors.E(err)
 		}
-		dirs = append(dirs, dir)
 		block = remaining
-	}
-	// Load children for this node.
-	elemPos := entryPath.NElem()
-	for _, dir := range dirs {
-		p, err := path.Parse(dir.Name)
+
+		// Process this entry.
+		p, err := path.Parse(entry.Name)
 		if err != nil {
 			return errors.E(err)
 		}
@@ -158,7 +156,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		// snapshots and other types of "redirected" directories. But we
 		// must patch it according to this tree's perspective.
 		var elem string
-		if p.Drop(1).Equal(entryPath) {
+		if p.Drop(1).Equal(nodePath) {
 			elem = p.Elem(elemPos)
 		} else {
 			// If the block being loaded is not a prefix of the
@@ -166,7 +164,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 			// entry.
 			elem = p.Elem(p.NElem() - 1) // ok, never root.
 			// Patch the entry's Name, so it belongs to this tree.
-			dir.Name = path.Join(entryPath.Path(), elem)
+			entry.Name = path.Join(nodePath.Path(), elem)
 		}
 		if _, exists := n.kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
@@ -176,7 +174,7 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 			return err
 		}
 		n.kids[elem] = &node{
-			entry: dir,
+			entry: entry,
 		}
 	}
 	return nil
