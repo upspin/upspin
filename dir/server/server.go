@@ -64,6 +64,9 @@ type server struct {
 	// at the root of every user's tree, if an explicit one is not found.
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
+
+	// snapshotChan is a channel for shutting down the snapshotter.
+	snapshotChan chan bool
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -645,6 +648,7 @@ func (s *server) Close() {
 	}
 
 	s.defaultAccess = nil
+	s.stopSnapshotLoop()
 }
 
 // loadTreeFor loads the user's tree, if it exists.
