@@ -93,6 +93,21 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	return l, li, nil
 }
 
+// HasLog reports whether user has logs in directory.
+func HasLog(user upspin.UserName, directory string) (bool, error) {
+	const op = "dir/server/tree.HasLog"
+	loc := filepath.Join(directory, "tree.log."+string(user))
+	loggerFile, err := os.OpenFile(loc, os.O_RDONLY, 0600)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, errors.E(op, errors.IO, err)
+	}
+	loggerFile.Close()
+	return true, nil
+}
+
 // User returns the user name who owns the root of the tree that this log represents.
 func (l *Log) User() upspin.UserName {
 	return l.user
