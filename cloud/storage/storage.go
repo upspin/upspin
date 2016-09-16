@@ -105,7 +105,7 @@ func WithOptions(options string) DialOpts {
 		for _, p := range pairs {
 			kv := strings.Split(p, "=")
 			if len(kv) != 2 {
-				return errors.E(op, errors.Syntax, errors.Errorf("error parsing option %s", kv))
+				return errors.E(op, errors.Invalid, errors.Errorf("error parsing option %s", kv))
 			}
 			o.Opts[kv[0]] = kv[1]
 		}

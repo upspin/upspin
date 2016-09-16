@@ -55,7 +55,7 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 		return nil, errors.E(op, errors.IO, err)
 	}
 	if len(labels)%2 != 0 {
-		return nil, errors.E(op, errors.Syntax, errors.Str("metric labels must come in pairs"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("metric labels must come in pairs"))
 	}
 	return &gcpSaver{
 		projectID: projectID,

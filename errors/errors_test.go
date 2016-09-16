@@ -113,18 +113,18 @@ var matchTests = []matchTest{
 	{io.EOF, E(io.EOF), false},
 	// Success. We can drop fields from the first argument and still match.
 	{E(io.EOF), E(io.EOF), true},
-	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, jane, path1), true},
-	{E("Op", Syntax, io.EOF, jane), E("Op", Syntax, io.EOF, jane, path1), true},
-	{E("Op", Syntax, io.EOF), E("Op", Syntax, io.EOF, jane, path1), true},
-	{E("Op", Syntax), E("Op", Syntax, io.EOF, jane, path1), true},
-	{E("Op"), E("Op", Syntax, io.EOF, jane, path1), true},
+	{E("Op", Invalid, io.EOF, jane, path1), E("Op", Invalid, io.EOF, jane, path1), true},
+	{E("Op", Invalid, io.EOF, jane), E("Op", Invalid, io.EOF, jane, path1), true},
+	{E("Op", Invalid, io.EOF), E("Op", Invalid, io.EOF, jane, path1), true},
+	{E("Op", Invalid), E("Op", Invalid, io.EOF, jane, path1), true},
+	{E("Op"), E("Op", Invalid, io.EOF, jane, path1), true},
 	// Failure.
 	{E(io.EOF), E(io.ErrClosedPipe), false},
 	{E("Op1"), E("Op2"), false},
-	{E(Syntax), E(Permission), false},
+	{E(Invalid), E(Permission), false},
 	{E(jane), E(john), false},
 	{E(path1), E(path2), false},
-	{E("Op", Syntax, io.EOF, jane, path1), E("Op", Syntax, io.EOF, john, path1), false},
+	{E("Op", Invalid, io.EOF, jane, path1), E("Op", Invalid, io.EOF, john, path1), false},
 	{E(path1, Str("something")), E(path1), false}, // Test nil error on rhs.
 	// Nested *Errors.
 	{E("Op1", E(path1)), E("Op1", john, E("Op2", jane, path1)), true},

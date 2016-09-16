@@ -591,7 +591,7 @@ func TestGlob(t *testing.T) {
 
 	// Test syntax error.
 	_, err = s.Glob(userName + "/[]")
-	expectErr := errors.E(errors.Syntax)
+	expectErr := errors.E(errors.Invalid)
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("err = %q, want = %q", err, expectErr)
 	}

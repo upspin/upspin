@@ -22,7 +22,7 @@ func TestInvalidUser(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected an error")
 	}
-	expected := "syntax error"
+	expected := "invalid operation"
 	if !strings.Contains(err.Error(), expected) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}

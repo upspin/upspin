@@ -134,7 +134,7 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 
 func errUserName(user upspin.UserName, msg string) (u, s, d string, err error) {
 	const op = "user.Parse"
-	return "", "", "", errors.E(op, errors.Syntax, user, errors.Str(msg))
+	return "", "", "", errors.E(op, errors.Invalid, user, errors.Str(msg))
 }
 
 // See the comments for UserAndDomain.
