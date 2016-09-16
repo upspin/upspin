@@ -52,14 +52,18 @@ type AuthClientService struct {
 type SecurityLevel int
 
 const (
-	// Secure as the security argument to NewGRPCClient requires TLS connections using CA certificates.
+	// Secure as the security argument to NewGRPCClient requires TLS
+	// connections using CA certificates.
 	Secure = SecurityLevel(iota + 1)
 
-	// InsecureAllowingSelfSignedCertificates as the security argument to NewGRPCClient requires TLS connections
-	// but allows self signed certificates.
+	// InsecureAllowingSelfSignedCertificates as the security argument to
+	// NewGRPCClient requires TLS connections but allows self signed
+	// certificates.
+	// TODO(adg): delete this?
 	InsecureAllowingSelfSignedCertificates
 
-	// NoSecurity as the security argument to NewGRPCClient requires connections with no authentication or encryption.
+	// NoSecurity as the security argument to NewGRPCClient requires
+	// connections with no authentication or encryption.
 	NoSecurity
 
 	// KeepAliveInterval is a suggested interval between keep-alive ping requests to the server.
@@ -106,19 +110,25 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 		grpc.WithDialer(ac.dialWithKeepAlive),
 		grpc.WithTimeout(3 * time.Second),
 	}
+	var tlsConfig *tls.Config
 	switch security {
 	case NoSecurity:
+		// No TLS config for no security.
+	case InsecureAllowingSelfSignedCertificates:
+		tlsConfig = &tls.Config{InsecureSkipVerify: true}
+	case Secure:
+		tlsConfig = &tls.Config{RootCAs: context.CertPool()}
+	default:
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
+	}
+	if tlsConfig != nil {
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+	} else {
 		// Only allow insecure connections to the loop back network.
 		if !isLocal(addr[skip:]) {
 			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
 		}
 		opts = append(opts, grpc.WithInsecure())
-	case Secure:
-		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: false})))
-	case InsecureAllowingSelfSignedCertificates:
-		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
-	default:
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewGRPCClient: %v", security))
 	}
 	var err error
 	ac.grpcConn, err = grpc.Dial(addr[skip:], opts...)

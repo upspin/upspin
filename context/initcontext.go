@@ -7,7 +7,9 @@ package context
 
 import (
 	"bufio"
+	"crypto/x509"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -24,7 +26,9 @@ import (
 var inTest = false // Generate errors instead of logs for certain problems.
 
 // base implements upspin.Context, returning default values for all operations.
-type base struct{}
+type base struct {
+	pool *x509.CertPool
+}
 
 func (base) UserName() upspin.UserName           { return defaultUserName }
 func (base) Factotum() upspin.Factotum           { return nil }
@@ -33,6 +37,17 @@ func (base) KeyEndpoint() upspin.Endpoint        { return ep0 }
 func (base) DirEndpoint() upspin.Endpoint        { return ep0 }
 func (base) StoreEndpoint() upspin.Endpoint      { return ep0 }
 func (base) StoreCacheEndpoint() upspin.Endpoint { return ep0 }
+func (base) CertPool() *x509.CertPool            { return systemCertPool }
+
+var systemCertPool *x509.CertPool
+
+func init() {
+	var err error
+	systemCertPool, err = x509.SystemCertPool()
+	if err != nil {
+		panic(err)
+	}
+}
 
 // New returns a context with all fields set as defaults.
 func New() upspin.Context {
@@ -53,6 +68,7 @@ const (
 	storecache  = "storecache"
 	packing     = "packing"
 	secrets     = "secrets"
+	tlscerts    = "tlscerts"
 )
 
 // FromFile initializes a context using the given file.
@@ -102,6 +118,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		storeserver: "",
 		storecache:  "",
 		secrets:     "",
+		tlscerts:    "",
 	}
 
 	// If the provided reader is nil, try $HOME/upspin/rc.
@@ -201,6 +218,34 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		}
 		ctx = SetFactotum(ctx, f)
 		// This must be done before bind so that keys are ready for authenticating to servers.
+	}
+
+	if dir := vals[tlscerts]; dir != "" {
+		var pool *x509.CertPool
+		fis, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return nil, errors.E(op, errors.Errorf("reading TLS Certificates in %q: %v", dir, err))
+		}
+		for _, fi := range fis {
+			name := fi.Name()
+			if filepath.Ext(name) != ".pem" {
+				continue
+			}
+			pem, err := ioutil.ReadFile(filepath.Join(dir, name))
+			if err != nil {
+				return nil, errors.E(op, errors.Errorf("reading TLS Certificate %q: %v", name, err))
+			}
+			if pool == nil {
+				pool, err = x509.SystemCertPool()
+				if err != nil {
+					return nil, errors.E(op, err)
+				}
+			}
+			pool.AppendCertsFromPEM(pem)
+		}
+		if pool != nil {
+			ctx = SetCertPool(ctx, pool)
+		}
 	}
 
 	ctx = SetKeyEndpoint(ctx, parseEndpoint(op, vals, keyserver, &err))
@@ -356,6 +401,22 @@ func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
 	return ctxDirEndpoint{
 		Context:     ctx,
 		dirEndpoint: e,
+	}
+}
+
+type ctxCertPool struct {
+	upspin.Context
+	pool *x509.CertPool
+}
+
+func (ctx ctxCertPool) CertPool() *x509.CertPool {
+	return ctx.pool
+}
+
+func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
+	return ctxCertPool{
+		Context: ctx,
+		pool:    pool,
 	}
 }
 
