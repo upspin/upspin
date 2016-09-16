@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b2f2e72_53ce4725",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-16T15:32:18Z",
+      "side": 1,
+      "message": "Yes, please do.",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b2f2e72_d3c157f8",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-16T15:32:18Z",
+      "side": 1,
+      "message": "Perhaps add a comment here about tlscerts, making clear that the value should be a directory containing .pem files.",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b2f2e72_7338ab29",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-16T15:32:18Z",
+      "side": 1,
+      "message": "Often when we want to override the default SystemCertPool it is to restrict, not add.  Is there a reasonable way to offer the caller both options?",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b2f2e72_33d1d3c2",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-09-16T15:32:18Z",
+      "side": 1,
+      "message": "Warn?   The most likely reason we get here is that the user attempted to use a format other than .pem.    But don\u0027t make it fatal, since in some circumstances it may be easiest to always pass a directory, sometimes deliberately empty.",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
