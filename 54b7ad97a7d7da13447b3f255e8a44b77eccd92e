@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_3f1a07d9",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 0,
+      "message": "isn\u0027t this check still important?",
+      "revId": "54b7ad97a7d7da13447b3f255e8a44b77eccd92e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
