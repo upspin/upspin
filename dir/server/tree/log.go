@@ -60,7 +60,7 @@ type LogIndex struct {
 // If two are opened and used simultaneously, results will be unpredictable.
 func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	const op = "dir/server/tree.NewLogs"
-	loc := filepath.Join(directory, "tree.log."+string(user))
+	loc := logFile(user, directory)
 	loggerFile, err := os.OpenFile(loc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
@@ -91,6 +91,25 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 		rootFile:  rootFile,
 	}
 	return l, li, nil
+}
+
+// HasLog reports whether user has logs in directory.
+func HasLog(user upspin.UserName, directory string) (bool, error) {
+	const op = "dir/server/tree.HasLog"
+	loc := logFile(user, directory)
+	loggerFile, err := os.OpenFile(loc, os.O_RDONLY, 0600)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, errors.E(op, errors.IO, err)
+	}
+	loggerFile.Close()
+	return true, nil
+}
+
+func logFile(user upspin.UserName, directory string) string {
+	return filepath.Join(directory, "tree.log."+string(user))
 }
 
 // User returns the user name who owns the root of the tree that this log represents.
