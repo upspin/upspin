@@ -16,6 +16,24 @@
       "revId": "674aa0c653351756d07890b71dbf2a5e1ceac0f3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b2f2e72_dcc40958",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-16T05:35:25Z",
+      "side": 1,
+      "message": "Sure. I\u0027ll put this in the cleanup CL I just sent out.",
+      "parentUuid": "30f4ff40_bf75f7c2",
+      "revId": "674aa0c653351756d07890b71dbf2a5e1ceac0f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
