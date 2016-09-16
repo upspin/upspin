@@ -6,6 +6,7 @@ package upspin
 
 import (
 	"crypto/elliptic"
+	"crypto/x509"
 	"errors"
 	"math/big"
 )
@@ -596,6 +597,10 @@ type Context interface {
 
 	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreCacheEndpoint() Endpoint
+
+	// CertPool returns the x509 certificate pool
+	// used to validate client TLS connections.
+	CertPool() *x509.CertPool
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
