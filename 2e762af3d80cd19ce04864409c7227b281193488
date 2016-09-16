@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_7ff9af68",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "t.Logf",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_3ff3278b",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "This comment seems out of place. That\u0027s not what\u0027s being tested here",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_5ffeeb52",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "t.Logf",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_1ff86361",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "t.Logf",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_ff0c9f9d",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 724,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "t.Logf\n\netcetera",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_df09db8b",
+        "filename": "dir/server/tree/all_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "I\u0027d make this\n\nfunc checkDirList(got []*upspin.DirEntry, want ...upspin.PathName)\n\nyou know the order that you\u0027re going to get the entries, right?",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_bf2df703",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "Why do two for loops? Couldn\u0027t contents of the next loop just be part of this loop? Then we don\u0027t need the dirs slice, which cuts many lines of code from the function. It also saves a bunch of allocations, not that that matters much.",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_9f2a33e8",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "It\u0027s a little confusing that this is named \u0027dir\u0027, as it makes me think of directories, not entries which may be files, links, or dirs.\n\nA suggestion: rename \u0027entryPath\u0027 above to \u0027nodePath\u0027, as it\u0027s the path of the node we\u0027re working on. Then name this \u0027entry\u0027, and the parsed name \u0027entryPath\u0027.\n\nThen below when you\u0027re comparing names, you\u0027re comparing \u0027nodePath\u0027 and \u0027entryPath\u0027.\n\nAlternatively, you could take all my above suggestions and s/entry/kid/ or s/entry/child/. That might be clearer still.",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_1f1f43c9",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "isn\u0027t this more precisely\n\nif p.Drop(1).Equal(entryPath) {\n\n?\n\ni think with string comparison you might match these inadvertently:\n\n  p         \u003d u@h/foo/barro/qux\n  entryPath \u003d u@h/foo/bar",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_9fc0f31e",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "// Create a synthetic node and load its kids.\n\n?",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_7fef6fb1",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "remove the parenthetical",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_5ff4ab81",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "a new root?\ni thought the root must already exist",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_dfdf9bf4",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 750,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "remove .String, printf does that",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_bfdcd700",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T02:24:52Z",
+      "side": 1,
+      "message": "avoid an unnecessary allocation:\n\nbuf.WriteString(string(n.entry.Name))\nbuf.WriteString(\"\\n\")",
+      "revId": "2e762af3d80cd19ce04864409c7227b281193488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
