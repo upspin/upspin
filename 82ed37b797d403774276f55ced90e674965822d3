@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_9f4b5379",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-16T06:26:47Z",
+      "side": 1,
+      "message": "func logfile(user upspin.UserName, dir string) string ?",
+      "revId": "82ed37b797d403774276f55ced90e674965822d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
