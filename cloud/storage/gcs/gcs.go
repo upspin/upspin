@@ -15,6 +15,7 @@ import (
 	gContext "golang.org/x/net/context"
 
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/googleapi"
 	gcsBE "google.golang.org/api/storage/v1"
 
 	"upspin.io/cloud/storage"
@@ -83,9 +84,13 @@ func (gcs *gcsImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink s
 
 // Get implements Storage.
 func (gcs *gcsImpl) Get(ref string) (link string, error error) {
+	const op = "cloud/storage/gcs.Get"
 	// Get the link of the blob
 	res, err := gcs.service.Objects.Get(gcs.bucketName, ref).Do()
 	if err != nil {
+		if gcsErr, ok := err.(*googleapi.Error); ok && gcsErr.Code == 404 {
+			return "", errors.E(op, errors.NotExist, err)
+		}
 		return "", err
 	}
 	log.Debug.Printf("The media download link for %v/%v is %v.", gcs.bucketName, res.Name, res.MediaLink)
@@ -94,8 +99,12 @@ func (gcs *gcsImpl) Get(ref string) (link string, error error) {
 
 // Download implements Storage.
 func (gcs *gcsImpl) Download(ref string) ([]byte, error) {
+	const op = "cloud/storage/gcs.Download"
 	resp, err := gcs.service.Objects.Get(gcs.bucketName, ref).Download()
 	if err != nil {
+		if gcsErr, ok := err.(*googleapi.Error); ok && gcsErr.Code == 404 {
+			return nil, errors.E(op, errors.NotExist, err)
+		}
 		return nil, err
 	}
 	defer resp.Body.Close()
