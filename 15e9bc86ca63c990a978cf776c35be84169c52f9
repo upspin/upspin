@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f07ee79b_98bd9922",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-18T22:53:32Z",
+      "side": 1,
+      "message": "Why not just pool \u003d systemCertPool?",
+      "revId": "15e9bc86ca63c990a978cf776c35be84169c52f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
