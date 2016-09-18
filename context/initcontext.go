@@ -69,6 +69,10 @@ const (
 	tlscerts    = "tlscerts"
 )
 
+// ErrNoFactotum indicates that the returned context contains no Factotum, and
+// that the user requested this by setting secrets=none in the configuration.
+var ErrNoFactotum = errors.Str("factotum not initialized: no secrets provided")
+
 // FromFile initializes a context using the given file.
 // As with InitContext, environment variables may override the
 // values in the context file.
@@ -141,70 +145,36 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	}
 
 	// First source of truth is the RC file.
-	if r != nil {
-		scanner := bufio.NewScanner(r)
-		for scanner.Scan() {
-			line := scanner.Text()
-			// Remove comments.
-			if sharp := strings.IndexByte(line, '#'); sharp >= 0 {
-				line = line[:sharp]
-			}
-			line = strings.TrimSpace(line)
-			tokens := strings.SplitN(line, "=", 2)
-			if len(tokens) != 2 {
-				continue
-			}
-			val := strings.TrimSpace(tokens[1])
-			attr := strings.TrimSpace(tokens[0])
-			if _, ok := vals[attr]; !ok {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("unrecognized key %q", attr))
-			}
-			vals[attr] = val
-		}
-		if err := scanner.Err(); err != nil {
-			return nil, err
-		}
+	if err := valsFromReader(vals, r); err != nil {
+		return nil, errors.E(op, err)
+	}
+	// Then override with environment variables.
+	if err := valsFromEnvironment(vals); err != nil {
+		return nil, errors.E(op, err)
 	}
 
-	// Environment variables trump the RC file. Look for any "upspin" values and
-	// warn about them - don't give errors though as they may be inconsequential.
-	// (We do generate an error when testing.)
-	for _, v := range os.Environ() {
-		if !strings.HasPrefix(v, "upspin") {
-			continue
-		}
-		// Variables we care about look like upspinkey=value.
-		kv := strings.SplitN(v, "=", 2)
-		if len(kv) != 2 {
-			log.Printf("context: invalid environment variable %q ignored", v)
-			continue
-		}
-		attr := kv[0][len("upspin"):]
-		val := kv[1]
-		if _, ok := vals[attr]; !ok {
-			if inTest {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
-			} else {
-				log.Printf("context: unrecognized environment variable %q ignored", v)
-			}
-			continue
-		}
-		if val != "" {
-			vals[attr] = val
-		}
-	}
+	// Construct a context from vals.
+	ctx := New()
 
-	user := upspin.UserName(vals[username])
+	ctx = SetUserName(ctx, upspin.UserName(vals[username]))
 
 	packer := pack.LookupByName(vals[packing])
 	if packer == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown packing %q", vals[packing]))
 	}
-	pack := packer.Packing()
+	ctx = SetPacking(ctx, packer.Packing())
 
-	ctx := New()
-	ctx = SetUserName(ctx, user)
-	ctx = SetPacking(ctx, pack)
+	if dir := vals[tlscerts]; dir != "" {
+		pool, err := certPoolFromDir(dir)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if pool != nil {
+			ctx = SetCertPool(ctx, pool)
+		} else {
+			log.Info.Printf("context: no PEM certificates found in %q", dir)
+		}
+	}
 
 	var err error
 	dir := vals[secrets]
@@ -225,46 +195,105 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		// This must be done before bind so that keys are ready for authenticating to servers.
 	}
 
-	if dir := vals[tlscerts]; dir != "" {
-		var pool *x509.CertPool
-		fis, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return nil, errors.E(op, errors.Errorf("reading TLS Certificates in %q: %v", dir, err))
-		}
-		for _, fi := range fis {
-			name := fi.Name()
-			if filepath.Ext(name) != ".pem" {
-				continue
-			}
-			pem, err := ioutil.ReadFile(filepath.Join(dir, name))
-			if err != nil {
-				return nil, errors.E(op, errors.Errorf("reading TLS Certificate %q: %v", name, err))
-			}
-			if pool == nil {
-				pool, err = x509.SystemCertPool()
-				if err != nil {
-					return nil, errors.E(op, err)
-				}
-			}
-			pool.AppendCertsFromPEM(pem)
-		}
-		if pool != nil {
-			ctx = SetCertPool(ctx, pool)
-		} else {
-			log.Info.Printf("context: no PEM certificates found in %q", dir)
-		}
-	}
-
 	ctx = SetKeyEndpoint(ctx, parseEndpoint(op, vals, keyserver, &err))
 	ctx = SetStoreEndpoint(ctx, parseEndpoint(op, vals, storeserver, &err))
 	ctx = SetStoreCacheEndpoint(ctx, parseEndpoint(op, vals, storecache, &err))
 	ctx = SetDirEndpoint(ctx, parseEndpoint(op, vals, dirserver, &err))
+
 	return ctx, err
 }
 
-// ErrNoFactotum indicates that the returned context contains no Factotum, and
-// that the user requested this by setting secrets=none in the configuration.
-var ErrNoFactotum = errors.Str("Factotum not initialized: no secrets provided")
+// valsFromReader reads key=value tokens from the provided reader and—if the
+// provided map contains that key—populates the map with the corresponding
+// value. Unrecognized keys generate an error.
+func valsFromReader(vals map[string]string, r io.Reader) error {
+	if r == nil {
+		return nil
+	}
+	s := bufio.NewScanner(r)
+	for s.Scan() {
+		line := s.Text()
+		// Remove comments.
+		if sharp := strings.IndexByte(line, '#'); sharp >= 0 {
+			line = line[:sharp]
+		}
+		line = strings.TrimSpace(line)
+		tokens := strings.SplitN(line, "=", 2)
+		if len(tokens) != 2 {
+			continue
+		}
+		val := strings.TrimSpace(tokens[1])
+		attr := strings.TrimSpace(tokens[0])
+		if _, ok := vals[attr]; !ok {
+			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", attr))
+		}
+		vals[attr] = val
+	}
+	return s.Err()
+}
+
+// valsFromEnvironment looks in the process' environment for any variables with
+// the prefix "upspin" and—if the provided map contains a key of that string
+// minus the prefix—populates the map with the corresponding value.
+// Unrecognized variable names are normally logged but
+// generate an error during testing.
+func valsFromEnvironment(vals map[string]string) error {
+	// Environment variables trump the RC file
+	for _, v := range os.Environ() {
+		if !strings.HasPrefix(v, "upspin") {
+			continue
+		}
+		// Variables we care about look like upspinkey=value.
+		kv := strings.SplitN(v, "=", 2)
+		if len(kv) != 2 {
+			log.Info.Printf("context: invalid environment variable %q ignored", v)
+			continue
+		}
+		attr := kv[0][len("upspin"):]
+		val := kv[1]
+		if _, ok := vals[attr]; !ok {
+			if inTest {
+				return errors.E(errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
+			} else {
+				log.Printf("context: unrecognized environment variable %q ignored", v)
+			}
+			continue
+		}
+		if val != "" {
+			vals[attr] = val
+		}
+	}
+	return nil
+}
+
+// certPoolFromDir parses any PEM files in the provided directory,
+// adds them to the system root certificate pool, and returns
+// the resulting pool.
+func certPoolFromDir(dir string) (*x509.CertPool, error) {
+	var pool *x509.CertPool
+	fis, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, errors.Errorf("reading TLS Certificates in %q: %v", dir, err)
+	}
+	for _, fi := range fis {
+		name := fi.Name()
+		if filepath.Ext(name) != ".pem" {
+			continue
+		}
+		pem, err := ioutil.ReadFile(filepath.Join(dir, name))
+		if err != nil {
+			return nil, errors.Errorf("reading TLS Certificate %q: %v", name, err)
+		}
+		if pool == nil {
+			pool, err = x509.SystemCertPool()
+			if err != nil {
+				return nil, err
+			}
+		}
+		pool.AppendCertsFromPEM(pem)
+	}
+	return pool, nil
+}
 
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
