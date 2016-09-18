@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "30f4ff40_ffe49f02",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T22:12:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b2f2e72_53ce4725",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b2f2e72_d3c157f8",
         "filename": "context/initcontext.go",
         "patchSetId": 3
@@ -30,6 +48,42 @@
       "writtenOn": "2016-09-16T15:32:18Z",
       "side": 1,
       "message": "Perhaps add a comment here about tlscerts, making clear that the value should be a directory containing .pem files.",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_3fd56739",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T22:12:51Z",
+      "side": 1,
+      "message": "Yes, I entirely forgot to update this comment. Will do.",
+      "parentUuid": "2b2f2e72_d3c157f8",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_dfe1dbf0",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T22:12:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b2f2e72_d3c157f8",
       "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "30f4ff40_bfde1727",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T22:12:51Z",
+      "side": 1,
+      "message": "Eric, we should consider doing that, but I\u0027d prefer not to add it in this CL. I\u0027ll file an issue.\n\nEd, I need a fresh cert pool. If I mutate the systemCertPool then all clients will use the provided tlscerts.",
+      "parentUuid": "2b2f2e72_d3a6b7c2",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b2f2e72_33d1d3c2",
         "filename": "context/initcontext.go",
         "patchSetId": 3
@@ -81,6 +153,24 @@
       "writtenOn": "2016-09-16T15:32:18Z",
       "side": 1,
       "message": "Warn?   The most likely reason we get here is that the user attempted to use a format other than .pem.    But don\u0027t make it fatal, since in some circumstances it may be easiest to always pass a directory, sometimes deliberately empty.",
+      "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_9fdb5337",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T22:12:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b2f2e72_33d1d3c2",
       "revId": "7de422aa2fb0f4bdf5f58800731eb3eff49c5825",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
