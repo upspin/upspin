@@ -1,0 +1,565 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_9fb473ed",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "s/snapshotter/snapshot loop/",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_dfaafb8a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "stopSnapshot?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_7fa3efb5",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "snapshotConfig\n\n// snapshotConfig holds the configuration for a snapshot.",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_5fa82b8e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "Am I right in observing that there\u0027s currently no way for a user to set up multiple snapshot configurations?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_bfb737f1",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "this is an interval, not a frequency",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_3f9d6768",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "snapshotConfig ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_ff96df4a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "rather than\n  uname + \"+\" + snapshotSuffix + \"@\" + domain\nyou can use\n  userName",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_ffadbfa4",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "dir/server:",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_62791820",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "i\u0027d go with just\n\nclose(s.stopSnapshot)\n\nthat unblocks any pending receives on the channel, and makes any further sends or closes panic",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_df931b59",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "ticker :\u003d time.NewTicker(snapshotWorkerInterval)\ndefer ticker.Stop()\nfor {\n  select {\n  case \u003c-ticker.C:\n    s.snapshotAll()\n  case \u003c-s.stopSnapshot:\n    return\n  }\n}",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_82ef7cb0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "explicitly mention that you\u0027re not checking this error, because it\u0027s logged",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_bf90574d",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "delete\nA common misconception about channels is that they should be closed when you\u0027re done using them. They\u0027re not like files.",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_82741c2c",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "dir/server.snapshotAll",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_427e140a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "log the error",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_a2c0401e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "s/ferr/check/ ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_22831008",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "s/shouldSnapshot/ok/?\npretty wordy boolean that\u0027s only used once",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_02880c1e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "if !ok {\n  continue\n}\n\nkeep the nesting at bay",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_829d3c5c",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "the boolean return here isn\u0027t really pulling its weight.\n\nhow about?\n\nfunc (s *server) nextSnapshot(cfg snapConfig) (path.Parsed, error) {\n\nand just have `return \"\", nil` mean no next snapshot",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_e284080e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "either delete or use it in the error returns",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_c291044a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "dstDir ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_62a238a2",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "don\u0027t return p on error, in any of the returns really, but particularly here",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_a28e0028",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "is this an internal error? there shouldn\u0027t ever be links in the snapshot hierarchy",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_4297343a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "why the name \u0027innerLookup\u0027?\nif anything, it\u0027s an outerLookup\nbut a better name would be good",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_e2ad288c",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "nextDirectoryVersion ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_c2aa2472",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "instead of a loop, why not just call nextDirectoryVersion before trying to make the path? then you don\u0027t need the \u0027existed\u0027 boolean at all, and can just have it fail if the directory exists",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_a2a720aa",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "s/existed/exists/",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_82c65c40",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "This all seems more complex than it needs to be.\nI think the entire function body can be replaced with this:\n\nnext \u003d dir\nfor i :\u003d 0; ; i++ {\n  _, _, err :\u003d tree.Lookup(next)\n  if errors.Match(errNotExist, err) {\n    return next, nil\n  }\n  if err !\u003d nil {\n    return path.Parsed{}, err\n  }\n  next, _ \u003d path.Parse(fmt.Sprintf(\"%s.%d\", next, i))\n}\n\nThis should be plenty efficient, as the Lookups will just be hitting the in-memory tree data structure, which should have all its children loaded after the first lookup",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_e2b648d6",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "you don\u0027t need the existed bool and associated logic (and named return values) if you adopt my suggestion above",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_22d550e0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_02ba4cba",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "p, err :\u003d",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_62cb5848",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "woah... this leaves the user with a different username. that seems really bad?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_42d054f0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "don\u0027t you have control over which of these errors is returned? why wouldn\u0027t it be Exist always?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_c2c3442a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-18T23:43:52Z",
+      "side": 1,
+      "message": "log the error",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
