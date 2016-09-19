@@ -167,7 +167,7 @@ func create(t *testing.T, s *server, name upspin.PathName, isDir bool) {
 		}
 		mu := userLock(p.User())
 		mu.Lock()
-		_, err = s.makeDirectory("", p)
+		err = s.mkDirIfNotExist(p)
 		mu.Unlock()
 	} else {
 		entry := defaultEnt
