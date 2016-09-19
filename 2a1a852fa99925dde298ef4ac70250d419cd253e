@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_62935807",
+        "filename": "test/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:17:35Z",
+      "side": 1,
+      "message": "since you\u0027re using SeqBase here, maybe these should be\n\nbaseSeq :\u003d upspin.SeqBase\nif !r.GotEntryWithSequence(base, baseSeq) {\n\nthen\n\nr.MakeDirectory(dir)\nr.DirLookup(base)\nbaseSeq++\nif !r.GotEntryWithSequence(base, baseSeq) {\n\netc",
+      "revId": "2a1a852fa99925dde298ef4ac70250d419cd253e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_a2ef2079",
+        "filename": "test/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:17:35Z",
+      "side": 1,
+      "message": "SeqBase",
+      "revId": "2a1a852fa99925dde298ef4ac70250d419cd253e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_828e5cdf",
+        "filename": "test/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:17:35Z",
+      "side": 1,
+      "message": "fileSeq :\u003d upspin.SeqBase\nif !r.GotEntryWithSequence(file, fileSeq) {",
+      "revId": "2a1a852fa99925dde298ef4ac70250d419cd253e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_4298541f",
+        "filename": "test/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:17:35Z",
+      "side": 1,
+      "message": "fileSeq++\nif !r.GotEntryWithSequence(file, fileSeq) {",
+      "revId": "2a1a852fa99925dde298ef4ac70250d419cd253e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_229d500f",
+        "filename": "test/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:17:35Z",
+      "side": 1,
+      "message": "this is redundant. delete",
+      "revId": "2a1a852fa99925dde298ef4ac70250d419cd253e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
