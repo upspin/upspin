@@ -68,7 +68,13 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context 
 	if err != nil {
 		panic(err)
 	}
-	_, err = dir.MakeDirectory(upspin.PathName(userName))
+	name := upspin.PathName(userName) + "/"
+	entry := &upspin.DirEntry{
+		Name:       name,
+		SignedName: name,
+		Attr:       upspin.AttrDirectory,
+	}
+	_, err = dir.Put(entry)
 	if err != nil {
 		panic(err)
 	}

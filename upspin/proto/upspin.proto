@@ -150,10 +150,6 @@ message DirPutRequest {
     bytes entry = 1;
 }
 
-message DirMakeDirectoryRequest {
-    string name = 1;
-}
-
 message DirGlobRequest {
     string pattern = 1;
 }
@@ -174,7 +170,6 @@ service Dir{
 
     rpc Lookup (DirLookupRequest) returns (EntryError) {}
     rpc Put (DirPutRequest) returns (EntryError) {}
-    rpc MakeDirectory (DirMakeDirectoryRequest) returns (EntryError) {}
     rpc Glob (DirGlobRequest) returns (EntriesError) {}
     rpc Delete (DirDeleteRequest) returns (EntryError) {}
     rpc WhichAccess (DirWhichAccessRequest) returns (EntryError) {}

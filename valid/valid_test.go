@@ -243,7 +243,6 @@ func TestDirEntry(t *testing.T) {
 	}
 	restore()
 	// Data present for directory.
-	// TODO: Only important if MakeDirectory becomes a special case of DirServer.Put.
 	entry.Attr = upspin.AttrDirectory
 	if err := DirEntry(&entry); err == nil {
 		t.Fatal("no error for directory with data")

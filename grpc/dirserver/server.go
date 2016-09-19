@@ -87,18 +87,6 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 	return op.entryError(dir.Put(entry))
 }
 
-// MakeDirectory implements proto.DirServer.
-func (s *server) MakeDirectory(ctx gContext.Context, req *proto.DirMakeDirectoryRequest) (*proto.EntryError, error) {
-	op := logf("MakeDirectory %q", req.Name)
-
-	dir, err := s.dirFor(ctx)
-	if err != nil {
-		return op.entryError(nil, err)
-	}
-
-	return op.entryError(dir.MakeDirectory(upspin.PathName(req.Name)))
-}
-
 // Glob implements proto.DirServer.
 func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.EntriesError, error) {
 	op := logf("Glob %q", req.Pattern)

@@ -279,7 +279,8 @@ type DirServer interface {
 	Lookup(name PathName) (*DirEntry, error)
 
 	// Put stores the DirEntry in the directory server. The entry
-	// must describe a plain file or link, not a directory itself.
+	// may be a plain file, a link, or a directory. (Only one of
+	// these attributes may be set.)
 	// In practice the data for the file should be stored in
 	// a StoreServer as specified by the blocks in the entry,
 	// all of which should be stored with the same packing.
@@ -317,16 +318,6 @@ type DirServer interface {
 	// returned DirEntry will be nil whether the operation
 	// succeeded or not.
 	Put(entry *DirEntry) (*DirEntry, error)
-
-	// MakeDirectory creates a directory with the given name, which
-	// must not already exist. All but the last element of the path
-	// name must already exist and be directories.
-	//
-	// If the returned error is ErrFollowLink, the caller should
-	// retry the operation as outlined in the description for
-	// ErrFollowLink. Otherwise, if there is no error, the
-	// returned DirEntry describes the newly created directory.
-	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full
 	// rooted tree. That is, the pattern must look like a full path
