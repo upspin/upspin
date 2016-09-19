@@ -152,3 +152,56 @@ func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
 		}
 	}
 }
+
+func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
+	const (
+		base   = ownerName + "/sequencenumbers"
+		dir    = base + "/dir"
+		subdir = dir + "/subdir"
+		file   = dir + "/file"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.DirLookup(base)
+	if !r.GotEntryWithSequence(base, upspin.SeqBase) { // = 1
+		t.Fatal(r.Diag())
+	}
+
+	r.MakeDirectory(dir)
+	r.DirLookup(base)
+	if !r.GotEntryWithSequence(base, 2) {
+		t.Fatal(r.Diag())
+	}
+
+	r.MakeDirectory(subdir)
+	r.DirLookup(base)
+	if !r.GotEntryWithSequence(base, 3) {
+		t.Fatal(r.Diag())
+	}
+
+	r.DirLookup(subdir)
+	if !r.GotEntryWithSequence(subdir, 1) {
+		t.Fatal(r.Diag())
+	}
+
+	r.Delete(subdir)
+	r.DirLookup(base)
+	if !r.GotEntryWithSequence(base, 4) {
+		t.Fatal(r.Diag())
+	}
+
+	r.Put(file, "meh")
+	r.DirLookup(file)
+	if !r.GotEntryWithSequence(file, upspin.SeqBase) { // = 1
+		t.Fatal(r.Diag())
+	}
+
+	r.Put(file, "new")
+	r.DirLookup(file)
+	if !r.GotEntryWithSequence(file, 2) {
+		t.Fatal(r.Diag())
+	}
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
