@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_e2f5284b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:13:44Z",
+      "side": 1,
+      "message": "This is way too much. This is all you need:\n\npath.Parse(fmt.Sprintf(\"%s.%d\", dir, i))",
+      "revId": "19f80ab17b54ff1ff026284627130470d82c4bb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
