@@ -459,9 +459,6 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if !canDelete {
 		return nil, s.errPerm(op, parsed)
 	}
-	if parsed.IsRoot() {
-		return nil, errors.E(op, pathName, errors.Str("cannot delete user root")) // Should be done in User service.
-	}
 
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
@@ -469,6 +466,10 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if entry.IsDir() {
 		if !s.isEmptyDirectory(op, entry) {
 			return nil, errors.E(op, pathName, errors.NotEmpty)
+		}
+		if parsed.IsRoot() {
+			delete(s.db.root, parsed.User())
+			return nil, nil // Nothing else to do.
 		}
 	}
 

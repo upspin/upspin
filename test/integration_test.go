@@ -249,6 +249,31 @@ func testDelete(t *testing.T, r *testenv.Runner) {
 	}
 }
 
+func testRootDeletion(t *testing.T, r *testenv.Runner) {
+	r.As(readerName)
+
+	// readerName does not have a root.
+	r.Delete(readerName + "/")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.MakeDirectory(readerName + "/")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Now delete that root.
+	r.Delete(readerName + "/")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	// Creation can happen again.
+	r.MakeDirectory(readerName + "/")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
+
 // integrationTests list all tests and their names. Order is important.
 var integrationTests = []struct {
 	name string
@@ -266,6 +291,7 @@ var integrationTests = []struct {
 	{"GlobErrors", testGlobErrors},
 	{"GlobLinkErrors", testGlobLinkErrors},
 	{"SequenceNumbers", testSequenceNumbers},
+	{"RootDeletion", testRootDeletion},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
