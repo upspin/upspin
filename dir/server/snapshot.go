@@ -226,7 +226,6 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 // that exists it would return "18.2", and so on.
 func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error) {
 	next := dir
-	lastElem := next.Elem(next.NElem() - 1) // safe, never root.
 	for i := 1; i < 1000; i++ {
 		_, _, err := tree.Lookup(next)
 		if errors.Match(errNotExist, err) {
@@ -235,7 +234,7 @@ func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error)
 		if err != nil {
 			return path.Parsed{}, err
 		}
-		next, err = path.Parse(path.Join(next.Drop(1).Path(), fmt.Sprintf("%s.%d", lastElem, i)))
+		next, err = path.Parse(upspin.PathName(fmt.Sprintf("%s.%d", dir, i)))
 		if err != nil {
 			return path.Parsed{}, err
 		}
@@ -263,6 +262,7 @@ func (s *server) makeSnapshotPath(name upspin.PathName) error {
 }
 
 // mkDirIfNotExist makes a directory if it does not yet exist.
+// userLock must be held for p.User().
 func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	// We need to impersonate this user so we can create the snapshot on
 	// their behalf (that is, Put access permissions must work
@@ -279,6 +279,24 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 		return err
 	}
 	return nil
+}
+
+// makeDirectory is a convenience function to make a directory.
+// userLock must be held for p.User().
+func (s *server) makeDirectory(op string, p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
+	// Create a new dir entry for this new dir.
+	de := &upspin.DirEntry{
+		Name:       p.Path(),
+		SignedName: p.Path(),
+		Attr:       upspin.AttrDirectory,
+		Writer:     s.userName,
+		Packing:    s.serverContext.Packing(),
+		Time:       upspin.Now(),
+		Sequence:   0, // Tree will increment when flushed.
+	}
+
+	// Attempt to put this new dir entry.
+	return s.put(op, p, de, opts...)
 }
 
 // isSnapshotUser reports whether the userName contains the snapshot suffix.
