@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_02ab6c29",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T21:40:31Z",
+      "side": 1,
+      "message": "hey look! you don\u0027t need this hack anymore.\njust move the contents of the makeDirectory helper into this function, and you can set the userName directly.",
+      "revId": "33adefe879e80c53d44bc916050af55fd96717c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
