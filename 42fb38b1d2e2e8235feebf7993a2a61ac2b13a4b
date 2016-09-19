@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_9b5fd36c",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "function nextSnapshotVersion appends a \".version\" at the end of the last directory.",
+      "parentUuid": "30f4ff40_e209a88b",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_221f90c9",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-19T01:59:33Z",
       "side": 1,
       "message": "Even though there\u0027s a type of that name, the method can still be named snapshotConfig, but I don\u0027t feel strongly about it. FWIW, the \"method with the same name as the type it returns\" is a pattern I use pretty often.",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_5b629b42",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "ack.",
+      "parentUuid": "30f4ff40_221f90c9",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_7b675751",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_02248c1f",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_e220880d",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-19T01:59:33Z",
       "side": 1,
       "message": "now that you\u0027re just closing this channel, it needn\u0027t be buffered",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_1b6c2331",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_e220880d",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_3b71df07",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_a22a80e7",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_c22d8403",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 10
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-19T01:59:33Z",
       "side": 1,
       "message": "return false, path.Parsed{}, nil",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_db554b50",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "This is okay since err\u003d\u003dnil. Not that it gets used when it\u0027s false, but correct.",
+      "parentUuid": "30f4ff40_c22d8403",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_fb528765",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_82f9bc6b",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_020dac97",
         "filename": "dir/server/snapshot_test.go",
         "patchSetId": 10
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-19T02:41:44Z",
       "side": 1,
       "message": "what do the *s mean? if year/month/day, what happens if there are multiple snapshots per day?",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_bb5c0f78",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "Correct, yyyy/mm/dd. It would return multiple entries. That\u0027s exactly what I want to test for. There\u0027s just one. Multiple ones would have a \".0\", \".1\" etc appended to them (next test).",
+      "parentUuid": "30f4ff40_020dac97",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_7b50b759",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "I could, but that\u0027s a redundant test since tree.PutDir is already tested at this level of detail.\n\nIf you think it\u0027s important to cover it here, I\u0027ll add in the next round.",
+      "parentUuid": "30f4ff40_42f3b489",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_22f8b061",
         "filename": "dir/server/snapshot_test.go",
         "patchSetId": 10
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-19T02:41:44Z",
       "side": 1,
       "message": "even if it\u0027s recent enough, shouldn\u0027t there be a snapshot subtree created with the new date and time.",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_5b4b7bb0",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T02:50:50Z",
+      "side": 1,
+      "message": "No, snapshotAll only performs a snapshot if there isn\u0027t one for that name already and, when there is, it\u0027s SnapshotInterval time units away from it.",
+      "parentUuid": "30f4ff40_22f8b061",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
