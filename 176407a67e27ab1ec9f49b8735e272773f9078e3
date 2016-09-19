@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_f8aa8d8a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_9fb473ed",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_dfaafb8a",
         "filename": "dir/server/server.go",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "stopSnapshot?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_98b7d9f1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_dfaafb8a",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_189d0968",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_7fa3efb5",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_5fa82b8e",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "Am I right in observing that there\u0027s currently no way for a user to set up multiple snapshot configurations?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_38a245af",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "For now, yes. There\u0027s a TODO for that.",
+      "parentUuid": "30f4ff40_5fa82b8e",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_d896b14b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done. I could swear I was using Hertz here. :-)",
+      "parentUuid": "30f4ff40_bfb737f1",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_3f9d6768",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "snapshotConfig ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_f8936d58",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "It\u0027s now a type name.",
+      "parentUuid": "30f4ff40_3f9d6768",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_b8b415ed",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_ff96df4a",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_ffadbfa4",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "dir/server:",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_58a381b5",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_ffadbfa4",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_78a8bd8e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_62791820",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_df931b59",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "ticker :\u003d time.NewTicker(snapshotWorkerInterval)\ndefer ticker.Stop()\nfor {\n  select {\n  case \u003c-ticker.C:\n    s.snapshotAll()\n  case \u003c-s.stopSnapshot:\n    return\n  }\n}",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_9890394e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_df931b59",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_b88df536",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_82ef7cb0",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_bf90574d",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -200,6 +398,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "delete\nA common misconception about channels is that they should be closed when you\u0027re done using them. They\u0027re not like files.",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_5b74db2a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_bf90574d",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_7b79971f",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_82741c2c",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_427e140a",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -234,6 +468,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "log the error",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_1b7e6309",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_427e140a",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_fb84c70d",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_a2c0401e",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_22831008",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -268,6 +538,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "s/shouldSnapshot/ok/?\npretty wordy boolean that\u0027s only used once",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_9b91134b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_22831008",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -291,6 +579,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_bb8e4f28",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_02880c1e",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_829d3c5c",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -302,6 +608,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "the boolean return here isn\u0027t really pulling its weight.\n\nhow about?\n\nfunc (s *server) nextSnapshot(cfg snapConfig) (path.Parsed, error) {\n\nand just have `return \"\", nil` mean no next snapshot",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_7ba2f7a1",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "It\u0027s more for documentation purposes and clarity. Special values can be useful but here the weight it needs to pull to exist is pretty low, since this is a cheap internal function.",
+      "parentUuid": "30f4ff40_829d3c5c",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -325,6 +649,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_3b9c7f5a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_e284080e",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_c291044a",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -336,6 +678,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "dstDir ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_bbd96f10",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_c291044a",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -359,6 +719,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_1b97433b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_62a238a2",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_a28e0028",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -370,6 +748,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "is this an internal error? there shouldn\u0027t ever be links in the snapshot hierarchy",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_fbada78b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done (I was thinking here that if the user configured things incorrectly, this should trigger. But maybe the configuration parser will verify that instead, like access.Parse does when we Put an Access file. We haven\u0027t designed that yet, so it\u0027s Internal for now).\n\nDone.",
+      "parentUuid": "30f4ff40_a28e0028",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -393,6 +789,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_5bc61b43",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_4297343a",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_e2ad288c",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -404,6 +818,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "nextDirectoryVersion ?",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_1bd0a3ef",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_e2ad288c",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -427,6 +859,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_3beebfb2",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_c2aa2472",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_a2a720aa",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -438,6 +888,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "s/existed/exists/",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_3bd55fe0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_a2a720aa",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -461,6 +929,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_1be983a9",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_82c65c40",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_e2b648d6",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -472,6 +958,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "you don\u0027t need the existed bool and associated logic (and named return values) if you adopt my suggestion above",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_dbe22bc5",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_e2b648d6",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -495,6 +999,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_fbdfe7f3",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_22d550e0",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_02ba4cba",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -506,6 +1028,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "p, err :\u003d",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_9bdcb301",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_02ba4cba",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -529,6 +1069,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_9bc3532b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "This is not as bad as it seems. This is running as user dirserver. It\u0027s the \"generator\" instance. That one that gets copied from at each call to Dial. It used not to have a name at all, because it never did anything. Now it runs in a single goroutine and changes its name as it snapshots the users.\n\nWhat I really want to do here is for s.Put to do all the access rights check before calling s.put. When MakeDirectory goes away, the lower-case version of it can simply bypass the checks in Put by calling put (lower-case p).\n\nMakes sense?\n\nClarified TODO.",
+      "parentUuid": "30f4ff40_62cb5848",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_42d054f0",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -546,6 +1104,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_bbc08f1e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "This was changed in the DirServer recently and my old assumption was snapshots were read-write.\n\nDone.",
+      "parentUuid": "30f4ff40_42d054f0",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_c2c3442a",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 9
@@ -557,6 +1133,24 @@
       "writtenOn": "2016-09-18T23:43:52Z",
       "side": 1,
       "message": "log the error",
+      "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_5beffbb0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T01:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_c2c3442a",
       "revId": "176407a67e27ab1ec9f49b8735e272773f9078e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
