@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f07ee79b_db3eab16",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-19T03:06:53Z",
+      "side": 1,
+      "message": "maybe start at 1. 18.0 sounds like the start point, not the second dump.\nand fix the comment.",
+      "revId": "ae1ebf7a255c38f74d524369c958f88d84773ada",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
