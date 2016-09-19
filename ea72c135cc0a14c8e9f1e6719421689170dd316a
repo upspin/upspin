@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_af1b6527",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T20:26:16Z",
+      "side": 1,
+      "message": "This is tested above, line 248.\n\nPerhaps you want me to combine the checks? The error message is different hence why the test is repeated, but maybe this is better?",
+      "parentUuid": "30f4ff40_a2d600b7",
+      "revId": "ea72c135cc0a14c8e9f1e6719421689170dd316a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_82e53ca3",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-19T20:16:50Z",
       "side": 1,
       "message": "out of date",
+      "revId": "ea72c135cc0a14c8e9f1e6719421689170dd316a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_4f465108",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T20:26:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f4ff40_82e53ca3",
       "revId": "ea72c135cc0a14c8e9f1e6719421689170dd316a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
