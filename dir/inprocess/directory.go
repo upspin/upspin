@@ -157,21 +157,6 @@ func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob [
 	}
 }
 
-// MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(directoryName)
-	if err != nil {
-		return nil, err
-	}
-	// Can't use newDirEntry as it adds a block.
-	entry := &upspin.DirEntry{
-		Name:       parsed.Path(),
-		SignedName: parsed.Path(),
-		Attr:       upspin.AttrDirectory,
-	}
-	return s.Put(entry)
-}
-
 // makeRoot creates a new user root.
 // s.db is locked.
 func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
@@ -225,10 +210,11 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 	entry, err = s.put(op, entry, parsed, false)
-	if err == nil && !entry.IsDir() {
-		return nil, nil // Successful Put (but not MakeDirectory - TODO) returns no entry.
+	if err != nil {
+		return nil, err
 	}
-	return entry, err
+	// Successful Put returns no entry.
+	return nil, nil
 }
 
 // canPut verifies that the name is permitted to be written.

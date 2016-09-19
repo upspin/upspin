@@ -101,11 +101,6 @@ func (d *DummyDirServer) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	return nil, nil
 }
 
-// MakeDirectory implements upspin.DirServer.
-func (d *DummyDirServer) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
-	return nil, nil
-}
-
 // Glob implements upspin.DirServer.
 func (d *DummyDirServer) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, nil

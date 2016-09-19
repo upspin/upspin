@@ -57,7 +57,6 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 }
 
 // Put implements upspin.StoreServer.Put.
-// Directories are created with MakeDirectory.
 func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	op := opf("Put", "%v bytes", len(data))
 

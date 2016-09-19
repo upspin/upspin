@@ -276,14 +276,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if entry == nil {
-		t.Fatal("nil entry from makeDirectory")
-	}
-	if entry.Name != dirName {
-		t.Fatalf("entry from makeDirectory(%q) is named %q", dirName, entry.Name)
-	}
-	if entry.Attr != upspin.AttrDirectory {
-		t.Fatalf("entry from makeDirectory(%q) has attr %v", dirName, entry.Attr)
+	if entry != nil {
+		t.Fatal("non-nil entry making directory")
 	}
 	_, err = makeDirectory(directory, upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
 	if err != nil {
@@ -715,8 +709,8 @@ func TestLinkToFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e == nil {
-		t.Fatal("nil entry from makeDirectory")
+	if e != nil {
+		t.Fatal("non-nil entry from makeDirectory")
 	}
 	entry := storeData(t, context, []byte("hello"), fileName)
 	e, err = dir.Put(entry)

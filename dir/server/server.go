@@ -254,6 +254,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 }
 
 // MakeDirectory implements upspin.DirServer.
+// TODO: DELETE
 func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.MakeDirectory"
 	o, m := newOptMetric(op)

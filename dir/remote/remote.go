@@ -66,22 +66,6 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return entries, op.error(err)
 }
 
-// MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (r *remote) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	op := opf("MakeDirectory", "%q", directoryName)
-
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	req := &proto.DirMakeDirectoryRequest{
-		Name: string(directoryName),
-	}
-	resp, err := r.dirClient.MakeDirectory(gCtx, req, callOpt)
-	err = finishAuth(err)
-	return op.entryError(resp, err)
-}
-
 func entryName(entry *upspin.DirEntry) string {
 	if entry == nil {
 		return "<nil>"
@@ -90,7 +74,6 @@ func entryName(entry *upspin.DirEntry) string {
 }
 
 // Put implements upspin.DirServer.Put.
-// Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	op := opf("Put", "%s", entryName(entry))
 
