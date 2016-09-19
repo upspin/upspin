@@ -241,11 +241,6 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.E(op, errReadOnly)
 }
 
-func (s *server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/filesystem.MakeDirectory"
-	return nil, errors.E(op, errReadOnly)
-}
-
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/filesystem.Put"
 	return nil, errors.E(op, errReadOnly)

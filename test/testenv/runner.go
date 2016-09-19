@@ -118,8 +118,8 @@ func (r *Runner) PutLink(oldName, linkName upspin.PathName) {
 	r.setErr(err)
 }
 
-// MakeDirectory performs a MakeDirectory request as the user
-// and populates the Runner's Entry field with the result.
+// MakeDirectory creates a directory by issuing a Put request
+// as the user and populates the Runner's Entry field with the result.
 func (r *Runner) MakeDirectory(p upspin.PathName) {
 	if r.err != nil {
 		return

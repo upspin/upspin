@@ -251,7 +251,7 @@ func (e *Env) rmTmpDir() error {
 }
 
 // NewUser creates a new client for a user.  The new user will not
-// have a root created. Callers should use the client to MakeDirectory if
+// have a root created. Callers should use the client to make a root directory if
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	const op = "testenv.NewUser"
@@ -303,7 +303,13 @@ func makeRootIfNotExist(ctx upspin.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = dir.MakeDirectory(path)
+
+	entry := &upspin.DirEntry{
+		Name:       path,
+		SignedName: path,
+		Attr:       upspin.AttrDirectory,
+	}
+	_, err = dir.Put(entry)
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
 		return err
 	}

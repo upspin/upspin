@@ -290,8 +290,9 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
-	defer s.StartSpan("dir.MakeDirectory").End()
-	return dir.MakeDirectory(entry.Name)
+	defer s.StartSpan("dir.makeDirectory").End()
+	entry.SignedName = entry.Name // Make sure they match as we step through links.
+	return dir.Put(entry)
 }
 
 // MakeDirectory implements upspin.Client.
@@ -300,7 +301,15 @@ func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 	m, s := newMetric(op)
 	defer m.Done()
 
-	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, makeDirectoryLookupFn, followFinalLink, s)
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	entry := &upspin.DirEntry{
+		Name: parsed.Path(), // SignedName is set in makeDirectoryLookupFn as it needs updating.
+		Attr: upspin.AttrDirectory,
+	}
+	entry, _, err = c.lookup(op, entry, makeDirectoryLookupFn, followFinalLink, s)
 	return entry, err
 }
 

@@ -26,14 +26,7 @@ func (Server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
-// MakeDirectory implements upspin.DirServer.MakeDirectory.
-func (Server) MakeDirectory(directoryName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/Server.MakeDirectory"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
-}
-
 // Put implements upspin.DirServer.Put.
-// Directories are created with MakeDirectory. Roots are anyway. TODO?.
 func (Server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/Server.Put"
 	return nil, errors.E(op, errors.Invalid, ServerErr)

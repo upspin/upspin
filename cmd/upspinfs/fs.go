@@ -265,7 +265,12 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	if err != nil {
 		return nil, e2e(errors.E(op, err))
 	}
-	if _, err := dir.MakeDirectory(upspin.PathName(nn.uname)); err != nil {
+	entry := &upspin.DirEntry{
+		Name:       upspin.PathName(nn.uname),
+		SignedName: upspin.PathName(nn.uname),
+		Attr:       upspin.AttrDirectory,
+	}
+	if _, err := dir.Put(entry); err != nil {
 		// TODO: implement links.
 		// TODO(p): remove from directory cache and retry?
 		return nil, e2e(errors.E(op, err, nn.uname))
