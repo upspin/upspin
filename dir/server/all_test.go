@@ -43,7 +43,7 @@ var testDir string
 
 func TestMakeRoot(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
-	de, err := s.MakeDirectory(userName + "/")
+	de, err := makeDirectory(s, userName+"/")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestMakeRoot(t *testing.T) {
 	}
 
 	// And we can't make a new root again.
-	_, err = s.MakeDirectory(userName + "/")
+	_, err = makeDirectory(s, userName+"/")
 	expectedErr := errors.E(errors.Exist)
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %q, want = %q", err, expectedErr)
@@ -76,7 +76,7 @@ func TestMakeRoot(t *testing.T) {
 	}
 
 	// Create it again.
-	_, err = s.MakeDirectory(userName + "/")
+	_, err = makeDirectory(s, userName+"/")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func TestMakeRoot(t *testing.T) {
 func TestMakeRootNoSlash(t *testing.T) {
 	const userName = "wilma@flintstone.org"
 	s := newDirServerForTesting(t, userName)
-	_, err := s.MakeDirectory(userName) // Note: No terminal slash on this name.
+	_, err := makeDirectory(s, userName) // Note: No terminal slash on this name.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestPut(t *testing.T) {
 
 func TestMakeDirectory(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
-	de, err := s.MakeDirectory(userName + "/dir")
+	de, err := makeDirectory(s, userName+"/dir")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +192,7 @@ func TestLink(t *testing.T) {
 	}
 
 	// Try to MakeDirectory under the link.
-	de2, err = s.MakeDirectory(userName + "/mylink/newdir")
+	de2, err = makeDirectory(s, userName+"/mylink/newdir")
 	if err != upspin.ErrFollowLink {
 		t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
 	}
@@ -425,7 +425,7 @@ func TestGlob(t *testing.T) {
 		"/dir/subdir/blub",
 		"/dir/subway/meh",
 	} {
-		_, err = sOwner.MakeDirectory(userName + dir)
+		_, err = makeDirectory(sOwner, userName+dir)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -667,7 +667,7 @@ func TestPermissionDenied(t *testing.T) {
 	if !errors.Match(access.ErrPermissionDenied, err) {
 		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
 	}
-	_, err = s.MakeDirectory(userName + "/dir")
+	_, err = makeDirectory(s, userName+"/dir")
 	if !errors.Match(access.ErrPermissionDenied, err) {
 		t.Fatalf("err = %v, want = %v", err, access.ErrPermissionDenied)
 	}
@@ -723,6 +723,14 @@ func TestMain(m *testing.M) {
 
 	os.RemoveAll(testDir)
 	os.Exit(code)
+}
+
+func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	return s.makeDirectory("makeDirectory", p)
 }
 
 func putAccessFile(t *testing.T, s *server, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
