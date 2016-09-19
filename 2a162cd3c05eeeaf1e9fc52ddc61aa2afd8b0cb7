@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f07ee79b_0aa84729",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T21:35:07Z",
+      "side": 1,
+      "message": "I guess, strictly speaking, yes.\n\nDone.",
+      "parentUuid": "30f4ff40_e27e48b5",
+      "revId": "2a162cd3c05eeeaf1e9fc52ddc61aa2afd8b0cb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_c28b44c9",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-19T21:19:52Z",
       "side": 1,
       "message": "where is this used? shouldn\u0027t Put call this somewhere?",
+      "revId": "2a162cd3c05eeeaf1e9fc52ddc61aa2afd8b0cb7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_aaa4b357",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T21:35:07Z",
+      "side": 1,
+      "message": "This is a convenience function that is used by snapshots. Since it\u0027s only used there, I moved it there.\n\nDone.",
+      "parentUuid": "30f4ff40_c28b44c9",
       "revId": "2a162cd3c05eeeaf1e9fc52ddc61aa2afd8b0cb7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
