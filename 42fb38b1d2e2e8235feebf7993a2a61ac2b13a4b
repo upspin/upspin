@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30f4ff40_221f90c9",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "Even though there\u0027s a type of that name, the method can still be named snapshotConfig, but I don\u0027t feel strongly about it. FWIW, the \"method with the same name as the type it returns\" is a pattern I use pretty often.",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_02248c1f",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "I don\u0027t think Canonicalize is the word you want here;\nmaybe just \n// Strip the suffix from the username.",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_e220880d",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "now that you\u0027re just closing this channel, it needn\u0027t be buffered",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_a22a80e7",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "return false, path.Parsed(), errors...",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_c22d8403",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "return false, path.Parsed{}, nil",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_82f9bc6b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-19T01:59:33Z",
+      "side": 1,
+      "message": "\"dir/server: created snapshot of %q at %q\"",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
