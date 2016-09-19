@@ -226,6 +226,7 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 // that exists it would return "18.2", and so on.
 func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error) {
 	next := dir
+	lastElem := next.Elem(next.NElem() - 1) // safe, never root.
 	for i := 1; i < 1000; i++ {
 		_, _, err := tree.Lookup(next)
 		if errors.Match(errNotExist, err) {
@@ -234,7 +235,7 @@ func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error)
 		if err != nil {
 			return path.Parsed{}, err
 		}
-		next, err = path.Parse(upspin.PathName(fmt.Sprintf("%s.%d", next, i)))
+		next, err = path.Parse(path.Join(next.Drop(1).Path(), fmt.Sprintf("%s.%d", lastElem, i)))
 		if err != nil {
 			return path.Parsed{}, err
 		}
