@@ -226,7 +226,6 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 // that exists it would return "18.2", and so on.
 func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error) {
 	next := dir
-	lastElem := next.Elem(next.NElem() - 1) // safe, never root.
 	for i := 1; i < 1000; i++ {
 		_, _, err := tree.Lookup(next)
 		if errors.Match(errNotExist, err) {
@@ -235,7 +234,7 @@ func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error)
 		if err != nil {
 			return path.Parsed{}, err
 		}
-		next, err = path.Parse(path.Join(next.Drop(1).Path(), fmt.Sprintf("%s.%d", lastElem, i)))
+		next, err = path.Parse(upspin.PathName(fmt.Sprintf("%s.%d", dir, i)))
 		if err != nil {
 			return path.Parsed{}, err
 		}
@@ -263,7 +262,19 @@ func (s *server) makeSnapshotPath(name upspin.PathName) error {
 }
 
 // mkDirIfNotExist makes a directory if it does not yet exist.
+// userLock must be held for p.User().
 func (s *server) mkDirIfNotExist(name path.Parsed) error {
+	// Create a new dir entry for this new dir.
+	de := &upspin.DirEntry{
+		Name:       name.Path(),
+		SignedName: name.Path(),
+		Attr:       upspin.AttrDirectory,
+		Writer:     name.User(),
+		Packing:    s.serverContext.Packing(),
+		Time:       upspin.Now(),
+		Sequence:   0, // Tree will increment when flushed.
+	}
+
 	// We need to impersonate this user so we can create the snapshot on
 	// their behalf (that is, Put access permissions must work
 	// as-if this user were performing the operations themselves).
@@ -274,7 +285,8 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	s.userName = name.User()
 	defer func() { s.userName = prev }()
 
-	_, err := s.makeDirectory("snapshotMkdir", name)
+	// Attempt to put this new dir entry.
+	_, err := s.put("dir/server.mkDirIfNotExist", name, de)
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
 		return err
 	}
