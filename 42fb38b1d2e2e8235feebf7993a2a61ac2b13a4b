@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "30f4ff40_e209a88b",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-19T02:41:44Z",
+      "side": 1,
+      "message": "what happens if there are multiple snapshots per day?",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30f4ff40_221f90c9",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 10
@@ -98,6 +115,57 @@
       "writtenOn": "2016-09-19T01:59:33Z",
       "side": 1,
       "message": "\"dir/server: created snapshot of %q at %q\"",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_020dac97",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-19T02:41:44Z",
+      "side": 1,
+      "message": "what do the *s mean? if year/month/day, what happens if there are multiple snapshots per day?",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_42f3b489",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-19T02:41:44Z",
+      "side": 1,
+      "message": "you should test that the Time on the root is the same as the directory elements to the snapshot",
+      "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_22f8b061",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-19T02:41:44Z",
+      "side": 1,
+      "message": "even if it\u0027s recent enough, shouldn\u0027t there be a snapshot subtree created with the new date and time.",
       "revId": "42fb38b1d2e2e8235feebf7993a2a61ac2b13a4b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
