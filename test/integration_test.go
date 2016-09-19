@@ -265,6 +265,7 @@ var integrationTests = []struct {
 	{"WhichAccessLinkErrors", testWhichAccessLinkErrors},
 	{"GlobErrors", testGlobErrors},
 	{"GlobLinkErrors", testGlobLinkErrors},
+	{"SequenceNumbers", testSequenceNumbers},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
