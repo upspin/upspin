@@ -243,18 +243,20 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, entry.Name, errIsSnapshot)
 	}
 
+	isAccessOrGroup := access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path())
+
 	// Links can't be named Access or Group and must use only Plain pack.
 	if entry.IsLink() {
-		if access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path()) {
+		if isAccessOrGroup {
 			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link cannot be named Access or Group"))
 		}
 		if entry.Packing != upspin.PlainPack {
 			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link can only use PlainPack"))
 		}
 	}
-	// Put is for regular files and links, not directories.
-	if entry.IsDir() {
-		return nil, errors.E(op, entry.Name, errors.IsDir)
+	// Directories cannot have reserved names.
+	if entry.IsDir() && isAccessOrGroup {
+		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access or Group"))
 	}
 
 	mu := userLock(p.User())
@@ -262,29 +264,6 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	defer mu.Unlock()
 
 	return s.put(op, p, entry, o)
-}
-
-// MakeDirectory implements upspin.DirServer.
-func (s *server) MakeDirectory(dirName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/server.MakeDirectory"
-	o, m := newOptMetric(op)
-	defer m.Done()
-
-	p, err := path.Parse(dirName)
-	if err != nil {
-		return nil, errors.E(op, dirName, err)
-	}
-	if isSnapshotUser(p.User()) {
-		return nil, errors.E(op, dirName, errIsSnapshot)
-	}
-	if access.IsAccessFile(dirName) || access.IsGroupFile(dirName) {
-		return nil, errors.E(op, errors.Invalid, errors.Str("cannot make directory named Access or Group"))
-	}
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
-	return s.makeDirectory(op, p, o)
 }
 
 // makeDirectory is a convenience function to make a directory.
@@ -305,7 +284,7 @@ func (s *server) makeDirectory(op string, p path.Parsed, opts ...options) (*upsp
 	return s.put(op, p, de, opts...)
 }
 
-// put implements the common functionality between Put and MakeDirectory.
+// put implements the bulk of Put.
 // userLock must be held for p.User().
 func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("put", opts)
@@ -318,8 +297,6 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	// Since dir is not the root, the user must have a tree already.
-	// Load it now.
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
