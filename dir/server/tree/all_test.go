@@ -48,7 +48,7 @@ func TestPutNodes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = tree.Put(newDirEntry("/", isDir, context))
+	root, err := tree.Put(newDirEntry("/", isDir, context))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,6 +98,11 @@ func TestPutNodes(t *testing.T) {
 	err = tree.Flush()
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	newRoot, _, err := tree.Lookup(mkpath(t, userName+"/"))
+	if newRoot.Time <= root.Time {
+		t.Fatalf("Time moved backwards: got %d, want > %d", newRoot.Time, root.Time)
 	}
 
 	// New log index shows we're now at the end of the log.
