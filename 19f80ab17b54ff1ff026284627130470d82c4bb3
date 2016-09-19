@@ -16,6 +16,24 @@
       "revId": "19f80ab17b54ff1ff026284627130470d82c4bb3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f07ee79b_0a6927ee",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-19T21:28:33Z",
+      "side": 1,
+      "message": "Done (in another CL).",
+      "parentUuid": "30f4ff40_e2f5284b",
+      "revId": "19f80ab17b54ff1ff026284627130470d82c4bb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
