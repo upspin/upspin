@@ -47,10 +47,7 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) ([]snapshotConfig, 
 	}
 
 	// Strip the suffix from the username.
-	idx := strings.Index(uname, "+")
-	if idx > 0 {
-		uname = uname[:idx]
-	}
+	uname = stripSuffix(uname)
 
 	// TODO: only a daily snapshot of the root for now; add mechanism for
 	// more options, such as parsing the tree for special config entries.
@@ -301,4 +298,36 @@ func isSnapshotUser(userName upspin.UserName) bool {
 		return false
 	}
 	return suffix == snapshotSuffix
+}
+
+// stripSuffix returns the base username (everything to the left of "+") from
+// name, if a suffix exists. Otherwise, it returns name.
+func stripSuffix(name string) string {
+	idx := strings.Index(name, "+")
+	if idx > 0 {
+		return name[:idx]
+	}
+	return name
+}
+
+// isSnapshotOwner reports whether username is the base user name (without the
+// "+snapshot" suffix) of snapshotUser or the snapshotUser itself.
+// snapshotUser must be known to be a snapshot user as checked by
+// isSnapshotUser or results are unpredictable.
+func isSnapshotOwner(userName upspin.UserName, snapshotUser upspin.UserName) bool {
+	u, suffix, domain, err := user.Parse(userName)
+	if err != nil {
+		log.Error.Printf("isSnapshotOwner: %s", err)
+		return false
+	}
+	if suffix != "" && suffix != snapshotSuffix {
+		return false
+	}
+	if suffix == snapshotSuffix {
+		// userName is the snapshotUser.
+		return snapshotUser == userName
+	}
+	// userName is the owner if and only if adding the snapshot suffix makes
+	// it the snapshotUser.
+	return u+"+"+snapshotSuffix+"@"+domain == string(snapshotUser)
 }
