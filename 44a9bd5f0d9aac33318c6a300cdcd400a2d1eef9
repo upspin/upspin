@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50b253c6_2b468507",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-20T00:21:39Z",
+      "side": 1,
+      "message": "Why not take the user from env, a flag or upspin/rc?",
+      "revId": "44a9bd5f0d9aac33318c6a300cdcd400a2d1eef9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "50b253c6_0b6f0190",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-20T00:21:39Z",
+      "side": 1,
+      "message": "What\u0027s the relationship between this and bob@b.com?",
+      "revId": "44a9bd5f0d9aac33318c6a300cdcd400a2d1eef9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
