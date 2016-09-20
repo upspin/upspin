@@ -607,10 +607,6 @@ type Dialer interface {
 // Service is the general interface returned by a dialer. It includes
 // methods to configure the service and report its setup.
 type Service interface {
-	// Configure configures a service once it has been dialed.
-	// The details of the configuration are implementation-defined.
-	Configure(options ...string) (UserName, error)
-
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint
 

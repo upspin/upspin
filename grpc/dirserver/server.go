@@ -143,28 +143,6 @@ func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 	return op.entryError(dir.WhichAccess(upspin.PathName(req.Name)))
 }
 
-// Empty struct we can allocate just once.
-var configureResponse proto.ConfigureResponse
-
-// Configure implements proto.DirServer.
-func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	op := logf("Configure %q", req.Options)
-
-	dir, err := s.dirFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
-	}
-	name, err := dir.Configure(req.Options...)
-	if err != nil {
-		op.log(err)
-	}
-	return &proto.ConfigureResponse{
-		UserName: string(name),
-		Error:    errors.MarshalError(err),
-	}, nil
-}
-
 // Endpoint implements proto.DirServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	return &proto.EndpointResponse{

@@ -52,11 +52,6 @@ func (d *dummyService) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{}
 }
 
-// Configure implements upspin.Service.
-func (d *dummyService) Configure(options ...string) (upspin.UserName, error) {
-	return "", nil
-}
-
 // Close implements upspin.Service.
 func (d *dummyService) Close() {
 }

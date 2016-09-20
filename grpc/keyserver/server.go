@@ -97,26 +97,6 @@ func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
 }
 
-// Configure implements proto.KeyServer.
-func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	op := logf("Configure %q", req.Options)
-
-	key, err := s.keyFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
-	}
-
-	name, err := key.Configure(req.Options...)
-	if err != nil {
-		op.log(err)
-	}
-	return &proto.ConfigureResponse{
-		UserName: string(name),
-		Error:    errors.MarshalError(err),
-	}, nil
-}
-
 // Endpoint implements proto.KeyServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	return &proto.EndpointResponse{

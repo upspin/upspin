@@ -9,8 +9,6 @@ package remote
 import (
 	"fmt"
 
-	gContext "golang.org/x/net/context"
-
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -30,7 +28,6 @@ type dialContext struct {
 
 // remote implements upspin.DirServer.
 type remote struct {
-	upspin.NoConfiguration
 	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
 	ctx                         dialContext
 	dirClient                   proto.DirClient
@@ -144,20 +141,6 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
-}
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) (upspin.UserName, error) {
-	op := opf("Configure", "%v", options)
-
-	req := &proto.ConfigureRequest{
-		Options: options,
-	}
-	resp, err := r.dirClient.Configure(gContext.Background(), req)
-	if err != nil {
-		return "", op.error(errors.IO, err)
-	}
-	return "", op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Dial implements upspin.Service.
