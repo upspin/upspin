@@ -24,21 +24,21 @@ import (
 // outside GCE. The default is the self-signed certificate in
 // upspin.io/auth/grpcauth/testdata.
 type Options struct {
-	CertFile    string
-	CertKeyFile string
+	CertFile string
+	KeyFile  string
 }
 
 var defaultOptions = &Options{
-	CertFile:    filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem"),
-	CertKeyFile: filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem"),
+	CertFile: filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/cert.pem"),
+	KeyFile:  filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/auth/grpcauth/testdata/key.pem"),
 }
 
 func (opt *Options) applyDefaults() {
 	if opt.CertFile == "" {
 		opt.CertFile = defaultOptions.CertFile
 	}
-	if opt.CertKeyFile == "" {
-		opt.CertKeyFile = defaultOptions.CertKeyFile
+	if opt.KeyFile == "" {
+		opt.KeyFile = defaultOptions.KeyFile
 	}
 }
 
@@ -76,10 +76,10 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 	}
 
 	log.Info.Printf("https: not on GCE; serving HTTPS on %q", addr)
-	if opt.CertFile == defaultOptions.CertFile || opt.CertKeyFile == defaultOptions.CertKeyFile {
+	if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
 		log.Error.Print("https: WARNING: using self-signed test certificates.")
 	}
-	config, err := auth.NewDefaultTLSConfig(opt.CertFile, opt.CertKeyFile)
+	config, err := auth.NewDefaultTLSConfig(opt.CertFile, opt.KeyFile)
 	if err != nil {
 		log.Fatalf("https: setting up TLS config: %v", err)
 	}
