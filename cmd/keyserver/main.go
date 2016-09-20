@@ -9,8 +9,6 @@ import (
 	"flag"
 	"net"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
@@ -26,7 +24,6 @@ import (
 	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-	"upspin.io/user"
 
 	// Load required transports
 	_ "upspin.io/key/transports"
@@ -35,7 +32,10 @@ import (
 // The upspin username for this server.
 const serverName = "keyserver"
 
-var testUser = flag.String("testuser", "", "initialize this `user` with test keys (localhost, inprocess only)")
+var (
+	testUser    = flag.String("test_user", "", "initialize a test `user` (localhost, inprocess only)")
+	testSecrets = flag.String("test_secrets", "", "initialize test user with the secrets in this `directory`")
+)
 
 func main() {
 	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
@@ -70,15 +70,7 @@ func main() {
 	}
 
 	// Special hack for bootstrapping the inprocess key server.
-	if *testUser != "" {
-		if key.Endpoint().Transport != upspin.InProcess {
-			log.Fatal("cannot use testuser for endpoint %q", key.Endpoint())
-		}
-		if !isLocal(flags.HTTPSAddr) {
-			log.Fatal("cannot use -testuser flag except on localhost:port")
-		}
-		setupTestUser(key)
-	}
+	setupTestUser(key)
 
 	authConfig := auth.Config{Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 		user, err := key.Lookup(userName)
@@ -124,13 +116,24 @@ func isLocal(addr string) bool {
 }
 
 func setupTestUser(key upspin.KeyServer) {
-	user, _, _, err := user.Parse(upspin.UserName(*testUser))
-	if err != nil {
-		log.Fatal(err)
+	if *testUser == "" {
+		return
 	}
-	f, err := factotum.NewFromDir(repo("key/testdata/" + user))
+	if *testSecrets == "" {
+		log.Fatalf("cannot set up a test user without specifying -test_secrets")
+	}
+
+	// Sanity checks to make sure we're not doing this in production.
+	if key.Endpoint().Transport != upspin.InProcess {
+		log.Fatal("cannot use testuser for endpoint %q", key.Endpoint())
+	}
+	if !isLocal(flags.HTTPSAddr) {
+		log.Fatal("cannot use -testuser flag except on localhost:port")
+	}
+
+	f, err := factotum.NewFromDir(*testSecrets)
 	if err != nil {
-		log.Fatalf("unable to initialize factotum for %q: %v", user, err)
+		log.Fatalf("unable to initialize factotum for %q: %v", *testUser, err)
 	}
 	userStruct := &upspin.User{
 		Name:      upspin.UserName(*testUser),
@@ -140,14 +143,4 @@ func setupTestUser(key upspin.KeyServer) {
 	if err != nil {
 		log.Fatalf("Put %q failed: %v", *testUser, err)
 	}
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-// For support of the testuser flag only.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
