@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "30f4ff40_4234d400",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-20T00:45:40Z",
+      "side": 1,
+      "message": "because, for now, they keyserver makes it hard to pre-populate it with an arbitrary user. i added a TODO",
+      "parentUuid": "50b253c6_2b468507",
+      "revId": "44a9bd5f0d9aac33318c6a300cdcd400a2d1eef9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "50b253c6_0b6f0190",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-20T00:21:39Z",
       "side": 1,
       "message": "What\u0027s the relationship between this and bob@b.com?",
+      "revId": "44a9bd5f0d9aac33318c6a300cdcd400a2d1eef9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30f4ff40_2239d0f6",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-20T00:45:40Z",
+      "side": 1,
+      "message": "there is no relationship. they username that the keyserver operates as is irrelevant",
+      "parentUuid": "50b253c6_0b6f0190",
       "revId": "44a9bd5f0d9aac33318c6a300cdcd400a2d1eef9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
