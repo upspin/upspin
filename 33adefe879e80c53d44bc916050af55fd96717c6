@@ -34,6 +34,24 @@
       "revId": "33adefe879e80c53d44bc916050af55fd96717c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "50b253c6_4e2ae7a1",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-20T01:08:32Z",
+      "side": 1,
+      "message": "I just realized this won\u0027t be enough, sadly. The access check permissions use s.userName as the current logged in user to check whether that user has rights.\n\nThe real fix is to move all the access checking outside of s.put and into s.Put.\n\nI\u0027m going to revert this piece for now (3 lines above) and will work on the real fix next (another CL).",
+      "parentUuid": "f07ee79b_6a569b01",
+      "revId": "33adefe879e80c53d44bc916050af55fd96717c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
