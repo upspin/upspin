@@ -98,7 +98,7 @@ func generateCert(dir string) error {
 
 	keyOut, err := os.OpenFile(filepath.Join(dir, "key.pem"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("failed to open key.pem for writing:", err)
+		return fmt.Errorf("failed to open key.pem for writing: %s", err)
 	}
 	if err := pem.Encode(keyOut, pemBlockForKey(priv)); err != nil {
 		return fmt.Errorf("failed to encode key.pem: %s", err)
