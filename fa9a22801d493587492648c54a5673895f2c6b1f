@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f0efc7c0_ad87bd10",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-20T21:44:45Z",
+      "side": 1,
+      "message": "s/across/through/",
+      "revId": "fa9a22801d493587492648c54a5673895f2c6b1f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_8d84810d",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-20T21:44:45Z",
+      "side": 1,
+      "message": "drop the if, just return err",
+      "revId": "fa9a22801d493587492648c54a5673895f2c6b1f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
