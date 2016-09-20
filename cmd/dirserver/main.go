@@ -39,7 +39,7 @@ import (
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "log", "project")
+	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -83,5 +83,8 @@ func main() {
 	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
-	https.ListenAndServe(serverName, flags.HTTPSAddr, nil)
+	https.ListenAndServe(serverName, flags.HTTPSAddr, &https.Options{
+		CertFile: flags.TLSCertFile,
+		KeyFile:  flags.TLSKeyFile,
+	})
 }

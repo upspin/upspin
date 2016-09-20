@@ -37,6 +37,11 @@ var (
 
 	// ServerKind is the implementation kind of this server.
 	ServerKind = "inprocess"
+
+	// TLSCertFile and TLSKeyFile specify the location of a TLS
+	// certificate/key pair used for serving TLS (HTTPS).
+	TLSCertFile string
+	TLSKeyFile  string
 )
 
 // flags is a map of flag registration functions keyed by flag name,
@@ -63,6 +68,10 @@ var flags = map[string]func(){
 	},
 	"kind": func() {
 		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+	},
+	"tls": func() {
+		flag.StringVar(&TLSCertFile, "tls_cert", TLSCertFile, "TLS Certificate `file` in PEM format")
+		flag.StringVar(&TLSKeyFile, "tls_key", TLSKeyFile, "TLS Key `file` in PEM format")
 	},
 }
 

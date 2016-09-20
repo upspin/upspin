@@ -38,7 +38,7 @@ const serverName = "keyserver"
 var testUser = flag.String("testuser", "", "initialize this `user` with test keys (localhost, inprocess only)")
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "log", "project")
+	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -95,8 +95,14 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+
 	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
-	https.ListenAndServe("userserver", flags.HTTPSAddr, nil)
+	const metadataKey = "userserver"
+
+	https.ListenAndServe(metadataKey, flags.HTTPSAddr, &https.Options{
+		CertFile: flags.TLSCertFile,
+		KeyFile:  flags.TLSKeyFile,
+	})
 }
 
 // isLocal returns true if the name only resolves to loopback addresses.
