@@ -262,7 +262,7 @@ func (s *server) makeSnapshotPath(name upspin.PathName) error {
 }
 
 // mkDirIfNotExist makes a directory if it does not yet exist.
-// userLock must be held for p.User().
+// userLock must be held for name.User().
 func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	// Create a new dir entry for this new dir.
 	de := &upspin.DirEntry{
@@ -275,22 +275,25 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 		Sequence:   0, // Tree will increment when flushed.
 	}
 
-	// We need to impersonate this user so we can create the snapshot on
-	// their behalf (that is, Put access permissions must work
-	// as-if this user were performing the operations themselves).
-	// TODO: makeDirectory currently calls s.put which does Access
-	// permission checking. Instead, it should handle that in s.Put and
-	// s.put should be the equivalent of a "super user" put.
-	prev := s.userName
-	s.userName = name.User()
-	defer func() { s.userName = prev }()
-
-	// Attempt to put this new dir entry.
-	_, err := s.put("dir/server.mkDirIfNotExist", name, de)
-	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
+	tree, err := s.loadTreeFor(name.User())
+	if err != nil {
 		return err
 	}
-	return nil
+	_, _, err = tree.Lookup(name)
+	if err == upspin.ErrFollowLink {
+		return errors.E(errors.Internal, errors.Str("cannot mkdir through a link"))
+	}
+	if err != nil && !errors.Match(errNotExist, err) {
+		// Real error. Abort.
+		return err
+	}
+	if err == nil {
+		// Directory exists. We're done.
+		return nil
+	}
+	// Attempt to put this new dir entry.
+	_, err = tree.Put(name, de)
+	return err
 }
 
 // isSnapshotUser reports whether the userName contains the snapshot suffix.
