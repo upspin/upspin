@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -154,6 +155,91 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	p, _ = path.Parse(ents[2].Name) // path is known valid.
 	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
 		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
+	}
+}
+
+func TestOnlyOwnerCanRead(t *testing.T) {
+	// snapshotUser can read.
+	s := newDirServerForTesting(t, snapshotUser)
+	_, err := s.Lookup(snapshotUser + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// owner of snapshot can read.
+	s = newDirServerForTesting(t, canonicalUser)
+	_, err = s.Lookup(snapshotUser + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// no one else can.
+	s = newDirServerForTesting(t, "spy@nsa.gov")
+	_, err = s.Lookup(snapshotUser + "/")
+	expectedErr := errors.E(upspin.PathName(snapshotUser+"/"), errIsSnapshot)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+}
+
+func TestOnlyOwnerCanGlob(t *testing.T) {
+	// snapshotUser can Glob.
+	s := newDirServerForTesting(t, snapshotUser)
+	_, err := s.Glob(snapshotUser + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// owner of snapshot can Glob.
+	s = newDirServerForTesting(t, canonicalUser)
+	_, err = s.Glob(snapshotUser + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// no one else can.
+	s = newDirServerForTesting(t, "spy@nsa.gov")
+	_, err = s.Glob(snapshotUser + "/*")
+	expectedErr := errors.E(snapshotUser+"/*", errIsSnapshot)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+}
+
+func TestSnapshotIsReadOnly(t *testing.T) {
+	for _, u := range []upspin.UserName{
+		snapshotUser,
+		canonicalUser,
+		"spy@kgb.ru",
+	} {
+		s := newDirServerForTesting(t, u)
+
+		// Ensures no user can:
+
+		// 1) Delete a snapshot;
+		_, err := s.Delete(snapshotUser + "/foo")
+		if !errors.Match(errIsSnapshot, err) {
+			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		}
+
+		// 2) Create a directory in the snapshot tree;
+		de := &upspin.DirEntry{
+			Name:       snapshotUser + "/bla",
+			SignedName: snapshotUser + "/bla",
+			Writer:     u,
+			Attr:       upspin.AttrDirectory,
+		}
+		_, err = s.Put(de)
+		if !errors.Match(errIsSnapshot, err) {
+			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		}
+
+		// 3) Modify a file in the snapshot.
+		de.Attr = upspin.AttrNone
+		_, err = s.Put(de)
+		if !errors.Match(errIsSnapshot, err) {
+			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		}
 	}
 }
 

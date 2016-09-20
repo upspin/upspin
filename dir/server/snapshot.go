@@ -302,3 +302,24 @@ func isSnapshotUser(userName upspin.UserName) bool {
 	}
 	return suffix == snapshotSuffix
 }
+
+// isSnapshotOwner reports whether username is the base user name (without the
+// "+snapshot" suffix) of snapshotUser or the snapshotUser itself.
+func isSnapshotOwner(userName upspin.UserName, snapshotUser upspin.UserName) bool {
+	u, suffix, domain, err := user.Parse(userName)
+	if err != nil {
+		// This should not happen. Log the error.
+		log.Error.Printf("isSnapshotOwner: error parsing %q: %s", userName, err)
+		return false
+	}
+	if suffix != "" && suffix != snapshotSuffix {
+		return false
+	}
+	if suffix == snapshotSuffix {
+		// userName is snapshotUser or it's another snapshot user.
+		return snapshotUser == userName
+	}
+	// userName is the owner if and only if adding the snapshot suffix makes
+	// it the snapshotUser.
+	return u+"+"+snapshotSuffix+"@"+domain == string(snapshotUser)
+}
