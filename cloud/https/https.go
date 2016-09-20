@@ -59,7 +59,7 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 		opt.applyDefaults()
 	}
 	if metadata.OnGCE() {
-		log.Println("https: on GCE; serving HTTPS on port 443 using Let's Encrypt")
+		log.Info.Println("https: on GCE; serving HTTPS on port 443 using Let's Encrypt")
 		var m letsencrypt.Manager
 		v := func(key string) string {
 			v, err := metadata.ProjectAttributeValue(key)
@@ -75,9 +75,9 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 		log.Fatalf("https: %v", m.Serve())
 	}
 
-	log.Printf("https: not on GCE; serving HTTPS on %q", addr)
+	log.Info.Printf("https: not on GCE; serving HTTPS on %q", addr)
 	if opt.CertFile == defaultOptions.CertFile || opt.CertKeyFile == defaultOptions.CertKeyFile {
-		log.Print("https: WARNING: using self-signed test certificates.")
+		log.Error.Print("https: WARNING: using self-signed test certificates.")
 	}
 	config, err := auth.NewDefaultTLSConfig(opt.CertFile, opt.CertKeyFile)
 	if err != nil {
