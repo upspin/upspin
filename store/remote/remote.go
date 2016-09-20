@@ -9,8 +9,6 @@ package remote
 import (
 	"fmt"
 
-	gContext "golang.org/x/net/context"
-
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -97,20 +95,6 @@ func (r *remote) Delete(ref upspin.Reference) error {
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
-}
-
-// Configure implements upspin.Service.
-func (r *remote) Configure(options ...string) (upspin.UserName, error) {
-	op := opf("Configure", "%v", options)
-
-	req := &proto.ConfigureRequest{
-		Options: options,
-	}
-	resp, err := r.storeClient.Configure(gContext.Background(), req)
-	if err != nil {
-		return "", op.error(errors.IO, err)
-	}
-	return "", op.error(errors.UnmarshalError(resp.Error))
 }
 
 func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) upspin.Service {

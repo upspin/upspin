@@ -25,8 +25,6 @@ func New() upspin.KeyServer {
 // There is one for each Dial call, but they all share the underlying database.
 // It implements the upspin.KeyServer interface.
 type server struct {
-	upspin.NoConfiguration
-
 	db *database
 }
 

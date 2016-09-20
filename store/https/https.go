@@ -20,7 +20,6 @@ import (
 // Store is an implementation of upspin.StoreServer that interfaces
 // with an HTTP server for serving data.
 type Store struct {
-	upspin.NoConfiguration
 	serverURL  string
 	httpClient HTTPClient
 }

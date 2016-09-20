@@ -248,10 +248,6 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 // Methods that do not apply to this server.
 
-func (s *server) Configure(options ...string) (upspin.UserName, error) {
-	return "", errors.Str("store/filesystem: Configure should not be called")
-}
-
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
 }

@@ -52,7 +52,6 @@ var (
 // server implements the upspin.DirServer interface. It is a multiplexed
 // by user onto a database.
 type server struct {
-	upspin.NoConfiguration
 	// context holds the context that created the call.
 	context upspin.Context
 	db      *database

@@ -55,12 +55,6 @@ func (u Server) Endpoint() upspin.Endpoint {
 	return u.endpoint
 }
 
-// Configure implements upspin.Service.
-func (Server) Configure(options ...string) (upspin.UserName, error) {
-	const op = "dir/Server.Configure"
-	return "", errors.E(op, errors.Invalid, ServerErr)
-}
-
 // Close implements upspin.Service.
 func (Server) Close() {
 }

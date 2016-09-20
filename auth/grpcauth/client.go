@@ -27,8 +27,6 @@ import (
 type GRPCCommon interface {
 	// Ping is the GRPC call for Ping.
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
-	// Configure is the GRPC call for Configure.
-	Configure(ctx gContext.Context, in *proto.ConfigureRequest, opts ...grpc.CallOption) (*proto.ConfigureResponse, error)
 }
 
 // AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.

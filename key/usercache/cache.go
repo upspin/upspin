@@ -28,10 +28,6 @@ type entry struct {
 type userCacheServer struct {
 	cache *userCache
 
-	// TODO(adg): should this plumb through to the underlying key server?
-	// What would that mean?
-	upspin.NoConfiguration
-
 	// The underlying key server.
 	base upspin.KeyServer
 

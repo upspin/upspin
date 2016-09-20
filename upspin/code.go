@@ -15,19 +15,6 @@ import (
 // This file contains implementations of things like marshaling of the
 // basic Upspin types.
 
-// ErrNoConfiguration is returned by the Configure method of the NoConfiguration type.
-var ErrNoConfiguration = errors.New("service does not accept configuration options")
-
-// NoConfiguration is a trivial type that implements the Configure method by returning
-// ErrNoConfiguration. It can be embedded in a type for a simple way to disable
-// configuration options for the service.
-type NoConfiguration struct{}
-
-// Configure implements Service.
-func (NoConfiguration) Configure(options ...string) (UserName, error) {
-	return "", ErrNoConfiguration
-}
-
 // Marshal packs the DirBlock into a byte slice for transport.
 func (d *DirBlock) Marshal() ([]byte, error) {
 	return d.MarshalAppend(nil)

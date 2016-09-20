@@ -123,26 +123,6 @@ func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 	return &deleteResponse, nil
 }
 
-// Configure implements proto.StoreServer.
-func (s *server) Configure(ctx gContext.Context, req *proto.ConfigureRequest) (*proto.ConfigureResponse, error) {
-	op := logf("Configure %q", req.Options)
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.ConfigureResponse{Error: errors.MarshalError(err)}, nil
-	}
-
-	name, err := store.Configure(req.Options...)
-	if err != nil {
-		op.log(err)
-	}
-	return &proto.ConfigureResponse{
-		UserName: string(name),
-		Error:    errors.MarshalError(err),
-	}, nil
-}
-
 // Endpoint implements proto.StoreServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	return &proto.EndpointResponse{

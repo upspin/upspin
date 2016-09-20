@@ -183,11 +183,6 @@ func (s *server) Close() {
 	}
 }
 
-// Configure implements upspin.Service.
-func (s *server) Configure(options ...string) (upspin.UserName, error) {
-	return "", errors.Str("key/gcp: Configure should not be called")
-}
-
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.

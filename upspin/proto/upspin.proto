@@ -25,16 +25,6 @@ message Signature {
     string s = 2;
 }
 
-message ConfigureRequest {
-    repeated string options = 1;
-}
-
-message ConfigureResponse {
-    bytes error = 1;
-    string user_name = 2;
-    Signature signature = 3;
-}
-
 message EndpointRequest {
 }
 
@@ -81,7 +71,6 @@ message StoreDeleteResponse {
 
 service Store {
     // Service methods:
-    rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
@@ -118,7 +107,6 @@ message KeyPutResponse {
 
 service Key {
     // Service methods:
-    rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
@@ -164,7 +152,6 @@ message DirWhichAccessRequest {
 
 service Dir{
     // Service methods:
-    rpc Configure (ConfigureRequest) returns (ConfigureResponse) {}
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 

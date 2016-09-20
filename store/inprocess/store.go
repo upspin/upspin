@@ -16,7 +16,6 @@ import (
 // service returns data and metadata referenced by the request.
 // There is one for each Dial call.
 type service struct {
-	upspin.NoConfiguration
 	// userName identifies the user accessing the service. TODO: unused.
 	userName upspin.UserName
 	data     *dataService
