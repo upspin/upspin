@@ -272,6 +272,12 @@ func testRootDeletion(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
+	// And we delete it again so this test can be re-run on a persistent
+	// server.
+	r.Delete(readerName + "/")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 }
 
 // integrationTests list all tests and their names. Order is important.

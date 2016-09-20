@@ -25,7 +25,7 @@ import (
 // common error values.
 var (
 	errNotExist   = errors.E(errors.NotExist)
-	errIsSnapshot = errors.E(errors.Permission, errors.Str("cannot modify snapshot"))
+	errIsSnapshot = errors.E(errors.Permission, errors.Str("only snapshot owner is allowed"))
 )
 
 const (
@@ -163,9 +163,17 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
+
 	mu := userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
+
+	if isSnapshotUser(p.User()) {
+		if isSnapshotOwner(s.userName, p.User()) {
+			return s.lookup(op, p, entryMustBeClean, o)
+		}
+		return nil, errors.E(op, name, errIsSnapshot)
+	}
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
 
@@ -240,7 +248,11 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, entry.Name, err)
 	}
 	if isSnapshotUser(p.User()) {
-		return nil, errors.E(op, entry.Name, errIsSnapshot)
+		if p.IsRoot() && isSnapshotOwner(s.userName, p.User()) {
+			// OK, owner can make the snapshot root.
+		} else {
+			return nil, errors.E(op, entry.Name, errIsSnapshot)
+		}
 	}
 
 	isAccessOrGroup := access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path())
@@ -377,11 +389,28 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 
+	overrideAccessCheck := false
+	if isSnapshotUser(p.User()) {
+		if isSnapshotOwner(s.userName, p.User()) {
+			log.Printf("user %q is owner of %q", s.userName, p.User())
+			overrideAccessCheck = true
+		} else {
+			return nil, errors.E(op, p.Path(), errIsSnapshot)
+		}
+	}
+
 	mu := userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
-	tree, err := s.loadTreeFor(p.User(), o)
+	return s.glob(op, p, overrideAccessCheck, o)
+}
+
+// glob implements the bulk of Glob on a pattern p, optionally allowing for
+// Access checks to be overriden.
+// userLock for pattern.User() must be held.
+func (s *server) glob(op string, p path.Parsed, overrideAccessCheck bool, opts ...options) ([]*upspin.DirEntry, error) {
+	tree, err := s.loadTreeFor(p.User(), opts...)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -420,10 +449,11 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				// next level (move d forward).
 				break
 			}
-			canList, _, err := s.hasRight(access.List, dir, o)
+			canList, _, err := s.hasRight(access.List, dir, opts...)
 			if err != nil && !errors.Match(errNotExist, err) {
 				return nil, errors.E(op, err)
 			}
+			canList = canList || overrideAccessCheck
 			if !canList {
 				if d == firstMeta {
 					return nil, s.errPerm(op, p.First(d))
@@ -448,10 +478,11 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				// Next, we must list any subdirs, unless the pattern is finished.
 				if d == p.NElem()-1 {
 					// If we can't read, strip Packdata and Location information.
-					canRead, _, err := s.hasRight(access.Read, dir, o)
+					canRead, _, err := s.hasRight(access.Read, dir, opts...)
 					if err != nil && !errors.Match(errNotExist, err) {
 						return nil, errors.E(op, err)
 					}
+					canRead = canRead || overrideAccessCheck
 					if canRead {
 						entries = append(entries, e)
 					} else {
