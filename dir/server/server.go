@@ -163,6 +163,10 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
+	if isSnapshotUser(p.User()) && !isSnapshotOwner(s.userName, p.User()) {
+		return nil, errors.E(op, name, errors.Permission, errors.Str("snapshots are readable only by their owners"))
+	}
+
 	mu := userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
@@ -240,7 +244,11 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, entry.Name, err)
 	}
 	if isSnapshotUser(p.User()) {
-		return nil, errors.E(op, entry.Name, errIsSnapshot)
+		if p.IsRoot() && isSnapshotOwner(s.userName, p.User()) {
+			// OK, owner can make the snapshot root.
+		} else {
+			return nil, errors.E(op, entry.Name, errIsSnapshot)
+		}
 	}
 
 	isAccessOrGroup := access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path())

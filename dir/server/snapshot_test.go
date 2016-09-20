@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -154,6 +155,30 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	p, _ = path.Parse(ents[2].Name) // path is known valid.
 	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
 		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
+	}
+}
+
+func TestOnlyOwnerCanRead(t *testing.T) {
+	// snapshotUser can read.
+	s := newDirServerForTesting(t, snapshotUser)
+	_, err := s.Lookup(snapshotUser + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// owner of snapshot can read.
+	s = newDirServerForTesting(t, canonicalUser)
+	_, err = s.Lookup(snapshotUser + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// no one else can.
+	s = newDirServerForTesting(t, "spy@nsa.gov")
+	_, err = s.Lookup(snapshotUser + "/")
+	expectedErr := errors.E(errors.Permission, snapshotUser+"/")
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 }
 
