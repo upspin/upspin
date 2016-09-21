@@ -192,7 +192,7 @@ func TestOnlyOwnerCanLookup(t *testing.T) {
 	// no one else can.
 	s = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Lookup(snapshotUser + "/")
-	expectedErr := errors.E(upspin.PathName(snapshotUser+"/"), errIsSnapshot)
+	expectedErr := errors.E(upspin.PathName(snapshotUser+"/"), errNotExist)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
@@ -216,45 +216,48 @@ func TestOnlyOwnerCanGlob(t *testing.T) {
 	// no one else can.
 	s = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Glob(snapshotUser + "/*")
-	expectedErr := errors.E(upspin.PathName(snapshotUser+"/*"), errIsSnapshot)
+	expectedErr := errors.E(upspin.PathName(snapshotUser+"/*"), errNotExist)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 }
 
 func TestSnapshotIsReadOnly(t *testing.T) {
-	for _, u := range []upspin.UserName{
-		snapshotUser,
-		canonicalUser,
-		"spy@kgb.ru",
+	for _, c := range []struct {
+		user upspin.UserName
+		err  error
+	}{
+		{snapshotUser, errReadOnly},
+		{canonicalUser, errReadOnly},
+		{"spy@kgb.ru", errNotExist},
 	} {
-		s := newDirServerForTesting(t, u)
+		s := newDirServerForTesting(t, c.user)
 
 		// Ensures no user can:
 
 		// 1) Delete a snapshot;
 		_, err := s.Delete(snapshotUser + "/foo")
-		if !errors.Match(errIsSnapshot, err) {
-			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		if !errors.Match(c.err, err) {
+			t.Errorf("%s: err = %v, want = %v", c.user, err, errReadOnly)
 		}
 
 		// 2) Create a directory in the snapshot tree;
 		de := &upspin.DirEntry{
 			Name:       snapshotUser + "/bla",
 			SignedName: snapshotUser + "/bla",
-			Writer:     u,
+			Writer:     c.user,
 			Attr:       upspin.AttrDirectory,
 		}
 		_, err = s.Put(de)
-		if !errors.Match(errIsSnapshot, err) {
-			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		if !errors.Match(c.err, err) {
+			t.Errorf("%s: err = %v, want = %v", c.user, err, errReadOnly)
 		}
 
 		// 3) Modify a file in the snapshot.
 		de.Attr = upspin.AttrNone
 		_, err = s.Put(de)
-		if !errors.Match(errIsSnapshot, err) {
-			t.Fatalf("%s: err = %v, want = %v", u, err, errIsSnapshot)
+		if !errors.Match(c.err, err) {
+			t.Errorf("%s: err = %v, want = %v", c.user, err, errReadOnly)
 		}
 	}
 }
