@@ -22,6 +22,24 @@
       "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "50b253c6_60fc88d0",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-21T17:08:06Z",
+      "side": 1,
+      "message": "This implements mode 400 for snapshots -- only the owner can see it. I can relax that, but it is my recollection that Rob suggested exactly that (mode 400, read-only owner, nothing to everyone else). \n\nI\u0027m happy to change, we just need to document what it is we want. As is, this is now documented here: https://docs.google.com/document/d/1PyuqCugrQBOjQgbObHijnrhREsrasKQa9UpdKFZ1Dd0/edit#heading\u003dh.d3af0gnc90hs",
+      "parentUuid": "50b253c6_40706499",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
