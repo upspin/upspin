@@ -40,6 +40,57 @@
       "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_4d9c595b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:07:42Z",
+      "side": 1,
+      "message": "I wonder if we should just say errors.NotExist when the non-owner makes a request.",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_adb05de3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:07:42Z",
+      "side": 1,
+      "message": "you need two different error messages. one for trying to mutate the contents of a snapshot, and one for not being the owner of the snapshot",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_6d97953a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:07:42Z",
+      "side": 1,
+      "message": "the new wording of errIsSnapshot makes this wrong\nI suggest adding another error type, one for permission denied on the basis of wrong user, the other for modifications",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
