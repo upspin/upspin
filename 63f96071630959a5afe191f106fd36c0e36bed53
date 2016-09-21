@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f0efc7c0_ed3a65cf",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:50:27Z",
+      "side": 1,
+      "message": "s/md/header/ ?",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_4d2c59a1",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:50:27Z",
+      "side": 1,
+      "message": "\"auth/grpcauth: ...\"\n\nalthough I\u0027m not sure we really want/need to log these errors anyway",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_8d3da1cb",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:50:27Z",
+      "side": 1,
+      "message": "check that s.config.Context is not nil before using this\notherwise a specially crafted request could make a non-proxy server panic",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0efc7c0_ad405d39",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-21T22:50:27Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
