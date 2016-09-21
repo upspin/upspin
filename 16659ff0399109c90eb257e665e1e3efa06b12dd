@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0f9e3d6_c4929e02",
+        "filename": "dir/server/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:31:10Z",
+      "side": 1,
+      "message": "This is similar to TImeFunc in auth/config.go.  That one seems to not be used by anyone but do we need something more general here?",
+      "range": {
+        "startLine": 107,
+        "startChar": 1,
+        "endLine": 107,
+        "endChar": 25
+      },
+      "revId": "16659ff0399109c90eb257e665e1e3efa06b12dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
