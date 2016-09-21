@@ -25,7 +25,7 @@ import (
 // common error values.
 var (
 	errNotExist   = errors.E(errors.NotExist)
-	errIsSnapshot = errors.E(errors.Permission, errors.Str("only snapshot owner is allowed"))
+	errNotMutable = errors.E(errors.Permission, errors.Str("not mutable"))
 )
 
 const (
@@ -177,7 +177,8 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		if isSnapshotOwner(s.userName, p.User()) {
 			return s.lookup(op, p, entryMustBeClean, o)
 		}
-		return nil, errors.E(op, name, errIsSnapshot)
+		// Non-owners cannot see other people's snapshots.
+		return nil, errors.E(op, name, errNotExist)
 	}
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
@@ -253,11 +254,15 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, entry.Name, err)
 	}
 	if isSnapshotUser(p.User()) {
-		if p.IsRoot() && isSnapshotOwner(s.userName, p.User()) {
-			// OK, owner can make the snapshot root.
-		} else {
-			return nil, errors.E(op, entry.Name, errIsSnapshot)
+		if !isSnapshotOwner(s.userName, p.User()) {
+			// Non-owners can't even see the snapshot.
+			return nil, errors.E(op, entry.Name, errNotExist)
 		}
+		if !p.IsRoot() {
+			// Not root: owner can't mutate anything else.
+			return nil, errors.E(op, entry.Name, errNotMutable)
+		}
+		// Else: isOwner && putting the root -> OK.
 	}
 
 	isAccessOrGroup := access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path())
@@ -397,10 +402,12 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	overrideAccessCheck := false
 	if isSnapshotUser(p.User()) {
 		if isSnapshotOwner(s.userName, p.User()) {
-			log.Printf("user %q is owner of %q", s.userName, p.User())
+			// Owners can glob everything, regardless of the
+			// original Access files.
 			overrideAccessCheck = true
 		} else {
-			return nil, errors.E(op, p.Path(), errIsSnapshot)
+			// Non-owners can't see anything.
+			return nil, errors.E(op, p.Path(), errNotExist)
 		}
 	}
 
@@ -531,7 +538,12 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, err)
 	}
 	if isSnapshotUser(p.User()) {
-		return nil, errors.E(op, name, errIsSnapshot)
+		if isSnapshotOwner(s.userName, p.User()) {
+			// Owner can't mutate.
+			return nil, errors.E(op, name, errNotMutable)
+		}
+		// Everyone else can't even see it.
+		return nil, errors.E(op, name, errNotExist)
 	}
 
 	mu := userLock(p.User())
