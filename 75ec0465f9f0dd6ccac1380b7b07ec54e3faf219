@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "70d2f719_81af1aed",
+        "filename": "auth/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ad3bb1_a49b2663",
+      "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad3bb1_c4cf5251",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-21T19:12:57Z",
       "side": 1,
       "message": "It looks like this pattern user + \" Authenticate \" + now happens in at least 3 places. Surely we can make this more homogeneous?",
+      "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b00e2f7b_e3343297",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:02:44Z",
+      "side": 1,
+      "message": "I went even crazier.  The magic is now defined in the header.  Plus I moved the signing and verifying into side by side routines so you can see that the messages match.",
+      "parentUuid": "10ad3bb1_c4cf5251",
       "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "b00e2f7b_23e80adf",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ad3bb1_44c46232",
+      "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad3bb1_64b75ed3",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-21T19:12:57Z",
       "side": 1,
       "message": "here too.",
+      "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "50d3331d_e082a236",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:02:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ad3bb1_64b75ed3",
       "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
