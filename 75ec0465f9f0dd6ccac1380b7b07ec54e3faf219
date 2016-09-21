@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "d0f9e3d6_64b1aae6",
+        "filename": "auth/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-21T23:09:57Z",
+      "side": 1,
+      "message": "I don\u0027t see it, but okay.",
+      "parentUuid": "70d2f719_81af1aed",
+      "revId": "75ec0465f9f0dd6ccac1380b7b07ec54e3faf219",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad3bb1_c4cf5251",
         "filename": "auth/grpcauth/client.go",
         "patchSetId": 1
