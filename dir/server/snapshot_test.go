@@ -104,7 +104,11 @@ func TestSnapshot(t *testing.T) {
 }
 
 func TestForceSnapshotVersioning(t *testing.T) {
+	mockTime := upspin.Now()
 	s := newDirServerForTesting(t, snapshotUser)
+	s.now = func() upspin.Time {
+		return mockTime
+	}
 
 	ents, err := s.Glob(snapshotUser + "/*/*/*")
 	if err != nil {
@@ -122,11 +126,16 @@ func TestForceSnapshotVersioning(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	mockTime++ // Pretend one second has elapsed (our time resolution).
+
 	// Force two new snapshots.
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	mockTime++ // Another second has elapsed.
+
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
 	if err != nil {
 		t.Fatal(err)
@@ -155,6 +164,13 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	p, _ = path.Parse(ents[2].Name) // path is known valid.
 	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
 		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
+	}
+	// Assert times are monotonically increasing.
+	if ents[1].Time >= ents[2].Time {
+		t.Errorf("time = %d, want < %d", ents[1].Time, ents[2].Time)
+	}
+	if ents[0].Time >= ents[1].Time {
+		t.Errorf("time = %d, want < %d", ents[0].Time, ents[1].Time)
 	}
 }
 
@@ -200,7 +216,7 @@ func TestOnlyOwnerCanGlob(t *testing.T) {
 	// no one else can.
 	s = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Glob(snapshotUser + "/*")
-	expectedErr := errors.E(snapshotUser+"/*", errIsSnapshot)
+	expectedErr := errors.E(upspin.PathName(snapshotUser+"/*"), errIsSnapshot)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}

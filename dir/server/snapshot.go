@@ -210,6 +210,8 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 		return err
 	}
 
+	// Update time so we know when the snapshot was taken.
+	entry.Time = s.now()
 	snapEntry, err := tree.PutDir(dstDir, entry)
 	if err != nil {
 		return err
