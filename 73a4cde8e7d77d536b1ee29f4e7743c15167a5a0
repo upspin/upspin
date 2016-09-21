@@ -60,6 +60,24 @@
     },
     {
       "key": {
+        "uuid": "f0dd072d_bd3d1fcb",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-21T22:45:31Z",
+      "side": 1,
+      "message": "I think that\u0027s a good idea. (This does not leak the existence of it since even when it doesn\u0027t exist we say the same thing. But for consistency, I think we should).",
+      "parentUuid": "f0efc7c0_4d9c595b",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f0efc7c0_adb05de3",
         "filename": "dir/server/server.go",
         "patchSetId": 4
@@ -77,6 +95,24 @@
     },
     {
       "key": {
+        "uuid": "70d2f719_a16b3ee7",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-21T22:45:31Z",
+      "side": 1,
+      "message": "Yup. Not being the owner will be NotExist instead.",
+      "parentUuid": "f0efc7c0_adb05de3",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f0efc7c0_6d97953a",
         "filename": "dir/server/server.go",
         "patchSetId": 4
@@ -88,6 +124,24 @@
       "writtenOn": "2016-09-21T22:07:42Z",
       "side": 1,
       "message": "the new wording of errIsSnapshot makes this wrong\nI suggest adding another error type, one for permission denied on the basis of wrong user, the other for modifications",
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0dd072d_9d49435e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-21T22:45:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0efc7c0_6d97953a",
       "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
