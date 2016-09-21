@@ -69,6 +69,10 @@ type server struct {
 
 	// stopSnapshot is a channel for shutting down the snapshot loop.
 	stopSnapshot chan bool
+
+	// now returns the time now. It's usually just upspin.Now but is
+	// overridden for tests.
+	now func() upspin.Time
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -148,6 +152,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
 		defaultAccess: cache.NewLRU(accessCacheSize),
+		now:           upspin.Now,
 	}
 	s.startSnapshotLoop()
 	return s, nil
