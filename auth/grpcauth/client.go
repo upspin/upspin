@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -27,6 +28,8 @@ import (
 type GRPCCommon interface {
 	// Ping is the GRPC call for Ping.
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
+	// Configure is the GRPC call for Configure.
+	Configure(ctx gContext.Context, in *proto.ConfigureRequest, opts ...grpc.CallOption) (*proto.ConfigureResponse, error)
 }
 
 // AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.
@@ -291,18 +294,13 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		return
 	}
 
-	user := string(ac.context.UserName())
-	now := time.Now().UTC().Format(time.ANSIC) // to discourage signature replay
-	sig, err := ac.context.Factotum().UserSign([]byte(user + " Authenticate " + now))
+	// Authenticate client's user name. reqNow discourages signature replay.
+	authMsg, err := signUser(ac.context, clientAuthMagic)
 	if err != nil {
+		log.Error.Printf("%s: signUser: %s", op, err)
 		return nil, nil, nil, errors.E(op, err)
 	}
-	md := metadata.MD{authRequestKey: []string{
-		user,
-		now,
-		sig.R.String(),
-		sig.S.String(),
-	}}
+	md := metadata.MD{authRequestKey: authMsg}
 	if ac.proxyNeedsConfiguration() {
 		md[proxyRequestKey] = []string{ac.proxyFor.String()}
 	}
@@ -315,9 +313,21 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 
 		token, ok := header[authTokenKey]
 		if !ok || len(token) != 1 {
-			return errors.Str("no auth token in response header")
+			return errors.E(op, errors.Str("no auth token in response header"))
 		}
 		now := time.Now()
+
+		// If talking to a proxy, make sure it is running as the same user.
+		if ac.isProxy() {
+			msg, ok := header[authRequestKey]
+			if !ok {
+				return errors.E(op, errors.Str("proxy server must authenticate"))
+			}
+			if err := ac.verifyServerUser(msg); err != nil {
+				log.Error.Printf("%s: client can't verify server user: %s", op, err)
+				return errors.E(op, err)
+			}
+		}
 
 		ac.mu.Lock()
 		defer ac.mu.Unlock()
@@ -327,6 +337,33 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		return nil
 	}
 	return
+}
+
+// verifyServerUser ensures server is running as the same user. It assumes that msg[0] is
+// the user name.
+func (ac *AuthClientService) verifyServerUser(msg []string) error {
+	u := upspin.UserName(msg[0])
+	if ac.context.UserName() != u {
+		return errors.Errorf("client %s does not match server %s", ac.context.UserName(), u)
+	}
+
+	// Get user's public key.
+	keyServer, err := bind.KeyServer(ac.context, ac.context.KeyEndpoint())
+	if err != nil {
+		return err
+	}
+	key, err := keyServer.Lookup(u)
+	if err != nil {
+		return err
+	}
+
+	// Validate signature.
+	err = verifyUser(key.PublicKey, msg, serverAuthMagic, time.Now())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Close implements upspin.Service.

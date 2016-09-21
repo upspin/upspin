@@ -55,7 +55,7 @@ func main() {
 	// Stop the cache server recursing.
 	ctx = context.SetStoreCacheEndpoint(ctx, upspin.Endpoint{})
 
-	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
+	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx), Context: ctx}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)
