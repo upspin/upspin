@@ -63,7 +63,7 @@ const (
 	// authTokenKey is the key in the context's metadata for the auth token.
 	authTokenKey = "upspinauthtoken" // must be all lower case.
 
-	// These keys are for inline auth token requests.
+	// authRequestKey is the key for inline user authentication.
 	authRequestKey = "upspinauthrequest"
 
 	// proxyRequestKey key is for inline proxy configuration requests.
@@ -71,6 +71,12 @@ const (
 
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
+
+	// clientAuthMagic is a string used in validating the client's user name.
+	clientAuthMagic = " Authenticate "
+
+	// serverAuthMagic is a string used in validating the server's user name.
+	serverAuthMagic = " AuthenticateServer "
 )
 
 // A SecureServer is a grpc server that implements the Authenticate method as defined by the upspin proto.
@@ -187,19 +193,11 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 		return nil, errors.E(op, user, err)
 	}
 
-	// Validate the time.
-	reqNow, err := time.Parse(time.ANSIC, authRequest[1])
-	if err != nil {
-		return nil, errors.E(op, user, err)
-	}
 	var now time.Time
 	if s.config.TimeFunc == nil {
 		now = time.Now()
 	} else {
 		now = s.config.TimeFunc()
-	}
-	if reqNow.After(now.Add(30*time.Second)) || reqNow.Before(now.Add(-45*time.Second)) {
-		log.Info.Printf("%v: %v: timestamp is far wrong (%v); proceeding anyway", op, user, now.Sub(reqNow))
 	}
 
 	// Get user's public key.
@@ -208,18 +206,9 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 		return nil, errors.E(op, user, err)
 	}
 
-	// Parse signature
-	var rs, ss big.Int
-	if _, ok := rs.SetString(authRequest[2], 10); !ok {
-		return nil, errors.E(op, errMissingSignature)
-	}
-	if _, ok := ss.SetString(authRequest[3], 10); !ok {
-		return nil, errors.E(op, errMissingSignature)
-	}
-
 	// Validate signature.
-	err = verifySignature(key, []byte(string(user)+" Authenticate "+authRequest[1]), &rs, &ss)
-	if err != nil {
+	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
+		log.Error.Printf("server can't verify user: %s", err)
 		return nil, errors.E(op, errors.Permission, user, errors.Errorf("invalid signature: %v", err))
 	}
 
@@ -230,18 +219,27 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 		log.Error.Printf("Can't create auth token.")
 		return nil, errors.E(op, err)
 	}
+	md := metadata.MD{authTokenKey: []string{authToken}}
 
-	// If there is a proxy request, remember the proxy's endpoint.
+	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
 	ep := &upspin.Endpoint{}
 	if len(proxyRequest) == 1 {
 		ep, err = upspin.ParseEndpoint(proxyRequest[0])
 		if err != nil {
+			log.Error.Printf("proxyRequest invalid proxy endpoint: %v", err)
 			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
 		}
+		// Authenticate the server to the user.
+		authMsg, err := signUser(s.config.Context, serverAuthMagic)
+		if err != nil {
+			log.Error.Printf("signUser: %s", err)
+			return nil, errors.E(op, err)
+		}
+		md[authRequestKey] = authMsg
 	}
 
 	session := auth.NewSession(user, expiration, authToken, ep, nil)
-	if err := grpc.SendHeader(ctx, metadata.Pairs(authTokenKey, authToken)); err != nil {
+	if err := grpc.SendHeader(ctx, md); err != nil {
 		return nil, errors.E(op, err)
 	}
 	return session, nil
@@ -262,14 +260,56 @@ func (s *secureServerImpl) GRPCServer() *grpc.Server {
 	return s.grpcServer
 }
 
-// verifySignature verifies that the hash was signed by one of the user's key.
-func verifySignature(key upspin.PublicKey, hash []byte, r, s *big.Int) error {
+// verifyUser verifies a grpc context header authenticating the remote user.
+//
+// The message is a slice of strings of the form: user, time, sig.R, sig.S
+func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time) error {
+	// Make sure the challenge time is sane.
+	msgNow, err := time.Parse(time.ANSIC, msg[1])
+	if err != nil {
+		return err
+	}
+	// Currently just print a message if the time is too far off.
+	// TODO(p): we have to do better than this.
+	if msgNow.After(now.Add(30*time.Second)) || msgNow.Before(now.Add(-45*time.Second)) {
+		log.Info.Printf("verifying %s: timestamp is far wrong (%v); proceeding anyway", msg[0], now.Sub(msgNow))
+	}
+
+	// Parse signature
+	var rs, ss big.Int
+	if _, ok := rs.SetString(msg[2], 10); !ok {
+		return errMissingSignature
+	}
+	if _, ok := ss.SetString(msg[3], 10); !ok {
+		return errMissingSignature
+	}
+
+	// Validate signature.
+	hash := []byte(msg[0] + magic + msg[1])
 	ecdsaPubKey, _, err := factotum.ParsePublicKey(key)
 	if err != nil {
 		return err
 	}
-	if ecdsa.Verify(ecdsaPubKey, hash, r, s) {
+	if ecdsa.Verify(ecdsaPubKey, hash, &rs, &ss) {
 		return nil
 	}
 	return errors.Str("signature fails to validate using the provided key")
+}
+
+// signUser creates a grpc context header authenticating the local user.
+func signUser(ctx upspin.Context, magic string) ([]string, error) {
+	// Discourage replay attacks.
+	now := time.Now().UTC().Format(time.ANSIC)
+	userString := string(ctx.UserName())
+	sig, err := ctx.Factotum().UserSign([]byte(userString + magic + now))
+	if err != nil {
+		log.Error.Printf("proxyRequest signing server user: %v", err)
+		return nil, err
+	}
+	return []string{
+		userString,
+		now,
+		sig.R.String(),
+		sig.S.String(),
+	}, nil
 }
