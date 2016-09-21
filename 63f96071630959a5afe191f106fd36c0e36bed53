@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b00e2f7b_a3fb5aa5",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0efc7c0_ed3a65cf",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f0efc7c0_4d2c59a1",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-21T22:50:27Z",
       "side": 1,
       "message": "\"auth/grpcauth: ...\"\n\nalthough I\u0027m not sure we really want/need to log these errors anyway",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10e1bbe4_deef4511",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0efc7c0_4d2c59a1",
       "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "d0f9e3d6_2492924e",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:13:38Z",
+      "side": 1,
+      "message": "fixed when I rearranged the code.",
+      "parentUuid": "f0efc7c0_8d3da1cb",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f0efc7c0_ad405d39",
         "filename": "auth/grpcauth/server.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-21T22:50:27Z",
       "side": 1,
       "message": "ditto",
+      "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0f9e3d6_048f9626",
+        "filename": "auth/grpcauth/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:13:38Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "f0efc7c0_ad405d39",
       "revId": "63f96071630959a5afe191f106fd36c0e36bed53",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
