@@ -20,12 +20,11 @@ type Config struct {
 	// Lookup looks up user keys.
 	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
 
-	// AllowUnauthenticatedConnections allows unauthenticated connections, making it the caller's
-	// responsibility to check Handler.IsAuthenticated.
-	AllowUnauthenticatedConnections bool
-
 	// TimeFunc returns the current time. If nil, time.Now() will be used. Mostly only used for testing.
 	TimeFunc func() time.Time
+
+	// Context contains information for authenticationg the server to the client (if required).
+	Context upspin.Context
 }
 
 // NewDefaultTLSConfig creates a new TLS config based on the certificate files given.
