@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0f9e3d6_04043670",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T23:23:36Z",
+      "side": 1,
+      "message": "what about\n\nif !isSnapshotOwner(...) {\n   return nil, errNotExist\n}\nif !p.IsRoot() {\n   return nil, errIsNotMutable\n}",
+      "range": {
+        "startLine": 257,
+        "startChar": 2,
+        "endLine": 265,
+        "endChar": 45
+      },
+      "revId": "70e6aef7de49b5d46f676d192509b367d8dcc1c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
