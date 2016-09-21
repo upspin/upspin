@@ -69,6 +69,9 @@ const (
 	// proxyRequestKey key is for inline proxy configuration requests.
 	proxyRequestKey = "upspinproxyrequest"
 
+	// proxyReplyKey is for proxy reply to authenticate server.
+	proxyReplyKey = "upspinproxyreply"
+
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
 )
@@ -230,18 +233,31 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 		log.Error.Printf("Can't create auth token.")
 		return nil, errors.E(op, err)
 	}
+	md := metadata.MD{authTokenKey: []string{authToken}}
 
-	// If there is a proxy request, remember the proxy's endpoint.
+	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
 	ep := &upspin.Endpoint{}
 	if len(proxyRequest) == 1 {
 		ep, err = upspin.ParseEndpoint(proxyRequest[0])
 		if err != nil {
+			log.Error.Printf("proxyRequest invalid proxy endpoint: %v", err)
 			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
+		}
+		ustr := string(s.config.Context.UserName())
+		sig, err := s.config.Context.Factotum().UserSign([]byte(ustr + " AuthenticateServer " + authRequest[1]))
+		if err != nil {
+			log.Error.Printf("proxyRequest signing server user: %v", err)
+			return nil, errors.E(op, err)
+		}
+		md[proxyReplyKey] = []string{
+			ustr,
+			sig.R.String(),
+			sig.S.String(),
 		}
 	}
 
 	session := auth.NewSession(user, expiration, authToken, ep, nil)
-	if err := grpc.SendHeader(ctx, metadata.Pairs(authTokenKey, authToken)); err != nil {
+	if err := grpc.SendHeader(ctx, md); err != nil {
 		return nil, errors.E(op, err)
 	}
 	return session, nil
