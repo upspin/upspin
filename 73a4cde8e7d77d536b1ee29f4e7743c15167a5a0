@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50b253c6_40706499",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-21T16:56:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand this if.  Shouldn\u0027t you just be asking isSnapshotOwner? This means that anyone can access (modulo access rights) that isn\u0027t a snapshot user.  I understood different from the conversation yesterday.",
+      "range": {
+        "startLine": 171,
+        "startChar": 1,
+        "endLine": 171,
+        "endChar": 28
+      },
+      "revId": "73a4cde8e7d77d536b1ee29f4e7743c15167a5a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
