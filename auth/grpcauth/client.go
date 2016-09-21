@@ -6,6 +6,7 @@ package grpcauth
 
 import (
 	"crypto/tls"
+	"math/big"
 	"math/rand"
 	"net"
 	"strings"
@@ -17,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -294,14 +296,14 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 	}
 
 	user := string(ac.context.UserName())
-	now := time.Now().UTC().Format(time.ANSIC) // to discourage signature replay
-	sig, err := ac.context.Factotum().UserSign([]byte(user + " Authenticate " + now))
+	reqNow := time.Now().UTC().Format(time.ANSIC) // to discourage signature replay
+	sig, err := ac.context.Factotum().UserSign([]byte(user + " Authenticate " + reqNow))
 	if err != nil {
 		return nil, nil, nil, errors.E(op, err)
 	}
 	md := metadata.MD{authRequestKey: []string{
 		user,
-		now,
+		reqNow,
 		sig.R.String(),
 		sig.S.String(),
 	}}
@@ -317,9 +319,20 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 
 		token, ok := header[authTokenKey]
 		if !ok || len(token) != 1 {
-			return errors.Str("no auth token in response header")
+			return errors.E(op, errors.Str("no auth token in response header"))
 		}
 		now := time.Now()
+
+		// If talking to a proxy, make sure it is running as the same user.
+		if ac.isProxy() {
+			proxy, ok := header[proxyReplyKey]
+			if !ok {
+				return errors.E(op, errors.Str("proxy server must authenticate"))
+			}
+			if err := ac.verifyProxyUser(proxy, reqNow); err != nil {
+				return errors.E(op, err)
+			}
+		}
 
 		ac.mu.Lock()
 		defer ac.mu.Unlock()
@@ -329,6 +342,39 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		return nil
 	}
 	return
+}
+
+// verifyProxyUser ensures proxy is running as the same user.
+func (ac *AuthClientService) verifyProxyUser(resp []string, now string) error {
+	// Get user's public key.
+	keyServer, err := bind.KeyServer(ac.context, ac.context.KeyEndpoint())
+	if err != nil {
+		return err
+	}
+	u := upspin.UserName(resp[0])
+	key, err := keyServer.Lookup(u)
+	if err != nil {
+		return err
+	}
+
+	// Validate signature.
+	var rs, ss big.Int
+	if _, ok := rs.SetString(resp[1], 10); !ok {
+		return errMissingSignature
+	}
+	if _, ok := ss.SetString(resp[2], 10); !ok {
+		return errMissingSignature
+	}
+	err = verifySignature(key.PublicKey, []byte(string(u)+" AuthenticateServer "+now), &rs, &ss)
+	if err != nil {
+		return err
+	}
+
+	// Must match client UserName.
+	if ac.context.UserName() != u {
+		return errors.Errorf("client %s does not match server %s", ac.context.UserName(), u)
+	}
+	return nil
 }
 
 // Close implements upspin.Service.
