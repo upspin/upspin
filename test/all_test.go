@@ -63,6 +63,8 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 	return f, data
 }
 
+// TODO: these are currently only running for InProcess. Make them run with all
+// integration tests.
 func runAllTests(t *testing.T, packing upspin.Packing) {
 	env := newEnv(t, packing)
 	t.Run("PutGetTopLevelFile", func(t *testing.T) {
