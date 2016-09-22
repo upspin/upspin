@@ -63,6 +63,8 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 	return f, data
 }
 
+// TODO: these are currently only running for InProcess. Make them run with all
+// integration tests.
 func runAllTests(t *testing.T, packing upspin.Packing) {
 	env := newEnv(t, packing)
 	t.Run("PutGetTopLevelFile", func(t *testing.T) {
@@ -70,9 +72,6 @@ func runAllTests(t *testing.T, packing upspin.Packing) {
 	})
 	t.Run("FileSequentialAccess", func(t *testing.T) {
 		testFileSequentialAccess(t, env)
-	})
-	t.Run("ReadAccess", func(t *testing.T) {
-		testReadAccess(t, packing)
 	})
 	t.Run("WhichAccess", func(t *testing.T) {
 		testWhichAccess(t, packing)

@@ -23,9 +23,8 @@ import (
 
 // Arguments for errStr in helpers.
 const (
-	success    = ""
-	permission = "permission denied"
-	notExist   = "does not exist"
+	success  = ""
+	notExist = "does not exist"
 )
 
 type runner struct {
@@ -97,138 +96,232 @@ func (r *runner) write(user upspin.UserName, file upspin.PathName, contents stri
 	r.check("Put", user, file, err, errStr)
 }
 
-func testReadAccess(t *testing.T, packing upspin.Packing) {
-	var (
-		user  = newUserName()
-		owner = newUserName()
-		root  = upspin.PathName(owner) + "/"
-	)
+func testReadAccess(t *testing.T, r *testenv.Runner) {
 	const (
-		groupDir         = "Group"
-		publicDir        = "public"
-		privateDir       = "private"
-		publicFile       = publicDir + "/public.txt"
-		privateFile      = privateDir + "/private.txt"
-		contentsOfPublic = "public file"
+		user  = readerName
+		owner = ownerName
+		base = owner + "/"
+		groupDir          = base + "Group"
+		publicDir         = base + "public"
+		privateDir        = base + "private"
+		publicFile        = publicDir + "/public.txt"
+		privateFile       = privateDir + "/private.txt"
+		contentsOfPublic  = "public file"
+		contentsOfPrivate = "private file"
 	)
-
-	testSetup := &testenv.Setup{
-		OwnerName: owner,
-		Packing:   packing,
-		Kind:      "inprocess",
-		Cleanup:   cleanup,
-	}
-
-	env, err := testenv.New(testSetup)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	// Build test tree.
-	tr := testenv.NewRunner()
-	tr.AddUser(env.Context)
-	tr.As(owner)
-	tr.MakeDirectory(root + groupDir)
-	tr.MakeDirectory(root + publicDir)
-	tr.Put(root+publicFile, contentsOfPublic)
-	tr.MakeDirectory(root + privateDir)
-	tr.Put(root+privateFile, "private")
-	if tr.Failed() {
-		t.Fatal(tr.Diag())
-	}
-
-	userContext, err := env.NewUser(user)
-	if err != nil {
-		t.Fatalf("NewUser: %v", err)
-	}
-	userClient := client.New(userContext)
-
-	r := runner{
-		env:        env,
-		owner:      owner,
-		userClient: userClient,
-		t:          t,
+	r.As(owner)
+	r.MakeDirectory(groupDir)
+	r.MakeDirectory(publicDir)
+	r.Put(publicFile, contentsOfPublic)
+	r.MakeDirectory(privateDir)
+	r.Put(privateFile, contentsOfPrivate)
+	if r.Failed() {
+		t.Fatal(r.Diag())
 	}
 
 	// With no access files, every item is readable by owner.
-	r.state = "No Access files"
-	r.read(owner, privateFile, success)
-	r.read(owner, publicFile, success)
+	r.Get(privateFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != contentsOfPrivate {
+		t.Errorf("data = %q, want = %q", r.Data, contentsOfPrivate)
+	}
+	r.Get(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != contentsOfPublic {
+		t.Errorf("data = %q, want = %q", r.Data, contentsOfPublic)
+	}
 
 	// With no access files, no item is visible to user.
-	r.read(user, "", notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, publicDir, notExist)
-	r.read(user, publicFile, notExist)
+	r.As(user)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(publicDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(publicFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
 	// Add /public/Access, granting Read to user and write to owner.
-	const accessFile = "/public/Access"
+	const accessFile = publicDir + "/Access"
 	var (
 		accessText = fmt.Sprintf("r:%s\nw:%s", user, owner)
 	)
-	r.state = "With Access file"
-	r.write(owner, accessFile, accessText, success)
+	r.As(owner)
+	r.Put(accessFile, accessText)
+	r.Put(publicFile, contentsOfPublic) // Put again to ensure re-wrapping of keys. TODO: fix.
 
 	// With Access file, every item is still readable by owner.
-	r.read(owner, privateFile, success)
-	r.read(owner, publicFile, success)
+	r.Get(privateFile)
+	r.Get(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
 	// With Access file, only public items are visible to user.
-	r.read(user, "", notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, privateDir, notExist)
-	// r.read(user, publicFile, success) TODO: Unpack: could not find wrapped key
-
-	// The only way to update the keys for the file using the Client interface is to use Put,
-	// which will call packer.Share. That also stores the file again, which is unnecessary. TODO.
-	r.write(owner, publicFile, contentsOfPublic, success)
-	r.read(user, publicFile, success)
+	r.As(user)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(publicDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.Get(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != contentsOfPublic {
+		t.Errorf("data = %q, want = %q", r.Data, contentsOfPublic)
+	}
 
 	// Change Access file to disable again.
 	const (
 		noUserAccessText = "r: someoneElse@test.com\n"
 	)
-	r.state = "With no user in Access file"
-	r.write(owner, accessFile, noUserAccessText, success)
+	r.As(owner)
+	r.Put(accessFile, noUserAccessText)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
-	r.read(user, "", notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, publicDir, notExist)
-	r.read(user, publicFile, notExist)
-	r.write(user, publicFile, "will not succeed", notExist)
+	r.As(user)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(publicDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(publicFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Put(publicFile, "will not succeed")
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
 	// Now create a group and put user in it and make owner a writer.
-	const groupFile = "/Group/mygroup"
+	const groupFile = groupDir +"/mygroup"
 	var (
 		groupAccessText = string("r: mygroup\nw:" + owner)
 		groupText       = fmt.Sprintf("%s\n", user)
 	)
-	r.state = "With user in Group file"
-	r.write(owner, accessFile, groupAccessText, success)
-	r.write(owner, groupFile, groupText, success)
 
-	r.read(user, "", notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, publicFile, success)
+	r.As(owner)
+	r.Put(groupFile, groupText)
+	r.Put(accessFile, groupAccessText)
+	r.Put(publicFile, contentsOfPublic) // Put file again to trigger sharing.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
-	r.write(owner, publicFile, contentsOfPublic, success) // Put file again to trigger sharing.
-	r.read(user, publicFile, success)
+	r.As(user)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(publicDir)
+	r.Get(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != contentsOfPublic {
+		t.Errorf("data = %q, want = %q", r.Data, contentsOfPublic)
+	}
 
-	// Take user out of the group.
+	// Remove Group file and check user lost all access now.
+	r.As(owner)
+	r.Delete(groupFile)
+
+	r.As(user)
+	r.DirLookup(publicDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(publicFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Put group file back, but take user out of the group.
 	const (
 		noUserGroupText = "someoneElse@test.com\n"
 	)
-	r.state = "With no user in Group file"
-	r.write(owner, groupFile, noUserGroupText, success)
 
-	r.read(user, "", notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, privateDir, notExist)
-	r.read(user, publicDir, notExist)
-	r.read(user, publicFile, notExist)
+	r.As(owner)
+	r.Put(groupFile, noUserGroupText)
+
+	r.As(user)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirLookup(publicDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.Get(publicFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Remove group file.
+	r.As(owner)
+	r.Delete(groupFile)
 }
 
 func testWhichAccess(t *testing.T, packing upspin.Packing) {
