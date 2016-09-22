@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0f9e3d6_0751d8ff",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-22T01:12:01Z",
+      "side": 1,
+      "message": "\"not mutable\" is much harder to understand than \"read only\" or the even better \"tree is read only\"",
+      "revId": "0598a9c0413351e23dacdb07cd077c8b17b02597",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
