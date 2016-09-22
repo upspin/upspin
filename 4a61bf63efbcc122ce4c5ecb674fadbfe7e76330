@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0f9e3d6_f39f9ab8",
+        "filename": "auth/config.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-22T15:13:43Z",
+      "side": 1,
+      "message": "authenticating",
+      "revId": "4a61bf63efbcc122ce4c5ecb674fadbfe7e76330",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0f9e3d6_d3a49e15",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-22T15:13:43Z",
+      "side": 1,
+      "message": "errors.Permission should be in there",
+      "revId": "4a61bf63efbcc122ce4c5ecb674fadbfe7e76330",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0f9e3d6_73b4ca3e",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-22T15:13:43Z",
+      "side": 1,
+      "message": "ditto?",
+      "revId": "4a61bf63efbcc122ce4c5ecb674fadbfe7e76330",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
