@@ -376,6 +376,12 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 		if access.IsAccessFile(entry.Name) {
 			s.access.Remove(entry.Name)
 		}
+		// If we're updating a Group file, remove the old one from the
+		// access group cache. Let the new one be loaded lazily.
+		if access.IsGroupFile(entry.Name) {
+			err = access.RemoveGroup(entry.Name)
+			log.Printf("===== removing Group file: %q: %v", entry.Name, err)
+		}
 	}
 
 	entry, err = tree.Put(p, entry)
@@ -566,15 +572,19 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	wasAccess := access.IsAccessFile(p.Path())
 	entry, err := tree.Delete(p)
 	if err != nil {
 		return entry, err // could be ErrFollowLink.
 	}
 	// If we just deleted an Access file, remove it from the accessCache too.
-	if wasAccess {
+	if access.IsAccessFile(p.Path()) {
 		s.access.Remove(p.Path())
 	}
+	// If we just deleted a Group file, remove it from the Group cache too.
+	if access.IsGroupFile(p.Path()) {
+		access.RemoveGroup(p.Path())
+	}
+
 	return entry, nil
 }
 
