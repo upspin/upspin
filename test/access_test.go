@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"upspin.io/access"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
@@ -237,9 +238,10 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// Remove group file.
+	// Remove group file and dir, so tests are hermetic.
 	r.As(owner)
 	r.Delete(groupFile)
+	r.Delete(groupDir)
 }
 
 func testWhichAccess(t *testing.T, r *testenv.Runner) {
@@ -380,3 +382,142 @@ func testWhichAccess(t *testing.T, r *testenv.Runner) {
 		t.Errorf("entry.Name = %q, want = %q", got, want)
 	}
 }
+
+func testGroupAccess(t *testing.T, r *testenv.Runner) {
+	const (
+		base           = ownerName + "/group-access"
+		accessFile     = base + "/Access"
+		accessContents = "l,r: friends,family\n*: " + ownerName
+		groupDir       = ownerName + "/Group"
+		groupFriends   = groupDir + "/friends"
+		groupFamily    = groupDir + "/family"
+		familyMembers  = "uncle@domain.com,cousin@foo.com"
+		groupContents  = familyMembers + "," + readerName
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(groupDir)
+	r.Put(groupFriends, readerName)
+	r.Put(groupFamily, groupContents)
+	r.Put(accessFile, accessContents)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Reader has List and Read access via both Group files.
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, accessFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Drop reader from one of the Group files.
+	r.As(ownerName)
+	r.Put(groupFamily, familyMembers)
+
+	// Still got read Access.
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, accessFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Now drop from remaining Group file.
+	r.As(ownerName)
+	r.Put(groupFriends, "# Just kidding. This is empty.")
+
+	// Can't see it anymore.
+	r.As(readerName)
+	r.DirLookup(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader list permissions by adding them
+	// to the friends group, and adding the friends group
+	// to the family group.
+	r.As(ownerName)
+	r.Put(groupFriends, "someone@else.com,family")
+	r.Put(groupFamily, groupContents)
+	r.Put(accessFile, "l:friends\n") // only list rights.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Can Glob but not see the contents (can't see Blocks).
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(false, accessFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Create a Group in the reader's tree that contains
+	// both the reader and the owner, and then use that
+	// Group in the owner's Access file.
+	const (
+		readerGroupDir  = readerName + "/Group"
+		readerGroupFile = readerGroupDir + "/team"
+	)
+
+	// Create a tree for reader.
+	r.As(readerName)
+	r.MakeDirectory(readerName + "/")
+	r.MakeDirectory(readerGroupDir)
+	r.Put(readerGroupFile, ownerName+","+readerName)
+
+	// Use only readerGroupFile in Access file.
+	r.As(ownerName)
+	r.Put(accessFile, "*:"+readerGroupFile)
+
+	// Now reader can Lookup owner's directory.
+	r.As(readerName)
+	r.Glob(base + "/*")
+	if !r.GotEntries(true, accessFile) {
+		t.Fatal(r.Diag())
+	}
+
+	// Give the reader create rights in their Group,
+	// and test that it works across trees.
+	const newDir = base + "/newdir"
+	r.As(ownerName)
+	r.Put(accessFile, "c:"+readerGroupFile)
+	r.MakeDirectory(newDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.Delete(newDir)
+	if !r.Match(access.ErrPermissionDenied) {
+		t.Fatal(r.Diag())
+	}
+
+	// Also test the delete right.
+	r.Put(accessFile, "d:"+readerGroupFile)
+	r.Delete(newDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// List and Read via Group files are already tested in testReadAccess.
+
+	// Clean up the reader's tree, as the integration test's cleanup
+	// process doesn't know about it.
+	r.As(readerName)
+	r.Delete(readerGroupFile)
+	r.Delete(readerGroupDir)
+	r.Delete(readerName + "/")
+
+	// Remove group file and dir, so tests are hermetic.
+	r.As(ownerName)
+	r.Delete(groupFriends)
+	r.Delete(groupFamily)
+	r.Delete(groupDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
+
+// TODO: cross DirServer support for Group files.
+// Requires that DirServer implements it.
+// Also, requires that testenv supports configuring multiple DirServers at
+// once (it mostly does via serverMux, but requires that env.Setup passes a l
+// ist of servers to work with).
