@@ -21,15 +21,15 @@ var _ upspin.StoreServer = Server{}
 var ServerErr = errors.Str("request to Server service")
 
 // Get implements upspin.StoreServer.Get.
-func (Server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (Server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/Server.Get"
-	return nil, nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, nil, nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Put implements upspin.StoreServer.Put.
-func (Server) Put(data []byte) (upspin.Reference, error) {
+func (Server) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/Server.Put"
-	return "", errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, ServerErr)
 }
 
 // Delete implements upspin.StoreServer.Delete.

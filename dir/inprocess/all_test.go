@@ -124,7 +124,7 @@ func readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		ciphertext, locs, err := store.Get(block.Location.Reference)
+		ciphertext, _, locs, err := store.Get(block.Location.Reference)
 		if err != nil {
 			return nil, err
 		}

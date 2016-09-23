@@ -33,12 +33,12 @@ type remote struct {
 var _ upspin.StoreServer = (*remote)(nil)
 
 // Get implements upspin.StoreServer.Get.
-func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := opf("Get", "%q", ref)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
-		return nil, nil, op.error(err)
+		return nil, nil, nil, op.error(err)
 	}
 	req := &proto.StoreGetRequest{
 		Reference: string(ref),
@@ -46,21 +46,21 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 	resp, err := r.storeClient.Get(gCtx, req, callOpt)
 	err = finishAuth(err)
 	if err != nil {
-		return nil, nil, op.error(errors.IO, err)
+		return nil, nil, nil, op.error(errors.IO, err)
 	}
 	if len(resp.Error) != 0 {
-		return nil, nil, errors.UnmarshalError(resp.Error)
+		return nil, nil, nil, errors.UnmarshalError(resp.Error)
 	}
-	return resp.Data, proto.UpspinLocations(resp.Locations), nil
+	return resp.Data, proto.UpspinRefdata(resp.Refdata), proto.UpspinLocations(resp.Locations), nil
 }
 
 // Put implements upspin.StoreServer.Put.
-func (r *remote) Put(data []byte) (upspin.Reference, error) {
+func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
 	op := opf("Put", "%v bytes", len(data))
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
-		return "", op.error(err)
+		return nil, op.error(err)
 	}
 	req := &proto.StorePutRequest{
 		Data: data,
@@ -68,9 +68,9 @@ func (r *remote) Put(data []byte) (upspin.Reference, error) {
 	resp, err := r.storeClient.Put(gCtx, req, callOpt)
 	err = finishAuth(err)
 	if err != nil {
-		return "", op.error(errors.IO, err)
+		return nil, op.error(errors.IO, err)
 	}
-	return upspin.Reference(resp.Reference), op.error(errors.UnmarshalError(resp.Error))
+	return proto.UpspinRefdata(resp.Refdata), op.error(errors.UnmarshalError(resp.Error))
 }
 
 // Delete implements upspin.StoreServer.Delete.

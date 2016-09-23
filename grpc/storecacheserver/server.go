@@ -98,8 +98,14 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 		op.log(err)
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
+	refdata := &upspin.Refdata{
+		Reference: upspin.Reference(req.Reference),
+		Volatile:  false, // TODO
+		Duration:  0,     // TODO
+	}
 	resp := &proto.StoreGetResponse{
 		Data:      data,
+		Refdata:   proto.RefdataProto(refdata),
 		Locations: proto.Locations(locs),
 	}
 	return resp, nil
@@ -120,8 +126,13 @@ func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 		op.log(err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
+	refdata := &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false, // TODO
+		Duration:  0,     // TODO
+	}
 	resp := &proto.StorePutResponse{
-		Reference: string(ref),
+		Refdata: proto.RefdataProto(refdata),
 	}
 	return resp, nil
 }

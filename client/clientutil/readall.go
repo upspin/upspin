@@ -65,7 +65,7 @@ Blocks:
 			if isError(err) {
 				continue
 			}
-			cipher, locs, err := store.Get(loc.Reference)
+			cipher, _, locs, err := store.Get(loc.Reference)
 			if isError(err) {
 				continue // locs guaranteed to be nil.
 			}

@@ -77,7 +77,7 @@ func New(options ...string) (upspin.StoreServer, error) {
 }
 
 // Put implements upspin.StoreServer.
-func (s *server) Put(data []byte) (upspin.Reference, error) {
+func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/gcp.Put"
 	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
@@ -87,7 +87,7 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 	err := s.cache.Put(initialRef, sha)
 	if err != nil {
 		s.mu.RUnlock()
-		return "", errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 	// Figure out the appropriate reference for this blob.
 	ref := sha.EncodedSum()
@@ -107,15 +107,20 @@ func (s *server) Put(data []byte) (upspin.Reference, error) {
 		}
 		s.mu.RUnlock()
 	}()
-	return upspin.Reference(ref), nil
+	refdata := &upspin.Refdata{
+		Reference: upspin.Reference(ref),
+		Volatile:  false,
+		Duration:  0,
+	}
+	return refdata, nil
 }
 
 // Get implements upspin.StoreServer.
-func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
 	file, loc, err := s.innerGet(ref)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if file != nil {
 		defer file.Close()
@@ -123,9 +128,14 @@ func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
 		if err != nil {
 			err = errors.E(op, err)
 		}
-		return bytes, nil, err
+		return bytes, nil, nil, err
 	}
-	return nil, []upspin.Location{loc}, nil
+	refdata := &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false,
+		Duration:  0,
+	}
+	return nil, refdata, []upspin.Location{loc}, nil
 }
 
 // innerGet gets a local file descriptor or a new location for the reference. It returns only one of the two return

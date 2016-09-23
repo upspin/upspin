@@ -122,14 +122,14 @@ func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.Pat
 	if err != nil {
 		return nil, err
 	}
-	ref, err := store.Put(ciphertext)
+	refdata, err := store.Put(ciphertext)
 	if err != nil {
 		return nil, err
 	}
 	bp.SetLocation(
 		upspin.Location{
 			Endpoint:  context.StoreEndpoint(),
-			Reference: ref,
+			Reference: refdata.Reference,
 		},
 	)
 	if err := bp.Close(); err != nil {
