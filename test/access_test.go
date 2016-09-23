@@ -231,88 +231,142 @@ func testReadAccess(t *testing.T, packing upspin.Packing) {
 	r.read(user, publicFile, notExist)
 }
 
-func testWhichAccess(t *testing.T, packing upspin.Packing) {
+func testWhichAccess(t *testing.T, r *testenv.Runner) {
 	var (
-		user  = newUserName()
-		owner = newUserName()
-		root  = upspin.PathName(owner) + "/"
 	)
 	const (
-		publicDir        = "public"
-		privateDir       = "private"
+		user  = readerName
+		owner = ownerName
+		base = owner + "/which-access"
+		publicDir        = base + "/public"
+		privateDir       = base + "/private"
 		publicFile       = publicDir + "/public.txt"
 		privateFile      = privateDir + "/private.txt"
 		contentsOfPublic = "public file"
 	)
-	testSetup := &testenv.Setup{
-		OwnerName: owner,
-		Packing:   packing,
-		Kind:      "inprocess",
-	}
-
-	env, err := testenv.New(testSetup)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Build test tree.
-	tr := testenv.NewRunner()
-	tr.AddUser(env.Context)
-	tr.As(owner)
-	tr.MakeDirectory(root + publicDir)
-	tr.Put(root+publicFile, contentsOfPublic)
-	tr.MakeDirectory(root + privateDir)
-	tr.Put(root+privateFile, "private")
-	if tr.Failed() {
-		t.Fatal(tr.Diag())
-	}
-
-	userContext, err := env.NewUser(user)
-	if err != nil {
-		t.Fatalf("NewUser: %v", err)
-	}
-	userClient := client.New(userContext)
-
-	r := runner{
-		env:        env,
-		owner:      owner,
-		userClient: userClient,
-		t:          t,
+	r.As(owner)
+	r.MakeDirectory(base)
+	r.MakeDirectory(publicDir)
+	r.Put(publicFile, contentsOfPublic)
+	r.MakeDirectory(privateDir)
+	r.Put(privateFile, "private")
+	if r.Failed() {
+		t.Fatal(r.Diag())
 	}
 
 	// With no access files, every item is seen by owner.
-	r.state = "No Access files"
-	r.whichAccess(owner, "", success)
-	r.whichAccess(owner, privateDir, success)
-	r.whichAccess(owner, privateDir, success)
-	r.whichAccess(owner, publicDir, success)
-	r.whichAccess(owner, publicFile, success)
+	r.DirWhichAccess(base)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(privateDir)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(privateFile)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(publicDir)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(publicFile)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
 	// With no access files, no item is seen by user.
-	r.whichAccess(user, "", notExist)
-	r.whichAccess(user, privateDir, notExist)
-	r.whichAccess(user, privateDir, notExist)
-	r.whichAccess(user, publicDir, notExist)
-	r.whichAccess(user, publicFile, notExist)
+	r.As(user)
+	r.DirWhichAccess(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(publicDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(publicFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
 	// Add /public/Access, granting List to user.
-	const accessFile = "/public/Access"
 	var (
+		accessFile = upspin.PathName(publicDir + "/Access")
 		accessText = fmt.Sprintf("list:%s\nw:%s", user, owner)
 	)
-	r.state = "With Access file"
-	r.write(owner, accessFile, accessText, success)
+	r.As(owner)
+	r.Put(accessFile, accessText)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
-	// With Access file, every item is seen by owner.
-	r.whichAccess(owner, "", success)
-	r.whichAccess(owner, privateDir, success)
-	r.whichAccess(owner, privateDir, success)
-	r.whichAccess(owner, publicDir, success)
-	r.whichAccess(owner, publicFile, success)
+	// With Access file, every item is still seen by owner.
+	r.DirWhichAccess(base)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(privateDir)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(privateFile)
+	if r.Entry != nil {
+		t.Errorf("entry.Name = %q, want = nil", r.Entry.Name)
+	}
+	r.DirWhichAccess(publicDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if got, want := r.Entry.Name, accessFile; got !=  want {
+		t.Errorf("entry.Name = %q, want = %q", got, want)
+	}
+	r.DirWhichAccess(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if got, want := r.Entry.Name, accessFile; got !=  want {
+		t.Errorf("entry.Name = %q, want = %q", got, want)
+	}
 
 	// With Access file, only public items are seen by user.
-	r.whichAccess(user, "", notExist)
-	r.whichAccess(user, privateDir, notExist)
-	r.whichAccess(user, privateDir, notExist)
-	r.whichAccess(user, publicDir, success)
+	r.As(user)
+	r.DirWhichAccess(base)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(privateDir)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(privateFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
+	r.DirWhichAccess(publicDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if got, want := r.Entry.Name, accessFile; got !=  want {
+		t.Errorf("entry.Name = %q, want = %q", got, want)
+	}
+	r.DirWhichAccess(publicFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if got, want := r.Entry.Name, accessFile; got !=  want {
+		t.Errorf("entry.Name = %q, want = %q", got, want)
+	}
 }

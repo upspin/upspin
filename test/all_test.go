@@ -74,9 +74,6 @@ func runAllTests(t *testing.T, packing upspin.Packing) {
 	t.Run("ReadAccess", func(t *testing.T) {
 		testReadAccess(t, packing)
 	})
-	t.Run("WhichAccess", func(t *testing.T) {
-		testWhichAccess(t, packing)
-	})
 }
 
 func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {
