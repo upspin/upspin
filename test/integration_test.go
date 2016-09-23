@@ -286,29 +286,32 @@ var integrationTests = []struct {
 	fn   func(*testing.T, *testenv.Runner)
 }{
 	// These tests may be run independently.
-	{"GetErrors", testGetErrors},
-	{"GetLinkErrors", testGetLinkErrors},
-	{"PutErrors", testPutErrors},
-	{"PutLinkErrors", testPutLinkErrors},
-	{"MakeDirectoryErrors", testMakeDirectoryErrors},
-	{"MakeDirectoryLinkErrors", testMakeDirectoryLinkErrors},
-	{"WhichAccess", testWhichAccess},
-	{"WhichAccessErrors", testWhichAccessErrors},
-	{"WhichAccessLinkErrors", testWhichAccessLinkErrors},
-	{"GlobErrors", testGlobErrors},
-	{"GlobLinkErrors", testGlobLinkErrors},
-	{"SequenceNumbers", testSequenceNumbers},
-	{"RootDeletion", testRootDeletion},
-	{"ReadAccess", testReadAccess},
+	/*
+		{"GetErrors", testGetErrors},
+		{"GetLinkErrors", testGetLinkErrors},
+		{"PutErrors", testPutErrors},
+		{"PutLinkErrors", testPutLinkErrors},
+		{"MakeDirectoryErrors", testMakeDirectoryErrors},
+		{"MakeDirectoryLinkErrors", testMakeDirectoryLinkErrors},
+		{"WhichAccess", testWhichAccess},
+		{"WhichAccessErrors", testWhichAccessErrors},
+		{"WhichAccessLinkErrors", testWhichAccessLinkErrors},
+		{"GlobErrors", testGlobErrors},
+		{"GlobLinkErrors", testGlobLinkErrors},
+		{"SequenceNumbers", testSequenceNumbers},
+		{"RootDeletion", testRootDeletion},
+		{"ReadAccess", testReadAccess},*/
+	{"GroupAccess", testGroupAccess},
 
 	// Each of these tests depend on the output of the previous one.
-	{"NoReadersAllowed", testNoReadersAllowed},
-	{"AllowListAccess", testAllowListAccess},
-	{"AllowReadAccess", testAllowReadAccess},
-	{"CreateAndOpen", testCreateAndOpen},
-	{"GlobWithLimitedAccess", testGlobWithLimitedAccess},
-	{"GlobWithPattern", testGlobWithPattern},
-	{"Delete", testDelete},
+	/*
+		{"NoReadersAllowed", testNoReadersAllowed},
+		{"AllowListAccess", testAllowListAccess},
+		{"AllowReadAccess", testAllowReadAccess},
+		{"CreateAndOpen", testCreateAndOpen},
+		{"GlobWithLimitedAccess", testGlobWithLimitedAccess},
+		{"GlobWithPattern", testGlobWithPattern},
+		{"Delete", testDelete},*/
 }
 
 func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
