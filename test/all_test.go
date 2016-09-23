@@ -20,20 +20,18 @@ import (
 	_ "upspin.io/store/inprocess"
 )
 
-func TestInProcess(t *testing.T) {
+func TestClientFile(t *testing.T) {
 	for _, p := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEPack} {
 		t.Run(fmt.Sprintf("packing=%v", p), func(t *testing.T) {
-			runAllTests(t, p)
+			testFileSequentialAccess(t, newEnv(t, p))
 		})
 	}
 }
 
-var userNameCounter = 0
-
 // newEnv configures a test environment using a packing.
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 	s := &testenv.Setup{
-		OwnerName: newUserName(),
+		OwnerName: "user1@domain.com",
 		Kind:      "inprocess",
 		Packing:   packing,
 	}
@@ -42,11 +40,6 @@ func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
 		t.Fatal(err)
 	}
 	return env
-}
-
-func newUserName() upspin.UserName {
-	userNameCounter++
-	return upspin.UserName(fmt.Sprintf("user%d@domain.com", userNameCounter))
 }
 
 func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing.T) (upspin.File, []byte) {
@@ -61,37 +54,6 @@ func setupFileIO(fileName upspin.PathName, max int, env *testenv.Env, t *testing
 		data[i] = uint8(i)
 	}
 	return f, data
-}
-
-// TODO: these are currently only running for InProcess. Make them run with all
-// integration tests.
-func runAllTests(t *testing.T, packing upspin.Packing) {
-	env := newEnv(t, packing)
-	t.Run("PutGetTopLevelFile", func(t *testing.T) {
-		testPutGetTopLevelFile(t, env)
-	})
-	t.Run("FileSequentialAccess", func(t *testing.T) {
-		testFileSequentialAccess(t, env)
-	})
-}
-
-func testPutGetTopLevelFile(t *testing.T, env *testenv.Env) {
-	client := env.Client
-	userName := env.Setup.OwnerName
-
-	fileName := upspin.PathName(userName + "/" + "file")
-	const text = "hello sailor"
-	_, err := client.Put(fileName, []byte(text))
-	if err != nil {
-		t.Fatal("put file:", err)
-	}
-	data, err := client.Get(fileName)
-	if err != nil {
-		t.Fatal("get file:", err)
-	}
-	if string(data) != text {
-		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text)
-	}
 }
 
 func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
