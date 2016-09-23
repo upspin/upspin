@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "505c1305_33f8df62",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:48:05Z",
+      "side": 1,
+      "message": "Oh, I meant the TODO above function testPackAndUnpack (sorry, it wraps around on gerrit).",
+      "revId": "05da31753a5660f26e671b99a866d57ad36c5a25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
