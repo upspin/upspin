@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "505c1305_b8f12efd",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:15:13Z",
+      "side": 1,
+      "message": "Not RefData?",
+      "revId": "62a909f7554c3be9a92fb8eb08a5937175905ade",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_98946a91",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:15:13Z",
+      "side": 1,
+      "message": "I\u0027d move Refdata after []byte. Rationale: They go together -- if []byte is present, Refdata will be present. But if []Location is not nil, Refdata should never be present.",
+      "revId": "62a909f7554c3be9a92fb8eb08a5937175905ade",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
