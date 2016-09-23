@@ -96,13 +96,13 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 	if err != nil {
 		return err
 	}
-	ref, err := store.Put(cipher)
+	refdata, err := store.Put(cipher)
 	if err != nil {
 		return err
 	}
 	loc := upspin.Location{
 		Endpoint:  store.Endpoint(),
-		Reference: ref,
+		Reference: refdata.Reference,
 	}
 	bp.SetLocation(loc)
 	return nil

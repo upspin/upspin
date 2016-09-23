@@ -69,13 +69,14 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
 
-	data, locs, err := store.Get(upspin.Reference(req.Reference))
+	data, refdata, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		op.log(err)
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StoreGetResponse{
 		Data:      data,
+		Refdata:   proto.RefdataProto(refdata),
 		Locations: proto.Locations(locs),
 	}
 	return resp, nil
@@ -91,13 +92,13 @@ func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 
-	ref, err := store.Put(req.Data)
+	refdata, err := store.Put(req.Data)
 	if err != nil {
 		op.log(err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
 	resp := &proto.StorePutResponse{
-		Reference: string(ref),
+		Refdata: proto.RefdataProto(refdata),
 	}
 	return resp, nil
 }

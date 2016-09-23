@@ -59,12 +59,17 @@ func (s *service) Endpoint() upspin.Endpoint {
 }
 
 // Put implements upspin.StoreServer
-func (s *service) Put(ciphertext []byte) (upspin.Reference, error) {
+func (s *service) Put(ciphertext []byte) (*upspin.Refdata, error) {
 	ref := upspin.Reference(sha256key.Of(ciphertext).String())
 	s.data.mu.Lock()
 	s.data.blob[ref] = ciphertext
 	s.data.mu.Unlock()
-	return ref, nil
+	refdata := &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false,
+		Duration:  0,
+	}
+	return refdata, nil
 }
 
 // Delete implements upspin.StoreServer
@@ -89,21 +94,26 @@ func (s *service) DeleteAll() {
 
 // Get implements upspin.StoreServer
 // TODO: Get should provide alternate location if missing.
-func (s *service) Get(ref upspin.Reference) (ciphertext []byte, other []upspin.Location, err error) {
+func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.Refdata, other []upspin.Location, err error) {
 	const op = "store/inprocess.Get"
 	if ref == "" {
-		return nil, nil, errors.E(op, errors.Invalid, errors.Str("empty reference"))
+		return nil, nil, nil, errors.E(op, errors.Invalid, errors.Str("empty reference"))
 	}
 	s.data.mu.Lock()
 	data, ok := s.data.blob[ref]
 	s.data.mu.Unlock()
 	if !ok {
-		return nil, nil, errors.E(op, errors.NotExist, "no such blob")
+		return nil, nil, nil, errors.E(op, errors.NotExist, "no such blob")
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
-		return nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
+		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
 	}
-	return copyOf(data), nil, nil
+	refdata = &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false,
+		Duration:  0,
+	}
+	return copyOf(data), refdata, nil, nil
 }
 
 // Dial always returns an authenticated instance to the underlying service.
