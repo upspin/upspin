@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "505c1305_55a8db2a",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T19:48:46Z",
+      "side": 1,
+      "message": "isn\u0027t this done now? can\u0027t you delete the \u0027runner\u0027 type?",
+      "revId": "be6ad46f55f3fc54ab57ce085b2afd6f4c27ee9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_15b66390",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T19:48:46Z",
+      "side": 1,
+      "message": "for consistency either make a \u0027contentsOfPrivate\u0027 or drop this",
+      "revId": "be6ad46f55f3fc54ab57ce085b2afd6f4c27ee9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
