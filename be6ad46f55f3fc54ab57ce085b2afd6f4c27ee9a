@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "505c1305_b80f6e9b",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T20:42:47Z",
+      "side": 1,
+      "message": "Next CL. :-)",
+      "parentUuid": "505c1305_55a8db2a",
+      "revId": "be6ad46f55f3fc54ab57ce085b2afd6f4c27ee9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "505c1305_15b66390",
         "filename": "test/access_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-23T19:48:46Z",
       "side": 1,
       "message": "for consistency either make a \u0027contentsOfPrivate\u0027 or drop this",
+      "revId": "be6ad46f55f3fc54ab57ce085b2afd6f4c27ee9a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_d81422b0",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T20:42:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "505c1305_15b66390",
       "revId": "be6ad46f55f3fc54ab57ce085b2afd6f4c27ee9a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
