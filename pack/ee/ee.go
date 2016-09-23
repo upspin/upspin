@@ -64,8 +64,10 @@ var _ upspin.Packer = ee{}
 type ee struct{}
 
 const (
-	aesKeyLen     = 32 // AES-256,random-key because public cloud should withstand multifile multikey attack.
-	marshalBufLen = 66 // big enough for p521 according to (c.curve.Params().BitSize + 7) >> 3
+	aesKeyLen            = 32 // AES-256,random-key because public cloud should withstand multifile multikey attack.
+	marshalBufLen        = 66 // big enough for p521 according to (c.curve.Params().BitSize + 7) >> 3
+	gcmStandardNonceSize = 12
+	gcmTagSize           = 16
 )
 
 func init() {
@@ -76,12 +78,6 @@ func init() {
 		elliptic.P521().Params().Name: "p521",
 	}
 }
-
-const (
-	// unfortunately cipher/gcm.go doesn't export these
-	gcmStandardNonceSize = 12
-	gcmTagSize           = 16
-)
 
 var (
 	errTooShort           = errors.Str("destination slice too short")

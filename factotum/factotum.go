@@ -56,6 +56,7 @@ func KeyHash(p upspin.PublicKey) []byte {
 // by hand coding direct generation or use of private keys.
 func NewFromDir(dir string) (upspin.Factotum, error) {
 	const op = "factotum.NewFromDir"
+
 	privBytes, err := readFile(op, dir, "secret.upspinkey")
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -66,6 +67,12 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 		return nil, errors.E(op, err)
 	}
 	pubBytes = stripCR(pubBytes)
+
+	// TODO(ehg) symmSecret is not intended to be the final design.
+	symmSecret, err = readFile(op, dir, "symmsecret.upspinkey")
+	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		return nil, errors.E(op, err)
+	}
 
 	// Read older key pairs.
 	s2, err := readFile(op, dir, "secret2.upspinkey")
@@ -287,3 +294,14 @@ func readFile(op, dir, name string) ([]byte, error) {
 	}
 	return b, nil
 }
+
+// SymmSecret returns a symmetric key.  This should remain undocumented because
+// the design will change as soon as a better idea surfaces.
+func SymmSecret() ([]byte, error) {
+	if len(symmSecret) == 0 {
+		return nil, errors.E("factotum.SymmSecret", errors.NotExist)
+	}
+	return symmSecret, nil
+}
+
+var symmSecret []byte
