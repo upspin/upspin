@@ -6,94 +6,13 @@ package test
 
 import (
 	"fmt"
-	"runtime"
-	"strings"
 	"testing"
 
-	"upspin.io/path"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/unassigned"
 )
-
-// TODO(adg, r): use testenv.Runner to run these tests,
-// instead of the ad hoc 'runner' type.
-
-// Arguments for errStr in helpers.
-const (
-	success  = ""
-	notExist = "does not exist"
-)
-
-type runner struct {
-	state      string
-	env        *testenv.Env
-	owner      upspin.UserName
-	userClient upspin.Client
-	t          *testing.T
-}
-
-func (r *runner) read(user upspin.UserName, file upspin.PathName, errStr string) {
-	file = path.Join(upspin.PathName(r.owner), string(file))
-	var err error
-	client := r.env.Client
-	if user != r.owner {
-		client = r.userClient
-	}
-	_, err = client.Get(file)
-	r.check("Get", user, file, err, errStr)
-}
-
-func (r *runner) whichAccess(user upspin.UserName, file upspin.PathName, errStr string) {
-	file = path.Join(upspin.PathName(r.owner), string(file))
-	var err error
-	client := r.env.Client
-	if user != r.owner {
-		client = r.userClient
-	}
-	dir, err := client.DirServer(file)
-	if err != nil {
-		r.Errorf("WhichAccess: cannot get DirServer for file %q: %v", file, err)
-		return
-	}
-	_, err = dir.WhichAccess(file)
-	r.check("WhichAccess", user, file, err, errStr)
-}
-
-func (r *runner) check(op string, user upspin.UserName, file upspin.PathName, err error, errStr string) {
-	if errStr == "" {
-		if err != nil {
-			r.Errorf("%s: %s %q for user %q failed incorrectly: %v", r.state, op, file, user, err)
-		}
-	} else if err == nil {
-		r.Errorf("%s: %s %q for user %q succeeded incorrectly: %v", r.state, op, file, user, err)
-	} else if s := err.Error(); !strings.Contains(s, errStr) {
-		r.Errorf("%s: %s %q for user %q failed with error:\n\t%v\nwant:\n\t%v", r.state, op, file, user, err, errStr)
-	}
-}
-
-func (r *runner) Errorf(format string, args ...interface{}) {
-	_, file, line, ok := runtime.Caller(3)
-	if ok { // Should never fail.
-		if slash := strings.LastIndexByte(file, '/'); slash >= 0 {
-			file = file[slash+1:]
-		}
-		format = fmt.Sprintf("%s:%d: ", file, line) + format
-	}
-	r.t.Errorf(format, args...)
-}
-
-func (r *runner) write(user upspin.UserName, file upspin.PathName, contents string, errStr string) {
-	file = path.Join(upspin.PathName(r.owner), string(file))
-	var err error
-	client := r.env.Client
-	if user != r.owner {
-		client = r.userClient
-	}
-	_, err = client.Put(file, []byte(contents))
-	r.check("Put", user, file, err, errStr)
-}
 
 func testReadAccess(t *testing.T, r *testenv.Runner) {
 	const (
