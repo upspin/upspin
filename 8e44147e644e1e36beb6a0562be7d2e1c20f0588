@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "505c1305_9838ead8",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:12:45Z",
+      "side": 1,
+      "message": "Why not inject symmSecret into Factotum here and change NewFactotum below?",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_583e52c6",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:12:45Z",
+      "side": 1,
+      "message": "why is this global? Just put it inside the Factotum (see above).",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "505c1305_78607633",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
@@ -64,6 +98,57 @@
       "writtenOn": "2016-09-23T20:43:19Z",
       "side": 1,
       "message": "s/go/Name/",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_d8a42216",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:12:45Z",
+      "side": 1,
+      "message": "I think we can make a TODO here to share this routine and the one below across the ee pack too.\n\nI suggest:\n\nTODO: move to pack/internal/packtest.",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_38b43e3e",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:12:45Z",
+      "side": 1,
+      "message": "TODO: move to pack/internal/packtest.",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_78beb61d",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-23T21:12:45Z",
+      "side": 1,
+      "message": "ditto.",
       "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
