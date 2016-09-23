@@ -292,6 +292,7 @@ var integrationTests = []struct {
 	{"PutLinkErrors", testPutLinkErrors},
 	{"MakeDirectoryErrors", testMakeDirectoryErrors},
 	{"MakeDirectoryLinkErrors", testMakeDirectoryLinkErrors},
+	{"WhichAccess", testWhichAccess},
 	{"WhichAccessErrors", testWhichAccessErrors},
 	{"WhichAccessLinkErrors", testWhichAccessLinkErrors},
 	{"GlobErrors", testGlobErrors},
