@@ -7,6 +7,8 @@
 package proto
 
 import (
+	"time"
+
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -148,7 +150,7 @@ func UpspinUser(user *User) *upspin.User {
 	}
 }
 
-// UserProto converts an upspin.User to proto.User.
+// UserProto converts an upspin.User to a proto.User.
 func UserProto(user *upspin.User) *User {
 	return &User{
 		Name:      string(user.Name),
@@ -156,6 +158,24 @@ func UserProto(user *upspin.User) *User {
 		Stores:    Endpoints(user.Stores),
 		PublicKey: string(user.PublicKey),
 		// TODO: other fields?
+	}
+}
+
+// RefdataProto converts an upspin.Refdata to a proto.Refdata.
+func RefdataProto(refdata *upspin.Refdata) *Refdata {
+	return &Refdata{
+		Reference: string(refdata.Reference),
+		Volatile:  refdata.Volatile,
+		Duration:  int64(refdata.Duration),
+	}
+}
+
+// UpspinRefdata converts a proto.Refdata to upspin.Refdata.
+func UpspinRefdata(refdata *Refdata) *upspin.Refdata {
+	return &upspin.Refdata{
+		Reference: upspin.Reference(refdata.Reference),
+		Volatile:  refdata.Volatile,
+		Duration:  time.Duration(refdata.Duration),
 	}
 }
 

@@ -9,6 +9,8 @@
 package filesystem
 
 import (
+	"time"
+
 	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -46,32 +48,37 @@ type server struct {
 
 var errNotDialed = errors.E(errors.Internal, errors.Str("must Dial before making request"))
 
-func (s *server) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/filesystem.Get"
 	log.Debug.Println(op, ref)
 
 	if s.user == nil {
-		return nil, nil, errors.E(op, errNotDialed)
+		return nil, nil, nil, errors.E(op, errNotDialed)
 	}
 
 	pathName := upspin.PathName(s.server.UserName()) + "/" + upspin.PathName(ref)
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return nil, nil, errors.E(op, err)
+		return nil, nil, nil, errors.E(op, err)
 	}
 
 	// Verify that the requesting user can access this file.
 	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.Read, parsed); err != nil {
-		return nil, nil, errors.E(op, err)
+		return nil, nil, nil, errors.E(op, err)
 	} else if !ok {
-		return nil, nil, errors.E(op, parsed.Path(), access.ErrPermissionDenied)
+		return nil, nil, nil, errors.E(op, parsed.Path(), access.ErrPermissionDenied)
 	}
 
 	data, err := readFile(s.root, pathName)
 	if err != nil {
-		return nil, nil, errors.E(op, err)
+		return nil, nil, nil, errors.E(op, err)
 	}
-	return data, nil, nil
+	refdata := &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false,
+		Duration:  time.Minute, // TODO: Just for fun.
+	}
+	return data, refdata, nil, nil
 }
 
 func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
@@ -93,9 +100,9 @@ func (s *server) Close() {
 
 var errNotImplemented = errors.Str("not implemented")
 
-func (s *server) Put(ciphertext []byte) (upspin.Reference, error) {
+func (s *server) Put(ciphertext []byte) (*upspin.Refdata, error) {
 	const op = "store/filesystem.Put"
-	return "", errors.E(op, errNotImplemented)
+	return nil, errors.E(op, errNotImplemented)
 }
 
 func (s *server) Delete(ref upspin.Reference) error {

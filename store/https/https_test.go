@@ -28,7 +28,7 @@ func TestGetError(t *testing.T) {
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 	s := New("http://localhost:80", mock)
 
-	_, _, err := s.Get(ref)
+	_, _, _, err := s.Get(ref)
 
 	expected := fmt.Sprintf("store/https.Get: %s: %s", ref, errSomethingBad)
 	if !strings.Contains(err.Error(), expected) {
@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 	mock := nettest.NewMockHTTPClient([]nettest.MockHTTPResponse{resp}, []*http.Request{nettest.AnyRequest})
 	s := New("http://localhost:80", mock)
 
-	data, _, err := s.Get(ref)
+	data, _, _, err := s.Get(ref)
 	if err != nil {
 		t.Fatal(err)
 	}

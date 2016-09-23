@@ -72,13 +72,13 @@ func (d *DummyKey) Put(user *upspin.User) error {
 }
 
 // Get implements upspin.StoreServer.
-func (d *DummyStoreServer) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
-	return nil, nil, nil
+func (d *DummyStoreServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
+	return nil, nil, nil, nil
 }
 
 // Put implements upspin.StoreServer.
-func (d *DummyStoreServer) Put(data []byte) (upspin.Reference, error) {
-	return "", nil
+func (d *DummyStoreServer) Put(data []byte) (*upspin.Refdata, error) {
+	return nil, nil
 }
 
 // Delete implements upspin.StoreServer.

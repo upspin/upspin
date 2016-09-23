@@ -199,12 +199,13 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 			continue
 		}
 		var locs []upspin.Location
-		data, locs, err = store.Get(loc.Reference)
+		data, _, locs, err = store.Get(loc.Reference) // TODO: Use refdata.
 		if isError(err) {
 			continue // locs guaranteed to be nil.
 		}
 		if locs == nil && err == nil {
-			// Success, cache the data.
+			// Success, maybe cache the data.
+			// TODO: Use refdata information to cache.
 			if err := cr.saveToCacheFile(file, data); err != nil {
 				log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
 			}
@@ -227,10 +228,12 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 func (c *storeCache) put(data []byte, store upspin.StoreServer) (upspin.Reference, error) {
 	// If we can't put it to the store, don't cache.
 	// TODO(p): This will change with a write through cache.
-	ref, err := store.Put(data)
+	// TODO(p): Use refdata information.
+	refdata, err := store.Put(data)
 	if err != nil {
-		return ref, err
+		return refdata.Reference, err
 	}
+	ref := refdata.Reference
 
 	file := c.cachePath(ref, store.Endpoint())
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()

@@ -30,17 +30,18 @@ func TestPutAndGet(t *testing.T) {
 	s := newStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
-	ref, err := s.server.Put([]byte(contents))
+	refdata, err := s.server.Put([]byte(contents))
 	if err != nil {
 		t.Fatal(err)
 	}
+	ref := refdata.Reference
 	if ref != expectedRef {
 		t.Errorf("Expected reference %q, got %q", expectedRef, ref)
 	}
 
 	<-s.ch // Wait for the server thread to put to GCP safely.
 
-	data, locs, err := s.server.Get(ref)
+	data, _, locs, err := s.server.Get(ref)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +74,7 @@ func TestGetFromLocalCache(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	data, locs, err := s.server.Get(expectedRef)
+	data, _, locs, err := s.server.Get(expectedRef)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +109,7 @@ func TestGetInvalidRef(t *testing.T) {
 	s := newStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
-	_, _, err := s.server.Get("bla bla bla")
+	_, _, _, err := s.server.Get("bla bla bla")
 	if err == nil {
 		t.Fatal("Expected error")
 	}
@@ -129,7 +130,7 @@ func TestGCPErrorsOut(t *testing.T) {
 		Link: "very poorly-formated url",
 	}
 
-	_, _, err := s.server.Get("123")
+	_, _, _, err := s.server.Get("123")
 	if err == nil {
 		t.Fatal("Expected error")
 	}

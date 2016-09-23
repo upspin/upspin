@@ -18,6 +18,13 @@ message Location {
     string reference = 2;
 }
 
+// Refdata mirrors upspin.Refdata.
+message Refdata {
+    string reference = 1;
+    bool volatile = 2;
+    int64 duration = 3;
+}
+
 // The Service interface.
 
 message Signature {
@@ -48,8 +55,9 @@ message StoreGetRequest {
 
 message StoreGetResponse {
     bytes data = 1;
-    repeated Location locations = 2;
-    bytes error = 3;
+    Refdata refdata = 2;
+    repeated Location locations = 3;
+    bytes error = 4;
 }
 
 message StorePutRequest {
@@ -57,7 +65,7 @@ message StorePutRequest {
 }
 
 message StorePutResponse {
-    string reference = 1;
+    Refdata refdata = 1;
     bytes error = 2;
 }
 

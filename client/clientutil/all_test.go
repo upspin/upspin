@@ -137,14 +137,17 @@ type mockStore struct {
 	locRedirection map[upspin.Reference][]upspin.Location
 }
 
-func (s *mockStore) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (s *mockStore) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	if locs, found := s.locRedirection[ref]; found {
-		return nil, locs, nil
+		return nil, nil, locs, nil
 	}
 	if ref == s.locWithContent.Reference {
-		return s.content, nil, nil
+		refdata := &upspin.Refdata{
+			Reference: ref,
+		}
+		return s.content, refdata, nil, nil
 	}
-	return nil, nil, errors.E(errors.NotExist)
+	return nil, nil, nil, errors.E(errors.NotExist)
 }
 
 func (s *mockStore) Dial(upspin.Context, upspin.Endpoint) (upspin.Service, error) {

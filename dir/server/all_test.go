@@ -862,13 +862,13 @@ func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location
 	if err != nil {
 		t.Fatal(err)
 	}
-	ref, err := store.Put(data)
+	refdata, err := store.Put(data)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return upspin.Location{
 		Endpoint:  store.Endpoint(),
-		Reference: ref,
+		Reference: refdata.Reference,
 	}
 }
 

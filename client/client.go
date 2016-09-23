@@ -184,7 +184,7 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 		}
 		data = data[n:]
 		ss = s.StartSpan("store.Put")
-		ref, err := store.Put(cipher)
+		refdata, err := store.Put(cipher)
 		ss.End()
 		if err != nil {
 			return err
@@ -192,7 +192,7 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 		bp.SetLocation(
 			upspin.Location{
 				Endpoint:  c.context.StoreEndpoint(),
-				Reference: ref,
+				Reference: refdata.Reference,
 			},
 		)
 	}

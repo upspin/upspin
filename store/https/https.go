@@ -84,30 +84,35 @@ func (s *Store) Ping() bool {
 }
 
 // Get implements StoreServer.
-func (s *Store) Get(ref upspin.Reference) ([]byte, []upspin.Location, error) {
+func (s *Store) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/https.Get"
 	if ref == "" {
-		return nil, nil, newStoreError(op, invalidRefError, "")
+		return nil, nil, nil, newStoreError(op, invalidRefError, "")
 	}
 	url := string(ref)
 	if !strings.HasPrefix(string(ref), "http://") && !strings.HasPrefix(string(ref), "https://") {
-		return nil, nil, newStoreError(op, notHTTPError, ref)
+		return nil, nil, nil, newStoreError(op, notHTTPError, ref)
 	}
 	httpReq, err := http.NewRequest(Get, url, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	body, err := s.requestAndReadResponseBody(op, ref, httpReq)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return body, nil, nil
+	refdata := &upspin.Refdata{
+		Reference: ref,
+		Volatile:  false,
+		Duration:  0,
+	}
+	return body, refdata, nil, nil
 }
 
 // Put implements StoreServer.
-func (s *Store) Put(data []byte) (upspin.Reference, error) {
+func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/https.Put"
-	return "", errors.E(op, errors.Str("not implemented"))
+	return nil, errors.E(op, errors.Str("not implemented"))
 }
 
 // Delete implements StoreServer.
