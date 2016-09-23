@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "505c1305_78607633",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "s/,/, /\nwhy the hyphen in random-key? then multi-key? i don\u0027t know what your rules are.",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_98c1ca24",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "s/in/them in/",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_5821f20e",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "this is fine but a little side-effect-specific. maybe it\u0027s best.\nslower and more thorough and clear would be to call valid.DirEntry(d) although it may be stricter than you need.\ni guess the right answer is to be consistent with the other implementations of Unpack do, which is what you have here.",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_f8e806a8",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "s/go/Name/",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_f86ba618",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "filepath.Join?",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_580ad280",
+        "filename": "pack/symm/symm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "s/+/,/",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "505c1305_18713a08",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-09-23T20:43:19Z",
+      "side": 1,
+      "message": "s/,//",
+      "revId": "8e44147e644e1e36beb6a0562be7d2e1c20f0588",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
