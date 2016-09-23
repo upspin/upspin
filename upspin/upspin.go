@@ -216,6 +216,9 @@ const (
 	// "p521": AES-256, SHA-512, and curve P521; strength 256.
 	// "25519": TODO(ehg) x/crypto/curve25519, github.com/agl/ed25519
 	EEPack Packing = 20
+
+	// SymmPack stores AES-encrypted data, using a symmetric key.
+	SymmPack Packing = 21
 )
 
 // User represents all the public information about an Upspin user as returned by KeyServer.
