@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"math/big"
+	"time"
 )
 
 // A UserName is just an e-mail address representing a user.
@@ -423,6 +424,15 @@ const (
 	SeqBase     = 1  // Base at which valid sequence numbers start.
 )
 
+// Refdata attaches information about cacheability to a Reference. A Refdata is
+// returned by a StoreServer to describe the lifetime of the data associated with
+// a Reference.
+type Refdata struct {
+	Reference Reference     // The reference itself.
+	Volatile  bool          // If true, the data might change on every Get and cannot be cached.
+	Duration  time.Duration // For non-volatile data, the predicted cacheable lifetime; 0 means forever.
+}
+
 // The StoreServer saves and retrieves data without interpretation.
 type StoreServer interface {
 	Dialer
@@ -431,17 +441,17 @@ type StoreServer interface {
 	// Get attempts to retrieve the data identified by the reference.
 	// Three things might happen:
 	// 1. The data is in this StoreServer. It is returned. The Location slice
-	// and error are nil.
+	// and error are nil. Refdata contains information about the data.
 	// 2. The data is not in this StoreServer, but may be in one or more
 	// other locations known to the store. The slice of Locations
-	// is returned. The data slice and error are nil.
-	// 3. An error occurs. The data and Location slices are nil
+	// is returned. The data, Refdata, Locations, and error are nil.
+	// 3. An error occurs. The data, Locations and Refdata are nil
 	// and the error describes the problem.
-	Get(ref Reference) ([]byte, []Location, error)
+	Get(ref Reference) ([]byte, *Refdata, []Location, error)
 
 	// Put puts the data into the store and returns the reference
 	// to be used to retrieve it.
-	Put(data []byte) (Reference, error)
+	Put(data []byte) (Refdata, error)
 
 	// Delete permanently removes all storage space associated
 	// with the reference. After a successful Delete, calls to Get with the
