@@ -300,6 +300,7 @@ var integrationTests = []struct {
 	{"SequenceNumbers", testSequenceNumbers},
 	{"RootDeletion", testRootDeletion},
 	{"ReadAccess", testReadAccess},
+	{"GroupAccess", testGroupAccess},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
