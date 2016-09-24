@@ -48,8 +48,8 @@ func init() {
 }
 
 var (
-	testDirEndpoint   = upspin.Endpoint{upspin.InProcess, "dir"}
-	testStoreEndpoint = upspin.Endpoint{upspin.InProcess, "store"}
+	testDirEndpoint   = upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "dir"}
+	testStoreEndpoint = upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "store"}
 	testPublicKey     upspin.PublicKey
 )
 

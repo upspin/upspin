@@ -47,7 +47,7 @@ func main() {
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
-		log.Fatal("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
+		log.Fatalf("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
 	done := do(ctx, mountpoint)
 	<-done
