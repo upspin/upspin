@@ -125,7 +125,7 @@ func setupTestUser(key upspin.KeyServer) {
 
 	// Sanity checks to make sure we're not doing this in production.
 	if key.Endpoint().Transport != upspin.InProcess {
-		log.Fatal("cannot use testuser for endpoint %q", key.Endpoint())
+		log.Fatalf("cannot use testuser for endpoint %q", key.Endpoint())
 	}
 	if !isLocal(flags.HTTPSAddr) {
 		log.Fatal("cannot use -testuser flag except on localhost:port")
