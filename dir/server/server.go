@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"sync"
 	"upspin.io/access"
 	"upspin.io/cache"
 	"upspin.io/dir/server/tree"
@@ -66,6 +67,13 @@ type server struct {
 	// at the root of every user's tree, if an explicit one is not found.
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
+
+	// userLocks is a pool of user locks. To find the correct lock for a
+	// user, a string hash of a username selects the index into the slice to
+	// use. This fixed pool ensures we don't have a growing number of locks
+	// and that we also don't have a race creating new locks when we first
+	// touch a user.
+	userLocks [numUserLocks]sync.Mutex
 
 	// stopSnapshot is a channel for shutting down the snapshot loop.
 	stopSnapshot chan bool
@@ -667,7 +675,7 @@ func (s *server) Close() {
 }
 
 func (s *server) closeTree(user upspin.UserName) error {
-	mu := userLock(s.userName)
+	mu := s.userLock(s.userName)
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -688,7 +696,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		return nil, errors.E(errors.Invalid, err)
 	}
 
-	mu := userLock(user)
+	mu := s.userLock(user)
 	mu.Lock()
 	defer mu.Unlock()
 
