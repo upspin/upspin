@@ -8,6 +8,7 @@ package server
 
 import (
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -69,21 +70,57 @@ func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Ac
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	p, err := path.Parse(name)
 	if err != nil {
-		return nil, errors.E(err)
+		return nil, err
 	}
-	// TODO: must check whether p.User() is the one originally locked and if
-	// not, we must lock it in a goroutine or prove that this read-race is
-	// harmless. Allowing a read-race for now.
-	// https://github.com/googleprivate/upspin/issues/37
-	tree, err := s.loadTreeFor(p.User())
+
+	var entry *upspin.DirEntry
+	if s.userName == p.User() {
+		entry, err = s.lookup("loadPath", p, entryMustBeClean)
+	} else {
+		entry, err = s.remoteLookup(p)
+	}
 	if err != nil {
-		return nil, errors.E(err)
+		return nil, err
 	}
-	entry, _, err := tree.Lookup(p)
-	if err != nil {
-		return nil, errors.E(err)
-	}
+	// entry contains a valid value now. Read it.
 	return clientutil.ReadAll(s.serverContext, entry)
+}
+
+// remoteLookup performs a lookup on the canonical DirServer for the path,
+// which might be remote.
+func (s *server) remoteLookup(p path.Parsed) (*upspin.DirEntry, error) {
+	key, err := bind.KeyServer(s.serverContext, s.serverContext.KeyEndpoint())
+	if err != nil {
+		return nil, err
+	}
+	u, err := key.Lookup(p.User())
+	if err != nil {
+		return nil, err
+	}
+	var firstErr error
+	check := func(err error) error {
+		if firstErr == nil {
+			firstErr = err
+		}
+		return err
+	}
+	for _, e := range u.Dirs {
+		if e == s.serverContext.DirEndpoint() {
+			// It okay to load the tree for this user, because they
+			// live in this dir server, according to the KeyServer.
+			return s.lookup("remoteLookup", p, entryMustBeClean)
+		}
+		dir, err := bind.DirServer(s.serverContext, e)
+		if check(err) != nil {
+			// Skip bad bind.
+			continue
+		}
+		return dir.Lookup(p.Path())
+	}
+	if firstErr != nil {
+		return nil, firstErr
+	}
+	return nil, errors.E(errors.NotExist, p.Path(), errors.Str("no remote entry for path"))
 }
 
 // hasRight reports whether the current user has the given right on the path. If
