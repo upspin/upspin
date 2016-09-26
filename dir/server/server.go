@@ -183,6 +183,8 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
 
+	log.Printf("Looking up %q for user %q", name, s.userName)
+
 	// Check if the user can know about the file at all. If not, to prevent
 	// leaking its existence, return NotExist.
 	if err == upspin.ErrFollowLink {
@@ -201,8 +203,10 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
+		log.Printf("can't read %q", p.Path())
 		return nil, s.errPerm(op, p, o)
 	}
+	log.Printf("entry for %q: %+v", p.Path(), entry)
 	return entry, nil
 }
 
