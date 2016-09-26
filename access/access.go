@@ -25,6 +25,7 @@ import (
 	"sync"
 
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -484,10 +485,17 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 	}
 	// If the file is an Access or Group file, the owner has full rights always; no one else
 	// can write it.
-	if IsAccessFile(pathName) || IsGroupFile(pathName) {
+	isGroupFile := IsGroupFile(pathName)
+	if IsAccessFile(pathName) || isGroupFile {
+		log.Printf("=== is Access or Group. Right:%v", right)
 		switch right {
 		case Write, Create, Delete, AnyRight:
 			return isOwner, nil, nil
+		case Read, List:
+			// Anyone can read and list a group file.
+			if isGroupFile {
+				return true, nil, nil
+			}
 		}
 	}
 	list, err := a.getListFor(right)
