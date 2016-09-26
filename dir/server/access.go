@@ -8,8 +8,10 @@ package server
 
 import (
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -73,18 +75,27 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(err)
 	}
-	// TODO: must check whether p.User() is the one originally locked and if
-	// not, we must lock it in a goroutine or prove that this read-race is
-	// harmless. Allowing a read-race for now.
-	// https://github.com/googleprivate/upspin/issues/37
-	tree, err := s.loadTreeFor(p.User())
+	log.Printf("=== server for %q (%p, %s). Lookup path: %s", s.userName, s, s.serverContext.DirEndpoint().NetAddr, name)
+
+	dir, err := bind.DirServerFor(s.serverContext, name)
 	if err != nil {
-		return nil, errors.E(err)
+		return nil, err
 	}
-	entry, _, err := tree.Lookup(p)
+	var entry *upspin.DirEntry
+	if dir.Endpoint() == s.serverContext.DirEndpoint() {
+		log.Printf("=== %p (%s) Local lookup of %q", s, s.serverContext.DirEndpoint().NetAddr, p)
+		entry, err = s.lookup("loadPath", p, entryMustBeClean)
+		log.Printf("=== Local lookup: %v", err)
+	} else {
+		log.Printf("=== remote lookup: %p %p", dir, s)
+		entry, err = dir.Lookup(name)
+		log.Printf("=== Lookup from other dirServer: %s: %v", name, err)
+	}
 	if err != nil {
-		return nil, errors.E(err)
+		log.Printf("==== error in loadpath: %v", err)
+		return nil, err
 	}
+	// entry contains a valid value now. Read it.
 	return clientutil.ReadAll(s.serverContext, entry)
 }
 

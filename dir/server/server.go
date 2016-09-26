@@ -10,6 +10,7 @@ import (
 	goPath "path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"upspin.io/access"
 	"upspin.io/cache"
@@ -66,6 +67,13 @@ type server struct {
 	// at the root of every user's tree, if an explicit one is not found.
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
+
+	// userLocks is a pool of user locks. To find the correct lock for a
+	// user, a string hash of a username selects the index into the slice to
+	// use. This fixed pool ensures we don't have a growing number of locks
+	// and that we also don't have a race creating new locks when we first
+	// touch a user.
+	userLocks []sync.Mutex
 
 	// stopSnapshot is a channel for shutting down the snapshot loop.
 	stopSnapshot chan bool
@@ -152,8 +160,10 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
 		defaultAccess: cache.NewLRU(accessCacheSize),
+		userLocks:     make([]sync.Mutex, numUserLocks),
 		now:           upspin.Now,
 	}
+	log.Printf("*** server %p, lock1 %p", s, &s.userLocks[0])
 	s.startSnapshotLoop()
 	return s, nil
 }
@@ -164,12 +174,13 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	o, m := newOptMetric(op)
 	defer m.Done()
 
+	log.Printf("%p (%s): Lookup for %q", s, s.serverContext.DirEndpoint().NetAddr, name)
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -218,9 +229,11 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ..
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	log.Printf("%p: Tree for user %q: %p", s, p.User(), tree)
 	entry, dirty, err := tree.Lookup(p)
 	if err != nil {
 		// This could be ErrFollowLink so return the entry as well.
+		log.Printf("%p: path: %s, err=%v", s, p, err)
 		return entry, err
 	}
 	if dirty && entryMustBeClean {
@@ -281,7 +294,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access or Group"))
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -420,7 +433,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -555,7 +568,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, errNotExist)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -606,7 +619,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, err)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -669,7 +682,7 @@ func (s *server) Close() {
 	// garbage-collected even if other servers have pointers into the
 	// cache (which at least one will have, the one created with New).
 
-	mu := userLock(s.userName)
+	mu := s.userLock(s.userName)
 	mu.Lock()
 	defer mu.Unlock()
 
