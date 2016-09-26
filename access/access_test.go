@@ -273,8 +273,8 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 	loadTest := func(name upspin.PathName) ([]byte, error) {
 		switch name {
-		case "me@here.com/Group/family":
-			return []byte("# My family\n sister@me.com, brother@me.com\n"), nil
+		case groupName:
+			return []byte(groupText), nil
 		default:
 			return nil, errors.Errorf("%s not found", name)
 		}
@@ -314,6 +314,10 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 	// AnyRight works for groups.
 	check("sister@me.com", AnyRight, "me@here.com/foo/bar", true)
+
+	// Anyone can read the Group file itself, but not List.
+	check("someone@new.br", Read, "someotherdude@other.there/Group/foo", true)
+	check("someone@new.br", List, "someotherdude@other.there/Group/foo", false)
 
 	err = RemoveGroup("me@here.com/Group/family")
 	if err != nil {

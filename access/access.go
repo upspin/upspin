@@ -484,10 +484,18 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 	}
 	// If the file is an Access or Group file, the owner has full rights always; no one else
 	// can write it.
-	if IsAccessFile(pathName) || IsGroupFile(pathName) {
+	isGroupFile := IsGroupFile(pathName)
+	if IsAccessFile(pathName) || isGroupFile {
 		switch right {
 		case Write, Create, Delete, AnyRight:
 			return isOwner, nil, nil
+		case Read:
+			// Group files must be readable by all since remote
+			// DirServers need to fetch them on behalf of their
+			// users.
+			if isGroupFile {
+				return true, nil, nil
+			}
 		}
 	}
 	list, err := a.getListFor(right)
