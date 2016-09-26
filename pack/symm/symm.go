@@ -13,6 +13,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"time"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -128,8 +129,16 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 
 	// Pick fresh nonce for this block.
 	nonce := make([]byte, nonceLen)
-	// TODO(ehg) Consider replacing with a counter such as strictly monotonic time.
-	_, err = rand.Read(nonce)
+	t := time.Now().UnixNano()
+	nonce[0] = byte(t >> 56)
+	nonce[1] = byte(t >> 48)
+	nonce[2] = byte(t >> 40)
+	nonce[3] = byte(t >> 32)
+	nonce[4] = byte(t >> 24)
+	nonce[5] = byte(t >> 16)
+	nonce[6] = byte(t >> 8)
+	nonce[7] = byte(t)
+	_, err = rand.Read(nonce[8:])
 	if err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}
