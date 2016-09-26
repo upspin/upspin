@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "25267fad_9627cccb",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-26T07:01:52Z",
+      "side": 1,
+      "message": "that\u0027d be fine if you never mutated it :-)\nbut a local instance variable\n\nvar aead cipher.AEAD \n\nwould be fine too",
+      "parentUuid": "505c1305_6a97b947",
+      "revId": "7ce29ea7455dbf9f25e39e08c7652d436686165f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "25267fad_b67c08ac",
         "filename": "pack/symm/symm.go",
         "patchSetId": 5
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "I\u0027m confused.  Isn\u0027t it standard for the receiver to have a variable name and a type?",
       "parentUuid": "25267fad_b67c08ac",
+      "revId": "7ce29ea7455dbf9f25e39e08c7652d436686165f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "25267fad_b62ac893",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-26T07:01:52Z",
+      "side": 1,
+      "message": "You don\u0027t need a receiver name at all if you never use the receiver, which will be the case in all of these functions.",
+      "parentUuid": "505c1305_aa91d152",
       "revId": "7ce29ea7455dbf9f25e39e08c7652d436686165f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
