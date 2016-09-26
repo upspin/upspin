@@ -100,12 +100,15 @@ func init() {
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 }
 
+var count int
+
 func randomEndpoint(prefix string) upspin.Endpoint {
 	b := make([]byte, 64)
 	rand.Read(b)
+	count++
 	return upspin.Endpoint{
 		Transport: upspin.InProcess,
-		NetAddr:   upspin.NetAddr(fmt.Sprintf("%s-%x", prefix, b)),
+		NetAddr:   upspin.NetAddr(fmt.Sprintf("%s-%d", prefix, count)),
 	}
 }
 
@@ -195,6 +198,7 @@ func New(setup *Setup) (*Env, error) {
 		return nil, errors.E(op, err)
 	}
 
+	log.Printf("== client with dir %p: dir endpoint.NetAddr: %s", env.dirServer, ctx.DirEndpoint().NetAddr)
 	env.Client = client.New(ctx)
 	return env, nil
 }

@@ -142,6 +142,7 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
+	log.Printf("%p: Tree.Lookup: %q", t, p)
 	node, err := t.loadPath(p)
 	if err == upspin.ErrFollowLink {
 		return &node.entry, node.dirty, err
@@ -340,7 +341,9 @@ func (t *Tree) loadPath(p path.Parsed) (*node, error) {
 		return nil, err
 	}
 	node := t.root
+	log.Printf("==Tree.loadPath: root %q", t.root.entry.Name)
 	for i := 0; i < p.NElem(); i++ {
+		log.Printf("==Tree.loadPath: loading elem %q from node: %q. kids: %+v", p.Elem(i), node.entry.Name, node.kids)
 		node, err = t.loadNode(node, p.Elem(i))
 		if err != nil {
 			return node, err // err could be upspin.ErrFollowLink.
@@ -355,6 +358,7 @@ func (t *Tree) loadPath(p path.Parsed) (*node, error) {
 func (t *Tree) loadDir(dir *node) error {
 	// Must load from store if kids are not loaded.
 	if dir.kids == nil && len(dir.entry.Blocks) > 0 {
+		log.Printf("loadDir: loading kids for dir: %+v", dir)
 		err := t.loadKids(dir)
 		if err != nil {
 			return err
@@ -372,6 +376,7 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 		return parent, upspin.ErrFollowLink
 	}
 	if !parent.entry.IsDir() {
+		log.Printf("Tree: Not dir: %s", parent.entry.Name)
 		return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 	}
 	err := t.loadDir(parent)
@@ -379,17 +384,19 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 		return nil, err
 	}
 	for dirName, node := range parent.kids {
+		log.Printf("Tree.loadNode: lookup at %s", dirName)
 		if elem == dirName {
 			return node, nil
 		}
 	}
+	log.Printf("Tree.loadNode: Could not find %q in parent=%s", elem, parent.entry.Name)
 	return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 }
 
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
+	log.Printf("Loading kids from Store for %q", parent.entry.Name)
 	data, err := clientutil.ReadAll(t.context, &parent.entry)
 	if err != nil {
 		return err
