@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "25caff6e_3c9f595a",
+        "filename": "dir/server/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-09-26T22:37:35Z",
+      "side": 1,
+      "message": "can\u0027t this also mean that the user should be on this dirserver but hasn\u0027t created(Put)  his root yet?",
+      "range": {
+        "startLine": 94,
+        "startChar": 4,
+        "endLine": 94,
+        "endChar": 91
+      },
+      "revId": "2f2dae98d6666334c8f03240250b2cddea6234f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
