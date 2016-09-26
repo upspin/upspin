@@ -8,8 +8,10 @@ package server
 
 import (
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -58,6 +60,7 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 // loadAccess loads and processes an Access file from its DirEntry.
 func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Access, error) {
 	defer span(opts).StartSpan("loadAccess").End()
+	log.Printf("=== loading access file: %s", entry.Name)
 	buf, err := clientutil.ReadAll(s.serverContext, entry)
 	if err != nil {
 		return nil, err
@@ -73,18 +76,35 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(err)
 	}
+	var entry *upspin.DirEntry
 	// TODO: must check whether p.User() is the one originally locked and if
 	// not, we must lock it in a goroutine or prove that this read-race is
 	// harmless. Allowing a read-race for now.
 	// https://github.com/googleprivate/upspin/issues/37
 	tree, err := s.loadTreeFor(p.User())
-	if err != nil {
-		return nil, errors.E(err)
+	if err == nil {
+		// Tree loaded. Lookup entry.
+		entry, _, err = tree.Lookup(p)
+	} else if err != nil && errors.Match(errNotExist, err) {
+		// Check with another dir server.
+		var dir upspin.DirServer
+		dir, err = bind.DirServerFor(s.serverContext, name)
+		if err != nil {
+			return nil, err
+		}
+		if dir == s {
+			return nil, errors.E(errors.Internal, errors.Str("dir server resolution returned self"))
+		}
+		entry, err = dir.Lookup(name)
+	} else {
+		// More serious error, abort.
+		return nil, err
 	}
-	entry, _, err := tree.Lookup(p)
+	// Fall through comes with a new value for 'err'. Check it now.
 	if err != nil {
-		return nil, errors.E(err)
+		return nil, err
 	}
+	// Entry contains a valid value. Use it.
 	return clientutil.ReadAll(s.serverContext, entry)
 }
 
