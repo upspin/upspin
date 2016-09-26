@@ -82,16 +82,11 @@ type Env struct {
 }
 
 var (
-	keyServerMux   *servermux.Mux
 	storeServerMux *servermux.Mux
 	dirServerMux   *servermux.Mux
 )
 
 func init() {
-	var key upspin.KeyServer
-	keyServerMux, key = servermux.NewKey()
-	bind.RegisterKeyServer(upspin.InProcess, key)
-
 	var store upspin.StoreServer
 	storeServerMux, store = servermux.NewStore()
 	bind.RegisterStoreServer(upspin.InProcess, store)
@@ -99,6 +94,8 @@ func init() {
 	var dir upspin.DirServer
 	dirServerMux, dir = servermux.NewDir()
 	bind.RegisterDirServer(upspin.InProcess, dir)
+
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 }
 
 func randomEndpoint(prefix string) upspin.Endpoint {
@@ -118,11 +115,9 @@ func New(setup *Setup) (*Env, error) {
 	}
 	ctx := context.New()
 
-	// All tests use an in-process key server.
-	keyEndpoint := randomEndpoint("key")
-	ctx = context.SetKeyEndpoint(ctx, keyEndpoint)
-	env.keyServer = keyserver.New()
-	keyServerMux.Register(keyEndpoint, env.keyServer)
+	// All tests use the same keyserver, so that users of different
+	// DirServers can still interact with each other.
+	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	switch k := setup.Kind; k {
 	case "inprocess", "server":
