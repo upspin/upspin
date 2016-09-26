@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"upspin.io/bind"
 	"upspin.io/client"
@@ -41,6 +42,7 @@ import (
 const (
 	TestStoreServer = "store.test.upspin.io:443"
 	TestDirServer   = "dir.test.upspin.io:443"
+	TestServerName  = "dir-server@upspin.io"
 )
 
 // Setup is a configuration structure that contains a directory tree and other optional flags.
@@ -82,16 +84,11 @@ type Env struct {
 }
 
 var (
-	keyServerMux   *servermux.Mux
 	storeServerMux *servermux.Mux
 	dirServerMux   *servermux.Mux
 )
 
 func init() {
-	var key upspin.KeyServer
-	keyServerMux, key = servermux.NewKey()
-	bind.RegisterKeyServer(upspin.InProcess, key)
-
 	var store upspin.StoreServer
 	storeServerMux, store = servermux.NewStore()
 	bind.RegisterStoreServer(upspin.InProcess, store)
@@ -99,6 +96,8 @@ func init() {
 	var dir upspin.DirServer
 	dirServerMux, dir = servermux.NewDir()
 	bind.RegisterDirServer(upspin.InProcess, dir)
+
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 }
 
 func randomEndpoint(prefix string) upspin.Endpoint {
@@ -118,11 +117,9 @@ func New(setup *Setup) (*Env, error) {
 	}
 	ctx := context.New()
 
-	// All tests use an in-process key server.
-	keyEndpoint := randomEndpoint("key")
-	ctx = context.SetKeyEndpoint(ctx, keyEndpoint)
-	env.keyServer = keyserver.New()
-	keyServerMux.Register(keyEndpoint, env.keyServer)
+	// All tests use the same keyserver, so that users of different
+	// DirServers can still interact with each other.
+	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	switch k := setup.Kind; k {
 	case "inprocess", "server":
@@ -147,8 +144,8 @@ func New(setup *Setup) (*Env, error) {
 			env.dirServer = dirserver_inprocess.New(ctx)
 		case "server":
 			// Set up user and factotum.
-			ctx = context.SetUserName(ctx, "upspin-test@google.com")
-			f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
+			ctx = context.SetUserName(ctx, TestServerName)
+			f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
