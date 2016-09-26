@@ -144,7 +144,7 @@ func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 		return false, path.Parsed{}, errors.E(op, err)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -178,7 +178,7 @@ func (s *server) lookupLocked(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -192,7 +192,7 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 		return err
 	}
 
-	mu := userLock(dstDir.User())
+	mu := s.userLock(dstDir.User())
 	mu.Lock()
 	defer mu.Unlock()
 

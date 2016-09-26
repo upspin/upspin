@@ -10,6 +10,7 @@ import (
 	goPath "path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"upspin.io/access"
 	"upspin.io/cache"
@@ -66,6 +67,13 @@ type server struct {
 	// at the root of every user's tree, if an explicit one is not found.
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
+
+	// userLocks is a pool of user locks. To find the correct lock for a
+	// user, a string hash of a username selects the index into the slice to
+	// use. This fixed pool ensures we don't have a growing number of locks
+	// and that we also don't have a race creating new locks when we first
+	// touch a user.
+	userLocks [numUserLocks]sync.Mutex
 
 	// stopSnapshot is a channel for shutting down the snapshot loop.
 	stopSnapshot chan bool
@@ -169,7 +177,7 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, err)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -282,7 +290,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -421,7 +429,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -556,7 +564,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, errNotExist)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -621,7 +629,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, err)
 	}
 
-	mu := userLock(p.User())
+	mu := s.userLock(p.User())
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -684,7 +692,7 @@ func (s *server) Close() {
 	// garbage-collected even if other servers have pointers into the
 	// cache (which at least one will have, the one created with New).
 
-	mu := userLock(s.userName)
+	mu := s.userLock(s.userName)
 	mu.Lock()
 	defer mu.Unlock()
 
