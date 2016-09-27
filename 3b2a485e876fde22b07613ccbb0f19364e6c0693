@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8571eb59_c972d13c",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "this should be under base, all the tests should be in self-contained directories.\n\nthis means you\u0027ll need to put the Access file in a sub-directory of base",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_897cd90f",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "s/bffs/friends/\ns/groupFile1/groupFriends/\ns/groupFile2/groupFamily/",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_e9779529",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "Use glob, so you can use the helper, and we test everything end-to-end:\n\nr.Glob(base + \"/*\")\nif !r.GotEntries(true, groupDir, etc) {\n  t.Fatal(r.Diag())\n}",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_4987c112",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_a9819d00",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "This is empty",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_0991c94d",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "// Give the reader list permissions by adding them\n// to the friends group, and adding the friends group\n// to the family group.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_6984050d",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "maybe make this content a constant, at the top, named readerAndFamily",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_298e0d2d",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "why are you also giving the owner glob rights here?",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_c9997176",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "use GotEntries",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_89937952",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "// Create a Group in the reader\u0027s tree that contains\n// both the reader and the owner, and then use that\n// Group in the owner\u0027s Access file.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_e99eb55b",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "these should also be in a base directory \u0027/group-access\u0027",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_a998bd6e",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "glob/gotentries",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_49aee184",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "// Give the reader create rights in their Group,\n// and test that it works across trees.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_69aba573",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "// Also test the delete right.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_09a8e973",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "where?",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_c9c09128",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T01:06:03Z",
+      "side": 1,
+      "message": "// Clean up the reader\u0027s tree, as the integration test\u0027s cleanup\n// process doesn\u0027t know about it.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
