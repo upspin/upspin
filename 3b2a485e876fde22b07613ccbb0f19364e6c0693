@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_a9a2d1a5",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Group files must be in subdir Group of root.",
+      "parentUuid": "8571eb59_c972d13c",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_897cd90f",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "s/bffs/friends/\ns/groupFile1/groupFriends/\ns/groupFile2/groupFamily/",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_4992455c",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_897cd90f",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_a498b86e",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_e9779529",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_4987c112",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "ditto",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_84aed481",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_4987c112",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_44a8ec74",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_a9819d00",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_0991c94d",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "// Give the reader list permissions by adding them\n// to the friends group, and adding the friends group\n// to the family group.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_24a5e89a",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_0991c94d",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_c4ca9c45",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "It\u0027s not re-used.",
+      "parentUuid": "8571eb59_6984050d",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_298e0d2d",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "why are you also giving the owner glob rights here?",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_44bfcca7",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Good form. But not needed. Removed.",
+      "parentUuid": "8571eb59_298e0d2d",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_24bcc8b0",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_c9997176",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_89937952",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "// Create a Group in the reader\u0027s tree that contains\n// both the reader and the owner, and then use that\n// Group in the owner\u0027s Access file.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_64d9b017",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_89937952",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_041784b9",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Group files must be in subdir Group of root.",
+      "parentUuid": "8571eb59_e99eb55b",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_a998bd6e",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -200,6 +398,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "glob/gotentries",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_c4205c0a",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_a998bd6e",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_e402406d",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_49aee184",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_69aba573",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -234,6 +468,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "// Also test the delete right.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_841254bb",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_69aba573",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "45f293e7_84593493",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_09a8e973",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_c9c09128",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -268,6 +538,24 @@
       "writtenOn": "2016-09-27T01:06:03Z",
       "side": 1,
       "message": "// Clean up the reader\u0027s tree, as the integration test\u0027s cleanup\n// process doesn\u0027t know about it.",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45f293e7_04654441",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T19:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_c9c09128",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
