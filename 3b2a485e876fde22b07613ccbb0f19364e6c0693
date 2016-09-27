@@ -265,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_aae72fd1",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T21:38:55Z",
+      "side": 1,
+      "message": "Ah, it was in the other order. Okay.\n\nDone.",
+      "parentUuid": "8571eb59_69a16540",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_298e0d2d",
         "filename": "test/access_test.go",
         "patchSetId": 3
@@ -417,6 +435,24 @@
       "side": 1,
       "message": "well then we\u0027d better remove /Group after this test completes.",
       "parentUuid": "45f293e7_041784b9",
+      "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_cae6e3d2",
+        "filename": "test/access_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-27T21:38:55Z",
+      "side": 1,
+      "message": "We do, at the bottom of this test. Not for the owner, because all its subdirs are removed by cleanup.",
+      "parentUuid": "8571eb59_49a4a151",
       "revId": "3b2a485e876fde22b07613ccbb0f19364e6c0693",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
