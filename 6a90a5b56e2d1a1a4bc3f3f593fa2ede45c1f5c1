@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8571eb59_099ea907",
+        "filename": "test/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-27T21:32:28Z",
+      "side": 1,
+      "message": "can you please use groupFriends / \"/friends\" ?\nI don\u0027t know what \"Bffs\" is",
+      "revId": "6a90a5b56e2d1a1a4bc3f3f593fa2ede45c1f5c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
