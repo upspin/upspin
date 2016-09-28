@@ -663,8 +663,8 @@ type Context interface {
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
-	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
-	StoreCacheEndpoint() Endpoint
+	// CacheEndpoint is the endpoint of the store and directory cache server.
+	CacheEndpoint() Endpoint
 
 	// CertPool returns the x509 certificate pool
 	// used to validate client TLS connections.
