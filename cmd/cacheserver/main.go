@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Storecache is a wrapper for a storage cache implementation that presents
-// itself as a GRPC interface.
+// Storecache is a wrapper for a storage cache implementation that presents itself as a GRPC interface.
 package main
 
 import (
@@ -13,17 +12,16 @@ import (
 	"upspin.io/auth/grpcauth"
 	"upspin.io/context"
 	"upspin.io/flags"
+	"upspin.io/grpc/dircacheserver"
 	"upspin.io/grpc/storecacheserver"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
 	// Load required transports
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/transports"
 
 	// Load useful packers
-	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
@@ -32,7 +30,7 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
-const serverName = "storecacheserver"
+const serverName = "cacheserver"
 
 func main() {
 	flags.Parse()
@@ -45,27 +43,34 @@ func main() {
 
 	// Serving address comes from config with flag overriding.
 	var addr string
-	ce := ctx.StoreCacheEndpoint()
-	if ce.Transport == upspin.Remote {
+	if ce := ctx.CacheEndpoint(); ce.Transport == upspin.Remote {
 		addr = string(ce.NetAddr)
 	}
 	if flags.NetAddr != "" {
 		addr = flags.NetAddr
 	}
+	if len(addr) == 0 {
+		log.Fatalf("no storage/dir cache network address specified")
+	}
 
 	// Stop the cache server recursing.
-	ctx = context.SetStoreCacheEndpoint(ctx, upspin.Endpoint{})
+	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
 	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx), Context: ctx}
 	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s, err := storecacheserver.New(ctx, grpcSecureServer)
+	ss, err := storecacheserver.New(ctx, grpcSecureServer)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
-	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
+	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), ss)
+	ds, err := dircacheserver.New(ctx, grpcSecureServer)
+	if err != nil {
+		log.Fatalf("opening cache: %s", err)
+	}
+	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), ds)
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
