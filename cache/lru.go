@@ -33,6 +33,13 @@ type LRU struct {
 	cache map[interface{}]*list.Element
 }
 
+// Iterator is a iterator through the list. The list may change while
+// the iterator is held making the iterator invalid.
+type Iterator struct {
+	lru  *LRU
+	this *list.Element
+}
+
 // *entry is the type stored in each *list.Element.
 type entry struct {
 	key, value interface{}
@@ -127,4 +134,27 @@ func (c *LRU) Len() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.ll.Len()
+}
+
+// NewIterator returns a new iterator for the LRU.
+func (c *LRU) NewIterator() *Iterator {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return &Iterator{lru: c, this: c.ll.Front()}
+}
+
+// GetAndAdvance returns key, value, true if the current entry is valid and advances the
+// iterator. Otherwise it returns nil,nil, false.
+func (i *Iterator) GetAndAdvance() (interface{}, interface{}, bool) {
+	if i == nil {
+		return nil, nil, false
+	}
+	i.lru.mu.Lock()
+	defer i.lru.mu.Unlock()
+	if i.this == nil {
+		return nil, nil, false
+	}
+	ent := i.this.Value.(*entry)
+	i.this = i.this.Next()
+	return ent.key, ent.value, true
 }
