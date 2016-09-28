@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_7b634739",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_29512d2d",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_69572524",
         "filename": "cmd/archive/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-28T00:59:20Z",
       "side": 1,
       "message": "put this up near the flags",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_fb45779c",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "see below.",
+      "parentUuid": "8571eb59_69572524",
       "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_db4a33ac",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_893ff9e2",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_0954691c",
         "filename": "cmd/archive/main.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-28T00:59:20Z",
       "side": 1,
       "message": "put this after or before \u0027type archiver\u0027",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_7b3a2721",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "moved up, after full definition of archiver.",
+      "parentUuid": "8571eb59_0954691c",
       "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_5b376335",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8571eb59_a9443d6f",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_495a614f",
         "filename": "cmd/archive/main.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-28T00:59:20Z",
       "side": 1,
       "message": "this isn\u0027t c, so we can put the main function at the top, next to where the flags are defined etc. then you can more easily read the program top to bottom",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_bbbadf8b",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T05:34:53Z",
+      "side": 1,
+      "message": "It\u0027s not about being C, it\u0027s about flow of reading code. Main only puts stuff together, but if I don\u0027t know what that stuff is, it\u0027s just not clear what it\u0027s doing yet. \n\nI suggest we do: const, var, types, implementation of type\u0027s methods, non-member helper functions, and then main and init last.\n\nOr we agree to live with slightly different styles. It\u0027s better than arguing forever (and beats moving code around at review time).",
+      "parentUuid": "8571eb59_495a614f",
       "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
