@@ -209,6 +209,24 @@
       "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_002a46e6",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T10:14:18Z",
+      "side": 1,
+      "message": "\"I suggest we do it my way, or we agree to disagree.\"\nYou drive a hard bargain!\n\nWhen I read a program, I start with main and follow the flow of code. Compilers do it the other way around, because they have a perfect memory. I don\u0027t.\n\nI don\u0027t care to argue about it any further, but I strongly suggest you do it the other way (the structure of cmd/upspin is nice, IMO). We are planning to open source this code, and it\u0027s important to me that the code is accessible to other programmers.",
+      "parentUuid": "45d37396_bbbadf8b",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
