@@ -88,7 +88,7 @@ type Factotum interface {
 
 	// ScalarMult is the bare private key operator, used in unwrapping packed data.
 	// Each call needs security review to ensure it cannot be abused as a signing
-	// oracle. Read https://en.wikipedia.org/wiki/Confused_deputy_problem.
+	// oracle. Read https://en.wikipedia.org/wiki/Confused_deputReqy_problem.
 	// Returns error "no such key" if factotum doesn't hold the necessary private key.
 	ScalarMult(keyHash []byte, c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error)
 
@@ -269,7 +269,7 @@ type PublicKey string
 // retry the operation, substituting that prefix (which may be the
 // entire name) with the contents of the Link field of the returned
 // DirEntry.
-var ErrFollowLink = errors.New("action incomplete: must follow link")
+var ErrFollowLink = errors.New("request incomplete: must follow link")
 
 // MaxLinkHops is the maximum number of links that will be followed
 // when evaluating a single path name.
@@ -346,9 +346,9 @@ type DirServer interface {
 	// links may only partially match the original argument pattern.
 	Glob(pattern string) ([]*DirEntry, error)
 
-	// Delete deletes the DirEntry for a name from the directory service.
-	// It does not delete the data it references; use StoreServer.Delete
-	// for that. If the name identifies a link, Delete will delete the
+	// Delete deleteReqs the DirEntry for a name from the directory service.
+	// It does not deleteReq the data it references; use StoreServer.Delete
+	// for that. If the name identifies a link, Delete will deleteReq the
 	// link itself, not its target.
 	//
 	// If the returned error is ErrFollowLink, the caller should
@@ -458,7 +458,7 @@ type StoreServer interface {
 	// and the error describes the problem.
 	Get(ref Reference) ([]byte, *Refdata, []Location, error)
 
-	// Put puts the data into the store and returns the reference
+	// Put putReqs the data into the store and returns the reference
 	// to be used to retrieve it.
 	Put(data []byte) (*Refdata, error)
 
@@ -504,7 +504,7 @@ type Client interface {
 	// PutLink creates a link from the new name to the old name. The
 	// new name must not look like the path to an Access or Group file.
 	// If something is already stored with the new name, it is first
-	// deleted from the directory but its storage is not deleted from
+	// deleteReqd from the directory but its storage is not deleteReqd from
 	// the Store. (See the documentation for Delete.) The old name is
 	// not evaluated, that is, the resulting link will hold the
 	// argument to PutLink even if it refers to a path that itself
@@ -527,11 +527,11 @@ type Client interface {
 	// Rename renames oldName to newName. The old name is no longer valid.
 	Rename(oldName, newName PathName) error
 
-	// Delete deletes the DirEntry associated with the name. The
-	// storage referenced by the DirEntry is not explicitly deleted,
+	// Delete deleteReqs the DirEntry associated with the name. The
+	// storage referenced by the DirEntry is not explicitly deleteReqd,
 	// although the storage server may garbage collect unreferenced
 	// data independently. If the final element of the path name is a
-	// link, Delete will delete the link itself, not the link target.
+	// link, Delete will deleteReq the link itself, not the link target.
 	Delete(name PathName) error
 
 	// Glob matches the pattern against the file names of the full
