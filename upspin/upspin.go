@@ -279,7 +279,7 @@ type PublicKey string
 // retry the operation, substituting that prefix (which may be the
 // entire name) with the contents of the Link field of the returned
 // DirEntry.
-var ErrFollowLink = errors.New("action incomplete: must follow link")
+var ErrFollowLink = errors.New("request incomplete: must follow link")
 
 // MaxLinkHops is the maximum number of links that will be followed
 // when evaluating a single path name.
@@ -615,8 +615,8 @@ type Context interface {
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
-	// StoreCacheEndpoint is the endpoint of the StoreServer in which to place new data items.
-	StoreCacheEndpoint() Endpoint
+	// CacheEndpoint is the endpoint of the store adn directory cache server.
+	CacheEndpoint() Endpoint
 
 	// CertPool returns the x509 certificate pool
 	// used to validate client TLS connections.

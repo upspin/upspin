@@ -98,8 +98,8 @@ func (r *remote) Endpoint() upspin.Endpoint {
 }
 
 func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) upspin.Service {
-	// Are we using a Store cache?
-	ce := context.StoreCacheEndpoint()
+	// Are we using a cache?
+	ce := context.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return nil
 	}
