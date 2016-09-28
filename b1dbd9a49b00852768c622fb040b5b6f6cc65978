@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8571eb59_29512d2d",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "really this is just a file, not necessarily an access file, and since the type is only used in the unarchive function, you can do this inside the func:\n\ntype file struct {\n  name upspin.PathName\n  content []byte\n}\nvar accessFiles []file",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_69572524",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "put this up near the flags",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_893ff9e2",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "fmt.Fprint(os.Stderr, `Usage:\n...\n`)",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_0954691c",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "put this after or before \u0027type archiver\u0027",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_a9443d6f",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "drop the variable, put it in the struct",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8571eb59_495a614f",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T00:59:20Z",
+      "side": 1,
+      "message": "this isn\u0027t c, so we can put the main function at the top, next to where the flags are defined etc. then you can more easily read the program top to bottom",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
