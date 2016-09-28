@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_330f3394",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_40472ea6",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_20730a10",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "hdr :\u003d \u0026tar.Header{\n Name: string(e.Name),\n Mode: 0600,\n}",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_d364d747",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_20730a10",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_b3504360",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_406e0e26",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_0058068a",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "hdr.Typeflag \u003d tar.TypeDir",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_13466fa8",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_0058068a",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_f34abbab",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_e054025a",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_c061fe31",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "hdr.Typeflag \u003d tar.TypeReg",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_333d7318",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_c061fe31",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_933a5f1e",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_a05efa73",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_804d36c8",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -132,6 +258,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "drop the else; there\u0027s no need for else after return",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_f3c91b21",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done (the else was to get new variable \u0027data\u0027 in the if scope. Without it, I need to create it and now the if-block is two lines longer).",
+      "parentUuid": "62ef8d70_804d36c8",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_b3e683a3",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_204c2ac6",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_0041268e",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -166,6 +328,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "you already have this todo up top",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_13930f0c",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_0041268e",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_f3975bf3",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_e03d2218",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_c03a1e1e",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -200,6 +398,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "delete",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_73840bbb",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_c03a1e1e",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_53a46751",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_80641648",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_a0095a8c",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -234,6 +468,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "each of these helpers are used only once, so each of them are just three lines of code that needn\u0027t be there.\ni\u0027d put them in main",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_13694fed",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Keeps main a little shorter.",
+      "parentUuid": "62ef8d70_a0095a8c",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "45d37396_5373c7dc",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_e00f6290",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62ef8d70_c00c5e9e",
         "filename": "cmd/archive/main.go",
         "patchSetId": 2
@@ -268,6 +538,24 @@
       "writtenOn": "2016-09-28T20:39:09Z",
       "side": 1,
       "message": "delete",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45d37396_731ecb6f",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-28T21:31:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ef8d70_c00c5e9e",
       "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
