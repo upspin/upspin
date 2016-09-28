@@ -154,3 +154,30 @@ func (c *LRU) PeekNewest() (key, value interface{}) {
 	ent := ele.Value.(*entry)
 	return ent.key, ent.value
 }
+
+// Iterator is an iterator through the list. The iterator points to a nil
+// element at the end of the list or when the list changes.
+type Iterator struct {
+	lru  *LRU
+	this *list.Element
+}
+
+// NewIterator returns a new iterator for the LRU.
+func (c *LRU) NewIterator() *Iterator {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return &Iterator{lru: c, this: c.ll.Front()}
+}
+
+// GetAndAdvance returns key, value, true if the current entry is valid and advances the
+// iterator. Otherwise it returns nil, nil, false.
+func (i *Iterator) GetAndAdvance() (interface{}, interface{}, bool) {
+	i.lru.mu.Lock()
+	defer i.lru.mu.Unlock()
+	if i.this == nil {
+		return nil, nil, false
+	}
+	ent := i.this.Value.(*entry)
+	i.this = i.this.Next()
+	return ent.key, ent.value, true
+}

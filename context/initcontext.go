@@ -33,14 +33,14 @@ var inTest = false // Generate errors instead of logs for certain problems.
 // base implements upspin.Context, returning default values for all operations.
 type base struct{}
 
-func (base) UserName() upspin.UserName           { return defaultUserName }
-func (base) Factotum() upspin.Factotum           { return nil }
-func (base) Packing() upspin.Packing             { return defaultPacking }
-func (base) KeyEndpoint() upspin.Endpoint        { return upspin.Endpoint{} }
-func (base) DirEndpoint() upspin.Endpoint        { return upspin.Endpoint{} }
-func (base) StoreEndpoint() upspin.Endpoint      { return upspin.Endpoint{} }
-func (base) StoreCacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
-func (base) CertPool() *x509.CertPool            { return systemCertPool }
+func (base) UserName() upspin.UserName      { return defaultUserName }
+func (base) Factotum() upspin.Factotum      { return nil }
+func (base) Packing() upspin.Packing        { return defaultPacking }
+func (base) KeyEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
+func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
+func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
+func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
+func (base) CertPool() *x509.CertPool       { return systemCertPool }
 
 var systemCertPool *x509.CertPool
 
@@ -69,7 +69,7 @@ const (
 	keyserver   = "keyserver"
 	dirserver   = "dirserver"
 	storeserver = "storeserver"
-	storecache  = "storecache"
+	cache       = "cache"
 	packing     = "packing"
 	secrets     = "secrets"
 	tlscerts    = "tlscerts"
@@ -143,7 +143,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
-		storecache:  "",
+		cache:       "",
 		secrets:     "",
 		tlscerts:    "",
 	}
@@ -224,7 +224,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	ctx = SetKeyEndpoint(ctx, parseEndpoint(op, vals, keyserver, &err))
 	ctx = SetStoreEndpoint(ctx, parseEndpoint(op, vals, storeserver, &err))
-	ctx = SetStoreCacheEndpoint(ctx, parseEndpoint(op, vals, storecache, &err))
+	ctx = SetCacheEndpoint(ctx, parseEndpoint(op, vals, cache, &err))
 	ctx = SetDirEndpoint(ctx, parseEndpoint(op, vals, dirserver, &err))
 
 	return ctx, err
@@ -427,21 +427,21 @@ func SetStoreEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
 	}
 }
 
-type ctxStoreCacheEndpoint struct {
+type ctxCacheEndpoint struct {
 	upspin.Context
-	storeCacheEndpoint upspin.Endpoint
+	cacheEndpoint upspin.Endpoint
 }
 
-func (ctx ctxStoreCacheEndpoint) StoreCacheEndpoint() upspin.Endpoint {
-	return ctx.storeCacheEndpoint
+func (ctx ctxCacheEndpoint) CacheEndpoint() upspin.Endpoint {
+	return ctx.cacheEndpoint
 }
 
-// SetStoreCacheEndpoint returns a context derived from the given context
-// with the given store cache endpoint.
-func SetStoreCacheEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
-	return ctxStoreCacheEndpoint{
-		Context:            ctx,
-		storeCacheEndpoint: e,
+// SetCacheEndpoint returns a context derived from the given context
+// with the given cache endpoint.
+func SetCacheEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+	return ctxCacheEndpoint{
+		Context:       ctx,
+		cacheEndpoint: e,
 	}
 }
 
