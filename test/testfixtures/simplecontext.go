@@ -70,8 +70,8 @@ func (ctx *simpleContext) StoreEndpoint() upspin.Endpoint {
 	return ep0
 }
 
-// StoreCacheEndpoint implements upspin.Context.
-func (ctx *simpleContext) StoreCacheEndpoint() upspin.Endpoint {
+// CacheEndpoint implements upspin.Context.
+func (ctx *simpleContext) CacheEndpoint() upspin.Endpoint {
 	return ep0
 }
 
