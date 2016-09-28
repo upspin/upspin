@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "62ef8d70_6069121c",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "I really must insist that you put the constructor alongside the type declaration. This is a standard go practice that has a number of benefits. One obvious one, in this case, is that the struct fields and the function that initializes them are co-located, so that if the fields change you can easily see that they are being properly initialized.",
+      "parentUuid": "45d37396_7b3a2721",
+      "revId": "b1dbd9a49b00852768c622fb040b5b6f6cc65978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8571eb59_a9443d6f",
         "filename": "cmd/archive/main.go",
         "patchSetId": 1
