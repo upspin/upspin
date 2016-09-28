@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62ef8d70_40472ea6",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "it\u0027s not clear that this happens only on unarchiving, nor does the flag description adequately describe what it does",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_20730a10",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "hdr :\u003d \u0026tar.Header{\n Name: string(e.Name),\n Mode: 0600,\n}",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_406e0e26",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "i find switches to be clearer than large sets of if/else blocks\n\nswitch {\ncase e.IsDir():\n\ncase e.IsLink():\n\ndefault:\n\n}",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_0058068a",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "hdr.Typeflag \u003d tar.TypeDir",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_e054025a",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "hdr.Typeflag \u003d tar.TypeSymlink\nhdr.Linkname \u003d string(e.Link)",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_c061fe31",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "hdr.Typeflag \u003d tar.TypeReg",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_a05efa73",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "hdr.Size \u003d size",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_804d36c8",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "drop the else; there\u0027s no need for else after return",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_204c2ac6",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "if !strings.HasPrefix(hdr.Name, a.prefixMatch) {\n  continue\n}\nname \u003d ...",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_0041268e",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "you already have this todo up top",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_e03d2218",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "fmt.Printf(\"...\", ...)\n\nPrintf uses Stdout",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_c03a1e1e",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_80641648",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "use Fprint, not Fprintf. there\u0027s no format string here",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_a0095a8c",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "each of these helpers are used only once, so each of them are just three lines of code that needn\u0027t be there.\ni\u0027d put them in main",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_e00f6290",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "switch flag.NArg() {\ncase 1:",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ef8d70_c00c5e9e",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-28T20:39:09Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "67305e5e6d57ff7b30fd34b7129646b469ae414a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
