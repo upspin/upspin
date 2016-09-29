@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "823c81c1_f140488c",
+        "filename": "dir/server/access.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T21:41:21Z",
+      "side": 1,
+      "message": "Does access.Can (the caller of this method) enforce that the userLock for the user in the given path is held?\n\nI am concerned that if this function can be invoked to read data from another user\u0027s tree, then that user\u0027s lock will not be held.",
+      "revId": "226455ca6484b4e436babfccdad89fcdf914fc3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_d13d4418",
+        "filename": "dir/server/access.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T21:41:21Z",
+      "side": 1,
+      "message": "this case is redundant",
+      "revId": "226455ca6484b4e436babfccdad89fcdf914fc3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
