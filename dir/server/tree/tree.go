@@ -652,8 +652,11 @@ func (t *Tree) flush() error {
 		return errors.E(op, err)
 	}
 
-	// Save new root to the log index.
-	return t.logIndex.SaveRoot(&t.root.entry)
+	// Save new root (if any) to the log index.
+	if t.root != nil {
+		return t.logIndex.SaveRoot(&t.root.entry)
+	}
+	return t.logIndex.DeleteRoot()
 }
 
 // Close flushes all dirty blocks to Store and releases all resources
@@ -664,7 +667,7 @@ func (t *Tree) Close() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	err := t.Flush()
+	err := t.flush()
 	if err != nil {
 		return errors.E(op, err)
 	}

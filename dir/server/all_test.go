@@ -16,6 +16,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/context"
+	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
@@ -73,6 +74,15 @@ func TestMakeRoot(t *testing.T) {
 	_, err = s.Delete(userName + "/")
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Ensure log for user has been deleted.
+	hasLog, err := tree.HasLog(userName, s.logDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hasLog {
+		t.Fatalf("expected no log for user %q in %q", userName, s.logDir)
 	}
 
 	// Create it again.
@@ -643,7 +653,7 @@ func TestClose(t *testing.T) {
 func TestCantProbeForExistence(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 
-	_, err := s.Lookup("barney@ruble.org/")
+	_, err := s.Lookup("barney@rubble.org/")
 	if !errors.Match(errNotExist, err) {
 		t.Fatalf("err = %v, want = %v", err, errNotExist)
 	}
