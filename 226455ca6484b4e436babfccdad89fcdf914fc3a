@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0251711f_6b47b578",
+        "filename": "dir/server/access.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-29T21:53:15Z",
+      "side": 1,
+      "message": "No. This is a long-standing TODO. I accidentally removed it. This is complex and why I\u0027m deferring for now. Dave had some suggestions like grab the locks in lexicographic order, making sure to unlock them first if they\u0027re in the wrong order.\n\nPut back the TODO.",
+      "parentUuid": "823c81c1_f140488c",
+      "revId": "226455ca6484b4e436babfccdad89fcdf914fc3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "823c81c1_d13d4418",
         "filename": "dir/server/access.go",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-29T21:41:21Z",
       "side": 1,
       "message": "this case is redundant",
+      "revId": "226455ca6484b4e436babfccdad89fcdf914fc3a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0251711f_4b4cf998",
+        "filename": "dir/server/access.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-09-29T21:53:15Z",
+      "side": 1,
+      "message": "Yeah. It was more for documentation reasons. Removed. \nDone.",
+      "parentUuid": "823c81c1_d13d4418",
       "revId": "226455ca6484b4e436babfccdad89fcdf914fc3a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
