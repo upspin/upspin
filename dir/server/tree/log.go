@@ -76,8 +76,8 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 		offset: offset,
 	}
 
-	rloc := filepath.Join(directory, "tree.root."+string(user))
-	iloc := filepath.Join(directory, "tree.index."+string(user))
+	rloc := rootFile(user, directory)
+	iloc := indexFile(user, directory)
 	rootFile, err := os.OpenFile(rloc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
@@ -109,6 +109,23 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 	return true, nil
 }
 
+// DeleteLogs deletes all data for a user in directory. Any existing logs
+// associated with user must not be used subsequently.
+func DeleteLogs(user upspin.UserName, directory string) error {
+	const op = "dir/server/tree.DeleteLogs"
+	for _, fn := range []string{
+		logFile(user, directory),
+		rootFile(user, directory),
+		indexFile(user, directory),
+	} {
+		err := os.Remove(fn)
+		if err != nil {
+			return errors.E(op, errors.IO, err)
+		}
+	}
+	return nil
+}
+
 // ListUsers applies a pattern to all known users in directory and returns
 // the matches. The format of the pattern is the same used by
 // path/filepath.Match. For example, to list all users name with suffix a valid
@@ -129,6 +146,14 @@ func ListUsers(pattern string, directory string) ([]upspin.UserName, error) {
 
 func logFile(user upspin.UserName, directory string) string {
 	return filepath.Join(directory, "tree.log."+string(user))
+}
+
+func indexFile(user upspin.UserName, directory string) string {
+	return filepath.Join(directory, "tree.index."+string(user))
+}
+
+func rootFile(user upspin.UserName, directory string) string {
+	return filepath.Join(directory, "tree.root."+string(user))
 }
 
 // User returns the user name who owns the root of the tree that this log represents.

@@ -571,11 +571,11 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 
 	// Load the tree for this user.
-	tree, err := s.loadTreeFor(p.User(), o)
+	t, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	entry, err := tree.Delete(p)
+	entry, err := t.Delete(p)
 	if err != nil {
 		return entry, err // could be ErrFollowLink.
 	}
@@ -587,8 +587,22 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if access.IsGroupFile(p.Path()) {
 		err = access.RemoveGroup(p.Path())
 		if err != nil {
-			// Nothing to do but log.
-			log.Error.Printf("%s: Error removing group file: %s", op, err)
+			// Nothing to do but log (it may not have been loaded
+			// yet, so it's not an error).
+			log.Printf("%s: Error removing group file: %s", op, err)
+		}
+	}
+	// If we just deleted the root, close the tree, remove it from the cache
+	// and delete all logs associated with the tree owner.
+	if p.IsRoot() {
+		err = t.Close()
+		if err != nil {
+			return nil, errors.E(op, name, err)
+		}
+		s.userTrees.Remove(p.User())
+		err = tree.DeleteLogs(p.User(), s.logDir)
+		if err != nil {
+			return nil, errors.E(op, name, err)
 		}
 	}
 
@@ -675,11 +689,11 @@ func (s *server) Close() {
 
 	t := s.userTrees.Remove(s.userName)
 	if tree, ok := t.(*tree.Tree); ok {
-		// Flush everything since Remove won't invoke EvictionNotifier.
-		err := tree.Flush()
+		// Close will flush and release all resources.
+		err := tree.Close()
 		if err != nil {
 			// TODO: return an error when Close expects it.
-			log.Error.Printf("%s: Error flushing user tree %q: %q", op, s.userName, err)
+			log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
 		}
 	}
 
