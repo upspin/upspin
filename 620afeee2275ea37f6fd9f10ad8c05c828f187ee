@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "823c81c1_b1d640e6",
+        "filename": "dir/server/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "don\u0027t wrap this error in errors.E",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_711698bf",
+        "filename": "dir/server/access.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "If the user has multiple DirServer endpoints in their KeyServer record, and one of them is this server, then we should just do the internal lookup.\n\nAs written, this code will use only the first available DirServer, meaning that if *this* DirServer is in the list, but not the first one, then it will do lookups against a remote server when it could just provide the file itself.\n\nI think that, probably, this code should do some of what bind.DirServerFor does. Something like this:\n\n        cxt :\u003d s.serverContext\n        key, err :\u003d bind.KeyServer(ctx, ctx.KeyEndpoint())\n        // handle err\n        u, err :\u003d key.Lookup(p.User())\n        // handle err\n        // check if this server should do the lookup\n        found :\u003d false\n        for _, e :\u003d range endpoints {\n                if e \u003d\u003d ctx.DirEndpoint() {\n                        found \u003d true\n                        entry, err \u003d s.lookup(...)\n                        break\n                }\n        }\n        if !found {\n                // perhaps another dirserver should do it\n                for _, e :\u003d range endpoints {\n                        if e \u003d\u003d ctx.DirEndpoint() {\n                                continue\n                        }\n                        d, err2 :\u003d bind.DirServer(ctx, e)\n                        if err2 !\u003d nil {\n                                if err \u003d\u003d nil {\n                                        err \u003d err2\n                                }\n                                continue\n                        }\n                        entry, err \u003d d.Lookup(...)\n                        break\n                }\n        }\n        // handle err\n        return clientutil.ReadAll(s.serverContext, entry)",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_31201008",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "userLocks [numUserLocks]sync.Mutex",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_511b94e3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_31f93066",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "just put these Setup structs in the call to testenv.New and save yourself some variables",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_11fe2c4e",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "ownerEnv\nreaderEnv\nmiddleEnv ?",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_11250c18",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "/group-file-multi-dir",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_f12968f2",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "fileContent",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_d1266422",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "create constants for all these file names, so that the structure of the files you are testing is clear at the top. that makes the entire test more readable.\ni suggest file names like\n\nownerGroup \u003d ownerName + \"/Group\"\nownerGroupClique \u003d ownerGroup + \"/clique\"\nownerGroupTeam \u003d ownerGroup + \"/team\"\nreaderGroup \u003d readerName + \"/Group\"\nreaderGroupTeam \u003d readerGroup + \"/team\"\nreaderAccess \u003d readerName + \"/Access\"",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_b133e062",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "and give the dirserver read rights",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_9130dc56",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "remove space?",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "823c81c1_71ffb84d",
+        "filename": "test/group_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-29T09:40:30Z",
+      "side": 1,
+      "message": "r.Data is already a string",
+      "revId": "620afeee2275ea37f6fd9f10ad8c05c828f187ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
