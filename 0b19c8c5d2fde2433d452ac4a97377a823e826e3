@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "823c81c1_9137bc36",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-09-30T02:05:36Z",
+      "side": 1,
+      "message": "this will be a concerning log message to users.\ncan you check whether the group is in the cache before removing it?\nor, alternately, we could change the semantics of RemoveGroup so that it returns nil if the group does not exist? (that may be undesirable, though)\ngenerally I\u0027d prefer not to bother our users with benign errors,\nespecially when we\u0027re asking them to trust us with their data.\nthey should regard error logs as a serious issue worthy of investigation",
+      "revId": "0b19c8c5d2fde2433d452ac4a97377a823e826e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
