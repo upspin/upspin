@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82d2c116_01eeaa77",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-03T22:36:03Z",
+      "side": 1,
+      "message": "needs a doc comment",
+      "revId": "70ae4e5a766d884a422c9859600b609d4001d6f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82d2c116_e1f0e658",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-03T22:36:03Z",
+      "side": 1,
+      "message": "put main above \u0027type archiver\u0027 :-)",
+      "revId": "70ae4e5a766d884a422c9859600b609d4001d6f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
