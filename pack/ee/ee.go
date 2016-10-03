@@ -724,9 +724,7 @@ func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, ciphe
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
-	// TODO(adg): drop this from the packdata, it's now in DirEntry.Packing.
-	(*dst)[0] = byte(upspin.EEPack)
-	n = 1
+	n = 0
 	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
 	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
 	if sig2.R == nil {
@@ -752,10 +750,7 @@ func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash
 	if len(pd) == 0 {
 		return sig0, sig0, nil, nil, errors.Str("nil packdata")
 	}
-	if pd[0] != byte(upspin.EEPack) {
-		return sig0, sig0, nil, nil, errors.Errorf("expected packing %d, got %d", upspin.EEPack, pd[0])
-	}
-	n := 1
+	n := 0
 	sig.R = big.NewInt(0)
 	sig.S = big.NewInt(0)
 	sig2.R = big.NewInt(0)
@@ -827,7 +822,7 @@ func pdGetBytes(dst *[]byte, src []byte) int {
 
 // packdataLen returns n big enough for packing, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
 func packdataLen(nwrap int) int {
-	return 1 + 2*marshalBufLen + (1+5*nwrap)*binary.MaxVarintLen64 +
+	return 2*marshalBufLen + (1+5*nwrap)*binary.MaxVarintLen64 +
 		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*marshalBufLen) +
 		sha256.Size + 1
 }
