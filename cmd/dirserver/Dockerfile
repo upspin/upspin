@@ -4,6 +4,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/upspin/serviceaccountkey.json
 COPY rc /upspin/rc
 COPY public.upspinkey /upspin/public.upspinkey
 COPY secret.upspinkey /upspin/secret.upspinkey
+COPY symmsecret.upspinkey /upspin/symmsecret.upspinkey
 COPY dirserver /dirserver
-ENTRYPOINT ["/dirserver", "-context=/upspin/rc", "-kind=server", "-config=CONFIG", "-project=PROJECT"]
+ENTRYPOINT ["/dirserver", "-context=/upspin/rc", "-kind=server", "-config=CONFIG", "-project=PROJECT", "-log=debug"]
 EXPOSE 80 443
