@@ -53,6 +53,7 @@ function build {
                 dirserver/rc
                 dirserver/public.upspinkey
                 dirserver/secret.upspinkey
+                dirserver/symmsecret.upspinkey
                 serviceaccountkey.json
             "
             ;;
