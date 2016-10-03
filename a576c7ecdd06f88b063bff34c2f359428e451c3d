@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "228f553f_9712eebb",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "surely usage()",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "228f553f_37693a1d",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "this is hard to parse\n// doArchive is called by the archive method to walk subdirectories.",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "228f553f_97574e5d",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "d? or maybe debug log? the right answer is probably a -v flag.",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "228f553f_f75ed274",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "s/files/files\u0027/\ns/access /Access /",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "228f553f_d70c769e",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "this should be up the top near main. it\u0027s good documentation",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "228f553f_174d1ec6",
+        "filename": "cmd/archive/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-03T23:54:04Z",
+      "side": 1,
+      "message": "these can stay down here. they\u0027re harmless and easy to understand.",
+      "revId": "a576c7ecdd06f88b063bff34c2f359428e451c3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
