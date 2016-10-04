@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82b48148_176f7cee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T22:55:59Z",
+      "side": 1,
+      "message": "You can just change it and gerrit will send a new email with a new title. Otherwise, all remains the same.",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
