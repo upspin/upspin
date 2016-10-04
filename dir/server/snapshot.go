@@ -144,10 +144,6 @@ func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 		return false, path.Parsed{}, errors.E(op, err)
 	}
 
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
 	entry, err := s.lookup(op, p, !entryMustBeClean)
 	if err != nil {
 		if err == upspin.ErrFollowLink {
@@ -170,31 +166,16 @@ func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 	return true, p, nil
 }
 
-// lookupLocked locks the userlock and calls lookup, which does not perform
-// access checks.
-func (s *server) lookupLocked(name upspin.PathName) (*upspin.DirEntry, error) {
-	p, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
-	return s.lookup("lookupLocked", p, entryMustBeClean)
-}
-
 // takeSnapshot takes a snapshot to dstDir from srcDir.
 func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error {
-	entry, err := s.lookupLocked(srcDir)
+	srcParsed, err := path.Parse(srcDir)
 	if err != nil {
 		return err
 	}
-
-	mu := userLock(dstDir.User())
-	mu.Lock()
-	defer mu.Unlock()
+	entry, err := s.lookup("takeSnapshot", srcParsed, entryMustBeClean)
+	if err != nil {
+		return err
+	}
 
 	tree, err := s.loadTreeFor(dstDir.User())
 	if err != nil {
@@ -246,7 +227,6 @@ func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error)
 
 // makeSnapshotPath makes the full path name, creating any necessary
 // subdirectories.
-// userLock for the user in name must be held.
 func (s *server) makeSnapshotPath(name upspin.PathName) error {
 	p, err := path.Parse(name)
 	if err != nil {
@@ -264,7 +244,6 @@ func (s *server) makeSnapshotPath(name upspin.PathName) error {
 }
 
 // mkDirIfNotExist makes a directory if it does not yet exist.
-// userLock must be held for name.User().
 func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	// Create a new dir entry for this new dir.
 	de := &upspin.DirEntry{
