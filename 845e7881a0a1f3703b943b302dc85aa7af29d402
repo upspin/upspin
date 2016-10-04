@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "62b86df6_18a6c5a8",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T03:38:10Z",
+      "side": 1,
+      "message": "check err !\u003d nil first\ni know you check it below,\nbut that\u0027s a bit too clever i think\nbetter to bail early if the lookup fails",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82d2c116_61921609",
         "filename": "dir/server/access.go",
         "patchSetId": 12
@@ -66,6 +83,24 @@
       "side": 1,
       "message": "The rationale for this is if you end up contacting a proxy/cache that has partial information somehow. You\u0027d continue talking to all dir servers until you either find the entry or exhaust all possibilities. In that the latter case, we\u0027d return errNotExist (assuming I fix the bug below on 134).",
       "parentUuid": "82d2c116_61921609",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b86df6_38a98978",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T03:38:10Z",
+      "side": 1,
+      "message": "There should never be a proxy or cache in someone\u0027s keyserver record.\nI believe this code is wrong. There\u0027s nowhere else that we try multiple dirservers if a file does not exist, why start here?",
+      "parentUuid": "42a449cb_2231505a",
       "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
