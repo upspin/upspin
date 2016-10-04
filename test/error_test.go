@@ -422,6 +422,12 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
+	// Can't make an Access directory.
+	r.MakeDirectory(access)
+	if !r.Match(errors.E(errors.Invalid, access)) {
+		t.Error(r.Diag())
+	}
+
 	// We expect a "not exist" error for a writer that has no rights
 	// to the directory, as they cannot even know that it exists.
 	r.As(writerName)
