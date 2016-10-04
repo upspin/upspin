@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "42a449cb_c2f86464",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T03:31:33Z",
+      "side": 1,
+      "message": "doh!",
+      "parentUuid": "82d2c116_418d12e4",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82d2c116_61921609",
         "filename": "dir/server/access.go",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-04T00:40:27Z",
       "side": 1,
       "message": "I don\u0027t think this is right. If you resolve a dir server for a user and the entry is not there, then you should return that notexist. The dirservers listed in a user\u0027s keyserver entry should each contain the same data.\n\nThat\u0027s why you need to do the keyserver lookup before doing any lookups (even the internal one), as even if this dirserver has a tree for the user, that doesn\u0027t mean that the user has listed this dirserver in its keyserver entry.",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42a449cb_2231505a",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T03:31:33Z",
+      "side": 1,
+      "message": "The rationale for this is if you end up contacting a proxy/cache that has partial information somehow. You\u0027d continue talking to all dir servers until you either find the entry or exhaust all possibilities. In that the latter case, we\u0027d return errNotExist (assuming I fix the bug below on 134).",
+      "parentUuid": "82d2c116_61921609",
       "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "42a449cb_02ff6c4d",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T03:31:33Z",
+      "side": 1,
+      "message": "yeah, my bad. will do.",
+      "parentUuid": "82d2c116_81971af6",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82d2c116_a17b3ec3",
         "filename": "dir/server/access.go",
         "patchSetId": 12
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-04T00:40:27Z",
       "side": 1,
       "message": "isn\u0027t it really \"no dirserver for user\"?",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42a449cb_e2036871",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T03:31:33Z",
+      "side": 1,
+      "message": "I thought about checking len(endpoints) here. If len \u003c\u003d 1 then that\u0027s true. Otherwise, it means we checked on remotes and found nothing. Would checking the len make it better?",
+      "parentUuid": "82d2c116_a17b3ec3",
       "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
