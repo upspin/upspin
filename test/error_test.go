@@ -424,7 +424,7 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 
 	// Can't make an Access directory.
 	r.MakeDirectory(access)
-	if !r.Match(errors.E(errors.Invalid, access)) {
+	if !r.Match(errors.E(errors.Invalid, upspin.PathName(access))) {
 		t.Error(r.Diag())
 	}
 
