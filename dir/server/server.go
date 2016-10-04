@@ -265,11 +265,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		// Else: isOwner && putting the root -> OK.
 	}
 
-	isAccessOrGroup := access.IsAccessFile(p.Path()) || access.IsGroupFile(p.Path())
+	isAccess := access.IsAccessFile(p.Path())
+	isGroup := access.IsGroupFile(p.Path())
 
 	// Links can't be named Access or Group and must use only Plain pack.
 	if entry.IsLink() {
-		if isAccessOrGroup {
+		if isAccess || isGroup {
 			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link cannot be named Access or Group"))
 		}
 		if entry.Packing != upspin.PlainPack {
@@ -277,8 +278,8 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 	// Directories cannot have reserved names.
-	if entry.IsDir() && isAccessOrGroup {
-		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access or Group"))
+	if isAccess && entry.IsDir() {
+		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
 	}
 
 	mu := userLock(p.User())

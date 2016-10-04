@@ -385,18 +385,20 @@ func testWhichAccess(t *testing.T, r *testenv.Runner) {
 
 func testGroupAccess(t *testing.T, r *testenv.Runner) {
 	const (
-		base           = ownerName + "/group-access"
-		accessFile     = base + "/Access"
-		accessContents = "l,r: friends,family\n*: " + ownerName
-		groupDir       = ownerName + "/Group"
-		groupFriends   = groupDir + "/friends"
-		groupFamily    = groupDir + "/family"
-		familyMembers  = "uncle@domain.com,cousin@foo.com"
-		groupContents  = familyMembers + "," + readerName
+		base            = ownerName + "/group-access"
+		accessFile      = base + "/Access"
+		accessContents  = "l,r: friends,family\n*: " + ownerName
+		groupDir        = ownerName + "/Group"
+		groupFriends    = groupDir + "/friends"
+		groupFamily     = groupDir + "/family"
+		groupPrivateDir = groupDir + "/private"
+		familyMembers   = "uncle@domain.com,cousin@foo.com"
+		groupContents   = familyMembers + "," + readerName
 	)
 	r.As(ownerName)
 	r.MakeDirectory(base)
 	r.MakeDirectory(groupDir)
+	r.MakeDirectory(groupPrivateDir)
 	r.Put(groupFriends, readerName)
 	r.Put(groupFamily, groupContents)
 	r.Put(accessFile, accessContents)
@@ -508,6 +510,7 @@ func testGroupAccess(t *testing.T, r *testenv.Runner) {
 
 	// Remove group file and dir, so tests are hermetic.
 	r.As(ownerName)
+	r.Delete(groupPrivateDir)
 	r.Delete(groupFriends)
 	r.Delete(groupFamily)
 	r.Delete(groupDir)

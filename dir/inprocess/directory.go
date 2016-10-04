@@ -204,7 +204,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 		if isAccess && entry.IsDir() {
 			// A Group file may be in a subdirectory; it's only Access files we worry about.
-			return nil, errors.E(op, entry.Name, errors.Str("cannot create a directory named Access"))
+			return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("cannot create a directory named Access"))
 		}
 	}
 
