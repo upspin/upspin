@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_3aa5454f",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-04T23:50:20Z",
+      "side": 1,
+      "message": "Not a problem.  We haven\u0027t defined an ordering on the two ops so that is acceptable.",
+      "parentUuid": "42a449cb_e5db7242",
+      "revId": "b9acb9c4760e64fec7561566323f76cb2a0a0282",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "42a449cb_05189636",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_faaa9d1f",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-04T23:50:20Z",
+      "side": 1,
+      "message": "Definitely a race that breaks semantics.  See my email on how to fix.",
+      "parentUuid": "42a449cb_05189636",
+      "revId": "b9acb9c4760e64fec7561566323f76cb2a0a0282",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "42a449cb_e51c922c",
         "filename": "dir/server/access.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-04T17:17:41Z",
       "side": 1,
       "message": "There could be a race here, but I think it\u0027s benign because access.New returns always the same thing, so at worst this is wasted work.\n\nDave?",
+      "revId": "b9acb9c4760e64fec7561566323f76cb2a0a0282",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82b48148_57b744ee",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-04T23:50:20Z",
+      "side": 1,
+      "message": "I agree.  There is a race with creating a new access file there and getting the default one  but it doesn\u0027t matter since there is no ordering defined.",
+      "parentUuid": "42a449cb_e51c922c",
       "revId": "b9acb9c4760e64fec7561566323f76cb2a0a0282",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
