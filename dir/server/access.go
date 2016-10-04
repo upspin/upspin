@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// TODO(edpin): fix access file caching
+
 package server
 
 // This file deals with loading Access files and checking access permissions.
@@ -15,7 +17,6 @@ import (
 )
 
 // whichAccess implements DirServer.WhichAccess.
-// userLock must be held for p.User().
 func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("whichAccess", opts)
 	defer ss.End()
@@ -66,17 +67,12 @@ func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Ac
 }
 
 // loadPath loads a name from the Store, if its entry can be resolved by this
-// DirServer. Intended for use with access.Can. The userLock for the user in
-// name must be held.
+// DirServer. Intended for use with access.Can.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(err)
 	}
-	// TODO: must check whether p.User() is the one originally locked and if
-	// not, we must lock it in a goroutine or prove that this read-race is
-	// harmless. Allowing a read-race for now.
-	// https://github.com/googleprivate/upspin/issues/37
 	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
 		return nil, errors.E(err)
@@ -90,7 +86,6 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 
 // hasRight reports whether the current user has the given right on the path. If
 // ErrFollowLink is returned, the DirEntry will be that of the link.
-// userLock must be held for p.User().
 func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (bool, *upspin.DirEntry, error) {
 	o, ss := subspan("hasRight", opts)
 	defer ss.End()
