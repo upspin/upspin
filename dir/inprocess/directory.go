@@ -193,12 +193,18 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	s.db.mu.Lock()
 	defer s.db.mu.Unlock()
-	if access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name) {
+	isAccess := access.IsAccessFile(entry.Name)
+	isGroup := access.IsGroupFile(entry.Name)
+	if isAccess || isGroup {
 		if entry.Packing != upspin.PlainPack {
 			return nil, errors.E(op, entry.Name, errors.Str("Access or Group file must use plain packing"))
 		}
-		if entry.IsLink() || entry.IsDir() {
+		if entry.IsLink() {
 			return nil, errors.E(op, entry.Name, errors.Str("cannot create a link named Access or Group"))
+		}
+		if isAccess && entry.IsDir() {
+			// A Group file may be in a subdirectory; it's only Access files we worry about.
+			return nil, errors.E(op, entry.Name, errors.Str("cannot create a directory named Access"))
 		}
 	}
 
