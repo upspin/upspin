@@ -36,6 +36,7 @@ func init() {
 }
 
 var aead cipher.AEAD // There is one global key, so one global cipher.
+
 func initAEAD() error {
 	const op = "pack/symm.initAEAD"
 
@@ -170,6 +171,12 @@ func (symm symm) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnp
 	// Call Size to check that the block Offsets and Sizes are consistent.
 	if _, err := d.Size(); err != nil {
 		return nil, errors.E(op, d.Name, err)
+	}
+	if aead == nil {
+		err := initAEAD()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &blockUnpacker{
