@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "42a449cb_85994682",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-04T17:21:53Z",
+      "side": 1,
+      "message": "i would flip these as isAccess is simpler and much rarer so do it first",
+      "revId": "1a71c0baf778f43caea99353e4c7c906618ca248",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
