@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "62622d91_28d5abb1",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T17:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42a449cb_c2f86464",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "62b86df6_18a6c5a8",
         "filename": "dir/server/access.go",
         "patchSetId": 12
@@ -48,6 +66,24 @@
       "writtenOn": "2016-10-04T03:38:10Z",
       "side": 1,
       "message": "check err !\u003d nil first\ni know you check it below,\nbut that\u0027s a bit too clever i think\nbetter to bail early if the lookup fails",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62622d91_c8e2cf93",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T17:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62b86df6_18a6c5a8",
       "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -107,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "62622d91_68f4034c",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T17:55:00Z",
+      "side": 1,
+      "message": "Ok. I think this will eventually be the right behavior, but not in this CL.\n\nDone.",
+      "parentUuid": "62b86df6_38a98978",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82d2c116_81971af6",
         "filename": "dir/server/access.go",
         "patchSetId": 12
@@ -136,6 +190,24 @@
       "side": 1,
       "message": "yeah, my bad. will do.",
       "parentUuid": "82d2c116_81971af6",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62622d91_08f1c75a",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T17:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42a449cb_02ff6c4d",
       "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
