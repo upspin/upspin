@@ -169,10 +169,6 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, err)
 	}
 
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
 	if isSnapshotUser(p.User()) {
 		if isSnapshotOwner(s.userName, p.User()) {
 			return s.lookup(op, p, entryMustBeClean, o)
@@ -209,7 +205,6 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
 // by put. If entryMustBeClean is true, the returned entry is guaranteed to have
 // valid references in its DirBlocks.
-// userLock must be held for p.User().
 func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("lookup", opts)
 	defer ss.End()
@@ -282,15 +277,10 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
 	}
 
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
 	return s.put(op, p, entry, o)
 }
 
 // put implements the bulk of Put.
-// userLock must be held for p.User().
 func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("put", opts)
 	defer ss.End()
@@ -421,16 +411,11 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		}
 	}
 
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
 	return s.glob(op, p, overrideAccessCheck, o)
 }
 
 // glob implements the bulk of Glob on a pattern p, optionally allowing for
 // Access checks to be overriden.
-// userLock for pattern.User() must be held.
 func (s *server) glob(op string, p path.Parsed, overrideAccessCheck bool, opts ...options) ([]*upspin.DirEntry, error) {
 	tree, err := s.loadTreeFor(p.User(), opts...)
 	if err != nil {
@@ -556,10 +541,6 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, name, errNotExist)
 	}
 
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
-
 	canDelete, link, err := s.hasRight(access.Delete, p, o)
 	if err == upspin.ErrFollowLink {
 		return s.errLink(op, link, o)
@@ -596,13 +577,10 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	// If we just deleted the root, close the tree, remove it from the cache
 	// and delete all logs associated with the tree owner.
 	if p.IsRoot() {
-		err = t.Close()
-		if err != nil {
+		if err := s.closeTree(p.User()); err != nil {
 			return nil, errors.E(op, name, err)
 		}
-		s.userTrees.Remove(p.User())
-		err = tree.DeleteLogs(p.User(), s.logDir)
-		if err != nil {
+		if err := tree.DeleteLogs(p.User(), s.logDir); err != nil {
 			return nil, errors.E(op, name, err)
 		}
 	}
@@ -620,10 +598,6 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
-
-	mu := userLock(p.User())
-	mu.Lock()
-	defer mu.Unlock()
 
 	// Check whether the user has Any right on p.
 	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
@@ -683,33 +657,40 @@ func (s *server) Close() {
 	// Remove this user's tree from the cache. This allows it to be
 	// garbage-collected even if other servers have pointers into the
 	// cache (which at least one will have, the one created with New).
-
-	mu := userLock(s.userName)
-	mu.Lock()
-	defer mu.Unlock()
-
-	t := s.userTrees.Remove(s.userName)
-	if tree, ok := t.(*tree.Tree); ok {
-		// Close will flush and release all resources.
-		err := tree.Close()
-		if err != nil {
-			// TODO: return an error when Close expects it.
-			log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
-		}
+	if err := s.closeTree(s.userName); err != nil {
+		// TODO: return an error when Close expects it.
+		log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
 	}
 
 	s.defaultAccess = nil
 	s.stopSnapshotLoop()
 }
 
+func (s *server) closeTree(user upspin.UserName) error {
+	mu := userLock(s.userName)
+	mu.Lock()
+	defer mu.Unlock()
+
+	if t, ok := s.userTrees.Remove(user).(*tree.Tree); ok {
+		// Close will flush and release all resources.
+		if err := t.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // loadTreeFor loads the user's tree, if it exists.
-// userLock must be held for user.
 func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree, error) {
 	defer span(opts).StartSpan("loadTreeFor").End()
 
 	if err := valid.UserName(user); err != nil {
 		return nil, errors.E(errors.Invalid, err)
 	}
+
+	mu := userLock(user)
+	mu.Lock()
+	defer mu.Unlock()
 
 	// Do we have a cached tree for this user already?
 	if val, found := s.userTrees.Get(user); found {
