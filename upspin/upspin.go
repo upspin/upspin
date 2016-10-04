@@ -220,6 +220,10 @@ const (
 
 	// SymmPack stores AES-encrypted data, using a symmetric key.
 	SymmPack Packing = 21
+
+	// EIPack provides integrity protection, like EEPack, but no encryption.
+	// It is typically used when read access is "all".
+	EIPack Packing = 22
 )
 
 // User represents all the public information about an Upspin user as returned by KeyServer.
