@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62622d91_080d4797",
+        "filename": "pack/ei/ei.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-04T17:53:02Z",
+      "side": 1,
+      "message": "Thanks.  I lost a bunch of editing changes and this is one I missed re-doing.",
+      "parentUuid": "a26c2582_ea9f8755",
+      "revId": "0bce62934d78f90a8f5d740bbe72a8497a7260d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a26c2582_4a86d318",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2016-10-04T17:36:46Z",
       "side": 1,
       "message": "ChecksumPack?\nCheckerPack?",
+      "parentUuid": "a26c2582_4a86d318",
+      "revId": "0bce62934d78f90a8f5d740bbe72a8497a7260d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62622d91_884617a8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-04T17:53:02Z",
+      "side": 1,
+      "message": "EIPack was named to be consistent with EEPack.\n(These are short for End-to-end/elliptic-curve Integrity-checking and End-to-end/elliptic-curve Encryption.)    There will someday be integrity-checking and encryption with other (e.g. quantum resistant) crypto algorithms, so we shouldn\u0027t use a completely generic name like ChecksumPack.\n\nI\u0027m not wedded to the current codenames;  happy to use whatever we agree on at the meeting today.",
       "parentUuid": "a26c2582_4a86d318",
       "revId": "0bce62934d78f90a8f5d740bbe72a8497a7260d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
