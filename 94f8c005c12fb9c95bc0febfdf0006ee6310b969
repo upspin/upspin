@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "42a449cb_85a386fb",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T16:49:47Z",
+      "side": 1,
+      "message": "Maybe \nisAccess :\u003d access.IsAccessFile(entry.Name)\n\nsince it\u0027s reused below?",
+      "revId": "94f8c005c12fb9c95bc0febfdf0006ee6310b969",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42a449cb_a58d6a8c",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-04T16:49:47Z",
+      "side": 1,
+      "message": "isAccess?",
+      "revId": "94f8c005c12fb9c95bc0febfdf0006ee6310b969",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
