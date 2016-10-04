@@ -206,7 +206,8 @@ const (
 	// Packings from 20 and above (as well as PlainPack=0) are fixed in
 	// value and semantics and may be used in production.
 
-	// EEPack stores AES-encrypted data, with metadata
+	// EEPack provides elliptic-curve end-to-end confidentiality and
+	// integrity protection.  It stores AES-encrypted data, with metadata
 	// including an ECDSA signature and ECDH-wrapped keys.
 	// (NIST SP 800-57 Pt.1 Rev.4 section 5.6.1)
 	// A signature and a per-file symmetric encryption key, wrapped
@@ -220,6 +221,11 @@ const (
 
 	// SymmPack stores AES-encrypted data, using a symmetric key.
 	SymmPack Packing = 21
+
+	// EEIntegrityPack provides elliptic-curve end-to-end integrity protection,
+	// like EEPack, but provides no confidentiality.
+	// It is typically used when read access is "all".
+	EEIntegrityPack Packing = 22
 )
 
 // User represents all the public information about an Upspin user as returned by KeyServer.
