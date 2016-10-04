@@ -5,7 +5,7 @@
 // Package symm implements an AES-GCM symmetric encryption packer.
 // Given the problems of secure distribution of symmetric keys across
 // multiple users, this package is intended for a single user, such as
-// a directory server encrypting its storage.  There is provision only
+// a directory server encrypting its storage. There is provision only
 // for a single static key.
 package symm
 

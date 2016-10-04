@@ -52,7 +52,7 @@ func KeyHash(p upspin.PublicKey) []byte {
 // NewFromDir returns a new Factotum providing all needed private key operations,
 // loading keys from a directory containing *.upspinkey files.
 // Our desired end state is that Factotum is implemented on each platform by the
-// best local means of protecting private keys.  Please do not break the abstraction
+// best local means of protecting private keys. Please do not break the abstraction
 // by hand coding direct generation or use of private keys.
 func NewFromDir(dir string) (upspin.Factotum, error) {
 	const op = "factotum.NewFromDir"
@@ -111,7 +111,7 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 	}
 
 	// Current file format is "# EE date" concatenated with old public.upspinkey
-	// then old secret.upspinkey, and repeat.  This should be cleaned up someday
+	// then old secret.upspinkey, and repeat. This should be cleaned up someday
 	// when we have a better idea of what other kinds of keys we need to save.
 	// For now, it is cavalier about bailing out at first little mistake.
 	lines := strings.Split(string(archived), "\n")
@@ -295,7 +295,7 @@ func readFile(op, dir, name string) ([]byte, error) {
 	return b, nil
 }
 
-// SymmSecret returns a symmetric key.  This should remain undocumented because
+// SymmSecret returns a symmetric key. This should remain undocumented because
 // the design will change as soon as a better idea surfaces.
 func SymmSecret() ([]byte, error) {
 	if len(symmSecret) == 0 {

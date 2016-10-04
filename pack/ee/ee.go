@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package ee implements elliptic-curve end-to-end-encrypted packers.
+// Package ee implements an elliptic-curve end-to-end encryption packer.
 package ee
 
 // Upspin ee crypto summary:
