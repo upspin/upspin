@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82d2c116_418d12e4",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T00:40:27Z",
+      "side": 1,
+      "message": "s/remove/remote/",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82d2c116_61921609",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T00:40:27Z",
+      "side": 1,
+      "message": "I don\u0027t think this is right. If you resolve a dir server for a user and the entry is not there, then you should return that notexist. The dirservers listed in a user\u0027s keyserver entry should each contain the same data.\n\nThat\u0027s why you need to do the keyserver lookup before doing any lookups (even the internal one), as even if this dirserver has a tree for the user, that doesn\u0027t mean that the user has listed this dirserver in its keyserver entry.",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82d2c116_81971af6",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T00:40:27Z",
+      "side": 1,
+      "message": "return nil, firstErr",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82d2c116_a17b3ec3",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-04T00:40:27Z",
+      "side": 1,
+      "message": "isn\u0027t it really \"no dirserver for user\"?",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
