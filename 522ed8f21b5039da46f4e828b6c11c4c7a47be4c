@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_e0af8c2d",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-05T04:09:49Z",
+      "side": 1,
+      "message": "it could avoid bugs with shared buffers.",
+      "parentUuid": "0277b180_75d408de",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_15dd9403",
         "filename": "pack/eeintegrity/eeintegrity.go",
         "patchSetId": 3
