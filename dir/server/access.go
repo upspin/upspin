@@ -75,7 +75,7 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 
 	var entry *upspin.DirEntry
 	if s.userName == p.User() {
-		entry, err = s.lookup("loadPath", p, entryMustBeClean)
+		entry, err = s.lookup("loadPath", p, !entryMustBeClean)
 	} else {
 		entry, err = s.remoteLookup(p)
 	}
@@ -108,7 +108,7 @@ func (s *server) remoteLookup(p path.Parsed) (*upspin.DirEntry, error) {
 		if e == s.serverContext.DirEndpoint() {
 			// It's okay to load the tree for this user, because they
 			// live in this dir server, according to the KeyServer.
-			return s.lookup("remoteLookup", p, entryMustBeClean)
+			return s.lookup("remoteLookup", p, !entryMustBeClean)
 		}
 		dir, err := bind.DirServer(s.serverContext, e)
 		if check(err) != nil {
