@@ -211,8 +211,8 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
-// by put. If entryMustBeClean is true, the returned entry is guaranteed to have
-// valid references in its DirBlocks.
+// by put. The returned entry guaranteed to have valid references in its
+// DirBlocks if it is a directory and entryMustBeClean is true.
 func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("lookup", opts)
 	defer ss.End()
