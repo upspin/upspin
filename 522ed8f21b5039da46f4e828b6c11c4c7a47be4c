@@ -68,6 +68,24 @@
       "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82b48148_e0ce6c56",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-05T03:38:38Z",
+      "side": 1,
+      "message": "Thanks, will fix this and will make another pass looking for more s/ee/ei/ mistakes.",
+      "parentUuid": "0277b180_15dd9403",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
