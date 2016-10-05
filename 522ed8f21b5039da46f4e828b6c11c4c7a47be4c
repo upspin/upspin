@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_60a6fca9",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-05T03:36:44Z",
+      "side": 1,
+      "message": "Well, I\u0027m not entirely opposed.  If I understand you correctly, that\u0027s the approach I referred to in the commit comment.  After starting down that path, I felt it was making the ee code more complicated.    In my past work at Bell Labs, Dave was always the master at finding an elegant way to combine things and so I also asked him for advice.  His experience is that in this sort of situation, the combination just makes life harder down the road when a small change is needed in one half and not the other.\n\nSo on balance I\u0027d like to try it this way for now, but with the comment left there as a reminder to all of us to reconsider later.   In the meantime, best if maintenance on both ee and eeintegrity is left to me, since I\u0027m sensitive to both the crypto delicacies and the desire to find a more elegant solution.",
+      "parentUuid": "0277b180_95bfe4ab",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_15dd9403",
         "filename": "pack/eeintegrity/eeintegrity.go",
         "patchSetId": 3
