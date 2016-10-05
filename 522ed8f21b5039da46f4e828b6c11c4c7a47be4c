@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_20cb5417",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-05T04:00:46Z",
+      "side": 1,
+      "message": "Yes, except in eeintegrity I drop dkey from the signature and drop wrap from pdMarshal.  When I was trying that approach I just passed empty arguments and used the flag to mark the dead code.  It still seemed to me to make ee harder to read than it is already.\n\nI\u0027m guessing the right time to refactor this will be when we know what the non-elliptic-curve versions of ee and eeintegrity look like.",
+      "parentUuid": "82b48148_80a9607a",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_15dd9403",
         "filename": "pack/eeintegrity/eeintegrity.go",
         "patchSetId": 3
