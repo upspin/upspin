@@ -161,6 +161,24 @@
     },
     {
       "key": {
+        "uuid": "0277b180_55a9cc76",
+        "filename": "dir/server/access.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-05T02:50:05Z",
+      "side": 1,
+      "message": "As discussed in the meeting, this won\u0027t be the right behavior. There\u0027s no reason to submit this CL with the wrong behavior.\n\nYou might want to wait for the userLock CL to go in (+2 and submit it at your leisure) before doing this one. Then you can do this in loadPath:\n\n- keyserver lookup for the user\n- if this dirserver\u0027s endpoint is one of their endpoints, do a local lookup\n- otherwise, do a lookup against one of their dir servers\n- always return the first dirserver.lookup failure",
+      "parentUuid": "62622d91_68f4034c",
+      "revId": "845e7881a0a1f3703b943b302dc85aa7af29d402",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82d2c116_81971af6",
         "filename": "dir/server/access.go",
         "patchSetId": 12
