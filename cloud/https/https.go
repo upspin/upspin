@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"google.golang.org/cloud/compute/metadata"
+	"cloud.google.com/go/compute/metadata"
 	"rsc.io/letsencrypt"
 
 	"upspin.io/auth"
