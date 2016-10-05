@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_80a9607a",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-05T03:41:41Z",
+      "side": 1,
+      "message": "There are little pieces that can be combined into a subroutine called by both.  For example:\n\t// Compute checksum of block hashes.\n\tsum :\u003d internal.BlockSum(bp.entry.Blocks)\n\n\t// Compute entry signature.\n\tsig, err :\u003d ctx.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)\n\tif err !\u003d nil {\n\t\treturn errors.E(op, err)\n\t}\n\n\treturn pdMarshal(\u0026bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)\n\ncould be turned into a routine called ChecksumAndMarshalll() or some such.  Might help a bit.\n\nOr you could make a version of ee that doesn\u0027t encrypt under some boolean in the in the blockPacker struct and have the ie.Pack and ee.Pack set the bool accordingly (they could both live in the same file ee/pack).  The init() function would register both Pack routines.\n\nNot sure its worth it since the commonality is small enough but it might be easier to maintain.",
+      "parentUuid": "0277b180_95bfe4ab",
+      "revId": "522ed8f21b5039da46f4e828b6c11c4c7a47be4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_15dd9403",
         "filename": "pack/eeintegrity/eeintegrity.go",
         "patchSetId": 3
