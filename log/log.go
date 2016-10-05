@@ -14,9 +14,9 @@ import (
 	goLog "log"
 	"os"
 
+	"cloud.google.com/go/logging"
 	"golang.org/x/net/context"
-	"google.golang.org/cloud"
-	"google.golang.org/cloud/logging"
+	"google.golang.org/api/option"
 )
 
 // Logger is the interface for logging messages.
@@ -55,13 +55,13 @@ var (
 	Error = newLogger(errors, logging.Error)
 
 	currentLevel  = info
-	client        *logging.Client
+	cloudLogger   *logging.Logger
 	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
 )
 
 type logger struct {
-	level      level
-	cloudLevel logging.Level
+	level         level
+	cloudSeverity logging.Severity
 }
 
 var _ Logger = (*logger)(nil)
@@ -71,8 +71,8 @@ func (l *logger) Printf(format string, v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if client != nil {
-		client.Logger(l.cloudLevel).Printf(format, v...)
+	if cloudLogger != nil {
+		cloudLogger.StandardLogger(l.cloudSeverity).Printf(format, v...)
 	}
 	defaultLogger.Printf(format, v...)
 }
@@ -82,8 +82,8 @@ func (l *logger) Print(v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if client != nil {
-		client.Logger(l.cloudLevel).Print(v...)
+	if cloudLogger != nil {
+		cloudLogger.StandardLogger(l.cloudSeverity).Print(v...)
 	}
 	defaultLogger.Print(v...)
 }
@@ -93,24 +93,24 @@ func (l *logger) Println(v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if client != nil {
-		client.Logger(l.cloudLevel).Println(v...)
+	if cloudLogger != nil {
+		cloudLogger.StandardLogger(l.cloudSeverity).Println(v...)
 	}
 	defaultLogger.Println(v...)
 }
 
 // Fatal writes a message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatal(v ...interface{}) {
-	if client != nil {
-		client.Logger(l.cloudLevel).Print(v...)
+	if cloudLogger != nil {
+		cloudLogger.StandardLogger(l.cloudSeverity).Print(v...)
 	}
 	defaultLogger.Fatal(v...)
 }
 
 // Fatalf writes a formated message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatalf(format string, v ...interface{}) {
-	if client != nil {
-		client.Logger(l.cloudLevel).Printf(format, v...)
+	if cloudLogger != nil {
+		cloudLogger.StandardLogger(l.cloudSeverity).Printf(format, v...)
 	}
 	defaultLogger.Fatalf(format, v...)
 }
@@ -201,16 +201,17 @@ func Fatalf(format string, v ...interface{}) {
 // instance writing to a given logName.
 func Connect(projectID, logName string) error {
 	var err error
-	client, err = newClient(projectID, logName)
+	client, err := newClient(projectID)
 	if err != nil {
 		return err
 	}
+	cloudLogger = client.Logger(logName)
 	return nil
 }
 
 // newClient creates a new client connected to the GCP Logging API with an assigned logName.
-func newClient(projectID, logName string) (*logging.Client, error) {
-	client, err := logging.NewClient(context.Background(), projectID, logName, cloud.WithScopes(logging.Scope))
+func newClient(projectID string) (*logging.Client, error) {
+	client, err := logging.NewClient(context.Background(), projectID, option.WithScopes(logging.WriteScope))
 	if err != nil {
 		return nil, err
 	}
@@ -218,9 +219,9 @@ func newClient(projectID, logName string) (*logging.Client, error) {
 }
 
 // newLogger instantiates an implicit Logger using the default client.
-func newLogger(level level, cloudLevel logging.Level) Logger {
+func newLogger(level level, cloudSeverity logging.Severity) Logger {
 	return &logger{
-		level:      level,
-		cloudLevel: cloudLevel,
+		level:         level,
+		cloudSeverity: cloudSeverity,
 	}
 }

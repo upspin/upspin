@@ -75,7 +75,7 @@
 // 	}
 // 	log.Fatal(m.Serve())
 //
-// (Package metadata is "google.golang.org/cloud/compute/metadata".)
+// (Package metadata is "cloud.google.com/go/compute/metadata".)
 //
 package letscloud
 
