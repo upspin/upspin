@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_601d5c70",
+        "filename": "dir/server/access.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-05T04:36:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0277b180_f5fd7851",
+      "revId": "f8f89769a819f5d6aa731df85f4fb3c914a921c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_1513d4c2",
         "filename": "dir/server/access.go",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "82b48148_a02f4490",
+        "filename": "dir/server/access.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-05T04:36:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0277b180_1513d4c2",
+      "revId": "f8f89769a819f5d6aa731df85f4fb3c914a921c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0277b180_3510d0b3",
         "filename": "dir/server/access.go",
         "patchSetId": 15
@@ -47,6 +83,41 @@
       "writtenOn": "2016-10-05T04:32:54Z",
       "side": 1,
       "message": "range u.Dirs",
+      "revId": "f8f89769a819f5d6aa731df85f4fb3c914a921c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82b48148_002570b0",
+        "filename": "dir/server/access.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-05T04:36:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0277b180_3510d0b3",
+      "revId": "f8f89769a819f5d6aa731df85f4fb3c914a921c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82b48148_e0294c8c",
+        "filename": "dir/server/access.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-05T04:36:35Z",
+      "side": 1,
+      "message": "Fixed typo: It -\u003e It\u0027s.",
       "revId": "f8f89769a819f5d6aa731df85f4fb3c914a921c1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
