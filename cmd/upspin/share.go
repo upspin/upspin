@@ -66,11 +66,10 @@ func newSharer(s *State) *Sharer {
 }
 
 // shareCommand is the main function for the share subcommand.
-func (s *State) shareCommand(args []string) {
+func (s *State) shareCommand(names []upspin.PathName) {
 	// To change things, User must be the owner of every file.
 	if s.sharer.fix {
-		for _, arg := range args {
-			name := upspin.PathName(arg)
+		for _, name := range names {
 			parsed, _ := path.Parse(name)
 			if parsed.User() != s.context.UserName() {
 				s.exitf("%q: %q is not owner", name, s.context.UserName())
@@ -79,7 +78,7 @@ func (s *State) shareCommand(args []string) {
 	}
 
 	// Files parse. Get the list of all directory entries we care about.
-	entries := s.sharer.allEntries(args)
+	entries := s.sharer.allEntries(names)
 
 	// Collect the access files. We need only one per directory.
 	for _, e := range entries {
@@ -234,11 +233,10 @@ func userListToString(userList []upspin.UserName) string {
 }
 
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
-func (s *Sharer) allEntries(args []string) []*upspin.DirEntry {
+func (s *Sharer) allEntries(names []upspin.PathName) []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
 	// We will not follow links; don't use Client. Use the directory server directly.
-	for _, arg := range args {
-		name := upspin.PathName(arg)
+	for _, name := range names {
 		entry, err := s.state.DirServer().Lookup(name)
 		if err != nil {
 			s.state.exitf("lookup %q: %s", name, err)
