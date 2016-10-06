@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -41,7 +42,6 @@ import (
 var commands = map[string]func(*State, ...string){
 	"countersign": (*State).countersign,
 	"get":         (*State).get,
-	"glob":        (*State).glob,
 	"info":        (*State).info,
 	"link":        (*State).link,
 	"ls":          (*State).ls,
@@ -168,11 +168,16 @@ func (s *State) get(args ...string) {
 	if err != nil {
 		s.exit(err)
 	}
+
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
+	names := s.globUpspin(fs.Arg(0))
+	if len(names) != 1 {
+		fs.Usage()
+	}
 
-	data, err := s.client.Get(upspin.PathName(fs.Arg(0)))
+	data, err := s.client.Get(names[0])
 	if err != nil {
 		s.exit(err)
 	}
@@ -193,31 +198,6 @@ func (s *State) get(args ...string) {
 	}
 }
 
-func (s *State) glob(args ...string) {
-	fs := flag.NewFlagSet("glob", flag.ExitOnError)
-	longFormat := fs.Bool("l", false, "long format")
-	fs.Usage = s.subUsage(fs, "glob [-l] pattern...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for i := 0; i < fs.NArg(); i++ {
-		de, err := s.client.Glob(fs.Arg(i))
-		if err != nil {
-			s.exit(err)
-		}
-
-		if *longFormat {
-			printLongDirEntries(de)
-		} else {
-			printShortDirEntries(de)
-		}
-	}
-}
-
 func (s *State) info(args ...string) {
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
 	fs.Usage = s.subUsage(fs, "info path...")
@@ -228,8 +208,7 @@ func (s *State) info(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		name := upspin.PathName(fs.Arg(i))
+	for _, name := range s.globAllUpspin(fs.Args()) {
 		// We don't want to follow links, so don't use Client.
 		entry, err := s.DirServer().Lookup(name)
 		if err != nil {
@@ -251,9 +230,14 @@ func (s *State) link(args ...string) {
 	if fs.NArg() != 2 {
 		fs.Usage()
 	}
-	originalPath := path.Clean(upspin.PathName(fs.Arg(0)))
-	linkPath := path.Clean(upspin.PathName(fs.Arg(1)))
-	_, err = s.client.PutLink(originalPath, linkPath)
+
+	originalPath := s.globUpspin(fs.Arg(0))
+	linkPath := s.globUpspin(fs.Arg(1))
+	if len(originalPath) != 1 || len(linkPath) != 1 {
+		fs.Usage()
+	}
+
+	_, err = s.client.PutLink(originalPath[0], linkPath[0])
 	if err != nil {
 		s.exit(err)
 	}
@@ -277,8 +261,8 @@ func (s *State) ls(args ...string) {
 	}
 	// The done map marks a directory we have listed, so we don't recur endlessly
 	// when given a chain of links with -L.
-	for _, arg := range fs.Args() {
-		s.list(upspin.PathName(arg), done, *longFormat, *followLinks, *recur)
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		s.list(name, done, *longFormat, *followLinks, *recur)
 	}
 }
 
@@ -326,8 +310,8 @@ func (s *State) mkdir(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		_, err := s.client.MakeDirectory(upspin.PathName(fs.Arg(i)))
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		_, err := s.client.MakeDirectory(name)
 		if err != nil {
 			s.exit(err)
 		}
@@ -345,8 +329,14 @@ func (s *State) put(args ...string) {
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
+
+	name := s.globUpspin(fs.Arg(0))
+	if len(name) != 1 {
+		fs.Usage()
+	}
+
 	data := s.readAll(*inFile)
-	_, err = s.client.Put(upspin.PathName(fs.Arg(0)), data)
+	_, err = s.client.Put(name[0], data)
 	if err != nil {
 		s.exit(err)
 	}
@@ -390,8 +380,8 @@ func (s *State) rm(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		err := s.client.Delete(upspin.PathName(fs.Arg(i)))
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		err := s.client.Delete(name)
 		if err != nil {
 			s.exit(err)
 		}
@@ -484,9 +474,10 @@ func (s *State) share(args ...string) {
 	if err != nil {
 		s.exit(err)
 	}
-	if fs.NArg() != 1 {
+	if fs.NArg() == 0 {
 		fs.Usage()
 	}
+
 	if *recur {
 		*isDir = true
 	}
@@ -498,7 +489,7 @@ func (s *State) share(args ...string) {
 	s.sharer.isDir = *isDir
 	s.sharer.recur = *recur
 	s.sharer.quiet = *quiet
-	s.shareCommand(fs.Args())
+	s.shareCommand(s.globAllUpspin(fs.Args()))
 }
 
 func (s *State) whichAccess(args ...string) {
@@ -511,8 +502,7 @@ func (s *State) whichAccess(args ...string) {
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for i := 0; i < fs.NArg(); i++ {
-		name := upspin.PathName(fs.Arg(i))
+	for _, name := range s.globAllUpspin(fs.Args()) {
 		acc, err := s.whichAccessFollowLinks(name)
 		if err != nil {
 			s.exit(err)
@@ -700,4 +690,64 @@ func (s *State) finishMetricsIfEnabled() {
 	for i := 0; metric.NumProcessed() > s.metricsSaver.NumProcessed() && i < 10; i++ {
 		time.Sleep(100 * time.Millisecond)
 	}
+}
+
+// globAllUpspin process the arguments, which should be Upspin paths,
+// expanding glob patterns.
+func (s *State) globAllUpspin(args []string) []upspin.PathName {
+	out := make([]upspin.PathName, 0, len(args))
+	for _, arg := range args {
+		out = append(out, s.globUpspin(arg)...)
+	}
+	return out
+}
+
+// globUpspin glob-expands the argument, which must be a syntactically
+// valid Upspin glob pattern (including a plain path name).
+func (s *State) globUpspin(pattern string) []upspin.PathName {
+	// Must be a valid Upspin path.
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		s.exit(err)
+	}
+	var out []upspin.PathName
+	// If it has no metacharacters, leave it alone.
+	if !strings.ContainsAny(pattern, `\*?[`) {
+		return append(out, upspin.PathName(pattern))
+	}
+	entries, err := s.client.Glob(parsed.String())
+	if err != nil {
+		s.exit(err)
+	}
+	for _, entry := range entries {
+		out = append(out, entry.Name)
+	}
+	return out
+}
+
+// globAllLocal process the arguments, which should be local file paths,
+// expanding glob patterns.
+// TODO: Unused for now.
+func (s *State) globAllLocal(args []string) []string {
+	out := make([]string, 0, len(args))
+	for _, arg := range args {
+		out = append(out, s.globLocal(arg)...)
+	}
+	return out
+}
+
+// globLocal glob-expands the argument, which should be a syntactically
+// valid glob pattern (including a plain file name).
+// TODO: Unused for now.
+func (s *State) globLocal(pattern string) []string {
+	// If it has no metacharacters, leave it alone.
+	if !strings.ContainsAny(pattern, `\*?[`) {
+		return []string{pattern}
+	}
+	strs, err := filepath.Glob(pattern)
+	if err != nil {
+		// Bad pattern, so treat as a literal.
+		return []string{pattern}
+	}
+	return strs
 }
