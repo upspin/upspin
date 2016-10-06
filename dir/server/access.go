@@ -15,6 +15,13 @@ import (
 	"upspin.io/upspin"
 )
 
+// accessEntry holds parsed Access files and a sequence number for their entries.
+// It is the unit stored in the access cache.
+type accessEntry struct {
+	sequence int64          // sequence number of the DirEntry parsed.
+	acc      *access.Access // parsed contents of the Access file.
+}
+
 // whichAccess implements DirServer.WhichAccess.
 func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("whichAccess", opts)
@@ -172,23 +179,47 @@ func (s *server) getAccess(entry *upspin.DirEntry, opts ...options) (*access.Acc
 		return nil, errors.E(errors.Internal, entry.Name, errors.Str("not an Access file"))
 	}
 
+	s.accessLock.Lock()
+	defer s.accessLock.Unlock()
+
 	// Is it in the cache?
-	if acc, found := s.access.Get(entry.Name); found {
-		if a, ok := acc.(*access.Access); ok {
-			return a, nil
+	var accEntry *accessEntry
+	a, found := s.access.Get(entry.Name)
+	if found {
+		var ok bool
+		accEntry, ok = a.(*accessEntry)
+		if !ok {
+			return nil, errors.E(errors.Internal, errors.Str("invalid accessEntry"))
 		}
-		return nil, errors.E(errors.Internal, errors.Str("invalid accessCache entry"))
+		if entry.Sequence != accEntry.sequence {
+			// A race happened and we have a cached version that is
+			// different than the requested one. Fail and let higher
+			// levels try again.
+			return nil, errors.E(errors.IO, entry.Name, errors.Str("Access file updated concurrently"))
+		}
+		return accEntry.acc, nil
 	}
-	// Not in cache, load from the Store.
+	// Not in cache; load data from the Store.
+
 	// TODO: we should also reload any known Group files from their remote
 	// origin from time to time if they're not local to this server.
 	acc, err := s.loadAccess(entry, o)
 	if err != nil {
 		return nil, err
 	}
-	// Add to the cache.
-	s.access.Add(entry.Name, acc)
+	// Add or update cache.
+	s.access.Add(entry.Name, &accessEntry{
+		sequence: entry.Sequence,
+		acc:      acc,
+	})
 	return acc, nil
+}
+
+// invalidateAccess removes a cached Access file from the access cache.
+func (s *server) invalidateAccess(name upspin.PathName) {
+	s.accessLock.Lock()
+	defer s.accessLock.Unlock()
+	s.access.Remove(name)
 }
 
 // getDefaultAccess returns the implicit Access file for a user.
