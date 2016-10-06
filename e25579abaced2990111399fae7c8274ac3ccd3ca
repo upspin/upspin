@@ -16,6 +16,24 @@
       "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f82accd_9c326d5b",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-06T02:46:23Z",
+      "side": 1,
+      "message": "I like to keep unrelated things in separate const blocks but it\u0027s no big deal.",
+      "parentUuid": "1f82accd_bcd409dc",
+      "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
