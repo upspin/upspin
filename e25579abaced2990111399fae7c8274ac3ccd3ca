@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "1f82accd_9c502d01",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-06T06:00:56Z",
+      "side": 1,
+      "message": "It\u0027s not vital but it probably matters. EqualFold is big and can\u0027t check for length as an early out.",
+      "parentUuid": "5f50a448_d82f6df5",
+      "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f50a448_9825f519",
         "filename": "access/access_test.go",
         "patchSetId": 2
