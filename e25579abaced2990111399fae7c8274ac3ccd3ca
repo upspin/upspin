@@ -34,6 +34,58 @@
       "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f50a448_b828b9f1",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-06T05:15:21Z",
+      "side": 1,
+      "message": "In particular, I think it makes sense to keep these separate as accessFile is not exported but the other consts are part of the exported API.",
+      "parentUuid": "1f82accd_9c326d5b",
+      "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f50a448_d82f6df5",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-06T05:15:21Z",
+      "side": 1,
+      "message": "I was not aware of EqualFold!\n\nI wonder if the len check actually buys us anything, with this modern compiler.",
+      "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f50a448_9825f519",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-06T05:15:21Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "e25579abaced2990111399fae7c8274ac3ccd3ca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
