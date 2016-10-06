@@ -412,7 +412,7 @@ func cleanup(env *testenv.Env) error {
 	if err != nil {
 		return err
 	}
-	return deleteAll(dir, ownerName)
+	return deleteAll(dir, upspin.PathName(env.Context.UserName()+"/"))
 }
 
 // deleteAll recursively deletes the directory named by path through the

@@ -242,6 +242,9 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 	r.As(owner)
 	r.Delete(groupFile)
 	r.Delete(groupDir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 }
 
 func testWhichAccess(t *testing.T, r *testenv.Runner) {

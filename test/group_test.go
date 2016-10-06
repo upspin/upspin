@@ -64,15 +64,16 @@ func TestGroupFileMultiDir(t *testing.T) {
 	r.AddUser(middleEnv.Context)
 
 	const (
-		base             = ownerName + "/group-multidir-test"
-		file             = base + "/test"
-		access           = base + "/Access"
-		ownerGroup       = ownerName + "/Group"
-		ownerGroupClique = ownerGroup + "/clique"
-		readerGroup      = readerName + "/Group"
-		readerGroupTeam  = readerGroup + "/team"
-		readerAccess     = readerName + "/Access"
-		fileContent      = "tadda!"
+		base              = ownerName + "/group-multidir-test"
+		file              = base + "/test"
+		ownerAccess       = base + "/Access"
+		ownerGroup        = ownerName + "/Group"
+		ownerGroupClique  = ownerGroup + "/clique"
+		ownerGroupAccess  = ownerGroup + "/Access"
+		readerGroup       = readerName + "/Group"
+		readerGroupTeam   = readerGroup + "/team"
+		readerGroupAccess = readerGroup + "/Access"
+		fileContent       = "tadda!"
 	)
 
 	// Owner creates a root and Group file.
@@ -81,14 +82,15 @@ func TestGroupFileMultiDir(t *testing.T) {
 	r.MakeDirectory(ownerGroup)
 	r.Put(ownerGroupClique, readerGroupTeam)
 	r.Put(file, fileContent)
-	r.Put(access, "r:"+testenv.TestServerName)
+	r.Put(ownerAccess, "r:"+ownerName)
+	r.Put(ownerGroupAccess, "r:all")
 
 	// Reader creates a root and a Group file and gives the dirserver
 	// read rights.
 	r.As(readerName)
 	r.MakeDirectory(readerGroup)
 	r.Put(readerGroupTeam, middleName)
-	r.Put(readerAccess, "r:"+testenv.TestServerName)
+	r.Put(readerGroupAccess, "r:all")
 
 	// MiddleName tries to access a file by owner, without success.
 	r.As(middleName)
@@ -97,10 +99,10 @@ func TestGroupFileMultiDir(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	// Now owner adds myclique to the Access file, allowing middleName
+	// Now owner adds clique to the Access file, allowing middleName
 	// indirectly to see file.
 	r.As(ownerName)
-	r.Put(access, "r,l:clique")
+	r.Put(ownerAccess, "r,l:clique")
 
 	// And now middleName should have access since middleName is listed
 	// indirectly in readerName's team Group file.
