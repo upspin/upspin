@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfe654fe_ff295ba2",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-06T18:49:45Z",
+      "side": 1,
+      "message": "I think we can use s.userLock(userInPath(entry.Name)) here.",
+      "revId": "3cab9a8f12526f921acbbcc4e9bf493fe180ad19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfe654fe_3f1bc38b",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-06T18:49:45Z",
+      "side": 1,
+      "message": "and here too.\n\nThoughts?",
+      "revId": "3cab9a8f12526f921acbbcc4e9bf493fe180ad19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
