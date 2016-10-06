@@ -10,8 +10,8 @@ import (
 	goPath "path"
 	"strconv"
 	"strings"
-
 	"sync"
+
 	"upspin.io/access"
 	"upspin.io/cache"
 	"upspin.io/dir/server/tree"
@@ -59,8 +59,8 @@ type server struct {
 	// for different users is okay as the LRU is thread-safe.
 	userTrees *cache.LRU
 
-	// access caches the parsed contents of Access files, indexed by their
-	// path names.
+	// access caches the parsed contents of Access files as struct
+	// accessEntry, indexed by their path names.
 	access *cache.LRU
 
 	// defaultAccess caches parsed empty Access files that implicitly exists
@@ -370,8 +370,8 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 		// sent us (those representing files only).
 		entry.Sequence = existingEntry.Sequence + 1
 
-		// If we're updating an Access file, remove the old one from the
-		// accessCache. Let the new one be loaded lazily.
+		// If we're updating an Access file delete it from the cache and
+		// let it be re-loaded lazily when needed again.
 		if access.IsAccessFile(entry.Name) {
 			s.access.Remove(entry.Name)
 		}
@@ -569,7 +569,8 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return entry, err // could be ErrFollowLink.
 	}
-	// If we just deleted an Access file, remove it from the accessCache too.
+	// If we just deleted an Access file, remove it from the access cache
+	// too.
 	if access.IsAccessFile(p.Path()) {
 		s.access.Remove(p.Path())
 	}
