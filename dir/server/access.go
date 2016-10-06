@@ -11,9 +11,19 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+// accessEntry holds parsed Access files and some metadata about their entries.
+// It is the unit stored in the accessCache. If the entry is dirty, it must be
+// re-read and parsed again from a file that has a newer sequence number.
+type accessEntry struct {
+	sequence int64          // sequence number of the DirEntry parsed.
+	dirty    bool           // whether the contents may have changed.
+	acc      *access.Access // parsed contents of the Access file.
+}
 
 // whichAccess implements DirServer.WhichAccess.
 func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
@@ -172,23 +182,70 @@ func (s *server) getAccess(entry *upspin.DirEntry, opts ...options) (*access.Acc
 		return nil, errors.E(errors.Internal, entry.Name, errors.Str("not an Access file"))
 	}
 
+	s.accessLock.Lock()
+	defer s.accessLock.Unlock()
+
 	// Is it in the cache?
-	if acc, found := s.access.Get(entry.Name); found {
-		if a, ok := acc.(*access.Access); ok {
-			return a, nil
+	var accEntry *accessEntry
+	a, found := s.access.Get(entry.Name)
+	if found {
+		var ok bool
+		accEntry, ok = a.(*accessEntry)
+		if !ok {
+			return nil, errors.E(errors.Internal, errors.Str("invalid accessEntry"))
 		}
-		return nil, errors.E(errors.Internal, errors.Str("invalid accessCache entry"))
+		// Is a dirty accessEntry?
+		if !accEntry.dirty {
+			return accEntry.acc, nil
+		}
+		// Fall through if dirty.
 	}
-	// Not in cache, load from the Store.
+	// Not in cache or dirty; load data from the Store.
+
 	// TODO: we should also reload any known Group files from their remote
 	// origin from time to time if they're not local to this server.
 	acc, err := s.loadAccess(entry, o)
 	if err != nil {
 		return nil, err
 	}
-	// Add to the cache.
-	s.access.Add(entry.Name, acc)
+	// Add or update cache.
+	if !found {
+		s.access.Add(entry.Name, &accessEntry{
+			sequence: entry.Sequence,
+			dirty:    false,
+			acc:      acc,
+		})
+	} else {
+		// Can we update this entry?
+		if entry.Sequence < accEntry.sequence {
+			// A race happened and we must return the newest entry,
+			// which is the one we have cached.
+			return accEntry.acc, nil
+		}
+		// Update looks sane. Proceed.
+		accEntry.dirty = false
+		accEntry.acc = acc
+		accEntry.sequence = entry.Sequence
+	}
 	return acc, nil
+}
+
+// invalidateAccess marks an Access file as dirty if it's in the access cache.
+func (s *server) invalidateAccess(name upspin.PathName) {
+	s.accessLock.Lock()
+	defer s.accessLock.Unlock()
+
+	a, found := s.access.Get(name)
+	if !found {
+		// Not in cache yet, nothing to do.
+		return
+	}
+	accEntry, ok := a.(*accessEntry)
+	if !ok {
+		log.Error.Printf("dir/server.invalidateAccess: invalid type for access entry")
+		return
+	}
+	accEntry.dirty = true
 }
 
 // getDefaultAccess returns the implicit Access file for a user.

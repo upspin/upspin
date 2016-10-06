@@ -59,9 +59,10 @@ type server struct {
 	// for different users is okay as the LRU is thread-safe.
 	userTrees *cache.LRU
 
-	// access caches the parsed contents of Access files, indexed by their
-	// path names.
-	access *cache.LRU
+	// access caches the parsed contents of Access files as struct
+	// accessEntry, indexed by their path names.
+	access     *cache.LRU
+	accessLock sync.Mutex // protects access.
 
 	// defaultAccess caches parsed empty Access files that implicitly exists
 	// at the root of every user's tree, if an explicit one is not found.
@@ -370,10 +371,11 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 		// sent us (those representing files only).
 		entry.Sequence = existingEntry.Sequence + 1
 
-		// If we're updating an Access file, remove the old one from the
-		// accessCache. Let the new one be loaded lazily.
+		// If we're updating an Access file, invalidate the cached
+		// entry, if any. (This must be done *after* the sequence number
+		// update.)
 		if access.IsAccessFile(entry.Name) {
-			s.access.Remove(entry.Name)
+			s.invalidateAccess(entry.Name)
 		}
 		// If we're updating a Group file, remove the old one from the
 		// access group cache. Let the new one be loaded lazily.
@@ -569,9 +571,17 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return entry, err // could be ErrFollowLink.
 	}
-	// If we just deleted an Access file, remove it from the accessCache too.
+	// If we just deleted an Access file, remove it from the access cache
+	// too.
 	if access.IsAccessFile(p.Path()) {
+		// Calling invalidate here would be wrong, because a new
+		// Sequence number for an non-existing file would start from
+		// upspin.SeqBase and the previously-cached version could have
+		// been older (>SeqBase).
+		s.accessLock.Lock()
 		s.access.Remove(p.Path())
+		s.accessLock.Unlock()
+
 	}
 	// If we just deleted a Group file, remove it from the Group cache too.
 	if access.IsGroupFile(p.Path()) {
@@ -636,8 +646,9 @@ func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, er
 	}
 
 	cp := *s // copy of the generator instance.
-	// Override userName (rest is "global").
+	// Override userName and accessLock (rest is "global").
 	cp.userName = ctx.UserName()
+	cp.accessLock = sync.Mutex{}
 	// create a default Access file for this user and cache it.
 	defaultAccess, err := access.New(upspin.PathName(cp.userName + "/"))
 	if err != nil {
