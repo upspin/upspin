@@ -33,6 +33,8 @@ Read : reader@reader.org
 WRITE: anotherwriter@a.bc
   create,DeLeTe  :admin@c.com`)
 
+	allUsersAccessText = []byte(`r : foo@bob.com, all`)
+
 	groupText = []byte("#This is my family\nfred@me.com, ann@me.com\njoe@me.com\n")
 )
 
@@ -75,6 +77,20 @@ func TestParseEmpty(t *testing.T) {
 	for i := Read; i < numRights; i++ {
 		match(t, a.list[i], nil)
 	}
+}
+
+func TestParseAllUsers(t *testing.T) {
+	a, err := Parse(testFile, allUsersAccessText)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = a
+
+	match(t, a.list[Read], []string{"foo@bob.com", string(AllUsers)})
+	match(t, a.list[Write], nil)
+	match(t, a.list[List], nil)
+	match(t, a.list[Create], nil)
+	match(t, a.list[Delete], nil)
 }
 
 type accessEqualTest struct {
@@ -327,6 +343,53 @@ func TestHasAccessWithGroups(t *testing.T) {
 	if len(missingGroups) != 1 {
 		t.Fatalf("Expected one missing group, got %d", len(missingGroups))
 	}
+}
+
+func TestAccessAllUsers(t *testing.T) {
+	const (
+		owner = upspin.UserName("me@here.com")
+
+		// This access file defines a single writer but allows anyone to read.
+		text = "r: All\n" +
+			"w: writer@foo.bar\n"
+	)
+	a, err := Parse(testFile, []byte(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
+		ok, groups, err := a.canNoGroupLoad(user, right, file)
+		if groups != nil {
+			t.Fatalf("non-empty groups %q", groups)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok == truth {
+			return
+		}
+		if ok {
+			t.Errorf("%s can %s %s", user, right, file)
+		} else {
+			t.Errorf("%s cannot %s %s", user, right, file)
+		}
+	}
+
+	// Owner can read.
+	check(owner, Read, "me@here.com/foo/bar", true)
+
+	// Random user can read (because of "all"==AllUsers).
+	check("someone@obscure.com", Read, "me@here.com/foo/bar", true)
+
+	// Owner cannot write.
+	check(owner, Write, "me@here.com/foo/bar", false)
+
+	// Writer can write.
+	check("writer@foo.bar", Write, "me@here.com/foo/bar", true)
+
+	// Unpermitted others cannot write.
+	check("someone@obscure.com", Write, "me@here.com/foo/bar", false)
 }
 
 func TestParseEmptyFile(t *testing.T) {

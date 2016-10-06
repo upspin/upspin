@@ -35,6 +35,33 @@ const (
 	accessFile = "Access"
 )
 
+const (
+	// All is a shorthand for AllUsers. Its appearance in a user list
+	// grants access to everyone who can authenticate to the Upspin system.
+	// This constant can be used in Access files, but will always be expanded
+	// to the the full name ("all@upspin.io") when returned from Access.Users
+	// and such.
+	All = "all" // Case is ignored, so "All", "ALL", etc. also work.
+
+	// AllUsers is a reserved Upspin user name. Its appearance in a user list
+	// grants access to everyone who can authenticate to the Upspin system.
+	AllUsers upspin.UserName = "all@upspin.io"
+)
+
+var (
+	allBytes       = []byte(All)
+	allUsersBytes  = []byte(AllUsers)
+	allUsersParsed path.Parsed
+)
+
+func init() {
+	var err error
+	allUsersParsed, err = path.Parse(upspin.PathName(AllUsers))
+	if err != nil {
+		panic(err)
+	}
+}
+
 // ErrPermissionDenied is a predeclared error reporting that a permission check has failed.
 // It is not used in this package but is commonly used in its clients.
 var ErrPermissionDenied = errors.E(errors.Permission)
@@ -264,6 +291,10 @@ func clean(line []byte) []byte {
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
 func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, error) {
 	for _, user := range users {
+		// Case-insensitive check for the "all" shorthand, which we promote to "all@upspin.io".
+		if len(user) == 3 && bytes.EqualFold(user, allBytes) {
+			user = allUsersBytes
+		}
 		p, err := path.Parse(upspin.PathName(user) + "/")
 		if err != nil {
 			if bytes.IndexByte(user, '@') >= 0 {
@@ -755,6 +786,10 @@ func (a *Access) inList(requester path.Parsed, list []path.Parsed, groupsToCheck
 	}
 Outer:
 	for _, allowed := range list {
+		// Simple test for AllUsers, granting universal access.
+		if allowed == allUsersParsed {
+			return true, nil
+		}
 		if allowed.IsRoot() {
 			if allowed.User() == requester.User() {
 				return true, nil
