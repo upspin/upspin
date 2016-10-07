@@ -78,22 +78,15 @@ func New(options ...string) (upspin.StoreServer, error) {
 
 // Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (*upspin.Refdata, error) {
-	const op = "store/gcp.Put"
-	reader := bytes.NewReader(data)
 	// TODO: check that userName has permission to write to this store server.
+	const op = "store/gcp.Put"
+	ref := sha256key.Of(data).String()
 	s.mu.RLock()
-	sha := sha256key.NewShaReader(reader)
-	initialRef := s.cache.RandomRef()
-	err := s.cache.Put(initialRef, sha)
+	err := s.cache.Put(ref, bytes.NewReader(data))
 	if err != nil {
 		s.mu.RUnlock()
 		return nil, errors.E(op, err)
 	}
-	// Figure out the appropriate reference for this blob.
-	ref := sha.EncodedSum()
-
-	// Rename it in the cache
-	s.cache.Rename(ref, initialRef)
 
 	// Now go store it in the cloud.
 	go func() {
