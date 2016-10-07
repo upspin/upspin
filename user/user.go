@@ -8,6 +8,8 @@ package user
 import (
 	"strings"
 
+	"golang.org/x/text/secure/precis"
+
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -21,8 +23,6 @@ import (
 //
 // Parsed validates the name as an e-mail address and lower-cases the  domain
 // so it is canonical.
-//
-// TODO: Need to think about Unicode user names.
 //
 // The rules are:
 //
@@ -41,22 +41,24 @@ import (
 //
 // <user name> :=
 //
-// Names are are constrained by what SMTP will allow, so these should be good:
+// Names are validated and canonicalized by the UsernameCasePreserved profile
+// of the RFC 7613, "Preparation, Enforcement, and Comparison of Internationalized Strings",
+// also known as PRECIS.
 //
-// - upper and lower case A-Z, case matters.
-// - 0-9  !#$%&'*+-/=?^_{|}~
-// - utf // TODO.
-// - spaces
+// Further restrictions are added here. The only ASCII punctuation characters
+// that are legal are "!#$%&'*+-/=?^_{|}~".
 //
-// Spaces may be problematic for us but we allow them here. TODO?
+// As a special case for use in Access and Group files, the name "*" is allowed.
 //
-// The username suffix is still more constrained: It uses the same character
-// set as domains, but of course without the need for periods.
+// Case is significant and spaces are not allowed.
 //
-// Facebook and Google constrain you to [a-zA-Z0-9+-.],
+// The username suffix is tightly constrained: It uses the same character
+// set as domains, but of course the spacing of periods is irrelevant.
+//
+// Facebook and Google constrain usernames to [a-zA-Z0-9+-.],
 // ignoring the period and, in Google only, ignoring everything
-// from a plus sign onwards. We accept this set but do not follow
-// the ignore rules.
+// from a plus sign onwards. We accept a superset of this but do not
+// follow the "ignore" rules.
 //
 func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	name := string(userName)
@@ -77,21 +79,25 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	if strings.Count(domain, ".") == 0 {
 		return errUserName(userName, "domain name must contain a period")
 	}
-	// Valid user name?
-	for _, c := range user {
-		if !okUserNameChar(c) {
-			return errUserName(userName, "bad symbol in user name")
-		}
+	plus := strings.IndexByte(user, '+')
+	if plus == len(user)-1 { // Check first because PRECIS dislikes + at end of string.
+		return errUserName(userName, "empty +suffix in user name")
+	}
+	// Validate and canonicalize the user name - and maybe suffix, but
+	// the suffix is checked more thoroughly below. We include the suffix
+	// here because PRECIS will prevent things like "+" or "joe+" or
+	// "+joe" as the full name. That is, we do PRECIS validation on
+	// the full user+suffix.
+	user, err = canonicalize(user)
+	if err != nil {
+		return "", "", "", errors.E("user.Parse", errors.Invalid, user, err)
 	}
 	// Valid +suffix (if any)?
-	if plus := strings.IndexByte(user, '+'); plus >= 0 {
+	if plus >= 0 {
 		if plus == 0 {
 			return errUserName(userName, "user name cannot start with +suffix")
 		}
 		suffix = user[plus+1:]
-		if suffix == "" {
-			return errUserName(userName, "empty +suffix in user name")
-		}
 		if strings.IndexByte(suffix, '+') > 0 {
 			return errUserName(userName, "multiple +suffixes in user name")
 		}
@@ -137,8 +143,28 @@ func errUserName(user upspin.UserName, msg string) (u, s, d string, err error) {
 	return "", "", "", errors.E(op, errors.Invalid, user, errors.Str(msg))
 }
 
-// See the comments for UserAndDomain.
-func okUserNameChar(r rune) bool {
+func canonicalize(user string) (string, error) {
+	// The PRECIS operation is expensive but applies to few strings.
+	// Take care of the easy stuff up front.
+	if user == "*" {
+		return user, nil
+	}
+	for _, r := range user {
+		if illegalASCIIPunctuation(r) {
+			return "", errors.Errorf("illegal character %c", r)
+		}
+		if !simpleUserNameChar(r) {
+			return precis.UsernameCasePreserved.String(user)
+			break
+		}
+	}
+	return user, nil
+}
+
+// Used by canonicalize to identify simple strings that don't need PRECIS processing.
+// Note we don't check punctuation here because identifiers allow punctuation but
+// only in certain places; let PRECIS do the work. "*" is the exception.
+func simpleUserNameChar(r rune) bool {
 	switch {
 	case 'a' <= r && r <= 'z':
 		return true
@@ -146,10 +172,14 @@ func okUserNameChar(r rune) bool {
 		return true
 	case '0' <= r && r <= '9':
 		return true
-	case strings.ContainsRune("!#$%&'*.+-/=?^_{|}~", r):
-		return true
 	}
 	return false
+}
+
+// illegalASCIIPunctuation reports whether the rune is an ASCII punctuation
+// character that is allowed by PRECIS but not by us.
+func illegalASCIIPunctuation(r rune) bool {
+	return strings.ContainsRune(" \"(),:;<>.[\\]`", r)
 }
 
 // See the comments for UserAndDomain.
