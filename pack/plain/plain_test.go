@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package plain
+package plain_test
 
 import (
 	"crypto/rand"
@@ -24,7 +24,7 @@ func TestRegister(t *testing.T) {
 		t.Fatal("Lookup failed")
 	}
 	if p.Packing() != upspin.PlainPack {
-		t.Fatalf("expected %q got %q", plainPack{}, p)
+		t.Fatalf("expected plain pack got %q", p)
 	}
 }
 
@@ -44,7 +44,7 @@ func TestPack(t *testing.T) {
 
 // doPack packs the contents of data for name and returns the cipher and the dir entry.
 func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.DirEntry) {
-	packer := plainPack{}
+	packer := pack.Lookup(upspin.PlainPack)
 	de := &upspin.DirEntry{
 		Name: name,
 	}
@@ -65,7 +65,7 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 
 // doUnpack unpacks cipher for a dir entry and returns the clear text.
 func doUnpack(t testing.TB, cipher []byte, de *upspin.DirEntry) []byte {
-	packer := plainPack{}
+	packer := pack.Lookup(upspin.PlainPack)
 	bp, err := packer.Unpack(globalContext, de)
 	if err != nil {
 		t.Fatal("doUnpack:", err)
