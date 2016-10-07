@@ -159,17 +159,14 @@ func (ac *AuthClientService) keepAlive() {
 			lastIdleness := time.Since(ac.lastActivity())
 			if lastIdleness < ac.keepAliveInterval {
 				sleepFor = ac.keepAliveInterval - lastIdleness
-				log.Debug.Printf("New ping in %v", sleepFor)
 				continue
 			}
 			sleepFor = ac.keepAliveInterval
 			if !ac.Ping() {
 				log.Error.Printf("grpcauth: keepAlive: ping failed")
 			}
-			log.Debug.Printf("grpcAuth: keepAlive: ping okay")
 			ac.setLastActivity()
 		case <-ac.closeKeepAlive:
-			log.Debug.Printf("grpcauth: keepAlive: exiting keep alive routine")
 			return
 		}
 	}
