@@ -52,6 +52,14 @@ func TestParse(t *testing.T) {
 		{upspin.UserName("me+@here.com"), U, S, D, "empty +suffix in user name"},
 		{upspin.UserName("me+a+b@here.com"), U, S, D, "multiple +suffixes in user name"},
 		{upspin.UserName("me+/x@here.com"), U, S, D, "bad symbol in +suffix"},
+		// A good PRECIS case: canonicalize the accent. These two should be the same user, "ê@here.com".
+		{upspin.UserName("\u00ea@here.com"), "\u00ea", S, "here.com", ""},  // Single code point.
+		{upspin.UserName("e\u0302@here.com"), "\u00ea", S, "here.com", ""}, // Accent as a combining character.
+		// Bad PRECIS cases.
+		{upspin.UserName("henry\u2163@here.com"), U, S, D, "precis: disallowed rune"},
+		{upspin.UserName("!@here.com"), U, S, D, "bidirule: failed Bidi Rule"}, // Bizarre error. TODO?
+		// Special wildcard case.
+		{upspin.UserName("*@here.com"), "*", S, "here.com", ""}, // Single code point.
 	}
 	for _, test := range tests {
 		u, s, d, err := Parse(test.userName)
