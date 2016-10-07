@@ -26,10 +26,6 @@ import (
 	// Load required transports
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
-
-	// This is required for context.InitContext to work.
-	// TODO(adg): This seems wrong; fix it.
-	_ "upspin.io/pack/plain"
 )
 
 const serverName = "storeserver"

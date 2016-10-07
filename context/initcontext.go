@@ -21,6 +21,10 @@ import (
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
+
+	// Needed because the default packing is "plain" and its
+	// implementation is referenced if no packing is specified.
+	_ "upspin.io/pack/plain"
 )
 
 var inTest = false // Generate errors instead of logs for certain problems.
