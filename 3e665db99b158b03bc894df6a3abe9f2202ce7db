@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f35bc64_96263c22",
+        "filename": "user/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-07T23:40:18Z",
+      "side": 1,
+      "message": "Why not add \u0027+\u0027?  It will make most Google names simple.  OF course, I say this in complete ignorance of PRECIS.",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 38
+      },
+      "revId": "3e665db99b158b03bc894df6a3abe9f2202ce7db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
