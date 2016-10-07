@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f993c96_05b9b496",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-07T00:13:32Z",
+      "side": 1,
+      "message": "TODO: move to a common function somewhere (used in 3 places now)",
+      "revId": "25face277d8ab512b9e97d5681f6a3f4b73acff2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
