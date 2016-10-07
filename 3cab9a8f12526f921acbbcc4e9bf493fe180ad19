@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fc21c70_dd8f1fdf",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-07T18:19:53Z",
+      "side": 1,
+      "message": "If you just make s.access use the entry.Name + entry.Sequence as key, you could avoid a lock.  Access files just don\u0027t change that often and the stale ones would drop out of the bottom of the LRU..",
+      "parentUuid": "dfe654fe_ff295ba2",
+      "revId": "3cab9a8f12526f921acbbcc4e9bf493fe180ad19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfe654fe_3f1bc38b",
         "filename": "dir/server/access.go",
         "patchSetId": 1
