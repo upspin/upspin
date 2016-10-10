@@ -2,15 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+package main
+
+// This file contains the implementation of the keygen command.
+// TODO: Put this into a help string when upspin supports that.
 // Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
 // which contain the private and public parts of a keypair.
 // Existing keypairs are appended to ~/.ssh/secret2.upspinkey.
 // Someday we hope to integrate with ssh-agent.
-package main
 
 import (
 	"encoding/binary"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -21,41 +23,6 @@ import (
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
 )
-
-var (
-	curveName = flag.String("curve", "p256", "curve name: p256, p384, or p521")
-	secret    = flag.String("secretseed", "", "128 bit secret seed in proquint format")
-	where     = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
-)
-
-func main() {
-	log.SetFlags(0)
-	log.SetPrefix("keygen: ")
-	flag.Parse()
-	switch *curveName {
-	case "p256":
-	case "p384":
-	case "p521":
-		// ok
-	default:
-		log.Printf("no such curve %q", *curveName)
-		flag.Usage()
-		os.Exit(2)
-	}
-
-	public, private, proquintStr, err := createKeys(*curveName, *secret)
-	if err != nil {
-		log.Fatalf("creating keys: %v", err)
-	}
-	err = saveKeys(keydir())
-	if err != nil {
-		log.Fatalf("saving previous keys failed(%v); keys not generated", err)
-	}
-	err = writeKeys(keydir(), public, private, proquintStr)
-	if err != nil {
-		log.Fatalf("writing keys: %v", err)
-	}
-}
 
 func createKeys(curveName, secret string) (public string, private, proquintStr string, err error) {
 	// Pick secret 128 bits.
@@ -155,15 +122,4 @@ func saveKeys(where string) error {
 		return err
 	}
 	return nil
-}
-
-func keydir() string {
-	if where != nil && len(*where) > 0 {
-		return *where
-	}
-	home := os.Getenv("HOME")
-	if len(home) == 0 {
-		log.Fatal("no home directory")
-	}
-	return filepath.Join(home, ".ssh")
 }
