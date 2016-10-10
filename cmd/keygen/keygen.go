@@ -18,9 +18,8 @@ import (
 	"path/filepath"
 
 	"upspin.io/cmd/keygen/proquint"
-	"upspin.io/pack"
+	"upspin.io/errors"
 	"upspin.io/pack/ee"
-	"upspin.io/upspin"
 )
 
 var (
@@ -28,98 +27,6 @@ var (
 	secret    = flag.String("secretseed", "", "128 bit secret seed in proquint format")
 	where     = flag.String("where", "", "directory to write keys. If empty, $HOME/.ssh/")
 )
-
-func createKeys() {
-	// Pick secret 128 bits.
-	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
-	b := make([]byte, 16)
-	var proquintStr string
-	if len(*secret) > 0 {
-		if len((*secret)) != 47 || (*secret)[5] != '-' {
-			log.Fatalf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
-				"not\n %s\nkey not generated", *secret)
-		}
-		for i := 0; i < 8; i++ {
-			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((*secret)[6*i:6*i+5])))
-		}
-	} else {
-		ee.GenEntropy(b)
-		proquints := make([]interface{}, 8)
-		for i := 0; i < 8; i++ {
-			proquints[i] = proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2]))
-		}
-		proquintStr = fmt.Sprintf("-secretseed %s-%s-%s-%s.%s-%s-%s-%s\n", proquints...)
-		// Ignore punctuation on input;  this format is just to help the user keep their place.
-
-	}
-
-	pub, priv, err := ee.CreateKeys(*curveName, b)
-
-	// Save the keys to files.
-	private, err := os.Create(filepath.Join(keydir(), "secret.upspinkey"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = private.Chmod(0600)
-	if err != nil {
-		log.Fatal(err)
-	}
-	public, err := os.Create(filepath.Join(keydir(), "public.upspinkey"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	private.WriteString(priv)
-	public.WriteString(string(pub))
-
-	err = private.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = public.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if proquintStr != "" {
-		fmt.Print(proquintStr)
-	}
-}
-
-func saveKeys() {
-	private, err := os.Open(filepath.Join(keydir(), "secret.upspinkey"))
-	if os.IsNotExist(err) {
-		return // There is nothing we need to save.
-	}
-	priv, err := ioutil.ReadAll(private)
-	if err != nil {
-		log.Fatal(err)
-	}
-	public, err := os.Open(filepath.Join(keydir(), "public.upspinkey"))
-	if err != nil {
-		log.Fatal(err) // Halt. Existing files are corrupted and need manual attention.
-	}
-	pub, err := ioutil.ReadAll(public)
-	if err != nil {
-		log.Fatal(err)
-	}
-	archive, err := os.OpenFile(filepath.Join(keydir(), "secret2.upspinkey"),
-		os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
-	if err != nil {
-		log.Fatal(err) // We don't have permission to archive old keys?
-	}
-	_, err = archive.Write([]byte("# EE \n")) // TODO(ehg) add file date
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = archive.Write(pub)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = archive.Write(priv)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 func main() {
 	log.SetFlags(0)
@@ -136,17 +43,119 @@ func main() {
 		os.Exit(2)
 	}
 
-	p := pack.Lookup(upspin.EEPack)
-	if p == nil {
-		log.Fatal("packers apparently not registered")
+	public, private, proquintStr, err := createKeys(*curveName, *secret)
+	if err != nil {
+		log.Fatalf("creating keys: %v", err)
+	}
+	err = saveKeys(keydir())
+	if err != nil {
+		log.Fatalf("saving previous keys: %v", err)
+	}
+	err = writeKeys(keydir(), public, private, proquintStr)
+	if err != nil {
+		log.Fatalf("writing keys: %v", err)
+	}
+}
+
+func createKeys(curveName, secret string) (public string, private, proquintStr string, err error) {
+	// Pick secret 128 bits.
+	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
+	b := make([]byte, 16)
+	if len(secret) > 0 {
+		if len((secret)) != 47 || (secret)[5] != '-' {
+			return "", "", "", err
+			log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
+				"not\n %s\nkey not generated", secret)
+			return "", "", "", errors.E("keygen", errors.Invalid, errors.Str("bad format for secret"))
+		}
+		for i := 0; i < 8; i++ {
+			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secret)[6*i:6*i+5])))
+		}
+	} else {
+		ee.GenEntropy(b)
+		proquints := make([]interface{}, 8)
+		for i := 0; i < 8; i++ {
+			proquints[i] = proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2]))
+		}
+		proquintStr = fmt.Sprintf("-secretseed %s-%s-%s-%s.%s-%s-%s-%s\n", proquints...)
+		// Ignore punctuation on input;  this format is just to help the user keep their place.
+
 	}
 
-	packer := pack.LookupByName("ee") // TODO var
-	if packer == nil {
-		log.Fatal("unrecognized packing ee")
+	pub, priv, err := ee.CreateKeys(curveName, b)
+	if err != nil {
+		return "", "", "", err
 	}
-	saveKeys()
-	createKeys()
+	return string(pub), priv, proquintStr, nil
+}
+
+func writeKeys(where, publicKey, privateKey, proquintStr string) error {
+	// Save the keys to files.
+	fdPrivate, err := os.Create(filepath.Join(where, "secret.upspinkey"))
+	if err != nil {
+		return err
+	}
+	err = fdPrivate.Chmod(0600)
+	if err != nil {
+		return err
+	}
+	fdPublic, err := os.Create(filepath.Join(where, "public.upspinkey"))
+	if err != nil {
+		return err
+	}
+
+	fdPrivate.WriteString(privateKey)
+	fdPublic.WriteString(string(publicKey))
+
+	err = fdPrivate.Close()
+	if err != nil {
+		return err
+	}
+	err = fdPublic.Close()
+	if err != nil {
+		return err
+	}
+	if proquintStr != "" {
+		fmt.Print(proquintStr)
+	}
+	return nil
+}
+
+func saveKeys(where string) error {
+	private, err := os.Open(filepath.Join(where, "secret.upspinkey"))
+	if os.IsNotExist(err) {
+		return nil // There is nothing we need to save.
+	}
+	priv, err := ioutil.ReadAll(private)
+	if err != nil {
+		return err
+	}
+	public, err := os.Open(filepath.Join(where, "public.upspinkey"))
+	if err != nil {
+		return err // Halt. Existing files are corrupted and need manual attention.
+	}
+	pub, err := ioutil.ReadAll(public)
+	if err != nil {
+		return err
+	}
+	archive, err := os.OpenFile(filepath.Join(where, "secret2.upspinkey"),
+		os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+	if err != nil {
+		return err // We don't have permission to archive old keys?
+	}
+	_, err = archive.Write([]byte("# EE \n")) // TODO(ehg) add file date
+	if err != nil {
+		return err
+	}
+	_, err = archive.Write(pub)
+	if err != nil {
+		return err
+	}
+	_, err = archive.Write(priv)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func keydir() string {
