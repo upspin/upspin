@@ -17,8 +17,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"upspin.io/cmd/keygen/proquint"
 	"upspin.io/errors"
+	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
 )
 
@@ -79,7 +79,6 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 		}
 		proquintStr = fmt.Sprintf("-secretseed %s-%s-%s-%s.%s-%s-%s-%s\n", proquints...)
 		// Ignore punctuation on input;  this format is just to help the user keep their place.
-
 	}
 
 	pub, priv, err := ee.CreateKeys(curveName, b)
