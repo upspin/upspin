@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f35bc64_9d0f34ed",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-10T16:14:08Z",
+      "side": 1,
+      "message": "I\u0027m fine with this, but I do think this hinders readability by a tiny little bit because one has to stop and think \"why is a dirty reference okay here if we\u0027re going to read it from store?\", \"ah, because it\u0027s a file, and files are never dirty\"...",
+      "revId": "0c9a5a31736dd7f0961e911e8b90b2ec157e906f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
