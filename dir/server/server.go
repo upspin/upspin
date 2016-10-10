@@ -325,7 +325,7 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 		}
 		// New file should have a valid sequence number, if user didn't pick one already.
 		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
-			entry.Sequence = upspin.SeqBase
+			entry.Sequence = upspin.NewSequence()
 		}
 	} else if err != nil {
 		// Some unexpected error happened looking up path. Abort.
@@ -368,7 +368,7 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 		// by the Tree since directory entries are never Put by the
 		// user explicitly. Here we adjust the dir entries that the user
 		// sent us (those representing files only).
-		entry.Sequence = existingEntry.Sequence + 1
+		entry.Sequence = upspin.SeqNext(existingEntry.Sequence)
 
 		// If we're updating an Access file delete it from the cache and
 		// let it be re-loaded lazily when needed again.

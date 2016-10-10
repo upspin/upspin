@@ -122,47 +122,47 @@ func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 	r.MakeDirectory(base)
 	r.DirLookup(base)
 	seq := int64(upspin.SeqBase)
-	if !r.GotEntryWithSequence(base, seq) {
+	if !r.GotEntryWithSequenceVersion(base, seq) {
 		t.Fatal(r.Diag())
 	}
 
 	seq++
 	r.MakeDirectory(dir)
 	r.DirLookup(base)
-	if !r.GotEntryWithSequence(base, seq) {
+	if !r.GotEntryWithSequenceVersion(base, seq) {
 		t.Fatal(r.Diag())
 	}
 
 	seq++
 	r.MakeDirectory(subdir)
 	r.DirLookup(base)
-	if !r.GotEntryWithSequence(base, seq) {
+	if !r.GotEntryWithSequenceVersion(base, seq) {
 		t.Fatal(r.Diag())
 	}
 
 	r.DirLookup(subdir)
-	if !r.GotEntryWithSequence(subdir, upspin.SeqBase) {
+	if !r.GotEntryWithSequenceVersion(subdir, upspin.SeqBase) {
 		t.Fatal(r.Diag())
 	}
 
 	seq++
 	r.Delete(subdir)
 	r.DirLookup(base)
-	if !r.GotEntryWithSequence(base, seq) {
+	if !r.GotEntryWithSequenceVersion(base, seq) {
 		t.Fatal(r.Diag())
 	}
 
 	fileSeq := int64(upspin.SeqBase)
 	r.Put(file, "meh")
 	r.DirLookup(file)
-	if !r.GotEntryWithSequence(file, fileSeq) {
+	if !r.GotEntryWithSequenceVersion(file, fileSeq) {
 		t.Fatal(r.Diag())
 	}
 
 	fileSeq++
 	r.Put(file, "new")
 	r.DirLookup(file)
-	if !r.GotEntryWithSequence(file, fileSeq) {
+	if !r.GotEntryWithSequenceVersion(file, fileSeq) {
 		t.Fatal(r.Diag())
 	}
 }
