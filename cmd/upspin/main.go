@@ -43,6 +43,7 @@ var commands = map[string]func(*State, ...string){
 	"countersign": (*State).countersign,
 	"get":         (*State).get,
 	"info":        (*State).info,
+	"keygen":      (*State).keygen,
 	"link":        (*State).link,
 	"ls":          (*State).ls,
 	"mkdir":       (*State).mkdir,
@@ -215,6 +216,52 @@ func (s *State) info(args ...string) {
 			s.exit(err)
 		}
 		s.printInfo(entry)
+	}
+}
+
+func (s *State) keygen(args ...string) {
+	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
+	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	where := fs.String("where", "", "`directory` to store keys; default $HOME/.ssh")
+	fs.Usage = s.subUsage(fs, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
+	err := fs.Parse(args)
+	if err != nil {
+		s.exit(err)
+	}
+	if fs.NArg() != 0 {
+		fs.Usage()
+	}
+	switch *curveName {
+	case "p256":
+	case "p384":
+	case "p521":
+		// ok
+	default:
+		log.Error.Printf("no such curve %q", *curveName)
+		fs.Usage()
+	}
+
+	public, private, proquintStr, err := createKeys(*curveName, *secret)
+	if err != nil {
+		s.exitf("creating keys: %v", err)
+	}
+
+	keyDir := *where
+	if keyDir == "" {
+		home := os.Getenv("HOME")
+		if len(home) == 0 {
+			log.Fatal("no home directory")
+		}
+		keyDir = filepath.Join(home, ".ssh")
+	}
+	err = saveKeys(keyDir)
+	if err != nil {
+		s.exitf("saving previous keys failed(%v); keys not generated", err)
+	}
+	err = writeKeys(keyDir, public, private, proquintStr)
+	if err != nil {
+		s.exitf("writing keys: %v", err)
 	}
 }
 
@@ -678,7 +725,7 @@ func (s *State) maybeEnableMetrics() {
 	if s.metricsSaver, err = metric.NewGCPSaver(gcloudProject, "app", "cmd/upspin"); err == nil {
 		metric.RegisterSaver(s.metricsSaver)
 	} else {
-		log.Error.Printf("Can't save metrics: %q", err)
+		log.Error.Printf("saving metrics: %q", err)
 	}
 }
 
