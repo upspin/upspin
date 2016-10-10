@@ -79,7 +79,7 @@ func startServer() (port string) {
 	return port
 }
 
-func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) (*prototest.DoATrumpResponse, error) {
+func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*prototest.EchoResponse, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
@@ -88,40 +88,40 @@ func (s *server) DoATrump(ctx gContext.Context, req *prototest.DoATrumpRequest) 
 	if session.User() != user {
 		s.t.Fatalf("Expected user %q, got %q", user, session.User())
 	}
-	if req.PeopleDemand == demands[s.iteration] {
-		resp := &prototest.DoATrumpResponse{
-			TrumpResponse: expectedResponses[s.iteration],
+	if req.Payload == payloads[s.iteration] {
+		resp := &prototest.EchoResponse{
+			Payload: payloads[s.iteration],
 		}
-		log.Printf("Trump: telling the people: %q", resp.TrumpResponse)
+		log.Printf("Server: Echo response: %q", resp.Payload)
 		s.iteration++
 		return resp, nil
 	}
-	s.t.Fatalf("iteration %d: invalid request %q", s.iteration, req.PeopleDemand)
+	s.t.Fatalf("iteration %d: invalid request %q", s.iteration, req.Payload)
 	return nil, nil // not reached
 }
 
 type client struct {
 	*AuthClientService // For handling Ping and Close.
 	grpcClient         prototest.TestServiceClient
-	demandCount        int
+	reqCount           int
 }
 
-func (c *client) TellTrump(t *testing.T, demand string) (response string) {
+func (c *client) Echo(t *testing.T, payload string) (response string) {
 	gCtx, callOpt, finishAuth, err := c.NewAuthContext()
 	if err != nil {
 		t.Fatal(err)
 	}
-	req := &prototest.DoATrumpRequest{
-		PeopleDemand: demand,
+	req := &prototest.EchoRequest{
+		Payload: payload,
 	}
-	log.Printf("Client: Telling Trump: %q", req.PeopleDemand)
-	resp, err := c.grpcClient.DoATrump(gCtx, req, callOpt)
+	log.Printf("Client: Echo request: %q", req.Payload)
+	resp, err := c.grpcClient.Echo(gCtx, req, callOpt)
 	err = finishAuth(err)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.demandCount++
-	return resp.TrumpResponse
+	c.reqCount++
+	return resp.Payload
 }
 
 func startClient(port string) {
@@ -156,28 +156,25 @@ func startClient(port string) {
 }
 
 func TestAll(t *testing.T) {
-	t.Log("Starting testing...")
-
 	// Inject testing into the server.
 	srv.t = t
 
-	if len(demands) < 1 {
+	if len(payloads) < 1 {
 		t.Fatalf("Programmer error. Make at least one demand!")
 	}
-	for i := range demands {
-		t.Logf("Calling Trump: %d", i)
-		response := cli.TellTrump(t, demands[i])
-		if expectedResponses[i] != response {
-			t.Errorf("Demand %d: Expected response %q, got %q", i, expectedResponses[i], response)
+	for i := range payloads {
+		response := cli.Echo(t, payloads[i])
+		if response != payloads[i] {
+			t.Errorf("Payload %d: Expected response %q, got %q", i, payloads[i], response)
 		}
 	}
 
 	// Verify server and client changed state.
-	if srv.iteration != len(demands) {
-		t.Errorf("Expected server to be on iteration %d, was on %d", len(demands), srv.iteration)
+	if srv.iteration != len(payloads) {
+		t.Errorf("Expected server to be on iteration %d, was on %d", len(payloads), srv.iteration)
 	}
-	if cli.demandCount != srv.iteration {
-		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.demandCount)
+	if cli.reqCount != srv.iteration {
+		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
 	}
 
 	if cli.lastActivity().IsZero() {
@@ -186,15 +183,11 @@ func TestAll(t *testing.T) {
 }
 
 var (
-	demands = []string{
-		"Make America great again",
-		"Embrace all people",
-		"Free the slaves!",
-	}
-	expectedResponses = []string{
-		"Invade Luxemborg",
-		"Build a wall!",
-		"I said 'Waaaaaalll'",
+	payloads = []string{
+		"The wren",
+		"Earns his living",
+		"Noiselessly.",
+		// - Kobayahsi Issa
 	}
 )
 
