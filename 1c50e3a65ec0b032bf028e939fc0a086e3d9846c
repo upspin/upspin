@@ -34,6 +34,24 @@
       "revId": "1c50e3a65ec0b032bf028e939fc0a086e3d9846c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffc878e8_289a2374",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-10T20:32:31Z",
+      "side": 1,
+      "message": "Yes, I prefer the revised error.\n\nAll this is very unlikely anyway, I admit.",
+      "parentUuid": "ffc878e8_08e5a7f6",
+      "revId": "1c50e3a65ec0b032bf028e939fc0a086e3d9846c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
