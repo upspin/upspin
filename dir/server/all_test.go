@@ -57,7 +57,7 @@ func TestMakeRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	deExpected := *de
-	deExpected.Sequence = upspin.SeqBase
+	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
 	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
 		t.Fatal(err)
@@ -122,7 +122,7 @@ func TestPut(t *testing.T) {
 		t.Fatal(err)
 	}
 	deExpected := *de
-	deExpected.Sequence = upspin.SeqBase
+	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
 	err = checkDirEntry("TestPut", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
