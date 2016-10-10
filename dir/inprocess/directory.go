@@ -168,7 +168,7 @@ func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
 	}
 	// We will have a zero-sized block here, which is odd but necessary to have
 	// a place to store the directory's Reference.
-	entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, upspin.SeqBase)
+	entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, upspin.NewSequence())
 	if err != nil {
 		return nil, err
 	}
@@ -845,7 +845,7 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 					return nil, nil, errors.E(op, newEntry.Name, errSeq)
 				}
 			}
-			newEntry.Sequence = nextEntry.Sequence + 1
+			newEntry.Sequence = upspin.SeqNext(nextEntry.Sequence)
 		}
 		break
 	}
@@ -857,7 +857,7 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 	} else {
 		// Add new entry to directory.
 		if newEntry.Sequence == upspin.SeqIgnore {
-			newEntry.Sequence = upspin.SeqBase
+			newEntry.Sequence = upspin.NewSequence()
 		}
 		data, err := newEntry.Marshal()
 		if err != nil {
@@ -865,7 +865,7 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 		}
 		dirData = append(dirData, data...)
 	}
-	entry, err := s.newDirEntry(dirName, dirData, dirEntry.Sequence+1)
+	entry, err := s.newDirEntry(dirName, dirData, upspin.SeqNext(dirEntry.Sequence))
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}
