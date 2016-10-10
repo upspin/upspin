@@ -219,6 +219,26 @@ func (r *Runner) GotEntryWithSequence(p upspin.PathName, seq int64) bool {
 	return false
 }
 
+// GotEntryWithSequenceVersion reports whether the Entry has the given name
+// and sequence version number and if not notes the discrepancy as the last error state.
+func (r *Runner) GotEntryWithSequenceVersion(p upspin.PathName, seq int64) bool {
+	if r.Failed() {
+		return false
+	}
+	if r.Entry != nil && r.Entry.Name == p && upspin.SeqVersion(r.Entry.Sequence) == upspin.SeqVersion(seq) {
+		return true
+	}
+	if r.Entry == nil {
+		r.lastErr = errors.Errorf("got nil entry, want %q", p)
+	} else if r.Entry.Name != p {
+		r.lastErr = errors.Errorf("got entry %q, want %q", r.Entry.Name, p)
+	} else {
+		r.lastErr = errors.Errorf("got sequence %d, want %d", r.Entry.Sequence, seq)
+	}
+	_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	return false
+}
+
 // GotEntries reports whether the names of the Entries match the provided
 // list (in order). It also checks that the presence of block data in
 // those entries matches the boolean.

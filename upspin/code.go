@@ -5,6 +5,7 @@
 package upspin
 
 import (
+	"crypto/rand"
 	"encoding/binary"
 	"errors"
 	"fmt" // Cannot use Upspin's error package because it would introduce a dependency cycle.
@@ -448,4 +449,35 @@ func SortDirEntries(slice []*DirEntry, unique bool) []*DirEntry {
 		}
 	}
 	return result
+}
+
+// NewSequence creates a sequence number for a new directory entry.  If a source of
+// randomness exists, use it for the generation number. Otherwise fall back to
+// nanosecond time in the belief that it is better than nothing.
+func NewSequence() int64 {
+	x := make([]byte, 4)
+	_, err := rand.Read(x)
+	var s int64
+	if err == nil {
+		s = int64(x[0])<<55 | int64(x[1])<<47 | int64(x[2])<<39 | int64(x[2])<<31
+	} else {
+		s = (time.Now().UnixNano() & 0xffffffff) << 31
+	}
+	return s | SeqBase
+}
+
+// SeqGeneration masks out the version number.
+func SeqGeneration(s int64) int64 {
+	if s < 0 {
+		return s
+	}
+	return s & 0x7fffffff80000000
+}
+
+// SeqVersion masks out the generation number.
+func SeqVersion(s int64) int64 {
+	if s < 0 {
+		return s
+	}
+	return s & 0x7fffffff
 }
