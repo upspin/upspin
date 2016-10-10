@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffc878e8_68c37b9f",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-10T20:12:45Z",
+      "side": 1,
+      "message": "My one concern with doing it this way is confusing the user if createKeys succeeds but saveKeys fails;  they\u0027ll think their new keys should be somewhere but they\u0027re discarded.\n\nThat\u0027s not a fatal flaw, because 1) they can just retry;  or 2) they can regenerate by using the prioquint secret.\n\nBut some will feel confused and lost.",
+      "revId": "1c50e3a65ec0b032bf028e939fc0a086e3d9846c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
