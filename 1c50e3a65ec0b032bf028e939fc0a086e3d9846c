@@ -16,6 +16,24 @@
       "revId": "1c50e3a65ec0b032bf028e939fc0a086e3d9846c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffc878e8_08e5a7f6",
+        "filename": "cmd/keygen/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-10T20:30:20Z",
+      "side": 1,
+      "message": "I am not sure I understand. Are you saying that the error message is weak? If I run this and it fails, I would assume nothing had happened. In this form, the only time that assumption would be wrong would be if saveKeys succeeds and writeKeys fails, but that is nearly inconceivable and harmless anyway.\n\nWould you prefer\n\n  err \u003d saveKeys(keydir())\n  if err !\u003d nil {\n    log.Fatalf(\"saving previous keys failed (%v); new keys not created\", err)\n  }\n\nOr is your point that we should run save before create? That\u0027s easy but introduces other peculiarities.",
+      "parentUuid": "ffc878e8_68c37b9f",
+      "revId": "1c50e3a65ec0b032bf028e939fc0a086e3d9846c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
