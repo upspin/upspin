@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f5008f0_9127dcbb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fe6485b_a18f5edf",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7fe6485b_01956aeb",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-11T01:42:56Z",
       "side": 1,
       "message": "s/23/31/ ?",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f5008f0_b12ce0a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "No,  later cl added more bits to the random part.",
+      "parentUuid": "7fe6485b_01956aeb",
       "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7f5008f0_b15780fc",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "I just copied this from the routine above.  I\u0027ll change that one too.",
+      "parentUuid": "7fe6485b_c18a62d1",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5c2405_9bc2af2f",
         "filename": "upspin/code.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-11T00:40:01Z",
       "side": 1,
       "message": "s/  / /",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f5008f0_d15c0423",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f5c2405_9bc2af2f",
       "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "7f5008f0_f16108d6",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f5c2405_1bb77fcf",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7fe6485b_61eb966b",
         "filename": "upspin/code.go",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-11T01:42:56Z",
       "side": 1,
       "message": "I\u0027d hoist the \u003c\u003c 31 out of the if/else condition and put it here\n\nreturn (s \u003c\u003c 31) | SeqBase",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f5008f0_11476c4d",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fe6485b_61eb966b",
       "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "7f5008f0_5151f402",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Fixed the problem by removing the routine and any mention of generation.",
+      "parentUuid": "5f5c2405_bbee93ae",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5c2405_dbe347c5",
         "filename": "upspin/code.go",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2016-10-11T00:40:01Z",
       "side": 1,
       "message": "SeqVersion returns the version number for the file.",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f5008f0_31447046",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T17:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f5c2405_dbe347c5",
       "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
