@@ -87,6 +87,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	http.HandleFunc("/incoming", incomingHandler)
 
 	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
 	const metadataKey = "userserver"
