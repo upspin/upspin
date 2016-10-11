@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: "dirserver"
+  name: "PREFIXstoreserver"
 spec:
   selector:
-    app: "dirserver"
+    app: "PREFIXstoreserver"
   ports:
   - name: "http"
     port: 80
