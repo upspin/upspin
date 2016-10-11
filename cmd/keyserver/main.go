@@ -26,6 +26,7 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
+
 	_ "upspin.io/key/transports"
 )
 
@@ -72,6 +73,8 @@ func main() {
 	// Special hack for bootstrapping the inprocess key server.
 	setupTestUser(key)
 
+	//	email = sendgrid.New("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", "upspin.io")
+
 	authConfig := auth.Config{Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 		user, err := key.Lookup(userName)
 		if err != nil {
@@ -87,6 +90,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	http.HandleFunc("/incoming", incomingHandler)
 
 	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
 	const metadataKey = "userserver"
