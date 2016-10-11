@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5f5c2405_ad5c9553",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T21:16:26Z",
+      "side": 1,
+      "message": "Not quite the top.  Because of sign they start at bit 1.  I\u0027ll reword accordingly.",
+      "parentUuid": "5f5c2405_2c36cb9a",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5c2405_8c2d1748",
         "filename": "upspin/code.go",
         "patchSetId": 2
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "5f5c2405_cdb6298d",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T21:16:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f5c2405_0cfca79a",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5c2405_acec9bf1",
         "filename": "upspin/code.go",
         "patchSetId": 2
@@ -81,6 +117,24 @@
       "writtenOn": "2016-10-11T17:44:24Z",
       "side": 1,
       "message": "umm, s++?",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_4d7cd9b9",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-11T21:16:26Z",
+      "side": 1,
+      "message": "sure, why not.",
+      "parentUuid": "5f5c2405_acec9bf1",
       "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
