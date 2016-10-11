@@ -37,6 +37,8 @@ var (
 	testSecrets = flag.String("test_secrets", "", "initialize test user with the secrets in this `directory`")
 )
 
+var key upspin.KeyServer
+
 func main() {
 	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
 
@@ -53,8 +55,7 @@ func main() {
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	ctx := context.SetUserName(context.New(), serverName)
 
-	// Create a new store implementation.
-	var key upspin.KeyServer
+	// Create a new key implementation.
 	var err error
 	switch flags.ServerKind {
 	case "inprocess":
@@ -87,6 +88,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	http.HandleFunc("/incoming", incomingHandler)
 
 	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
 	const metadataKey = "userserver"
