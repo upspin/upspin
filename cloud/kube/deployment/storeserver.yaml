@@ -1,17 +1,17 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: storeserver
+  name: PREFIXstoreserver
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: storeserver
+        app: PREFIXstoreserver
     spec:
       containers:
-      - name: storeserver
-        image: gcr.io/PROJECT/storeserver
+      - name: PREFIXstoreserver
+        image: gcr.io/PROJECT/PREFIXstoreserver
         ports:
         - containerPort: 80
         - containerPort: 443

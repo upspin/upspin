@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: "frontend"
+  name: "PREFIXdirserver"
 spec:
   selector:
-    app: "frontend"
+    app: "PREFIXdirserver"
   ports:
   - name: "http"
     port: 80
