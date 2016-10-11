@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: "keyserver"
+  name: "PREFIXkeyserver"
 spec:
   selector:
-    app: "keyserver"
+    app: "PREFIXkeyserver"
   ports:
   - name: "http"
     port: 80
