@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f5c2405_8c08b7d3",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T17:44:24Z",
+      "side": 1,
+      "message": "these chains of ifs make nice switches, but it\u0027s fine as is too.",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_2c36cb9a",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T17:44:24Z",
+      "side": 1,
+      "message": "s/40/the top \u0026/",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_8c2d1748",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T17:44:24Z",
+      "side": 1,
+      "message": "s/random/cryptographic \u0026/",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_0cfca79a",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T17:44:24Z",
+      "side": 1,
+      "message": "SeqNext returns the next sequence number. It wraps...",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_acec9bf1",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T17:44:24Z",
+      "side": 1,
+      "message": "umm, s++?",
+      "revId": "bfe650a232ff997e757a3d0d80fb9c1b4d9f2eaa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
