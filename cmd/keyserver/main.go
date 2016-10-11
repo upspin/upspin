@@ -35,6 +35,8 @@ const serverName = "keyserver"
 var (
 	testUser    = flag.String("test_user", "", "initialize a test `user` (localhost, inprocess only)")
 	testSecrets = flag.String("test_secrets", "", "initialize test user with the secrets in this `directory`")
+	// The format of the email config file must be lines: api key, incoming email provider user name and password.
+	emailConfigFile = flag.String("email_config", "", "config file name for incoming email signups")
 )
 
 func main() {
@@ -53,9 +55,9 @@ func main() {
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
 	ctx := context.SetUserName(context.New(), serverName)
 
-	// Create a new store implementation.
-	var key upspin.KeyServer
+	// Create a new key implementation.
 	var err error
+	var key upspin.KeyServer
 	switch flags.ServerKind {
 	case "inprocess":
 		key = inprocess.New()
@@ -87,6 +89,13 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	if *emailConfigFile != "" {
+		mailHandler, err := newMailHandler(key, *emailConfigFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		http.HandleFunc("/mail", mailHandler.h)
+	}
 
 	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
 	const metadataKey = "userserver"

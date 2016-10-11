@@ -377,6 +377,10 @@ func (c *Config) buildServer(server string) error {
 			"secret.upspinkey",
 			"symmsecret.upspinkey",
 		}
+	case "keyserver":
+		files = []string{
+			"emailconfig",
+		}
 	}
 	base := filepath.Join(os.Getenv("HOME"), "upspin/deploy", c.Project, server)
 	for _, f := range files {
