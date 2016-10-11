@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f5c2405_9bc2af2f",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T00:40:01Z",
+      "side": 1,
+      "message": "s/  / /",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_1bb77fcf",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T00:40:01Z",
+      "side": 1,
+      "message": "s/use it/it is used/\ns/fall/we fall/",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_bbee93ae",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T00:40:01Z",
+      "side": 1,
+      "message": "weird documentation. also the name isn\u0027t great. maybe SeqRandom or SeqNoise or SeqUnique?\n\nit would help if the field of DirEntry in upspin.go explained a little better how this worked.",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_dbe347c5",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T00:40:01Z",
+      "side": 1,
+      "message": "SeqVersion returns the version number for the file.",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
