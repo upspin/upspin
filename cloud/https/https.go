@@ -6,17 +6,22 @@
 package https
 
 import (
+	"context"
 	"crypto/tls"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"google.golang.org/api/option"
+
 	"cloud.google.com/go/compute/metadata"
+	"cloud.google.com/go/storage"
 	"rsc.io/letsencrypt"
 
 	"upspin.io/auth"
-	"upspin.io/cloud/letscloud"
 	"upspin.io/log"
 )
 
@@ -61,16 +66,13 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 	if metadata.OnGCE() {
 		log.Info.Println("https: on GCE; serving HTTPS on port 443 using Let's Encrypt")
 		var m letsencrypt.Manager
-		v := func(key string) string {
-			v, err := metadata.ProjectAttributeValue(key)
-			if err != nil {
-				log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
-			}
-			return v
+		const key = "letsencrypt-bucket"
+		bucket, err := metadata.InstanceAttributeValue(key)
+		if err != nil {
+			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
 		}
-		get, put := v("letscloud-get-url-"+metaSuffix), v("letscloud-put-url-"+metaSuffix)
-		if err := letscloud.Cache(&m, get, put); err != nil {
-			log.Fatalf("https: %v", err)
+		if err := letsencryptCache(&m, bucket, metaSuffix); err != nil {
+			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
 		}
 		log.Fatalf("https: %v", m.Serve())
 	}
@@ -90,4 +92,46 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 	}
 	err = http.Serve(tls.NewListener(ln, config), nil)
 	log.Fatalf("https: %v", err)
+}
+
+func letsencryptCache(m *letsencrypt.Manager, bucket, suffix string) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
+	if err != nil {
+		return err
+	}
+	obj := client.Bucket(bucket).Object("letsencrypt-" + suffix)
+
+	// Try to read the existing cache value, if present.
+	r, err := obj.NewReader(ctx)
+	if err != storage.ErrObjectNotExist {
+		if err != nil {
+			return err
+		}
+		data, err := ioutil.ReadAll(r)
+		r.Close()
+		if err != nil {
+			return err
+		}
+		if err := m.Unmarshal(string(data)); err != nil {
+			return err
+		}
+	}
+
+	go func() {
+		// Watch the letsencrypt manager for changes and cache them.
+		for range m.Watch() {
+			w := obj.NewWriter(ctx)
+			_, err := io.WriteString(w, m.Marshal())
+			if err != nil {
+				log.Printf("https: writing letsencrypt cache: %v", err)
+				continue
+			}
+			if err := w.Close(); err != nil {
+				log.Printf("https: writing letsencrypt cache: %v", err)
+			}
+		}
+	}()
+
+	return nil
 }
