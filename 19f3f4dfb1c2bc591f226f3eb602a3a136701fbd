@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f5c2405_4242e395",
+        "filename": "cloud/mail/mail.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "such as SendGrid or MailGun.\n\nno need for latin.",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_c2b8b395",
+        "filename": "cloud/mail/mail.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "\"attached to the Mail object\" isn\u0027t the way Go works, or at least isn\u0027t how it\u0027s written about.\nsuggestion:\n\nDomain returns the domain name of the server providing mail service.",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_c2dfd3cd",
+        "filename": "cloud/mail/sendgrid/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "\"captured\" is long and unnecessary. i\u0027d go with \"request\" and \"headers\".",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_c28a73d1",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "should fit on one line?",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_229a4f1d",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "s/where to send/for/",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_02ac6b3d",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-11T23:01:19Z",
+      "side": 1,
+      "message": "why Typex not Type?",
+      "revId": "19f3f4dfb1c2bc591f226f3eb602a3a136701fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
