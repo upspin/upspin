@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "7fe6485b_a18f5edf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-11T01:42:56Z",
+      "side": 1,
+      "message": "\"top 32 bits\" ? We tend to think of ints in terms of bit lengths",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7fe6485b_01956aeb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-11T01:42:56Z",
+      "side": 1,
+      "message": "s/23/31/ ?",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7fe6485b_c18a62d1",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-11T01:42:56Z",
+      "side": 1,
+      "message": "if you make line 235 be\n\n} else if upspin.SeqVersion(r.Entry.Sequence) !\u003d upspin.SeqVersion(seq) {\n\nthen you can add a final else blcok with \u0027return true\u0027\n\nthen you don\u0027t need to do the tests on this line twice",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5c2405_9bc2af2f",
         "filename": "upspin/code.go",
         "patchSetId": 1
@@ -30,6 +81,23 @@
       "writtenOn": "2016-10-11T00:40:01Z",
       "side": 1,
       "message": "s/use it/it is used/\ns/fall/we fall/",
+      "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7fe6485b_61eb966b",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-11T01:42:56Z",
+      "side": 1,
+      "message": "I\u0027d hoist the \u003c\u003c 31 out of the if/else condition and put it here\n\nreturn (s \u003c\u003c 31) | SeqBase",
       "revId": "11d68f64189229f1d4151294a70d7571d1538d71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
