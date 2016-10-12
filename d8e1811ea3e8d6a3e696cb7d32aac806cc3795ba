@@ -104,6 +104,24 @@
       "revId": "d8e1811ea3e8d6a3e696cb7d32aac806cc3795ba",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c99da37_92fb2cd5",
+        "filename": "cmd/keyserver/internal/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T21:22:23Z",
+      "side": 1,
+      "message": "Ah, spoke in person. It\u0027s now internal/mail.",
+      "parentUuid": "fc95e6fb_6371f66d",
+      "revId": "d8e1811ea3e8d6a3e696cb7d32aac806cc3795ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
