@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c64320a_92756c24",
+        "filename": "cmd/keyserver/internal/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T20:29:12Z",
+      "side": 1,
+      "message": "why is this a mock request? it looks real to me",
+      "revId": "d8e1811ea3e8d6a3e696cb7d32aac806cc3795ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c73b6d0_1fa16ba6",
+        "filename": "cmd/keyserver/internal/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T20:29:12Z",
+      "side": 1,
+      "message": "there should be a comment explaining how this was acquired.\nalso i am slightly nervous this exposes information we don\u0027t want to publish.\nbut the mail address is fake, so can some of the headers be dropped?",
+      "revId": "d8e1811ea3e8d6a3e696cb7d32aac806cc3795ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc7742bf_1a5c1d1f",
+        "filename": "cmd/keyserver/internal/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T20:29:12Z",
+      "side": 1,
+      "message": "don\u0027t call it internal. put it in a subdirectory and call it mail or something.\nsee go/src/cmd/asm for an example.",
+      "revId": "d8e1811ea3e8d6a3e696cb7d32aac806cc3795ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
