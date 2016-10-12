@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_4cad5f39",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T21:55:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc94a252_cc630f3a",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dc94a252_2c6bb318",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-12T21:48:55Z",
       "side": 1,
       "message": "s/from/From:/ ?",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_6cb21b9a",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T21:55:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc94a252_2c6bb318",
       "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_8ca6675c",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T21:55:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc94a252_ac3fa30c",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dc94a252_ec60cb2f",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-12T21:48:55Z",
       "side": 1,
       "message": "errors.E(\"mail.Parse\", s.Err())?",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_cca06f41",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T21:55:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc94a252_ec60cb2f",
       "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
