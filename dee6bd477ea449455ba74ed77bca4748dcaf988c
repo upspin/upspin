@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cde9ef7_2f3d29df",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-12T23:32:02Z",
+      "side": 1,
+      "message": "these return values need names",
+      "revId": "dee6bd477ea449455ba74ed77bca4748dcaf988c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_cf21fdbd",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-12T23:32:02Z",
+      "side": 1,
+      "message": "are you aware of package net/mail ?\n\nhttps://golang.org/pkg/net/mail/\n\nYou should be using that wherever possible, rather than writing your own.\n\nFYI, if you\u0027re going to write some code that has probably been implemented by someone else somewhere, it\u0027s worth doing a godoc.org search (\"parse mail\" shows net/mail as the first result)",
+      "revId": "dee6bd477ea449455ba74ed77bca4748dcaf988c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
