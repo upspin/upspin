@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_0f1a692e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T23:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_2f3d29df",
+      "revId": "dee6bd477ea449455ba74ed77bca4748dcaf988c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_cf21fdbd",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-12T23:32:02Z",
       "side": 1,
       "message": "are you aware of package net/mail ?\n\nhttps://golang.org/pkg/net/mail/\n\nYou should be using that wherever possible, rather than writing your own.\n\nFYI, if you\u0027re going to write some code that has probably been implemented by someone else somewhere, it\u0027s worth doing a godoc.org search (\"parse mail\" shows net/mail as the first result)",
+      "revId": "dee6bd477ea449455ba74ed77bca4748dcaf988c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_ef2d1d46",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T23:48:20Z",
+      "side": 1,
+      "message": "Ah, yes. On my first look, it didn\u0027t apply, but now on a second look, it does, so I\u0027m using some of it now.\n\nSadly, I can\u0027t use more of it because we\u0027re getting an HTTPS request from SendGrid, not a raw SMTP message. Most of the parsing work is done by SendGrid already. The rest here is just HTTP req parsing.\n\nDone.",
+      "parentUuid": "3cde9ef7_cf21fdbd",
       "revId": "dee6bd477ea449455ba74ed77bca4748dcaf988c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
