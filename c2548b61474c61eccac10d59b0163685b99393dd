@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f5c2405_55db7b0e",
+        "filename": "cloud/mail/mail.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T00:18:39Z",
+      "side": 1,
+      "message": "Not right now. But it\u0027s easy to add if we want to.",
+      "parentUuid": "3cde9ef7_6f757121",
+      "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_0f7aa510",
         "filename": "cloud/mail/mail.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-12T00:06:14Z",
       "side": 1,
       "message": "I think s/Body// would be better, it\u0027s kind of obvious what text/html are.",
+      "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_75d87f11",
+        "filename": "cloud/mail/mail.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T00:18:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_0f7aa510",
       "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5f5c2405_b514d7b2",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T00:18:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_ef8081fd",
+      "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_2f7f6901",
         "filename": "cloud/mail/sendgrid/sendgrid.go",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "5f5c2405_f51e4fd0",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T00:18:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_2f7f6901",
+      "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_cf833d08",
         "filename": "cloud/mail/sendgrid/sendgrid.go",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2016-10-12T00:06:14Z",
       "side": 1,
       "message": "why not\n\nif textBody !\u003d \"\" {\n msg.Content \u003d append(msg.Content, content{\n\t\t\t\tType:  \"text/plain\",\n\t\t\t\tValue: textBody,\n\t\t\t})\n}\n\n?\n\nSeems weird to remove them, rather than add them.\nI had to do a double-take. I think it\u0027s less code this way, too.",
+      "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5c2405_3510c7b1",
+        "filename": "cloud/mail/sendgrid/sendgrid.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-12T00:18:39Z",
+      "side": 1,
+      "message": "I wanted to keep the message above \"whole\", so it\u0027s easy to see all the fields. But I don\u0027t care too much and fewer lines is a good point too.\n\nDone.",
+      "parentUuid": "3cde9ef7_cf833d08",
       "revId": "c2548b61474c61eccac10d59b0163685b99393dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
