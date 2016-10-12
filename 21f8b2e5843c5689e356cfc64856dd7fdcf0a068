@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc94a252_cc630f3a",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T21:48:55Z",
+      "side": 1,
+      "message": "this is confusing. maybe the constants need different names, like hFrom, hSPF, or hdrFrom, hdrSPF etc.",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_2c6bb318",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T21:48:55Z",
+      "side": 1,
+      "message": "s/from/From:/ ?",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_ac3fa30c",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T21:48:55Z",
+      "side": 1,
+      "message": "define const op \u003d \"mail.Parse\" above and use it in all these errors.E calls.",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_ec60cb2f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-12T21:48:55Z",
+      "side": 1,
+      "message": "errors.E(\"mail.Parse\", s.Err())?",
+      "revId": "21f8b2e5843c5689e356cfc64856dd7fdcf0a068",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
