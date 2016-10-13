@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3cde9ef7_efae419b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "renamed to \u0027kube\u0027",
+      "parentUuid": "fca966a7_fdde6761",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca966a7_dd328b12",
         "filename": "cloud/https/https.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-13T17:10:14Z",
       "side": 1,
       "message": "A comment here would be helpful. If I understand this right, cloudCache seems a bit too generic. Shouldn\u0027t it be letsEncryptCache or certCache?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_6fac919f",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fca966a7_dd328b12",
       "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3cde9ef7_8fbbf5d7",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "nope, the reader should be closed regardless of whether ReadAll failed",
+      "parentUuid": "fca966a7_7d0b7739",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca966a7_9d0e4340",
         "filename": "cloud/https/https.go",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-13T17:10:14Z",
       "side": 1,
       "message": "What is this iterating on? Why is there more than one thing to watch? or are these events in time and if so, does it ever finish?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_4fa74dbe",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "added a comment. no it never finishes",
+      "parentUuid": "fca966a7_9d0e4340",
       "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "3cde9ef7_afb839db",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "actually i deliberately went with \u0027writing\u0027 because as a reader i don\u0027t care that it\u0027s writing or closing, just that the general write operation failed. saying \u0027closing\u0027 is confusing because that\u0027s doesn\u0027t describe the bigger picture of what is happening.",
+      "parentUuid": "fca966a7_3d53af37",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca966a7_dd2deb9b",
         "filename": "cmd/upspin-deploy/main.go",
         "patchSetId": 7
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-13T17:10:14Z",
       "side": 1,
       "message": "string doesn\u0027t need to be quoted. maybe none of these do, actually.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_4fbe6dd0",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "as discussed, this is to improve the usage message",
+      "parentUuid": "fca966a7_dd2deb9b",
       "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "3cde9ef7_6fc33155",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "because I have aspirations of moving the type to another package and making it available elsewhere.\nalso it\u0027s the central type of the package, making it lowercase makes it less prominent where it appears in the code.\nsame thing for the field names; at some point the will be part of a public api, and it makes them clearly distinct from the internal helper methods like \"zoneName\".",
+      "parentUuid": "fca966a7_1d77d3c5",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca966a7_fd8c2795",
         "filename": "cmd/upspin-deploy/main.go",
         "patchSetId": 7
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "3cde9ef7_2fcd297d",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "all dependencies, including the standard library.\nadded a comment",
+      "parentUuid": "fca966a7_fd8c2795",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fca966a7_bdad7ff3",
         "filename": "cmd/upspin-deploy/main.go",
         "patchSetId": 7
@@ -149,6 +293,24 @@
       "writtenOn": "2016-10-13T17:10:14Z",
       "side": 1,
       "message": "I see you add the keyserver in the writeRC function below. But it would be clearer to have it be an entry in the two cases below, despite the minor repetition. I first wrote a comment here about adding it and was confused until I got to that function.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_0fc8656c",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T22:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fca966a7_bdad7ff3",
       "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
