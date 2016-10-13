@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cde9ef7_8f045528",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_af011917",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "are you decoding json here?\njust use json.Unmarshal\n\nif not, put the dkim parsing code in its own function that returns a domain and a status",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_4f00ad10",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "please just use \"text\", not the constant text.\noveruse of constants with such short/general names leads to errors like the one that you made on the next line.",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_6f05711f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "can we go with \"I am\" ?\nit\u0027s generally bad style to use contractions in written english",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_2f0f693f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "third argument should be upspin.Signature, right?",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_0f0aa52e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "var (\n  s \u003d ...\n  state \u003d ... \n  keyLine \u003d 0\n  userName upspin.UserName\n  pubKey string\n  sig string\n)",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_cf133d66",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T00:23:21Z",
+      "side": 1,
+      "message": "this doesn\u0027t confirm that you\u0027ve actually scanned all of these values\n\nI don\u0027t think this is really a job for scanner.\nJust split the input into lines with strings.Split (use TrimSpace first) and just check each expected line with string comparisons. You\u0027re doing too much work here with all the Sscanf stuff.",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
