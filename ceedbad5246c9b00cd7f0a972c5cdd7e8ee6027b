@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_1500b60f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_8f045528",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_af011917",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-13T00:23:21Z",
       "side": 1,
       "message": "are you decoding json here?\njust use json.Unmarshal\n\nif not, put the dkim parsing code in its own function that returns a domain and a status",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_3505b220",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_af011917",
       "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_550a3e2f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_4f00ad10",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_6f05711f",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-13T00:23:21Z",
       "side": 1,
       "message": "can we go with \"I am\" ?\nit\u0027s generally bad style to use contractions in written english",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_750f3a3e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_6f05711f",
       "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_9513c666",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_2f0f693f",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_0f0aa52e",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 5
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_b510c25a",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_0f0aa52e",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_cf133d66",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 5
@@ -115,6 +223,24 @@
       "writtenOn": "2016-10-13T00:23:21Z",
       "side": 1,
       "message": "this doesn\u0027t confirm that you\u0027ve actually scanned all of these values\n\nI don\u0027t think this is really a job for scanner.\nJust split the input into lines with strings.Split (use TrimSpace first) and just check each expected line with string comparisons. You\u0027re doing too much work here with all the Sscanf stuff.",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_5524fe6e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T03:14:49Z",
+      "side": 1,
+      "message": "Added one more state to ensure we have enough lines and added a test.\n\nAbout scanner: it was actually a deliberate choice. I think it\u0027s a better tool for the job here. Split does more allocations. Even though allocations probably don\u0027t matter here much, the scanner was a good choice because it simple and less code -- with splits I\u0027d need to trim and split the lines again, test the length and keep track of line numbers. \n\nIf you strongly oppose, let me know a little more about your concern. I was once told to use scanner instead of split.\n\nI removed one use of Sscanf though as you suggested and used a straight str compare.",
+      "parentUuid": "3cde9ef7_cf133d66",
       "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
