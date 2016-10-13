@@ -244,6 +244,24 @@
       "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_cf457d46",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T03:45:52Z",
+      "side": 1,
+      "message": "Split does zero allocations. You\u0027re actually doing many more allocations here by using scanner and scanf.\n\nIt\u0027s easier for me to write the code than to explain, so here it is:\n\n\tlines :\u003d strings.Split(strings.TrimSpace(data), \"\\n\")\n\tif len(lines) !\u003d 6 {\n\t\treturn // badly formed message\n\t}\n\ti :\u003d 0\n\tnext :\u003d func() string { i++; return strings.TrimSpace(lines[i-1]) }\n\n\ts :\u003d next()\n\tconst userPrefix \u003d \"I am \"\n\tif !strings.HasPrefix(s, userPrefix) {\n\t\treturn // bad username line\n\t}\n\tuser :\u003d upspin.UserName(s[len(userPrefix):])\n\n\tconst keyPreamble \u003d \"My public key is\"\n\tif next() !\u003d keyPreamble {\n\t\treturn // missing key preamble\n\t}\n\n\tkey :\u003d upspin.PublicKey(next() + \"\\n\" + next() + \"\\n\" + next() + \"\\n\")\n\n\tconst sigPrefix \u003d \"Signature: \"\n\ts \u003d next()\n\tif !strings.HasPrefix(s, sigPrefix) {\n\t\treturn // missing signature\n\t}\n\tsig :\u003d upspin.Signature(s[len(sigPrefix):])\n\n(incidentally, I think you need a trailing \\n on the public key)",
+      "parentUuid": "dc94a252_5524fe6e",
+      "revId": "ceedbad5246c9b00cd7f0a972c5cdd7e8ee6027b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
