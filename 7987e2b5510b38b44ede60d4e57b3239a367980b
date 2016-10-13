@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fca966a7_3d7f2f36",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-13T17:21:07Z",
+      "side": 1,
+      "message": "Among other things, to ensure we only allow account creation in domains that police account creation abuse.   We may also need to limit to domains that implement DKIM correctly, if we discover errors that are hard to detect at the per-message level.",
+      "parentUuid": "dc94a252_a00a4232",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_cfb7bd3e",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 7
