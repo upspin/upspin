@@ -51,6 +51,7 @@ var commands = map[string]func(*State, ...string){
 	"rotate":      (*State).rotate,
 	"rm":          (*State).rm,
 	"share":       (*State).share,
+	"signup":      (*State).signup,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
 }
@@ -73,10 +74,10 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
-	state := newState()
 
+	state := newState(strings.ToLower(flag.Arg(0)))
 	args := flag.Args()[1:]
-	state.op = strings.ToLower(flag.Arg(0))
+
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
 	if state.op == "shell" {
@@ -263,6 +264,88 @@ func (s *State) keygen(args ...string) {
 	if err != nil {
 		s.exitf("writing keys: %v", err)
 	}
+}
+
+func (s *State) signup(args ...string) {
+	fs := flag.NewFlagSet("signup", flag.ExitOnError)
+	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
+	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
+	fs.Usage = s.subUsage(fs, "signup email_address")
+	err := fs.Parse(args)
+	if err != nil {
+		s.exit(err)
+	}
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+
+	// User must have a home dir in their native OS.
+	homedir, err := context.Homedir()
+	if err != nil {
+		s.exit(err)
+	}
+
+	uname, _, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
+	if err != nil {
+		s.exit(err)
+	}
+	userName := upspin.UserName(uname + "@" + domain)
+
+	// Figure out location of the rc file.
+	if !filepath.IsAbs(*rcFile) {
+		*rcFile = filepath.Join(homedir, *rcFile)
+	}
+	defer restoreEnvironment(os.Environ())
+	wipeUpspinEnvironment()
+
+	// Verify if we have an rc file.
+	fmt.Printf("Trying to open %s", *rcFile)
+	_, err = context.FromFile(*rcFile)
+	if err == nil && !*force {
+		s.exitf("%s already exists", *rcFile)
+	}
+
+	// Create an rc file for this new user.
+	const (
+		rcTemplate       = "username=%s\nkeyserver=%s\n"
+		defaultKeyServer = "remote,key.upspin.io:443"
+	)
+
+	rcContents := fmt.Sprintf(rcTemplate, userName, defaultKeyServer)
+	err = ioutil.WriteFile(*rcFile, []byte(rcContents), 0640)
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Generate a new key.
+	s.keygen()
+	// TODO: write better instructions.
+	fmt.Println("Write down the code above. It is used to recover your keys.")
+
+	// Now load the context. This time it should succeed.
+	ctx, err := context.FromFile(*rcFile)
+	if err != nil {
+		s.exit(err)
+	}
+
+	pubKey := strings.TrimSpace(string(ctx.Factotum().PublicKey()))
+
+	// Sign the username and key.
+	sig, err := ctx.Factotum().UserSign([]byte(string(ctx.UserName()) + pubKey))
+	if err != nil {
+		s.exit(err)
+	}
+
+	const mailTemplate = `I am %s
+My public key is
+%s
+Signature:
+%s:%s
+`
+	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), pubKey,
+		sig.R.String(), sig.S.String())
+
+	fmt.Printf("To complete your registration, send email to signup@key.upspin.io with the following contents:\n%s\n", msg)
 }
 
 func (s *State) link(args ...string) {
@@ -676,9 +759,13 @@ func (s *State) readAll(fileName string) []byte {
 	return data
 }
 
-func newState() *State {
+func newState(op string) *State {
 	s := &State{
-		op: "init",
+		op: op,
+	}
+	if op == "signup" {
+		// signup is special since there is no user yet.
+		return s
 	}
 	ctx, err := context.FromFile(flags.Context)
 	if err != nil {
@@ -802,4 +889,22 @@ func (s *State) globLocal(pattern string) []string {
 		return []string{pattern}
 	}
 	return strs
+}
+
+func wipeUpspinEnvironment() {
+	for _, env := range os.Environ() {
+		if strings.HasPrefix(env, "upspin") {
+			os.Setenv(env, "")
+		}
+	}
+}
+
+func restoreEnvironment(env []string) {
+	for _, e := range env {
+		kv := strings.Split(e, "=")
+		if len(kv) != 2 {
+			continue
+		}
+		os.Setenv(kv[0], kv[1])
+	}
 }
