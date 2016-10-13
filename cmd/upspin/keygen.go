@@ -30,7 +30,6 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 	b := make([]byte, 16)
 	if len(secret) > 0 {
 		if len((secret)) != 47 || (secret)[5] != '-' {
-			return "", "", "", err
 			log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
 				"not\n %s\nkey not generated", secret)
 			return "", "", "", errors.E("keygen", errors.Invalid, errors.Str("bad format for secret"))
