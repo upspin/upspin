@@ -17,7 +17,6 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
@@ -81,7 +80,7 @@ var ErrNoFactotum = errors.Str("factotum not initialized: no secrets provided")
 // As with InitContext, environment variables may override the
 // values in the context file.
 func FromFile(name string) (upspin.Context, error) {
-	f, err := os.Open(flags.Context)
+	f, err := os.Open(name)
 	if err != nil {
 		return nil, errors.E("context.FromFile", err)
 	}
@@ -136,7 +135,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	// If the provided reader is nil, try $HOME/upspin/rc.
 	if r == nil {
-		home, err := homedir()
+		home, err := Homedir()
 		if err != nil {
 			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
 		}
@@ -460,7 +459,9 @@ func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
 	}
 }
 
-func homedir() (string, error) {
+// TODO(adg): move to osutil package?
+// Homedir returns the home directory of the OS' logged-in user.
+func Homedir() (string, error) {
 	u, err := user.Current()
 	// user.Current may return an error, but we should only handle it if it
 	// returns a nil user. This is because os/user is wonky without cgo,
@@ -483,7 +484,7 @@ func homedir() (string, error) {
 }
 
 func sshdir() (string, error) {
-	h, err := homedir()
+	h, err := Homedir()
 	if err != nil {
 		return "", err
 	}

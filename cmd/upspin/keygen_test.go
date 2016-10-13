@@ -70,14 +70,14 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	if string(data) != public {
-		t.Fatal("reading public key: got %q; want %q", data, public)
+		t.Fatalf("reading public key: got %q; want %q", data, public)
 	}
 	data, err = ioutil.ReadFile(filepath.Join(dir, "secret.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if string(data) != private {
-		t.Fatal("reading secret key: got %q; want %q", data, private)
+		t.Fatalf("reading secret key: got %q; want %q", data, private)
 	}
 
 	// Generate again.

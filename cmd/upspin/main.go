@@ -51,6 +51,7 @@ var commands = map[string]func(*State, ...string){
 	"rotate":      (*State).rotate,
 	"rm":          (*State).rm,
 	"share":       (*State).share,
+	"signup":      (*State).signup,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
 }
@@ -73,10 +74,10 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
-	state := newState()
 
+	state := newState(strings.ToLower(flag.Arg(0)))
 	args := flag.Args()[1:]
-	state.op = strings.ToLower(flag.Arg(0))
+
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
 	if state.op == "shell" {
@@ -263,6 +264,96 @@ func (s *State) keygen(args ...string) {
 	if err != nil {
 		s.exitf("writing keys: %v", err)
 	}
+}
+
+func (s *State) signup(args ...string) {
+	fs := flag.NewFlagSet("signup", flag.ExitOnError)
+	force := fs.Bool("force", false, "create a new user even if keys and RC file exist")
+	fs.Usage = s.subUsage(fs, "signup email_address [-context=<location of new RC file>]")
+	err := fs.Parse(args)
+	if err != nil {
+		s.exit(err)
+	}
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+
+	// User must have a home dir in their native OS.
+	homedir, err := context.Homedir()
+	if err != nil {
+		s.exit(err)
+	}
+
+	userName := upspin.UserName(fs.Arg(0))
+
+	uname, suffix, domain, err := user.Parse(userName)
+	if err != nil {
+		s.exit(err)
+	}
+	if suffix == "" {
+		userName = upspin.UserName(uname)
+	} else {
+		userName = upspin.UserName(uname + "+" + suffix)
+	}
+	userName = userName + upspin.UserName("@"+domain)
+
+	// Figure out location of the RC file.
+	rcFile := filepath.Join(homedir, "/upspin/rc")
+	if flags.Context != "" {
+		// Context can be relative to the user's home dir or absolute.
+		if flags.Context[0] == '/' {
+			rcFile = flags.Context
+		} else {
+			rcFile = filepath.Join(homedir, rcFile)
+		}
+	}
+
+	// Verify if we have an RC file.
+	_, err = context.FromFile(rcFile)
+	if err == nil && !*force {
+		s.exitf(rcFile + " already exists")
+	}
+
+	// Create an RC file for this new user.
+	const rcTemplate = "username=%s\nkeyserver=%s\n"
+	const defaultKeyServer = "remote,key.upspin.io:443"
+
+	rcContents := fmt.Sprintf(rcTemplate, userName, defaultKeyServer)
+	fileMode := os.FileMode(0640) // rw-r---
+	err = ioutil.WriteFile(rcFile, []byte(rcContents), fileMode)
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Generate a new key.
+	s.keygen()
+	// TODO: write better instructions.
+	fmt.Println("Write down the code above. It is used to recover your keys.")
+
+	// Now load the context. This time it should succeed.
+	ctx, err := context.InitContext(nil)
+	if err != nil {
+		s.exit(err)
+	}
+
+	pubKey := strings.TrimSpace(string(ctx.Factotum().PublicKey()))
+
+	// Sign the username and key.
+	sig, err := ctx.Factotum().UserSign([]byte(string(ctx.UserName()) + pubKey))
+	if err != nil {
+		s.exit(err)
+	}
+
+	const mailTemplate = `I am %s
+My public key is
+%s
+Signature:
+%s:%s
+`
+	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), pubKey,
+		sig.R.String(), sig.S.String())
+
+	fmt.Printf("To complete your registration, send email to signup@key.upspin.io with the following contents:\n%s\n", msg)
 }
 
 func (s *State) link(args ...string) {
@@ -676,9 +767,13 @@ func (s *State) readAll(fileName string) []byte {
 	return data
 }
 
-func newState() *State {
+func newState(op string) *State {
 	s := &State{
-		op: "init",
+		op: op,
+	}
+	if op == "signup" {
+		// signup is special since there is no user yet.
+		return s
 	}
 	ctx, err := context.FromFile(flags.Context)
 	if err != nil {
