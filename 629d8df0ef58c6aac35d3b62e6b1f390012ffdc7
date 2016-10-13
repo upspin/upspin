@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3c8e9e81_b297be3b",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:38:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_cf9a5d72",
+      "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_8f945546",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-13T22:32:09Z",
       "side": 1,
       "message": "delete",
+      "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c8e9e81_72aab671",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:38:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_8f945546",
       "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3c8e9e81_f2c6a643",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:38:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_ef972149",
+      "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_af911955",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "3c8e9e81_52b692d4",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:38:34Z",
+      "side": 1,
+      "message": "sigStr is used below.",
+      "parentUuid": "3cde9ef7_af911955",
+      "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_52705232",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-10-13T22:32:09Z",
       "side": 1,
       "message": "s/sigStr/next()/",
+      "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c8e9e81_72b396e3",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:38:34Z",
+      "side": 1,
+      "message": "used below.",
+      "parentUuid": "3cde9ef7_52705232",
       "revId": "629d8df0ef58c6aac35d3b62e6b1f390012ffdc7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
