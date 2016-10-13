@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_a00a4232",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "Explained further. ehg is investigating this.",
+      "parentUuid": "3cde9ef7_4f8d0d8f",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_cfb7bd3e",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-13T04:28:04Z",
       "side": 1,
       "message": "delete",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_c0074e2b",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "need zero value.",
+      "parentUuid": "3cde9ef7_cfb7bd3e",
       "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_e0044a29",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_2fb3e955",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_afbef915",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-13T04:28:04Z",
       "side": 1,
       "message": "we should really put code to do this in package upspin. add a todo?",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_0002361a",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_afbef915",
       "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "dc94a252_40051e1f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "see above.",
+      "parentUuid": "3cde9ef7_8fc1b598",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3cde9ef7_efb4013c",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 7
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-13T04:28:04Z",
       "side": 1,
       "message": "add blank above this line",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc94a252_600a1a30",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T04:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cde9ef7_efb4013c",
       "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
