@@ -94,7 +94,8 @@ func parseDKIM(s string) (domain, status string, err error) {
    p256
    1063349993423423435345345345345345340
    3453453457828271720003453453245354698
-   Signature: 123453534534-32423423423
+   Signature:
+   123453534534:32423423423
 */
 
 // ParseBody parses the contents of the email and returns the user name,
@@ -105,7 +106,7 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 	var sig upspin.Signature
 
 	lines := strings.Split(strings.TrimSpace(data), "\n")
-	if len(lines) != 6 {
+	if len(lines) != 7 {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("badly formatted email message"))
 	}
 	i := 0
@@ -124,16 +125,15 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 	}
 	pubKey := upspin.PublicKey(next() + "\n" + next() + "\n" + next() + "\n")
 
-	const sigPrefix = "Signature: "
-	s = next()
-	if !strings.HasPrefix(s, sigPrefix) {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing signature"))
+	const sigPreamble = "Signature:"
+	if next() != sigPreamble {
+		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing signature preamble line"))
 	}
 
 	// TODO: parsing signature should move to package upspin. Signature
 	// should also not have pointers, but big.Ints directly.
-	sigStr := s[len(sigPrefix):]
-	sigFields := strings.Split(sigStr, "-")
+	sigStr := next()
+	sigFields := strings.Split(sigStr, ":")
 	if len(sigFields) != 2 {
 		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature format: %q", sigStr))
 	}
