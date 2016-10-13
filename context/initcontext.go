@@ -136,7 +136,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 
 	// If the provided reader is nil, try $HOME/upspin/rc.
 	if r == nil {
-		home, err := homedir()
+		home, err := Homedir()
 		if err != nil {
 			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
 		}
@@ -460,7 +460,9 @@ func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
 	}
 }
 
-func homedir() (string, error) {
+// TODO(adg): move to osutil package?
+// Homedir returns the home directory of the OS' logged-in user.
+func Homedir() (string, error) {
 	u, err := user.Current()
 	// user.Current may return an error, but we should only handle it if it
 	// returns a nil user. This is because os/user is wonky without cgo,
@@ -483,7 +485,7 @@ func homedir() (string, error) {
 }
 
 func sshdir() (string, error) {
-	h, err := homedir()
+	h, err := Homedir()
 	if err != nil {
 		return "", err
 	}

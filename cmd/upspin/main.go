@@ -26,6 +26,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user"
+	"upspin.io/valid"
 
 	// Load useful packers
 
@@ -51,6 +52,7 @@ var commands = map[string]func(*State, ...string){
 	"rotate":      (*State).rotate,
 	"rm":          (*State).rm,
 	"share":       (*State).share,
+	"signup":      (*State).signup,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
 }
@@ -73,7 +75,12 @@ func main() {
 	if len(flag.Args()) < 1 {
 		usage()
 	}
-	state := newState()
+	var state *State
+	if flag.Arg(0) != "signup" {
+		state = newState()
+	} else {
+		state = &State{op: "signup"}
+	}
 
 	args := flag.Args()[1:]
 	state.op = strings.ToLower(flag.Arg(0))
@@ -263,6 +270,73 @@ func (s *State) keygen(args ...string) {
 	if err != nil {
 		s.exitf("writing keys: %v", err)
 	}
+}
+
+func (s *State) signup(args ...string) {
+	fs := flag.NewFlagSet("signup", flag.ExitOnError)
+	force := fs.Bool("force", false, "force creating a new user even if keys and RC file exist")
+	fs.Usage = s.subUsage(fs, "signup emailAddress")
+	err := fs.Parse(args)
+	if err != nil {
+		s.exit(err)
+	}
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	userName := upspin.UserName(fs.Arg(0))
+	if err := valid.UserName(userName); err != nil {
+		s.exit(err)
+	}
+
+	// Verify if we have an RC file.
+	_, err = context.InitContext(nil)
+	if err == nil && !*force {
+		s.exitf("Existing upspin/rc file in $HOME. Remove it and try again.")
+	}
+
+	// Create an RC file for this new user.
+	const rcTemplate = "username=%s\nkeyserver=%s\n"
+	const defaultKeyServer = "remote,key.upspin.io:443"
+
+	homedir, err := context.Homedir()
+	if err != nil {
+		s.exit(err)
+	}
+	err = ioutil.WriteFile(filepath.Join(homedir, "/upspin/rc"),
+		[]byte(fmt.Sprintf(rcTemplate, userName, defaultKeyServer)),
+		0640)
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Generate a new key.
+	s.keygen()
+	fmt.Println("Write down the code above. It is used to recover your keys.")
+
+	// Now load the context. This time it should succeed.
+	ctx, err := context.InitContext(nil)
+	if err != nil {
+		s.exit(err)
+	}
+
+	pubKey := strings.TrimSpace(string(ctx.Factotum().PublicKey()))
+
+	// Sign the username and key.
+	sig, err := ctx.Factotum().UserSign([]byte(string(ctx.UserName()) + pubKey))
+	if err != nil {
+		s.exit(err)
+	}
+
+	const mailTemplate = `I am %s
+My public key is
+%s
+Signature:
+%s:%s
+`
+	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), pubKey,
+		sig.R.String(), sig.S.String())
+
+	s.exitf("To complete your registration, send email to signup@key.upspin.io with the following contents:\n%s", msg)
 }
 
 func (s *State) link(args ...string) {
