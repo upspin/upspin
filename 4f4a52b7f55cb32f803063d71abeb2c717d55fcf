@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c8e9e81_f218e6e6",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T22:40:59Z",
+      "side": 1,
+      "message": "// TODO: move to osutil?",
+      "revId": "4f4a52b7f55cb32f803063d71abeb2c717d55fcf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
