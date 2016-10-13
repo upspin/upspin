@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fca966a7_fdde6761",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "k8s is cryptic. Why not kube? You have functions called kubeXYZ and the cmdline is kubectl.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_dd328b12",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "A comment here would be helpful. If I understand this right, cloudCache seems a bit too generic. Shouldn\u0027t it be letsEncryptCache or certCache?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_7d0b7739",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be below the if block below?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_9d0e4340",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "What is this iterating on? Why is there more than one thing to watch? or are these events in time and if so, does it ever finish?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_3d53af37",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "s/writing/closing/",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_dd2deb9b",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "string doesn\u0027t need to be quoted. maybe none of these do, actually.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_1d77d3c5",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "Why are the type and all its fields exported?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_fd8c2795",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "What is this doing, exactly? A comment would help. Is it listing all the imported packages or just the \"remote\" ones?",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_bdad7ff3",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "I see you add the keyserver in the writeRC function below. But it would be clearer to have it be an entry in the two cases below, despite the minor repetition. I first wrote a comment here about adding it and was confused until I got to that function.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fca966a7_bdffbfbf",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-13T17:10:14Z",
+      "side": 1,
+      "message": "see comment about k8s.",
+      "revId": "febcbe811eff605a046bb6ad427b389f3053443e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
