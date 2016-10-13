@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cde9ef7_4f8d0d8f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "to what end?",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_cfb7bd3e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_2fb3e955",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "i suggest moving this below the const, to match line 128 and to make it clearer that this set of lines tests for the user prefix",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_afbef915",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "we should really put code to do this in package upspin. add a todo?",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_8fc1b598",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "sig :\u003d upspin.Signature{R: \u0026rs, S: \u0026ss}",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cde9ef7_efb4013c",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-13T04:28:04Z",
+      "side": 1,
+      "message": "add blank above this line",
+      "revId": "7987e2b5510b38b44ede60d4e57b3239a367980b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
