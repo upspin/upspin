@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c64970a_bba09377",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T23:54:39Z",
+      "side": 1,
+      "message": "hmm, maybe we should have ParseGroup public in the access package.\nbut this is fine for now if you add a TODO.",
+      "revId": "3cb9e3660a959673fef9f96fb46d64c2a75e50e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
