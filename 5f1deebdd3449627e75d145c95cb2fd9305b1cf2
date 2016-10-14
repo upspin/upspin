@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc76c682_15d3d458",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T17:39:33Z",
+      "side": 1,
+      "message": "When deploying a new keyserver, what does this mean? Should it be always empty? If not always empty, should it be detected and an error returned (do you need a mustNotProvideFlag function?)?",
+      "revId": "5f1deebdd3449627e75d145c95cb2fd9305b1cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
