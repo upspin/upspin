@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bc37efd9_f532720b",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T21:56:48Z",
+      "side": 1,
+      "message": "See line 295.",
+      "parentUuid": "bc37efd9_35247adf",
+      "revId": "1314dc96ca5e3c6d0dccb496e834ffe94207196f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_f504b233",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-14T21:51:39Z",
       "side": 1,
       "message": "don\u0027t you need to make a copy first? it\u0027s just a slice and i\u0027m not convinced it will be unaffected by setenv.",
+      "revId": "1314dc96ca5e3c6d0dccb496e834ffe94207196f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc37efd9_d52f6ea1",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T21:56:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_f504b233",
       "revId": "1314dc96ca5e3c6d0dccb496e834ffe94207196f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
