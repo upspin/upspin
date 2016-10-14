@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fc76c682_155af482",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T16:47:44Z",
+      "side": 1,
+      "message": "Your code is not wrong. It\u0027s just that the format of the email looks better with just one space. I can remove this and change the template below to have the Signature on the same line. Then it all works. (That is, this is just cosmetic stuff).",
+      "parentUuid": "fc8de6b6_5da73ba7",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c885ea4_5f648b42",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-14T16:21:21Z",
       "side": 1,
       "message": "The signature is ok for initial testing purposes if you want, but I\u0027d just as soon remove it before we make this permanent.  Unless I\u0027m missing something, this signature doesn\u0027t prove anything, and may confuse the casual reader.  Better for them to ask, \"Hey, how can you do such a security critical function unauthenticated?!\" and then learn about DKIM.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_75616831",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T16:47:44Z",
+      "side": 1,
+      "message": "The only thing this adds is proof that the user had the secret key at some point. I agree it\u0027s not needed, but it\u0027s a little added bonus. \n\nI can remove it in another CL, because now the rest of the code uses it, so it needs to be removed together.",
+      "parentUuid": "3c885ea4_5f648b42",
       "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
