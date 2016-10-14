@@ -6,8 +6,6 @@
 // on the Google Cloud Platform.
 package main
 
-// TODO(adg): support deploying only a single server (only dirserver, say)
-
 // TODO(adg): comprehensive help/setup text
 // TODO(adg): delete load balancers
 // TODO(adg): kubectl delete services
@@ -68,15 +66,26 @@ var (
 	prefix = flag.String("prefix", "", "A `string` that begins all resource names")
 	domain = flag.String("domain", "", "The base domain `name` for the Upspin services")
 
-	keyserver = flag.Bool("keyserver", false, "Create/deploy/delete a keyserver in addition to the usual set")
-	frontend  = flag.Bool("frontend", false, "Create/deploy/delete a frontend in addition to the usual set")
+	keyserver = flag.String("keyserver", defaultKeyServer, "Key server `host:port` (empty means use this cluster's KeyServer)")
 
 	create = flag.Bool("create", false, "Create cloud services")
 	deploy = flag.Bool("deploy", true, "Deploy Upspin servers")
 	delete = flag.String("delete", "", "Delete cloud services (string must equal the `project` name, for safety)")
+
+	all = flag.Bool("all", false, "Deploy all servers")
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %v [flags] [servers...]\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "The specified servers are those to be created, deployed, or deleted.\n")
+		fmt.Fprintf(os.Stderr, "They may be any combination of\n")
+		fmt.Fprintf(os.Stderr, "\t%s\n", strings.Join(validServers, " "))
+		fmt.Fprintf(os.Stderr, "If no servers are provided, the default list is\n")
+		fmt.Fprintf(os.Stderr, "\t%s\n\n", strings.Join(defaultServers, " "))
+		fmt.Fprintf(os.Stderr, "Flags:\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	mustProvideFlag(project, "-project")
@@ -97,12 +106,20 @@ func main() {
 		Domain: *domain,
 
 		KeyServer: *keyserver,
-		Frontend:  *frontend,
+
+		Servers: flag.Args(),
+	}
+
+	if len(cfg.Servers) == 0 {
+		cfg.Servers = defaultServers
+	}
+	if *all {
+		cfg.Servers = validServers
 	}
 
 	if *delete != "" {
 		if *delete != *project {
-			fmt.Fprintln(os.Stderr, "error: -delete must equal -project")
+			fmt.Fprintf(os.Stderr, "error: -delete must equal -project\n\n")
 			os.Exit(1)
 		}
 		if err := wrap("delete", cfg.Delete()); err != nil {
@@ -127,7 +144,7 @@ func main() {
 
 func mustProvideFlag(f *string, name string) {
 	if *f == "" {
-		fmt.Fprintf(os.Stderr, "error: you must specify the %s flag\n", name)
+		fmt.Fprintf(os.Stderr, "error: you must specify the %s flag\n\n", name)
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -152,30 +169,31 @@ type Config struct {
 	// will be "store.example.com".
 	Domain string
 
-	// Create/deploy a keyserver (default is to use key.upspin.io).
-	KeyServer bool
+	// KeyServer address. If empty, uses KeyServer in this cluster.
+	KeyServer string
 
-	// Create/deploy a frontend.
-	Frontend bool
+	// Servers specifies the servers to deploy.
+	// Valid values are "dirserver", "storeserver", "keyserver", and "frontend".
+	Servers []string
 }
 
+var (
+	validServers   = []string{"dirserver", "storeserver", "keyserver", "frontend"}
+	defaultServers = []string{"dirserver", "storeserver"}
+)
+
 func (c *Config) servers() (ss []string) {
-	for _, s := range []string{
-		"dirserver",
-		"storeserver",
-		"keyserver",
-		"frontend",
-	} {
-		if !c.KeyServer && s == "keyserver" {
-			continue
+	for _, s := range c.Servers {
+		for _, s2 := range validServers {
+			if s == s2 {
+				ss = append(ss, s)
+			}
 		}
-		if !c.Frontend && s == "frontend" {
-			continue
-		}
-		ss = append(ss, s)
 	}
 	return
 }
+
+const defaultKeyServer = "key.upspin.io:443"
 
 func (c *Config) inProd() bool {
 	// The upspin-prod and upspin-test projects were created
@@ -184,8 +202,6 @@ func (c *Config) inProd() bool {
 	// things here to avoid re-creating everything.
 	return (c.Project == "upspin-prod" || c.Project == "upspin-test") && c.Prefix == ""
 }
-
-const defaultKeyServerEndpoint = "remote,key.upspin.io:443"
 
 func (c *Config) Create() error {
 	if c.inProd() {
@@ -302,7 +318,7 @@ func (c *Config) Delete() error {
 }
 
 func (c *Config) Deploy() error {
-	log.Printf("Deploying Upspin servers: Project=%q Zone=%q Prefix=%q", c.Project, c.Zone, c.Prefix)
+	log.Printf("Deploying Upspin servers %v: Project=%q Zone=%q Prefix=%q", c.servers(), c.Project, c.Zone, c.Prefix)
 
 	// Install dependencies to speed builds.
 	if err := c.installDeps(); err != nil {
@@ -563,8 +579,8 @@ func (c *Config) restartServer(server string) error {
 }
 
 func (c *Config) endpoint(server string) string {
-	if server == "keyserver" && !c.KeyServer {
-		return defaultKeyServerEndpoint
+	if server == "keyserver" && c.KeyServer != "" {
+		return "remote," + c.KeyServer
 	}
 	return "remote," + c.hostName(server) + ":443"
 }
@@ -733,7 +749,9 @@ func (c *Config) createBuckets() error {
 	}
 
 	for _, s := range bucketSuffixes {
-		if !c.KeyServer && s == "key" {
+		if c.KeyServer != "" && s == "key" {
+			// If we're not using our own KeyServer,
+			// don't create a bucket for it.
 			continue
 		}
 		name := c.bucketName(s)
@@ -754,7 +772,7 @@ func (c *Config) deleteBuckets() error {
 	}
 
 	for _, s := range bucketSuffixes {
-		if !c.KeyServer && s == "key" {
+		if c.KeyServer != "" && s == "key" {
 			continue
 		}
 
