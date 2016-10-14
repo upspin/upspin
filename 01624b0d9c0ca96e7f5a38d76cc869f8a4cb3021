@@ -2,6 +2,125 @@
   "comments": [
     {
       "key": {
+        "uuid": "fc76c682_b8c69542",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "this is obscure and needs a comment.\nsince there\u0027s only one call to newState, refactor the whole thing so it\u0027s done there. should be easy.\n\nstate :\u003d newState(strings.ToLower(flag.Arg(0))\nargs :\u003d flag.Args()[1:]",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_f8d00df6",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "s/force creating/create/\nalso you need a flag to specify where to write the rc file",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_78bddda9",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "email_address\nconsistent with other usage messages (see link e.g.)",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_b81855e6",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "this isn\u0027t where you use valid. valid is for servers to check that internally all is well.\nhere you call user.Parse to _create_ a valid name from the one provided.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_782f9df5",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "look at the other calls to exit and exitf. they don\u0027t look like this.\nalso i don\u0027t believe you should ever tell a user, especially one signing up and therefore new to the system, to remove anything.\n\ns.exitf(\"$HOME/upspin/rc already exists\")\n\nbut this is wrong in general anyway, since the error might be due to environment variables. be explicit and actually guarantee that the environment is clean, the file exists, etc.\nif the -context flag is set, it\u0027s another thing to think about.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_380e0598",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "this is hard to read. please break it up.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_78087d89",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "explain this better, or for just now just add: TODO: write proper help",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc8de6b6_5da73ba7",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 1
@@ -102,6 +221,23 @@
       "side": 1,
       "message": "SGTM",
       "parentUuid": "fc76c682_75616831",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc76c682_3857e55b",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:18:53Z",
+      "side": 1,
+      "message": "this will make it exit(1). you don\u0027t want that. use Println",
       "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
