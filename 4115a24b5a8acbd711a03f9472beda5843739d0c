@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc37efd9_9239fcef",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T20:39:47Z",
+      "side": 1,
+      "message": "s/RC/rc/",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc37efd9_f26048eb",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T20:39:47Z",
+      "side": 1,
+      "message": "s/rec/rc/",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc37efd9_d25d4431",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T20:39:47Z",
+      "side": 1,
+      "message": "you need to wipe the environment.",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
