@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c39f6b7_896fb953",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:33:58Z",
+      "side": 1,
+      "message": "you need to say \"line %d\" or the number appears nowhere.\n\nfmt.Println(errors.E(\"op\", upspin.PathName(\"xxx\"), errors.Invalid, errors.Errorf(\"%d: syntax error in group file: %q\", 33, \"la de da\")))\n\nproduces\n\nxxx: op: invalid operation: 33: syntax error in group file: \"la de da\"\n\nto make it read well, i would say\n\nsyntax error in group file on line %d: %s",
+      "revId": "b97b37c4da3650ae399385b4433b46505ccf8eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_a9747d26",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T18:33:58Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "b97b37c4da3650ae399385b4433b46505ccf8eb9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
