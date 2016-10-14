@@ -18,6 +18,7 @@ import (
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
 
+	"upspin.io/errors"
 	_ "upspin.io/pack/debug"
 )
 
@@ -549,5 +550,20 @@ func TestGlobLinks(t *testing.T) {
 	if !globAndCheck(t, client, root+"/*/*",
 		"linkglobber@google.com/dir/file") {
 		t.Error("glob failed")
+	}
+}
+
+func TestRejectBadAccessFile(t *testing.T) {
+	const (
+		user          = "bad@access.org"
+		root          = user
+		accessFile    = root + "/Access"
+		accessContent = "all:*"
+	)
+	client := New(setup(user, ""))
+	_, err := client.Put(accessFile, []byte(accessContent))
+	expectedErr := errors.E(upspin.PathName(accessFile), errors.Invalid)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("error = %s, want = %s", err, expectedErr)
 	}
 }
