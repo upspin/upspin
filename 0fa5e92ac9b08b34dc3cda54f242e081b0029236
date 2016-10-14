@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "bc37efd9_f5e3921c",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-14T22:19:47Z",
+      "side": 1,
+      "message": "If you have to log pwd, maybe do a slow hash of it?  There\u0027s a big chance of leaking secrets here.",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -98,6 +115,23 @@
       "writtenOn": "2016-10-14T22:12:16Z",
       "side": 1,
       "message": "maybe include the name of the user making the request in these errors",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c28fb81_f0fcbeca",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-14T22:19:47Z",
+      "side": 1,
+      "message": "Are you actually checking the DKIM signature somewhere, or taking SendGrid\u0027s word for it?",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
