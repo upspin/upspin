@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc8de6b6_5da73ba7",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-14T16:21:21Z",
+      "side": 1,
+      "message": "I had been trying to canonicalize the key before it went into factotum.  Do you have an example showing that TrimSpace is needed here?  It may be a bug elsewhere in my code.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c885ea4_5f648b42",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-14T16:21:21Z",
+      "side": 1,
+      "message": "The signature is ok for initial testing purposes if you want, but I\u0027d just as soon remove it before we make this permanent.  Unless I\u0027m missing something, this signature doesn\u0027t prove anything, and may confuse the casual reader.  Better for them to ask, \"Hey, how can you do such a security critical function unauthenticated?!\" and then learn about DKIM.",
+      "revId": "01624b0d9c0ca96e7f5a38d76cc869f8a4cb3021",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
