@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc37efd9_35247adf",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T21:51:39Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be filepath.Join(getenv(\"HOME\"), \"upspin\", \"rc\")",
+      "revId": "1314dc96ca5e3c6d0dccb496e834ffe94207196f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc37efd9_f504b233",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T21:51:39Z",
+      "side": 1,
+      "message": "don\u0027t you need to make a copy first? it\u0027s just a slice and i\u0027m not convinced it will be unaffected by setenv.",
+      "revId": "1314dc96ca5e3c6d0dccb496e834ffe94207196f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
