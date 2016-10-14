@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc37efd9_951fa61e",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T22:14:11Z",
+      "side": 1,
+      "message": "Group files too.",
+      "revId": "f9fffc6074802b68741de08f34221e3c1cd58a6c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
