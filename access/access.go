@@ -142,6 +142,7 @@ func (a *Access) Path() upspin.PathName {
 
 // Parse parses the contents of the path name, in data, and returns the parsed Access.
 func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
+	const op = "access.Parse"
 	a, parsed, err := newAccess(pathName)
 	if err != nil {
 		return nil, err
@@ -159,19 +160,19 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		// A line is two non-empty comma-separated lists, separated by a colon.
 		colon := bytes.IndexByte(line, ':')
 		if colon < 0 {
-			return nil, errors.Errorf("%s:%d: syntax error: no colon on line: %q", pathName, lineNum, line)
+			return nil, errors.E(op, pathName, errors.Invalid, errors.Errorf("%d: no colon on line: %q", lineNum, line))
 		}
 
 		// Parse rights and users lists.
 		rightsText := bytes.TrimSpace(line[:colon]) // TrimSpace for good error messages below.
 		rights = splitList(rights[:0], rightsText)
 		if rights == nil {
-			return nil, errors.Errorf("%s:%d: syntax error: invalid rights list: %q", pathName, lineNum, rightsText)
+			return nil, errors.E(op, pathName, errors.Invalid, errors.Errorf("%d: invalid rights list: %q", lineNum, rightsText))
 		}
 		usersText := bytes.TrimSpace(line[colon+1:])
 		users = splitList(users[:0], usersText)
 		if users == nil {
-			return nil, errors.Errorf("%s:%d: syntax error: invalid users list: %q", pathName, lineNum, usersText)
+			return nil, errors.E(op, pathName, errors.Invalid, errors.Errorf("%d: invalid users list: %q", lineNum, usersText))
 		}
 
 		var err error
@@ -184,10 +185,10 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 			case Read, Write, List, Create, Delete:
 				err = a.addRight(r, parsed.User(), users)
 			case Invalid:
-				err = errors.Errorf("%s:%d: invalid right: %q", pathName, lineNum, right)
+				err = errors.Errorf("%d: invalid right: %q", lineNum, right)
 			}
 			if err != nil {
-				return nil, errors.Errorf("%s:%d: bad users list %q: %v", pathName, lineNum, usersText, err)
+				return nil, errors.E(op, pathName, errors.Invalid, err)
 			}
 		}
 	}
@@ -423,13 +424,14 @@ func IsGroupFile(pathName upspin.PathName) bool {
 // which should have been read from the group file with that name.
 // If the group is already known, its definition is replaced.
 func AddGroup(pathName upspin.PathName, contents []byte) error {
+	const op = "access.AddGroup"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	group, err := parseGroup(parsed, contents)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	mu.Lock()
 	groups[parsed.Path()] = group
@@ -442,7 +444,7 @@ func RemoveGroup(pathName upspin.PathName) error {
 	const op = "access.RemoveGroup"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	mu.Lock()
 	defer mu.Unlock()
@@ -466,14 +468,14 @@ func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 
 		users = splitList(users[:0], line)
 		if users == nil {
-			return nil, errors.Errorf("%s:%d: syntax error in group file: %q", parsed, lineNum, line)
+			return nil, errors.E(parsed.Path(), errors.Invalid, errors.Errorf("%d: syntax error in group file: %q", lineNum, line))
 		}
 		if group == nil {
 			group = make([]path.Parsed, 0, preallocSize(len(users)))
 		}
 		group, err = parsedAppend(group, parsed.User(), users...)
 		if err != nil {
-			return nil, errors.Errorf("%s:%d: bad group users list %q: %v", parsed, lineNum, line, err)
+			return nil, errors.E(parsed.Path(), errors.Invalid, errors.Errorf("%d: bad group users list %q: %v", lineNum, line, err))
 		}
 	}
 	if s.Err() != nil {
@@ -575,10 +577,11 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 // The method loads group files as needed by
 // calling the provided function to read each file's contents.
 func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName, load func(upspin.PathName) ([]byte, error)) (bool, error) {
+	const op = "access.Can"
 	for {
 		granted, missing, err := a.canNoGroupLoad(requester, right, pathName)
 		if err != nil {
-			return false, err
+			return false, errors.E(op, err)
 		}
 		if missing == nil {
 			return granted, nil
@@ -586,11 +589,11 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		for _, group := range missing {
 			data, err := load(group)
 			if err != nil {
-				return false, err
+				return false, errors.E(op, err)
 			}
 			err = AddGroup(group, data)
 			if err != nil {
-				return false, err
+				return false, errors.E(op, err)
 			}
 		}
 	}
@@ -703,11 +706,12 @@ func (s sliceOfUserName) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 // Read and List.  Users loads group files as needed by calling the provided
 // function to read each file's contents.
 func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
+	const op = "access.Users"
 	var userNames []upspin.UserName
 	for {
 		users, neededGroups, err := a.usersNoGroupLoad(right)
 		if err != nil {
-			return nil, err
+			return nil, errors.E(op, err)
 		}
 		if neededGroups == nil {
 			userNames = users
@@ -716,11 +720,11 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 		for _, group := range neededGroups {
 			groupData, err := load(group)
 			if err != nil {
-				return nil, err
+				return nil, errors.E(op, err)
 			}
 			err = AddGroup(group, groupData)
 			if err != nil {
-				return nil, err
+				return nil, errors.E(op, err)
 			}
 		}
 	}
@@ -743,34 +747,36 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
 func (a *Access) MarshalJSON() ([]byte, error) {
+	const op = "access.MarshalJSON"
 	// We need to export a field of Access but we don't want to make it public,
 	// so we encode it separately.
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	if err := enc.Encode(a.list); err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	return buf.Bytes(), nil
 }
 
 // UnmarshalJSON returns an Access given its path name and its JSON encoding.
 func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
+	const op = "access.UnmarshalJSON"
 	var list [numRights][]path.Parsed
 	err := json.Unmarshal(jsonAccess, &list)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	access := &Access{
 		list: list,
 	}
 	access.parsed, err = path.Parse(name)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	access.owner = access.parsed.User()
 	_, _, access.domain, err = user.Parse(access.parsed.User())
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
 	return access, nil
 }
