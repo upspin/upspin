@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc37efd9_95ac46d5",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T22:05:22Z",
+      "side": 1,
+      "message": "I\u0027m sorry, the original was fine. I didn\u0027t realize that under the covers os.Environ copied the slice but of course it does - it\u0027s not C.\n\nSo you can use the old code if you prefer.",
+      "revId": "4abaccdae8d8f61d9daadf37772d62ba0f6f2fc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
