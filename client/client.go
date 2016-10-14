@@ -114,8 +114,10 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 	name = evalEntry.Name
 
+	isAccessFile := access.IsAccessFile(name)
+	isGroupFile := access.IsGroupFile(name)
 	var packer upspin.Packer
-	if access.IsAccessFile(name) || access.IsGroupFile(name) {
+	if isAccessFile || isGroupFile {
 		packer = pack.Lookup(upspin.PlainPack)
 	} else {
 		// Encrypt data according to the preferred packer
@@ -123,6 +125,21 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		packer = pack.Lookup(c.context.Packing())
 		if packer == nil {
 			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
+		}
+	}
+
+	// Ensure Access file is valid.
+	if isAccessFile {
+		_, err := access.Parse(name, data)
+		if err != nil {
+			return nil, errors.E(op, name, err)
+		}
+	}
+	// Ensure Group file is valid.
+	if isGroupFile {
+		err := access.AddGroup(name, data)
+		if err != nil {
+			return nil, errors.E(op, name, err)
 		}
 	}
 
