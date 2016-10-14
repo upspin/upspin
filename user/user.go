@@ -46,7 +46,7 @@ import (
 // also known as PRECIS.
 //
 // Further restrictions are added here. The only ASCII punctuation characters
-// that are legal are "!#$%&'*+-/=?^_{|}~".
+// that are legal are "#$%&'*+-/=?^_{|}~".
 //
 // As a special case for use in Access and Group files, the name "*" is allowed.
 //
@@ -151,7 +151,7 @@ func canonicalize(user string) (string, error) {
 	}
 	for _, r := range user {
 		if illegalASCIIPunctuation(r) {
-			return "", errors.Errorf("illegal character %c", r)
+			return "", errors.Errorf("illegal character %q", r)
 		}
 		if !simpleUserNameChar(r) {
 			return precis.UsernameCasePreserved.String(user)
@@ -179,7 +179,7 @@ func simpleUserNameChar(r rune) bool {
 // illegalASCIIPunctuation reports whether the rune is an ASCII punctuation
 // character that is allowed by PRECIS but not by us.
 func illegalASCIIPunctuation(r rune) bool {
-	return strings.ContainsRune(" \"(),:;<>.[\\]`", r)
+	return strings.ContainsRune(" !\"(),:;<>.[\\]`", r)
 }
 
 // See the comments for UserAndDomain.
