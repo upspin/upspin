@@ -7,7 +7,6 @@ package access
 import (
 	"reflect"
 	"sort"
-	"strings"
 	"testing"
 
 	"upspin.io/errors"
@@ -148,7 +147,7 @@ func TestParseGroup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	group, err := parseGroup(parsed, groupText)
+	group, err := parseGroup("TestParseGroup", parsed, groupText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,7 +171,7 @@ func TestGroupParseAllocs(t *testing.T) {
 		t.Fatal(err)
 	}
 	allocs := testing.AllocsPerRun(100, func() {
-		parseGroup(parsed, groupText)
+		parseGroup("TestGroupParseAllocs", parsed, groupText)
 	})
 	t.Log("allocs:", allocs)
 	if allocs != 6 {
@@ -433,97 +432,88 @@ func TestParseContainsGroupName(t *testing.T) {
 }
 
 func TestParseWrongFormat1(t *testing.T) {
-	const (
-		expectedErr = testFile + ":1: invalid right: \"rrrr\""
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str("1: invalid access right: \"rrrr\""))
+
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseWrongFormat2(t *testing.T) {
-	const (
-		expectedErr = testFile + ":2: syntax error: invalid users list: "
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`2: invalid users list: "a@b.co : x"`))
 	accessText := []byte("#A comment\n r: a@b.co : x")
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseWrongFormat3(t *testing.T) {
-	const (
-		expectedErr = testFile + ":1: syntax error: invalid rights"
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`1: invalid rights list: ""`))
 	accessText := []byte(": bob@abc.com") // missing access format text.
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseWrongFormat4(t *testing.T) {
-	const (
-		expectedErr = testFile + ":1: invalid right: \"rea\""
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`1: invalid access right: "rea"`))
 	accessText := []byte("rea:bob@abc.com") // invalid access format text.
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseMissingAccessField(t *testing.T) {
-	const (
-		expectedErr = testFile + ":1: syntax error: no colon on line: "
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`1: no colon on line: "bob@abc.com"`))
 	accessText := []byte("bob@abc.com")
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
-	const (
-		expectedErr = testFile + ":3: syntax error: invalid users list: "
-	)
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`3: invalid users list: "a@b.co r: c@b.co"`))
 	accessText := []byte("\n\nr: a@b.co r: c@b.co")
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("Expected error, got none")
 	}
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Errorf("Expected prefix %s, got %s", expectedErr, err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
 func TestParseBadGroupPath(t *testing.T) {
+	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`bad user name in group path "notanemail/Group/family"`))
+
 	accessText := []byte("r: notanemail/Group/family")
 	_, err := Parse(testFile, accessText)
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
-	if !strings.Contains(err.Error(), "group") {
-		t.Fatalf("expected group error, got: %v", err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
@@ -533,23 +523,26 @@ func TestParseBadGroupFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Multiple commas not allowed.
-	_, err = parseGroup(parsed, []byte("joe@me.com ,, fred@me.com"))
+	_, err = parseGroup("TestParseBadGroupFile", parsed, []byte("joe@me.com ,, fred@me.com"))
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
 }
 
 func TestParseBadGroupMember(t *testing.T) {
+	expectedErr := errors.E(upspin.PathName(testGroupFile), errors.Invalid,
+		errors.Str(`1: bad group users list "joe@me.com, fred@": user fred@: user.Parse: invalid operation: missing domain name`))
+
 	parsed, err := path.Parse(testGroupFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = parseGroup(parsed, []byte("joe@me.com, fred@"))
+	_, err = parseGroup("TestParseBadGroupMember", parsed, []byte("joe@me.com, fred@"))
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
-	if !strings.Contains(err.Error(), "missing domain name") {
-		t.Fatalf("expected missing domain name error, got: %v", err)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want %s", err, expectedErr)
 	}
 }
 
