@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_187745b8",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_d5f9aed8",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_55f5bed5",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-14T22:12:16Z",
       "side": 1,
       "message": "don\u0027t capitalize these   s/O/o/ etc.",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_d8ceadbb",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_55f5bed5",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_b8d5f946",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_35ea3af6",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_f56a729a",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-14T22:12:16Z",
       "side": 1,
       "message": "don\u0027t you need to write to w in all of these?",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_98afd5c9",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "I need one write for this function, which these two accomplish and the one below does too.\n\nHere, we\u0027re acknowledging the HTTP message, not its contents. See below.",
+      "parentUuid": "bc37efd9_f56a729a",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_b8ac19d5",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_f5e3921c",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-14T22:12:16Z",
       "side": 1,
       "message": "s/we/we have/\n\nbut we haven\u0027t, because there are lots of early returns below, so i don\u0027t know what you mean",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_1813c53f",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "We\u0027re acknowledging the HTTP message from SendGrid. As far as SG is concerned, they don\u0027t need to retry from this point on. The delivery has happened. \n\nUpdated comment.",
+      "parentUuid": "bc37efd9_b5dd0a59",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_9806f5f7",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "We don\u0027t know it at this point, but done below.",
+      "parentUuid": "bc37efd9_555c9e07",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c28fb81_f0fcbeca",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -132,6 +258,24 @@
       "writtenOn": "2016-10-14T22:19:47Z",
       "side": 1,
       "message": "Are you actually checking the DKIM signature somewhere, or taking SendGrid\u0027s word for it?",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_785c4108",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Taking SG\u0027s word. This is the value-add of SG at this point. The long-term plan is to do DKIM ourselves as well as do the delivery of the message ourselves (speak SMTP vs HTTP). This is step 0. It won\u0027t remain this way forever. We\u0027ll either write out own or migrate to KT\u0027s implementation.",
+      "parentUuid": "1c28fb81_f0fcbeca",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_186185bf",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_757e825f",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_552a5e47",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -166,6 +328,24 @@
       "writtenOn": "2016-10-14T22:12:16Z",
       "side": 1,
       "message": "this is weird flow. i\u0027d expect sendMail to return an error as well and to show it",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_9874b57f",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T23:29:27Z",
+      "side": 1,
+      "message": "I didn\u0027t want every call to sendMail to return an error because it would be too repetitive. Since sendMail is done on every error condition above, checking that it failed would create a series of nested ifs.\n\nThis one particular line is a bit special because I, as the maintainer of the keyserver, want to know what the error was from Lookup. I\u0027d expect success or NotExist. If something else happened, I want to investigate, but I don\u0027t need to send it back to the user. It is a weird flow, but I think it\u0027s a reflection of what is necessary here.",
+      "parentUuid": "bc37efd9_552a5e47",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
