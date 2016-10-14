@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c39f6b7_09374998",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:37:45Z",
+      "side": 1,
+      "message": "no colon on line %d: %q",
+      "revId": "8917e3e491994f1ffeac84729426c39f80e4e49f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_a9f0fdc2",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:37:45Z",
+      "side": 1,
+      "message": "invalid rights list on line %d: %q",
+      "revId": "8917e3e491994f1ffeac84729426c39f80e4e49f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_c9f531b2",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:37:45Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "8917e3e491994f1ffeac84729426c39f80e4e49f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_6907e5c2",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:37:45Z",
+      "side": 1,
+      "message": "s/://",
+      "revId": "8917e3e491994f1ffeac84729426c39f80e4e49f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
