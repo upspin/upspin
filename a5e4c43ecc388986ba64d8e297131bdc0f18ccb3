@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c39f6b7_c9c7f15d",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "but -context comes before signup, so this is wrong. delete the [...] and we\u0027ll address it when i add -help to these. (soon)\n\nalso in these messages s/RC/rc/ to avoid confusion and honor tradition",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_29afad98",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "delete the else. parse returns the suffix as part of the username",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_4c8eaf2f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "unix-specific. use filepath.IsAbs",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_8c98a76f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "s.exitf(\"rc file %q already exists\", rcFile)",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_ec97633a",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "s/RC/rc/",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_0cad9787",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "i might const (...) these.",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_6cbd33aa",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "no need. just use 0640 below, and put a comment if you want.\nif you want to keep the identifier though (i wouldn\u0027t, but), make it a const",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_4c322f5f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "i\u0027m still nervous about this.\ni would wipe the environment before calling it.\n\ni might even open the file myself and pass it as an io.Reader.",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c39f6b7_4c0b0f87",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "you can make this easier to ready by this hack\n\nconst mailTemplate \u003d \"\" +\n`the\ndata`",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c0d132b_d77f7c1b",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-14T19:50:05Z",
+      "side": 1,
+      "message": "wow",
+      "revId": "a5e4c43ecc388986ba64d8e297131bdc0f18ccb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
