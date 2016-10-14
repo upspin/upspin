@@ -58,7 +58,7 @@ func TestParse(t *testing.T) {
 		{upspin.UserName("e\u0302@here.com"), "\u00ea", S, "here.com", ""}, // Accent as a combining character.
 		// Bad PRECIS cases.
 		{upspin.UserName("henry\u2163@here.com"), U, S, D, "precis: disallowed rune"},
-		{upspin.UserName("!@here.com"), U, S, D, "invalid operation: illegal character '!'"},
+		{upspin.UserName("!!@here.com"), U, S, D, "invalid operation: user name contains only punctuation"},
 		// Special wildcard case.
 		{upspin.UserName("*@here.com"), "*", S, "here.com", ""}, // Single code point.
 	}
@@ -118,5 +118,5 @@ func okASCII(r rune) bool {
 	case 'A' <= r && r <= 'Z':
 		return true
 	}
-	return strings.ContainsRune("#$%&'*+-/=?^_{|}~", r)
+	return legalASCIIPunctuation(r)
 }
