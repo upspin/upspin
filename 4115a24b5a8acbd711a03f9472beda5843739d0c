@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bc37efd9_7257b8e5",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T20:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_9239fcef",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_f26048eb",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bc37efd9_525cb407",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T20:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_f26048eb",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_d25d4431",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-14T20:39:47Z",
       "side": 1,
       "message": "you need to wipe the environment.",
+      "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc37efd9_326130c0",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-14T20:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc37efd9_d25d4431",
       "revId": "4115a24b5a8acbd711a03f9472beda5843739d0c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
