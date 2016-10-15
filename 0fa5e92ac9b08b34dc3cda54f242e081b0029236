@@ -231,6 +231,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_1e788d6d",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-15T20:19:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c64970a_3ea1d1de",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
