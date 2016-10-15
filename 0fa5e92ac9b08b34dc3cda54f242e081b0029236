@@ -195,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_9eba5da2",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-15T02:09:56Z",
+      "side": 1,
+      "message": "I don\u0027t have to print, if that\u0027s preferable.",
+      "parentUuid": "7c64970a_7b243bc9",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -312,6 +330,24 @@
       "side": 1,
       "message": "That\u0027s ok for now.  But let\u0027s add a comment noting that.  Otherwise it looks to reviewers like an unintentional vulnerability.",
       "parentUuid": "7c64970a_785c4108",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_beb721b9",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-15T02:09:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c64970a_5b113776",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
