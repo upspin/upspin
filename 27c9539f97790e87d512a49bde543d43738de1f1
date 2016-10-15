@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c64970a_7e5189d5",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-15T21:44:54Z",
+      "side": 1,
+      "message": "To update your upspin key, the sequence is:\n  upspin keygen\n  upspin countersign\n  upspin rotate\n  upspin share -d -r -fix me@example.com/\nKeygen will create a new key and save the old one.\nCountersign will walk your file tree\nadding signatures with the new key alongside the old.\nRotate pushes your new key to the KeyServer.\nShare walks your file tree re-wrapping the encryption\nkeys from your old key to your new key.\n\nRotate is equivalent to\n  restore old files in .ssh\n  upspin user | rewritePublicKey | upspin user -put\n  bring back the new files in .ssh\n\nWe could merge the code for rotate into the end of countersign,\nat the risk of people having trouble recovering from errors.",
+      "revId": "27c9539f97790e87d512a49bde543d43738de1f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
