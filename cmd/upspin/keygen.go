@@ -5,11 +5,6 @@
 package main
 
 // This file contains the implementation of the keygen command.
-// TODO: Put this into a help string when upspin supports that.
-// Keygen creates local files secret.upspinkey and public.upspinkey in ~/.ssh
-// which contain the private and public parts of a keypair.
-// Existing keypairs are appended to ~/.ssh/secret2.upspinkey.
-// Someday we hope to integrate with ssh-agent.
 
 import (
 	"encoding/binary"

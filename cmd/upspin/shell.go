@@ -13,14 +13,14 @@ import (
 )
 
 func (s *State) shell(args ...string) {
+	const help = `
+Shell runs an interactive session for upspin subcommands.
+When running the shell, the leading "upspin" is assumed on each command.
+`
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
 	promptFlag := fs.String("prompt", "u> ", "interactive prompt")
 	verbose := fs.Bool("v", false, "verbose; print to stderr each command before execution")
-	fs.Usage = s.subUsage(fs, "shell")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
