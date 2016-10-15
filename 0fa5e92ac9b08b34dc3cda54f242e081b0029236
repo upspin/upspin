@@ -213,6 +213,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_3ea1d1de",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-15T07:45:21Z",
+      "side": 1,
+      "message": "It is better to never log credentials, as even failed attempts may just be an obvious typo or a password typed in the username field.  So if you are willing to simply log.Error.Print(\"Failed BasicAuth\") then I feel much better.",
+      "parentUuid": "7c64970a_9eba5da2",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
