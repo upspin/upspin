@@ -131,9 +131,13 @@ func (s *State) exit(err error) {
 	s.exitf("%s", err)
 }
 
-func (s *State) subUsage(fs *flag.FlagSet, msg string) func() {
-	return func() {
-		fmt.Fprintf(os.Stderr, "Usage: upspin %s\n", msg)
+func (s *State) parseFlags(fs *flag.FlagSet, args []string, help, usage string) {
+	helpFlag := fs.Bool("help", false, "print more information about the command")
+	usageFn := func() {
+		fmt.Fprintf(os.Stderr, "Usage: upspin %s\n", usage)
+		if *helpFlag {
+			fmt.Fprintln(os.Stderr, help)
+		}
 		// How many flags?
 		n := 0
 		fs.VisitAll(func(*flag.Flag) { n++ })
@@ -146,15 +150,26 @@ func (s *State) subUsage(fs *flag.FlagSet, msg string) func() {
 		}
 		os.Exit(2)
 	}
-}
-
-func (s *State) countersign(args ...string) {
-	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "countersign")
+	fs.Usage = usageFn
 	err := fs.Parse(args)
 	if err != nil {
 		s.exit(err)
 	}
+	if *helpFlag {
+		fs.Usage()
+	}
+}
+
+func (s *State) countersign(args ...string) {
+	const help = `
+Countersign updates the signatures and encrypted data for all items
+owned by the user. It is intended to be run after a user has changed
+keys.
+
+See the description for rotate for information about updating keys.
+`
+	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "countersign")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
@@ -163,13 +178,14 @@ func (s *State) countersign(args ...string) {
 }
 
 func (s *State) get(args ...string) {
+	const help = `
+Get writes to standard output the contents identified by the Upspin path.
+
+TODO: Delete when cp appears?
+`
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
-	fs.Usage = s.subUsage(fs, "get [-out=outputfile] path")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "get [-out=outputfile] path")
 
 	if fs.NArg() != 1 {
 		fs.Usage()
@@ -201,12 +217,17 @@ func (s *State) get(args ...string) {
 }
 
 func (s *State) info(args ...string) {
+	const help = `
+Info prints to standard output a thorough description of all the
+information about named paths, including information provided by
+ls but also storage references, sizes, and other metadata.
+`
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "info path...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
+	s.parseFlags(fs, args, help, "info path...")
+	if fs.NArg() != 0 {
+		fs.Usage()
 	}
+
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
@@ -221,15 +242,23 @@ func (s *State) info(args ...string) {
 }
 
 func (s *State) keygen(args ...string) {
+	const help = `
+Keygen creates a new Upspin key pair and stores the pair in local
+files secret.upspinkey and public.upspinkey in $HOME/.ssh. Existing
+key pairs are appended to ~/.ssh/secret2.upspinkey. Keygen does not
+update the information in the key server; use the user -put command
+for that.
+
+New users should instead use the signup command to create their
+first key. Keygen can be used to create new keys.
+
+See the description for rotate for information about updating keys.
+`
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 	where := fs.String("where", "", "`directory` to store keys; default $HOME/.ssh")
-	fs.Usage = s.subUsage(fs, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
@@ -266,15 +295,221 @@ func (s *State) keygen(args ...string) {
 	}
 }
 
-func (s *State) signup(args ...string) {
-	fs := flag.NewFlagSet("signup", flag.ExitOnError)
-	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
-	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
-	fs.Usage = s.subUsage(fs, "signup email_address")
-	err := fs.Parse(args)
+func (s *State) link(args ...string) {
+	const help = `
+Link creates an Upspin link. The link is created at the first path
+argument and points to the second path argument.
+`
+	fs := flag.NewFlagSet("link", flag.ExitOnError)
+	// This is the same order as in the Unix ln command. It sorta feels
+	// backwards, but it's also the same as in cp, with the new name second.
+	s.parseFlags(fs, args, help, "link original_path link_path")
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+
+	originalPath := s.globUpspin(fs.Arg(0))
+	linkPath := s.globUpspin(fs.Arg(1))
+	if len(originalPath) != 1 || len(linkPath) != 1 {
+		fs.Usage()
+	}
+
+	_, err := s.client.PutLink(originalPath[0], linkPath[0])
 	if err != nil {
 		s.exit(err)
 	}
+}
+
+func (s *State) ls(args ...string) {
+	const help = `
+Ls, analogous to its Unix namesake, lists the names and, if requested,
+other properties of Upspin files and directories. By default it
+does not follow links; use the -L flag to learn about the targets
+of links.
+`
+	fs := flag.NewFlagSet("ls", flag.ExitOnError)
+	longFormat := fs.Bool("l", false, "long format")
+	followLinks := fs.Bool("L", false, "follow links")
+	recur := fs.Bool("R", false, "recur into subdirectories")
+	s.parseFlags(fs, args, help, "ls [-l] [path...]")
+
+	done := map[upspin.PathName]bool{}
+	if fs.NArg() == 0 {
+		userRoot := upspin.PathName(s.context.UserName())
+		s.list(userRoot, done, *longFormat, *followLinks, *recur)
+		return
+	}
+	// The done map marks a directory we have listed, so we don't recur endlessly
+	// when given a chain of links with -L.
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		s.list(name, done, *longFormat, *followLinks, *recur)
+	}
+}
+
+func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
+	done[name] = true
+	entry, err := s.client.Lookup(name, followLinks)
+	if err != nil {
+		s.exit(err)
+	}
+
+	var dirContents []*upspin.DirEntry
+	if entry.IsDir() {
+		dirContents, err = s.client.Glob(string(entry.Name) + "/*")
+		if err != nil {
+			s.exit(err)
+		}
+	} else {
+		dirContents = []*upspin.DirEntry{entry}
+	}
+
+	if longFormat {
+		printLongDirEntries(dirContents)
+	} else {
+		printShortDirEntries(dirContents)
+	}
+
+	if !recur {
+		return
+	}
+	for _, entry := range dirContents {
+		if entry.IsDir() && !done[entry.Name] {
+			fmt.Printf("\n%s:\n", entry.Name)
+			s.list(entry.Name, done, longFormat, followLinks, recur)
+		}
+	}
+}
+
+func (s *State) mkdir(args ...string) {
+	const help = `
+Mkdir, analogous to its Unix namesake, creates Upspin directories.
+`
+	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "mkdir directory...")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		_, err := s.client.MakeDirectory(name)
+		if err != nil {
+			s.exit(err)
+		}
+	}
+}
+
+func (s *State) put(args ...string) {
+	const help = `
+Put writes its input to the store server and installs a directory
+entry with the given path name to refer to the data.
+
+TODO: Delete when cp appears?
+`
+	fs := flag.NewFlagSet("put", flag.ExitOnError)
+	inFile := fs.String("in", "", "input file (default standard input)")
+	s.parseFlags(fs, args, help, "put [-in=inputfile] path")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+
+	name := s.globUpspin(fs.Arg(0))
+	if len(name) != 1 {
+		fs.Usage()
+	}
+
+	data := s.readAll(*inFile)
+	_, err := s.client.Put(name[0], data)
+	if err != nil {
+		s.exit(err)
+	}
+}
+
+func (s *State) rotate(args ...string) {
+	const help = `
+Rotate pushes an updated key to the key server.
+
+To update an Upspin key, the sequence is:
+
+  upspin keygen            # Create new key.
+  upspin countersign       # Update file signatures to use new key.
+  upspin rotate            # Save new key to key server.
+  upspin share -r -fix me@example.com/  # Update keys in file metadata. 
+
+Keygen creates a new key and saves the old one. Countersign walks
+the file tree and adds signatures with the new key alongside those
+for the old. Rotate pushes the new key to the KeyServer. Share walks
+the file tree, re-wrapping the encryption keys that were encrypted
+with the old key to use the new key.
+
+Some of these steps could be folded together but the full sequence
+makes it easier to recover if a step fails.
+
+TODO: Rotate and countersign are terms of art, not clear to users.
+`
+	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "rotate")
+	if fs.NArg() != 0 {
+		fs.Usage()
+	}
+
+	f := s.context.Factotum() // save latest factotum
+	lastCtx := s.context
+	s.context = context.SetFactotum(s.context, f.Pop()) // context now defaults to old key
+	defer func() { s.context = lastCtx }()
+
+	keyServer := s.KeyServer()
+	u, err := keyServer.Lookup(s.context.UserName())
+	if err != nil {
+		s.exit(err)
+	}
+	u.PublicKey = f.PublicKey()
+	err = keyServer.Put(u)
+	if err != nil {
+		s.exit(err)
+	}
+}
+
+func (s *State) rm(args ...string) {
+	const help = `
+Rm, analogous to its Unix namesake, removes Upspin files and
+directories.
+`
+	fs := flag.NewFlagSet("rm", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "rm path...")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		err := s.client.Delete(name)
+		if err != nil {
+			s.exit(err)
+		}
+	}
+}
+
+func (s *State) signup(args ...string) {
+	const help = `
+Signup registers new users with Upspin. It creates a private/public
+key pair, stores the private key locally, and prepares to store the
+private key with the public upspin key server. It writes an intial
+"rc" file into $HOME/upspin/rc, holding the username and the location
+of the key server.
+
+As the final step, it writes the contents of a mail message to
+standard output. This message contains the public key to be registered
+with the key server. After running signup, the new user must mail
+this message to signup@key.upspin.io to complete the signup process.
+
+Once this is done, the user should update the rc file to hold the
+network addresses of the directory and store servers to use; the
+local adminstrator can provide this information.
+
+TODO: The last step should be done automatically. Perhaps signup
+should take those two addresses as arguments.
+`
+	fs := flag.NewFlagSet("signup", flag.ExitOnError)
+	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
+	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
+	s.parseFlags(fs, args, help, "signup email_address")
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
@@ -348,187 +583,24 @@ Signature:
 	fmt.Printf("To complete your registration, send email to signup@key.upspin.io with the following contents:\n%s\n", msg)
 }
 
-func (s *State) link(args ...string) {
-	fs := flag.NewFlagSet("link", flag.ExitOnError)
-	// This is the same order as in the Unix ln command. It sorta feels
-	// backwards, but it's also the same as in cp, with the new name second.
-	fs.Usage = s.subUsage(fs, "link original_path link_path")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() != 2 {
-		fs.Usage()
-	}
-
-	originalPath := s.globUpspin(fs.Arg(0))
-	linkPath := s.globUpspin(fs.Arg(1))
-	if len(originalPath) != 1 || len(linkPath) != 1 {
-		fs.Usage()
-	}
-
-	_, err = s.client.PutLink(originalPath[0], linkPath[0])
-	if err != nil {
-		s.exit(err)
-	}
-}
-
-func (s *State) ls(args ...string) {
-	fs := flag.NewFlagSet("ls", flag.ExitOnError)
-	longFormat := fs.Bool("l", false, "long format")
-	followLinks := fs.Bool("L", false, "follow links")
-	recur := fs.Bool("R", false, "recur into subdirectories")
-	fs.Usage = s.subUsage(fs, "ls [-l] [path...]")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	done := map[upspin.PathName]bool{}
-	if fs.NArg() == 0 {
-		userRoot := upspin.PathName(s.context.UserName())
-		s.list(userRoot, done, *longFormat, *followLinks, *recur)
-		return
-	}
-	// The done map marks a directory we have listed, so we don't recur endlessly
-	// when given a chain of links with -L.
-	for _, name := range s.globAllUpspin(fs.Args()) {
-		s.list(name, done, *longFormat, *followLinks, *recur)
-	}
-}
-
-func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
-	done[name] = true
-	entry, err := s.client.Lookup(name, followLinks)
-	if err != nil {
-		s.exit(err)
-	}
-
-	var dirContents []*upspin.DirEntry
-	if entry.IsDir() {
-		dirContents, err = s.client.Glob(string(entry.Name) + "/*")
-		if err != nil {
-			s.exit(err)
-		}
-	} else {
-		dirContents = []*upspin.DirEntry{entry}
-	}
-
-	if longFormat {
-		printLongDirEntries(dirContents)
-	} else {
-		printShortDirEntries(dirContents)
-	}
-
-	if !recur {
-		return
-	}
-	for _, entry := range dirContents {
-		if entry.IsDir() && !done[entry.Name] {
-			fmt.Printf("\n%s:\n", entry.Name)
-			s.list(entry.Name, done, longFormat, followLinks, recur)
-		}
-	}
-}
-
-func (s *State) mkdir(args ...string) {
-	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "mkdir directory...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
-		_, err := s.client.MakeDirectory(name)
-		if err != nil {
-			s.exit(err)
-		}
-	}
-}
-
-func (s *State) put(args ...string) {
-	fs := flag.NewFlagSet("put", flag.ExitOnError)
-	inFile := fs.String("in", "", "input file (default standard input)")
-	fs.Usage = s.subUsage(fs, "put [-in=inputfile] path")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() != 1 {
-		fs.Usage()
-	}
-
-	name := s.globUpspin(fs.Arg(0))
-	if len(name) != 1 {
-		fs.Usage()
-	}
-
-	data := s.readAll(*inFile)
-	_, err = s.client.Put(name[0], data)
-	if err != nil {
-		s.exit(err)
-	}
-}
-
-func (s *State) rotate(args ...string) {
-	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "rotate")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() != 0 {
-		fs.Usage()
-	}
-
-	f := s.context.Factotum() // save latest factotum
-	lastCtx := s.context
-	s.context = context.SetFactotum(s.context, f.Pop()) // context now defaults to old key
-	defer func() { s.context = lastCtx }()
-
-	keyServer := s.KeyServer()
-	u, err := keyServer.Lookup(s.context.UserName())
-	if err != nil {
-		s.exit(err)
-	}
-	u.PublicKey = f.PublicKey()
-	err = keyServer.Put(u)
-	if err != nil {
-		s.exit(err)
-	}
-}
-
-func (s *State) rm(args ...string) {
-	fs := flag.NewFlagSet("rm", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "rm path...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
-	if fs.NArg() == 0 {
-		fs.Usage()
-	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
-		err := s.client.Delete(name)
-		if err != nil {
-			s.exit(err)
-		}
-	}
-}
-
 func (s *State) user(args ...string) {
+	const help = `
+User prints in JSON format the user record stored in the key server
+for the specified user, by default the current user.
+
+With the -put flag, user writes or replaces the information stored
+for the current user. It can be used to update keys for the user;
+for new users see the signup command. The information is read
+from standard input or from the file provided with the -in flag.
+It must be the complete record for the user, and must be in the
+same JSON format printed by the command without the -put flag.
+`
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
 	put := fs.Bool("put", false, "write new user record")
 	inFile := fs.String("in", "", "input file (default standard input)")
 	force := fs.Bool("force", false, "force writing user record even if key is empty")
 	// TODO: the username is not accepted with -put. We may need two lines to fix this (like 'man printf').
-	fs.Usage = s.subUsage(fs, "user [-put [-in=inputfile] [-force]] [username...]")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "user [-put [-in=inputfile] [-force]] [username...]")
 	keyServer := s.KeyServer()
 	if *put {
 		if fs.NArg() != 0 {
@@ -593,17 +665,24 @@ func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 }
 
 func (s *State) share(args ...string) {
+	const help = `
+Share reports the user names that have access to each of the argument
+paths, and what access rights each has. If the access rights do not
+agree with the keys stored in the directory metadata for a path,
+that is also reported. Given the -fix flag, share updates the keys
+to resolve any such inconsistency. Given both -fix and -force, it
+updates the keys regardless. The -d and -r flags apply to directories;
+-r states whether the share command should descend into subdirectories.
+
+See the description for rotate for information about updating keys.
+`
 	fs := flag.NewFlagSet("share", flag.ExitOnError)
 	fix := fs.Bool("fix", false, "repair incorrect share settings")
 	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
 	quiet := fs.Bool("q", false, "suppress output. Default is to show state for every file")
-	fs.Usage = s.subUsage(fs, "share path...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "share path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
@@ -623,12 +702,12 @@ func (s *State) share(args ...string) {
 }
 
 func (s *State) whichAccess(args ...string) {
+	const help = `
+Whichaccess reports the Upspin path of the Access file
+that controls permissions for each of the argument paths.
+`
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
-	fs.Usage = s.subUsage(fs, "whichaccess path...")
-	err := fs.Parse(args)
-	if err != nil {
-		s.exit(err)
-	}
+	s.parseFlags(fs, args, help, "whichaccess path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
