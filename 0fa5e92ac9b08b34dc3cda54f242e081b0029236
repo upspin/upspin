@@ -177,6 +177,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_7b243bc9",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-15T00:38:15Z",
+      "side": 1,
+      "message": "I had in mind PBKDR2, but SHA256 is better than nothing.  We should rotate any password whose hash shows up in the logs, and as long as we do that, sha is ok.",
+      "parentUuid": "7c64970a_b8ac19d5",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc37efd9_b5dd0a59",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 7
@@ -276,6 +294,24 @@
       "side": 1,
       "message": "Taking SG\u0027s word. This is the value-add of SG at this point. The long-term plan is to do DKIM ourselves as well as do the delivery of the message ourselves (speak SMTP vs HTTP). This is step 0. It won\u0027t remain this way forever. We\u0027ll either write out own or migrate to KT\u0027s implementation.",
       "parentUuid": "1c28fb81_f0fcbeca",
+      "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_5b113776",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-15T00:38:15Z",
+      "side": 1,
+      "message": "That\u0027s ok for now.  But let\u0027s add a comment noting that.  Otherwise it looks to reviewers like an unintentional vulnerability.",
+      "parentUuid": "7c64970a_785c4108",
       "revId": "0fa5e92ac9b08b34dc3cda54f242e081b0029236",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
