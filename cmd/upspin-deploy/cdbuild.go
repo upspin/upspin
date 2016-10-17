@@ -10,6 +10,7 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,8 +20,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/satori/go.uuid"
 
 	cstorage "cloud.google.com/go/storage"
 	"golang.org/x/net/context"
@@ -32,7 +31,7 @@ import (
 
 func cdbuild(dir, projectID, name string) error {
 	stagingBucket := projectID + "-cdbuild"
-	buildObject := fmt.Sprintf("build/%s-%s.tar.gz", name, uuid.NewV4())
+	buildObject := fmt.Sprintf("build/%s-%s.tar.gz", name, randomID())
 
 	ctx := context.Background()
 	hc, err := google.DefaultClient(ctx, storage.CloudPlatformScope)
@@ -195,4 +194,13 @@ type renamingFileInfo struct {
 
 func (fi renamingFileInfo) Name() string {
 	return fi.name
+}
+
+func randomID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	return fmt.Sprintf("%x", b)
 }
