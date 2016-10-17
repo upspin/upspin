@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5cd8b33a_dfa3bb82",
+        "filename": "cloud/docker/keyserver/Dockerfile",
+        "patchSetId": 11
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:52:29Z",
+      "side": 1,
+      "message": "can we call this mailconfig ?\nwe don\u0027t use \u0027email\u0027 anywhere else",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_5f796b39",
         "filename": "cmd/keyserver/main.go",
         "patchSetId": 11
@@ -13,6 +30,23 @@
       "writtenOn": "2016-10-17T23:51:07Z",
       "side": 1,
       "message": "Ah, great. This is much better",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_ffa07f78",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:52:29Z",
+      "side": 1,
+      "message": "mailConfigFile? mail_config?\nthis is the first appearance of \u0027email\u0027",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
