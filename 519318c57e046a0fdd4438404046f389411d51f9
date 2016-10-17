@@ -454,6 +454,24 @@
       "revId": "519318c57e046a0fdd4438404046f389411d51f9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_169e5cb5",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "yeah, there was :-)\nreading and writing to a variable at the same time is a race, always",
+      "parentUuid": "7c64970a_ec689314",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
