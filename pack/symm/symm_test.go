@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"upspin.io/context"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/pack/internal/packtest"
@@ -41,7 +42,7 @@ func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.
 	d.Packing = packer.Packing()
 	bp, err := packer.Pack(ctx, d)
 	if err != nil {
-		t.Fatal("packBlob(%s):", d.Name, err)
+		t.Fatal("packBlob:", d.Name, err)
 	}
 	cipher, err := bp.Pack(text)
 	if err != nil {
@@ -87,6 +88,25 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
 	}
+}
+
+func TestBadkeyPack(t *testing.T) {
+	const (
+		user upspin.UserName = "carla@upspin.io"
+		name                 = upspin.PathName(user + "/file/of/carla")
+	)
+	ctx, packer := setup(user)
+	d := &upspin.DirEntry{
+		Name:       name,
+		SignedName: name,
+		Writer:     ctx.UserName(),
+	}
+	d.Packing = packer.Packing()
+	_, err := packer.Pack(ctx, d)
+	if errors.Match(errors.E(errors.NotExist), err) {
+		return // User carla has no symmsecret.upspinkey, so this err is expected.
+	}
+	t.Error("BadkeyPack:", err)
 }
 
 func TestPack(t *testing.T) {
