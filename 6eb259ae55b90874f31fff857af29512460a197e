@@ -16,6 +16,63 @@
       "revId": "6eb259ae55b90874f31fff857af29512460a197e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_d6b18495",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T05:34:56Z",
+      "side": 1,
+      "message": "s/~/$HOME/",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_16565c26",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T05:34:56Z",
+      "side": 1,
+      "message": "what about the default of showing your own root? line 338",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_76535036",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T05:34:56Z",
+      "side": 1,
+      "message": "is this worth mentioning?\npeople who know the commands will immediately see the resemblance\nthose who don\u0027t won\u0027t care",
+      "range": {
+        "startLine": 385,
+        "startChar": 7,
+        "endLine": 385,
+        "endChar": 37
+      },
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
