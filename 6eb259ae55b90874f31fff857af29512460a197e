@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c64970a_212454df",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-17T00:40:15Z",
+      "side": 1,
+      "message": "Or rename to \u0027cat\u0027 and call cp on stdout?",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
