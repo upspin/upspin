@@ -47,7 +47,7 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), trace.CloudPlatformScope)
 	if err != nil {
-		log.Fatalf("Unable to get default client: %v", err)
+		log.Fatalf("metric: unable to get default client: %v", err)
 	}
 
 	srv, err := trace.New(client)
@@ -84,7 +84,7 @@ func (g *gcpSaver) saverLoop() {
 
 // save serializes the metric in a GCP-friendly way and saves it to the
 // specific GCP backend configured when the Saver was created.
-func (g *gcpSaver) save(m *Metric) error {
+func (g *gcpSaver) save(m *Metric) {
 	traceSpans := make([]*trace.TraceSpan, len(m.spans))
 	for i, s := range m.spans {
 		var annotation map[string]string
@@ -117,8 +117,10 @@ func (g *gcpSaver) save(m *Metric) error {
 		},
 	}
 	err := g.api.Save(traces)
+	if err != nil {
+		log.Error.Printf("metric: error saving to GCP: %v", err)
+	}
 	atomic.AddInt32(&g.processed, 1)
-	return err
 }
 
 func toKindString(k Kind) string {
@@ -204,7 +206,6 @@ var _ traceSaver = (*traceSaverImpl)(nil)
 
 // Save implement SaveTraces.
 func (s *traceSaverImpl) Save(traces *trace.Traces) error {
-	e, err := s.api.PatchTraces(s.projectID, traces).Do()
-	log.Debug.Printf("Saving Metrics to GCP: %v %v", e, err)
+	_, err := s.api.PatchTraces(s.projectID, traces).Do()
 	return err
 }
