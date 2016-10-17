@@ -128,6 +128,7 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		// lines[3] "2694...192"  public Y
 		// lines[4] "8220...5934" private D
 		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4])
+		lines = lines[5:]
 		if err != nil {
 			return f, errors.E(op, err)
 		}
@@ -136,11 +137,10 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		log.Debug.Printf("%s: %x (older)", op, h)
 		_, ok := f.keys[h]
 		if ok { // Duplicate.
-			continue // TODO Should we warn?
+			continue
 		}
 		f.keys[h] = *pfk
 		f.previous = h
-		lines = lines[5:]
 	}
 	return f, nil
 }
