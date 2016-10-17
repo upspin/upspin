@@ -16,12 +16,16 @@ import (
 	"strings"
 	"time"
 
+	// We deliberately use native Go logs for this command-line tool
+	// as there is no need to report errors to GCP.
+	// Our dependencies will still use the Upspin logs
+	"log"
+
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/context"
 	"upspin.io/factotum"
 	"upspin.io/flags"
-	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -41,6 +45,7 @@ import (
 
 var commands = map[string]func(*State, ...string){
 	"countersign": (*State).countersign,
+	"cp":          (*State).cp,
 	"get":         (*State).get,
 	"info":        (*State).info,
 	"keygen":      (*State).keygen,
@@ -68,6 +73,8 @@ type State struct {
 }
 
 func main() {
+	log.SetFlags(0)
+	log.SetPrefix("upspin: ")
 	flag.Usage = usage
 	flags.Parse() // enable all flags
 
@@ -129,6 +136,17 @@ func (s *State) exitf(format string, args ...interface{}) {
 // exit calls s.exitf with the error.
 func (s *State) exit(err error) {
 	s.exitf("%s", err)
+}
+
+// failf logs the error and sets the exit code. It does not exit the program.
+func (s *State) failf(format string, args ...interface{}) {
+	log.Printf(format, args...)
+	s.exitCode = 1
+}
+
+// fail calls s.failf with the error.
+func (s *State) fail(err error) {
+	s.failf("%v", err)
 }
 
 func (s *State) parseFlags(fs *flag.FlagSet, args []string, help, usage string) {
@@ -216,6 +234,33 @@ TODO: Delete when cp appears?
 	}
 }
 
+func (s *State) cp(args ...string) {
+	const help = `
+Cp copies files into, out of, and within Upspin. If the final
+argument is a directory, the files are placed inside it.  The other
+arguments must not be directories.
+
+If the final argument is not a directory, cp requires exactly two
+path names and copies the contents of the first to the second.
+
+The command starts several copies at once to overlap I/O for
+efficiency. The -n flag controls the parallelism.
+
+TODO: Allow recursive descent of a directory.
+`
+	fs := flag.NewFlagSet("cp", flag.ExitOnError)
+	n := fs.Int("n", 4, "number of parallel copies to perform; must be > 0")
+	verbose := fs.Bool("v", false, "log each file as it is copied")
+	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
+	if fs.NArg() < 2 || *n <= 0 {
+		fs.Usage()
+	}
+
+	nSrc := fs.NArg() - 1
+	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
+	s.copyCommand(fs, *n, *verbose, src, dest)
+}
+
 func (s *State) info(args ...string) {
 	const help = `
 Info prints to standard output a thorough description of all the
@@ -224,9 +269,6 @@ ls but also storage references, sizes, and other metadata.
 `
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
 	s.parseFlags(fs, args, help, "info path...")
-	if fs.NArg() != 0 {
-		fs.Usage()
-	}
 
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -268,7 +310,7 @@ See the description for rotate for information about updating keys.
 	case "p521":
 		// ok
 	default:
-		log.Error.Printf("no such curve %q", *curveName)
+		log.Printf("no such curve %q", *curveName)
 		fs.Usage()
 	}
 
@@ -890,7 +932,7 @@ func (s *State) maybeEnableMetrics() {
 	if s.metricsSaver, err = metric.NewGCPSaver(gcloudProject, "app", "cmd/upspin"); err == nil {
 		metric.RegisterSaver(s.metricsSaver)
 	} else {
-		log.Error.Printf("saving metrics: %q", err)
+		log.Printf("saving metrics: %q", err)
 	}
 }
 
