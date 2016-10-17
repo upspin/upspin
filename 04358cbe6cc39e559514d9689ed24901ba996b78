@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cf0fb9e_33433088",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T22:53:57Z",
+      "side": 1,
+      "message": "I\u0027m not blocked, I just wiped the old keys. But thanks.\n\nRegardless, please add\n\nFixes #84\n\nwhich will cause the issue to close automatically once this has landed.",
+      "revId": "04358cbe6cc39e559514d9689ed24901ba996b78",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
