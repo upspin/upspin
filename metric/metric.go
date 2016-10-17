@@ -126,7 +126,7 @@ func (m *Metric) Done() {
 		atomic.AddInt32(&processed, 1)
 	default:
 		// Warn if channel is full.
-		log.Error.Printf("Metric channel is full. Dropping metric %q.", m.name)
+		log.Error.Printf("metric: channel is full. Dropping metric %q.", m.name)
 	}
 }
 
@@ -141,7 +141,7 @@ func (s *Span) End() *Metric {
 // It may return nil if the parent Metric of s is Done.
 func (s *Span) StartSpan(name string) *Span {
 	if s.metric == nil {
-		log.Error.Printf("Parent metric of span %q is nil", s.name)
+		log.Error.Printf("metric: parent metric of span %q is nil", s.name)
 		return nil
 	}
 	subSpan := s.metric.StartSpan(name)
