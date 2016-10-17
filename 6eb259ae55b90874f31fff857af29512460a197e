@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_8199a0c9",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T06:14:25Z",
+      "side": 1,
+      "message": "well, we have put. delete both or keep both.",
+      "parentUuid": "7c64970a_212454df",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c1e3a18_d6b18495",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-17T05:34:56Z",
       "side": 1,
       "message": "s/~/$HOME/",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_218e947e",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T06:14:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c1e3a18_d6b18495",
       "revId": "6eb259ae55b90874f31fff857af29512460a197e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,42 @@
     },
     {
       "key": {
+        "uuid": "7c64970a_e1873c5d",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T06:14:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c1e3a18_16565c26",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_419388a5",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T06:14:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c1e3a18_16565c26",
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c1e3a18_76535036",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 2
@@ -70,6 +142,24 @@
         "endLine": 385,
         "endChar": 37
       },
+      "revId": "6eb259ae55b90874f31fff857af29512460a197e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c64970a_01859054",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-17T06:14:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c1e3a18_76535036",
       "revId": "6eb259ae55b90874f31fff857af29512460a197e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
