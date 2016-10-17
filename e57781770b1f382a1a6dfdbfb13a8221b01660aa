@@ -1,0 +1,180 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cd8b33a_5f796b39",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "Ah, great. This is much better",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_7f7e2f24",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "not sure why you flipped these around, but ok",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_ff895f08",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "mailhandler:",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_1f960329",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "errors.E(\"mailHandler\", err)",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_3f9bc751",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "looks like a typo to me; should be ServeHTTP",
+      "range": {
+        "startLine": 63,
+        "startChar": 21,
+        "endLine": 63,
+        "endChar": 23
+      },
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_5f908b29",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_9fa93369",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "this could probably benefit from being split in two\n\nbody :\u003d fmt.Sprintf(...)\nm.sendMail(to, \"...\", body)",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_7f954f18",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "we probably shouldn\u0027t be sending err.Error to the user directly, for security reasons.\nadd a TODO for that specifically? (I know you already have the TODO about sending better message bodies)",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_9f8213e5",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_bf7fd71b",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T23:51:07Z",
+      "side": 1,
+      "message": "s/\u003d/:\u003d/",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
