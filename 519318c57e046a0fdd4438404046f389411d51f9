@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c1e3a18_36f55847",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "rather than making this a global, i\u0027d prefer that function main calls a function to initialize the email stuff, passing in the KeyServer as an argument",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_76efd076",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "put this const in the function call, directly before the mail.Send call",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_96e54c9e",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "put this declaration alongside the lock, by the function that uses it",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_16f2dc5e",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "create a type\n\ntype mailHandler struct {\n}\n\nthat contains the upspin.KeyServer and the mail.Mail (and then you can call the field \u0027mail\u0027)\n\nand create a constructor function that is invoked from the main package.\n\nthen this function (mailHandler) can be the method ServeHTTP on mailHandler, so that mailHandler implements http.Handler",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_b68968de",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "http.Error(w, \"authentication failed\", http.StatusForbidden)",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_56ec5480",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "these log messages are not very helpful. they don\u0027t say who is making the request, for example. include r.RemoteAddr ?\nwe\u0027ll need to do something a little more clever when we\u0027re behind a load balancer (as we are in production), but add a todo for that",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_968eece1",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "what does this comment mean?",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_f693e007",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "http.Error(w, \"authentication failed\", http.StatusForbidden)",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_d6986425",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "delete; this is implicit in all go http handlers",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_367ef8b2",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "that\u0027s way bigger than we will ever need.\nthe purpose of that argument is to prevent abuse.\nif we happily slurp in 1mb chunks, that\u0027s a DoS vector\n64kb should be more than enough.",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_167bfcc2",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "i think the subject line for all these error mails should be \"Sign-up error\"\n\nand the body should contain the additional context (that you provide in the other subject lines below). you can write a quick helper function to do this",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_768870d2",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "well, only if they\u0027re able to send a signed email from that account, in which case they have a right to know that the account exists already",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_d6dfc4c9",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-17T01:53:42Z",
+      "side": 1,
+      "message": "there\u0027s a race here. you could just call initEmail to fix that.\n\nbut you don\u0027t need to do this lazily. just put it in the constructor for the new mailHandler type",
+      "revId": "519318c57e046a0fdd4438404046f389411d51f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
