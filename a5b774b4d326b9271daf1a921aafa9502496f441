@@ -16,6 +16,23 @@
       "revId": "a5b774b4d326b9271daf1a921aafa9502496f441",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_1f7523f0",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-18T22:22:24Z",
+      "side": 1,
+      "message": "I think you should only do the alternate check if os.IsNotExist(err) is true, other errors shouldn\u0027t be masked by this behavior. otherwise a failure to open a file named with a relative path will be masked by a not exist error of opening the file in $HOME/upspin",
+      "revId": "a5b774b4d326b9271daf1a921aafa9502496f441",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
