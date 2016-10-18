@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_a2e8643a",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-18T17:01:19Z",
+      "side": 1,
+      "message": "not sure what you meant about verbose, and here flagSet is only used to call Usage. i\u0027ll document that.",
+      "parentUuid": "1cf0fb9e_a265043b",
+      "revId": "86825d131551441111e8d709504d96436a3f17f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1cf0fb9e_a23a24fa",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_821ba896",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-18T17:01:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1cf0fb9e_a23a24fa",
+      "revId": "86825d131551441111e8d709504d96436a3f17f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1cf0fb9e_0261781b",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-18T16:58:12Z",
       "side": 1,
       "message": "s/ot/to/",
+      "revId": "86825d131551441111e8d709504d96436a3f17f5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_22163470",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-18T17:01:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1cf0fb9e_0261781b",
       "revId": "86825d131551441111e8d709504d96436a3f17f5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
