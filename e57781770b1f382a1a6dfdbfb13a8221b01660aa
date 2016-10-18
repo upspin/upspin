@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_e1b70eb8",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_5f796b39",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_ffa07f78",
         "filename": "cmd/keyserver/main.go",
         "patchSetId": 11
@@ -47,6 +65,24 @@
       "writtenOn": "2016-10-17T23:52:29Z",
       "side": 1,
       "message": "mailConfigFile? mail_config?\nthis is the first appearance of \u0027email\u0027",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_41e422ca",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_ffa07f78",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_61e31ec0",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "I was putting it back after it was made global.\nReversed.",
+      "parentUuid": "5cd8b33a_7f7e2f24",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_ff895f08",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 11
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_e1ceee3f",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_ff895f08",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_1f960329",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 11
@@ -98,6 +170,24 @@
       "writtenOn": "2016-10-17T23:51:07Z",
       "side": 1,
       "message": "errors.E(\"mailHandler\", err)",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_611afee3",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done (but this is not public).",
+      "parentUuid": "5cd8b33a_1f960329",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -127,6 +217,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_41f26281",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Ah, I was registering it with http.HandlerFunc. I can register it with http.Handler instead.\nDone.",
+      "parentUuid": "5cd8b33a_3f9bc751",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_5f908b29",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 11
@@ -138,6 +246,24 @@
       "writtenOn": "2016-10-17T23:51:07Z",
       "side": 1,
       "message": "delete",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_21f75671",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_5f908b29",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -161,6 +287,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_81ec4aa2",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_9fa93369",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_7f954f18",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 11
@@ -172,6 +316,24 @@
       "writtenOn": "2016-10-17T23:51:07Z",
       "side": 1,
       "message": "we probably shouldn\u0027t be sending err.Error to the user directly, for security reasons.\nadd a TODO for that specifically? (I know you already have the TODO about sending better message bodies)",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_01005a62",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_7f954f18",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -195,6 +357,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_e1fc2e50",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_9f8213e5",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_bf7fd71b",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 11
@@ -206,6 +386,41 @@
       "writtenOn": "2016-10-17T23:51:07Z",
       "side": 1,
       "message": "s/\u003d/:\u003d/",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_4159c2a7",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_bf7fd71b",
+      "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_215e3691",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T01:19:21Z",
+      "side": 1,
+      "message": "Fixed.",
       "revId": "e57781770b1f382a1a6dfdbfb13a8221b01660aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
