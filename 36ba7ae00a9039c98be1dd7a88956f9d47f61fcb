@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cf0fb9e_a1534652",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-18T01:36:57Z",
+      "side": 1,
+      "message": "Perhaps a comment here?  I don\u0027t understand why this \"end cp\" log line when there is a similar one from doCopy.",
+      "revId": "36ba7ae00a9039c98be1dd7a88956f9d47f61fcb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
