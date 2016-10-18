@@ -30,82 +30,89 @@ func (c *copyState) logf(format string, args ...interface{}) {
 	}
 }
 
+// A cpFile is a glob-expanded file name and an indication of whether
+// it resides on Upspin.
+type cpFile struct {
+	path     string
+	isUpspin bool
+}
+
 func (s *State) copyCommand(flagSet *flag.FlagSet, numWorkers int, verbose bool, src []string, dst string) {
 	// TODO: Check for nugatory copies.
-	// TODO: Globbing on all paths.
 	cs := &copyState{
 		state:      s,
 		flagSet:    flagSet,
 		numWorkers: numWorkers,
 		verbose:    verbose,
 	}
-	if s.isDir(dst) {
-		s.copyToDir(cs, src, dst)
+	// Glob the paths.
+	var files []cpFile
+	for _, file := range src {
+		files = append(files, cs.glob(file)...)
+	}
+	files = append(files, cs.glob(dst)...)
+	srcFiles, dstFile := files[:len(files)-1], files[len(files)-1] // We are guaranteed at least two entries in files.
+	if s.isDir(dstFile) {
+		s.copyToDir(cs, srcFiles, dstFile)
 		return
 	}
 	if len(src) != 1 {
-		s.failf("copying multiple files but %s is not a directory", dst)
+		s.failf("copying multiple files but %s is not a directory", dstFile.path)
 		cs.flagSet.Usage()
 	}
-	s.copyToFile(cs, src[0], dst)
+	s.copyToFile(cs, srcFiles[0], dstFile)
+}
+
+// isDir reports whether the file is a directory either in Upspin
+// or in the local file system.
+func (s *State) isDir(cf cpFile) bool {
+	if cf.isUpspin {
+		entry, err := s.client.Lookup(upspin.PathName(cf.path), true)
+		// Report the error here if it's anything odd, because otherwise
+		// we'll report "not a directory" misleadingly.
+		if err != nil && !errors.Match(notExist, err) {
+			log.Printf("%q: %v", cf.path, err)
+		}
+		return err == nil && entry.IsDir()
+	}
+	// Not an Upspin name. Is it a local directory?
+	info, err := os.Stat(cf.path)
+	return err == nil && info.IsDir()
 }
 
 var notExist = errors.E(errors.NotExist)
 
-// isDir reports whether the named item is a directory either in Upspin
-// or in the local file system.
-func (s *State) isDir(dir string) bool {
-	// First we see if it's an Upspin name.
-	_, err := path.Parse(upspin.PathName(dir))
-	if err == nil {
-		// It's a legal Upspin name. Is it a directory?
-		entry, err := s.client.Lookup(upspin.PathName(dir), true)
-		// Report the error here if it's anything odd, because otherwise
-		// we'll report "not a directory" misleadingly.
-		if err != nil && !errors.Match(notExist, err) {
-			log.Printf("%q: %v", dir, err)
-		}
-		return err == nil && entry.IsDir()
-	}
-	// Not a legal Upspin name. Is it a local directory?
-	info, err := os.Stat(dir)
-	return err == nil && info.IsDir()
-}
-
 // open opens the file regardless of its location.
-func (s *State) open(file string) (io.ReadCloser, error) {
+func (s *State) open(file cpFile) (io.ReadCloser, error) {
 	if s.isDir(file) {
-		return nil, errors.E(upspin.PathName(file), errors.IsDir)
+		return nil, errors.E(upspin.PathName(file.path), errors.IsDir)
 	}
-	parsed, err := path.Parse(upspin.PathName(file))
-	if err == nil {
-		return s.client.Open(parsed.Path())
+	if file.isUpspin {
+		return s.client.Open(upspin.PathName(file.path))
 	}
-	return os.Open(file)
+	return os.Open(file.path)
 }
 
 // create creates the file regardless of its location.
-func (s *State) create(file string) (io.WriteCloser, error) {
-	parsed, err := path.Parse(upspin.PathName(file))
-	if err == nil {
-		fd, err := s.client.Create(parsed.Path())
+func (s *State) create(file cpFile) (io.WriteCloser, error) {
+	if file.isUpspin {
+		fd, err := s.client.Create(upspin.PathName(file.path))
 		return fd, err
 	}
-	fd, err := os.Create(file)
+	fd, err := os.Create(file.path)
 	return fd, err
 }
 
 // createInDir create file 'base' in directory 'dir' regardless of the
 // directory's location.
-func (s *State) createInDir(dir, base string) (string, io.WriteCloser, error) {
-	parsed, err := path.Parse(upspin.PathName(dir))
-	if err == nil {
-		to := path.Join(parsed.Path(), base)
+func (s *State) createInDir(dir cpFile, base string) (string, io.WriteCloser, error) {
+	if dir.isUpspin {
+		to := path.Join(upspin.PathName(dir.path), base)
 		fd, err := s.client.Create(to)
 		return string(to), fd, err
 	}
-	to := filepath.Join(dir, base)
-	fd, err := os.Create(filepath.Join(dir, base))
+	to := filepath.Join(dir.path, base)
+	fd, err := os.Create(to)
 	return to, fd, err
 }
 
@@ -118,7 +125,7 @@ type copyWork struct {
 }
 
 // copyToDir copies, in parallel, the source files to the destination directory.
-func (s *State) copyToDir(cs *copyState, src []string, dir string) {
+func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 	work := make(chan copyWork) // No need for buffering.
 	var wait sync.WaitGroup
 
@@ -131,7 +138,7 @@ func (s *State) copyToDir(cs *copyState, src []string, dir string) {
 				s.exitCode = 1
 				continue
 			}
-			to, writer, err := s.createInDir(dir, filepath.Base(from))
+			to, writer, err := s.createInDir(dir, filepath.Base(from.path))
 			if err != nil {
 				s.fail(err)
 				s.exitCode = 1
@@ -139,7 +146,7 @@ func (s *State) copyToDir(cs *copyState, src []string, dir string) {
 				continue
 			}
 			work <- copyWork{
-				src:    from,
+				src:    from.path,
 				reader: reader,
 				dst:    to,
 				writer: writer,
@@ -158,7 +165,7 @@ func (s *State) copyToDir(cs *copyState, src []string, dir string) {
 }
 
 // copyToFile copies the source to the destination.
-func (s *State) copyToFile(cs *copyState, src, dst string) {
+func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
 	reader, err := s.open(src)
 	if err != nil {
 		s.fail(err)
@@ -173,9 +180,9 @@ func (s *State) copyToFile(cs *copyState, src, dst string) {
 		return
 	}
 	copy := copyWork{
-		src:    src,
+		src:    src.path,
 		reader: reader,
-		dst:    dst,
+		dst:    dst.path,
 		writer: writer,
 	}
 	cs.doCopy(copy)
@@ -198,4 +205,28 @@ func (cs *copyState) doCopy(copy copyWork) {
 		cs.state.fail(err)
 		return
 	}
+}
+
+// glob glob-expands the argument, which could be a local file
+// name or an Upspin path name.
+func (cs *copyState) glob(pattern string) (files []cpFile) {
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err == nil {
+		// It's an Upspin path.
+		for _, path := range cs.state.globUpspin(parsed.String()) {
+			files = append(files, cpFile{
+				path:     string(path),
+				isUpspin: true,
+			})
+		}
+		return files
+	}
+	// It's a local path.
+	for _, path := range cs.state.globLocal(pattern) {
+		files = append(files, cpFile{
+			path:     path,
+			isUpspin: false,
+		})
+	}
+	return files
 }
