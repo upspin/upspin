@@ -103,6 +103,46 @@ foo
 	}
 }
 
+func TestParseBody_HTMLAndEmptyLines(t *testing.T) {
+	const funky = `
+   I *am* bla@bleh.com   *
+   	*My public key is *
+   	p256*
+   	          999*9*9
+   102345***
+     Signature:
+1234*:*1432*5*324
+
+
+	`
+
+	userName, pubKey, sig, err := ParseBody(funky)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := userName, upspin.UserName("foo@bar.com"); got != want {
+		t.Errorf("userName = %q, want = %q", got, want)
+	}
+	if got, want := pubKey, upspin.PublicKey("p256\n1063349993423423435345345345345345340\n3453453457828271720003453453245354698\n"); got != want {
+		t.Errorf("pubKey = %q, want = %q", got, want)
+	}
+	var rs, ss big.Int
+	if _, ok := rs.SetString("122323423", 10); !ok {
+		t.Fatal("cannot parse R signature")
+	}
+	if _, ok := ss.SetString("199993211232983", 10); !ok {
+		t.Fatal("cannot parse S signature")
+	}
+	expectedSig := upspin.Signature{
+		R: &rs,
+		S: &ss,
+	}
+	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
+		t.Errorf("sig = %v, want = %v", got, want)
+	}
+
+}
+
 func newRequest(t *testing.T, data string) *http.Request {
 	req, err := http.NewRequest("POST", "some.url/incoming", bytes.NewReader([]byte(data)))
 	if err != nil {
