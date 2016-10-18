@@ -58,6 +58,7 @@ import (
 //   https://pantheon.corp.google.com/apis/api/monitoring.googleapis.com/overview
 // - Authenticate using the gcloud tool:
 //   $ gcloud auth login
+//   $ gcloud auth application-default login
 
 var (
 	project = flag.String("project", "", "Google Cloud Project `ID`")
@@ -545,12 +546,16 @@ func (c *Config) buildBinary(dir, server string) error {
 
 func (c *Config) buildEnv() (env []string) {
 	for _, s := range os.Environ() {
-		if strings.HasPrefix(s, "GOOS=") || strings.HasPrefix(s, "GOARCH=") {
-			continue
+		switch {
+		case strings.HasPrefix(s, "GOOS="),
+			strings.HasPrefix(s, "GOARCH="),
+			strings.HasPrefix(s, "CGO_ENABLED="):
+			// Skip.
+		default:
+			env = append(env, s)
 		}
-		env = append(env, s)
 	}
-	return append(env, "GOOS=linux", "GOARCH=amd64")
+	return append(env, "GOOS=linux", "GOARCH=amd64", "CGO_ENABLED=0")
 }
 
 func (c *Config) ipAddress(server string) (string, error) {
