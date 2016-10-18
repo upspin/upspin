@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cf0fb9e_82c5689a",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T17:13:15Z",
+      "side": 1,
+      "message": "I mean this. Why is verbose extracted here and passed to copyCommand when it\u0027s part of \u0027fs\u0027 already?",
+      "revId": "e8cabee4c6b08b0cd6dfe49a2d730681bb2e8f8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
