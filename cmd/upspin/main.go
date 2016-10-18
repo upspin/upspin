@@ -969,11 +969,11 @@ func (s *State) globUpspin(pattern string) []upspin.PathName {
 	if err != nil {
 		s.exit(err)
 	}
-	var out []upspin.PathName
 	// If it has no metacharacters, leave it alone.
 	if !hasGlobChar(pattern) {
-		return append(out, upspin.PathName(pattern))
+		return []upspin.PathName{upspin.PathName(pattern)}
 	}
+	var out []upspin.PathName
 	entries, err := s.client.Glob(parsed.String())
 	if err != nil {
 		s.exit(err)
@@ -984,20 +984,8 @@ func (s *State) globUpspin(pattern string) []upspin.PathName {
 	return out
 }
 
-// globAllLocal process the arguments, which should be local file paths,
-// expanding glob patterns.
-// TODO: Unused for now.
-func (s *State) globAllLocal(args []string) []string {
-	out := make([]string, 0, len(args))
-	for _, arg := range args {
-		out = append(out, s.globLocal(arg)...)
-	}
-	return out
-}
-
 // globLocal glob-expands the argument, which should be a syntactically
 // valid glob pattern (including a plain file name).
-// TODO: Unused for now.
 func (s *State) globLocal(pattern string) []string {
 	// If it has no metacharacters, leave it alone.
 	if !hasGlobChar(pattern) {
