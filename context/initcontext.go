@@ -76,11 +76,19 @@ const (
 // that the user requested this by setting secrets=none in the configuration.
 var ErrNoFactotum = errors.Str("factotum not initialized: no secrets provided")
 
-// FromFile initializes a context using the given file.
+// FromFile initializes a context using the given file. If the file cannot
+// be opened but the name can be found in $HOME/upspin, that file is used.
 // As with InitContext, environment variables may override the
 // values in the context file.
 func FromFile(name string) (upspin.Context, error) {
 	f, err := os.Open(name)
+	if err != nil && !filepath.IsAbs(name) && os.IsNotExist(err) {
+		// It's a local name, so, try adding $HOME/upspin
+		home, errHome := Homedir()
+		if errHome == nil {
+			f, err = os.Open(filepath.Join(home, "upspin", name))
+		}
+	}
 	if err != nil {
 		return nil, errors.E("context.FromFile", err)
 	}
