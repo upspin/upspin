@@ -197,13 +197,17 @@ func (cs *copyState) worker(work chan copyWork, wait *sync.WaitGroup) {
 
 func (cs *copyState) doCopy(copy copyWork) {
 	cs.logf("start cp %s %s", copy.src, copy.dst)
-	defer cs.logf("end cp %s %s", copy.src, copy.dst)
-	defer copy.reader.Close()
-	defer copy.writer.Close()
+	defer func() {
+		cs.logf("end cp %s %s", copy.src, copy.dst)
+		copy.reader.Close()
+		err := copy.writer.Close()
+		if err != nil {
+			cs.state.fail(err)
+		}
+	}()
 	_, err := io.Copy(copy.writer, copy.reader)
 	if err != nil {
 		cs.state.fail(err)
-		return
 	}
 }
 
