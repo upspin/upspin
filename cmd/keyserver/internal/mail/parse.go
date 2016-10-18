@@ -68,8 +68,8 @@ func ParseMail(data url.Values) (from string, body string, err error) {
 		return "", "", errors.E(op, errors.Permission, errors.Str("SPF failed"))
 	}
 
-	// Get the email body, in text format.
-	// TODO: maybe parse HTML if text is empty?
+	// Get the email body, in text format (always present, even when
+	// original is in HTML).
 	body = data.Get("text")
 	if body == "" {
 		return "", "", errors.E(op, errors.Invalid, errors.Str("empty email body"))
@@ -105,37 +105,79 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 	const op = "cmd/keyserver/internal/mail.ParseBody"
 	var sig upspin.Signature
 
-	lines := strings.Split(strings.TrimSpace(data), "\n")
-	if len(lines) != 7 {
+	clean := strings.TrimSpace(data)
+	r := strings.NewReplacer("*", "", "\\r", "") // HTML markers are converted to a *.
+	clean = r.Replace(clean)
+
+	lines := strings.Split(clean, "\n")
+	if len(lines) < 7 {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("badly formatted email message"))
 	}
 	i := 0
-	next := func() string { i++; return strings.TrimSpace(lines[i-1]) }
+	var s string
+	next := func() error {
+		i++
+		if i > len(lines) {
+			return errors.E(op, errors.Invalid, errors.Str("premature end of email message"))
+		}
+		s = strings.TrimSpace(lines[i-1])
+		return nil
+	}
+	advanceTo := func(want string) error {
+		for {
+			if err := next(); err != nil {
+				return err
+			}
+			if strings.HasPrefix(s, want) {
+				return nil
+			}
+		}
+	}
 
 	const userPrefix = "I am "
-	s := next()
-	if !strings.HasPrefix(s, userPrefix) {
+	if err := advanceTo(userPrefix); err != nil {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing username"))
 	}
 	userName := upspin.UserName(s[len(userPrefix):])
 
 	const keyPreamble = "My public key is"
-	if next() != keyPreamble {
+	if err := advanceTo(keyPreamble); err != nil {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing key preamble line"))
 	}
-	pubKey := upspin.PublicKey(next() + "\n" + next() + "\n" + next() + "\n")
+
+	// Key
+	var keyStr string
+	keyLine := 0
+	for next() == nil {
+		if s == "" {
+			continue
+		}
+		keyStr += s + "\n"
+		keyLine++
+		if keyLine == 3 {
+			break
+		}
+	}
+	if keyLine != 3 {
+		return "", "", sig, errors.E(op, errors.Invalid, errors.Errorf("invalid public key format: %q", keyStr))
+	}
+	pubKey := upspin.PublicKey(keyStr)
 
 	const sigPreamble = "Signature:"
-	if next() != sigPreamble {
+	if err := advanceTo(sigPreamble); err != nil {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing signature preamble line"))
+	}
+
+	err := next()
+	if err != nil {
+		return "", "", sig, errors.E(errors.Invalid, errors.Str("missing signature"))
 	}
 
 	// TODO: parsing signature should move to package upspin. Signature
 	// should also not have pointers, but big.Ints directly.
-	sigStr := next()
-	sigFields := strings.Split(sigStr, ":")
+	sigFields := strings.Split(s, ":")
 	if len(sigFields) != 2 {
-		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature format: %q", sigStr))
+		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature format: %q", s))
 	}
 	var rs, ss big.Int
 	if _, ok := rs.SetString(sigFields[0], 10); !ok {
