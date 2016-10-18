@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5cd8b33a_1fe443c9",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-18T22:36:25Z",
+      "side": 1,
+      "message": "I learned a new word today",
+      "revId": "36ba7ae00a9039c98be1dd7a88956f9d47f61fcb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1cf0fb9e_a1534652",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 1
@@ -31,6 +48,23 @@
       "side": 1,
       "message": "dreg, deleted.",
       "parentUuid": "1cf0fb9e_a1534652",
+      "revId": "36ba7ae00a9039c98be1dd7a88956f9d47f61fcb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_7ff1cf77",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-18T22:36:25Z",
+      "side": 1,
+      "message": "need to check the error on the writer close",
       "revId": "36ba7ae00a9039c98be1dd7a88956f9d47f61fcb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
