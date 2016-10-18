@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1c1e3a18_f63760ff",
+        "filename": "cmd/upspin-deploy/deploy-prod.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-18T22:31:53Z",
+      "side": 1,
+      "message": "Why?",
+      "parentUuid": "fc76c682_15e914d4",
+      "revId": "5f1deebdd3449627e75d145c95cb2fd9305b1cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc76c682_55e38cf3",
         "filename": "cmd/upspin-deploy/deploy-test.sh",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2016-10-14T17:39:33Z",
       "side": 1,
       "message": "When deploying a new keyserver, what does this mean? Should it be always empty? If not always empty, should it be detected and an error returned (do you need a mustNotProvideFlag function?)?",
+      "revId": "5f1deebdd3449627e75d145c95cb2fd9305b1cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c1e3a18_76d6b0be",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-18T22:31:53Z",
+      "side": 1,
+      "message": "It\u0027s a bit odd, because if you\u0027re deploying just the keyserver then the flag is actually irrelevant. If you\u0027re deploying the dirserver and storeserver then you need to specify the flag if and only if you have an alternate keyserver. If you\u0027re deploying dirserver, storeserver, and keyserver together then you should specify -key\u003d\"\".\n\nThe latter two cases are \"expert level\" operations; few people will want to run their own keyservers. So I think I\u0027m okay with leaving it like this, if you are.",
+      "parentUuid": "fc76c682_15d3d458",
       "revId": "5f1deebdd3449627e75d145c95cb2fd9305b1cf2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
