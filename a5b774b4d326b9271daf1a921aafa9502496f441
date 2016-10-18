@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cf0fb9e_2ca746f7",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-18T20:21:35Z",
+      "side": 1,
+      "message": "I think I use a similar trick in upspin signup. We may be able to remove that. I\u0027ll take a look later.",
+      "revId": "a5b774b4d326b9271daf1a921aafa9502496f441",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
