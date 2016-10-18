@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_ca8ca2c4",
+        "filename": "cmd/upspin-deploy/deploy-prod.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-18T22:39:19Z",
+      "side": 1,
+      "message": "Because it\u0027s correct. $@ expands the words, but \"$@\" expands the words while preserving the word boundaries. If you run shell script foo like this:\n\n$ foo \u0027a b\u0027 c\n\n\"$@\" expands to \"a b\" c while $@ expands to a b c.\n\nIt\u0027s not always important but it\u0027s a good habit to have.",
+      "parentUuid": "1c1e3a18_f63760ff",
+      "revId": "5f1deebdd3449627e75d145c95cb2fd9305b1cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc76c682_55e38cf3",
         "filename": "cmd/upspin-deploy/deploy-test.sh",
         "patchSetId": 2
