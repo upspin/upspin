@@ -22,6 +22,7 @@ type copyState struct {
 	flagSet    *flag.FlagSet // Used only to call Usage.
 	numWorkers int
 	verbose    bool
+	recur      bool
 }
 
 func (c *copyState) logf(format string, args ...interface{}) {
@@ -37,13 +38,14 @@ type cpFile struct {
 	isUpspin bool
 }
 
-func (s *State) copyCommand(flagSet *flag.FlagSet, numWorkers int, verbose bool, src []string, dst string) {
+func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
 	// TODO: Check for nugatory copies.
 	cs := &copyState{
 		state:      s,
-		flagSet:    flagSet,
-		numWorkers: numWorkers,
-		verbose:    verbose,
+		flagSet:    fs,
+		numWorkers: intFlag(fs, "n"),
+		recur:      boolFlag(fs, "r"),
+		verbose:    boolFlag(fs, "v"),
 	}
 	// Glob the paths.
 	var files []cpFile

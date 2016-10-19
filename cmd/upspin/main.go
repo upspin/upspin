@@ -140,7 +140,8 @@ func (s *State) exit(err error) {
 
 // failf logs the error and sets the exit code. It does not exit the program.
 func (s *State) failf(format string, args ...interface{}) {
-	log.Printf(format, args...)
+	format = fmt.Sprintf("upspin: %s: %s\n", s.op, format)
+	fmt.Fprintf(os.Stderr, format, args...)
 	s.exitCode = 1
 }
 
@@ -191,15 +192,14 @@ See the description for rotate for information about updating keys.
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
-	s.countersigner = newCountersigner(s)
-	s.countersignCommand()
+	s.countersignCommand(fs)
 }
 
 func (s *State) get(args ...string) {
 	const help = `
 Get writes to standard output the contents identified by the Upspin path.
 
-TODO: Delete when cp appears?
+TODO: Delete in favor of cp?
 `
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
@@ -238,7 +238,7 @@ func (s *State) cp(args ...string) {
 	const help = `
 Cp copies files into, out of, and within Upspin. If the final
 argument is a directory, the files are placed inside it.  The other
-arguments must not be directories.
+arguments must not be directories unless the -r flag is set.
 
 If the final argument is not a directory, cp requires exactly two
 path names and copies the contents of the first to the second.
@@ -246,11 +246,12 @@ path names and copies the contents of the first to the second.
 The command starts several copies at once to overlap I/O for
 efficiency. The -n flag controls the parallelism.
 
-TODO: Allow recursive descent of a directory.
+TODO: -r is unimplemented.
 `
 	fs := flag.NewFlagSet("cp", flag.ExitOnError)
 	n := fs.Int("n", 4, "number of parallel copies to perform; must be > 0")
-	verbose := fs.Bool("v", false, "log each file as it is copied")
+	fs.Bool("v", false, "log each file as it is copied")
+	fs.Bool("r", false, "recursively copy directories")
 	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
 	if fs.NArg() < 2 || *n <= 0 {
 		fs.Usage()
@@ -258,7 +259,7 @@ TODO: Allow recursive descent of a directory.
 
 	nSrc := fs.NArg() - 1
 	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
-	s.copyCommand(fs, *n, *verbose, src, dest)
+	s.copyCommand(fs, src, dest)
 }
 
 func (s *State) info(args ...string) {
@@ -444,7 +445,7 @@ func (s *State) put(args ...string) {
 Put writes its input to the store server and installs a directory
 entry with the given path name to refer to the data.
 
-TODO: Delete when cp appears?
+TODO: Delete in favor of cp?
 `
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
@@ -722,7 +723,7 @@ See the description for rotate for information about updating keys.
 	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
-	quiet := fs.Bool("q", false, "suppress output. Default is to show state for every file")
+	fs.Bool("q", false, "suppress output. Default is to show state for every file")
 	s.parseFlags(fs, args, help, "share path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -734,12 +735,7 @@ See the description for rotate for information about updating keys.
 	if *force {
 		*fix = true
 	}
-	s.sharer.fix = *fix
-	s.sharer.force = *force
-	s.sharer.isDir = *isDir
-	s.sharer.recur = *recur
-	s.sharer.quiet = *quiet
-	s.shareCommand(s.globAllUpspin(fs.Args()))
+	s.shareCommand(fs)
 }
 
 func (s *State) whichAccess(args ...string) {
@@ -1015,4 +1011,14 @@ func restoreEnvironment(env []string) {
 		}
 		os.Setenv(kv[0], kv[1])
 	}
+}
+
+// intFlag returns the value of the named integer flag in the flag set.
+func intFlag(fs *flag.FlagSet, name string) int {
+	return fs.Lookup(name).Value.(flag.Getter).Get().(int)
+}
+
+// boolFlag returns the value of the named boolean flag in the flag set.
+func boolFlag(fs *flag.FlagSet, name string) bool {
+	return fs.Lookup(name).Value.(flag.Getter).Get().(bool)
 }

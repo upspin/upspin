@@ -10,6 +10,7 @@ package main
 // Derived from ./share.go.
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -45,7 +46,8 @@ func newCountersigner(s *State) *Countersigner {
 }
 
 // countersignCommand is the main function for the countersign subcommand.
-func (s *State) countersignCommand() {
+func (s *State) countersignCommand(fs *flag.FlagSet) {
+	s.countersigner = newCountersigner(s)
 	newF := s.context.Factotum()
 
 	lastCtx := s.context
