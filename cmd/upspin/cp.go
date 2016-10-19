@@ -38,13 +38,19 @@ type cpFile struct {
 	isUpspin bool
 }
 
+var (
+	errExist    = errors.E(errors.Exist)
+	errNotExist = errors.E(errors.NotExist)
+	errIsDir    = errors.E(errors.IsDir)
+)
+
 func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
 	// TODO: Check for nugatory copies.
 	cs := &copyState{
 		state:      s,
 		flagSet:    fs,
 		numWorkers: intFlag(fs, "n"),
-		recur:      boolFlag(fs, "r"),
+		recur:      boolFlag(fs, "R"),
 		verbose:    boolFlag(fs, "v"),
 	}
 	// Glob the paths.
@@ -62,6 +68,10 @@ func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
 		s.failf("copying multiple files but %s is not a directory", dstFile.path)
 		cs.flagSet.Usage()
 	}
+	if cs.recur {
+		s.failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
+		cs.flagSet.Usage()
+	}
 	s.copyToFile(cs, srcFiles[0], dstFile)
 }
 
@@ -72,7 +82,7 @@ func (s *State) isDir(cf cpFile) bool {
 		entry, err := s.client.Lookup(upspin.PathName(cf.path), true)
 		// Report the error here if it's anything odd, because otherwise
 		// we'll report "not a directory" misleadingly.
-		if err != nil && !errors.Match(notExist, err) {
+		if err != nil && !errors.Match(errNotExist, err) {
 			log.Printf("%q: %v", cf.path, err)
 		}
 		return err == nil && entry.IsDir()
@@ -81,8 +91,6 @@ func (s *State) isDir(cf cpFile) bool {
 	info, err := os.Stat(cf.path)
 	return err == nil && info.IsDir()
 }
-
-var notExist = errors.E(errors.NotExist)
 
 // open opens the file regardless of its location.
 func (s *State) open(file cpFile) (io.ReadCloser, error) {
@@ -127,35 +135,13 @@ type copyWork struct {
 }
 
 // copyToDir copies, in parallel, the source files to the destination directory.
+// It is a wrapper for copyDir, but holds the single work channel and waitgroup.
 func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 	work := make(chan copyWork) // No need for buffering.
 	var wait sync.WaitGroup
 
-	// Deliver work to the workers.
-	go func() {
-		for _, from := range src {
-			reader, err := s.open(from)
-			if err != nil {
-				s.fail(err)
-				s.exitCode = 1
-				continue
-			}
-			to, writer, err := s.createInDir(dir, filepath.Base(from.path))
-			if err != nil {
-				s.fail(err)
-				s.exitCode = 1
-				reader.Close()
-				continue
-			}
-			work <- copyWork{
-				src:    from.path,
-				reader: reader,
-				dst:    to,
-				writer: writer,
-			}
-		}
-		close(work)
-	}()
+	// Launch the copier.
+	go s.copyDir(cs, true, work, &wait, src, dir)
 
 	// Start the workers.
 	wait.Add(cs.numWorkers)
@@ -166,8 +152,80 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 	wait.Wait()
 }
 
+// copyDir copies, in parallel, the source files to the destination directory.
+// It recurs if -R is set and a source is a subdirectory.
+func (s *State) copyDir(cs *copyState, doClose bool, work chan copyWork, wait *sync.WaitGroup, src []cpFile, dir cpFile) {
+	// Deliver work to the workers.
+	for _, from := range src {
+		reader, err := s.open(from)
+		if cs.recur && errors.Match(errIsDir, err) {
+			// If the problem is that from is a directory but have -R,
+			// recur on the contents.
+			cs.logf("recursive descent into %s", from.path)
+			newFiles, err := s.contents(cs, from)
+			if len(newFiles) == 0 && err != nil {
+				continue
+			}
+			// May need to make subdirectory (even if it will have no files).
+			subDir := dir
+			if dir.isUpspin {
+				// Rather than use the libraries and a lot of casting, it's easiest just to cat the strings here.
+				subDir.path = subDir.path + "/" + filepath.Base(from.path) // TODO: is filepath.Base OK?
+				_, err := s.client.MakeDirectory(upspin.PathName(subDir.path))
+				if err != nil && !errors.Match(errExist, err) {
+					s.fail(err)
+					continue
+				}
+			} else {
+				subDir.path = filepath.Join(subDir.path, filepath.Base(from.path))
+				err := os.Mkdir(subDir.path, 0755) // TODO: Mode.
+				if err != nil && !os.IsExist(err) {
+					s.fail(err)
+					continue
+				}
+			}
+			s.copyDir(cs, false, work, wait, newFiles, subDir)
+			continue
+		}
+		if err != nil {
+			s.fail(err)
+			continue
+		}
+		to, writer, err := s.createInDir(dir, filepath.Base(from.path))
+		if err != nil {
+			s.fail(err)
+			reader.Close()
+			continue
+		}
+		work <- copyWork{
+			src:    from.path,
+			reader: reader,
+			dst:    to,
+			writer: writer,
+		}
+	}
+	if doClose {
+		close(work)
+	}
+}
+
 // copyToFile copies the source to the destination.
 func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
+	// If both are in Upspin, we can avoid touching the data by copying
+	// just the references.
+	if src.isUpspin && dst.isUpspin {
+		_, err := s.client.PutDuplicate(upspin.PathName(src.path), upspin.PathName(dst.path))
+		if err == nil {
+			return
+		}
+		if errors.Match(errExist, err) {
+			// File already exists, which PutDuplicate doesn't handle.
+			// For now, just fall through. We could remove it and retry
+			// but that's a little scary.
+		} else {
+			s.fail(err)
+		}
+	}
 	reader, err := s.open(src)
 	if err != nil {
 		s.fail(err)
@@ -235,4 +293,43 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 		})
 	}
 	return files
+}
+
+// contents return the top-level contents of dir as a slice of cpFiles.
+func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
+	if dir.isUpspin {
+		entries, err := s.client.Glob(dir.path + "/*") // TODO: Escape metacharacters in path.
+		if err != nil {
+			s.fail(err)
+			// OK to continue; there may still be files.
+		}
+		files := make([]cpFile, len(entries))
+		for i, entry := range entries {
+			files[i] = cpFile{
+				path:     string(entry.Name),
+				isUpspin: true,
+			}
+		}
+		return files, err
+	}
+	// Local directory.
+	fd, err := os.Open(dir.path)
+	if err != nil {
+		s.fail(err)
+		return nil, err
+	}
+	defer fd.Close()
+	names, err := fd.Readdirnames(0)
+	if err != nil {
+		s.fail(err)
+		// OK to continue; there may still be files.
+	}
+	files := make([]cpFile, len(names))
+	for i, name := range names {
+		files[i] = cpFile{
+			path:     filepath.Join(dir.path, name),
+			isUpspin: false,
+		}
+	}
+	return files, err
 }
