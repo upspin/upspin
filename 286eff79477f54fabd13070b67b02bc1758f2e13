@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c62d790_c8108f76",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-19T23:28:38Z",
+      "side": 1,
+      "message": "Did you mean to call this storeServerUserName?",
+      "revId": "286eff79477f54fabd13070b67b02bc1758f2e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
