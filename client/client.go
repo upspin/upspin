@@ -137,8 +137,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 	// Ensure Group file is valid.
 	if isGroupFile {
-		// TODO: export parseGroup so we can validate this without adding.
-		err := access.AddGroup(name, data)
+		_, err := access.ParseGroup(parsed, data)
 		if err != nil {
 			return nil, errors.E(op, name, err)
 		}

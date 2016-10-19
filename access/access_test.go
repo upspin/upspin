@@ -147,7 +147,7 @@ func TestParseGroup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	group, err := parseGroup(parsed, groupText)
+	group, err := ParseGroup(parsed, groupText)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +171,7 @@ func TestGroupParseAllocs(t *testing.T) {
 		t.Fatal(err)
 	}
 	allocs := testing.AllocsPerRun(100, func() {
-		parseGroup(parsed, groupText)
+		ParseGroup(parsed, groupText)
 	})
 	t.Log("allocs:", allocs)
 	if allocs != 6 {
@@ -523,7 +523,7 @@ func TestParseBadGroupFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Multiple commas not allowed.
-	_, err = parseGroup(parsed, []byte("joe@me.com ,, fred@me.com"))
+	_, err = ParseGroup(parsed, []byte("joe@me.com ,, fred@me.com"))
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}
@@ -537,7 +537,7 @@ func TestParseBadGroupMember(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = parseGroup(parsed, []byte("joe@me.com, fred@"))
+	_, err = ParseGroup(parsed, []byte("joe@me.com, fred@"))
 	if err == nil {
 		t.Fatal("expected error, got none")
 	}

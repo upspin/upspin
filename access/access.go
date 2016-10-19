@@ -428,7 +428,7 @@ func AddGroup(pathName upspin.PathName, contents []byte) error {
 	if err != nil {
 		return err
 	}
-	group, err := parseGroup(parsed, contents)
+	group, err := ParseGroup(parsed, contents)
 	if err != nil {
 		return err
 	}
@@ -454,9 +454,9 @@ func RemoveGroup(pathName upspin.PathName) error {
 	return nil
 }
 
-// parseGroup parses a group file but does not install it in the groups map.
-func parseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err error) {
-	const op = "access.parseGroup"
+// ParseGroup parses a group file but does not call AddGroup to install it.
+func ParseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err error) {
+	const op = "access.ParseGroup"
 	// Temporary. Pre-allocate so it can be reused in the loop, saving allocations.
 	users := make([][]byte, 10)
 	s := bufio.NewScanner(bytes.NewReader(contents))
