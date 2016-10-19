@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_0a350109",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T20:52:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_9fe3f31d",
+      "revId": "5892c06766a9f9c1f233f9004c8ab612f439007e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_bfe0b711",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_4a16e970",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T20:52:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_bfe0b711",
+      "revId": "5892c06766a9f9c1f233f9004c8ab612f439007e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_dfdd7b58",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-19T20:42:12Z",
       "side": 1,
       "message": "and blank lines are skipped here, making the signature parsing a bit more resiliant",
+      "revId": "5892c06766a9f9c1f233f9004c8ab612f439007e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_2a0f1d4f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T20:52:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_dfdd7b58",
       "revId": "5892c06766a9f9c1f233f9004c8ab612f439007e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
