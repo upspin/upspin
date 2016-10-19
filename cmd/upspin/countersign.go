@@ -5,9 +5,7 @@
 package main
 
 // Countersign has utility functions for updating signatures of encrypted items
-// after users update their keys.  Invoke before publishing the new keys.
-
-// Derived from ./share.go.
+// after writers update their keys.  Invoke before publishing the new keys.
 
 import (
 	"flag"
@@ -33,21 +31,16 @@ type Countersigner struct {
 	oldKey upspin.PublicKey
 }
 
-func newCountersigner(s *State) *Countersigner {
-	c := &Countersigner{
-		state: s,
-	}
+// countersignCommand is the main function for the countersign subcommand.
+func (s *State) countersignCommand(fs *flag.FlagSet) {
 	u, err := s.KeyServer().Lookup(s.context.UserName())
 	if err != nil || len(u.PublicKey) == 0 {
 		s.exitf("can't find old key for %q: %s\n", s.context.UserName(), err)
 	}
-	c.oldKey = u.PublicKey
-	return c
-}
-
-// countersignCommand is the main function for the countersign subcommand.
-func (s *State) countersignCommand(fs *flag.FlagSet) {
-	s.countersigner = newCountersigner(s)
+	c := &Countersigner{
+		state:  s,
+		oldKey: u.PublicKey,
+	}
 	newF := s.context.Factotum()
 
 	lastCtx := s.context
@@ -55,7 +48,6 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 	defer func() { s.context = lastCtx }()
 
 	root := upspin.PathName(string(s.context.UserName()) + "/")
-	c := s.countersigner
 	entries := c.entriesFromDirectory(root)
 	for _, e := range entries {
 		c.countersign(e, newF)
