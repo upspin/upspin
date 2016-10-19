@@ -16,6 +16,24 @@
       "revId": "072b6926f20d2bb923067a39f4a60f334e998d18",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_d5b27e32",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-19T22:22:21Z",
+      "side": 1,
+      "message": "state.sharer is used by both info.go and share.go, and the initialization in newState does seem to be intended to last longer than a countersigner.\n\nSo I\u0027m not sure it is feasible to do this for sharer, and at any rate should be a separate CL.",
+      "parentUuid": "1cf0fb9e_75462a70",
+      "revId": "072b6926f20d2bb923067a39f4a60f334e998d18",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
