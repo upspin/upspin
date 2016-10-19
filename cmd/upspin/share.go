@@ -8,6 +8,7 @@ package main
 
 import (
 	"crypto/sha256"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -66,7 +67,13 @@ func newSharer(s *State) *Sharer {
 }
 
 // shareCommand is the main function for the share subcommand.
-func (s *State) shareCommand(names []upspin.PathName) {
+func (s *State) shareCommand(fs *flag.FlagSet) {
+	names := s.globAllUpspin(fs.Args())
+	s.sharer.fix = boolFlag(fs, "fix")
+	s.sharer.force = boolFlag(fs, "force")
+	s.sharer.isDir = boolFlag(fs, "d")
+	s.sharer.recur = boolFlag(fs, "r")
+	s.sharer.quiet = boolFlag(fs, "q")
 	// To change things, User must be the owner of every file.
 	if s.sharer.fix {
 		for _, name := range names {
