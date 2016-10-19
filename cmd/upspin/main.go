@@ -238,20 +238,23 @@ func (s *State) cp(args ...string) {
 	const help = `
 Cp copies files into, out of, and within Upspin. If the final
 argument is a directory, the files are placed inside it.  The other
-arguments must not be directories unless the -r flag is set.
+arguments must not be directories unless the -R flag is set.
 
 If the final argument is not a directory, cp requires exactly two
 path names and copies the contents of the first to the second.
+The -r flag requires that the final argument be a directory.
+
+When copying from on Upspin path to another Upspin path, cp can be
+very efficient, copying only the references to the data rather than
+the data itself.
 
 The command starts several copies at once to overlap I/O for
 efficiency. The -n flag controls the parallelism.
-
-TODO: -r is unimplemented.
 `
 	fs := flag.NewFlagSet("cp", flag.ExitOnError)
 	n := fs.Int("n", 4, "number of parallel copies to perform; must be > 0")
 	fs.Bool("v", false, "log each file as it is copied")
-	fs.Bool("r", false, "recursively copy directories")
+	fs.Bool("R", false, "recursively copy directories")
 	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
 	if fs.NArg() < 2 || *n <= 0 {
 		fs.Usage()
