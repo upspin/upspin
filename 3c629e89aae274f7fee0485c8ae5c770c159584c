@@ -1,0 +1,237 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cd8b33a_7f29cfb6",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "HTML markers? I\u0027m not sure what this code is doing.\nWho does the converting? SendGrid?",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_7ff70f1e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "The TrimSpace on each line should take care of \\r \nAt that point, you might as well use strings.Replace",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_1f11a377",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "this check is unnecessary now; it\u0027ll just fail when it can\u0027t find the username, which is a better diagnostic error anyway",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_9f04d333",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "var line string ?\nit should have a clearer name now that it has a special relationship to the next func",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_3f166770",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "the only failure here is that we run out of lines, so this function should just return a bool and then you can construct a better error message where next is called",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_ff34ff0e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "s/want/prefix/?\n\nYou never use the error from advanceTo, it should also return a bool.\ntrue if it finds the prefix, false if not",
+      "range": {
+        "startLine": 126,
+        "startChar": 19,
+        "endLine": 126,
+        "endChar": 23
+      },
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_7f20efc2",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "for next() {\n  if strings.HasPrefix(s, prefix) {\n    return true\n  }\n}\nreturn false",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_5f1b2b97",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "these all become \n\nif !advanceTo(userPrefix) {",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_1ff8c30f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "I think keyLines is clearer, because you\u0027re counting them.",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_ff0b1f3e",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "for ; keyLines \u003c 3 \u0026\u0026 next(); keyLines++ {",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_df373b11",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "It would be cleaner to preprocess the slice of lines to trim them and remove any blanks. For instance, you don\u0027t do the removal of blank lines between the signature preamble and the signature itself, but this would be taken care of with preprocessing.",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_3ffd8700",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "delete the next four lines",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd8b33a_5ff24b2f",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-19T04:59:46Z",
+      "side": 1,
+      "message": "delete \u0027format\u0027",
+      "range": {
+        "startLine": 180,
+        "startChar": 80,
+        "endLine": 180,
+        "endChar": 86
+      },
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
