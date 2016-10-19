@@ -19,6 +19,42 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_3b549911",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_7f29cfb6",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_1b51dd20",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "It looks like only gmail does that. Yahoo mail does not. HTML email is fully stripped from Yahoo, but Gmail puts these markers in. I added a TODO to test more email providers.",
+      "parentUuid": "5cd8b33a_7f29cfb6",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_7ff70f1e",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -30,6 +66,24 @@
       "writtenOn": "2016-10-19T04:59:46Z",
       "side": 1,
       "message": "The TrimSpace on each line should take care of \\r \nAt that point, you might as well use strings.Replace",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_7b6d81e6",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_7ff70f1e",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_5b7245c8",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_1f11a377",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_9f04d333",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -70,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_bb77e9b5",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_9f04d333",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_3f166770",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -81,6 +171,24 @@
       "writtenOn": "2016-10-19T04:59:46Z",
       "side": 1,
       "message": "the only failure here is that we run out of lines, so this function should just return a bool and then you can construct a better error message where next is called",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_9b7cad9b",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_3f166770",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -110,6 +218,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_3b6bf9ce",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "I had prefix, thought you\u0027d prefer want. Oh well. Done.\nDone.",
+      "parentUuid": "5cd8b33a_ff34ff0e",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_7f20efc2",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -121,6 +247,24 @@
       "writtenOn": "2016-10-19T04:59:46Z",
       "side": 1,
       "message": "for next() {\n  if strings.HasPrefix(s, prefix) {\n    return true\n  }\n}\nreturn false",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_bbc5299a",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_7f20efc2",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -144,6 +288,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_dbcbd5a8",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_5f1b2b97",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_1ff8c30f",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -155,6 +317,24 @@
       "writtenOn": "2016-10-19T04:59:46Z",
       "side": 1,
       "message": "I think keyLines is clearer, because you\u0027re counting them.",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_5b0ec517",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_1ff8c30f",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -178,6 +358,42 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_fbfcd1ca",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_ff0b1f3e",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_9bef8d04",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done. See below.",
+      "parentUuid": "5cd8b33a_ff0b1f3e",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_df373b11",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -189,6 +405,24 @@
       "writtenOn": "2016-10-19T04:59:46Z",
       "side": 1,
       "message": "It would be cleaner to preprocess the slice of lines to trim them and remove any blanks. For instance, you don\u0027t do the removal of blank lines between the signature preamble and the signature itself, but this would be taken care of with preprocessing.",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_dbe0f512",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "I started that way, but it ended up being more code at the top. I think this is not too bad?",
+      "parentUuid": "5cd8b33a_df373b11",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -212,6 +446,24 @@
     },
     {
       "key": {
+        "uuid": "1cf0fb9e_1bdb9d63",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_3ffd8700",
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cd8b33a_5ff24b2f",
         "filename": "cmd/keyserver/internal/mail/parse.go",
         "patchSetId": 3
@@ -229,6 +481,24 @@
         "endLine": 180,
         "endChar": 86
       },
+      "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf0fb9e_5b5c0508",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-19T16:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cd8b33a_5ff24b2f",
       "revId": "3c629e89aae274f7fee0485c8ae5c770c159584c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
