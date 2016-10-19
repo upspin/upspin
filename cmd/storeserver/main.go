@@ -73,7 +73,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
+
+	// TODO: parse flags here.
+	writers := []upspin.UserName{}
+	writerDomains := []string{"upspin.io", "google.com"}
+
+	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr), writers, writerDomains)
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())

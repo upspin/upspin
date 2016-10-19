@@ -17,6 +17,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 )
 
 // server is a SecureServer that talks to a Store interface and serves gRPC requests.
@@ -31,39 +32,62 @@ type server struct {
 
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
+
+	// Collection of allowed writers to this server.
+	// TODO: hash the user names to make it more difficult for attackers to
+	// exploit bugs into revealing the writers.
+	writers map[upspin.UserName]bool
+
+	// Whitelisted domains that can write to this server. This is in
+	// addition to the whitelist of individual writers.
+	writerDomains map[string]bool
+
+	// TODO: add a blacklist too.
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, ss grpcauth.SecureServer, addr upspin.NetAddr) proto.StoreServer {
-	return &server{
+func New(ctx upspin.Context, store upspin.StoreServer, ss grpcauth.SecureServer,
+	addr upspin.NetAddr, writers []upspin.UserName, writerDomains []string) proto.StoreServer {
+
+	s := &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		store:        store,
-		SecureServer: ss,
+		store:         store,
+		SecureServer:  ss,
+		writers:       make(map[upspin.UserName]bool),
+		writerDomains: make(map[string]bool),
 	}
+	for _, w := range writers {
+		s.writers[w] = true
+	}
+	for _, d := range writerDomains {
+		s.writerDomains[d] = true
+	}
+	return s
 }
 
-// storeFor returns a StoreServer instance bound to the user specified in the context.
-func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
+// storeFor returns a StoreServer instance bound to the user specified in the
+// context and reports whether the current user is allowed to write to the store.
+func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, bool, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), s.store.Endpoint())
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
-	return svc.(upspin.StoreServer), nil
+	return svc.(upspin.StoreServer), s.isWriter(session.User()), nil
 }
 
 // Get implements proto.StoreServer.
 func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	op := logf("Get %q", req.Reference)
 
-	store, err := s.storeFor(ctx)
+	store, _, err := s.storeFor(ctx)
 	if err != nil {
 		op.log(err)
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
@@ -86,8 +110,13 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	op := logf("Put %.30x...", req.Data)
 
-	store, err := s.storeFor(ctx)
+	store, isWriter, err := s.storeFor(ctx)
 	if err != nil {
+		op.log(err)
+		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
+	}
+	if !isWriter {
+		err := errors.E("grpc/storeserver.Put", errors.Permission, errors.Str("user not allowed to write to this store"))
 		op.log(err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
 	}
@@ -110,8 +139,13 @@ var deleteResponse proto.StoreDeleteResponse
 func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	op := logf("Delete %q", req.Reference)
 
-	store, err := s.storeFor(ctx)
+	store, isWriter, err := s.storeFor(ctx)
 	if err != nil {
+		op.log(err)
+		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
+	}
+	if !isWriter {
+		err := errors.E("grpc/storeserver.Delete", errors.Permission, errors.Str("user not allowed to delete from store"))
 		op.log(err)
 		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
@@ -132,6 +166,21 @@ func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*pr
 			NetAddr:   string(s.endpoint.NetAddr),
 		},
 	}, nil
+}
+
+func (s *server) isWriter(u upspin.UserName) bool {
+	if _, found := s.writers[u]; found {
+		return true
+	}
+	_, _, domain, err := user.Parse(u)
+	if err != nil {
+		// Should never happen at this point.
+		return false
+	}
+	if _, found := s.writerDomains[domain]; found {
+		return true
+	}
+	return false
 }
 
 func logf(format string, args ...interface{}) operation {
