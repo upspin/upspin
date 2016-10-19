@@ -416,8 +416,8 @@ func IsGroupFile(pathName upspin.PathName) bool {
 	if err != nil {
 		return false
 	}
-	// Need "a@b.c/Group/file".
-	return parsed.NElem() >= 2 && parsed.Elem(0) == "Group"
+	// Need "a@b.c/Group/file", but file can't be Access.
+	return parsed.NElem() >= 2 && parsed.Elem(0) == "Group" && parsed.Elem(parsed.NElem()-1) != accessFile
 }
 
 // AddGroup installs a group with the specified name and textual contents,
