@@ -696,6 +696,7 @@ func TestIsAccessFile(t *testing.T) {
 		{"a@b.com/Access", true},
 		{"a@b.com/foo/bar/Access", true},
 		{"a@b.com/NotAccess", false},
+		{"a@b.com/Group/Access", true},
 		{"a@b.com//Access/", true},     // Extra slashes don't matter.
 		{"a@b.com//Access/foo", false}, //Access must not be a directory.
 		{"/Access/foo", false},         // No user.
@@ -721,10 +722,12 @@ func TestIsGroupFile(t *testing.T) {
 	}{
 		{"a@b.com/Group/foo", true},
 		{"a@b.com/Group/foo/bar", true},
-		{"a@b.com//Group/", false},   // No file.
-		{"a@b.com//Group/foo", true}, // Extra slashes don't matter.
-		{"a@b.com/foo/Group", false}, // Group directory must be in root.
-		{"/Group/foo", false},        // No user.
+		{"a@b.com/Group/Access", false},     // Access file is not a Group file.
+		{"a@b.com/Group/Access/bar", false}, // Access cannot be a directory.
+		{"a@b.com//Group/", false},          // No file.
+		{"a@b.com//Group/foo", true},        // Extra slashes don't matter.
+		{"a@b.com/foo/Group", false},        // Group directory must be in root.
+		{"/Group/foo", false},               // No user.
 	}
 	for _, test := range tests {
 		isGroup := IsGroupFile(test.name)
