@@ -30,6 +30,7 @@ import (
 
 const serverName = "storeserver"
 
+// TODO: The bulk of this is very similar to dirserver/main.go. Maybe generalize more?
 func main() {
 	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
 
@@ -43,12 +44,10 @@ func main() {
 		}
 	}
 
-	// Load context and keys for this server. It needn't have a real username.
+	// Load context and keys for this server. It needs a real upspin username and keys.
 	ctx, err := context.FromFile(flags.Context)
-	if err != nil && err != context.ErrNoFactotum {
+	if err != nil {
 		log.Fatal(err)
-	} else if err == nil {
-		log.Fatal("storeserver does not use keys, set secrets=none in rc")
 	}
 
 	// Create a new store implementation.

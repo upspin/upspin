@@ -377,8 +377,9 @@ func (c *Config) buildServer(server string) error {
 		)
 	case "storeserver":
 		err = writeRC(dir,
-			"username=storeserver",
-			"secrets=none",
+			"username="+c.storeServeUserrName(),
+			"secrets=/upspin",
+			"storeserver="+c.endpoint("storeserver"), // So it knows how to compare to itself.
 			"keyserver="+c.endpoint("keyserver"),
 		)
 	}
@@ -397,6 +398,11 @@ func (c *Config) buildServer(server string) error {
 	case "keyserver":
 		files = []string{
 			"mailconfig",
+		}
+	case "storeserver":
+		files = []string{
+			"public.upspinkey",
+			"secret.upspinkey",
 		}
 	}
 	base := filepath.Join(os.Getenv("HOME"), "upspin/deploy", c.Project, server)
@@ -471,6 +477,14 @@ func (c *Config) dirServerUserName() string {
 		return "upspin-dir@upspin.io"
 	}
 	return "upspin-dir@" + c.Domain
+}
+
+func (c *Config) storeServeUserrName() string {
+	if c.inProd() {
+		// HACK: see the comment on inProd.
+		return "upspin-store@upspin.io"
+	}
+	return "upspin-store@" + c.Domain
 }
 
 func writeRC(dir string, lines ...string) error {
