@@ -69,9 +69,6 @@ type database struct {
 	// so it's not _too_ bad.
 	mu sync.RWMutex
 
-	// dialed reports whether the service has its first Dialed connection.
-	dialed bool
-
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
 
@@ -344,7 +341,7 @@ func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, dele
 		}
 		var accessFile *access.Access
 		if !deleting {
-			data, err := s.readAll(s.context, entry)
+			data, err := s.readAll(s.db.dirContext, entry)
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
@@ -740,7 +737,7 @@ func (s *server) load(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.readAll(s.context, entry)
+	return s.readAll(s.db.dirContext, entry)
 }
 
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.
@@ -881,16 +878,6 @@ func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	const op = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
-	}
-	s.db.mu.Lock()
-	defer s.db.mu.Unlock()
-	if !s.db.dialed {
-		if context.UserName() == "" {
-			return nil, errors.E(op, errors.Invalid, errors.Str("no user name"))
-		}
-		// This is the first call; set the owner and endpoint.
-		s.db.dirContext = context
-		s.db.dialed = true
 	}
 	this := *s // Make a copy.
 	this.context = context
