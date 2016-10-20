@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c62d790_0e3d4fda",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-20T03:15:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcafeff4_b26e8071",
+      "revId": "286eff79477f54fabd13070b67b02bc1758f2e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c62d790_c8108f76",
         "filename": "cmd/upspin-deploy/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-19T23:28:38Z",
       "side": 1,
       "message": "Did you mean to call this storeServerUserName?",
+      "revId": "286eff79477f54fabd13070b67b02bc1758f2e13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c62d790_8e285f9e",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-20T03:15:26Z",
+      "side": 1,
+      "message": "Yes, thank you.\nDone.",
+      "parentUuid": "7c62d790_c8108f76",
       "revId": "286eff79477f54fabd13070b67b02bc1758f2e13",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
