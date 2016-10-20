@@ -19,6 +19,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -74,6 +75,8 @@ var (
 	delete = flag.String("delete", "", "Delete cloud services (string must equal the `project` name, for safety)")
 
 	all = flag.Bool("all", false, "Create/deploy/delete all servers")
+
+	pruneContainers = flag.Bool("prune_containers", false, "Delete old container images for the specified servers and exit")
 )
 
 func main() {
@@ -118,10 +121,16 @@ func main() {
 		cfg.Servers = validServers
 	}
 
+	if *pruneContainers {
+		if err := cfg.pruneContainers(); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if *delete != "" {
 		if *delete != *project {
 			fmt.Fprintf(os.Stderr, "error: -delete must equal -project\n\n")
-			os.Exit(1)
+			os.Exit(2)
 		}
 		if err := wrap("delete", cfg.Delete()); err != nil {
 			log.Fatal(err)
@@ -750,6 +759,90 @@ func (c *Config) deleteCluster() error {
 		op, err = svc.Projects.Zones.Operations.Get(c.Project, c.Zone, op.Name).Do()
 	}
 	return okReason("notFound", err)
+}
+
+func (c *Config) pruneContainers() error {
+	log.Printf("Pruning containers for services %v", c.servers())
+
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
+	if err != nil {
+		return err
+	}
+
+	bucket := client.Bucket("artifacts." + c.Project + ".appspot.com")
+	for _, s := range s {
+		if err := pruneContainersForService(ctx, bucket, s); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func pruneContainersForService(ctx context.Context, bucket *storage.BucketHandle, service string) error {
+	get := func(name string) ([]byte, error) {
+		r, err := bucket.Object(library + "tag_latest").NewReader(ctx)
+		if err != nil {
+			return err
+		}
+		defer r.Close()
+		return ioutil.ReadAll(r)
+	}
+
+	library := "containers/repositories/library/" + service + "/"
+
+	latestBytes, err := get(library + "tag_latest")
+	if err == storage.ErrBucketNotExist || err == ErrObjectNotExist {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	latest := string(latestBytes)
+
+	it := bucket.Objects(ctx, &storage.Query{Prefix: library})
+	for {
+		o, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return okReason("notFound", err)
+		}
+
+		mPrefix := library + "manifest_"
+		if !strings.HasPrefix(o.Name, mPrefix) {
+			// Not a manifest file; don't delete it.
+			continue
+		}
+		hash := strings.TrimPrefix(o.Name, mPrefix)
+		if hash == latest {
+			//  Is the latest manifest; don't delete it.
+			continue
+		}
+
+		// Delete the old manifest.
+		err = okReason("notFound", bucket.Object(o.Name).Delete(ctx))
+		if err != nil && err != storage.ErrObjectNotExist {
+			return err
+		}
+	}
+
+	// Read in latest manifest.
+	manifestBytes, err := get(library + "manifest_" + latest)
+	if err != nil {
+		return err
+	}
+	var manifest struct {
+		FSLayers []struct {
+			BlobSum string
+		}
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		return err
+	}
+
+	return
 }
 
 var bucketSuffixes = []string{
