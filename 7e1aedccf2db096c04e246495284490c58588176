@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c62d790_c84baf26",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-20T00:02:49Z",
+      "side": 1,
+      "message": "Inconsistent -r and -R here?\n\nShould there be \u0027if recur\u0027?",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c62d790_68996363",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-20T00:02:49Z",
+      "side": 1,
+      "message": "I\u0027m not certain what you mean here about OK to continue, but I\u0027d just as soon \"upspin cp\" stop without copying any files if there are errors during worklist creation and the destination isUpspin.  Otherwise I\u0027m likely to waste space on the storage server by restarting the command after fixing mistakes.  Yes?",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c62d790_2b8a85fd",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-20T00:02:49Z",
+      "side": 1,
+      "message": "-r or -R?",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
