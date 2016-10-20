@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "bcafeff4_3283b0ec",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-20T00:53:18Z",
+      "side": 1,
+      "message": "move this if block up to directly after s.open ?\n\nthen follow with\n\nif err !\u003d nil {\n  s.fail(err)\n  continue\n}",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcafeff4_12802cdc",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-20T00:53:18Z",
+      "side": 1,
+      "message": "if len(newFiles) \u003d\u003d 0 \u0026\u0026 err !\u003d nil {\n  continue\n}",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c62d790_68996363",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 4
@@ -30,6 +64,24 @@
       "writtenOn": "2016-10-20T00:02:49Z",
       "side": 1,
       "message": "I\u0027m not certain what you mean here about OK to continue, but I\u0027d just as soon \"upspin cp\" stop without copying any files if there are errors during worklist creation and the destination isUpspin.  Otherwise I\u0027m likely to waste space on the storage server by restarting the command after fixing mistakes.  Yes?",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcafeff4_528ab4fd",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-20T00:53:18Z",
+      "side": 1,
+      "message": "if the files are the same, then no extra space will be stored on the server\nhowever, i can see an issue with wasted upstream bandwidth anyway",
+      "parentUuid": "7c62d790_68996363",
       "revId": "7e1aedccf2db096c04e246495284490c58588176",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
