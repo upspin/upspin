@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7c62d790_0b3d41da",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-20T01:09:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c62d790_c84baf26",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bcafeff4_3283b0ec",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7c62d790_0b6b01cf",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-20T01:09:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcafeff4_3283b0ec",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bcafeff4_12802cdc",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-20T00:53:18Z",
       "side": 1,
       "message": "if len(newFiles) \u003d\u003d 0 \u0026\u0026 err !\u003d nil {\n  continue\n}",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c62d790_0b546110",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-20T01:09:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcafeff4_12802cdc",
       "revId": "7e1aedccf2db096c04e246495284490c58588176",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -106,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "7c62d790_2b3a85e3",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-20T01:09:41Z",
+      "side": 1,
+      "message": "The \u0027files are the same\u0027 question is for another CL. See the TODO at the top.",
+      "parentUuid": "bcafeff4_528ab4fd",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c62d790_2b8a85fd",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 4
@@ -117,6 +189,24 @@
       "writtenOn": "2016-10-20T00:02:49Z",
       "side": 1,
       "message": "-r or -R?",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c62d790_eb230dc0",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-20T01:09:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c62d790_2b8a85fd",
       "revId": "7e1aedccf2db096c04e246495284490c58588176",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
