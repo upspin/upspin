@@ -88,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "7c62d790_4b333911",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-20T01:00:30Z",
+      "side": 1,
+      "message": "That\u0027s true if using plain packing.   But with ee, we pick a new encryption key each time, so the bytes on the storage server do change.   There\u0027s a tough call here.  If we put the sha256 of the unencrypted bytes in direntry, then people can tell if file A is the same as file B.  If we put the sha256 of the encrypted bytes in direntry, then there is no really cheap way to know if the new file is the same as the old one.",
+      "parentUuid": "bcafeff4_528ab4fd",
+      "revId": "7e1aedccf2db096c04e246495284490c58588176",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c62d790_2b8a85fd",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 4
