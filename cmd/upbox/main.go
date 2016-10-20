@@ -2,48 +2,130 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Command upbox builds and runs inprocess key, store, and directory servers
-// and provides an upspin shell acting as the test user bob@b.com.
-package main
+/*
+Command upbox builds and runs Upspin servers as specified by a configuration
+file and provides an upspin shell acting as the first user specified by the
+configuration.
 
-// TODO(adg): wait for each server to start up
-// TODO(adg): use flags package
+Configuration files must be in YAML format, of this general form:
+
+	users:
+
+	  # Name specifies the user name of this user.
+	  # It must be non-empty.
+	  # It can be a full email address, or just the user component.
+	  # In the latter case, the top-level domain field must be set.
+	- name: joe
+
+	- name: jess@example.net
+	  # StoreServer and DirServer specify the store and directory endpoints
+	  # for this user.
+	  # If empty, they default to the servers "storeserver" and "dirserver",
+	  # respectively.
+	  # If they are of the form "$servername" then the address of the server
+	  # "servername" is used.
+	  storeserver: store.upspin.io
+	  dirserver: dir.upspin.io
+
+	  # Packing specifies the packing method for this user.
+	  # If empty, it defaults to "plain".
+	  packing: ee
+
+	servers:
+
+	  # Name specifies a short name for this server.
+	  # It must be non-empty.
+	  # The names "keyserver", "storeserver", and "dirserver" imply some
+	  # useful defaults.
+	- name: storeserver
+
+	- name: dirserver
+	  # User specifies the user to run this server as.
+	  # It can be a full email address, or just the user component.
+	  # If empty, the Name of the server is combined with the
+	  # Config's Domain and a user is created with that name.
+	  # In the latter cases, the top-level Domain field must be set.
+	  user: joe
+
+	- name: myserver
+	  # ImportPath specifies the import path for this server
+	  # that is built before starting the server.
+	  # If empty, the server Name is appended to the string
+	  # "upspin.io/cmd/".
+	  importpath: github.com/user/myserver
+
+	# KeyServer specifies the KeyServer that each user in the cluster
+	# should use. If it is empty, then a Server named "keyserver" must
+	# be included in the list of Servers, and the address of that server
+	# is used.
+	keyserver: key.uspin.io
+
+	# Domain specifies a domain that is appended to any user names that do
+	# not include a domain component.
+	# Domain must be specified if any domain suffixes are ommited from
+	# User Names or if a Servers is specified with an empty User field.
+	domain: exmaple.com
+
+If no config is specified, the default config is used:
+
+	users:
+	  - name: user
+	servers:
+	  - name: keyserver
+	  - name: storeserver
+	  - name: dirserver
+	domain: example.com
+
+*/
+package main
 
 import (
 	"bufio"
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"upspin.io/upspin"
 )
 
 var (
 	logLevel = flag.String("log", "info", "log `level`")
 	basePort = flag.Int("port", 8000, "base `port` number for upspin servers")
-	userName = flag.String("user", "user@example.com", "test user `name`")
+	config   = flag.String("config", "", "configuration `file` name")
 )
 
 func main() {
 	flag.Parse()
-	if err := do(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+
+	cfg, err := ConfigFromFile(*config)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "upbox: error parsing config:", err)
+		os.Exit(1)
+	}
+
+	if err := cfg.Run(); err != nil {
+		fmt.Fprintln(os.Stderr, "upbox:", err)
 		os.Exit(1)
 	}
 }
 
-func do() error {
+func (cfg *Config) Run() error {
 	// Build servers and commands.
-	cmd := exec.Command("go", "install",
-		"upspin.io/cmd/keyserver",
-		"upspin.io/cmd/storeserver",
-		"upspin.io/cmd/dirserver",
-		"upspin.io/cmd/upspin",
-		"upspin.io/cmd/keygen",
-	)
+	args := []string{"install", "upspin.io/cmd/upspin"}
+	for _, s := range cfg.Servers {
+		args = append(args, s.ImportPath)
+	}
+	cmd := exec.Command("go", args...)
 	cmd.Stdout = prefix("build: ", os.Stdout)
 	cmd.Stderr = prefix("build: ", os.Stderr)
 	if err := cmd.Run(); err != nil {
@@ -56,27 +138,7 @@ func do() error {
 		return err
 	}
 	defer os.RemoveAll(tmpDir)
-
-	port := *basePort
-	keyAddr := fmt.Sprintf("localhost:%d", port)
-	port++
-	storeAddr := fmt.Sprintf("localhost:%d", port)
-	port++
-	dirAddr := fmt.Sprintf("localhost:%d", port)
-
-	rcFile := filepath.Join(tmpDir, "rc")
-	rcContent := strings.Join([]string{
-		"username=" + *userName,
-		"keyserver=remote," + keyAddr,
-		"storeserver=remote," + storeAddr,
-		"dirserver=remote," + dirAddr,
-		"secrets=" + tmpDir,
-		"packing=ee",
-		"tlscerts=" + tmpDir,
-	}, "\n")
-	if err := ioutil.WriteFile(rcFile, []byte(rcContent), 0644); err != nil {
-		return err
-	}
+	userDir := func(user string) string { return filepath.Join(tmpDir, user) }
 
 	// Generate TLS certificates.
 	if err := generateCert(tmpDir); err != nil {
@@ -84,80 +146,130 @@ func do() error {
 	}
 
 	// Generate keys.
-	keygen := exec.Command("keygen", "-where="+tmpDir)
-	keygen.Stdout = prefix("keygen: ", os.Stdout)
-	keygen.Stderr = prefix("keygen: ", os.Stderr)
-	if err := keygen.Run(); err != nil {
-		return err
+	for _, u := range cfg.Users {
+		fmt.Printf("Generating keys for user %q\n", u.Name)
+		dir := userDir(u.Name)
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			return err
+		}
+		keygen := exec.Command("upspin", "keygen", "-where="+dir)
+		keygen.Stdout = prefix("keygen: ", os.Stdout)
+		keygen.Stderr = prefix("keygen: ", os.Stderr)
+		if err := keygen.Run(); err != nil {
+			return err
+		}
+		u.secrets = dir
 	}
 
-	fmt.Printf("Generated keys for user %q\n", *userName)
+	writeRC := func(server, user string) (string, error) {
+		u, ok := cfg.user[user]
+		if !ok {
+			return "", fmt.Errorf("unknown user %q", user)
+		}
 
-	server := func(name string, args ...string) *exec.Cmd {
-		cmd := exec.Command(name, append([]string{
+		rcContent := []string{
+			"username=" + u.Name,
+			"tlscerts=" + tmpDir,
+			"packing=" + u.Packing,
+			"storeserver=" + u.StoreServer,
+			"dirserver=" + u.DirServer,
+		}
+		switch server {
+		case "keyserver":
+			rcContent = append(rcContent,
+				"keyserver=inprocess,",
+				"secrets=none",
+			)
+		default:
+			rcContent = append(rcContent,
+				"keyserver=remote,"+cfg.KeyServer,
+				"secrets="+userDir(user),
+			)
+		}
+		rcFile := filepath.Join(tmpDir, "rc."+server)
+		if err := ioutil.WriteFile(rcFile, []byte(strings.Join(rcContent, "\n")), 0644); err != nil {
+			return "", err
+		}
+		return rcFile, nil
+	}
+
+	// Start servers.
+	for i := range cfg.Servers {
+		s := cfg.Servers[i]
+
+		rcFile, err := writeRC(s.Name, s.User)
+		if err != nil {
+			return fmt.Errorf("writing rc for %v: %v", s.Name, err)
+		}
+
+		args := []string{
 			"-context=" + rcFile,
 			"-log=" + *logLevel,
 			"-tls_cert=" + filepath.Join(tmpDir, "cert.pem"),
 			"-tls_key=" + filepath.Join(tmpDir, "key.pem"),
-		}, args...)...)
-		cmd.Stdout = prefix(name+":\t", os.Stdout)
-		cmd.Stderr = prefix(name+":\t", os.Stderr)
-		return cmd
+			"-https=" + s.addr,
+			"-addr=" + s.addr,
+		}
+		if s.Name == "keyserver" {
+			args = append(args,
+				"-test_user="+s.User,
+				"-test_secrets="+userDir(s.User),
+			)
+		}
+		cmd := exec.Command(s.Name, args...)
+		cmd.Stdout = prefix(s.Name+":\t", os.Stdout)
+		cmd.Stderr = prefix(s.Name+":\t", os.Stderr)
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("starting %v: %v", s.Name, err)
+		}
+		defer kill(cmd)
 	}
 
-	// Start keyserver.
-	key := server("keyserver",
-		"-https="+keyAddr,
-		"-addr="+keyAddr, // is this necessary?
-		"-test_user="+*userName,
-		"-test_secrets="+tmpDir,
-	)
-	key.Env = []string{
-		"upspinusername=key@example.net",
-		"upspinsecrets=none",
-		"upspinpacking=plain",
-		"upspinstoreserver=unassigned,",
-		"upspindirserver=unassigned,",
-		"GOPATH=" + os.Getenv("GOPATH"),
+	// Wait for the keyserver to start and add the users to it.
+	if err := waitReady(cfg.KeyServer); err != nil {
+		return err
 	}
-	if err := key.Start(); err != nil {
-		return fmt.Errorf("starting keyserver: %v", err)
+	keyUser := cfg.Users[0].Name
+	if s, ok := cfg.server["keyserver"]; ok {
+		keyUser = s.User
 	}
-	defer kill(key)
+	rcFile, err := writeRC("key-bootstrap", keyUser)
+	if err != nil {
+		return err
+	}
+	for _, u := range cfg.Users {
+		pk, err := ioutil.ReadFile(filepath.Join(userDir(u.Name), "public.upspinkey"))
+		if err != nil {
+			return err
+		}
+		user := &upspin.User{
+			Name:      upspin.UserName(u.Name),
+			Dirs:      []upspin.Endpoint{{upspin.Remote, upspin.NetAddr(u.DirServer)}},
+			Stores:    []upspin.Endpoint{{upspin.Remote, upspin.NetAddr(u.StoreServer)}},
+			PublicKey: upspin.PublicKey(pk),
+		}
+		userJSON, err := json.Marshal(user)
+		if err != nil {
+			return err
+		}
+		cmd := exec.Command("upspin",
+			"-context="+rcFile,
+			"-log="+*logLevel,
+			"user", "-put",
+		)
+		cmd.Stdin = bytes.NewReader(userJSON)
+		cmd.Stdout = prefix("key-bootstrap:\t", os.Stdout)
+		cmd.Stderr = prefix("key-bootstrap:\t", os.Stderr)
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
 
-	// Start storeserver.
-	store := server("storeserver",
-		"-https="+storeAddr,
-		"-addr="+storeAddr, // is this necessary?
-	)
-	store.Env = []string{
-		"upspinusername=store@example.net",
-		"upspinsecrets=none",
-		"upspinpacking=plain",
-		"upspinstoreserver=inprocess,",
-		"upspindirserver=unassigned,",
-		"GOPATH=" + os.Getenv("GOPATH"),
+	// Start a shell as the first user.
+	rcFile, err = writeRC("shell", cfg.Users[0].Name)
+	if err != nil {
+		return err
 	}
-	if err := store.Start(); err != nil {
-		return fmt.Errorf("starting storeserver: %v", err)
-	}
-	defer kill(store)
-
-	// Start dirserver.
-	dir := server("dirserver",
-		"-https="+dirAddr,
-		"-addr="+dirAddr, // is this necessary?
-	)
-	dir.Env = []string{
-		"upspindirserver=inprocess,",
-		"GOPATH=" + os.Getenv("GOPATH"),
-	}
-	if err := dir.Start(); err != nil {
-		return fmt.Errorf("starting dirserver: %v", err)
-	}
-	defer kill(dir)
-
-	// Start upspin shell.
 	shell := exec.Command("upspin",
 		"-context="+rcFile,
 		"-log="+*logLevel,
@@ -184,4 +296,22 @@ func prefix(p string, out io.Writer) io.Writer {
 		}
 	}()
 	return w
+}
+
+func waitReady(addr string) error {
+	rt := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	req, _ := http.NewRequest("GET", "https://"+addr, nil)
+	for i := 0; i < 10; i++ {
+		_, err := rt.RoundTrip(req)
+		if err != nil {
+			time.Sleep(time.Second)
+			continue
+		}
+		return nil
+	}
+	return fmt.Errorf("timed out waiting for %q to come up", addr)
 }
