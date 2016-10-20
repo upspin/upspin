@@ -69,9 +69,6 @@ type database struct {
 	// so it's not _too_ bad.
 	mu sync.RWMutex
 
-	// dialed reports whether the service has its first Dialed connection.
-	dialed bool
-
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
 
@@ -344,7 +341,7 @@ func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, dele
 		}
 		var accessFile *access.Access
 		if !deleting {
-			data, err := s.readAll(s.context, entry)
+			data, err := s.readAll(entry)
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
@@ -426,8 +423,8 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 }
 
 // readAll retrieves the data for the entry.
-func (s *server) readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
-	return clientutil.ReadAll(context, entry)
+func (s *server) readAll(entry *upspin.DirEntry) ([]byte, error) {
+	return clientutil.ReadAll(s.db.dirContext, entry)
 }
 
 // Delete implements upspin.DirServer.Delete.
@@ -610,7 +607,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				}
 			}
 			// Fetch the directory's contents.
-			payload, err := s.readAll(s.db.dirContext, ent)
+			payload, err := s.readAll(ent)
 			if err != nil {
 				return nil, errors.E(op, ent.Name, errors.Internal, errors.Str("invalid reference: "+err.Error()))
 			}
@@ -740,7 +737,7 @@ func (s *server) load(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.readAll(s.context, entry)
+	return s.readAll(entry)
 }
 
 // rootAccess file returns the parsed Access file providing default permissions for the root of this path.
@@ -764,7 +761,7 @@ func (s *server) rootAccessFile(parsed path.Parsed) *access.Access {
 // fetchEntry returns the reference for the named elem within the directory referenced by dirEntry.
 // It reads the whole directory, so avoid calling it repeatedly.
 func (s *server) fetchEntry(op string, entry *upspin.DirEntry, elem string) (*upspin.DirEntry, error) {
-	payload, err := s.readAll(s.db.dirContext, entry)
+	payload, err := s.readAll(entry)
 	if err != nil {
 		return nil, err
 	}
@@ -799,7 +796,7 @@ var errSeq = errors.Str("sequence mismatch")
 // installEntry installs the new entry in the directory referenced by the dirEntry, appending or overwriting the
 // entry as required. It returns the entry updated directory and the blob itself.
 func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upspin.DirEntry, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (*upspin.DirEntry, []byte, error) {
-	dirData, err := s.readAll(s.db.dirContext, dirEntry)
+	dirData, err := s.readAll(dirEntry)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -881,16 +878,6 @@ func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	const op = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
-	}
-	s.db.mu.Lock()
-	defer s.db.mu.Unlock()
-	if !s.db.dialed {
-		if context.UserName() == "" {
-			return nil, errors.E(op, errors.Invalid, errors.Str("no user name"))
-		}
-		// This is the first call; set the owner and endpoint.
-		s.db.dirContext = context
-		s.db.dialed = true
 	}
 	this := *s // Make a copy.
 	this.context = context
