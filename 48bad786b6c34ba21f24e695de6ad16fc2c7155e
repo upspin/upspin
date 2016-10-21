@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc96c7c7_a56ca4eb",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-21T15:01:28Z",
+      "side": 1,
+      "message": "i would put the config management stuff in a separate file and leave the control here. separation for clarity",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc96c7c7_c598d0c6",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-21T15:01:28Z",
+      "side": 1,
+      "message": "this function is long and repetitive. the repetitive may be unavoidable but the length is not. break it into manageable pieces.",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc96c7c7_455e802d",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-21T15:01:28Z",
+      "side": 1,
+      "message": "when this and other errors are delivered and printed, there really is no context. it doesn\u0027t even print the command name! so in some shell script all you\u0027ll see is\n\ndomain must be specified\n\nin the error output. bad UX.\n\nyou need a much better package comment that talks about the YAML file. the config flag usage string should say it\u0027s a YAML file. errors should be reported by go standard logs, i think, and you should say\n  log.SetPrefix(\"upbox: \")\nand maybe\n  log.SetFlags(0)\nfor niceness. certain failures, in particular those caused by reading a bad config file, should trigger a usage message that has or perhaps points to better information",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc96c7c7_a593c4a7",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-21T15:01:28Z",
+      "side": 1,
+      "message": "this, for an example, is a worthless error message",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
