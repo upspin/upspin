@@ -599,8 +599,7 @@ should take those two addresses as arguments.
 	// Generate a new key.
 	s.keygen()
 	// TODO: write better instructions.
-	fmt.Println("Write down the code above. It is used to recover your keys.")
-
+	fmt.Println("Write down the command above. You will need it if you lose your keys.")
 	// Now load the context. This time it should succeed.
 	ctx, err := context.FromFile(*rcFile)
 	if err != nil {
