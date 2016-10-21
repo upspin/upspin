@@ -38,7 +38,7 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 		for i := 0; i < 8; i++ {
 			proquints[i] = proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2]))
 		}
-		proquintStr = fmt.Sprintf("-secretseed %s-%s-%s-%s.%s-%s-%s-%s\n", proquints...)
+		proquintStr = fmt.Sprintf("%s-%s-%s-%s.%s-%s-%s-%s", proquints...)
 		// Ignore punctuation on input;  this format is just to help the user keep their place.
 	}
 
@@ -76,7 +76,7 @@ func writeKeys(where, publicKey, privateKey, proquintStr string) error {
 		return err
 	}
 	if proquintStr != "" {
-		fmt.Print(proquintStr)
+		fmt.Printf("Keys generated. To recover them if lost, run:\n\tupspin keygen -secretseed %s\n", proquintStr)
 	}
 	return nil
 }
