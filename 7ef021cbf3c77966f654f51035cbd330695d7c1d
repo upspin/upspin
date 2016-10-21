@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c0f8be2_c2ab7329",
+        "filename": "cmd/upspinfs/sh_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-10-21T23:54:28Z",
+      "side": 1,
+      "message": "Can we just stick this somewhere generic since they really have to be called in every server where we might want to test with inprocess impls?  As is putting inprocess endpoints in my upspin/rc has become useless unless I stick these lines in upspinfs/main, upspin and any other program we or our users might write.",
+      "revId": "7ef021cbf3c77966f654f51035cbd330695d7c1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
