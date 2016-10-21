@@ -17,11 +17,11 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
+	_ "upspin.io/dir/remote"
+	_ "upspin.io/key/remote"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/transports"
+	_ "upspin.io/store/remote"
 )
 
 func usage() {
