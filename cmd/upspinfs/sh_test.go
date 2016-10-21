@@ -16,6 +16,10 @@ import (
 	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/upspin"
+
+	dirserver "upspin.io/dir/inprocess"
+	keyserver "upspin.io/key/inprocess"
+	storeserver "upspin.io/store/inprocess"
 )
 
 // unmountHelper exists because (on Linux at least) you need an suid
@@ -39,6 +43,10 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)
 	ctx = context.SetDirEndpoint(ctx, endpoint)
+
+	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+	bind.RegisterDirServer(upspin.InProcess, dirserver.New(ctx))
 
 	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))
 	user := &upspin.User{
