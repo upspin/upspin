@@ -18,24 +18,24 @@ type Server struct {
 
 var _ upspin.StoreServer = Server{}
 
-var ServerErr = errors.Str("request to Server service")
+var unassignedErr = errors.Str("request to unassigned service")
 
 // Get implements upspin.StoreServer.Get.
 func (Server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/Server.Get"
-	return nil, nil, nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, nil, nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.StoreServer.Put.
 func (Server) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/Server.Put"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.StoreServer.Delete.
 func (Server) Delete(ref upspin.Reference) error {
 	const op = "store/Server.Delete"
-	return errors.E(op, errors.Invalid, ServerErr)
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.

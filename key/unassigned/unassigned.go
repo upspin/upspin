@@ -18,18 +18,18 @@ type Server struct {
 
 var _ upspin.KeyServer = Server{}
 
-var ServerErr = errors.Str("request to Server service")
+var unassignedErr = errors.Str("request to unassigned service")
 
 // Lookup implements upspin.KeysServer.Lookup.
 func (Server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/Server.Lookup"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.KeysServer.Put.
 func (Server) Put(user *upspin.User) error {
 	const op = "key/Server.Put"
-	return errors.E(op, errors.Invalid, ServerErr)
+	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.
