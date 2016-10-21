@@ -18,36 +18,36 @@ type Server struct {
 
 var _ upspin.DirServer = Server{}
 
-var ServerErr = errors.Str("request to Server service")
+var unassignedErr = errors.Str("request to unassigned service")
 
 // Glob implements upspin.DirServer.Glob.
 func (Server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "dir/Server.Glob"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.DirServer.Put.
 func (Server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "dir/Server.Put"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (Server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/Server.WhichAccess"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (Server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/Server.Delete"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (Server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/Server.Lookup"
-	return nil, errors.E(op, errors.Invalid, ServerErr)
+	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Endpoint implements upspin.Service.
