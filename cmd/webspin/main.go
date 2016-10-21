@@ -19,6 +19,10 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	// Load useful packers
+	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/plain"
+
 	// Load required transports
 	_ "upspin.io/dir/transports"
 	_ "upspin.io/key/transports"
