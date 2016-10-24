@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e17460bf_93057cef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "then why is it in the gcp directory?",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_53f124eb",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "could it be a package instead?",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_73f6a0e6",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "but it\u0027s part of package gcp",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_13ebacf9",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "s/Block/\u0026s/",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_d3e45429",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "store/permission? or maybe something short, like store/perm",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_93dedc51",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "there is no need for this function. just use go p.updateLoop at the call site",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_735b0010",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "what is the select for?",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_336588cc",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "is netAddr wise? if it DHCPs that could change every boot, making the system unusable.\ni was expecting something generic like \"store\" for the file name, or maybe the user name up to the @. if you need a different list, create a different owner",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_7384602e",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "\"expands it as Group\"?",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_d3921471",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "s/readA/a/\n\nread is just get, and it returns the list of allowed writers.\nin fact a number of the methods in this file are redundant like that",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_337ee85a",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "this seems fine as is",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_938c9c51",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "just \"load\"",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_7329c04f",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "just lookup",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_d3177408",
+        "filename": "store/gcp/permission_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:24:06Z",
+      "side": 1,
+      "message": "but it shouldn\u0027t. see comments elsewhere",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
