@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -110,13 +111,13 @@ func TestPutNewUserSelf(t *testing.T) {
 	user := &upspin.User{
 		Name: myName,
 		Dirs: []upspin.Endpoint{
-			upspin.Endpoint{
+			{
 				Transport: upspin.Remote,
 				NetAddr:   upspin.NetAddr("there.co.uk"),
 			},
 		},
 		Stores: []upspin.Endpoint{
-			upspin.Endpoint{
+			{
 				Transport: upspin.Remote,
 				NetAddr:   upspin.NetAddr("down-under.au"),
 			},
@@ -186,6 +187,24 @@ func TestPutNewUserSelfIsAdmin(t *testing.T) {
 	}
 	if !isAdmin {
 		t.Error("Expected user to be an admin")
+	}
+}
+
+func TestPutWildcardUser(t *testing.T) {
+	const myName = "*@mydomain.com"
+	user := &upspin.User{
+		Name: myName,
+	}
+	buf := marshalUser(t, user, isAdmin)
+
+	// New server for myName.
+	u, _ := newKeyServerWithMocking(myName, myName, buf)
+
+	// Change my information.
+	err := u.Put(user)
+	expectedErr := errors.E(errors.Invalid, upspin.UserName(myName))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
 }
 
