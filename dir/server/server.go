@@ -270,19 +270,37 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	isAccess := access.IsAccessFile(p.Path())
 	isGroup := access.IsGroupFile(p.Path())
+	isLink := entry.IsLink()
 
-	// Links can't be named Access or Group and must use only Plain pack.
-	if entry.IsLink() {
+	// Links can't be named Access or Group.
+	if isLink {
 		if isAccess || isGroup {
 			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link cannot be named Access or Group"))
-		}
-		if entry.Packing != upspin.PlainPack {
-			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link can only use PlainPack"))
 		}
 	}
 	// Directories cannot have reserved names.
 	if isAccess && entry.IsDir() {
 		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
+	}
+
+	// Special files must use PlainPack.
+	if (isGroup || isAccess) && entry.Packing != upspin.PlainPack {
+		return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("must use PlainPack"))
+	}
+
+	if isAccess {
+		// Validate access files at Put time to detect bad ones early.
+		_, err := s.loadAccess(entry, o)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+	}
+	if isGroup {
+		// Validate group files at Put time to detect bad ones early.
+		err = s.loadGroup(p, entry)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 	}
 
 	return s.put(op, p, entry, o)
