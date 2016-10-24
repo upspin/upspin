@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
+	"upspin.io/user"
 	"upspin.io/valid"
 )
 
@@ -69,14 +70,22 @@ func dup(u *upspin.User) *upspin.User {
 }
 
 // Put implements upspin.KeyServer.
-func (s *server) Put(user *upspin.User) error {
+func (s *server) Put(u *upspin.User) error {
 	const op = "key/inprocess.Put"
-	if err := valid.User(user); err != nil {
+	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
 	}
+	name, _, _, err := user.Parse(u.Name)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if name == "*" {
+		return errors.E(op, errors.Invalid, u.Name, errors.Str("user has wildcard '*' in name"))
+	}
+
 	s.db.mu.RLock()
 	defer s.db.mu.RUnlock()
-	s.db.users[user.Name] = dup(user)
+	s.db.users[u.Name] = dup(u)
 	return nil
 }
 

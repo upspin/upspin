@@ -14,6 +14,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
+	"upspin.io/user"
 	"upspin.io/valid"
 
 	// We use GCS as the backing for our data.
@@ -62,8 +63,6 @@ type userEntry struct {
 	IsAdmin bool
 }
 
-var errInvalidUserName = errors.E(errors.Invalid, errors.Str("invalid user name format"))
-
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/gcp.Lookup"
@@ -78,18 +77,25 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 }
 
 // Put implements upspin.KeyServer.
-func (s *server) Put(user *upspin.User) error {
+func (s *server) Put(u *upspin.User) error {
 	const op = "key/gcp.Put"
 	if s.user == "" {
 		return errors.E(op, errors.Invalid, errors.Str("not bound to user"))
 	}
-	if err := valid.User(user); err != nil {
+	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
+	}
+	name, _, _, err := user.Parse(u.Name)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if name == "*" {
+		return errors.E(op, errors.Invalid, u.Name, errors.Str("user has wildcard '*' in name"))
 	}
 
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
-	entry, err := s.fetchUserEntry(op, user.Name)
+	entry, err := s.fetchUserEntry(op, u.Name)
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
@@ -101,7 +107,7 @@ func (s *server) Put(user *upspin.User) error {
 	}
 
 	// Is the user operating on his/her own record?
-	if user.Name != s.user {
+	if u.Name != s.user {
 		// Not operating on own record, so we need to ensure context.UserName is an admin.
 		// First, retrieve the user entry for the context user.
 		entry, err := s.fetchUserEntry(op, s.user)
@@ -116,7 +122,7 @@ func (s *server) Put(user *upspin.User) error {
 
 	// Put puts, it does not update, so we simply overwrite what's there if it exists.
 	// Set IsAdmin to what it was before or false by default.
-	return s.putUserEntry(op, &userEntry{User: *user, IsAdmin: isAdmin})
+	return s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
