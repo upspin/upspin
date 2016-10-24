@@ -722,6 +722,66 @@ func TestOverwriteFileWithWrongSequence(t *testing.T) {
 	}
 }
 
+func TestPutBadAccess(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+
+	const accessFileContents = "Merge: batman@gotham.city"
+
+	loc := writeToStore(t, s.serverContext, []byte(accessFileContents))
+
+	de := &upspin.DirEntry{
+		Name:       userName + "/Access",
+		SignedName: userName + "/Access",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
+		Blocks: []upspin.DirBlock{
+			{
+				Location: loc,
+				Offset:   0,
+				Size:     int64(len(accessFileContents)),
+			},
+		},
+	}
+	_, err := s.Put(de)
+	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+}
+
+func TestPutBadGroup(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	_, err := makeDirectory(s, userName+"/Group")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const groupFileContents = "yo@bar" // bad username.
+
+	loc := writeToStore(t, s.serverContext, []byte(groupFileContents))
+
+	de := &upspin.DirEntry{
+		Name:       userName + "/Group/badgroup",
+		SignedName: userName + "/Group/badgroup",
+		Attr:       upspin.AttrNone,
+		Writer:     userName,
+		Packing:    upspin.PlainPack,
+		Blocks: []upspin.DirBlock{
+			{
+				Location: loc,
+				Offset:   0,
+				Size:     int64(len(groupFileContents)),
+			},
+		},
+	}
+	_, err = s.Put(de)
+	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+}
+
 func TestMain(m *testing.M) {
 	var err error
 	testDir, err = ioutil.TempDir("", "DirServer")
