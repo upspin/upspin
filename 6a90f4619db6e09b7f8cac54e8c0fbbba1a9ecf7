@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_96bd6abc",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:33:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_b3d4384b",
+      "revId": "6a90f4619db6e09b7f8cac54e8c0fbbba1a9ecf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_33a268e5",
         "filename": "access/access.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-24T20:08:36Z",
       "side": 1,
       "message": "GroupDir is the base name of the directory of group files in the user root.",
+      "revId": "6a90f4619db6e09b7f8cac54e8c0fbbba1a9ecf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_f6b05ee5",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:33:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_33a268e5",
       "revId": "6a90f4619db6e09b7f8cac54e8c0fbbba1a9ecf7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
