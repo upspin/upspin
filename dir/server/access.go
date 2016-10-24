@@ -230,3 +230,14 @@ func (s *server) getDefaultAccess(userName upspin.UserName) (acc *access.Access,
 	}
 	return
 }
+
+// loadGroup loads a group file from its entry and parses it, but does not
+// add it.
+func (s *server) loadGroup(p path.Parsed, entry *upspin.DirEntry) error {
+	data, err := clientutil.ReadAll(s.serverContext, entry)
+	if err != nil {
+		return err
+	}
+	_, err = access.ParseGroup(p, data)
+	return err
+}
