@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bcafeff4_12eb0cc8",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "need? no. this is an experiment, though.\nwe could replace it with json at any time, if we decide yaml is a bad idea.\nwhile the format is simple with just the defaults, it has the potential to be significantly more complex.",
+      "parentUuid": "9c0f8be2_7606a983",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9c0f8be2_96fd3d4c",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-24T02:21:11Z",
       "side": 1,
       "message": "It would be good if this format wasn\u0027t buried here and instead were listed at the top of the file or in a README.",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcafeff4_72e898c9",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "i have improved the docs",
+      "parentUuid": "9c0f8be2_96fd3d4c",
       "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "bcafeff4_32ee10d8",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc96c7c7_a56ca4eb",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc96c7c7_c598d0c6",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-21T15:01:28Z",
       "side": 1,
       "message": "this function is long and repetitive. the repetitive may be unavoidable but the length is not. break it into manageable pieces.",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcafeff4_52e594ed",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc96c7c7_c598d0c6",
       "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "bcafeff4_b2c0403b",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc96c7c7_455e802d",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc96c7c7_a593c4a7",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 2
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-21T15:01:28Z",
       "side": 1,
       "message": "this, for an example, is a worthless error message",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcafeff4_92c53c4b",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-24T05:25:10Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "fc96c7c7_a593c4a7",
       "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
