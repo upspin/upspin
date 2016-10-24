@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "9c0f8be2_7606a983",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T02:21:11Z",
+      "side": 1,
+      "message": "Do we really need to add one more dependency? I know this is just one command, not a package others depend on, but the format you list below is very simple and can be better used without introducing yet a new dependency.",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c0f8be2_96fd3d4c",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T02:21:11Z",
+      "side": 1,
+      "message": "It would be good if this format wasn\u0027t buried here and instead were listed at the top of the file or in a README.",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc96c7c7_a56ca4eb",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 2
