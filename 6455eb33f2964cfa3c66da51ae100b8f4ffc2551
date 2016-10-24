@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_9696ca32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_93057cef",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_53f124eb",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "could it be a package instead?",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_d981d3e3",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_53f124eb",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_f97e0f1f",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_73f6a0e6",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_13ebacf9",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "s/Block/\u0026s/",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_998b5b00",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_13ebacf9",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_59970326",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_d3e45429",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_93dedc51",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "there is no need for this function. just use go p.updateLoop at the call site",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_799c3f47",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_93dedc51",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_19918b2e",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "I had something in mind. Dropped.\nDone.",
+      "parentUuid": "e17460bf_735b0010",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_336588cc",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -132,6 +258,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "is netAddr wise? if it DHCPs that could change every boot, making the system unusable.\ni was expecting something generic like \"store\" for the file name, or maybe the user name up to the @. if you need a different list, create a different owner",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_f9a7ef90",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_336588cc",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_99b91bb0",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_7384602e",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_d3921471",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -166,6 +328,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "s/readA/a/\n\nread is just get, and it returns the list of allowed writers.\nin fact a number of the methods in this file are redundant like that",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_39e487c7",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_d3921471",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_d9d8f309",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_337ee85a",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_938c9c51",
         "filename": "store/gcp/permission.go",
         "patchSetId": 8
@@ -200,6 +398,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "just \"load\"",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_f9d5afd0",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_938c9c51",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_99d27be6",
+        "filename": "store/gcp/permission.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_7329c04f",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_d3177408",
         "filename": "store/gcp/permission_test.go",
         "patchSetId": 8
@@ -234,6 +468,24 @@
       "writtenOn": "2016-10-24T20:24:06Z",
       "side": 1,
       "message": "but it shouldn\u0027t. see comments elsewhere",
+      "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_b9cf373b",
+        "filename": "store/gcp/permission_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T22:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17460bf_d3177408",
       "revId": "6455eb33f2964cfa3c66da51ae100b8f4ffc2551",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
