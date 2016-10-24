@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "e17460bf_13df2cf4",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-24T18:41:36Z",
+      "side": 1,
+      "message": "I think this should be discussed carefully. New dependencies add new headaches. See thread \"building outside\". The experimental nature of this is understandable, but they tend to stay that way. Why not use JSON now?",
+      "parentUuid": "bcafeff4_12eb0cc8",
+      "revId": "48bad786b6c34ba21f24e695de6ad16fc2c7155e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9c0f8be2_96fd3d4c",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 2
