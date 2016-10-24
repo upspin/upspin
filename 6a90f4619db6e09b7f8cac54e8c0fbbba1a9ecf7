@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e17460bf_b3d4384b",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:08:36Z",
+      "side": 1,
+      "message": "// AccessFile is the base name of an access control file.\n\n(as written, it\u0027s like \"NumberOne is the name of number one\".",
+      "revId": "6a90f4619db6e09b7f8cac54e8c0fbbba1a9ecf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_33a268e5",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:08:36Z",
+      "side": 1,
+      "message": "GroupDir is the base name of the directory of group files in the user root.",
+      "revId": "6a90f4619db6e09b7f8cac54e8c0fbbba1a9ecf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
