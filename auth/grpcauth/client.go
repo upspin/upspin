@@ -266,7 +266,7 @@ func (ac *AuthClientService) proxyNeedsConfiguration() bool {
 // 	ctx, callOpt, finishAuth, err := ac.NewAuthContext()
 // 	// handle err
 // 	req := &proto.RequestMessage{ ... }
-// 	resp, err := c.grpcClient.DoATrump(ctx, req, callOpt)
+// 	resp, err := c.grpcClient.Echo(ctx, req, callOpt)
 // 	err = finishAuth(err)
 // 	// handle err
 func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, finishAuth func(error) error, err error) {
