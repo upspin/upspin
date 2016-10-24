@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e17460bf_1312cc3b",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:14:30Z",
+      "side": 1,
+      "message": "set by Do but what is it?",
+      "revId": "e029fb13a6c8348cd17a834077bd0912afdde2c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e17460bf_d3fbf4ce",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-24T20:14:30Z",
+      "side": 1,
+      "message": "this comment isn\u0027t too helpful yet captures the difficulty of coupling data structures to an externally defined format, and the description of that format.\n\ni am not sure that JSON is the answer here, but i am sure that we need to think this through properly. it\u0027s possible (likely even) the answer spills over to the rc files",
+      "revId": "e029fb13a6c8348cd17a834077bd0912afdde2c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
