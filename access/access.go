@@ -31,8 +31,11 @@ import (
 )
 
 const (
-	// accessFile is the name of the Access file.
-	accessFile = "Access"
+	// AccessFile is the base name of an access control file.
+	AccessFile = "Access"
+
+	// GroupDir is the base name of the directory of group files in the user root.
+	GroupDir = "Group"
 )
 
 const (
@@ -303,7 +306,7 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 				return nil, err
 			}
 			// Is it a badly formed group file?
-			const groupElem = "/Group/"
+			const groupElem = "/" + GroupDir + "/"
 			slash := bytes.IndexByte(user, '/')
 			if slash >= 0 && bytes.Index(user, []byte(groupElem)) == slash {
 				// Looks like a group file but is missing the user name.
@@ -318,7 +321,7 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 		// Check group syntax.
 		if !p.IsRoot() {
 			// First element must be group.
-			if p.Elem(0) != "Group" {
+			if p.Elem(0) != GroupDir {
 				return nil, errors.Errorf("illegal group %q", user)
 			}
 			// Groups cannot be wild cards.
@@ -417,7 +420,7 @@ func IsGroupFile(pathName upspin.PathName) bool {
 		return false
 	}
 	// Need "a@b.c/Group/file", but file can't be Access.
-	return parsed.NElem() >= 2 && parsed.Elem(0) == "Group" && parsed.Elem(parsed.NElem()-1) != accessFile
+	return parsed.NElem() >= 2 && parsed.Elem(0) == GroupDir && parsed.Elem(parsed.NElem()-1) != AccessFile
 }
 
 // AddGroup installs a group with the specified name and textual contents,
