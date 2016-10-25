@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a104284e_1ad441a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T06:01:38Z",
+      "side": 1,
+      "message": "This doesn\u0027t read too well. Why do I care to have a new package with a new init function? I know nothing about what this package does.\n\nSuggestion: make inclusion and initialization of the transports easier.\n\nOr something along these lines.",
+      "revId": "69f7ba3b7d4b42731891f4a36524797e7bb47aef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
