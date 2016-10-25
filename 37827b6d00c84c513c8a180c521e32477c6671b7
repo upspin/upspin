@@ -493,6 +493,24 @@
     },
     {
       "key": {
+        "uuid": "610b10aa_67d9b20b",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T22:53:57Z",
+      "side": 1,
+      "message": "Logs will always be verbose. The solution is to filter the logs when you\u0027re interested in something. It\u0027s impossible to handle it any other way.",
+      "parentUuid": "01cc14aa_f76b1ad1",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_c8a14f7d",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
