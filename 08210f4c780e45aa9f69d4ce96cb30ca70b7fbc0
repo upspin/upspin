@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_9aeb11c5",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:07:57Z",
+      "side": 1,
+      "message": "My two cents:\n\n* Servers should almost always call valid since servers are an API and APIs are for programmers (and like compilers, they shouldn\u0027t be fixing programmer\u0027s input). \n* UIs are for users and cmd/upspin is an UI, so it can make fixes or prompt the user to make them.  \n* Client is a middle layer, it may do both things depending on the case.\n\nIn the MkDir case you mention, the trailing slash is perhaps a small fix that makes sense for the server to make, since there is really no other interpretation there.\n\nIf you look at valid.User, it checks for endpoints too. We can\u0027t fix endpoints.\n\nI agree on documenting this properly. Let\u0027s talk at the meeting.",
+      "parentUuid": "a104284e_3a6ca5e9",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_286e2b73",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 1
