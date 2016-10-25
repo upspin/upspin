@@ -15,7 +15,8 @@ import (
 	"upspin.io/upspin"
 )
 
-// Config holds the configuration parameters for instantiating a server (HTTP or gRPC).
+// Config holds the configuration parameters for instantiating a server (HTTP or
+// GRPC).
 type Config struct {
 	// Lookup looks up user keys.
 	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)

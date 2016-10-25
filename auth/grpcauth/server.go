@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package grpcauth handles authenticating users using gRPC.
+// Package grpcauth handles authenticating users using GRPC.
 //
 // To use a grpcauth on the server side:
 //
@@ -79,7 +79,7 @@ const (
 	serverAuthMagic = " AuthenticateServer "
 )
 
-// A SecureServer is a grpc server that implements the Authenticate method as defined by the upspin proto.
+// A SecureServer is a GRPC server that implements the Authenticate method as defined by the upspin proto.
 type SecureServer interface {
 	// Ping responds with the same.
 	Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
@@ -93,7 +93,7 @@ type SecureServer interface {
 	// Stop stops serving requests immediately, closing all open connections.
 	Stop()
 
-	// GRPCServer returns the underlying grpc server.
+	// GRPCServer returns the underlying GRPC server.
 	GRPCServer() *grpc.Server
 }
 
@@ -256,12 +256,12 @@ func (s *secureServerImpl) GRPCServer() *grpc.Server {
 	return s.grpcServer
 }
 
-// verifyUser verifies a grpc context header authenticating the remote user.
+// verifyUser verifies a GRPC context header authenticating the remote user.
 //
 // The message is a slice of strings of the form: user, time, sig.R, sig.S
 func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time) error {
 	if len(msg) != 4 {
-		return errors.Str("bad grpc header")
+		return errors.Str("bad GRPC header")
 	}
 
 	// Make sure the challenge time is sane.
@@ -296,7 +296,7 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 	return errors.Str("signature fails to validate using the provided key")
 }
 
-// signUser creates a grpc context header authenticating the local user.
+// signUser creates a GRPC context header authenticating the local user.
 func signUser(ctx upspin.Context, magic string) ([]string, error) {
 	if ctx == nil {
 		return nil, errors.Str("nil context")

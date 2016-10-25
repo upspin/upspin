@@ -22,7 +22,7 @@ import (
 	_ "upspin.io/key/transports"
 )
 
-// server is a SecureServer that talks to a KeyServer interface and serves gRPC requests.
+// server is a SecureServer that talks to a KeyServer interface and serves GRPC requests.
 type server struct {
 	context upspin.Context
 

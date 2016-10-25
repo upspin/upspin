@@ -193,7 +193,7 @@ func (ac *AuthClientService) SetService(common GRPCCommon) {
 	ac.grpcCommon = common
 }
 
-// GRPCConn returns the grpc client connection used to dial the server.
+// GRPCConn returns the GRPC client connection used to dial the server.
 func (ac *AuthClientService) GRPCConn() *grpc.ClientConn {
 	return ac.grpcConn
 }

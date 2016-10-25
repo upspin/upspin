@@ -19,7 +19,7 @@ import (
 	gContext "golang.org/x/net/context"
 )
 
-// server is a SecureServer that talks to a DirServer interface and serves gRPC requests.
+// server is a SecureServer that talks to a DirServer interface and serves GRPC requests.
 type server struct {
 	context upspin.Context
 
