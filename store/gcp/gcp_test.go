@@ -11,11 +11,13 @@ import (
 	"time"
 
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 
 	// Import needed storage backend.
+	"upspin.io/cloud/storage"
 	_ "upspin.io/cloud/storage/gcs"
 )
 
@@ -27,7 +29,7 @@ const (
 )
 
 func TestPutAndGet(t *testing.T) {
-	s := newStoreServer()
+	s := newTestStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	refdata, err := s.server.Put([]byte(contents))
@@ -64,7 +66,7 @@ func TestPutAndGet(t *testing.T) {
 }
 
 func TestGetFromLocalCache(t *testing.T) {
-	s := newStoreServer()
+	s := newTestStoreServer()
 	cache := s.server.cache
 	defer cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
@@ -90,7 +92,7 @@ func TestGetFromLocalCache(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	s := newStoreServer()
+	s := newTestStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	err := s.server.Delete(expectedRef)
@@ -106,7 +108,7 @@ func TestDelete(t *testing.T) {
 // Test some error conditions.
 
 func TestGetInvalidRef(t *testing.T) {
-	s := newStoreServer()
+	s := newTestStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	_, _, _, err := s.server.Get("bla bla bla")
@@ -120,7 +122,7 @@ func TestGetInvalidRef(t *testing.T) {
 }
 
 func TestGCPErrorsOut(t *testing.T) {
-	s := newStoreServer()
+	s := newTestStoreServer()
 	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
 
 	oldStorage := s.server.storage
@@ -141,11 +143,12 @@ func TestGCPErrorsOut(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	_, err := New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	ctx := context.New()
+	_, err := New(ctx, "defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = New("dance=the macarena")
+	_, err = New(ctx, "dance=the macarena")
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
@@ -155,20 +158,32 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func newStoreServer() *storeTestServer {
-	ch := make(chan bool)
+func newTestStoreServer() *storeTestServer {
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, owner)
+	return newTestStoreServerForContext(ctx)
+}
 
+func newServer(ctx upspin.Context, st storage.Storage) *server {
+	return &server{
+		ctx:     ctx,
+		user:    ctx.UserName(),
+		cache:   cache.NewFileCache(""),
+		storage: st,
+	}
+}
+
+func newTestStoreServerForContext(ctx upspin.Context) *storeTestServer {
+	ch := make(chan bool)
 	s := &storeTestServer{
-		server: &server{
-			cache: cache.NewFileCache(""),
-			storage: &testGCP{
+		server: newServer(ctx,
+			&testGCP{
 				ExpectGet: storagetest.ExpectGet{
 					Ref:  expectedRef,
 					Link: linkForRef,
 				},
 				ch: ch,
-			},
-		},
+			}),
 		ch: ch,
 	}
 	return s

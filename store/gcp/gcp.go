@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
@@ -35,16 +34,16 @@ const (
 
 // server implements upspin.StoreServer.
 type server struct {
-	mu       sync.RWMutex // Protects fields below.
-	refCount uint64       // How many clones of us exist.
-	storage  storage.Storage
-	cache    *cache.FileCache
+	ctx     upspin.Context   // server context.
+	user    upspin.UserName  // owner of this instance of the server.
+	storage storage.Storage  // underlying storage medium.
+	cache   *cache.FileCache // local file cache.
 }
 
 var _ upspin.StoreServer = (*server)(nil)
 
-// New returns a StoreServer that serves the given endpoint with the provided options.
-func New(options ...string) (upspin.StoreServer, error) {
+// New returns a StoreServer for a context with the provided options.
+func New(ctx upspin.Context, options ...string) (upspin.StoreServer, error) {
 	const op = "store/gcp.New"
 
 	var dialOpts []storage.DialOpts
@@ -70,21 +69,22 @@ func New(options ...string) (upspin.StoreServer, error) {
 	}
 	log.Debug.Printf("Configured GCP store: %v", options)
 
-	return &server{
+	srv := &server{
+		ctx:     ctx,
+		user:    ctx.UserName(),
 		storage: s,
 		cache:   c,
-	}, nil
+	}
+	return srv, nil
 }
 
 // Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (*upspin.Refdata, error) {
-	// TODO: check that userName has permission to write to this store server.
 	const op = "store/gcp.Put"
+
 	ref := sha256key.Of(data).String()
-	s.mu.RLock()
 	err := s.cache.Put(ref, bytes.NewReader(data))
 	if err != nil {
-		s.mu.RUnlock()
 		return nil, errors.E(op, err)
 	}
 
@@ -98,7 +98,6 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 			// because FileCache is thread safe.
 			s.cache.Purge(ref)
 		}
-		s.mu.RUnlock()
 	}()
 	refdata := &upspin.Refdata{
 		Reference: upspin.Reference(ref),
@@ -136,8 +135,6 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 // caller should close it. If location is non-zero ref is in the backend at that location.
 func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
 	const op = "store/gcp.Get"
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	file, err = s.cache.OpenRefForRead(string(ref))
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
@@ -177,9 +174,6 @@ func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.
 // Delete implements upspin.StoreServer.
 func (s *server) Delete(ref upspin.Reference) error {
 	const op = "store/gcp.Delete"
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	// TODO: verify ownership and proper ACLs to delete blob
 	err := s.storage.Delete(string(ref))
 	if err != nil {
 		return errors.E(op, errors.Errorf("%s: %s", ref, err))
@@ -189,10 +183,9 @@ func (s *server) Delete(ref upspin.Reference) error {
 
 // Dial implements upspin.Service.
 func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.refCount++
-	return s, nil
+	newS := *s
+	newS.user = context.UserName()
+	return &newS, nil
 }
 
 // Ping implements upspin.Service.
@@ -202,28 +195,11 @@ func (s *server) Ping() bool {
 
 // Close implements upspin.Service.
 func (s *server) Close() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if s.refCount == 0 {
-		log.Error.Printf("Closing non-dialed gcp store")
-		return
-	}
-	s.refCount--
-
-	if s.refCount == 0 {
-		if s.storage != nil {
-			s.storage.Close()
-		}
-		s.storage = nil
-		if s.cache != nil {
-			s.cache.Delete()
-		}
-		s.cache = nil
-	}
+	// TODO: Close is never called in practice so we might as well remove it
+	// from the interface.
 }
 
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
-	return upspin.Endpoint{} // No endpoint.
+	return s.ctx.StoreEndpoint()
 }

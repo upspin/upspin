@@ -75,9 +75,9 @@ type Env struct {
 	// Setup contains the original setup options.
 	Setup *Setup
 
-	keyServer   upspin.KeyServer
-	storeServer upspin.StoreServer
-	dirServer   upspin.DirServer
+	KeyServer   upspin.KeyServer
+	StoreServer upspin.StoreServer
+	DirServer   upspin.DirServer
 
 	tmpDir     string
 	exitCalled bool
@@ -135,13 +135,13 @@ func New(setup *Setup) (*Env, error) {
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/gcp implementation
 		// isn't interesting when run offline.
-		env.storeServer = storeserver.New()
-		storeServerMux.Register(storeEndpoint, env.storeServer)
+		env.StoreServer = storeserver.New()
+		storeServerMux.Register(storeEndpoint, env.StoreServer)
 
 		// Set up DirServer instance.
 		switch k {
 		case "inprocess":
-			env.dirServer = dirserver_inprocess.New(ctx)
+			env.DirServer = dirserver_inprocess.New(ctx)
 		case "server":
 			// Set up user and factotum.
 			ctx = context.SetUserName(ctx, TestServerName)
@@ -157,13 +157,13 @@ func New(setup *Setup) (*Env, error) {
 				return nil, errors.E(op, err)
 			}
 			env.tmpDir = logDir
-			env.dirServer, err = dirserver_server.New(ctx, "logDir="+logDir)
+			env.DirServer, err = dirserver_server.New(ctx, "logDir="+logDir)
 			if err != nil {
 				env.rmTmpDir()
 				return nil, errors.E(op, err)
 			}
 		}
-		dirServerMux.Register(dirEndpoint, env.dirServer)
+		dirServerMux.Register(dirEndpoint, env.DirServer)
 
 	case "remote":
 		ctx = context.SetStoreEndpoint(ctx, upspin.Endpoint{
@@ -225,14 +225,14 @@ func (e *Env) Exit() error {
 
 	check(e.rmTmpDir())
 
-	if e.dirServer != nil {
-		e.dirServer.Close()
+	if e.DirServer != nil {
+		e.DirServer.Close()
 	}
-	if e.storeServer != nil {
-		e.storeServer.Close()
+	if e.StoreServer != nil {
+		e.StoreServer.Close()
 	}
-	if e.keyServer != nil {
-		e.keyServer.Close()
+	if e.KeyServer != nil {
+		e.KeyServer.Close()
 	}
 
 	return firstErr

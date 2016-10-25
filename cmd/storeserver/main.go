@@ -24,9 +24,9 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
-	// Load required transports
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	// We need the directory transports to fetch write permissions.
+	"upspin.io/store/perm"
+	_ "upspin.io/transports"
 )
 
 const serverName = "storeserver"
@@ -57,7 +57,7 @@ func main() {
 	case "inprocess":
 		store = inprocess.New()
 	case "gcp":
-		store, err = gcp.New(flags.Config...)
+		store, err = gcp.New(ctx, flags.Config...)
 	case "filesystem":
 		store, err = filesystem.New(ctx, flags.Config...)
 	default:
@@ -72,7 +72,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
+	wrappedStore := perm.WrapStore(ctx, store)
+	s := storeserver.New(ctx, wrappedStore, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
