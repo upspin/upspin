@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01cc14aa_f79c3af9",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T20:38:39Z",
+      "side": 1,
+      "message": "isn\u0027t it sufficient just to check that len(vals) is the same afterwards?",
+      "revId": "1527d6b50651e30cd55c2afbefdc57f9d0a2052a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
