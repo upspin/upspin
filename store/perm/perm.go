@@ -71,14 +71,14 @@ func NewStore(ctx upspin.Context) *Store {
 // UpdateLoop continuously looks for updates on this StoreServer's permissions.
 // It must be run in a goroutine before calling IsMutationAllowed.
 func (p *Store) UpdateLoop() {
-	err := p.updateAllowedWriters()
+	err := p.UpdateAllowedWriters()
 	if err != nil {
 		log.Error.Printf("Error updating StoreServer's writers: %s", err)
 	}
 	p.firstRun.Done()
 
 	for {
-		err = p.updateAllowedWriters()
+		err = p.UpdateAllowedWriters()
 		if err != nil {
 			log.Error.Printf("Error updating StoreServer's writers: %s", err)
 			time.Sleep(retryTimeout)
@@ -88,9 +88,9 @@ func (p *Store) UpdateLoop() {
 	}
 }
 
-// updateAllowedWriters retrieves and parses the Group file that rules over
+// UpdateAllowedWriters retrieves and parses the Group file that rules over
 // this StoreServer's allowed writers.
-func (p *Store) updateAllowedWriters() error {
+func (p *Store) UpdateAllowedWriters() error {
 	entry, err := p.lookupGroupFile()
 	if err != nil {
 		return err

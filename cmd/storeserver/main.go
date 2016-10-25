@@ -25,6 +25,7 @@ import (
 	"upspin.io/upspin/proto"
 
 	// Load required transports
+	_ "upspin.io/dir/transports" // for fetching write permissions.
 	_ "upspin.io/key/transports"
 	_ "upspin.io/store/transports"
 )
@@ -57,7 +58,7 @@ func main() {
 	case "inprocess":
 		store = inprocess.New()
 	case "gcp":
-		store, err = gcp.New(flags.Config...)
+		store, err = gcp.New(ctx, flags.Config...)
 	case "filesystem":
 		store, err = filesystem.New(ctx, flags.Config...)
 	default:

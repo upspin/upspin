@@ -184,7 +184,7 @@ func TestLifeCycle(t *testing.T) {
 	}
 
 	// Force a re-computation of the permissions.
-	err = perm.updateAllowedWriters()
+	err = perm.UpdateAllowedWriters()
 	if err != nil {
 		t.Fatal(err)
 	}
