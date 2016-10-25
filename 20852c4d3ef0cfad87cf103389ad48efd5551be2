@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "a104284e_773be832",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:49:53Z",
+      "side": 1,
+      "message": "s/checks/check/",
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_6814a3b7",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -25,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_97312c52",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:49:53Z",
+      "side": 1,
+      "message": "he means call AddGroup. i think it\u0027s fine as is.",
+      "parentUuid": "811e44a4_6814a3b7",
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_080fe7a2",
         "filename": "dir/server/access.go",
         "patchSetId": 1
@@ -36,6 +71,24 @@
       "writtenOn": "2016-10-25T00:46:04Z",
       "side": 1,
       "message": "add it? add it to the cache?",
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_57b50485",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:49:53Z",
+      "side": 1,
+      "message": "worth saying that or maybe \"but does not pass it to access.AddGroup\".",
+      "parentUuid": "811e44a4_080fe7a2",
       "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -59,6 +112,24 @@
         "endLine": 287,
         "endChar": 11
       },
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_37cfa014",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:49:53Z",
+      "side": 1,
+      "message": "agree",
+      "parentUuid": "811e44a4_4819dfeb",
       "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
