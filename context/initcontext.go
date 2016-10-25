@@ -7,13 +7,17 @@ package context
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/x509"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -145,20 +149,40 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	if r == nil {
 		home, err := Homedir()
 		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
+			return nil, errors.E(op, err)
 		}
 		f, err := os.Open(filepath.Join(home, "upspin/rc"))
 		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
+			return nil, errors.E(op, err)
 		}
 		r = f
 		defer f.Close()
 	}
 
-	// First source of truth is the RC file.
-	if err := valsFromReader(vals, r); err != nil {
+	// First source of truth is the YAML file.
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	if err := valsFromYAML(vals, data); err != nil {
+
+		// Try to parse the old format and if it parses print
+		// instructions for conversion to YAML.
+		// TODO(adg): delete this once transition to YAML is complete
+		if err := valsFromReader(vals, bytes.NewReader(data)); err == nil {
+			for k, v := range vals {
+				if v == "" {
+					delete(vals, k)
+				}
+			}
+			if data, err := yaml.Marshal(vals); err == nil {
+				return nil, fmt.Errorf("context in old format, should be YAML:\n\n%s\n", data)
+			}
+		}
+
+		return nil, errors.E(op, err)
+	}
+
 	// Then override with environment variables.
 	if err := valsFromEnvironment(vals); err != nil {
 		return nil, errors.E(op, err)
@@ -187,7 +211,6 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		}
 	}
 
-	var err error
 	dir := vals[secrets]
 	if dir == "" {
 		dir, err = sshdir()
@@ -214,9 +237,28 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	return ctx, err
 }
 
+// valsFromYAML parses YAML from the given map and puts the values
+// into the provided map. Unrecognized keys generate an error.
+func valsFromYAML(vals map[string]string, data []byte) error {
+	keys := map[string]bool{}
+	for k := range vals {
+		keys[k] = true
+	}
+	if err := yaml.Unmarshal(data, vals); err != nil {
+		return err
+	}
+	for k := range vals {
+		if !keys[k] {
+			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", k))
+		}
+	}
+	return nil
+}
+
 // valsFromReader reads key=value tokens from the provided reader and—if the
 // provided map contains that key—populates the map with the corresponding
 // value. Unrecognized keys generate an error.
+// TODO(adg): delete this once the transition to YAML is complete
 func valsFromReader(vals map[string]string, r io.Reader) error {
 	if r == nil {
 		return nil
@@ -231,7 +273,7 @@ func valsFromReader(vals map[string]string, r io.Reader) error {
 		line = strings.TrimSpace(line)
 		tokens := strings.SplitN(line, "=", 2)
 		if len(tokens) != 2 {
-			continue
+			return errors.E(errors.Invalid, errors.Errorf("bad line %q", line))
 		}
 		val := strings.TrimSpace(tokens[1])
 		attr := strings.TrimSpace(tokens[0])
