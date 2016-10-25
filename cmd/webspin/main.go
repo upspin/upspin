@@ -24,9 +24,7 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	"upspin.io/transports"
 )
 
 func main() {
@@ -44,6 +42,7 @@ func newServer() *server {
 	if err != nil {
 		log.Fatal(err)
 	}
+	transports.Init(ctx)
 	return &server{cli: client.New(ctx)}
 }
 
