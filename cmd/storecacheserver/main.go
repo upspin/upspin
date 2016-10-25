@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Storecache is a wrapper for a storage cache implementation that presents itself as a grpc interface.
+// Storecache is a wrapper for a storage cache implementation that presents
+// itself as a GRPC interface.
 package main
 
 import (

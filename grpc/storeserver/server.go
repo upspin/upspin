@@ -19,7 +19,7 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// server is a SecureServer that talks to a Store interface and serves gRPC requests.
+// server is a SecureServer that talks to a Store interface and serves GRPC requests.
 type server struct {
 	context upspin.Context
 
