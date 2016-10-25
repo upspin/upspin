@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a104284e_77792871",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "you don\u0027t need the local import name",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_b792706f",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "Domain specifies the default domain of any user names ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_978f6c45",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "should?",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_d789f43f",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "// User ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_f78cf851",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "still want to know what this field is.",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_3724c07a",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "// Server ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_1729bc50",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "export this const and it\u0027ll show up in the docs",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_573344c2",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "// ConfigFromFile ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_17841c2d",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "the # characters aren\u0027t helping here. i\u0027d rewrite this to give a simple example that\u0027s cut-and-pastable and after that explain the meanings in better-flowing prose.",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_97664cd5",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T02:06:22Z",
+      "side": 1,
+      "message": "s/imply some/represent/",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
