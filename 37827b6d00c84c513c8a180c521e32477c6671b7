@@ -457,6 +457,24 @@
     },
     {
       "key": {
+        "uuid": "610b10aa_e796c228",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T20:49:01Z",
+      "side": 1,
+      "message": "The only practical difference is how long we\u0027ll be waiting. I\u0027d rather wait 1 or 2 minutes than 5. Why do you want it to be longer?",
+      "parentUuid": "a104284e_e5243e26",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_c8a14f7d",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -667,6 +685,24 @@
     },
     {
       "key": {
+        "uuid": "610b10aa_c79bbe4e",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T20:49:01Z",
+      "side": 1,
+      "message": "why? It\u0027s the only group file of concern in this package",
+      "parentUuid": "a104284e_ab00451e",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_e8b9b3ae",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -836,6 +872,24 @@
       "side": 1,
       "message": "Absolutely. But note that this is only a test for this package, not a test that integrates with a StoreServer implementation yet. As such, it\u0027s not \"hooked up\" to a StoreServer yet. \n\nThe test you want will come in the next CL, when I plug this into store/gcp.",
       "parentUuid": "811e44a4_e8d253e6",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "610b10aa_a790ca2b",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T20:49:01Z",
+      "side": 1,
+      "message": "why do you need store/gcp to test that functionality?",
+      "parentUuid": "a104284e_cb31490a",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
