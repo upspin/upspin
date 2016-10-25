@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_c852ef7d",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "goimports does this, and i like it. makes it clearer",
+      "parentUuid": "a104284e_77792871",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a104284e_b792706f",
         "filename": "cmd/upbox/config.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T02:06:22Z",
       "side": 1,
       "message": "Domain specifies the default domain of any user names ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_28410ba7",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_b792706f",
       "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_0846c7be",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_978f6c45",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a104284e_d789f43f",
         "filename": "cmd/upbox/config.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-25T02:06:22Z",
       "side": 1,
       "message": "// User ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_683b0333",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_d789f43f",
       "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_a834db41",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_f78cf851",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a104284e_3724c07a",
         "filename": "cmd/upbox/config.go",
         "patchSetId": 4
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-25T02:06:22Z",
       "side": 1,
       "message": "// Server ...",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_4840bf9f",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_3724c07a",
       "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -138,6 +246,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_88311752",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_573344c2",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a104284e_17841c2d",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 4
@@ -155,6 +281,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_48b55f85",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_17841c2d",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a104284e_97664cd5",
         "filename": "cmd/upbox/main.go",
         "patchSetId": 4
@@ -166,6 +310,24 @@
       "writtenOn": "2016-10-25T02:06:22Z",
       "side": 1,
       "message": "s/imply some/represent/",
+      "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_68b02397",
+        "filename": "cmd/upbox/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T04:17:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a104284e_97664cd5",
       "revId": "eee5dd609d9c1abee80b08cf1546f92755ab9bca",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
