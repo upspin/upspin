@@ -14,7 +14,6 @@ package perm
 //   where all writes would be allowed until the initial load is completed.
 //
 // TODOs:
-// - Use it in store/gcp (next CL).
 // - Cache references so we don't need to retrieve the contents every time.
 // - Poll more frequently if there is no control Group set up, so the StoreServer
 //   updates faster when creating a new one for the first time.
@@ -31,6 +30,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 const (
@@ -43,7 +43,7 @@ const (
 	pollInterval = 2 * time.Minute
 
 	// retryTimeout is the interval between re-attempts between failures.
-	retryTimeout = 10 * time.Second
+	retryTimeout = 10 * time.Minute //time.Second
 )
 
 // Store performs permission checking for StoreServer implementations.
@@ -65,20 +65,21 @@ func NewStore(ctx upspin.Context) *Store {
 		serverCtx: ctx,
 	}
 	p.firstRun.Add(1)
+	go p.updateLoop()
 	return p
 }
 
-// UpdateLoop continuously looks for updates on this StoreServer's permissions.
+// updateLoop continuously looks for updates on this StoreServer's permissions.
 // It must be run in a goroutine before calling IsMutationAllowed.
-func (p *Store) UpdateLoop() {
-	err := p.updateAllowedWriters()
+func (p *Store) updateLoop() {
+	err := p.UpdateNow()
 	if err != nil {
 		log.Error.Printf("Error updating StoreServer's writers: %s", err)
 	}
 	p.firstRun.Done()
 
 	for {
-		err = p.updateAllowedWriters()
+		err = p.UpdateNow()
 		if err != nil {
 			log.Error.Printf("Error updating StoreServer's writers: %s", err)
 			time.Sleep(retryTimeout)
@@ -88,11 +89,18 @@ func (p *Store) UpdateLoop() {
 	}
 }
 
-// updateAllowedWriters retrieves and parses the Group file that rules over
-// this StoreServer's allowed writers.
-func (p *Store) updateAllowedWriters() error {
+// UpdateNow retrieves and parses the Group file that rules over this
+// StoreServer's allowed writers.
+func (p *Store) UpdateNow() error {
 	entry, err := p.lookupGroupFile()
 	if err != nil {
+		// If the group file does not exist, reset writers map.
+		if errors.Match(errors.E(errors.NotExist), err) {
+			p.mu.Lock()
+			p.writers = nil
+			p.mu.Unlock()
+			return nil
+		}
 		return err
 	}
 	users, err := p.allowedWriters(entry)
@@ -177,14 +185,14 @@ func (p *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.E(errors.NotExist, parsed.Path(), errors.Str("no dir entry for path"))
 }
 
-// IsAllowedMutation reports whether the user has mutation privileges on the
+// IsWriter reports whether the user has mutation privileges on the
 // StoreServer. It is intended to be called from StoreServer.Put and
 // StoreServer.Delete.
-func (p *Store) IsAllowedMutation(u upspin.UserName) bool {
+func (p *Store) IsWriter(u upspin.UserName) bool {
 	p.firstRun.Wait()
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	// Everyone is allowed if there are no control Groups yet.
+	// Everyone is allowed if there is no control Group yet.
 	if p.writers == nil {
 		return true
 	}
@@ -192,5 +200,17 @@ func (p *Store) IsAllowedMutation(u upspin.UserName) bool {
 	if p.writers[access.All] {
 		return true
 	}
-	return p.writers[u] // If u is not found, false is returned (default for bool).
+	// Is this exact user allowed?
+	if p.writers[u] {
+		return true
+	}
+	// Maybe the domain is wildcarded. Check this case last as it's the most
+	// expensive.
+	_, _, domain, err := user.Parse(u)
+	if err != nil {
+		// Should never happen at this point.
+		log.Error.Printf("store/perm: unexpected error: %s", err)
+		return false
+	}
+	return p.writers[upspin.UserName("*@"+domain)]
 }

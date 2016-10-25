@@ -23,7 +23,6 @@ const (
 func TestNoGroupFileAllowsAll(t *testing.T) {
 	ownerEnv := setup(t)
 	perm := NewStore(ownerEnv.Context)
-	go perm.UpdateLoop()
 
 	// Everyone is allowed.
 	for _, user := range []upspin.UserName{
@@ -32,7 +31,7 @@ func TestNoGroupFileAllowsAll(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !perm.IsAllowedMutation(user) {
+		if !perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -53,10 +52,9 @@ func TestAllowsOnlyOwner(t *testing.T) {
 	}
 
 	perm := NewStore(ownerEnv.Context)
-	go perm.UpdateLoop()
 
 	// Owner is allowed.
-	if !perm.IsAllowedMutation(owner) {
+	if !perm.IsWriter(owner) {
 		t.Errorf("Owner is not allowed, expected allowed")
 	}
 
@@ -66,7 +64,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if perm.IsAllowedMutation(user) {
+		if perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -118,7 +116,6 @@ func TestIncludeRemoteGroups(t *testing.T) {
 	}
 
 	perm := NewStore(ownerEnv.Context)
-	go perm.UpdateLoop()
 
 	// owner, writer and randomDude are allowed.
 	for _, user := range []upspin.UserName{
@@ -126,7 +123,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		writer,
 		randomDude,
 	} {
-		if !perm.IsAllowedMutation(user) {
+		if !perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -138,7 +135,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		"god@heaven.infinite",
 		"nobody@nobody.org",
 	} {
-		if perm.IsAllowedMutation(user) {
+		if perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -162,7 +159,6 @@ func TestLifeCycle(t *testing.T) {
 	r.AddUser(ownerEnv.Context)
 	r.AddUser(writerEnv.Context)
 	perm := NewStore(ownerEnv.Context)
-	go perm.UpdateLoop()
 
 	// Everyone is allowed at first.
 	for _, user := range []upspin.UserName{
@@ -171,27 +167,33 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !perm.IsAllowedMutation(user) {
+		if !perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
 
 	r.As(owner)
 	r.MakeDirectory(groupDir)
-	r.Put(ownersGroup, owner) // Only owner can write.
+	r.Put(ownersGroup, "*@example.com") // Anyone at example.com is allowed.
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
 
 	// Force a re-computation of the permissions.
-	err = perm.updateAllowedWriters()
+	err = perm.UpdateNow()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Owner continues to be allowed.
-	if !perm.IsAllowedMutation(owner) {
-		t.Errorf("Owner is not allowed, expected allowed")
+	// Owner continues to be allowed, as well as others in the domain.
+	for _, user := range []upspin.UserName{
+		owner,
+		"fred@example.com",
+		"shirley@example.com",
+	} {
+		if !perm.IsWriter(user) {
+			t.Errorf("User %s is not allowed, expected allowed", user)
+		}
 	}
 
 	// But no one else is allowed.
@@ -200,7 +202,7 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if perm.IsAllowedMutation(user) {
+		if perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}

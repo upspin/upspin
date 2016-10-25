@@ -11,8 +11,10 @@ import (
 	"time"
 
 	"upspin.io/cloud/storage/storagetest"
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/store/gcp/cache"
+	"upspin.io/store/perm"
 	"upspin.io/upspin"
 
 	// Import needed storage backend.
@@ -141,11 +143,12 @@ func TestGCPErrorsOut(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	_, err := New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	ctx := context.New()
+	_, err := New(ctx, "defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = New("dance=the macarena")
+	_, err = New(ctx, "dance=the macarena")
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
@@ -156,10 +159,18 @@ func TestNew(t *testing.T) {
 }
 
 func newStoreServer() *storeTestServer {
-	ch := make(chan bool)
+	ctx := context.New()
+	ctx = context.SetUserName(ctx, owner)
+	return newStoreServerForContext(ctx)
+}
 
+func newStoreServerForContext(ctx upspin.Context) *storeTestServer {
+	ch := make(chan bool)
 	s := &storeTestServer{
 		server: &server{
+			ctx:   ctx,
+			user:  ctx.UserName(),
+			perm:  perm.NewStore(ctx),
 			cache: cache.NewFileCache(""),
 			storage: &testGCP{
 				ExpectGet: storagetest.ExpectGet{
