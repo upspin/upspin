@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01cc14aa_f4f1d8c5",
+        "filename": "transports/transports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T19:57:09Z",
+      "side": 1,
+      "message": "but it takes a Context, not a file. and how can you call Init without one?",
+      "revId": "9aea08ada3c100a5312ab278e0c9cc0ab19df313",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01cc14aa_d4f6dcbb",
+        "filename": "transports/transports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T19:57:09Z",
+      "side": 1,
+      "message": "this is bizarre.",
+      "revId": "9aea08ada3c100a5312ab278e0c9cc0ab19df313",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
