@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "01cc14aa_ba610953",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "610b10aa_07a2f680",
+      "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "610b10aa_27a5fa88",
         "filename": "store/perm/perm.go",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T21:17:11Z",
       "side": 1,
       "message": "for {",
+      "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01cc14aa_1a535d84",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "610b10aa_27a5fa88",
       "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "01cc14aa_fa40a1a4",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "610b10aa_67abf25f",
+      "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "610b10aa_47a8ee60",
         "filename": "store/perm/perm.go",
         "patchSetId": 11
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-25T21:17:11Z",
       "side": 1,
       "message": "time.Sleep(pollInterval)",
+      "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01cc14aa_da45e5b2",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "610b10aa_47a8ee60",
       "revId": "e37967e3aeb45bc4f0ce6b12b3d6614f786e7857",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
