@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "811e44a4_08f8875d",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T01:57:59Z",
+      "side": 1,
+      "message": "ack.\nwent with \u0027run\u0027 for the parallel to cmd.Run, which blocks until the process exits",
+      "parentUuid": "e17460bf_56f91212",
+      "revId": "e029fb13a6c8348cd17a834077bd0912afdde2c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e17460bf_d3fbf4ce",
         "filename": "cmd/upbox/config.go",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2016-10-24T20:14:30Z",
       "side": 1,
       "message": "this comment isn\u0027t too helpful yet captures the difficulty of coupling data structures to an externally defined format, and the description of that format.\n\ni am not sure that JSON is the answer here, but i am sure that we need to think this through properly. it\u0027s possible (likely even) the answer spills over to the rc files",
+      "revId": "e029fb13a6c8348cd17a834077bd0912afdde2c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_68edc39b",
+        "filename": "cmd/upbox/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T01:57:59Z",
+      "side": 1,
+      "message": "ack?",
+      "parentUuid": "e17460bf_d3fbf4ce",
       "revId": "e029fb13a6c8348cd17a834077bd0912afdde2c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
