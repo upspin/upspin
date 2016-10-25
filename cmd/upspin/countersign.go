@@ -15,14 +15,6 @@ import (
 	"upspin.io/context"
 	"upspin.io/pack/ee"
 	"upspin.io/upspin"
-
-	// Load useful packers
-	_ "upspin.io/pack/plain"
-
-	// Load required transports
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
 )
 
 // Countersigner holds the state for the countersign calculation.

@@ -32,15 +32,11 @@ import (
 	"upspin.io/user"
 
 	// Load useful packers
-
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	"upspin.io/transports"
 )
 
 var commands = map[string]func(*State, ...string){
@@ -894,6 +890,7 @@ func newState(op string) *State {
 	if err != nil {
 		s.exit(err)
 	}
+	transports.Init(ctx)
 	s.client = client.New(ctx)
 	s.context = ctx
 	s.sharer = newSharer(s)
