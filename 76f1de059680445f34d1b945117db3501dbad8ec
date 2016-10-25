@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01cc14aa_3a74d97d",
+        "filename": "transports/transports.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T22:55:11Z",
+      "side": 1,
+      "message": "s/an/ an/\nalso reflow the paragraph",
+      "revId": "76f1de059680445f34d1b945117db3501dbad8ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
