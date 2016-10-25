@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01cc14aa_7a3ff1ec",
+        "filename": "transports/transports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T22:19:44Z",
+      "side": 1,
+      "message": "It should not be imported by server programs.",
+      "revId": "d3a341949c3ce3aa0ad2564479c8ceede947e636",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01cc14aa_5a3c35f6",
+        "filename": "transports/transports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T22:19:44Z",
+      "side": 1,
+      "message": "s/noop/no-op/\n\ni also think you should reiterate clients only here.\nalso explain why and when you should call it",
+      "revId": "d3a341949c3ce3aa0ad2564479c8ceede947e636",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
