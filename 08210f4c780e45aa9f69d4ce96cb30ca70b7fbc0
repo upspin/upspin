@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "811e44a4_286e2b73",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T00:01:23Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be in valid.User ? and also user.Parse ?",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
