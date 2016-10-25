@@ -376,8 +376,8 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 			return nil, nil, err
 		}
 		kind := classify(err)
-		if kind == errors.Permission {
-			// We act like a permission error didn't happen in the hopes that
+		if kind == errors.Permission || kind == errors.NotExist {
+			// We act like the error didn't happen in the hopes that
 			// a later longer path will succeed.
 			de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
 			return dir, de, nil
