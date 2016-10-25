@@ -800,7 +800,7 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 	seqWidth := 2
 	sizeWidth := 2
 	for _, e := range de {
-		s := fmt.Sprintf("%d", e.Sequence)
+		s := fmt.Sprintf("%d", upspin.SeqVersion(e.Sequence))
 		if seqWidth < len(s) {
 			seqWidth = len(s)
 		}
@@ -823,11 +823,17 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 			redirect = " -> " + string(e.Link)
 		}
 		endpt := ""
+		prevLoc := ""
 		for i := range e.Blocks {
+			loc := e.Blocks[i].Location.Endpoint.String()
+			if loc == prevLoc {
+				continue
+			}
+			prevLoc = loc
 			if i > 0 {
 				endpt += ","
 			}
-			endpt += e.Blocks[i].Location.Endpoint.String()
+			endpt += loc
 		}
 		packStr := "?"
 		packer := lookupPacker(e)
@@ -837,7 +843,7 @@ func printLongDirEntries(de []*upspin.DirEntry) {
 		fmt.Printf("%c %-6s %*d %*d %s [%s]\t%s%s\n",
 			attrChar,
 			packStr,
-			seqWidth, e.Sequence,
+			seqWidth, upspin.SeqVersion(e.Sequence),
 			sizeWidth, sizeOf(e),
 			e.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
 			endpt,
