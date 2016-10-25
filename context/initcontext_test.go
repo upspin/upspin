@@ -63,17 +63,6 @@ func TestInitContext(t *testing.T) {
 	testConfig(t, &expect, makeConfig(&expect))
 }
 
-func TestComments(t *testing.T) {
-	expect := expectations{
-		username:    "p@google.com",
-		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
-		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
-		packing:     upspin.PlainPack, // TODO upspin.EEPack,
-	}
-	testConfig(t, &expect, makeCommentedConfig(&expect))
-}
-
 func TestDefaults(t *testing.T) {
 	expect := expectations{
 		username: "noone@nowhere.org",
@@ -84,11 +73,11 @@ func TestDefaults(t *testing.T) {
 
 func TestBadKey(t *testing.T) {
 	// "name=" should be "username=".
-	const config = `name=p@google.com
-packing=ee
-keyserver=inprocess
-dirserver=inprocess
-storeserver=inprocess`
+	const config = `name: p@google.com
+packing: ee
+keyserver: inprocess
+dirserver: inprocess
+storeserver: inprocess`
 	_, err := InitContext(strings.NewReader(config))
 	if err == nil {
 		t.Fatalf("expected error, got none")
@@ -160,36 +149,27 @@ func makeConfig(expect *expectations) string {
 	var buf bytes.Buffer
 
 	if expect.username != "" {
-		fmt.Fprintf(&buf, "username = %s\n", expect.username)
+		fmt.Fprintf(&buf, "username: %s\n", expect.username)
 	}
 
 	var zero upspin.Endpoint
 	if expect.keyserver != zero {
-		fmt.Fprintf(&buf, "keyserver = %s\n", expect.keyserver)
+		fmt.Fprintf(&buf, "keyserver: %s\n", expect.keyserver)
 	}
 	if expect.storeserver != zero {
-		fmt.Fprintf(&buf, "storeserver = %s\n", expect.storeserver)
+		fmt.Fprintf(&buf, "storeserver: %s\n", expect.storeserver)
 	}
 	if expect.dirserver != zero {
-		fmt.Fprintf(&buf, "dirserver = %s\n", expect.dirserver)
+		fmt.Fprintf(&buf, "dirserver: %s\n", expect.dirserver)
 	}
 
-	fmt.Fprintf(&buf, "packing = %s\n", pack.Lookup(expect.packing))
+	fmt.Fprintf(&buf, "packing: %s\n", pack.Lookup(expect.packing))
 
 	if expect.secrets != "" {
-		fmt.Fprintf(&buf, "secrets = %s\n", expect.secrets)
+		fmt.Fprintf(&buf, "secrets: %s\n", expect.secrets)
 	}
 
 	return buf.String()
-}
-
-func makeCommentedConfig(expect *expectations) string {
-	return fmt.Sprintf("# Line one is a comment\nusername = %s # Ignore this.\nkeyserver= %s\nstoreserver = %s\n  dirserver =%s   \npacking=%s #Ignore this",
-		expect.username,
-		expect.keyserver,
-		expect.storeserver,
-		expect.dirserver,
-		pack.Lookup(expect.packing).String())
 }
 
 func saveEnvs(e *envs) {
