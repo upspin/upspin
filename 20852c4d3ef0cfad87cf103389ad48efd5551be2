@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "811e44a4_6814a3b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T00:46:04Z",
+      "side": 1,
+      "message": "add it to what?",
+      "range": {
+        "startLine": 11,
+        "startChar": 55,
+        "endLine": 11,
+        "endChar": 62
+      },
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_080fe7a2",
+        "filename": "dir/server/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T00:46:04Z",
+      "side": 1,
+      "message": "add it? add it to the cache?",
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "811e44a4_4819dfeb",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T00:46:04Z",
+      "side": 1,
+      "message": "does it matter what packing a link has?\nit has no data",
+      "range": {
+        "startLine": 287,
+        "startChar": 5,
+        "endLine": 287,
+        "endChar": 11
+      },
+      "revId": "20852c4d3ef0cfad87cf103389ad48efd5551be2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
