@@ -475,6 +475,24 @@
     },
     {
       "key": {
+        "uuid": "01cc14aa_f76b1ad1",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "Too many logs here and in the dir server. Which will mean we\u0027ll be pressed to suppress log messages in the code, which is not ideal, I\u0027d rather generate less traffic. \n\nAlso, for the sake of embedded devices. (We\u0027re unlikely to run a StoreServer there, but just in case).\n\nAnyway, I changed it to 2 min.\nDone.",
+      "parentUuid": "610b10aa_e796c228",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_c8a14f7d",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -703,6 +721,24 @@
     },
     {
       "key": {
+        "uuid": "01cc14aa_d7701ec2",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "No reason. BTW, I fixed it already in the last round.\nDone.",
+      "parentUuid": "610b10aa_c79bbe4e",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_e8b9b3ae",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -890,6 +926,24 @@
       "side": 1,
       "message": "why do you need store/gcp to test that functionality?",
       "parentUuid": "a104284e_cb31490a",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01cc14aa_970066b1",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T22:09:25Z",
+      "side": 1,
+      "message": "It\u0027s nicer to do it there, but easier to do it here.\nDone.",
+      "parentUuid": "610b10aa_a790ca2b",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
