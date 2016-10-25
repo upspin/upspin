@@ -17,11 +17,10 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 
-	_ "upspin.io/dir/remote"
-	_ "upspin.io/key/remote"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/store/remote"
+
+	"upspin.io/transports"
 )
 
 func usage() {
@@ -43,6 +42,7 @@ func main() {
 	if err != nil {
 		log.Debug.Fatal(err)
 	}
+	transports.Init(ctx)
 
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
