@@ -6,7 +6,6 @@
 package context
 
 import (
-	"bufio"
 	"crypto/x509"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,8 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -145,20 +146,25 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	if r == nil {
 		home, err := Homedir()
 		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
+			return nil, errors.E(op, err)
 		}
 		f, err := os.Open(filepath.Join(home, "upspin/rc"))
 		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot load keys: %v", err))
+			return nil, errors.E(op, err)
 		}
 		r = f
 		defer f.Close()
 	}
 
-	// First source of truth is the RC file.
-	if err := valsFromReader(vals, r); err != nil {
+	// First source of truth is the YAML file.
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	if err := valsFromYAML(vals, data); err != nil {
+		return nil, errors.E(op, err)
+	}
+
 	// Then override with environment variables.
 	if err := valsFromEnvironment(vals); err != nil {
 		return nil, errors.E(op, err)
@@ -187,7 +193,6 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		}
 	}
 
-	var err error
 	dir := vals[secrets]
 	if dir == "" {
 		dir, err = sshdir()
@@ -214,33 +219,20 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	return ctx, err
 }
 
-// valsFromReader reads key=value tokens from the provided reader and—if the
-// provided map contains that key—populates the map with the corresponding
-// value. Unrecognized keys generate an error.
-func valsFromReader(vals map[string]string, r io.Reader) error {
-	if r == nil {
-		return nil
+// valsFromYAML parses YAML from the given map and puts the values
+// into the provided map. Unrecognized keys generate an error.
+func valsFromYAML(vals map[string]string, data []byte) error {
+	newVals := map[string]string{}
+	if err := yaml.Unmarshal(data, newVals); err != nil {
+		return errors.E(errors.Invalid, errors.Errorf("parsing YAML file: %v", err))
 	}
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		line := s.Text()
-		// Remove comments.
-		if sharp := strings.IndexByte(line, '#'); sharp >= 0 {
-			line = line[:sharp]
+	for k, v := range newVals {
+		if _, ok := vals[k]; !ok {
+			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", k))
 		}
-		line = strings.TrimSpace(line)
-		tokens := strings.SplitN(line, "=", 2)
-		if len(tokens) != 2 {
-			continue
-		}
-		val := strings.TrimSpace(tokens[1])
-		attr := strings.TrimSpace(tokens[0])
-		if _, ok := vals[attr]; !ok {
-			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", attr))
-		}
-		vals[attr] = val
+		vals[k] = v
 	}
-	return s.Err()
+	return nil
 }
 
 // valsFromEnvironment looks in the process' environment for any variables with
