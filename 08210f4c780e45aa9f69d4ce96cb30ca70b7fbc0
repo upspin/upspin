@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "a104284e_f7007866",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:42:28Z",
+      "side": 1,
+      "message": "this isn\u0027t right. the user is giving you this string. you\u0027re a server. your job is to canonicalize it, not to reject it if it is non-canonical.\nuser.Parse is all you need, but then you must install it using the name that comes back from there.\n\nyou made the same mistake in directory.Put but we fixed it there.",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_286e2b73",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 1
@@ -31,6 +48,40 @@
       "side": 1,
       "message": "No. \"*\" is explicitly allowed in Parse and Valid. We are allowed to add it to any Access file, by design (though, I don\u0027t think it works perfectly everywhere as-is).",
       "parentUuid": "811e44a4_286e2b73",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_77eda89b",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:42:28Z",
+      "side": 1,
+      "message": "return errors.E(op, errors.Invalid, u.Name, errors.Str(\"user has wildcard \u0027*\u0027 in name\")",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_375840a3",
+        "filename": "key/inprocess/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-25T00:42:28Z",
+      "side": 1,
+      "message": "same thing here.",
       "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
