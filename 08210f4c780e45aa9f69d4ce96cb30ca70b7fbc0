@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_7ab0ed96",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T05:54:52Z",
+      "side": 1,
+      "message": "Well, if this is an error, I made this error once, here and in DirServer at the same time. As you can see, I\u0027m just renaming a parameter here. This line is not new, it has been here for a while.\n\nHowever, we do reject Dir.Put on poorly formatted DirEntry, which comes from the user too (or could come, if the user wants to talk directly to the dir server). This is true of dir/server and dir/inprocess.\n\nAnd key/inprocess.Put does the same thing.\n\nSo, what\u0027s really the correct answer here? \n\nI think the user needs to send a valid user. cmd/upspin user -put should canonicalize it if it\u0027s not right.",
+      "parentUuid": "a104284e_f7007866",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_286e2b73",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 1
