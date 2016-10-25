@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_05a50289",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_487d5f24",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_a8817be4",
         "filename": "/COMMIT_MSG",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "seems obvious, not sure you need to call this out",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_e5a1de7c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_a8817be4",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_ba9c1555",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Initially, we said we would limit it to files stored in *this* StoreServer. It\u0027s better to do the full resolution.",
+      "parentUuid": "811e44a4_887e371e",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_e88b73fe",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "for StoreServer implementations.",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_45bc2aa4",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_e88b73fe",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_456eea73",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Ah yeah. I moved it from GCP and forgot to export a few things. Done now.\nDone.",
+      "parentUuid": "811e44a4_6891432e",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_c8882f05",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "It\u0027s the package now. This can be deleted.",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_a5acf66d",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_c8882f05",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_05ba22a2",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_28974b27",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_089c0746",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -132,6 +258,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "work this and the next bullet into the exported documentation",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_45e54ac6",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_089c0746",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_657dee24",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "It\u0027s here to remind me to do it, in case I get distracted. It will be deleted in due time.",
+      "parentUuid": "811e44a4_4896ff27",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_a8aa1b58",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -166,6 +328,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "delete",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_85df32f2",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_a8aa1b58",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_cbb66929",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_88a75792",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_68c66337",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -200,6 +398,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "StoreWriterGroupFile ?",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_65196eec",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_68c66337",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_e5243e26",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "How\u0027s 5? The second todo will address the first initial config.",
+      "parentUuid": "811e44a4_e8a4138f",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_c8a14f7d",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -234,6 +468,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "performs permission checking for StoreServer implementations.",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_45f38a85",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_c8a14f7d",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_85ed729e",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_28bc6ba3",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_08c1a71d",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -268,6 +538,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "NewStore",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_65f20e80",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_08c1a71d",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -291,6 +579,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_a5035671",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "It my nickname for StoreServer :-) Fixed everywhere.\nDone.",
+      "parentUuid": "811e44a4_48cb9f3b",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_68df83f3",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -302,6 +608,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "if you return an error from this function then you can trivially use a different retry timeout depending on whether the update succeeded or not\n(5-10 seconds for a failed attempt, 1-2 mins for a success)",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_0556a273",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_68df83f3",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -325,6 +649,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_ab00451e",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "It was. I thought you\u0027d ask \"which Group file\". :-( Maybe it should be lookupStoreWritersGroupFile.\nDone.",
+      "parentUuid": "811e44a4_88ac776e",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_e8b9b3ae",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -336,6 +678,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "unroll ?",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_0b0eb150",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_e8b9b3ae",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -359,6 +719,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_4bf9d912",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_c8b66fbe",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_28e58bc7",
         "filename": "store/perm/perm.go",
         "patchSetId": 10
@@ -370,6 +748,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "I guess this should be exported, too?",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_8bf3c132",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_28e58bc7",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -393,6 +789,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_0bb1912e",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_08ea4795",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_e8d253e6",
         "filename": "store/perm/perm_test.go",
         "patchSetId": 10
@@ -404,6 +818,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "I\u0027d like to see a test here that goes through the whole flow\n\nstoreserver starts\nno group file\nauthentication succeeds for anyone\ngroup file added\nauthentication succeeds for specified users, noone else",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_cb31490a",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Absolutely. But note that this is only a test for this package, not a test that integrates with a StoreServer implementation yet. As such, it\u0027s not \"hooked up\" to a StoreServer yet. \n\nThe test you want will come in the next CL, when I plug this into store/gcp.",
+      "parentUuid": "811e44a4_e8d253e6",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -433,6 +865,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_0b835152",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "811e44a4_88d597d2",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_a8d85b08",
         "filename": "store/perm/perm_test.go",
         "patchSetId": 10
@@ -450,6 +900,24 @@
     },
     {
       "key": {
+        "uuid": "a104284e_4b47196c",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "I\u0027m thinking it should be controlled by the caller, because it needs to call the StoreServer, so the StoreServer implementation should decide when it\u0027s ready to be called. If it turns out not to be an issue in the next CL, I\u0027ll do so.",
+      "parentUuid": "811e44a4_a8d85b08",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "811e44a4_48e43fc8",
         "filename": "store/perm/perm_test.go",
         "patchSetId": 10
@@ -461,6 +929,24 @@
       "writtenOn": "2016-10-25T00:37:00Z",
       "side": 1,
       "message": "why are you doing this here? shouldn\u0027t isAllowedMutation do this?",
+      "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_2b4c558c",
+        "filename": "store/perm/perm_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T16:58:05Z",
+      "side": 1,
+      "message": "It does. I was redundantly doing it here too. Removed.\nDone.",
+      "parentUuid": "811e44a4_48e43fc8",
       "revId": "37827b6d00c84c513c8a180c521e32477c6671b7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
