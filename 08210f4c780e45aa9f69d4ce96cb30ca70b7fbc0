@@ -16,6 +16,24 @@
       "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a104284e_14f7fab9",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-25T00:10:54Z",
+      "side": 1,
+      "message": "No. \"*\" is explicitly allowed in Parse and Valid. We are allowed to add it to any Access file, by design (though, I don\u0027t think it works perfectly everywhere as-is).",
+      "parentUuid": "811e44a4_286e2b73",
+      "revId": "08210f4c780e45aa9f69d4ce96cb30ca70b7fbc0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
