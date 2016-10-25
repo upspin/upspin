@@ -32,9 +32,7 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
-	_ "upspin.io/dir/transports"
-	_ "upspin.io/key/transports"
-	_ "upspin.io/store/transports"
+	"upspin.io/transports"
 )
 
 var (
@@ -100,6 +98,7 @@ func newArchiver() (*archiver, error) {
 	if err != nil {
 		return nil, err
 	}
+	transports.Init(ctx)
 	c := client.New(ctx)
 	return &archiver{
 		client:        c,

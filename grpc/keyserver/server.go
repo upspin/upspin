@@ -17,9 +17,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-
-	// Load required transports
-	_ "upspin.io/key/transports"
 )
 
 // server is a SecureServer that talks to a KeyServer interface and serves gRPC requests.
