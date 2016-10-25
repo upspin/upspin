@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "610b10aa_47ad8e67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T21:34:46Z",
+      "side": 1,
+      "message": "rewritten",
+      "parentUuid": "a104284e_1ad441a7",
+      "revId": "69f7ba3b7d4b42731891f4a36524797e7bb47aef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41ca8c6f_79cba33b",
         "filename": "cmd/upspinfs/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T13:13:47Z",
       "side": 1,
       "message": "Forget to include it in the CL?",
+      "revId": "69f7ba3b7d4b42731891f4a36524797e7bb47aef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "610b10aa_67b092c5",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-25T21:34:46Z",
+      "side": 1,
+      "message": "yep, i am smart",
+      "parentUuid": "41ca8c6f_79cba33b",
       "revId": "69f7ba3b7d4b42731891f4a36524797e7bb47aef",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
