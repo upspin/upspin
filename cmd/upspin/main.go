@@ -682,7 +682,7 @@ same JSON format printed by the command without the -put flag.
 
 func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	data := s.readAll(inFile)
-	userStrct := new(upspin.User)
+	userStruct := new(upspin.User)
 	err := json.Unmarshal(data, userStrct)
 	if err != nil {
 		// TODO(adg): better error message?
@@ -696,12 +696,12 @@ func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	if err != nil && !force {
 		s.exitf("invalid public key, to override use -force: %s", err.Error())
 	}
-	// Validate username
-	_, _, _, err = user.Parse(userStrct.Name)
+	// Clean the username.
+	userStruct.Name, err = user.Clean(userStruct.Name)
 	if err != nil {
 		s.exit(err)
 	}
-	err = keyServer.Put(userStrct)
+	err = keyServer.Put(userStruct)
 	if err != nil {
 		s.exit(err)
 	}
