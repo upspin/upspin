@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e16c60ba_736fc017",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:18:27Z",
+      "side": 1,
+      "message": "switch b {\ncase \u0027\\\\\u0027, \u0027*\u0027, \u0027?\u0027, \u0027[\u0027:\n  return true\ndefault:\n  return false\n}\n\ngotta be faster, right?",
+      "revId": "3d2f8d666f127b98c5fe2e7f7154648872fb274c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
