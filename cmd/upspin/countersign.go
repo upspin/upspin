@@ -63,7 +63,7 @@ func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 // entriesFromDirectory returns the list of relevant entries in the directory, recursively.
 func (c *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	thisDir, err := c.state.DirServer().Glob(string(dir) + "/*") // Do not want to follow links.
+	thisDir, err := c.state.DirServer().Glob(upspin.AllFilesGlob(dir)) // Do not want to follow links.
 	if err != nil {
 		c.state.exitf("globbing %q: %s", dir, err)
 	}
