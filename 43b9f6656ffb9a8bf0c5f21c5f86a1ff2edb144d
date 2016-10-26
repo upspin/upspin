@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "618870a5_c814636a",
+        "filename": "cache/lru.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "s/a/an/",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_f37cb02a",
         "filename": "cache/lru.go",
         "patchSetId": 5
@@ -104,6 +121,40 @@
       "writtenOn": "2016-10-26T02:41:27Z",
       "side": 1,
       "message": "what if neither netaddr nor the store cache endpoint are set?",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_8867bbff",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "I\u0027d simply call it \"a log\" here in prose, instead of \"clogImpl\". Or \"an implementation of a cache log\" or so.",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c8fd4300",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "s/an/a/",
       "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -308,6 +359,23 @@
       "writtenOn": "2016-10-26T02:41:27Z",
       "side": 1,
       "message": "check the error\nit won\u0027t return an error if the directory already exists",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c822a3be",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "s/renaning/renaming/",
       "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -575,6 +643,23 @@
     },
     {
       "key": {
+        "uuid": "618870a5_e8404753",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "I was told goroutine is one word.",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_b3aa3824",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 5
@@ -654,6 +739,125 @@
       "writtenOn": "2016-10-26T02:41:27Z",
       "side": 1,
       "message": "not a good log message",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_285b0f46",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "Usually these are put in the middle section (line 14).",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_6855170e",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "s/gRPC/GRPC/",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c870e3c2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "Typed accidentally?",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_087baba2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "Find-replace error here and below?",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_28606fea",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "find replace error?",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_485db32d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "find-replace error?",
+      "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_686a77ca",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 530,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T19:26:22Z",
+      "side": 1,
+      "message": "ditto",
       "revId": "43b9f6656ffb9a8bf0c5f21c5f86a1ff2edb144d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
