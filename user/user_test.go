@@ -120,3 +120,40 @@ func okASCII(r rune) bool {
 	}
 	return legalASCIIPunctuation(r)
 }
+
+func TestClean(t *testing.T) {
+	type cases struct {
+		in  upspin.UserName
+		out upspin.UserName
+		ok  bool
+	}
+	tests := []cases{
+		{"", "", false},
+		{"abc@", "", false},
+		{"abc@def.com", "abc@def.com", true},
+		{"abc@DEF.com", "abc@def.com", true},          // lower-case the domain.
+		{"e\u0302@here.com", "\u00ea@here.com", true}, // PRECIS canonicalization.
+	}
+	for _, test := range tests {
+		out, err := Clean(test.in)
+		if out == test.out && test.ok == (err == nil) {
+			// All good.
+			continue
+		}
+		if err != nil && !test.ok {
+			// All good, caught the error.
+			continue
+		}
+		t.Errorf("Clean(%q)=(%q, %v); expected %q with ok==%t", test.in, out, err, test.out, test.ok)
+	}
+}
+
+func TestCleanNoAlloc(t *testing.T) {
+	allocs := testing.AllocsPerRun(100, func() {
+		Clean("abc@def.com")
+	})
+	t.Log("allocs:", allocs)
+	if allocs != 0 {
+		t.Fatal("expected no allocations, got ", allocs)
+	}
+}

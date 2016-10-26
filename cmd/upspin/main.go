@@ -659,7 +659,11 @@ same JSON format printed by the command without the -put flag.
 		userNames = append(userNames, s.context.UserName())
 	} else {
 		for i := 0; i < fs.NArg(); i++ {
-			userNames = append(userNames, upspin.UserName(fs.Arg(i)))
+			userName, err := user.Clean(upspin.UserName(fs.Arg(i)))
+			if err != nil {
+				s.exit(err)
+			}
+			userNames = append(userNames, userName)
 		}
 	}
 	for _, name := range userNames {
@@ -969,9 +973,9 @@ func (s *State) globUpspin(pattern string) []upspin.PathName {
 	if err != nil {
 		s.exit(err)
 	}
-	// If it has no metacharacters, leave it alone.
+	// If it has no metacharacters, leave it alone but clean it.
 	if !hasGlobChar(pattern) {
-		return []upspin.PathName{upspin.PathName(pattern)}
+		return []upspin.PathName{path.Clean(upspin.PathName(pattern))}
 	}
 	var out []upspin.PathName
 	entries, err := s.client.Glob(parsed.String())
