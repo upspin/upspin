@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "e16c60ba_13e3ec90",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "this doesn\u0027t exist anymore. you need to sync\nuse upspin.io/transports instead",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_33e0e881",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "context?",
+      "range": {
+        "startLine": 40,
+        "startChar": 63,
+        "endLine": 40,
+        "endChar": 70
+      },
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "618870a5_7f886fab",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -13,6 +53,108 @@
       "writtenOn": "2016-10-26T03:00:39Z",
       "side": 1,
       "message": "not a sentence",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_f382f097",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "debugging dreg?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_53dd64c4",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "please put this setup at the top\nit\u0027s not boilerplate; it\u0027s important information about the state of the tests\nthe first thing i had to do to understand the test was to scroll to the bottom of the file\n\nalso it should have a more descriptive name. there are other tests; should they also use this setup? (rhetorical question; they shouldn\u0027t/needn\u0027t be changed, but this name should be more specific)",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_d37df4d6",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "since you only use onwerEnv and writerEnv to set up the test runner, why not just return the testrunner instead?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_73da60cf",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "told ya ;-)",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_93737c0d",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "ok, now that you\u0027ve shown that all callers just do\n\nperm :\u003d perm.NewStore(ctx)\ngo perm.UpdateLoop()\n\ncan you please unexport this and put it in NewStore?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_b37878e8",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-26T04:12:14Z",
+      "side": 1,
+      "message": "now that this is part of the exported api, it should have a nicer name. how about \"UpdateNow\" ? then it\u0027s called as perm.UpdateNow().",
       "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
