@@ -213,3 +213,19 @@ func okDomainChar(r rune) bool {
 	}
 	return false
 }
+
+// Clean returns the user name in canonical form as described by
+// the comments on the Parse function.
+func Clean(userName upspin.UserName) (upspin.UserName, error) {
+	user, _, domain, err := Parse(userName)
+	if err != nil {
+		return "", err
+	}
+	// Do we need to rebuild? Avoid allocation if we can.
+	userString := string(userName)
+	atSign := strings.IndexByte(userString, '@')
+	if user == userString[:atSign] && domain == userString[atSign+1:] {
+		return userName, nil
+	}
+	return upspin.UserName(user + "@" + domain), nil
+}
