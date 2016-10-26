@@ -78,7 +78,7 @@ domain: example.com
 func ConfigFromFile(name string) (*Config, error) {
 	var data []byte
 	if name == "" {
-		data = []byte(defaultConfig)
+		data = []byte(DefaultConfig)
 	} else {
 		var err error
 		data, err = ioutil.ReadFile(name)
