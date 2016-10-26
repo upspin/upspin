@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618870a5_48ecd3dc",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-26T19:57:00Z",
+      "side": 1,
+      "message": "It you change the spelling in the line above, you have to change it here.",
+      "revId": "c727a70e133cecd8589184881e6a9d5f9da921fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
