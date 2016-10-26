@@ -125,7 +125,10 @@ func (c *client) Echo(t *testing.T, payload string) (response string) {
 }
 
 func startClient(port string) {
-	ctx := context.SetUserName(context.New(), user)
+	ctx, err := context.SetUserName(context.New(), user)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {

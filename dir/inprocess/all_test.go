@@ -47,7 +47,10 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 		NetAddr:   "", // ignored
 	}
 	ctx = context.New()
-	ctx = context.SetUserName(ctx, name)
+	ctx, err := context.SetUserName(ctx, name)
+	if err != nil {
+		panic(err)
+	}
 	ctx = context.SetPacking(ctx, upspin.DebugPack)
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)

@@ -97,7 +97,10 @@ func setupTestContext(t *testing.T) upspin.Context {
 		t.Fatal(err)
 	}
 	ctx := context.New()
-	ctx = context.SetUserName(ctx, userName)
+	ctx, err = context.SetUserName(ctx, userName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx = context.SetPacking(ctx, upspin.EEPack)
 	ctx = context.SetFactotum(ctx, f)
 	ctx = context.SetKeyEndpoint(ctx, inProcess)

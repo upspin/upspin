@@ -89,15 +89,22 @@ storeserver: inprocess`
 
 func TestEnv(t *testing.T) {
 	expect := expectations{
-		username:    "p@google.com",
+		username:    "quux",
 		keyserver:   Endpoint(upspin.InProcess, ""),
 		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
 		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
+	defer func() {
+		os.Setenv("upspinusername", "")
+		os.Setenv("upspinkeyserver", "")
+		os.Setenv("upspindirserver", "")
+		os.Setenv("upspinstoreserver", "")
+		os.Setenv("upspinpacking", "")
+	}()
 	config := makeConfig(&expect)
-	expect.username = "quux"
-	os.Setenv("upspinusername", string(expect.username))
+	expect.username = "p@google.com"
+	os.Setenv("upspinusername", "p@google.com")
 	expect.keyserver = Endpoint(upspin.InProcess, "")
 	expect.dirserver = Endpoint(upspin.Remote, "who.knows:1234")
 	expect.storeserver = Endpoint(upspin.Remote, "who.knows:1234")

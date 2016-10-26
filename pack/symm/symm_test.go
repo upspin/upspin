@@ -185,7 +185,10 @@ func BenchmarkPackUnpack_1Mbyte(b *testing.B) {
 }
 
 func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
-	ctx := context.SetUserName(context.New(), name)
+	ctx, err := context.SetUserName(context.New(), name)
+	if err != nil {
+		log.Fatalf("can't set username %s: %v", name, err)
+	}
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {

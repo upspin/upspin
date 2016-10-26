@@ -312,7 +312,10 @@ func TestBadSharing(t *testing.T) {
 	// Don't share with Bob (do nothing).
 
 	// Now load Bob as the current user.
-	ctx = context.SetUserName(ctx, bobsUserName)
+	ctx, err = context.SetUserName(ctx, bobsUserName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	f, err = factotum.NewFromDir(repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
@@ -330,7 +333,10 @@ func TestBadSharing(t *testing.T) {
 }
 
 func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
-	ctx := context.SetUserName(context.New(), name)
+	ctx, err := context.SetUserName(context.New(), name)
+	if err != nil {
+		log.Fatalf("can't set username %s: %v", name, err)
+	}
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {

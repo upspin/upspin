@@ -52,7 +52,11 @@ func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(context.SetUserName(s.context, session.User()), s.key.Endpoint())
+	cx, err := context.SetUserName(s.context, session.User())
+	if err != nil {
+		return nil, err
+	}
+	svc, err := s.key.Dial(cx, s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}

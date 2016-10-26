@@ -874,7 +874,10 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 		NetAddr:   "",
 	}
 	ctx := context.New()
-	ctx = context.SetUserName(ctx, serverName)
+	ctx, err = context.SetUserName(ctx, serverName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx = context.SetPacking(ctx, upspin.EEPack)
 	ctx = context.SetFactotum(ctx, factotum)
 	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
@@ -901,7 +904,10 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	// Set the public key for the user, since EE Pack requires the dir owner
 	// to have a wrapped key.
 	userCtx := context.New()
-	userCtx = context.SetUserName(userCtx, userName)
+	userCtx, err = context.SetUserName(userCtx, userName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	userCtx = context.SetDirEndpoint(userCtx, ctx.DirEndpoint())
 	user = &upspin.User{
 		Name:      userName,

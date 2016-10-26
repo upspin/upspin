@@ -10,7 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/user"
+	goUser "os/user"
 	"path/filepath"
 	"strings"
 
@@ -21,6 +21,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
+	"upspin.io/user"
 
 	// Needed because the default packing is "plain" and its
 	// implementation is referenced if no packing is specified.
@@ -173,7 +174,10 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	// Construct a context from vals.
 	ctx := New()
 
-	ctx = SetUserName(ctx, upspin.UserName(vals[username]))
+	ctx, err = SetUserName(ctx, upspin.UserName(vals[username]))
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 
 	packer := pack.LookupByName(vals[packing])
 	if packer == nil {
@@ -327,12 +331,17 @@ func (ctx ctxUserName) UserName() upspin.UserName {
 }
 
 // SetUserName returns a context derived from the given context
-// with the given user name.
-func SetUserName(ctx upspin.Context, u upspin.UserName) upspin.Context {
+// with the given user name. It returns an error if the name is not
+// clean (see user.Clean).
+func SetUserName(ctx upspin.Context, u upspin.UserName) (upspin.Context, error) {
+	u, err := user.Clean(u)
+	if err != nil {
+		return nil, err
+	}
 	return ctxUserName{
 		Context:  ctx,
 		userName: u,
-	}
+	}, nil
 }
 
 type ctxFactotum struct {
@@ -462,7 +471,7 @@ func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
 // TODO(adg): move to osutil package?
 // Homedir returns the home directory of the OS' logged-in user.
 func Homedir() (string, error) {
-	u, err := user.Current()
+	u, err := goUser.Current()
 	// user.Current may return an error, but we should only handle it if it
 	// returns a nil user. This is because os/user is wonky without cgo,
 	// but it should work well enough for our purposes.

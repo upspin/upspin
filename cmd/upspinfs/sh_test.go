@@ -38,7 +38,10 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 		NetAddr:   "", // ignored
 	}
 	ctx = context.New()
-	ctx = context.SetUserName(ctx, upspin.UserName(name))
+	ctx, err = context.SetUserName(ctx, upspin.UserName(name))
+	if err != nil {
+		return nil, err
+	}
 	ctx = context.SetPacking(ctx, upspin.DebugPack)
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)

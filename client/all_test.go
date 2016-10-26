@@ -51,7 +51,10 @@ func checkTransport(s upspin.Service) {
 }
 
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
-	ctx := context.SetUserName(baseCtx, userName)
+	ctx, err := context.SetUserName(baseCtx, userName)
+	if err != nil {
+		panic(err)
+	}
 	key, _ := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	checkTransport(key)
 	dir, _ := bind.DirServer(ctx, ctx.DirEndpoint())
@@ -65,7 +68,7 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context 
 		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
 		PublicKey: publicKey,
 	}
-	err := key.Put(user)
+	err = key.Put(user)
 	if err != nil {
 		panic(err)
 	}

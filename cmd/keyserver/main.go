@@ -54,11 +54,13 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	ctx := context.SetUserName(context.New(), serverName)
+	ctx, err := context.SetUserName(context.New(), serverName)
+	if err != nil {
+		log.Fatalf("Can't initialize context: %v", err)
+	}
 
 	// Create a new key implementation.
 	var key upspin.KeyServer
-	var err error
 	switch flags.ServerKind {
 	case "inprocess":
 		key = inprocess.New()

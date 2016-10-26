@@ -968,7 +968,10 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Context
 		NetAddr:   "",
 	}
 	ctx := context.New()
-	ctx = context.SetUserName(ctx, serverName)
+	ctx, err = context.SetUserName(ctx, serverName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx = context.SetFactotum(ctx, factotum)
 	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
 	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)

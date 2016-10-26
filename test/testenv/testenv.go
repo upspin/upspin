@@ -144,7 +144,10 @@ func New(setup *Setup) (*Env, error) {
 			env.dirServer = dirserver_inprocess.New(ctx)
 		case "server":
 			// Set up user and factotum.
-			ctx = context.SetUserName(ctx, TestServerName)
+			ctx, err := context.SetUserName(ctx, TestServerName)
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
 			f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
 			if err != nil {
 				return nil, errors.E(op, err)
@@ -252,7 +255,10 @@ func (e *Env) rmTmpDir() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 	const op = "testenv.NewUser"
-	ctx := context.SetUserName(e.Context, userName)
+	ctx, err := context.SetUserName(e.Context, userName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	ctx = context.SetPacking(ctx, e.Setup.Packing)
 
 	// Set up a factotum for the user.

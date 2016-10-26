@@ -56,7 +56,10 @@ var (
 // setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 	c := context.New()
-	c = context.SetUserName(c, upspin.UserName(user))
+	c, err := context.SetUserName(c, upspin.UserName(user))
+	if err != nil {
+		t.Fatal(err)
+	}
 	c = context.SetPacking(c, upspin.DebugPack)
 	c = context.SetKeyEndpoint(c, keyService.endpoint)
 	keyService.context = c

@@ -159,7 +159,10 @@ func (m *mailHandler) createUser(u *upspin.User) error {
 	// with it implicitly.
 	ctx := context.New()
 	ctx = context.SetKeyEndpoint(ctx, m.key.Endpoint())
-	ctx = context.SetUserName(ctx, u.Name)
+	ctx, err := context.SetUserName(ctx, u.Name)
+	if err != nil {
+		return err
+	}
 
 	service, err := m.key.Dial(ctx, m.key.Endpoint())
 	if err != nil {

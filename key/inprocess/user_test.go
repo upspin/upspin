@@ -19,7 +19,7 @@ var (
 	inProcessEndpoint = upspin.Endpoint{
 		Transport: upspin.InProcess,
 	}
-	user = upspin.User{
+	testUser = upspin.User{
 		Name:      "joe@blow.com",
 		Dirs:      []upspin.Endpoint{inProcessEndpoint},
 		Stores:    []upspin.Endpoint{inProcessEndpoint},
@@ -29,7 +29,10 @@ var (
 
 func setup(t *testing.T) upspin.KeyServer {
 	c := context.New()
-	c = context.SetUserName(c, user.Name)
+	c, err := context.SetUserName(c, testUser.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
 	c = context.SetKeyEndpoint(c, inProcessEndpoint)
 	c = context.SetStoreEndpoint(c, inProcessEndpoint)
 	c = context.SetDirEndpoint(c, inProcessEndpoint)
@@ -42,15 +45,15 @@ func TestInstallAndLookup(t *testing.T) {
 		t.Fatal("Not an inprocess KeyServer")
 	}
 
-	err := key.Put(&user)
+	err := key.Put(&testUser)
 	if err != nil {
 		t.Fatal(err)
 	}
-	got, err := key.Lookup(user.Name)
+	got, err := key.Lookup(testUser.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(got, &user) {
-		t.Errorf("Lookup: incorrect data returned: got %v; want %v", got, &user)
+	if !reflect.DeepEqual(got, &testUser) {
+		t.Errorf("Lookup: incorrect data returned: got %v; want %v", got, &testUser)
 	}
 }

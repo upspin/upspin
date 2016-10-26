@@ -52,7 +52,11 @@ func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(context.SetUserName(s.context, session.User()), s.dir.Endpoint())
+	cx, err := context.SetUserName(s.context, session.User())
+	if err != nil {
+		return nil, err
+	}
+	svc, err := s.dir.Dial(cx, s.dir.Endpoint())
 	if err != nil {
 		return nil, err
 	}

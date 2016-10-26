@@ -45,7 +45,10 @@ var (
 
 func init() {
 	c := context.New()
-	c = context.SetUserName(c, userName)
+	c, err := context.SetUserName(c, userName)
+	if err != nil {
+		panic(err)
+	}
 	c = context.SetPacking(c, upspin.DebugPack)
 	c = context.SetKeyEndpoint(c, inProcess)
 	globalContext = c
