@@ -158,13 +158,18 @@ func (cfg *Config) Run() error {
 	}
 
 	// Generate keys.
+	// Write an empty RC file for use by 'upspin keygen'.
+	rcKeygen := filepath.Join(tmpDir, "rc.keygen")
+	if err := ioutil.WriteFile(rcKeygen, nil, 0644); err != nil {
+		return err
+	}
 	for _, u := range cfg.Users {
 		fmt.Printf("Generating keys for user %q\n", u.Name)
 		dir := userDir(u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
-		keygen := exec.Command("upspin", "keygen", "-where="+dir)
+		keygen := exec.Command("upspin", "-context="+rcKeygen, "keygen", "-where="+dir)
 		keygen.Stdout = prefix("keygen: ", os.Stdout)
 		keygen.Stderr = prefix("keygen: ", os.Stderr)
 		if err := keygen.Run(); err != nil {
@@ -180,22 +185,22 @@ func (cfg *Config) Run() error {
 		}
 
 		rcContent := []string{
-			"username=" + u.Name,
-			"tlscerts=" + tmpDir,
-			"packing=" + u.Packing,
-			"storeserver=" + u.StoreServer,
-			"dirserver=" + u.DirServer,
+			"username: " + u.Name,
+			"tlscerts: " + tmpDir,
+			"packing: " + u.Packing,
+			"storeserver: " + u.StoreServer,
+			"dirserver: " + u.DirServer,
 		}
 		switch server {
 		case "keyserver":
 			rcContent = append(rcContent,
-				"keyserver=inprocess,",
-				"secrets=none",
+				"keyserver: inprocess,",
+				"secrets: none",
 			)
 		default:
 			rcContent = append(rcContent,
-				"keyserver=remote,"+cfg.KeyServer,
-				"secrets="+userDir(user),
+				"keyserver: remote,"+cfg.KeyServer,
+				"secrets: "+userDir(user),
 			)
 		}
 		rcFile := filepath.Join(tmpDir, "rc."+server)
@@ -254,10 +259,18 @@ func (cfg *Config) Run() error {
 		if err != nil {
 			return err
 		}
+		dir, err := upspin.ParseEndpoint(u.DirServer)
+		if err != nil {
+			return err
+		}
+		store, err := upspin.ParseEndpoint(u.StoreServer)
+		if err != nil {
+			return err
+		}
 		user := &upspin.User{
 			Name:      upspin.UserName(u.Name),
-			Dirs:      []upspin.Endpoint{{upspin.Remote, upspin.NetAddr(u.DirServer)}},
-			Stores:    []upspin.Endpoint{{upspin.Remote, upspin.NetAddr(u.StoreServer)}},
+			Dirs:      []upspin.Endpoint{*dir},
+			Stores:    []upspin.Endpoint{*store},
 			PublicKey: upspin.PublicKey(pk),
 		}
 		userJSON, err := json.Marshal(user)
