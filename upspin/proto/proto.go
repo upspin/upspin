@@ -163,6 +163,9 @@ func UserProto(user *upspin.User) *User {
 
 // RefdataProto converts an upspin.Refdata to a proto.Refdata.
 func RefdataProto(refdata *upspin.Refdata) *Refdata {
+	if refdata == nil {
+		return nil
+	}
 	return &Refdata{
 		Reference: string(refdata.Reference),
 		Volatile:  refdata.Volatile,
@@ -172,6 +175,9 @@ func RefdataProto(refdata *upspin.Refdata) *Refdata {
 
 // UpspinRefdata converts a proto.Refdata to upspin.Refdata.
 func UpspinRefdata(refdata *Refdata) *upspin.Refdata {
+	if refdata == nil {
+		return nil
+	}
 	return &upspin.Refdata{
 		Reference: upspin.Reference(refdata.Reference),
 		Volatile:  refdata.Volatile,
