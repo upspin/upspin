@@ -683,16 +683,16 @@ same JSON format printed by the command without the -put flag.
 func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	data := s.readAll(inFile)
 	userStruct := new(upspin.User)
-	err := json.Unmarshal(data, userStrct)
+	err := json.Unmarshal(data, userStruct)
 	if err != nil {
 		// TODO(adg): better error message?
 		s.exit(err)
 	}
 	// Validate public key.
-	if userStrct.PublicKey == "" && !force {
+	if userStruct.PublicKey == "" && !force {
 		s.exitf("An empty public key will prevent user from accessing services. To override use -force.")
 	}
-	_, _, err = factotum.ParsePublicKey(userStrct.PublicKey)
+	_, _, err = factotum.ParsePublicKey(userStruct.PublicKey)
 	if err != nil && !force {
 		s.exitf("invalid public key, to override use -force: %s", err.Error())
 	}
