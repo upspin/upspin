@@ -396,7 +396,7 @@ func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFo
 
 	var dirContents []*upspin.DirEntry
 	if entry.IsDir() {
-		dirContents, err = s.client.Glob(string(entry.Name) + "/*")
+		dirContents, err = s.client.Glob(upspin.AllFilesGlob(entry.Name))
 		if err != nil {
 			s.exit(err)
 		}

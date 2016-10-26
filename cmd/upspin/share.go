@@ -260,7 +260,7 @@ func (s *Sharer) allEntries(names []upspin.PathName) []*upspin.DirEntry {
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory. See comment in allEntries about links.
-	thisDir, err := s.state.DirServer().Glob(string(dir) + "/*")
+	thisDir, err := s.state.DirServer().Glob(upspin.AllFilesGlob(dir))
 	if err != nil {
 		s.state.exitf("globbing %q: %s", dir, err)
 	}
