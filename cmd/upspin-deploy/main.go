@@ -373,15 +373,15 @@ func (c *Config) buildServer(server string) error {
 			"secrets: /upspin",
 			"keyserver: "+c.endpoint("keyserver"),
 			"storeserver: "+c.endpoint("storeserver"),
-			"dirserver: remote,"+c.endpoint("dirserver"),
+			"dirserver: "+c.endpoint("dirserver"),
 		)
 	case "storeserver":
 		err = writeRC(dir,
 			"username: "+c.storeServerUserName(),
 			"secrets: /upspin",
 			"keyserver: "+c.endpoint("keyserver"),
-			"storeserver: "+c.endpoint("storeserver"), // So that it knows how who it is.
-			"dirserver: remote,"+c.endpoint("dirserver"),
+			"storeserver: "+c.endpoint("storeserver"), // So that it knows who it is.
+			"dirserver: "+c.endpoint("dirserver"),
 		)
 	}
 	if err != nil {
