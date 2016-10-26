@@ -5,6 +5,7 @@
 package upspin
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/binary"
 	"errors"
@@ -486,4 +487,48 @@ func SeqNext(s int64) int64 {
 		return SeqBase
 	}
 	return s
+}
+
+var globMeta = []byte(`\*?[`)
+
+func isMeta(b byte) bool {
+	return bytes.IndexByte(globMeta, b) >= 0
+}
+
+// QuoteGlob returns a string that quotes all Glob metacharacters
+// inside the argument path name; the returned string is a regular expression matching
+// the literal text. For example, QuoteGlob`[foo]`) returns `\[foo\]`.
+// In effect, the resulting string matches the literal text of the argument
+// with no metacharacter processing.
+func QuoteGlob(p PathName) PathName {
+	s := string(p)
+	// A byte loop is correct because all metacharacters are ASCII.
+	found := false
+	for i := 0; i < len(s); i++ {
+		if isMeta(s[i]) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return p
+	}
+
+	b := make([]byte, 0, 2*len(s))
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if isMeta(c) {
+			b = append(b, '\\')
+		}
+		b = append(b, c)
+	}
+	return PathName(b)
+}
+
+// AllFilesGlob returns the Glob pattern that will match all the files in the
+// argument directory, which is treated as a literal string (that is, it is passed
+// through QuoteGlob). For example, given ann@machine.com/foo, it will
+// return ann@machine.com/foo/*.
+func AllFilesGlob(dir PathName) string {
+	return string(QuoteGlob(dir)) + "/*"
 }

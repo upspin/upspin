@@ -298,7 +298,7 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 // contents return the top-level contents of dir as a slice of cpFiles.
 func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
 	if dir.isUpspin {
-		entries, err := s.client.Glob(dir.path + "/*") // TODO: Escape metacharacters in path.
+		entries, err := s.client.Glob(upspin.AllFilesGlob(upspin.PathName(dir.path)))
 		if err != nil {
 			s.fail(err)
 			// OK to continue; there may still be files.
