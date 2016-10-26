@@ -373,7 +373,7 @@ func (c *Config) buildServer(server string) error {
 			"secrets=/upspin",
 			"keyserver="+c.endpoint("keyserver"),
 			"storeserver="+c.endpoint("storeserver"),
-			"dirserver=remote,"+c.endpoint("dirserver"),
+			"dirserver="+c.endpoint("dirserver"),
 		)
 	case "storeserver":
 		err = writeRC(dir,
@@ -381,7 +381,7 @@ func (c *Config) buildServer(server string) error {
 			"secrets=/upspin",
 			"keyserver="+c.endpoint("keyserver"),
 			"storeserver="+c.endpoint("storeserver"), // So it knows how to compare to itself.
-			"dirserver=remote,"+c.endpoint("dirserver"),
+			"dirserver="+c.endpoint("dirserver"),
 		)
 	}
 	if err != nil {
