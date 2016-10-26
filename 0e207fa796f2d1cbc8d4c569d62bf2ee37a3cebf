@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_45b75e8c",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_13e3ec90",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_33e0e881",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2016-10-26T04:12:14Z",
       "side": 1,
       "message": "context?",
+      "range": {
+        "startLine": 40,
+        "startChar": 63,
+        "endLine": 40,
+        "endChar": 70
+      },
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_65c462f9",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_33e0e881",
       "range": {
         "startLine": 40,
         "startChar": 63,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_85c166ea",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "618870a5_7f886fab",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_f382f097",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -70,6 +130,24 @@
       "writtenOn": "2016-10-26T04:12:14Z",
       "side": 1,
       "message": "debugging dreg?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_45659e38",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_f382f097",
       "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -93,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_6560e219",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_53dd64c4",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_d37df4d6",
         "filename": "store/gcp/perm_test.go",
         "patchSetId": 1
@@ -104,6 +200,24 @@
       "writtenOn": "2016-10-26T04:12:14Z",
       "side": 1,
       "message": "since you only use onwerEnv and writerEnv to set up the test runner, why not just return the testrunner instead?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_855de65e",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "I use writerEnv.Context. But I solved it similarly.\nDone.",
+      "parentUuid": "e16c60ba_d37df4d6",
       "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -127,6 +241,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_0546366c",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Oops. Done.",
+      "parentUuid": "e16c60ba_73da60cf",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_93737c0d",
         "filename": "store/perm/perm.go",
         "patchSetId": 1
@@ -138,6 +270,24 @@
       "writtenOn": "2016-10-26T04:12:14Z",
       "side": 1,
       "message": "ok, now that you\u0027ve shown that all callers just do\n\nperm :\u003d perm.NewStore(ctx)\ngo perm.UpdateLoop()\n\ncan you please unexport this and put it in NewStore?",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_6555420e",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_93737c0d",
       "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -161,6 +311,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_e575d2af",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_b37878e8",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "618870a5_9f41b381",
         "filename": "store/perm/perm.go",
         "patchSetId": 1
@@ -172,6 +340,24 @@
       "writtenOn": "2016-10-26T03:00:39Z",
       "side": 1,
       "message": "this is an ugly name. can\u0027t we find a nicer one? like IsWriter?\nthe file is StoreWriters.",
+      "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c599aec8",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "618870a5_9f41b381",
       "revId": "0e207fa796f2d1cbc8d4c569d62bf2ee37a3cebf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false

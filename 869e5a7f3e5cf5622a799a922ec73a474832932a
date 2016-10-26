@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_c5460e96",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 0,
+      "message": "I\u0027m going to put a TODO here because this needs to be refCounted and it seems it\u0027s pretty useless since we never stop running. Maybe a finalizer is the right solution.",
+      "parentUuid": "e16c60ba_13684c11",
+      "revId": "869e5a7f3e5cf5622a799a922ec73a474832932a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_3365483a",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-26T04:12:14Z",
       "side": 0,
       "message": "no?",
+      "revId": "869e5a7f3e5cf5622a799a922ec73a474832932a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_e54b129b",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-26T18:39:27Z",
+      "side": 0,
+      "message": "ack",
+      "parentUuid": "e16c60ba_3365483a",
       "revId": "869e5a7f3e5cf5622a799a922ec73a474832932a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
