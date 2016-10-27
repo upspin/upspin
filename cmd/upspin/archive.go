@@ -32,6 +32,7 @@ import (
 	_ "upspin.io/pack/plain"
 
 	// Load required transports
+	"golang.org/x/tools/go/gcimporter15/testdata"
 	"upspin.io/transports"
 )
 
@@ -51,6 +52,26 @@ type archiver struct {
 	// See flags match and replace.
 	prefixMatch   string
 	prefixReplace string
+}
+
+func (s *State) archiveCommand(args ...string) {
+	const help = `
+Archive archives an Upspin path into a local file in tar format.
+E.g. archive user@domain.com/dir /tmp/foo
+`
+	fs := flag.NewFlagSet("archive", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "archive upspin_directory local_directory")
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+	a, err := newArchiver()
+	if err != nil {
+		exitf(err.Error())
+	}
+	err = a.archive(upspin.PathName(flag.Arg(0)), createOrDie(flag.Arg(1)))
+	if err != nil {
+		exitf(err.Error())
+	}
 }
 
 func main() {
