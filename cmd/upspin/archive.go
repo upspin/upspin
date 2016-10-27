@@ -9,7 +9,7 @@ package main
 // - Better regexp matching (support sed-like behavior).
 // - Keep time from original archive.
 // - Add tests.
-// - Add -v flag for verbose operation.
+// - Integrate with cp logic.
 
 import (
 	"archive/tar"
@@ -21,23 +21,9 @@ import (
 	"strings"
 
 	"upspin.io/access"
-	"upspin.io/client"
-	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
-
-	// Load useful packers
-	_ "upspin.io/pack/ee"
-	_ "upspin.io/pack/plain"
-
-	// Load required transports
-	"upspin.io/transports"
-)
-
-var (
-	match   = flag.String("match", "", "if present, matches pathname prefixes")
-	replace = flag.String("replace", "", "if present, replaces the pathname matched by flag -match")
 )
 
 // archiver implements archiving and unarchiving to/from Upspin tree and a local
@@ -51,60 +37,73 @@ type archiver struct {
 	// See flags match and replace.
 	prefixMatch   string
 	prefixReplace string
+
+	verbose bool
 }
 
-func main() {
-	flag.Usage = usage
-	flag.Parse()
-
-	if flag.NArg() < 1 {
-		usage()
+func (s *State) tar(args ...string) {
+	const help = `
+Tar archives an Upspin tree into a local tar file.
+E.g. tar user@domain.com/dir /tmp/archive.tar
+`
+	fs := flag.NewFlagSet("tar", flag.ExitOnError)
+	verbose := fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "tar upspin_directory local_file")
+	if fs.NArg() != 2 {
+		fs.Usage()
 	}
-	a, err := newArchiver()
+	a, err := s.newArchiver(*verbose)
 	if err != nil {
-		exitf(err.Error())
+		s.exitf(err.Error())
 	}
-	if flag.NArg() == 1 {
-		err = a.unarchive(openOrDie(flag.Arg(0)))
-	} else if flag.NArg() == 2 {
-		err = a.archive(upspin.PathName(flag.Arg(0)), createOrDie(flag.Arg(1)))
-	} else {
-		fmt.Fprintf(os.Stderr, "too many args: %d", flag.NArg())
-		usage()
-	}
+	err = a.archive(upspin.PathName(fs.Arg(0)), s.createOrDie(fs.Arg(1)))
 	if err != nil {
-		exitf(err.Error())
+		s.exitf(err.Error())
 	}
-	os.Exit(0)
 }
 
-func usage() {
-	fmt.Fprintf(os.Stderr, "Usage of archive:\n")
-	fmt.Fprintf(os.Stderr, "\tarchive <upspin path> <os file path>\n")
-	fmt.Fprintf(os.Stderr, "\t\tArchives an Upspin path into a local file.\n")
-	fmt.Fprintf(os.Stderr, "\t\tE.g. archive user@domain.com/dir /tmp/foo\n")
-	fmt.Fprintf(os.Stderr, "\n\tarchive <os file path>\n")
-	fmt.Fprintf(os.Stderr, "\t\tUnarchives the contents of a local file into Upspin.\n")
-	fmt.Fprintf(os.Stderr, "\t\tE.g. archive /tmp/foo\n")
-	fmt.Fprintf(os.Stderr, "\t\tTo override the destination, use -match and -replace:\n")
-	fmt.Fprintf(os.Stderr, "\t\tE.g. archive /tmp/foo -match user@domain.com -replace=newuser@a.uk\n")
-	fmt.Fprintf(os.Stderr, "\nFlags:\n")
-	flag.PrintDefaults()
-	os.Exit(2)
+func (s *State) untar(args ...string) {
+	const help = `
+Untar unarchives a local tar file into Upspin.
+E.g. untar /tmp/archive.tar
+
+Untar allows the prefix of the Upspin path contained in the tar file to
+be replaced. The destination Upspin prefix must exist. For example:
+
+   untar /tmp/archive.tar -match bob@a.com -replace sue@a.com
+
+untars archive.tar replacing the paths
+`
+	fs := flag.NewFlagSet("untar", flag.ExitOnError)
+	match := fs.String("match", "", "if present, matches pathname prefixes")
+	replace := fs.String("replace", "", "if present, replaces the pathname matched by flag -match")
+	verbose := fs.Bool("v", false, "verbose output")
+
+	s.parseFlags(fs, args, help, "untar local_file")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	a, err := s.newArchiver(*verbose)
+	if err != nil {
+		s.exitf(err.Error())
+	}
+	a.matchReplace(*match, *replace)
+	err = a.unarchive(s.openOrDie(fs.Arg(0)))
+	if err != nil {
+		s.exitf(err.Error())
+	}
 }
 
-func newArchiver() (*archiver, error) {
-	ctx, err := context.InitContext(nil)
-	if err != nil {
-		return nil, err
-	}
-	transports.Init(ctx)
-	c := client.New(ctx)
+func (s *State) newArchiver(verbose bool) (*archiver, error) {
 	return &archiver{
-		client:        c,
-		prefixMatch:   *match,
-		prefixReplace: *replace,
+		client:  s.client,
+		verbose: verbose,
 	}, nil
+}
+
+func (a *archiver) matchReplace(match, replace string) {
+	a.prefixMatch = match
+	a.prefixReplace = replace
 }
 
 // archive walks the pathName and writes the contents to dst.
@@ -132,8 +131,9 @@ func (a *archiver) doArchive(pathName upspin.PathName, tw *tar.Writer, dst io.Wr
 			Mode:    0600,
 			ModTime: e.Time.Go(),
 		}
-		// TODO: use -v
-		fmt.Printf("Archiving %q\n", e.Name)
+		if a.verbose {
+			fmt.Printf("Archiving %q\n", e.Name)
+		}
 		switch {
 		case e.IsDir():
 			hdr.Typeflag = tar.TypeDir
@@ -209,7 +209,9 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 			name = upspin.PathName(hdr.Name)
 		}
 
-		fmt.Fprintf(os.Stdout, "Extracting %q into %q\n", hdr.Name, name)
+		if a.verbose {
+			fmt.Fprintf(os.Stdout, "Extracting %q into %q\n", hdr.Name, name)
+		}
 
 		switch hdr.Typeflag {
 		case tar.TypeDir:
@@ -255,24 +257,18 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 	return nil
 }
 
-func exitf(reason string, params ...interface{}) {
-	fmt.Fprintf(os.Stderr, reason, params...)
-	fmt.Fprintf(os.Stderr, "\n")
-	os.Exit(3)
-}
-
-func openOrDie(path string) *os.File {
+func (s *State) openOrDie(path string) *os.File {
 	f, err := os.Open(path)
 	if err != nil {
-		exitf(err.Error())
+		s.exitf(err.Error())
 	}
 	return f
 }
 
-func createOrDie(path string) *os.File {
+func (s *State) createOrDie(path string) *os.File {
 	f, err := os.Create(path)
 	if err != nil {
-		exitf(err.Error())
+		s.exitf(err.Error())
 	}
 	return f
 }
