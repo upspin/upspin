@@ -136,27 +136,18 @@ func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 	if len(dkey) != aesKeyLen {
 		return nil, errors.E(op, errKeyLength)
 	}
-	block, err := aes.NewCipher(dkey)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	iv := make([]byte, block.BlockSize())
-	// iv=0 is ok because we're certain that dkey is random and not reused
-	stream := cipher.NewCTR(block, iv)
 
 	return &blockPacker{
-		ctx:    ctx,
-		entry:  d,
-		dkey:   dkey,
-		cipher: stream,
+		ctx:   ctx,
+		entry: d,
+		dkey:  dkey,
 	}, nil
 }
 
 type blockPacker struct {
-	ctx    upspin.Context
-	entry  *upspin.DirEntry
-	dkey   []byte
-	cipher cipher.Stream
+	ctx   upspin.Context
+	entry *upspin.DirEntry
+	dkey  []byte
 
 	buf internal.LazyBuffer
 }
@@ -170,7 +161,9 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 	ciphertext = bp.buf.Bytes(len(cleartext))
 
 	// Encrypt.
-	bp.cipher.XORKeyStream(ciphertext, cleartext)
+	if err := crypt(ciphertext, cleartext, bp.dkey, len(bp.entry.Blocks)); err != nil {
+		return nil, errors.E(op, err)
+	}
 
 	// Compute size, offset, and checksum.
 	size := int64(len(ciphertext))
@@ -334,19 +327,12 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			return nil, errors.E(op, d.Name, writer, errVerify)
 			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 		}
-		// Set up stream cipher.
-		block, err := aes.NewCipher(dkey)
-		if err != nil {
-			return nil, errors.E(op, d.Name, err)
-		}
-		iv := make([]byte, aes.BlockSize)
-		stream := cipher.NewCTR(block, iv)
 		// We're OK to start decrypting blocks.
 		return &blockUnpacker{
 			ctx:          ctx,
 			entry:        d,
 			BlockTracker: internal.NewBlockTracker(d.Blocks),
-			cipher:       stream,
+			dkey:         dkey,
 		}, nil
 	}
 	return nil, errors.E(op, d.Name, me, errors.Str("could not find wrapped key"))
@@ -356,7 +342,7 @@ type blockUnpacker struct {
 	ctx                   upspin.Context
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
-	cipher                cipher.Stream
+	dkey                  []byte
 
 	buf internal.LazyBuffer
 }
@@ -373,9 +359,16 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	cleartext = bp.buf.Bytes(len(ciphertext))
 
 	// Decrypt.
-	bp.cipher.XORKeyStream(cleartext, ciphertext)
+	if err := crypt(cleartext, ciphertext, bp.dkey, bp.Block); err != nil {
+		return nil, errors.E(op, bp.entry.Name, err)
+	}
 
 	return cleartext, nil
+}
+
+func (bp *blockUnpacker) Close() error {
+	zeroSlice(&bp.dkey)
+	return nil
 }
 
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
@@ -861,4 +854,36 @@ func zeroSlice(b *[]byte) {
 	for i := range *b {
 		(*b)[i] = 0
 	}
+}
+
+// crypt [enc|de]crypts the input bytes into the output slice
+// with the provided key for the given DirBlock.
+func crypt(out, in, key []byte, blockNum int) error {
+	blockCipher, err := aes.NewCipher(key)
+	if err != nil {
+		return err
+	}
+	iv := ivForBlock(blockCipher, blockNum)
+	cipher.NewCTR(blockCipher, iv).XORKeyStream(out, in)
+	return nil
+}
+
+// ivForBlock returns a unique initialization vector
+// for the given block cipher and DirBlock.
+func ivForBlock(block cipher.Block, blockNum int) []byte {
+	// We start with a zero iv because we're certain that the
+	// encryption key is random and not reused anywhere.
+	iv := make([]byte, block.BlockSize()) // 16 bytes, in practice
+
+	// Put the block number in the first four bytes
+	// so that each block has a unique iv.
+	// The cipher.CTR stream increments the least significant bits of the
+	// iv to implement the (cipher) block counter, so unless a block is
+	// 2^48 bytes long we should never step on that behavior.
+	iv[3] = byte(blockNum)
+	iv[2] = byte(blockNum >> 8)
+	iv[1] = byte(blockNum >> 16)
+	iv[0] = byte(blockNum >> 24)
+
+	return iv
 }
