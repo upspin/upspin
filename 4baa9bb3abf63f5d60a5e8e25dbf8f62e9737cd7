@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "e16c60ba_33b1c8e8",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T07:49:41Z",
+      "side": 1,
+      "message": "move up",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_53be44b7",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T07:49:41Z",
+      "side": 1,
+      "message": "store \u003d perm.WrapStore(ctx, store)\n\nthat way there\u0027s no chance you\u0027ll use the unwrapped one",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_b3c4f84e",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 3
