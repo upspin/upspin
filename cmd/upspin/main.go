@@ -53,6 +53,8 @@ var commands = map[string]func(*State, ...string){
 	"rm":          (*State).rm,
 	"share":       (*State).share,
 	"signup":      (*State).signup,
+	"tar":         (*State).tar,
+	"untar":       (*State).untar,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
 }
@@ -739,6 +741,38 @@ See the description for rotate for information about updating keys.
 	s.shareCommand(fs)
 }
 
+func (s *State) tar(args ...string) {
+	const help = `
+Tar archives an Upspin tree into a local tar file.
+`
+	fs := flag.NewFlagSet("tar", flag.ExitOnError)
+	fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "tar upspin_directory local_file")
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+	s.tarCommand(fs)
+}
+
+func (s *State) untar(args ...string) {
+	const help = `
+Untar unarchives a local tar file into Upspin.
+
+Untar allows the prefix of the Upspin path contained in the tar file to
+be matched and replaced by using the flags -match and -replace.
+The destination Upspin prefix must exist.
+`
+	fs := flag.NewFlagSet("untar", flag.ExitOnError)
+	fs.String("match", "", "if present, extracts from the tar file only those pathname prefixes that match")
+	fs.String("replace", "", "if present, replaces the pathnames matched by flag -match with this value")
+	fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "untar local_file")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	s.untarCommand(fs)
+}
+
 func (s *State) whichAccess(args ...string) {
 	const help = `
 Whichaccess reports the Upspin path of the Access file
@@ -1003,6 +1037,22 @@ func (s *State) globLocal(pattern string) []string {
 	return strs
 }
 
+func (s *State) openLocal(path string) *os.File {
+	f, err := os.Open(path)
+	if err != nil {
+		s.exitf(err.Error())
+	}
+	return f
+}
+
+func (s *State) createLocal(path string) *os.File {
+	f, err := os.Create(path)
+	if err != nil {
+		s.exitf(err.Error())
+	}
+	return f
+}
+
 func wipeUpspinEnvironment() {
 	for _, env := range os.Environ() {
 		if strings.HasPrefix(env, "upspin") {
@@ -1029,4 +1079,9 @@ func intFlag(fs *flag.FlagSet, name string) int {
 // boolFlag returns the value of the named boolean flag in the flag set.
 func boolFlag(fs *flag.FlagSet, name string) bool {
 	return fs.Lookup(name).Value.(flag.Getter).Get().(bool)
+}
+
+// stringFlag returns the value of the named string flag in the flag set.
+func stringFlag(fs *flag.FlagSet, name string) string {
+	return fs.Lookup(name).Value.(flag.Getter).Get().(string)
 }
