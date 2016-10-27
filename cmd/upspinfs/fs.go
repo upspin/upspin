@@ -376,11 +376,14 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 			return nil, nil, err
 		}
 		kind := classify(err)
-		if kind == errors.Permission {
-			// We act like the error didn't happen in the hopes that
-			// a later longer path will succeed.
-			de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
-			return dir, de, nil
+		if (kind == errors.Permission || kind == errors.NotExist) && f.context.UserName() != n.user {
+			// Attempt a glob in the parent. If that works, don't fake anything.
+			if _, err := dir.Glob(string(path.Join(n.uname, "*"))); err != nil {
+				// We act like the error didn't happen in the hopes that
+				// a later longer path will succeed.
+				de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
+				return dir, de, nil
+			}
 		}
 		f.enoent(uname)
 		return nil, nil, err
