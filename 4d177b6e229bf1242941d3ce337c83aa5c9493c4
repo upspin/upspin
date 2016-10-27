@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e16c60ba_936b7cd2",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T00:49:01Z",
+      "side": 1,
+      "message": "I think the check valid.User should be done here, and not in SetUserName.\nThese checks should be done where the data enters the system, not within it. Callers of SetUserName get that username from somewhere, and they should be responsible for validating it.",
+      "revId": "4d177b6e229bf1242941d3ce337c83aa5c9493c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
