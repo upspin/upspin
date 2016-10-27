@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618870a5_d4adda85",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T02:27:21Z",
+      "side": 1,
+      "message": "this means vals isn\u0027t the same as the values, which is OK but probably worth a comment.",
+      "revId": "c793b447f98d95c0533f4c8dd6d883524f4b8e01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
