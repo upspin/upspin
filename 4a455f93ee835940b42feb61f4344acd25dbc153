@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "21c918eb_511e27d5",
+        "filename": "cmd/upspin/archive.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T22:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81b56446_373ef77f",
+      "revId": "4a455f93ee835940b42feb61f4344acd25dbc153",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "01a974f7_219a3458",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-27T22:49:16Z",
       "side": 1,
       "message": "all the actual commands live in this file and define flags here.\nthey call out to functions in other commands.\nrefactor to follow this pattern.\n\nsee e.g. shell or share or info.",
+      "revId": "4a455f93ee835940b42feb61f4344acd25dbc153",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1667cd0_2fb79926",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T22:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01a974f7_219a3458",
       "revId": "4a455f93ee835940b42feb61f4344acd25dbc153",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
