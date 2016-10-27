@@ -412,6 +412,10 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	if ok {
 		return key
 	}
+	if user == access.AllUsers {
+		s.userKeys[user] = "<all>"
+		return ""
+	}
 	u, err := s.state.KeyServer().Lookup(user)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
