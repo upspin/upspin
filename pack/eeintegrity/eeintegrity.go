@@ -238,6 +238,10 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	return cleartext, nil
 }
 
+func (bp *blockUnpacker) Close() error {
+	return nil
+}
+
 // ReaderHashes is unused in this packer.
 func (ei ei) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 	return
