@@ -16,6 +16,24 @@
       "revId": "d66af07d2b58255b5a9e4981230846fc3d7723cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c809be9f",
+        "filename": "context/initcontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T03:43:55Z",
+      "side": 1,
+      "message": "it\u0027s fine, but i am slightly nervous that vals, which is still alive here, is no longer correct. that\u0027s the comment i was looking for.",
+      "parentUuid": "e16c60ba_9307fcfa",
+      "revId": "d66af07d2b58255b5a9e4981230846fc3d7723cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
