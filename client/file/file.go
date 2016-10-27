@@ -6,11 +6,15 @@
 package file
 
 import (
-	"io"
-
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/pack"
 	"upspin.io/upspin"
 )
+
+// copied from client/client.go
+// TODO(adg): should this be a constant in package upspin?
+const maxBlockSize = 1024 * 1024
 
 // maxInt is the int64 representation of the maximum value of an int.
 // It allows us to verify that an int64 value never exceeds the length of a slice.
@@ -21,26 +25,56 @@ var maxInt = int64(^uint(0) >> 1)
 // It always keeps the whole file in memory under the assumption
 // that it is encrypted and must be read and written atomically.
 type File struct {
-	client   upspin.Client   // Client the File belongs to.
-	closed   bool            // Whether the file has been closed, preventing further operations.
 	name     upspin.PathName // Full path name.
-	writable bool            // File is writable (made with Create, not Open).
 	offset   int64           // File location for next read or write operation. Constrained to <= maxInt.
-	data     []byte          // Contents of file.
+	writable bool            // File is writable (made with Create, not Open).
+	closed   bool            // Whether the file has been closed, preventing further operations.
+
+	// Used only by readers.
+	context upspin.Context
+	entry   *upspin.DirEntry
+	size    int64
+	bu      upspin.BlockUnpacker
+	// Keep the most recently unpacked block around
+	// in case a subsequent readAt starts at the same place.
+	lastBlockIndex int
+	lastBlockBytes []byte
+
+	// Used only by writers.
+	client upspin.Client // Client the File belongs to.
+	data   []byte        // Contents of file.
 }
 
 var _ upspin.File = (*File)(nil)
 
-// Readable creates a new file with a given name and data contents,
-// belonging to a given client for read only. The data belongs to File
-// and must not be modified after this call.
-func Readable(client upspin.Client, name upspin.PathName, data []byte) *File {
-	return &File{
-		client:   client,
-		name:     name,
-		writable: false,
-		data:     data,
+// Readable creates a new File for the given DirEntry that must be readable
+// using the given Context.
+func Readable(ctx upspin.Context, entry *upspin.DirEntry) (*File, error) {
+	// TODO(adg): check if this is a dir or link?
+	const op = "client/file.Readable"
+
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return nil, errors.E(op, entry.Name, errors.Invalid, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
+	bu, err := packer.Unpack(ctx, entry)
+	if err != nil {
+		return nil, errors.E(op, entry.Name, err)
+	}
+	size, err := entry.Size()
+	if err != nil {
+		return nil, errors.E(op, entry.Name, err)
+	}
+
+	return &File{
+		context:        ctx,
+		name:           entry.Name,
+		writable:       false,
+		entry:          entry,
+		size:           size,
+		bu:             bu,
+		lastBlockIndex: -1,
+	}, nil
 }
 
 // Writable creates a new file with a given name, belonging to a given
@@ -75,7 +109,7 @@ func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
 	return f.readAt(op, b, off)
 }
 
-func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
+func (f *File) readAt(op string, dst []byte, off int64) (n int, err error) {
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
@@ -85,10 +119,55 @@ func (f *File) readAt(op string, b []byte, off int64) (n int, err error) {
 	if off < 0 {
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
 	}
-	if off >= int64(len(f.data)) {
-		return 0, io.EOF
+	if off >= f.size {
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("offset beyond end of file"))
 	}
-	n = copy(b, f.data[off:])
+
+	// Iterate over blocks that contain the data we're interested in
+	// and append their content to len(dst).
+	for i := range f.entry.Blocks {
+		b := &f.entry.Blocks[i]
+
+		if b.Offset+b.Size < off {
+			// This block is before our interest.
+			continue
+		}
+		if b.Offset >= off+int64(len(dst)) {
+			// This block is beyond our interest.
+			break
+		}
+
+		if _, ok := f.bu.SeekBlock(i); !ok {
+			return 0, errors.E(op, errors.IO, f.name, errors.Errorf("could not seek to block %d", i))
+		}
+
+		var clear []byte
+		if i == f.lastBlockIndex {
+			// If this is the block we last read (will often happen
+			// with sequential reads) then use that content,
+			// to avoid reading and unpacking again.
+			clear = f.lastBlockBytes
+		} else {
+			// Otherwise, we need to read the block and unpack.
+			cipher, err := clientutil.ReadLocation(f.context, b.Location)
+			if err != nil {
+				return 0, errors.E(op, errors.IO, f.name, err)
+			}
+			clear, err = f.bu.Unpack(cipher)
+			if err != nil {
+				return 0, errors.E(op, errors.IO, f.name, err)
+			}
+			f.lastBlockIndex = i
+			f.lastBlockBytes = clear
+		}
+
+		clearIdx := 0
+		if off > b.Offset {
+			clearIdx = int(off - b.Offset)
+		}
+		n += copy(dst[n:], clear[clearIdx:])
+	}
+
 	return n, nil
 }
 
@@ -172,7 +251,11 @@ func (f *File) Close() error {
 	}
 	f.closed = true
 	if !f.writable {
-		f.data = nil // Might as well release it early.
+		f.lastBlockIndex = -1
+		f.lastBlockBytes = nil
+		if err := f.bu.Close(); err != nil {
+			return errors.E(op, err)
+		}
 		return nil
 	}
 	_, err := f.client.Put(f.name, f.data)
