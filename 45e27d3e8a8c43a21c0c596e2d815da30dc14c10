@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618870a5_48076e7f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T04:26:49Z",
+      "side": 1,
+      "message": "But what are \"the problems\" (assuming there\u0027s a crash somewhere, not just fixing the race)?",
+      "revId": "45e27d3e8a8c43a21c0c596e2d815da30dc14c10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
