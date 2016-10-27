@@ -17,6 +17,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 )
 
 // server is a SecureServer that talks to a Store interface and serves GRPC requests.
@@ -52,7 +53,11 @@ func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), s.store.Endpoint())
+	userName, err := user.Clean(session.User())
+	if err != nil {
+		return nil, err
+	}
+	svc, err := s.store.Dial(context.SetUserName(s.context, userName), s.store.Endpoint())
 	if err != nil {
 		return nil, err
 	}
