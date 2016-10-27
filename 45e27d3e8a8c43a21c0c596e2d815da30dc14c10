@@ -16,6 +16,24 @@
       "revId": "45e27d3e8a8c43a21c0c596e2d815da30dc14c10",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_937e1c5b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T04:57:57Z",
+      "side": 1,
+      "message": "The problem is that a cipher.AEAD offers no guarantees of concurrency safety, yet all blockpackers/unpackers use the same instance. Using a crypto primitive in this way seems risky at best.",
+      "parentUuid": "618870a5_48076e7f",
+      "revId": "45e27d3e8a8c43a21c0c596e2d815da30dc14c10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
