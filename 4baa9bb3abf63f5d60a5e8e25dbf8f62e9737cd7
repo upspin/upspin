@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_ebc03c1c",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_33b1c8e8",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_53be44b7",
         "filename": "cmd/storeserver/main.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-27T07:49:41Z",
       "side": 1,
       "message": "store \u003d perm.WrapStore(ctx, store)\n\nthat way there\u0027s no chance you\u0027ll use the unwrapped one",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_0bc64035",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_53be44b7",
       "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_8bba50a1",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_b3c4f84e",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_f3ce706a",
         "filename": "store/gcp/perm_test.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-27T07:48:53Z",
       "side": 1,
       "message": "This test should be in package perm, where you can test against an inprocess store.",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_abb714b9",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_f3ce706a",
       "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_cbe458cd",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Re-worked a bit to simplify.\nDone.",
+      "parentUuid": "e16c60ba_13ef6cd3",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_53e9e4ca",
         "filename": "store/perm/perm.go",
         "patchSetId": 3
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_ebe91ca2",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_53e9e4ca",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_73e6e0fd",
         "filename": "store/perm/perm.go",
         "patchSetId": 3
@@ -115,6 +223,24 @@
       "writtenOn": "2016-10-27T07:48:53Z",
       "side": 1,
       "message": "you don\u0027t want to overwrite serverCtx with this context, as the user\u0027s context will likely have the wrong endpoints and username.\n\ninstead you should have a separate user field that you set here with context.UserName()",
+      "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_6bad0c68",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_73e6e0fd",
       "revId": "4baa9bb3abf63f5d60a5e8e25dbf8f62e9737cd7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
