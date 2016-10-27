@@ -376,7 +376,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 			return nil, nil, err
 		}
 		kind := classify(err)
-		if kind == errors.Permission || kind == errors.NotExist {
+		if kind == errors.Permission {
 			// We act like the error didn't happen in the hopes that
 			// a later longer path will succeed.
 			de = &upspin.DirEntry{Name: uname, Attr: upspin.AttrDirectory}
@@ -845,11 +845,11 @@ func do(ctx upspin.Context, mountpoint string) chan bool {
 		fuse.VolumeName(string(f.context.UserName())),
 		fuse.DaemonTimeout("240"),
 		//fuse.OSXDebugFuseKernel(),
-		fuse.NoAppleDouble(),
+		//fuse.NoAppleDouble(),
 		fuse.NoAppleXattr(),
 	)
 	if err != nil {
-		log.Debug.Fatal(err)
+		log.Fatalf("fuse.Mount failed: %s", err)
 	}
 
 	// Check if the mount process has an error to report.  The timer is
