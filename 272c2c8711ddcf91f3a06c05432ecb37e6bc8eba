@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_28678a65",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T06:25:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_530644fa",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_730340e9",
         "filename": "store/gcp/gcp.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-27T03:41:48Z",
       "side": 1,
       "message": "this is a regression in this cl\nthe refcount stuff seems fine; why did you remove it?",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_c840dea5",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T06:25:52Z",
+      "side": 1,
+      "message": "Close is never used in practice. Let\u0027s delete it.",
+      "parentUuid": "e16c60ba_730340e9",
       "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "618870a5_083ba633",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T06:25:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_93f0dcea",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e16c60ba_b3f5d8d9",
         "filename": "store/gcp/perm_test.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-27T03:41:48Z",
       "side": 1,
       "message": "storeOther is kind of a meaningless name. I had to read the code carefully to understand what was going on. \"storeAsWriter\"? \n\nalso, storeOther and storeOwner are hard to distinguish",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_28406a9f",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T06:25:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e16c60ba_b3f5d8d9",
       "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
