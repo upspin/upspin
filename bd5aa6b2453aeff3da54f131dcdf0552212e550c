@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e19380d8_107e7259",
+        "filename": "cmd/upspin/archive.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "no OrDie please. just call this open and put it in the same file as the other methods on State.",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "868bbadf_0352704d",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "i would just \n\ns.tarCommand(fs)\n\nand do all the other work there.",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e19380d8_30936e77",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "s.exit(err)",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81b56446_ba72ce56",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "not a sentence and doesn\u0027t tell me what the prefix is. text? elements? user name?\n\nalso none of the other help messages are example-driven. please just explain, and follow the lead from the other subcommands.",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "868bbadf_234bf4a0",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "matches in what sense? does this mean only extract those that match. _this_ is what the help message is for.",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81b56446_7a898606",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "868bbadf_c35b2867",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "s.untarCommand(fs)",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1667cd0_4ff92dd6",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "s.exit(err)",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a6eefe70_56c37296",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 793,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T23:00:47Z",
+      "side": 1,
+      "message": "s.exit(err)",
+      "revId": "bd5aa6b2453aeff3da54f131dcdf0552212e550c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
