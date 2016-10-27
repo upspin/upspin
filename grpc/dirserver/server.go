@@ -15,6 +15,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 
 	gContext "golang.org/x/net/context"
 )
@@ -52,7 +53,11 @@ func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(context.SetUserName(s.context, session.User()), s.dir.Endpoint())
+	userName, err := user.Clean(session.User())
+	if err != nil {
+		return nil, err
+	}
+	svc, err := s.dir.Dial(context.SetUserName(s.context, userName), s.dir.Endpoint())
 	if err != nil {
 		return nil, err
 	}

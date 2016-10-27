@@ -10,7 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/user"
+	osuser "os/user"
 	"path/filepath"
 	"strings"
 
@@ -21,6 +21,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/upspin"
+	"upspin.io/user"
 
 	// Needed because the default packing is "plain" and its
 	// implementation is referenced if no packing is specified.
@@ -173,7 +174,12 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	// Construct a context from vals.
 	ctx := New()
 
-	ctx = SetUserName(ctx, upspin.UserName(vals[username]))
+	// Put the canonical respresentation of the username in the context.
+	username, err := user.Clean(upspin.UserName(vals[username]))
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	ctx = SetUserName(ctx, username)
 
 	packer := pack.LookupByName(vals[packing])
 	if packer == nil {
@@ -462,7 +468,7 @@ func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
 // TODO(adg): move to osutil package?
 // Homedir returns the home directory of the OS' logged-in user.
 func Homedir() (string, error) {
-	u, err := user.Current()
+	u, err := osuser.Current()
 	// user.Current may return an error, but we should only handle it if it
 	// returns a nil user. This is because os/user is wonky without cgo,
 	// but it should work well enough for our purposes.

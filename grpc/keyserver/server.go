@@ -17,6 +17,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 )
 
 // server is a SecureServer that talks to a KeyServer interface and serves GRPC requests.
@@ -52,7 +53,11 @@ func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(context.SetUserName(s.context, session.User()), s.key.Endpoint())
+	userName, err := user.Clean(session.User())
+	if err != nil {
+		return nil, err
+	}
+	svc, err := s.key.Dial(context.SetUserName(s.context, userName), s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}
