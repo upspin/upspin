@@ -57,6 +57,10 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Pac
 	if !bytes.Equal(data, out.Bytes()) {
 		t.Fatal("output did not match input")
 	}
+
+	if err := unpackEntryRandomly(ctx, store, packer, de, out.Bytes()); err != nil {
+		t.Fatalf("unpacking random entries: %v", err)
+	}
 }
 
 func packEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, r io.Reader) error {
@@ -128,4 +132,37 @@ func unpackEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *
 			return err
 		}
 	}
+}
+
+func unpackEntryRandomly(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, out []byte) error {
+	bp, err := packer.Unpack(ctx, de)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < 10000; i++ {
+		n := mRand.Intn(len(de.Blocks))
+		b, ok := bp.SeekBlock(n)
+		if !ok {
+			return fmt.Errorf("seek to block %d failed", n)
+		}
+
+		ref := b.Location.Reference
+		cipher, ok := store[ref]
+		if !ok {
+			return fmt.Errorf("could not find reference %q in store", ref)
+		}
+
+		clear, err := bp.Unpack(cipher)
+		if err != nil {
+			return err
+		}
+
+		want := out[b.Offset : b.Offset+b.Size]
+		if !bytes.Equal(clear, want) {
+			return fmt.Errorf("block %d did not decrypt correctly", n)
+		}
+	}
+
+	return nil
 }

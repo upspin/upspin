@@ -6,6 +6,7 @@ package ee
 
 import (
 	"bytes"
+	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
 	"log"
@@ -386,4 +387,114 @@ func repo(dir ...string) string {
 		log.Fatal("no GOPATH")
 	}
 	return filepath.Join(gopath, "src", "upspin.io", filepath.Join(dir...))
+}
+
+func TestConsistentKeyStream(t *testing.T) {
+	// This test that the EE packer with different block sizes still
+	// generates the same ciphertext when all blocks are concatenated.
+	blockSizes := []int{777, 1024, 4001, 92341, 1024 * 1024}
+	const (
+		user upspin.UserName = "joe@upspin.io"
+		name                 = upspin.PathName(user + "/file/of/user")
+	)
+
+	ctx, packer := setup(user)
+	de := &upspin.DirEntry{
+		Name:       name,
+		SignedName: name,
+		Writer:     ctx.UserName(),
+		Packing:    packer.Packing(),
+	}
+
+	// Generate a little over 2MB of random data.
+	data := make([]byte, 2*1024*1024+3)
+	if _, err := rand.Read(data); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new key to re-use for each separate pack operation.
+	dkey, blockCipher, err := newKeyAndCipher()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Generate the expected ciphertext in one operation.
+	// We will then compare the ciphertext generated over multiple blocks
+	// against this canonical reference.
+	wantCipherText := make([]byte, len(data))
+	iv := make([]byte, blockCipher.BlockSize()) // zero
+	cipher.NewCTR(blockCipher, iv).XORKeyStream(wantCipherText, data)
+
+	// Encrypt data at various block sizes.
+	dirEntries := map[int]upspin.DirEntry{}
+	for _, bs := range blockSizes {
+		t.Logf("encrypt blockSize=%d", bs)
+
+		bp, err := packer.Pack(ctx, de)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Replace the random dkey/cipher with our own.
+		bpp := bp.(*blockPacker)
+		// Make a copy of dkey, as it'll get zeroed on close.
+		bpp.dkey = append([]byte(nil), dkey...)
+		bpp.cipher = blockCipher
+
+		var gotCipherText []byte
+		for i := 0; i < len(data); i += bs {
+			clear := data[i:]
+			if len(clear) > bs {
+				clear = clear[:bs]
+			}
+			cipher, err := bp.Pack(clear)
+			if err != nil {
+				t.Fatal(err)
+			}
+			gotCipherText = append(gotCipherText, cipher...)
+			bp.SetLocation(upspin.Location{Reference: "dummy"})
+		}
+		if err := bp.Close(); err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(gotCipherText, wantCipherText) {
+			t.Fatalf("cipherText for block size %d did not match", bs)
+		}
+
+		dirEntries[bs] = *de
+		de.Packdata = nil
+		de.Blocks = nil
+	}
+
+	// Decrypt data and verify.
+	for _, bs := range blockSizes {
+		t.Logf("decrypt blockSize=%d", bs)
+
+		de := dirEntries[bs]
+		bu, err := packer.Unpack(ctx, &de)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got := make([]byte, len(data))
+
+		for i := 0; i < len(data); i += bs {
+			if _, ok := bu.NextBlock(); !ok {
+				t.Fatal("expected next block, didn't find one")
+			}
+			cipher := wantCipherText[i:]
+			if len(cipher) > bs {
+				cipher = cipher[:bs]
+			}
+			clear, err := bu.Unpack(cipher)
+			if err != nil {
+				t.Fatal(err)
+			}
+			copy(got[i:], clear)
+		}
+
+		if !bytes.Equal(data, got) {
+			t.Errorf("cleartext for blockSize=%d does not match input", bs)
+		}
+	}
 }
