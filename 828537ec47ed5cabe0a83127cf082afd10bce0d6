@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618870a5_2b1944ed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:48:00Z",
+      "side": 1,
+      "message": "s/our/out",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_abc1d4e9",
+        "filename": "client/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:48:00Z",
+      "side": 1,
+      "message": "Here too it would be good to know your last block cache is working (see comment below for context).",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_6bb7cc8c",
+        "filename": "client/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:48:00Z",
+      "side": 1,
+      "message": "Should this test reach inside the File somehow and check how many block unpack operations were done? This would help ensure we\u0027re doing the minimum necessary, but may require some extra instrumentation.",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_0bc9e00b",
+        "filename": "client/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:48:00Z",
+      "side": 1,
+      "message": "1023? for an odd number with slightly more chances of one-off errors?",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_ebf75c6e",
+        "filename": "client/file/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-27T16:48:00Z",
+      "side": 1,
+      "message": "Why \"len(dst)\"? Just \"append their content to dst\".",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
