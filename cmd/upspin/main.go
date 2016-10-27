@@ -53,6 +53,8 @@ var commands = map[string]func(*State, ...string){
 	"rm":          (*State).rm,
 	"share":       (*State).share,
 	"signup":      (*State).signup,
+	"tar":         (*State).tar,
+	"untar":       (*State).untar,
 	"user":        (*State).user,
 	"whichaccess": (*State).whichAccess,
 }
@@ -737,6 +739,59 @@ See the description for rotate for information about updating keys.
 		*fix = true
 	}
 	s.shareCommand(fs)
+}
+
+func (s *State) tar(args ...string) {
+	const help = `
+Tar archives an Upspin tree into a local tar file.
+E.g. tar user@domain.com/dir /tmp/archive.tar
+`
+	fs := flag.NewFlagSet("tar", flag.ExitOnError)
+	verbose := fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "tar upspin_directory local_file")
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+	a, err := s.newArchiver(*verbose)
+	if err != nil {
+		s.exitf(err.Error())
+	}
+	err = a.archive(upspin.PathName(fs.Arg(0)), s.createOrDie(fs.Arg(1)))
+	if err != nil {
+		s.exitf(err.Error())
+	}
+}
+
+func (s *State) untar(args ...string) {
+	const help = `
+Untar unarchives a local tar file into Upspin.
+E.g. untar /tmp/archive.tar
+
+Untar allows the prefix of the Upspin path contained in the tar file to
+be replaced. The destination Upspin prefix must exist. For example:
+
+   untar /tmp/archive.tar -match bob@a.com -replace sue@a.com
+
+untars archive.tar replacing the paths
+`
+	fs := flag.NewFlagSet("untar", flag.ExitOnError)
+	match := fs.String("match", "", "if present, matches pathname prefixes")
+	replace := fs.String("replace", "", "if present, replaces the pathname matched by flag -match")
+	verbose := fs.Bool("v", false, "verbose output")
+
+	s.parseFlags(fs, args, help, "untar local_file")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	a, err := s.newArchiver(*verbose)
+	if err != nil {
+		s.exitf(err.Error())
+	}
+	a.matchReplace(*match, *replace)
+	err = a.unarchive(s.openOrDie(fs.Arg(0)))
+	if err != nil {
+		s.exitf(err.Error())
+	}
 }
 
 func (s *State) whichAccess(args ...string) {
