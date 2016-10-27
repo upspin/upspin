@@ -124,20 +124,30 @@ type BlockPacker interface {
 	// SetLocation updates the Location field of the last-Packed DirBlock.
 	SetLocation(Location)
 
-	// Close updates the Signature for the DirEntry.
+	// Close updates the Signature for the DirEntry and releases any
+	// resources associated with the packing operation.
 	Close() error
 }
 
 // BlockUnpacker operates on a DirEntry, unpacking and verifying its DirBlocks.
 type BlockUnpacker interface {
-	// NextBlock returns the next DirBlock in the sequence.
+	// NextBlock returns the next DirBlock in the sequence and true,
+	// or a zero DirBlock and false if there are no more blocks to unpack.
 	NextBlock() (DirBlock, bool)
+
+	// SeekBlock returns the nth DirBlock and true,
+	// or a zero DirBlock and false if the nth block does not exist.
+	SeekBlock(n int) (DirBlock, bool)
 
 	// Unpack takes ciphertext returns the cleartext. If appropriate, the
 	// result is verified as correct according to the block's Packdata.
 	//
 	// The cleartext slice remains valid until the next call to Unpack.
 	Unpack(ciphertext []byte) (cleartext []byte, err error)
+
+	// Close releases any resources associated with the unpacking
+	// operation.
+	Close() error
 }
 
 // Packer provides the implementation of a Packing. The pack package binds

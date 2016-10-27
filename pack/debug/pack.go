@@ -240,6 +240,10 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	return cleartext, nil
 }
 
+func (bp *blockUnpacker) Close() error {
+	return nil
+}
+
 func (p testPack) PackLen(context upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
