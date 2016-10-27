@@ -115,6 +115,10 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	return
 }
 
+func (bp *blockUnpacker) Close() error {
+	return nil
+}
+
 // Name implements upspin.Name.
 func (p plainPack) Name(ctx upspin.Context, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/plain.Name"
