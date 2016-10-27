@@ -30,7 +30,7 @@ type Client struct {
 
 var _ upspin.Client = (*Client)(nil)
 
-const maxBlockSize = 1024 * 1024
+var maxBlockSize = 1024 * 1024 // modified by tests
 
 const (
 	followFinalLink      = true
@@ -568,11 +568,22 @@ func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 
 // Open implements upspin.Client.
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
-	data, err := c.Get(name)
+	const op = "client.Open"
+	entry, err := c.Lookup(name, true)
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, err)
 	}
-	return file.Readable(c, name, data), nil
+	if entry.IsDir() {
+		return nil, errors.E(op, name, errors.Str("cannot Open a directory"))
+	}
+	if entry.IsLink() {
+		return nil, errors.E(op, name, errors.Str("cannot Open a link"))
+	}
+	f, err := file.Readable(c.context, entry)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
+	return f, nil
 }
 
 // DirServer implements upspin.Client.
