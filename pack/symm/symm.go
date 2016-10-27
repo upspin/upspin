@@ -13,6 +13,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"sync"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -35,10 +36,20 @@ func init() {
 	pack.Register(symm{})
 }
 
-var aead cipher.AEAD // There is one global key, so one global cipher.
+var (
+	aead   cipher.AEAD // There is one global key, so one global cipher.
+	aeadMu sync.Mutex
+)
 
 func initAEAD() error {
 	const op = "pack/symm.initAEAD"
+
+	aeadMu.Lock()
+	defer aeadMu.Unlock()
+
+	if aead != nil {
+		return nil
+	}
 
 	// Fetch the symmetric key.
 	dkey, err := factotum.SymmSecret()
@@ -97,11 +108,8 @@ func (symm symm) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacke
 	if err := pack.CheckPacking(symm, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
-	if aead == nil {
-		err := initAEAD()
-		if err != nil {
-			return nil, err
-		}
+	if err := initAEAD(); err != nil {
+		return nil, errors.E(op, err)
 	}
 
 	// TODO(adg): support append; for now assume a new file.
@@ -172,11 +180,8 @@ func (symm symm) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnp
 	if _, err := d.Size(); err != nil {
 		return nil, errors.E(op, d.Name, err)
 	}
-	if aead == nil {
-		err := initAEAD()
-		if err != nil {
-			return nil, err
-		}
+	if err := initAEAD(); err != nil {
+		return nil, errors.E(op, err)
 	}
 
 	return &blockUnpacker{
