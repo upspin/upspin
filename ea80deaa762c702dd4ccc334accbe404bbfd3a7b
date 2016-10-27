@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618870a5_6be26c1c",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T17:43:45Z",
+      "side": 1,
+      "message": "why not just update? whenever it happens, it\u0027s now.",
+      "revId": "ea80deaa762c702dd4ccc334accbe404bbfd3a7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "618870a5_4b6a089c",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T17:43:45Z",
+      "side": 1,
+      "message": "this should be access.AllUsers, as it\u0027s coming from Access.Users. that\u0027s what\u0027s stored in the user list. access.All is just the word \"all\" as it appears in the file. the name stored in the Access object must be a valid upspin name, so it becomes all@upspin.io",
+      "revId": "ea80deaa762c702dd4ccc334accbe404bbfd3a7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
