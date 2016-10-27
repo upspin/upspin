@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "81b56446_373ef77f",
+        "filename": "cmd/upspin/archive.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T22:49:16Z",
+      "side": 1,
+      "message": "s/E.g./Example:/\n\nbut this is not a great help message. it\u0027ll do for now.",
+      "revId": "4a455f93ee835940b42feb61f4344acd25dbc153",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01a974f7_219a3458",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-27T22:49:16Z",
+      "side": 1,
+      "message": "all the actual commands live in this file and define flags here.\nthey call out to functions in other commands.\nrefactor to follow this pattern.\n\nsee e.g. shell or share or info.",
+      "revId": "4a455f93ee835940b42feb61f4344acd25dbc153",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
