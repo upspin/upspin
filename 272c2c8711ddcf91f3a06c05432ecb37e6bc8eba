@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e16c60ba_530644fa",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T03:41:48Z",
+      "side": 1,
+      "message": "delete the comment on this line, and above\n// We need the directory transports to fetch write permissions.",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_730340e9",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T03:41:48Z",
+      "side": 1,
+      "message": "this is a regression in this cl\nthe refcount stuff seems fine; why did you remove it?",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_93f0dcea",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T03:41:48Z",
+      "side": 1,
+      "message": "this should have a more descriptive name. there are other tests; should they also use this setup? (rhetorical question; they shouldn\u0027t/needn\u0027t be changed, but this name should be more specific)",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e16c60ba_b3f5d8d9",
+        "filename": "store/gcp/perm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-27T03:41:48Z",
+      "side": 1,
+      "message": "storeOther is kind of a meaningless name. I had to read the code carefully to understand what was going on. \"storeAsWriter\"? \n\nalso, storeOther and storeOwner are hard to distinguish",
+      "revId": "272c2c8711ddcf91f3a06c05432ecb37e6bc8eba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
