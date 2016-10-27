@@ -52,6 +52,10 @@ func (d *infoDirEntry) Readers() string {
 	return users
 }
 
+func (d *infoDirEntry) Sequence() int64 {
+	return upspin.SeqVersion(d.DirEntry.Sequence)
+}
+
 func (d *infoDirEntry) Hashes() string {
 	h := ""
 	if d.IsDir() || d.Packing != upspin.EEPack {
