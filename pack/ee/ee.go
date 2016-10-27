@@ -125,38 +125,45 @@ func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 	// TODO(adg): support append; for now assume a new file.
 	d.Blocks = nil
 
-	// Pick fresh file encryption key.
-	dkey := make([]byte, aesKeyLen)
-	_, err := rand.Read(dkey)
+	dkey, blockCipher, err := newKeyAndCipher()
 	if err != nil {
 		return nil, errors.E(op, d.Name, err)
 	}
 
-	// Set up the stream cipher.
-	if len(dkey) != aesKeyLen {
-		return nil, errors.E(op, errKeyLength)
-	}
-	block, err := aes.NewCipher(dkey)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	iv := make([]byte, block.BlockSize())
-	// iv=0 is ok because we're certain that dkey is random and not reused
-	stream := cipher.NewCTR(block, iv)
-
 	return &blockPacker{
 		ctx:    ctx,
 		entry:  d,
+		cipher: blockCipher,
 		dkey:   dkey,
-		cipher: stream,
 	}, nil
+}
+
+func newKeyAndCipher() ([]byte, cipher.Block, error) {
+	// Pick fresh file encryption key.
+	dkey := make([]byte, aesKeyLen)
+	_, err := rand.Read(dkey)
+	if err != nil {
+		return nil, nil, err
+	}
+	// This shouldn't happen, but be paranoid.
+	if len(dkey) != aesKeyLen {
+		return nil, nil, errKeyLength
+	}
+
+	// Set up the block cipher.
+	blockCipher, err := aes.NewCipher(dkey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return dkey, blockCipher, nil
 }
 
 type blockPacker struct {
 	ctx    upspin.Context
 	entry  *upspin.DirEntry
+	cipher cipher.Block
 	dkey   []byte
-	cipher cipher.Stream
 
 	buf internal.LazyBuffer
 }
@@ -167,17 +174,21 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 		return nil, err
 	}
 
-	ciphertext = bp.buf.Bytes(len(cleartext))
-
-	// Encrypt.
-	bp.cipher.XORKeyStream(ciphertext, cleartext)
-
-	// Compute size, offset, and checksum.
-	size := int64(len(ciphertext))
+	// Compute offset of this block,
+	// the size of the preceding blocks.
 	offs, err := bp.entry.Size()
 	if err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}
+
+	// Encrypt.
+	ciphertext = bp.buf.Bytes(len(cleartext))
+	if err := crypt(ciphertext, cleartext, bp.cipher, offs); err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Compute size and checksum.
+	size := int64(len(ciphertext))
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
 
@@ -334,19 +345,16 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			return nil, errors.E(op, d.Name, writer, errVerify)
 			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 		}
-		// Set up stream cipher.
-		block, err := aes.NewCipher(dkey)
+		blockCipher, err := aes.NewCipher(dkey)
 		if err != nil {
-			return nil, errors.E(op, d.Name, err)
+			return nil, errors.E(op, err)
 		}
-		iv := make([]byte, aes.BlockSize)
-		stream := cipher.NewCTR(block, iv)
 		// We're OK to start decrypting blocks.
 		return &blockUnpacker{
 			ctx:          ctx,
 			entry:        d,
 			BlockTracker: internal.NewBlockTracker(d.Blocks),
-			cipher:       stream,
+			cipher:       blockCipher,
 		}, nil
 	}
 	return nil, errors.E(op, d.Name, me, errors.Str("could not find wrapped key"))
@@ -356,7 +364,7 @@ type blockUnpacker struct {
 	ctx                   upspin.Context
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
-	cipher                cipher.Stream
+	cipher                cipher.Block
 
 	buf internal.LazyBuffer
 }
@@ -373,9 +381,15 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	cleartext = bp.buf.Bytes(len(ciphertext))
 
 	// Decrypt.
-	bp.cipher.XORKeyStream(cleartext, ciphertext)
+	if err := crypt(cleartext, ciphertext, bp.cipher, bp.entry.Blocks[bp.Block].Offset); err != nil {
+		return nil, errors.E(op, bp.entry.Name, err)
+	}
 
 	return cleartext, nil
+}
+
+func (bp *blockUnpacker) Close() error {
+	return nil
 }
 
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
@@ -861,4 +875,37 @@ func zeroSlice(b *[]byte) {
 	for i := range *b {
 		(*b)[i] = 0
 	}
+}
+
+// crypt [enc|de]crypts the input bytes into the output slice
+// with the provided key for the given DirBlock.
+func crypt(out, in []byte, blockCipher cipher.Block, offset int64) error {
+	const streamBufferSize = 512  // as defined in $GOROOT/src/crypto/cipher/ctr.go
+	bs := blockCipher.BlockSize() // 16 bytes in practice
+
+	// We start with a zero iv because we're certain that the
+	// encryption key is random and not reused anywhere.
+	iv := make([]byte, bs)
+
+	// Set the initialization vector to whatever it was at the start of the
+	// nearest (looking backward) stream buffer.
+	ivStart := (offset - (offset % streamBufferSize)) / int64(bs)
+	iv[bs-1] = byte(ivStart)
+	iv[bs-2] = byte(ivStart >> 8)
+	iv[bs-3] = byte(ivStart >> 16)
+	iv[bs-4] = byte(ivStart >> 24)
+
+	ctr := cipher.NewCTR(blockCipher, iv)
+
+	// If this offset is not an even multiple of streamBufferSize
+	// xor some empty data to synchronize it.
+	if n := int(offset % streamBufferSize); n > 0 {
+		ignore := make([]byte, n)
+		ctr.XORKeyStream(ignore, ignore)
+	}
+
+	// Encrypt the block.
+	ctr.XORKeyStream(out, in)
+
+	return nil
 }

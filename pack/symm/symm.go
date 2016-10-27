@@ -204,6 +204,10 @@ func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error)
 	return aead.Open(cleartext[:0], nonce, ciphertext, additionalData)
 }
 
+func (bp *blockUnpacker) Close() error {
+	return nil
+}
+
 // Methods that are not implemented.
 
 var errNotImplemented = errors.Str("not implemented")

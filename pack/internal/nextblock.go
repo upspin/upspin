@@ -25,6 +25,14 @@ func (t *BlockTracker) NextBlock() (upspin.DirBlock, bool) {
 	if t.Block >= len(t.bs) {
 		return upspin.DirBlock{}, false
 	}
-	b := t.bs[t.Block]
-	return b, true
+	return t.bs[t.Block], true
+}
+
+// SeekBlock implements part of the upspin.BlockUnpacker interface.
+func (t *BlockTracker) SeekBlock(n int) (upspin.DirBlock, bool) {
+	if n < 0 || n >= len(t.bs) {
+		return upspin.DirBlock{}, false
+	}
+	t.Block = n
+	return t.bs[t.Block], true
 }
