@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a16b489a_58049479",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 884,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-28T01:00:27Z",
+      "side": 1,
+      "message": "Indices here look peculiar, but I won\u0027t get a chance to look closely until later tonight.",
+      "revId": "7368b1c32841d29298bfba4ac0951884496d411e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
