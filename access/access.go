@@ -524,7 +524,7 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 	// can write it.
 	if IsAccessFile(pathName) || IsGroupFile(pathName) {
 		switch right {
-		case Write, Create, Delete, AnyRight:
+		case Write, Create, Delete:
 			return isOwner, nil, nil
 		}
 	}

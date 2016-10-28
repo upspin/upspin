@@ -248,8 +248,18 @@ func TestHasAccessNoGroups(t *testing.T) {
 	check("writer@foo.bar", AnyRight, "me@here.com/foo/bar", true)
 	check("not@a.person", AnyRight, "me@here.com/foo/bar", false)
 
+	// The "AnyRight" right check also works for Access files.
+	check(owner, AnyRight, "me@here.com/Access", true)
+	check("writer@foo.bar", AnyRight, "me@here.com/Access", true)
+	check("reader@foo.bar", AnyRight, "me@here.com/Access", true)
+	check("writer@foo.bar", AnyRight, "me@here.com/Access", true)
+	check("not@a.person", AnyRight, "me@here.com/Access", false)
+
 	// Wildcard that should match.
 	check("joe@nsa.gov", Read, "me@here.com/foo/barx", true)
+	check("joe@nsa.gov", AnyRight, "me@here.com/foo/barx", true)
+	check("joe@nsa.gov", Read, "me@here.com/Access", true)
+	check("joe@nsa.gov", AnyRight, "me@here.com/Access", true)
 
 	// Wildcard that should not match.
 	check("*@nasa.gov", Read, "me@here.com/foo/bar", false)
