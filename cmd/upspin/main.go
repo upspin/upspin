@@ -49,6 +49,7 @@ var commands = map[string]func(*State, ...string){
 	"ls":          (*State).ls,
 	"mkdir":       (*State).mkdir,
 	"put":         (*State).put,
+	"repack":      (*State).repack,
 	"rotate":      (*State).rotate,
 	"rm":          (*State).rm,
 	"share":       (*State).share,
@@ -464,6 +465,30 @@ TODO: Delete in favor of cp?
 	if err != nil {
 		s.exit(err)
 	}
+}
+
+func (s *State) repack(args ...string) {
+	const help = `
+Repack rewrites the data referred to by each path , storing it again using the
+packing specificied by its -pack option, ee by default. If the data is already
+packed with the specified packing, the data is untouched unless the -f (force)
+flag is specified, which would be helpful if the data was to be repacked using a
+fresh key.
+`
+
+	// TODO: Do we want a --deletestorage flag?
+
+	fs := flag.NewFlagSet("repack", flag.ExitOnError)
+	fs.Bool("f", false, "force repack even if the file is already packed as requested")
+	fs.String("pack", "ee", "packing to use when rewriting")
+	fs.Bool("r", false, "recur into subdirectories")
+	fs.Bool("v", false, "verbose: log progress")
+	s.parseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+
+	s.repackCommand(fs)
 }
 
 func (s *State) rotate(args ...string) {
