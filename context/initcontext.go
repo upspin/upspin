@@ -369,7 +369,7 @@ func (ctx ctxPacking) Packing() upspin.Packing {
 }
 
 // SetPacking returns a context derived from the given context
-// with the given factotum.
+// with the given packing.
 func SetPacking(ctx upspin.Context, p upspin.Packing) upspin.Context {
 	return ctxPacking{
 		Context: ctx,
