@@ -107,9 +107,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 	}
 }
 
-const (
-	Max = 100 * 1000 // Must be > 100.
-)
+const Max = 100 * 1000 // Must be > 100.
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
 	client := New(setup(user, ""))
@@ -182,6 +180,13 @@ func TestFileSequentialAccess(t *testing.T) {
 }
 
 func TestFileRandomAccess(t *testing.T) {
+	// Use a much smaller block size for these tests.
+	oldMaxBlockSize := maxBlockSize
+	maxBlockSize = 1024
+	defer func() {
+		maxBlockSize = oldMaxBlockSize
+	}()
+
 	const (
 		user     = "user4@google.com"
 		root     = user + "/"
