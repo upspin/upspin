@@ -51,6 +51,43 @@ func TestLRU(t *testing.T) {
 	expectMiss("1")
 }
 
+func TestPeek(t *testing.T) {
+	c := cache.NewLRU(2)
+
+	if k, v := c.PeekOldest(); k != nil || v != nil {
+		t.Errorf("LRU = %q, %q; want nil, nil", k, v)
+	}
+	if k, v := c.PeekNewest(); k != nil || v != nil {
+		t.Errorf("MRU = %q, %q; want nil, nil", k, v)
+	}
+
+	c.Add("k1", "v1")
+	c.Add("k2", "v2")
+
+	if k, v := c.PeekOldest(); k != "k1" || v != "v1" {
+		t.Errorf("LRU = %q, %q; want k1, v1", k, v)
+	}
+	if k, v := c.PeekNewest(); k != "k2" || v != "v2" {
+		t.Errorf("MRU = %q, %q; want k2, v2", k, v)
+	}
+
+	c.Get("k1")
+	if k, v := c.PeekOldest(); k != "k2" || v != "v2" {
+		t.Errorf("LRU = %q, %q; want k2, v2", k, v)
+	}
+	if k, v := c.PeekNewest(); k != "k1" || v != "v1" {
+		t.Errorf("MRU = %q, %q; want k1, v1", k, v)
+	}
+
+	c.Add("k3", "v3")
+	if k, v := c.PeekOldest(); k != "k1" || v != "v1" {
+		t.Errorf("MRU = %q, %q; want k1, v1", k, v)
+	}
+	if k, v := c.PeekNewest(); k != "k3" || v != "v3" {
+		t.Errorf("MRU = %q, %q; want k3, v3", k, v)
+	}
+}
+
 func TestRemoveOldest(t *testing.T) {
 	c := cache.NewLRU(2)
 	c.Add("1", "one")
