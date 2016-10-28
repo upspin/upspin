@@ -128,3 +128,29 @@ func (c *LRU) Len() int {
 	defer c.mu.Unlock()
 	return c.ll.Len()
 }
+
+// PeekLRU peeks at the least-recently used entry, without modifying the cache
+// in any way. If the cache is empty, two nils are returned.
+func (c *LRU) PeekLRU() (key, value interface{}) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	ele := c.ll.Back()
+	if ele == nil {
+		return
+	}
+	ent := ele.Value.(*entry)
+	return ent.key, ent.value
+}
+
+// PeekMRU peeks at the most-recently used entry, without modifying the cache in
+// any way. If the cache is empty, two nils are returned.
+func (c *LRU) PeekMRU() (key, value interface{}) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	ele := c.ll.Front()
+	if ele == nil {
+		return
+	}
+	ent := ele.Value.(*entry)
+	return ent.key, ent.value
+}
