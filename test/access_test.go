@@ -384,6 +384,13 @@ func testWhichAccess(t *testing.T, r *testenv.Runner) {
 	if got, want := r.Entry.Name, accessFile; got != want {
 		t.Errorf("entry.Name = %q, want = %q", got, want)
 	}
+	r.DirWhichAccess(accessFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if got, want := r.Entry.Name, accessFile; got != want {
+		t.Errorf("entry.Name = %q, want = %q", got, want)
+	}
 }
 
 func testGroupAccess(t *testing.T, r *testenv.Runner) {
