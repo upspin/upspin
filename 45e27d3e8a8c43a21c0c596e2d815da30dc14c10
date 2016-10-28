@@ -51,6 +51,23 @@
       "revId": "45e27d3e8a8c43a21c0c596e2d815da30dc14c10",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_58cb6106",
+        "filename": "pack/symm/symm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-10-28T20:38:13Z",
+      "side": 1,
+      "message": "Would it be easier to understand if we use sync.Once?",
+      "revId": "45e27d3e8a8c43a21c0c596e2d815da30dc14c10",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
