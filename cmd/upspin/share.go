@@ -226,6 +226,9 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 }
 
 func userListToString(userList []upspin.UserName) string {
+	if userList == nil {
+		return "<nil>"
+	}
 	userString := fmt.Sprint(userList)
 	return userString[1 : len(userString)-1]
 }
@@ -327,6 +330,9 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 
 // usersWithReadAccess returns the list of user names granted access by this access file.
 func (s *State) usersWithAccess(client upspin.Client, a *access.Access, right access.Right) []upspin.UserName {
+	if a == nil {
+		return nil
+	}
 	userList, err := a.Users(right, client.Get)
 	if err != nil {
 		s.exitf("getting user list: %s", err)
