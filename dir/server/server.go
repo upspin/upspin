@@ -68,6 +68,11 @@ type server struct {
 	// It's indexed by the username.
 	defaultAccess *cache.LRU
 
+	// remoteGroups caches groupEntry objects that stores remote Group files
+	// that must be periodically forgotten so they're reloaded fresh again
+	// when needed.
+	remoteGroups *cache.LRU
+
 	// userLocks is a pool of user locks. To find the correct lock for a
 	// user, a string hash of a username selects the index into the slice to
 	// use. This fixed pool ensures we don't have a growing number of locks
@@ -116,6 +121,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 	// Check which options are present and pick suitable defaults.
 	userCacheSize := 1000
 	accessCacheSize := 1000
+	groupCacheSize := 100
 	logDir := ""
 	for _, opt := range options {
 		o := strings.Split(opt, "=")
@@ -124,7 +130,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		}
 		k, v := o[0], o[1]
 		switch k {
-		case "userCacheSize", "accessCacheSize":
+		case "userCacheSize", "accessCacheSize", "groupCacheSize":
 			cacheSize, err := strconv.ParseInt(v, 10, 32)
 			if err != nil {
 				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid cache size %q: %s", v, err))
@@ -137,6 +143,8 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 				userCacheSize = int(cacheSize)
 			case "accessCacheSize":
 				accessCacheSize = int(cacheSize)
+			case "groupCacheSize":
+				groupCacheSize = int(cacheSize)
 			}
 		case "logDir":
 			logDir = v
@@ -160,9 +168,12 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
 		defaultAccess: cache.NewLRU(accessCacheSize),
+		remoteGroups:  cache.NewLRU(groupCacheSize),
 		now:           upspin.Now,
 	}
+	// Start background services.
 	s.startSnapshotLoop()
+	s.startGroupRefreshLoop()
 	return s, nil
 }
 
