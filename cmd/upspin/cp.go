@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -18,11 +17,10 @@ import (
 )
 
 type copyState struct {
-	state      *State
-	flagSet    *flag.FlagSet // Used only to call Usage.
-	numWorkers int
-	verbose    bool
-	recur      bool
+	state   *State
+	flagSet *flag.FlagSet // Used only to call Usage.
+	verbose bool
+	recur   bool
 }
 
 func (c *copyState) logf(format string, args ...interface{}) {
@@ -47,11 +45,10 @@ var (
 func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
 	// TODO: Check for nugatory copies.
 	cs := &copyState{
-		state:      s,
-		flagSet:    fs,
-		numWorkers: intFlag(fs, "n"),
-		recur:      boolFlag(fs, "R"),
-		verbose:    boolFlag(fs, "v"),
+		state:   s,
+		flagSet: fs,
+		recur:   boolFlag(fs, "R"),
+		verbose: boolFlag(fs, "v"),
 	}
 	// Glob the paths.
 	var files []cpFile
@@ -72,7 +69,11 @@ func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
 		s.failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
 		cs.flagSet.Usage()
 	}
-	s.copyToFile(cs, srcFiles[0], dstFile)
+	reader, err := s.open(srcFiles[0])
+	if err != nil {
+		s.fail(err)
+	}
+	s.copyToFile(cs, reader, srcFiles[0], dstFile)
 }
 
 // isDir reports whether the file is a directory either in Upspin
@@ -113,61 +114,21 @@ func (s *State) create(file cpFile) (io.WriteCloser, error) {
 	return fd, err
 }
 
-// createInDir create file 'base' in directory 'dir' regardless of the
-// directory's location.
-func (s *State) createInDir(dir cpFile, base string) (string, io.WriteCloser, error) {
-	if dir.isUpspin {
-		to := path.Join(upspin.PathName(dir.path), base)
-		fd, err := s.client.Create(to)
-		return string(to), fd, err
-	}
-	to := filepath.Join(dir.path, base)
-	fd, err := os.Create(to)
-	return to, fd, err
-}
-
-// copyWork is the unit of work passed to the copy worker.
-type copyWork struct {
-	src    string
-	reader io.ReadCloser
-	dst    string
-	writer io.WriteCloser
-}
-
-// copyToDir copies, in parallel, the source files to the destination directory.
-// It is a wrapper for copyDir, but holds the single work channel and waitgroup.
-func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
-	work := make(chan copyWork) // No need for buffering.
-	var wait sync.WaitGroup
-
-	// Launch the copier.
-	go s.copyDir(cs, true, work, &wait, src, dir)
-
-	// Start the workers.
-	wait.Add(cs.numWorkers)
-	for i := 0; i < cs.numWorkers; i++ {
-		go cs.worker(work, &wait)
-	}
-
-	wait.Wait()
-}
-
-// copyDir copies, in parallel, the source files to the destination directory.
+// copyToDir copies the source files to the destination directory.
 // It recurs if -R is set and a source is a subdirectory.
-func (s *State) copyDir(cs *copyState, doClose bool, work chan copyWork, wait *sync.WaitGroup, src []cpFile, dir cpFile) {
-	// Deliver work to the workers.
+func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 	for _, from := range src {
+		dstPath := path.Join(upspin.PathName(dir.path), filepath.Base(from.path))
 		if dir.isUpspin && from.isUpspin {
 			// Try a fast copy. It can fail but that's OK.
-			dst := path.Join(upspin.PathName(dir.path), filepath.Base(from.path))
-			cs.logf("try fast copy to %s", dst)
-			if s.fastCopy(upspin.PathName(from.path), dst) == nil {
+			cs.logf("try fast copy to %s", dstPath)
+			if s.fastCopy(upspin.PathName(from.path), dstPath) == nil {
 				continue
 			}
 		}
 		reader, err := s.open(from)
 		if cs.recur && errors.Match(errIsDir, err) {
-			// If the problem is that from is a directory but have -R,
+			// If the problem is that from is a directory but we have -R,
 			// recur on the contents.
 			cs.logf("recursive descent into %s", from.path)
 			newFiles, err := s.contents(cs, from)
@@ -192,33 +153,23 @@ func (s *State) copyDir(cs *copyState, doClose bool, work chan copyWork, wait *s
 					continue
 				}
 			}
-			s.copyDir(cs, false, work, wait, newFiles, subDir)
+			s.copyToDir(cs, newFiles, subDir)
 			continue
 		}
 		if err != nil {
 			s.fail(err)
 			continue
 		}
-		to, writer, err := s.createInDir(dir, filepath.Base(from.path))
-		if err != nil {
-			s.fail(err)
-			reader.Close()
-			continue
+		dst := cpFile{
+			path:     string(dstPath),
+			isUpspin: dir.isUpspin,
 		}
-		work <- copyWork{
-			src:    from.path,
-			reader: reader,
-			dst:    to,
-			writer: writer,
-		}
-	}
-	if doClose {
-		close(work)
+		s.copyToFile(cs, reader, from, dst)
 	}
 }
 
-// copyToFile copies the source to the destination.
-func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
+// copyToFile copies the source to the destination. The source file has already been opened.
+func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile) {
 	cs.logf("start cp %s %s", src.path, dst.path)
 	defer cs.logf("end cp %s %s", src.path, dst.path)
 	// If both are in Upspin, we can avoid touching the data by copying
@@ -230,26 +181,13 @@ func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
 			return
 		}
 	}
-	reader, err := s.open(src)
-	if err != nil {
-		s.fail(err)
-		s.exitCode = 1
-		return
-	}
 	writer, err := s.create(dst)
 	if err != nil {
 		s.fail(err)
-		s.exitCode = 1
 		reader.Close()
 		return
 	}
-	copy := copyWork{
-		src:    src.path,
-		reader: reader,
-		dst:    dst.path,
-		writer: writer,
-	}
-	cs.doCopy(copy)
+	cs.doCopy(reader, writer)
 }
 
 // fastCopy copies the source to the destination using the references rather than the data.
@@ -276,22 +214,15 @@ func (s *State) fastCopy(src, dst upspin.PathName) error {
 	return nil
 }
 
-func (cs *copyState) worker(work chan copyWork, wait *sync.WaitGroup) {
-	defer wait.Done()
-	for copy := range work {
-		cs.doCopy(copy)
-	}
-}
-
-func (cs *copyState) doCopy(copy copyWork) {
+func (cs *copyState) doCopy(reader io.ReadCloser, writer io.WriteCloser) {
 	defer func() {
-		copy.reader.Close()
-		err := copy.writer.Close()
+		reader.Close()
+		err := writer.Close()
 		if err != nil {
 			cs.state.fail(err)
 		}
 	}()
-	_, err := io.Copy(copy.writer, copy.reader)
+	_, err := io.Copy(writer, reader)
 	if err != nil {
 		cs.state.fail(err)
 	}
