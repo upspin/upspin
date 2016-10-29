@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "266bee00_696acd2f",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-29T05:42:00Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "fb911e16a5fa7455909ab8affbe97ab7ba8ae00e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_c94e81dd",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-29T05:42:00Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "fb911e16a5fa7455909ab8affbe97ab7ba8ae00e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
