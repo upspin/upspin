@@ -157,6 +157,14 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 func (s *State) copyDir(cs *copyState, doClose bool, work chan copyWork, wait *sync.WaitGroup, src []cpFile, dir cpFile) {
 	// Deliver work to the workers.
 	for _, from := range src {
+		if dir.isUpspin && from.isUpspin {
+			// Try a fast copy. It can fail but that's OK.
+			dst := path.Join(upspin.PathName(dir.path), filepath.Base(from.path))
+			cs.logf("try fast copy to %s", dst)
+			if s.fastCopy(upspin.PathName(from.path), dst) == nil {
+				continue
+			}
+		}
 		reader, err := s.open(from)
 		if cs.recur && errors.Match(errIsDir, err) {
 			// If the problem is that from is a directory but have -R,
@@ -211,19 +219,15 @@ func (s *State) copyDir(cs *copyState, doClose bool, work chan copyWork, wait *s
 
 // copyToFile copies the source to the destination.
 func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
+	cs.logf("start cp %s %s", src.path, dst.path)
+	defer cs.logf("end cp %s %s", src.path, dst.path)
 	// If both are in Upspin, we can avoid touching the data by copying
 	// just the references.
 	if src.isUpspin && dst.isUpspin {
-		_, err := s.client.PutDuplicate(upspin.PathName(src.path), upspin.PathName(dst.path))
+		cs.logf("try fast copy to %s", dst)
+		err := s.fastCopy(upspin.PathName(src.path), upspin.PathName(dst.path))
 		if err == nil {
 			return
-		}
-		if errors.Match(errExist, err) {
-			// File already exists, which PutDuplicate doesn't handle.
-			// For now, just fall through. We could remove it and retry
-			// but that's a little scary.
-		} else {
-			s.fail(err)
 		}
 	}
 	reader, err := s.open(src)
@@ -248,6 +252,30 @@ func (s *State) copyToFile(cs *copyState, src, dst cpFile) {
 	cs.doCopy(copy)
 }
 
+// fastCopy copies the source to the destination using the references rather than the data.
+// If it fails, PutDuplicate failed because the file exists or the source is a directory.
+// (Any other error is unexpected and exits the copy command.)
+// The caller may be able to retry with a regular copy.
+func (s *State) fastCopy(src, dst upspin.PathName) error {
+	_, err := s.client.PutDuplicate(src, dst)
+	if err == nil {
+		return nil
+	}
+	if errors.Match(errExist, err) {
+		// File already exists, which PutDuplicate doesn't handle.
+		// Use regular copy. We could remove it and retry
+		// but that's a little scary.
+		return err
+	}
+	if errors.Match(errIsDir, err) {
+		// Oops, we have a directory. Retry.
+		return err
+	}
+	// Unexpected error. Die.
+	s.fail(err)
+	return nil
+}
+
 func (cs *copyState) worker(work chan copyWork, wait *sync.WaitGroup) {
 	defer wait.Done()
 	for copy := range work {
@@ -256,9 +284,7 @@ func (cs *copyState) worker(work chan copyWork, wait *sync.WaitGroup) {
 }
 
 func (cs *copyState) doCopy(copy copyWork) {
-	cs.logf("start cp %s %s", copy.src, copy.dst)
 	defer func() {
-		cs.logf("end cp %s %s", copy.src, copy.dst)
 		copy.reader.Close()
 		err := copy.writer.Close()
 		if err != nil {
