@@ -611,20 +611,20 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, err
 	}
 	if entry.IsLink() {
-		return nil, errors.E(op, oldName, errors.Internal, "after lookup, cannot be link")
+		return nil, errors.E(op, oldName, errors.Internal, errors.Str("after lookup, cannot be link"))
 	}
 	if entry.IsDir() {
-		return nil, errors.E(op, oldName, "cannot link or rename directories")
+		return nil, errors.E(op, oldName, errors.IsDir, errors.Str("cannot link or rename directories"))
 	}
 	trueOldName := entry.Name
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.E(op, oldName, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
+		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
 		if entry.Packing != upspin.PlainPack {
-			return nil, errors.Errorf("can only link plain packed files to access or group files")
+			return nil, errors.E(op, oldName, errors.Invalid, errors.Str("can only link plain packed files to access or group files"))
 		}
 	}
 
