@@ -245,16 +245,12 @@ The -R flag requires that the final argument be a directory.
 When copying from one Upspin path to another Upspin path, cp can be
 very efficient, copying only the references to the data rather than
 the data itself.
-
-The command starts several copies at once to overlap I/O for
-efficiency. The -n flag controls the parallelism.
 `
 	fs := flag.NewFlagSet("cp", flag.ExitOnError)
-	n := fs.Int("n", 4, "number of parallel copies to perform; must be > 0")
 	fs.Bool("v", false, "log each file as it is copied")
 	fs.Bool("R", false, "recursively copy directories")
 	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
-	if fs.NArg() < 2 || *n <= 0 {
+	if fs.NArg() < 2 {
 		fs.Usage()
 	}
 
