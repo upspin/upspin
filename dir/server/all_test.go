@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"upspin.io/access"
 	"upspin.io/bind"
@@ -40,7 +41,10 @@ const (
 	otherUser  = "somedude@somewhere.com"
 )
 
-var testDir string
+var (
+	testDir  string
+	mockTime upspin.Time
+)
 
 func TestMakeRoot(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
@@ -640,6 +644,52 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestForgetsRemoteGroupFiles(t *testing.T) {
+	// Give otherUser read access through someone else's family Group.
+	const (
+		familyGroupName     = "foo@bar.com/Group/family"
+		familyGroupContents = otherUser
+
+		accessFile     = userName + "/Access"
+		accessContents = "r: " + familyGroupName
+	)
+
+	s := newDirServerForTesting(t, userName)
+	_, err := putAccessFile(t, s, accessFile, accessContents)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sReader := newDirServerForTesting(t, otherUser)
+	_, err = sReader.Lookup(accessFile)
+	if !errors.Match(errNotExist, err) {
+		t.Errorf("err = %s\nwant = %q", err, errNotExist)
+	}
+
+	// Simulate we loaded the family Group through some remote server.
+	s.remoteGroups.Add(upspin.PathName(familyGroupName), (lastLoad)(mockTime.Go()))
+	err = access.AddGroup(familyGroupName, []byte(familyGroupContents))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Check that reader has read access.
+	_, err = sReader.Lookup(accessFile)
+	if err != nil {
+		t.Errorf("Expected no error, got = %s", err)
+	}
+
+	// Now time moves forward and the Group file granting reader read right
+	// expires.
+	mockTime += 10 // 10 seconds later (expiration time is just a milli).
+	time.Sleep(2 * remoteGroupDuration)
+
+	_, err = sReader.Lookup(accessFile)
+	if !errors.Match(errNotExist, err) {
+		t.Errorf("err = %s, want = %q", err, errNotExist)
+	}
+}
+
 func TestClose(t *testing.T) {
 	s := newDirServerForTesting(t, userName)
 	s.Close()
@@ -914,10 +964,13 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 		t.Fatal(err)
 	}
 	if generatorInstance == nil {
+		remoteGroupDuration = 50 * time.Millisecond
+		mockTime = upspin.Now()
 		generatorInstance, err = New(ctx, "logDir="+testDir)
 		if err != nil {
 			t.Fatal(err)
 		}
+		generatorInstance.(*server).now = func() upspin.Time { return mockTime }
 	}
 	// Get a new instance properly initialized for this user.
 	svr, err := generatorInstance.Dial(userCtx, endpointInProcess)

@@ -7,10 +7,13 @@ package server
 // This file deals with loading Access files and checking access permissions.
 
 import (
+	"time"
+
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -21,6 +24,14 @@ type accessEntry struct {
 	sequence int64          // sequence number of the DirEntry parsed.
 	acc      *access.Access // parsed contents of the Access file.
 }
+
+// lastLoad is the value stored in the remoteGroup cache. It represents the last
+// time a remote Group file was loaded by the DirServer.
+type lastLoad time.Time
+
+// remoteGroupDuration is how long a remote Group can be cached for.
+// Modified by tests.
+var remoteGroupDuration = 2 * time.Minute
 
 // whichAccess implements DirServer.WhichAccess.
 func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, error) {
@@ -73,7 +84,7 @@ func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Ac
 }
 
 // loadPath loads a name from the Store, if its entry can be resolved by this
-// DirServer. Intended for use with access.Can.
+// DirServer. Intended for use with access.Can only.
 func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 	p, err := path.Parse(name)
 	if err != nil {
@@ -85,6 +96,14 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 		entry, err = s.lookup("loadPath", p, entryMustBeClean)
 	} else {
 		entry, err = s.remoteLookup(p)
+		if err == nil {
+			// Remember this Group file so we can then forget it
+			// when it gets stale. This is guaranteed to be a Group
+			// file because Access files are local only. If this
+			// ever changes, we must first check whether
+			// access.IsGroupFile(p.path()).
+			s.remoteGroups.Add(p.Path(), (lastLoad)(s.now().Go()))
+		}
 	}
 	if err != nil {
 		return nil, err
@@ -240,4 +259,42 @@ func (s *server) loadGroup(p path.Parsed, entry *upspin.DirEntry) error {
 	}
 	_, err = access.ParseGroup(p, data)
 	return err
+}
+
+// groupRefreshLoop periodically removes potentially stale Group files from the
+// access group cache. It runs continuously and must be in a goroutine.
+func (s *server) groupRefreshLoop() {
+	for {
+		time.Sleep(remoteGroupDuration)
+		for {
+			k, v := s.remoteGroups.PeekOldest()
+			if k == nil || v == nil {
+				// Nothing to do.
+				break
+			}
+			lastLoaded, ok := v.(lastLoad)
+			if !ok {
+				log.Error.Printf("dir/server.groupRemoval: value is not a lastLoad type")
+				return
+			}
+			if (time.Time)(lastLoaded).Add(remoteGroupDuration).Before(s.now().Go()) {
+				// Remote the oldest (LRU) and calls OnEviction.
+				s.remoteGroups.RemoveOldest()
+				continue // look for the next one to expire.
+			}
+			break // Oldest entry is not old enough. Stop and wait.
+		}
+	}
+}
+
+// OnEviction implements cache.EvictionNotifier. It is called when the remote
+// group cache is full or an item is forcefully evicted (by calling RemoveOldest
+// on the cache). In effect, this "forgets" the Group file if it was loaded.
+func (l lastLoad) OnEviction(key interface{}) {
+	name, ok := key.(upspin.PathName)
+	if !ok {
+		log.Error.Printf("dir/server: key in remote group cache is not a pathname: %v", key)
+		return
+	}
+	access.RemoveGroup(name) // ignore return, it may not have been loaded.
 }

@@ -104,12 +104,7 @@ func TestSnapshot(t *testing.T) {
 }
 
 func TestForceSnapshotVersioning(t *testing.T) {
-	mockTime := upspin.Now()
 	s := newDirServerForTesting(t, snapshotUser)
-	s.now = func() upspin.Time {
-		return mockTime
-	}
-
 	ents, err := s.Glob(snapshotUser + "/*/*/*")
 	if err != nil {
 		t.Fatal(err)
