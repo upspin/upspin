@@ -619,8 +619,16 @@ func (t *Tree) removeFromDirtyList(p path.Parsed, n *node) {
 
 // Flush flushes all dirty dir entries to the Tree's Store.
 func (t *Tree) Flush() error {
+	const op = "dir/server/tree.Flush"
+
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
+	err := t.loadRoot()
+	if err != nil {
+		return errors.E(op, err)
+	}
+
 	return t.flush()
 }
 
@@ -628,6 +636,12 @@ func (t *Tree) Flush() error {
 // t.mu must be held.
 func (t *Tree) flush() error {
 	const op = "dir/server/tree.Flush"
+
+	if t.root == nil {
+		// Nothing to do.
+		return nil
+	}
+
 	// Flush from highest path depth up to root.
 	for i := len(t.dirtyNodes) - 1; i >= 0; i-- {
 		m := t.dirtyNodes[i]
@@ -652,11 +666,8 @@ func (t *Tree) flush() error {
 		return errors.E(op, err)
 	}
 
-	// Save new root (if any) to the log index.
-	if t.root != nil {
-		return t.logIndex.SaveRoot(&t.root.entry)
-	}
-	return t.logIndex.DeleteRoot()
+	// Save new root to the log index.
+	return t.logIndex.SaveRoot(&t.root.entry)
 }
 
 // Close flushes all dirty blocks to Store and releases all resources
