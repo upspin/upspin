@@ -17,13 +17,48 @@ import (
 // the necessary keys loaded in the context to unpack the cipher if the entry
 // is encrypted.
 func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
-	const op = "clientutil.ReadAll"
+	const op = "client/clientutil.ReadAll"
 
 	if entry.IsLink() {
 		return nil, errors.E(op, errors.Invalid, errors.Str("can't read a link entry"))
 	}
 
-	// firstError remembers the first error we saw. If we fail completely we return it.
+	var data []byte
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return nil, errors.E(op, entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
+	}
+	bu, err := packer.Unpack(ctx, entry)
+	if err != nil {
+		return nil, errors.E(op, entry.Name, err) // Showstopper.
+	}
+	for {
+		block, ok := bu.NextBlock()
+		if !ok {
+			break // EOF
+		}
+		// block is known valid as per valid.DirEntry above.
+
+		cipher, err := ReadLocation(ctx, block.Location)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		clear, err := bu.Unpack(cipher)
+		if err != nil {
+			return nil, errors.E(op, entry.Name, err)
+		}
+		data = append(data, clear...) // TODO: Could avoid a copy if only one block.
+	}
+	return data, nil
+}
+
+// ReadLocation uses the provided Context to fetch the contents of the given
+// Location, following any StoreServer.Get redirects.
+func ReadLocation(ctx upspin.Context, loc upspin.Location) ([]byte, error) {
+	const op = "client/clientutil.ReadLocation"
+
+	// firstError remembers the first error we saw.
+	// If we fail completely we return it.
 	var firstError error
 	// isError reports whether err is non-nil and remembers it if it is.
 	isError := func(err error) bool {
@@ -36,62 +71,37 @@ func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		return true
 	}
 
-	var data []byte
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return nil, errors.E(op, entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
-	}
-	bu, err := packer.Unpack(ctx, entry)
-	if err != nil {
-		return nil, errors.E(op, entry.Name, err) // Showstopper.
-	}
-Blocks:
-	for b := 0; ; b++ {
-		block, ok := bu.NextBlock()
-		if !ok {
-			break // EOF
+	// knownLocs stores the known Locations for this block. Value is
+	// ignored.
+	knownLocs := make(map[upspin.Location]bool)
+	// Get the data for this block.
+	// where is the list of locations to examine. It is updated in the loop.
+	where := []upspin.Location{loc}
+	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
+		loc := where[i]
+		store, err := bind.StoreServer(ctx, loc.Endpoint)
+		if isError(err) {
+			continue
 		}
-		// block is known valid as per valid.DirEntry above.
+		data, _, locs, err := store.Get(loc.Reference)
+		if isError(err) {
+			continue // locs guaranteed to be nil.
+		}
+		if locs == nil && err == nil {
+			return data, nil
+		}
+		// Add new locs to the list. Skip ones already there - they've been processed.
+		for _, newLoc := range locs {
+			if _, found := knownLocs[newLoc]; !found {
+				where = append(where, newLoc)
+				knownLocs[newLoc] = true
+			}
+		}
+	}
 
-		// knownLocs stores the known Locations for this block. Value is
-		// ignored.
-		knownLocs := make(map[upspin.Location]bool)
-		// Get the data for this block.
-		// where is the list of locations to examine. It is updated in the loop.
-		where := []upspin.Location{block.Location}
-		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
-			loc := where[i]
-			store, err := bind.StoreServer(ctx, loc.Endpoint)
-			if isError(err) {
-				continue
-			}
-			cipher, _, locs, err := store.Get(loc.Reference)
-			if isError(err) {
-				continue // locs guaranteed to be nil.
-			}
-			if locs == nil && err == nil {
-				// Found the data. Unpack it.
-				clear, err := bu.Unpack(cipher)
-				if err != nil {
-					return nil, errors.E(op, entry.Name, err) // Showstopper.
-				}
-				data = append(data, clear...) // TODO: Could avoid a copy if only one block.
-				continue Blocks
-			}
-			// Add new locs to the list. Skip ones already there - they've been processed.
-			for _, newLoc := range locs {
-				if _, found := knownLocs[newLoc]; !found {
-					where = append(where, newLoc)
-					knownLocs[newLoc] = true
-				}
-			}
-		}
-		// If we arrive here, we have failed to find a block.
-		if firstError != nil {
-			return nil, errors.E(op, entry.Name, firstError)
-		}
-		return nil, errors.E(op, entry.Name, errors.IO,
-			errors.Errorf("data for block %d not found on any store server", b))
+	// If we arrive here, we have failed to find a block.
+	if firstError != nil {
+		return nil, errors.E(op, firstError)
 	}
-	return data, nil
+	return nil, errors.E(op, errors.IO, errors.Errorf("data for location %v not found on any store server", loc))
 }
