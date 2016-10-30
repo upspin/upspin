@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "268cce49_6dce9550",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-30T22:15:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "618870a5_2b1944ed",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "618870a5_abc1d4e9",
         "filename": "client/all_test.go",
         "patchSetId": 2
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "268cce49_adaf9d63",
+        "filename": "client/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-30T22:15:52Z",
+      "side": 1,
+      "message": "It shouldn\u0027t need to reach inside. It could just wrap the store and check for unnecessary gets. But I don\u0027t want to do that in this CL. I\u0027ve added a TODO to the relevant part of the client/file package.",
+      "parentUuid": "618870a5_6bb7cc8c",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "618870a5_0bc9e00b",
         "filename": "client/all_test.go",
         "patchSetId": 2
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "268cce49_8db2e1c8",
+        "filename": "client/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-30T22:15:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "618870a5_0bc9e00b",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "618870a5_ebf75c6e",
         "filename": "client/file/file.go",
         "patchSetId": 2
@@ -81,6 +135,24 @@
       "writtenOn": "2016-10-27T16:48:00Z",
       "side": 1,
       "message": "Why \"len(dst)\"? Just \"append their content to dst\".",
+      "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "268cce49_cdbce99f",
+        "filename": "client/file/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-30T22:15:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "618870a5_ebf75c6e",
       "revId": "828537ec47ed5cabe0a83127cf082afd10bce0d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
