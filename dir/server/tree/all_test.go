@@ -886,6 +886,18 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 	}
 }
 
+func TestFlushNewTree(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = tree.Flush()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {

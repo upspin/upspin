@@ -351,6 +351,30 @@ func TestHasRight(t *testing.T) {
 	}
 }
 
+// Check regression: This was a bug in the Tree.
+func TestGlobDoesNotRemoveRoot(t *testing.T) {
+	s := newDirServerForTesting(t, userName)
+	// Forces a flush on the user tree.
+	ents1, err := s.Glob(userName + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Forget this user's tree (force a new Tree object to be re-created).
+	val := s.userTrees.Remove(upspin.UserName(userName))
+	if val == nil {
+		t.Fatal("Expected existing value, got nil")
+	}
+
+	ents2, err := s.Glob(userName + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(ents2), len(ents1); got != want {
+		t.Fatalf("Tree got corrupted. len(ents) = %d, want = %d", got, want)
+	}
+}
+
 func TestGlob(t *testing.T) {
 	sOwner := newDirServerForTesting(t, userName)
 
