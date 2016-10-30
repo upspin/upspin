@@ -62,7 +62,7 @@ func (s *service) Endpoint() upspin.Endpoint {
 func (s *service) Put(ciphertext []byte) (*upspin.Refdata, error) {
 	ref := upspin.Reference(sha256key.Of(ciphertext).String())
 	s.data.mu.Lock()
-	s.data.blob[ref] = ciphertext
+	s.data.blob[ref] = copyOf(ciphertext)
 	s.data.mu.Unlock()
 	refdata := &upspin.Refdata{
 		Reference: ref,
