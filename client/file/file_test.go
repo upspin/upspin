@@ -5,7 +5,6 @@
 package file
 
 import (
-	"log"
 	"strings"
 	"testing"
 
@@ -14,11 +13,6 @@ import (
 
 func create(name upspin.PathName) upspin.File {
 	return Writable(&dummyClient{}, name)
-}
-
-func open(name upspin.PathName, existingData []byte) upspin.File {
-	f := Readable(&dummyClient{}, name, existingData)
-	return f
 }
 
 func setupFileIO(fileName upspin.PathName, max int, t *testing.T) (upspin.File, []byte) {
@@ -56,84 +50,6 @@ func TestWriteAndClose(t *testing.T) {
 	dummyClient := realFile.client.(*dummyClient)
 	if string(dummyClient.putData) != dummyData {
 		t.Errorf("Expected %s, got %s", dummyData, dummyClient.putData)
-	}
-}
-
-func TestReadAndSeek(t *testing.T) {
-	f := open(fileName, []byte(dummyData))
-	buf := make([]byte, len(dummyData)+10)
-	n, err := f.Read(buf)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	if n != len(dummyData) {
-		t.Fatalf("Expected len %d, got %d", len(dummyData), n)
-	}
-	buf = buf[:n]
-	if string(buf) != dummyData {
-		t.Errorf("Expected %s, got %s", dummyData, buf)
-	}
-	// Now read at a random location
-	var location int64 = 8
-	n, err = f.ReadAt(buf, location)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	expected := int64(len(dummyData)) - location
-	if int64(n) != expected {
-		t.Fatalf("Expected %d, got %d", expected, n)
-	}
-	buf = buf[:n]
-	expectedSubString := "some dummy data."
-	if string(buf) != expectedSubString {
-		t.Errorf("Expected %s, got %s", expectedSubString, buf)
-	}
-	// Seek and read.
-	location = 19 // Another arbitrary point
-	n64, err := f.Seek(location, 0)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	if n64 != location {
-		t.Fatalf("Expected %d, got %d", location, n)
-	}
-	n, err = f.Read(buf)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	expected = int64(len(dummyData)) - location
-	if int64(n) != expected {
-		t.Errorf("Expected %d, got %d", expected, n)
-	}
-	buf = buf[:n]
-	expectedSubString = "data."
-	if string(buf) != expectedSubString {
-		t.Errorf("Expected %s, got %s", expectedSubString, buf)
-	}
-	// Seek to the middle and then seek some more from there.
-	location = 10
-	_, err = f.Seek(location, 0)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	n64, err = f.Seek(3, 1)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	expected = location + 3
-	if n64 != expected {
-		t.Fatalf("Expected %d, got %d", expected, n)
-	}
-	buf = buf[0:30]
-	log.Printf("buf=%s,len=%d", buf, len(buf))
-	n, err = f.Read(buf)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	buf = buf[:n]
-	expectedSubString = "dummy data."
-	if string(buf) != expectedSubString {
-		t.Errorf("Expected %s, got %s", expectedSubString, buf)
 	}
 }
 
