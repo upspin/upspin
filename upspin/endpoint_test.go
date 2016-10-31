@@ -10,20 +10,25 @@ import (
 )
 
 func TestParseAndString(t *testing.T) {
-	tests := []string{
-		"remote,localhost:8080",
-		"https,https://localhost:8080",
-		"inprocess",
+	tests := []struct {
+		in, want string
+	}{
+		{"remote,localhost:8080", "remote,localhost:8080"},
+		{"https,https://localhost:8080", "https,https://localhost:8080"},
+		{"inprocess", "inprocess"},
+		{"localhost:8080", "remote,localhost:8080"},
+		{"store.example.com", "remote,store.example.com:443"},
+		{"remote,store.example.com", "remote,store.example.com:443"},
 	}
 	for _, test := range tests {
-		ep, err := ParseEndpoint(test)
+		ep, err := ParseEndpoint(test.in)
 		if err != nil {
 			t.Errorf("parsing %q: %v", test, err)
 			continue
 		}
 		got := ep.String()
-		if got != test {
-			t.Errorf("got %q, want %q", got, test)
+		if got != test.want {
+			t.Errorf("got %q, want %q", got, test.want)
 		}
 	}
 }
@@ -60,7 +65,7 @@ func TestErroneousString(t *testing.T) {
 }
 
 func TestJSON(t *testing.T) {
-	e := Endpoint{Transport: Remote, NetAddr: "whatnot"}
+	e := Endpoint{Transport: Remote, NetAddr: "localhost:8080"}
 	buf, err := e.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
