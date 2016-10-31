@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "266bee00_0484e058",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-31T16:38:16Z",
+      "side": 1,
+      "message": "another method not worth the trouble. go is a keyword; use it at the call site.",
+      "revId": "d528502a321e52a3dc5415f29ea9ed8fee774202",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_e469e4d6",
+        "filename": "dir/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-31T16:38:16Z",
+      "side": 1,
+      "message": "s/stores/store/",
+      "revId": "d528502a321e52a3dc5415f29ea9ed8fee774202",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
