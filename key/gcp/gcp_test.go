@@ -113,13 +113,13 @@ func TestPutNewUserSelf(t *testing.T) {
 		Dirs: []upspin.Endpoint{
 			{
 				Transport: upspin.Remote,
-				NetAddr:   upspin.NetAddr("there.co.uk"),
+				NetAddr:   upspin.NetAddr("there.co.uk:443"),
 			},
 		},
 		Stores: []upspin.Endpoint{
 			{
 				Transport: upspin.Remote,
-				NetAddr:   upspin.NetAddr("down-under.au"),
+				NetAddr:   upspin.NetAddr("down-under.au:443"),
 			},
 		},
 		PublicKey: upspin.PublicKey("my key"),

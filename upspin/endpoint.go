@@ -20,7 +20,12 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 		if len(elems) < 2 {
 			return nil, fmt.Errorf("remote endpoint %q requires a netaddr", v)
 		}
-		return &Endpoint{Transport: Remote, NetAddr: NetAddr(elems[1])}, nil
+		// Assume implicit port 443 if no port specified.
+		addr := elems[1]
+		if !strings.Contains(addr, ":") {
+			addr += ":443"
+		}
+		return &Endpoint{Transport: Remote, NetAddr: NetAddr(addr)}, nil
 	case "https":
 		if len(elems) < 2 {
 			return nil, fmt.Errorf("https endpoint %q requires a netaddr", v)
@@ -28,6 +33,17 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 		return &Endpoint{Transport: HTTPS, NetAddr: NetAddr(elems[1])}, nil
 	case "unassigned":
 		return &Endpoint{Transport: Unassigned}, nil
+	default:
+		if len(elems) != 1 {
+			break
+		}
+		// Assume "remote" transport if none specified.
+		// Assume implicit port 443 if no port specified.
+		addr := elems[0]
+		if !strings.Contains(addr, ":") {
+			addr += ":443"
+		}
+		return &Endpoint{Transport: Remote, NetAddr: NetAddr(addr)}, nil
 	}
 
 	return nil, fmt.Errorf("unknown transport type in endpoint %q", v)
