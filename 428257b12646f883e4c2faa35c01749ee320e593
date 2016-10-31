@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "268cce49_2daacd28",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T03:47:04Z",
+      "side": 1,
+      "message": "Oh, I forgot to mail the other CL.\n  https://upspin-review.googlesource.com/6183\nIn general, I think that approach is messier.\nI think an endpoint string as stored by the keyserver or sent across the wire should always be a complete one.\nThis is just a convenience for people writing config files.\n\nI don\u0027\u0027t think we take endpoints on the command line anymore...",
+      "parentUuid": "266bee00_a9b345ec",
+      "revId": "428257b12646f883e4c2faa35c01749ee320e593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "266bee00_e9bd3db9",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "268cce49_6db4d587",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T03:47:04Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "266bee00_e9bd3db9",
+      "revId": "428257b12646f883e4c2faa35c01749ee320e593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "266bee00_09c19939",
         "filename": "context/initcontext.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-31T02:33:00Z",
       "side": 1,
       "message": "This is confusing, because it takes a while to figure out that if text \u003d\u003d \"https,https://foo.bar.com\", this will NOT change the transport to remote.\n\nWouldn\u0027t it be shorter to call ParseEndpoint below and on error test whether adding remote would fix it? Then if it did fix it, you could check whether a port was present and if not add \":443\".",
+      "revId": "428257b12646f883e4c2faa35c01749ee320e593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "268cce49_4daf1938",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T03:47:04Z",
+      "side": 1,
+      "message": "yeah I totall rewrote this after your suggestions, PTAL.",
+      "parentUuid": "266bee00_09c19939",
       "revId": "428257b12646f883e4c2faa35c01749ee320e593",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
