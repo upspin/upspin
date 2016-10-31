@@ -153,6 +153,22 @@ func TestNoSecrets(t *testing.T) {
 	}
 }
 
+func TestEndpointDefaults(t *testing.T) {
+	config := `
+keyserver: key.example.com
+dirserver: remote,dir.example.com
+storeserver: store.example.com:8080
+`
+	expect := expectations{
+		username:    "noone@nowhere.org",
+		packing:     upspin.PlainPack,
+		keyserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "key.example.com:443"},
+		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "dir.example.com:443"},
+		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "store.example.com:8080"},
+	}
+	testConfig(t, &expect, config)
+}
+
 func makeConfig(expect *expectations) string {
 	var buf bytes.Buffer
 

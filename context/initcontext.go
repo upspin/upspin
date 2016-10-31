@@ -36,10 +36,10 @@ type base struct{}
 func (base) UserName() upspin.UserName           { return defaultUserName }
 func (base) Factotum() upspin.Factotum           { return nil }
 func (base) Packing() upspin.Packing             { return defaultPacking }
-func (base) KeyEndpoint() upspin.Endpoint        { return ep0 }
-func (base) DirEndpoint() upspin.Endpoint        { return ep0 }
-func (base) StoreEndpoint() upspin.Endpoint      { return ep0 }
-func (base) StoreCacheEndpoint() upspin.Endpoint { return ep0 }
+func (base) KeyEndpoint() upspin.Endpoint        { return upspin.Endpoint{} }
+func (base) DirEndpoint() upspin.Endpoint        { return upspin.Endpoint{} }
+func (base) StoreEndpoint() upspin.Endpoint      { return upspin.Endpoint{} }
+func (base) StoreCacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) CertPool() *x509.CertPool            { return systemCertPool }
 
 var systemCertPool *x509.CertPool
@@ -304,22 +304,35 @@ func certPoolFromDir(dir string) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
-
 func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
 	text, ok := vals[key]
 	if !ok || text == "" {
-		return ep0
+		return upspin.Endpoint{}
 	}
+
 	ep, err := upspin.ParseEndpoint(text)
+	// If no transport is provided, assume remote transport.
+	if err != nil && !strings.Contains(text, ",") {
+		if ep2, err2 := upspin.ParseEndpoint("remote," + text); err2 == nil {
+			ep = ep2
+			err = nil
+		}
+	}
 	if err != nil {
 		err = errors.E(op, errors.Errorf("cannot parse service %q: %v", text, err))
 		log.Error.Print(err)
 		if *errorp == nil {
 			*errorp = err
 		}
-		return ep0
+		return upspin.Endpoint{}
 	}
+
+	// If it's a remote and the provided address does
+	// not include a port, assume port 443.
+	if ep.Transport == upspin.Remote && !strings.Contains(string(ep.NetAddr), ":") {
+		ep.NetAddr += ":443"
+	}
+
 	return *ep
 }
 
