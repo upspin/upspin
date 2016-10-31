@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "266bee00_0fd4f9ce",
+        "filename": "dir/server/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T17:49:20Z",
+      "side": 1,
+      "message": "Yeah, I anticipated this. But it looks asymmetrical (see discussion on previous round at the call site). Oh well.\n\nDone.",
+      "parentUuid": "266bee00_0484e058",
+      "revId": "d528502a321e52a3dc5415f29ea9ed8fee774202",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "266bee00_e469e4d6",
         "filename": "dir/server/server.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-31T16:38:16Z",
       "side": 1,
       "message": "s/stores/store/",
+      "revId": "d528502a321e52a3dc5415f29ea9ed8fee774202",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_efd09ddc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T17:49:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "266bee00_e469e4d6",
       "revId": "d528502a321e52a3dc5415f29ea9ed8fee774202",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
