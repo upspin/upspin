@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "266bee00_a4afec63",
+        "filename": "context/initcontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T04:25:52Z",
+      "side": 1,
+      "message": "I actually saw that one after seeing this. I agree. I this is the right place for it for the exact same reasons.",
+      "parentUuid": "268cce49_2daacd28",
+      "revId": "428257b12646f883e4c2faa35c01749ee320e593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "266bee00_e9bd3db9",
         "filename": "context/initcontext.go",
         "patchSetId": 1
