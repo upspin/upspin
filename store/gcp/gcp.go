@@ -18,6 +18,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 
@@ -78,18 +79,25 @@ func New(options ...string) (upspin.StoreServer, error) {
 
 // Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (*upspin.Refdata, error) {
-	// TODO: check that userName has permission to write to this store server.
 	const op = "store/gcp.Put"
+
+	m, sp := newMetric(op)
+	sp.SetAnnotation(fmt.Sprintf("size=%d", len(data)))
+	s2 := sp.StartSpan("cacheData")
+
 	ref := sha256key.Of(data).String()
 	s.mu.RLock()
 	err := s.cache.Put(ref, bytes.NewReader(data))
+	s2.End()
 	if err != nil {
 		s.mu.RUnlock()
+		m.Done()
 		return nil, errors.E(op, err)
 	}
 
 	// Now go store it in the cloud.
 	go func() {
+		sp = sp.StartSpan("gcsUpload")
 		if _, err := s.storage.PutLocalFile(s.cache.GetFileLocation(ref), ref); err == nil {
 			// Remove the locally-cached entry so we never
 			// keep files locally, as we're a tiny server
@@ -98,7 +106,9 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 			// because FileCache is thread safe.
 			s.cache.Purge(ref)
 		}
+		sp.End()
 		s.mu.RUnlock()
+		m.Done()
 	}()
 	refdata := &upspin.Refdata{
 		Reference: upspin.Reference(ref),
@@ -111,16 +121,23 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
-	file, loc, err := s.innerGet(ref)
+
+	m, sp := newMetric(op)
+	defer m.Done()
+
+	file, loc, err := s.innerGet(ref, sp.StartSpan("innerGet"))
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	if file != nil {
+		sp = sp.StartSpan("readAll")
+		defer sp.End()
 		defer file.Close()
 		bytes, err := ioutil.ReadAll(file)
 		if err != nil {
 			err = errors.E(op, err)
 		}
+		sp.SetAnnotation(fmt.Sprintf("size=%d", len(bytes)))
 		return bytes, nil, nil, err
 	}
 	refdata := &upspin.Refdata{
@@ -128,17 +145,21 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 		Volatile:  false,
 		Duration:  0,
 	}
+	sp.SetAnnotation(fmt.Sprintf("refsize=%d", len(ref)))
 	return nil, refdata, []upspin.Location{loc}, nil
 }
 
 // innerGet gets a local file descriptor or a new location for the reference. It returns only one of the two return
 // values or an error. file is non-nil when the ref is found locally; the file is open for read and the
 // caller should close it. If location is non-zero ref is in the backend at that location.
-func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.Location, err error) {
+func (s *server) innerGet(ref upspin.Reference, span *metric.Span) (file *os.File, location upspin.Location, err error) {
 	const op = "store/gcp.Get"
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+
+	s1 := span.StartSpan("localLookup")
 	file, err = s.cache.OpenRefForRead(string(ref))
+	s1.End()
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
 		log.Debug.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
@@ -146,6 +167,8 @@ func (s *server) innerGet(ref upspin.Reference) (file *os.File, location upspin.
 	}
 
 	// File is not local, try to get it from our storage.
+	sp := span.StartSpan("gcsLookup")
+	defer sp.End()
 	var link string
 	link, err = s.storage.Get(string(ref))
 	if err != nil {
@@ -179,7 +202,10 @@ func (s *server) Delete(ref upspin.Reference) error {
 	const op = "store/gcp.Delete"
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	// TODO: verify ownership and proper ACLs to delete blob
+
+	m, _ := newMetric(op)
+	defer m.Done()
+
 	err := s.storage.Delete(string(ref))
 	if err != nil {
 		return errors.E(op, errors.Errorf("%s: %s", ref, err))
@@ -226,4 +252,10 @@ func (s *server) Close() {
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
+}
+
+// newMetric creates a new metric for operation op.
+func newMetric(op string) (*metric.Metric, *metric.Span) {
+	m := metric.New("server")
+	return m, m.StartSpan(op)
 }
