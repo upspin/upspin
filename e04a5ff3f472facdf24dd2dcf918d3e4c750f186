@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "266bee00_6443145e",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-10-31T16:28:55Z",
+      "side": 1,
+      "message": "this would fit on one line.",
+      "revId": "e04a5ff3f472facdf24dd2dcf918d3e4c750f186",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
