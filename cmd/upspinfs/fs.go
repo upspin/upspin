@@ -358,7 +358,11 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 	}
 	user := n.user
 	if n.t == rootNode {
-		user = upspin.UserName(uname)
+		if parsed, err := path.Parse(uname); err != nil {
+			return nil, nil, err
+		} else {
+			user = parsed.User()
+		}
 	}
 	dir, err := n.f.dirLookup(user)
 	if err != nil {
@@ -376,7 +380,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 			return nil, nil, err
 		}
 		kind := classify(err)
-		if (kind == errors.Permission || kind == errors.NotExist) && f.context.UserName() != n.user {
+		if (kind == errors.Permission || kind == errors.NotExist) && f.context.UserName() != user {
 			// Attempt a glob in the parent. If that works, don't fake anything.
 			if _, err := dir.Glob(string(path.Join(n.uname, "._is_anyone_there"))); err != nil {
 				// We act like the error didn't happen in the hopes that
