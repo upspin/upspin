@@ -304,13 +304,45 @@ func certPoolFromDir(dir string) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
+var (
+	ep0        upspin.Endpoint // Will have upspin.Unassigned as transport.
+	transports = []string{
+		upspin.Unassigned.String(),
+		upspin.InProcess.String(),
+		upspin.Remote.String(),
+		upspin.HTTPS.String(),
+	}
+)
 
 func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
 	text, ok := vals[key]
 	if !ok || text == "" {
 		return ep0
 	}
+
+	// If no known transport is provided, assume remote transport.
+	// If a remote is specified or assumed and the provided address does
+	// not include a port, assume port 443.
+	elems := strings.SplitN(text, ",", 2)
+	isKnownTransport := false
+	for _, t := range transports {
+		if elems[0] == t {
+			isKnownTransport = true
+		}
+	}
+	var addr string
+	if len(elems) == 2 && elems[0] == "remote" {
+		addr = elems[1]
+	} else if len(elems) == 1 && !isKnownTransport {
+		addr = elems[0]
+	}
+	if addr != "" {
+		if !strings.Contains(addr, ":") {
+			addr += ":443"
+		}
+		text = "remote," + addr
+	}
+
 	ep, err := upspin.ParseEndpoint(text)
 	if err != nil {
 		err = errors.E(op, errors.Errorf("cannot parse service %q: %v", text, err))
