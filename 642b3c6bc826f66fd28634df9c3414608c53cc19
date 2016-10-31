@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "266bee00_89d2c916",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T02:09:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "268cce49_0d0991a0",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "268cce49_ad195deb",
         "filename": "dir/server/all_test.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-31T00:52:17Z",
       "side": 1,
       "message": "example.com ?",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_69d76d08",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T02:09:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "268cce49_ad195deb",
       "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "266bee00_c9eb21c8",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T02:09:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "268cce49_8d1ca1dc",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "268cce49_4d1399cc",
         "filename": "dir/server/server.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-31T00:52:17Z",
       "side": 1,
       "message": "why the asymmetry between startSnapshotLoop and go s.groupRefreshLoop?\n\ncan we have s.startGroupRefreshLoop ?",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "266bee00_09e6b9fe",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-10-31T02:09:40Z",
+      "side": 1,
+      "message": "The asymmetry was intentional because of a comment Rob made on a similar method I had in store/perm, where it was only a one-liner doing the same thing, \"go startSomeLoop()\". I do prefer the consistency within this file though, even if we break the consistency of not having a method just for this.\n\nMaybe I\u0027ll coalesce them into a single \"startBackgroundTasks\" method in another CL.\n\nDone.",
+      "parentUuid": "268cce49_4d1399cc",
       "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
