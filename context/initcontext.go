@@ -58,8 +58,9 @@ func New() upspin.Context {
 }
 
 var (
-	defaultUserName = upspin.UserName("noone@nowhere.org")
-	defaultPacking  = upspin.PlainPack
+	defaultUserName    = upspin.UserName("noone@nowhere.org")
+	defaultPacking     = upspin.PlainPack
+	defaultKeyEndpoint = upspin.Endpoint{upspin.Remote, "key.upspin.io:443"}
 )
 
 // Known keys. All others are treated as errors.
@@ -135,7 +136,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	vals := map[string]string{
 		username:    string(defaultUserName),
 		packing:     defaultPacking.String(),
-		keyserver:   "",
+		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
 		storecache:  "",
