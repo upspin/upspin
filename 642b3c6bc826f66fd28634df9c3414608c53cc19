@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "268cce49_0d0991a0",
+        "filename": "dir/server/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T00:52:17Z",
+      "side": 1,
+      "message": "put this type declaration alongside its OnEviction method",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "268cce49_ad195deb",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T00:52:17Z",
+      "side": 1,
+      "message": "example.com ?",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "268cce49_8d1ca1dc",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T00:52:17Z",
+      "side": 1,
+      "message": "is this because the server can\u0027t find foo@bar.com?\nleave a comment explaining that",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "268cce49_4d1399cc",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-10-31T00:52:17Z",
+      "side": 1,
+      "message": "why the asymmetry between startSnapshotLoop and go s.groupRefreshLoop?\n\ncan we have s.startGroupRefreshLoop ?",
+      "revId": "642b3c6bc826f66fd28634df9c3414608c53cc19",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
