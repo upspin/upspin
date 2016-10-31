@@ -58,8 +58,9 @@ func New() upspin.Context {
 }
 
 var (
-	defaultUserName = upspin.UserName("noone@nowhere.org")
-	defaultPacking  = upspin.PlainPack
+	defaultUserName    = upspin.UserName("noone@nowhere.org")
+	defaultPacking     = upspin.PlainPack
+	defaultKeyEndpoint = upspin.Endpoint{upspin.Remote, "key.upspin.io:443"}
 )
 
 // Known keys. All others are treated as errors.
@@ -309,6 +310,9 @@ var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
 	text, ok := vals[key]
 	if !ok || text == "" {
+		if key == "keyserver" {
+			return defaultKeyEndpoint
+		}
 		return ep0
 	}
 	ep, err := upspin.ParseEndpoint(text)

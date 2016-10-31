@@ -44,20 +44,12 @@ type envs struct {
 	secrets     string
 }
 
-// Endpoint is a helper to make it easier to build vet-error-free upspin.Endpoints.
-func Endpoint(t upspin.Transport, n upspin.NetAddr) upspin.Endpoint {
-	return upspin.Endpoint{
-		Transport: t,
-		NetAddr:   n,
-	}
-}
-
 func TestInitContext(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
-		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
-		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
+		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
+		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
+		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
@@ -65,8 +57,9 @@ func TestInitContext(t *testing.T) {
 
 func TestDefaults(t *testing.T) {
 	expect := expectations{
-		username: "noone@nowhere.org",
-		packing:  upspin.PlainPack,
+		username:  "noone@nowhere.org",
+		keyserver: defaultKeyEndpoint,
+		packing:   upspin.PlainPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -90,9 +83,9 @@ storeserver: inprocess`
 func TestEnv(t *testing.T) {
 	expect := expectations{
 		username:    "quux",
-		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
-		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
+		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
+		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
+		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 
@@ -106,9 +99,9 @@ func TestEnv(t *testing.T) {
 	config := makeConfig(&expect)
 	expect.username = "p@google.com"
 	os.Setenv("upspinusername", string(expect.username))
-	expect.keyserver = Endpoint(upspin.InProcess, "")
-	expect.dirserver = Endpoint(upspin.Remote, "who.knows:1234")
-	expect.storeserver = Endpoint(upspin.Remote, "who.knows:1234")
+	expect.keyserver = upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""}
+	expect.dirserver = upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"}
+	expect.storeserver = upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"}
 	os.Setenv("upspinkeyserver", expect.keyserver.String())
 	os.Setenv("upspindirserver", expect.dirserver.String())
 	os.Setenv("upspinstoreserver", expect.storeserver.String())
@@ -120,9 +113,9 @@ func TestEnv(t *testing.T) {
 func TestBadEnv(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
-		keyserver:   Endpoint(upspin.InProcess, ""),
-		dirserver:   Endpoint(upspin.Remote, "who.knows:1234"),
-		storeserver: Endpoint(upspin.Remote, "who.knows:1234"),
+		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
+		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
+		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		packing:     upspin.PlainPack, // TODO upspin.EEPack,
 	}
 	config := makeConfig(&expect)
