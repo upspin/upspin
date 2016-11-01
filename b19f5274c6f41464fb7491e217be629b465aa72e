@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06e18a16_120eac52",
+        "filename": "cmd/upspin-deploy/cdbuild.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-01T14:40:32Z",
+      "side": 1,
+      "message": "Maybe in another CL, any chance this could be parameterized so we can deploy binaries with -race?",
+      "revId": "b19f5274c6f41464fb7491e217be629b465aa72e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
