@@ -467,9 +467,8 @@ func (c *Config) kubeCredentials() error {
 }
 
 func (c *Config) buildBaseImage() error {
-	log.Println("Building base Docker image")
-	return cdbuild(repoPath("cloud/docker/base"), c.Project, "base", "")
-	return nil
+	log.Println("Building cloudbuild Docker image")
+	return cdbuild(repoPath("cloud/docker/cloudbuild"), c.Project, "cloudbuild", "")
 }
 
 func (c *Config) dirServerUserName() string {
