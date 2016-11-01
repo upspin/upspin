@@ -8,8 +8,8 @@ package ee
 // Upspin ee crypto summary:
 // Alice shares a file with Bob by picking a new random symmetric key, encrypting the file,
 // wrapping the symmetric encryption key with Bob's public key, signing the file using
-// her own elliptic curve private key, and sending the ciphertext and metadata to a
-// directory server.
+// her own elliptic curve private key, and sending the ciphertext to a storage server
+// and metadata to a directory server.
 
 import (
 	"bytes"
