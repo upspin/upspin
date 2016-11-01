@@ -140,11 +140,7 @@ func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create user.
-	u := &upspin.User{
-		Name:      userName,
-		PublicKey: pubKey,
-	}
-	err = m.createUser(u)
+	err = m.createUser(userName, pubKey)
 	if err != nil {
 		m.sendErrorMail(from, fmt.Sprintf("Failure creating Upspin user %q", userName), err)
 		return
@@ -154,22 +150,69 @@ func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Your account %q with public key\n%s\nhas been created.", userName, pubKey))
 }
 
-func (m *mailHandler) createUser(u *upspin.User) error {
+func (m *mailHandler) createUser(name upspin.UserName, pubKey upspin.PublicKey) error {
+	key, err := m.dialForUser(name)
+	if err != nil {
+		return err
+	}
+	defer key.Close() // be nice and release resources.
+	err = key.Put(&upspin.User{
+		Name:      name,
+		PublicKey: pubKey,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Attempt to create a "+snapshot" user.
+	user, _, domain, err := user.Parse(name)
+	if err != nil {
+		return err
+	}
+	// Strip suffix, if any.
+	if suffixPos := strings.Index(user, "+"); suffixPos > 0 {
+		user = user[:suffixPos]
+	}
+
+	snapshotUser := upspin.UserName(user + "+snapshot@" + domain)
+
+	// Lookup snapshotUser to ensure we don't overwrite an existing one.
+	_, err = m.key.Lookup(snapshotUser)
+	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		return err
+	}
+	if err == nil {
+		// We do not update the snapshot user if it already exists.
+		return nil
+	}
+	// Else, if it does not exist, we create it.
+	keySnap, err := m.dialForUser(snapshotUser)
+	if err != nil {
+		return err
+	}
+	defer keySnap.Close() // be nice and release resources.
+	return keySnap.Put(&upspin.User{
+		Name:      snapshotUser,
+		PublicKey: pubKey,
+	})
+}
+
+func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	// We need to dial this server locally so the new user is authenticated
 	// with it implicitly.
 	ctx := context.New()
 	ctx = context.SetKeyEndpoint(ctx, m.key.Endpoint())
-	ctx = context.SetUserName(ctx, u.Name)
+	ctx = context.SetUserName(ctx, name)
 
 	service, err := m.key.Dial(ctx, m.key.Endpoint())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	keyServer, ok := service.(upspin.KeyServer)
 	if !ok {
-		return errors.E(errors.Internal, errors.Str("dialed service not an instance of upspin.KeyServer"))
+		return nil, errors.E(errors.Internal, errors.Str("dialed service not an instance of upspin.KeyServer"))
 	}
-	return keyServer.Put(u)
+	return keyServer, nil
 }
 
 func validateSignature(u upspin.UserName, k upspin.PublicKey, sig upspin.Signature) error {
