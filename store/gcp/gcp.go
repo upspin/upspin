@@ -81,7 +81,7 @@ func New(options ...string) (upspin.StoreServer, error) {
 func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/gcp.Put"
 
-	m, sp := newMetric(op)
+	m, sp := metric.NewSpan(op)
 	sp.SetAnnotation(fmt.Sprintf("size=%d", len(data)))
 	s2 := sp.StartSpan("cacheData")
 
@@ -122,7 +122,7 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
 
-	m, sp := newMetric(op)
+	m, sp := metric.NewSpan(op)
 	defer m.Done()
 
 	file, loc, err := s.innerGet(ref, sp.StartSpan("innerGet"))
@@ -203,7 +203,7 @@ func (s *server) Delete(ref upspin.Reference) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	m, _ := newMetric(op)
+	m, _ := metric.NewSpan(op)
 	defer m.Done()
 
 	err := s.storage.Delete(string(ref))
@@ -252,10 +252,4 @@ func (s *server) Close() {
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
-}
-
-// newMetric creates a new metric for operation op.
-func newMetric(op string) (*metric.Metric, *metric.Span) {
-	m := metric.New("server")
-	return m, m.StartSpan(op)
 }

@@ -686,7 +686,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 }
 
 func newMetric(op string) (*metric.Metric, *metric.Span) {
-	m := metric.New("Client")
+	m := metric.New("")
 	s := m.StartSpan(op).SetKind(metric.Client)
 	return m, s
 }
