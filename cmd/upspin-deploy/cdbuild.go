@@ -29,7 +29,7 @@ import (
 	"google.golang.org/api/storage/v1"
 )
 
-func cdbuild(dir, projectID, name string) error {
+func cdbuild(dir, projectID, name, pkgPath string) error {
 	stagingBucket := projectID + "-cdbuild"
 	buildObject := fmt.Sprintf("build/%s-%s.tar.gz", name, randomID())
 
@@ -49,6 +49,19 @@ func cdbuild(dir, projectID, name string) error {
 	if err != nil {
 		return fmt.Errorf("Could not get cloudbuild client: %v", err)
 	}
+
+	var steps []*cloudbuild.BuildStep
+	if pkgPath != "" {
+		steps = append(steps, &cloudbuild.BuildStep{
+			Name: "gcr.io/cloud-builders/go",
+			Args: []string{"install", pkgPath},
+			Env:  []string{"CGO_ENABLED=0"},
+		})
+	}
+	steps = append(steps, &cloudbuild.BuildStep{
+		Name: "gcr.io/cloud-builders/docker",
+		Args: []string{"build", "--tag=gcr.io/" + projectID + "/" + name, "."},
+	})
 	call := api.Projects.Builds.Create(projectID, &cloudbuild.Build{
 		LogsBucket: stagingBucket,
 		Source: &cloudbuild.Source{
@@ -57,12 +70,7 @@ func cdbuild(dir, projectID, name string) error {
 				Object: buildObject,
 			},
 		},
-		Steps: []*cloudbuild.BuildStep{
-			{
-				Name: "gcr.io/cloud-builders/dockerizer",
-				Args: []string{"gcr.io/" + projectID + "/" + name},
-			},
-		},
+		Steps:  steps,
 		Images: []string{"gcr.io/" + projectID + "/" + name},
 	})
 	op, err := call.Context(ctx).Do()
@@ -162,8 +170,16 @@ func uploadTar(ctx context.Context, root string, hc *http.Client, bucket string,
 		if err != nil {
 			return err
 		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		hdr.Name = rel
 		if err := tw.WriteHeader(hdr); err != nil {
 			return err
+		}
+		if info.IsDir() {
+			return nil
 		}
 		f, err := os.Open(path)
 		if err != nil {
