@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06e18a16_152d76f1",
+        "filename": "metric/metric.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-01T17:42:42Z",
+      "side": 1,
+      "message": "the name is not optional as an argument. maybe\n\nIf the name is non-empty, ....",
+      "revId": "37d5475a48199e81e90aa96b670d78a09530e7ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
