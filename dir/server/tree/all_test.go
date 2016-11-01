@@ -6,7 +6,6 @@ package tree
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -19,10 +18,10 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/ee"
-
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
+
+	_ "upspin.io/pack/ee"
 )
 
 func init() {
@@ -1003,8 +1002,6 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Context
 	}
 
 	// Set the public key for the user, since EE Pack requires the dir owner to have a wrapped key.
-	// TODO: re-think this for directories, but probably correct as-is because if the dir server goes
-	// rogue or fails, the user can always run a dir server locally as himself and retrieve dir blocks.
 	user = &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
@@ -1021,7 +1018,6 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Context
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("tmpDir: %s", tmpDir)
 	log, logIndex, err := NewLogs(userName, tmpDir)
 	if err != nil {
 		t.Fatal(err)

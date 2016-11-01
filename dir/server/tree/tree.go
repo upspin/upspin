@@ -456,7 +456,7 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	// The root of the tree must be flushed immediately or its recovery
 	// becomes cumbersome. Nothing else exists prior to a root existing,
 	// so only the root will be flushed.
-	log.Printf("Created root: %v", t.root)
+	log.Printf("Created root: %s", p)
 	return t.flush()
 }
 

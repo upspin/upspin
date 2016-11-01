@@ -643,9 +643,6 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		return s.errLink(op, link, o)
 	}
 	if err != nil {
-		// TODO: this could leak the existence of name. But the attacker
-		// needs to get lucky to trigger an error; a poorly-constructed
-		// name is not enough.
 		return nil, errors.E(op, err)
 	}
 	if !hasAny {
