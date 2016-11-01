@@ -226,7 +226,12 @@ func (c *Config) Create() error {
 
 	count++
 	go func() {
-		errc <- wrap("buckets", c.createBuckets())
+		if err := wrap("buckets", c.createBuckets()); err != nil {
+			errc <- err
+			return
+		}
+		// Base image depends on storage buckets.
+		errc <- wrap("base", c.buildBaseImage())
 	}()
 
 	count++
@@ -241,11 +246,6 @@ func (c *Config) Create() error {
 	count++
 	go func() {
 		errc <- wrap("disks", c.createDisks())
-	}()
-
-	count++
-	go func() {
-		errc <- wrap("base", c.buildBaseImage())
 	}()
 
 	// Wait for the above concurrent tasks to complete.
@@ -322,10 +322,6 @@ func (c *Config) Deploy() error {
 	log.Printf("Deploying Upspin servers %v: Project=%q Zone=%q Prefix=%q", c.servers(), c.Project, c.Zone, c.Prefix)
 
 	// Install dependencies to speed builds.
-	if err := c.installDeps(); err != nil {
-		return wrap("deps", err)
-	}
-
 	if err := c.kubeCredentials(); err != nil {
 		return wrap("gcloud", err)
 	}
@@ -416,13 +412,16 @@ func (c *Config) buildServer(server string) error {
 	if err := c.copyDockerfile(dir, server); err != nil {
 		return err
 	}
-	if err := c.buildBinary(dir, server); err != nil {
+
+	// Collect source code for server and its dependencies.
+	pkgPath := "upspin.io/cmd/" + server
+	if err := c.copySource(dir, pkgPath); err != nil {
 		return err
 	}
 
 	name := c.Prefix + server
 	log.Printf("Building Docker image %q", name)
-	if err := cdbuild(dir, c.Project, name); err != nil {
+	if err := cdbuild(dir, c.Project, name, pkgPath); err != nil {
 		return err
 	}
 
@@ -469,7 +468,8 @@ func (c *Config) kubeCredentials() error {
 
 func (c *Config) buildBaseImage() error {
 	log.Println("Building base Docker image")
-	return cdbuild(repoPath("cloud/docker/base"), c.Project, "base")
+	return cdbuild(repoPath("cloud/docker/base"), c.Project, "base", "")
+	return nil
 }
 
 func (c *Config) dirServerUserName() string {
@@ -524,39 +524,43 @@ func (c *Config) prepareConfig(data []byte, server string) []byte {
 	return data
 }
 
-func (c *Config) installDeps() error {
-	log.Print("Running 'go install' for dependencies")
-
-	// Find all dependencies of the servers we are going to build.
-	args := []string{"list", "-f", `{{join .Imports "\n"}}`}
-	for _, s := range c.servers() {
-		args = append(args, "upspin.io/cmd/"+s)
-	}
-	cmd := exec.Command("go", args...)
-	cmd.Env = c.buildEnv()
+// copySource copies the source code for the specified package and all
+// its non-goroot dependencies to the specified workspace directory.
+func (c *Config) copySource(dir, pkgPath string) error {
+	// Find all package dependencies.
+	cmd := exec.Command("go", "list", "-f", `{{join .Deps "\n"}}`, pkgPath)
 	cmd.Stderr = os.Stderr
-	depBytes, err := cmd.Output()
+	cmd.Env = c.buildEnv()
+	out, err := cmd.Output()
 	if err != nil {
 		return err
 	}
-	deps := strings.Split(string(bytes.TrimSpace(depBytes)), "\n")
 
-	// Build them for GOOS=linux GOARCH=amd64.
-	cmd = exec.Command("go", append([]string{"install"}, deps...)...)
-	cmd.Env = c.buildEnv()
-	cmd.Stdout = os.Stdout
+	// Find the directories for the non-goroot packages.
+	deps := strings.Split(string(bytes.TrimSpace(out)), "\n")
+	args := []string{"list", "-f", `{{if not .Goroot}}{{.ImportPath}} {{.Dir}}{{end}}`, pkgPath}
+	cmd = exec.Command("go", append(args, deps...)...)
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
+	cmd.Env = c.buildEnv()
+	out, err = cmd.Output()
+	if err != nil {
+		return err
+	}
 
-func (c *Config) buildBinary(dir, server string) error {
-	out := filepath.Join(dir, server)
-	pkg := "upspin.io/cmd/" + server
-	cmd := exec.Command("go", "build", "-tags", "debug", "-o", out, pkg)
-	cmd.Env = c.buildEnv()
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	// Copy the contents of those directories to a workspace at dir.
+	for _, line := range strings.Split(string(bytes.TrimSpace(out)), "\n") {
+		pair := strings.SplitN(line, " ", 2)
+		if len(pair) != 2 {
+			return fmt.Errorf("unexpected 'go list' output: %q", line)
+		}
+		pkgPath, pkgDir := pair[0], pair[1]
+		dstDir := filepath.Join(dir, "src", pkgPath)
+		if err := cpDir(dstDir, pkgDir); err != nil {
+			return fmt.Errorf("copying %q: %v", pkgPath, err)
+		}
+	}
+
+	return nil
 }
 
 func (c *Config) buildEnv() (env []string) {
@@ -1099,6 +1103,29 @@ func cp(dst, src string) error {
 	}
 	// Ensure the destination has the same mtime as the source.
 	return os.Chtimes(dst, fi.ModTime(), fi.ModTime())
+}
+
+// cpDir copies the contents of the source directory to the destination
+// directory, making it if necessary. It does not copy sub-directories.
+func cpDir(dst, src string) error {
+	if err := os.MkdirAll(dst, 0755); err != nil {
+		return err
+	}
+	walk := func(srcPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if srcPath == src {
+				// Don't skip the directory we're copying.
+				return nil
+			}
+			return filepath.SkipDir
+		}
+		dstPath := filepath.Join(dst, srcPath[len(src):])
+		return cp(dstPath, srcPath)
+	}
+	return filepath.Walk(src, walk)
 }
 
 func repoPath(suffix string) string {
