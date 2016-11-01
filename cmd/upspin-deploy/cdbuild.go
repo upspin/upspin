@@ -53,9 +53,9 @@ func cdbuild(dir, projectID, name, pkgPath string) error {
 	var steps []*cloudbuild.BuildStep
 	if pkgPath != "" {
 		steps = append(steps, &cloudbuild.BuildStep{
-			Name: "gcr.io/cloud-builders/go",
+			Name: "gcr.io/" + projectID + "/cloudbuild",
 			Args: []string{"install", pkgPath},
-			Env:  []string{"CGO_ENABLED=0"},
+			Env:  []string{"GOPATH=/workspace"},
 		})
 	}
 	steps = append(steps, &cloudbuild.BuildStep{
