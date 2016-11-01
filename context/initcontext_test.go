@@ -50,7 +50,7 @@ func TestInitContext(t *testing.T) {
 		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		packing:     upspin.PlainPack, // TODO upspin.EEPack,
+		packing:     upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -59,7 +59,7 @@ func TestDefaults(t *testing.T) {
 	expect := expectations{
 		username:  "noone@nowhere.org",
 		keyserver: defaultKeyEndpoint,
-		packing:   upspin.PlainPack,
+		packing:   upspin.EEPack,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -86,7 +86,7 @@ func TestEnv(t *testing.T) {
 		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		packing:     upspin.PlainPack, // TODO upspin.EEPack,
+		packing:     upspin.EEPack,
 	}
 
 	defer func() {
@@ -105,7 +105,7 @@ func TestEnv(t *testing.T) {
 	os.Setenv("upspinkeyserver", expect.keyserver.String())
 	os.Setenv("upspindirserver", expect.dirserver.String())
 	os.Setenv("upspinstoreserver", expect.storeserver.String())
-	expect.packing = upspin.PlainPack
+	expect.packing = upspin.EEPack
 	os.Setenv("upspinpacking", pack.Lookup(expect.packing).String())
 	testConfig(t, &expect, config)
 }
@@ -116,7 +116,7 @@ func TestBadEnv(t *testing.T) {
 		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		packing:     upspin.PlainPack, // TODO upspin.EEPack,
+		packing:     upspin.EEPack,
 	}
 	config := makeConfig(&expect)
 	os.Setenv("upspinuser", string(expect.username)) // Should be upspinusername.
@@ -133,7 +133,7 @@ func TestBadEnv(t *testing.T) {
 func TestNoSecrets(t *testing.T) {
 	expect := expectations{
 		username: "bob@google.com",
-		packing:  upspin.PlainPack,
+		packing:  upspin.EEPack,
 		secrets:  "none",
 	}
 	r := strings.NewReader(makeConfig(&expect))
@@ -154,7 +154,7 @@ storeserver: store.example.com:8080
 `
 	expect := expectations{
 		username:    "noone@nowhere.org",
-		packing:     upspin.PlainPack,
+		packing:     upspin.EEPack,
 		keyserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "key.example.com:443"},
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "dir.example.com:443"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "store.example.com:8080"},
