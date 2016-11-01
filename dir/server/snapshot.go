@@ -21,8 +21,8 @@ const (
 	snapshotSuffix            = "snapshot"
 	snapshotGlob              = "*+" + snapshotSuffix + "@*"
 	snapshotDefaultDateFormat = "2006/01/02"
-	snapshotDefaultInterval   = 24 * time.Hour
-	snapshotWorkerInterval    = 1 * time.Hour // TODO: adjust when done testing.
+	snapshotDefaultInterval   = 12 * time.Hour
+	snapshotWorkerInterval    = 2 * time.Hour
 )
 
 // snapshotConfig holds the configuration for a snapshot. Users may have
@@ -52,8 +52,6 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) ([]snapshotConfig, 
 		uname = uname[:idx]
 	}
 
-	// TODO: only a daily snapshot of the root for now; add mechanism for
-	// more options, such as parsing the tree for special config entries.
 	return []snapshotConfig{{
 		srcDir:     upspin.PathName(uname + "@" + domain + "/"),
 		dstDir:     upspin.PathName(userName),
@@ -79,6 +77,10 @@ func (s *server) stopSnapshotLoop() {
 
 // snapshotLoop runs in a goroutine and performs periodic snapshots.
 func (s *server) snapshotLoop() {
+	// Run once upon starting.
+	s.snapshotAll() // returned error is already logged.
+
+	// Run periodically.
 	ticker := time.NewTicker(snapshotWorkerInterval)
 	defer ticker.Stop()
 	for {

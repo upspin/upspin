@@ -212,8 +212,6 @@ func (s *server) getAccess(entry *upspin.DirEntry, opts ...options) (*access.Acc
 	}
 	// Not in cache; load data from the Store.
 
-	// TODO: we should also reload any known Group files from their remote
-	// origin from time to time if they're not local to this server.
 	acc, err := s.loadAccess(entry, o)
 	if err != nil {
 		return nil, err

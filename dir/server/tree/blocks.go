@@ -20,7 +20,6 @@ const blockSize = 1024 * 1024 // 1MB
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
 func (t *Tree) store(n *node) error {
-
 	// Get our store server.
 	storeServer, err := bind.StoreServer(t.context, t.context.StoreEndpoint())
 	if err != nil {
@@ -90,14 +89,13 @@ func (t *Tree) store(n *node) error {
 
 // storeBlock stores a single block of data to the StoreServer as part of a block packing operation.
 func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) error {
-	// TODO(edpin): remove logging once debugging is done.
-	log.Debug.Printf("Writing %d bytes of data", len(data))
 	cipher, err := bp.Pack(data)
 	if err != nil {
 		return err
 	}
 	refdata, err := store.Put(cipher)
 	if err != nil {
+		log.Error.Printf("Error writing block to store: %s", err)
 		return err
 	}
 	loc := upspin.Location{
