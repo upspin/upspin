@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ee
+package ee_test
 
 import (
 	"bytes"
@@ -20,6 +20,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
+	"upspin.io/pack/ee"
 	"upspin.io/pack/internal/packtest"
 	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
@@ -413,7 +414,7 @@ func TestConsistentKeyStream(t *testing.T) {
 	}
 
 	// Create a new key to re-use for each separate pack operation.
-	dkey, blockCipher, err := newKeyAndCipher()
+	dkey, blockCipher, err := ee.NewKeyAndCipher()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -436,10 +437,8 @@ func TestConsistentKeyStream(t *testing.T) {
 		}
 
 		// Replace the random dkey/cipher with our own.
-		bpp := bp.(*blockPacker)
-		// Make a copy of dkey, as it'll get zeroed on close.
-		bpp.dkey = append([]byte(nil), dkey...)
-		bpp.cipher = blockCipher
+		// Send a copy of dkey, as the original will get zeroed on close.
+		ee.SetblockPacker(bp, append([]byte(nil), dkey...), blockCipher)
 
 		var gotCipherText []byte
 		for i := 0; i < len(data); i += bs {

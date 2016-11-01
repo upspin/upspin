@@ -23,8 +23,10 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/user"
 
-	// Needed because the default packing is "plain" and its
+	// Needed because the default packing is "ee" and its
 	// implementation is referenced if no packing is specified.
+	// We also need "plain" when packing for "all".
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 )
 
@@ -59,7 +61,7 @@ func New() upspin.Context {
 
 var (
 	defaultUserName    = upspin.UserName("noone@nowhere.org")
-	defaultPacking     = upspin.PlainPack
+	defaultPacking     = upspin.EEPack
 	defaultKeyEndpoint = upspin.Endpoint{upspin.Remote, "key.upspin.io:443"}
 )
 
@@ -122,7 +124,7 @@ func FromFile(name string) (upspin.Context, error) {
 // If a remote endpoint is specified without a port in its address component
 // the port is assumed to be 443.
 //
-// The default value for packing is "plain".
+// The default value for packing is "ee".
 //
 // The default value for secrets is "$HOME/.ssh".
 // The special value "none" indicates there are no secrets to load;
