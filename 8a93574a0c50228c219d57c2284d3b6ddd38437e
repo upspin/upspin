@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06e18a16_00f09674",
+        "filename": "pack/internal/packtest/blocktest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-01T19:07:32Z",
+      "side": 1,
+      "message": "A comment here would be helpful. Maybe this should be called \"skipOverhead\" (if I understand this right)? The problem with \"clear\" is that I was reading it as an adjective, not a verb. I think you mean it as a verb here, right?",
+      "revId": "8a93574a0c50228c219d57c2284d3b6ddd38437e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
