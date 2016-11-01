@@ -19,7 +19,16 @@ import (
 
 type fakeStore map[upspin.Reference][]byte
 
+const (
+	aeadOverhead = 16
+)
+
 func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Packer, userName upspin.UserName) {
+	var overhead int64
+	if packer.Packing() == upspin.SymmPack {
+		overhead = aeadOverhead
+	}
+
 	pathName := upspin.PathName(userName + "/file")
 
 	// Work with 1MB of random data.
@@ -47,6 +56,15 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Pac
 
 	t.Logf("packed %v bytes into %v blocks", len(data), len(de.Blocks))
 
+	clearOffsets := make([]int64, len(de.Blocks))
+	for i, _ := range clearOffsets {
+		if i == 0 {
+			clearOffsets[i] = 0
+		} else {
+			clearOffsets[i] = clearOffsets[i-1] + de.Blocks[i-1].Size - overhead
+		}
+	}
+
 	var out bytes.Buffer
 	if err := unpackEntry(ctx, store, packer, de, &out); err != nil {
 		t.Fatal("unpackEntry:", err)
@@ -58,7 +76,7 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Pac
 		t.Fatal("output did not match input")
 	}
 
-	if err := unpackEntryRandomly(ctx, store, packer, de, out.Bytes()); err != nil {
+	if err := unpackEntryRandomly(ctx, store, packer, de, data, clearOffsets); err != nil {
 		t.Fatalf("unpacking random entries: %v", err)
 	}
 }
@@ -134,7 +152,7 @@ func unpackEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *
 	}
 }
 
-func unpackEntryRandomly(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, out []byte) error {
+func unpackEntryRandomly(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, data []byte, clearOffsets []int64) error {
 	bp, err := packer.Unpack(ctx, de)
 	if err != nil {
 		return err
@@ -158,7 +176,8 @@ func unpackEntryRandomly(ctx upspin.Context, store fakeStore, packer upspin.Pack
 			return err
 		}
 
-		want := out[b.Offset : b.Offset+b.Size]
+		off := (int)(clearOffsets[n])
+		want := data[off : off+len(clear)]
 		if !bytes.Equal(clear, want) {
 			return fmt.Errorf("block %d did not decrypt correctly", n)
 		}
