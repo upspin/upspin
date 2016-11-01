@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "268cce49_cde78969",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-01T00:29:22Z",
+      "side": 1,
+      "message": "perhaps the metric package should provide this function, given how there\u0027s an equivalent function in package client.",
+      "revId": "7e0c162e73daf68b4df4ba7e4050ce943ae2447b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
