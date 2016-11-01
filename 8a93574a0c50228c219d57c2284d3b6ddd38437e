@@ -16,6 +16,23 @@
       "revId": "8a93574a0c50228c219d57c2284d3b6ddd38437e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "06e18a16_202dd2f1",
+        "filename": "pack/internal/packtest/blocktest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-01T19:10:41Z",
+      "side": 1,
+      "message": "you don\u0027t need to set it to zero since allocation always returns cleared memory.\n\nif i \u003e 0 { ... }",
+      "revId": "8a93574a0c50228c219d57c2284d3b6ddd38437e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
