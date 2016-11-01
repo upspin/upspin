@@ -129,7 +129,6 @@ func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
 
 	// Pick fresh nonce for this block.
 	nonce := make([]byte, nonceLen)
-	// TODO(ehg) Consider replacing with a counter such as strictly monotonic time.
 	_, err = rand.Read(nonce)
 	if err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
