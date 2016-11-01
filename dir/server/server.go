@@ -816,9 +816,9 @@ func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) (*up
 
 // newOptMetric creates a new options populated with a metric for operation op.
 func newOptMetric(op string) (options, *metric.Metric) {
-	m := metric.New("server")
+	m, sp := metric.NewSpan(op)
 	opts := options{
-		span: m.StartSpan(op),
+		span: sp,
 	}
 	return opts, m
 }

@@ -4,7 +4,10 @@
 
 package metric
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestAll(t *testing.T) {
 	saver := &dummySaver{
@@ -37,7 +40,9 @@ func TestAll(t *testing.T) {
 	}
 
 	// Save one more metric.
-	New("MkDir").StartSpan("putBytes").End().Done()
+	m, sp := NewSpan("putBytes")
+	sp.End()
+	m.Done()
 
 	// Finish.
 	saveQueue <- nil
@@ -47,8 +52,14 @@ func TestAll(t *testing.T) {
 	if len(saver.metricsReceived) != 2 {
 		t.Fatalf("Expected 2 metrics processed, got %d", len(saver.metricsReceived))
 	}
-	verifyMetric(t, saver.metricsReceived[0], "DirGet", "getRoot", "getInnerRoot", "getCloudBytes")
-	verifyMetric(t, saver.metricsReceived[1], "MkDir", "putBytes")
+	err := verifyMetric(t, saver.metricsReceived[0], "DirGet", "DirGet.getRoot", "DirGet.getInnerRoot", "DirGet.getCloudBytes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = verifyMetric(t, saver.metricsReceived[1], "", "putBytes")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expected = "hello"
 	if saver.metricsReceived[0].spans[2].annotation != expected {
@@ -63,23 +74,24 @@ func TestFullChannel(t *testing.T) {
 	// If we block, this test will never finish.
 }
 
-func verifyMetric(t *testing.T, m *Metric, expectedName string, expectedSpanNames ...string) {
+func verifyMetric(t *testing.T, m *Metric, expectedName string, expectedSpanNames ...string) error {
 	if m.name != expectedName {
-		t.Errorf("Expected %q, got %q", expectedName, m.name)
+		return fmt.Errorf("Expected %q, got %q", expectedName, m.name)
 	}
 	if len(m.spans) != len(expectedSpanNames) {
-		t.Errorf("Expected %d spans, got %d", len(expectedSpanNames), len(m.spans))
+		return fmt.Errorf("Expected %d spans, got %d", len(expectedSpanNames), len(m.spans))
 	}
 	for i, s := range m.spans {
-		exp := m.name + "." + expectedSpanNames[i]
+		exp := expectedSpanNames[i]
 		if s.name != exp {
-			t.Errorf("Expected span %d of metric %q to be named %q, got %q", i, m.name, exp, s.name)
+			return fmt.Errorf("Expected span %d of metric %q to be named %q, got %q", i, m.name, exp, s.name)
 		}
 		if s.endTime.IsZero() {
 			// using %v because s.name may be nil.
-			t.Errorf("Span %d (%v) of metric %q has zero time", i, s.name, m.name)
+			return fmt.Errorf("Span %d (%v) of metric %q has zero time", i, s.name, m.name)
 		}
 	}
+	return nil
 }
 
 type dummySaver struct {

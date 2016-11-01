@@ -61,11 +61,18 @@ const saveQueueLength = 16
 // saveQueue buffers metrics to be saved to the backend.
 var saveQueue = make(chan *Metric, saveQueueLength)
 
-// New creates a new named metric.
+// New creates a new named metric. If name is non-empty, it will prefix every
+// descendant's Span name.
 func New(name string) *Metric {
 	return &Metric{
 		name: name,
 	}
+}
+
+// NewSpan creates a new unamed metric with a newly-started named span.
+func NewSpan(name string) (*Metric, *Span) {
+	m := New("")
+	return m, m.StartSpan(name)
 }
 
 var (
@@ -91,8 +98,12 @@ func (m *Metric) StartSpan(name string) *Span {
 	if m.spans == nil {
 		m.spans = make([]*Span, 0, 16)
 	}
+	spanName := name
+	if m.name != "" {
+		spanName = fmt.Sprintf("%s.%s", m.name, name)
+	}
 	s := &Span{
-		name:      fmt.Sprintf("%s.%s", m.name, name),
+		name:      spanName,
 		startTime: time.Now(),
 		metric:    m,
 		kind:      Server,
