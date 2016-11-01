@@ -605,11 +605,17 @@ should take those two addresses as arguments.
 
 	// Create an rc file for this new user.
 	const (
-		rcTemplate       = "username=%s\nkeyserver=%s\n"
+		rcTemplate = `username: %s
+
+### Please update these entries to refer to your servers
+### and remove the leading # character.
+# storeserver: remote,store.example.com
+# dirserver: remote,dir.example.com`
+
 		defaultKeyServer = "remote,key.upspin.io:443"
 	)
 
-	rcContents := fmt.Sprintf(rcTemplate, userName, defaultKeyServer)
+	rcContents := fmt.Sprintf(rcTemplate, userName)
 	err = ioutil.WriteFile(*rcFile, []byte(rcContents), 0640)
 	if err != nil {
 		s.exit(err)
