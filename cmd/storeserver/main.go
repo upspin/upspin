@@ -26,6 +26,8 @@ import (
 	"upspin.io/upspin/proto"
 
 	// We need the directory transports to fetch write permissions.
+	"time"
+	"upspin.io/test/flakystore"
 	_ "upspin.io/transports"
 )
 
@@ -73,6 +75,10 @@ func main() {
 		log.Fatal(err)
 	}
 	store = perm.WrapStore(ctx, store)
+	store, err = flakystore.New(store, 5*time.Second, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
 	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 

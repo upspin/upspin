@@ -41,6 +41,7 @@ var (
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
 		Cleanup:   cleanup,
+		//StoreFlakiness: testenv.FlakinessSevere,
 	}
 	readerContext upspin.Context
 )

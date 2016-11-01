@@ -35,7 +35,9 @@ import (
 	_ "upspin.io/store/remote"
 
 	// Transport required to use the remote store server.
+	"time"
 	_ "upspin.io/store/https"
+	"upspin.io/test/flakystore"
 )
 
 // The servers that "remote" tests will work against.
@@ -59,10 +61,25 @@ type Setup struct {
 	// Verbose indicates whether we should print verbose debug messages.
 	Verbose bool
 
+	//
+	StoreFlakiness StoreFlakiness
+
 	// Cleanup, if present, is run at Exit to clean up any test state necessary.
 	// It may return an error, which is returned by Exit.
 	Cleanup func(e *Env) error
 }
+
+// StoreFlakiness sets the level of unreliability of the StoreServer, which
+// triggers errors and random delays.
+type StoreFlakiness int
+
+// Levels of flakiness for the StoreServer.
+const (
+	FlakinessNone     StoreFlakiness = iota
+	FlakinessModerate                // 10% error chance, up to 1s delays.
+	FlakinessHigh                    // 25% error chance, up to 3s delays.
+	FlakinessSevere                  // 50% error chance, up to 5s delays.
+)
 
 // Env is the test environment. It contains a client which is the main piece that tests should use.
 type Env struct {
@@ -136,6 +153,24 @@ func New(setup *Setup) (*Env, error) {
 		// version for offline tests; the store/gcp implementation
 		// isn't interesting when run offline.
 		env.StoreServer = storeserver.New()
+
+		var err error
+		switch setup.StoreFlakiness {
+		case FlakinessNone:
+			// Skip
+		case FlakinessModerate:
+			env.StoreServer, err = flakystore.New(env.StoreServer, time.Second, 10)
+		case FlakinessHigh:
+			env.StoreServer, err = flakystore.New(env.StoreServer, 3*time.Second, 25)
+		case FlakinessSevere:
+			env.StoreServer, err = flakystore.New(env.StoreServer, 0 /*5*time.Second*/, 50)
+		default:
+			return nil, errors.E(errors.Invalid, errors.Str("invalid flakiness level"))
+		}
+		if err != nil {
+			return nil, err
+		}
+
 		storeServerMux.Register(storeEndpoint, env.StoreServer)
 
 		// Set up DirServer instance.
