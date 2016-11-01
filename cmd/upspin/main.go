@@ -605,7 +605,7 @@ should take those two addresses as arguments.
 
 	// Create an rc file for this new user.
 	const (
-		rcTemplate       = "username=%s\nkeyserver=%s\n"
+		rcTemplate       = "username: %s\nkeyserver: %s\n"
 		defaultKeyServer = "remote,key.upspin.io:443"
 	)
 
