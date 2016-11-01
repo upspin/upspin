@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "06e18a16_5b556f0b",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-01T21:40:55Z",
+      "side": 1,
+      "message": "### Please update these entries to refer to your servers\n### and remove the leading # character.",
+      "revId": "bebeb987f15a30e28379e0dbc897bcbd9b4efeb5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
