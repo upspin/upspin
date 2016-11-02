@@ -531,8 +531,8 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 // safely ignored as part of a multi-request glob operation.
 func benignGlobError(err error) bool {
 	return errors.Match(errors.E(errors.NotExist), err) ||
-		errors.Match(errors.E(errors.Permission), err)
-
+		errors.Match(errors.E(errors.Permission), err) ||
+		errors.Match(errors.E(errors.Private), err)
 }
 
 func (c *Client) globOnePattern(pattern string, s *metric.Span) (entries, links []*upspin.DirEntry, err error) {

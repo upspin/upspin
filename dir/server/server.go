@@ -26,6 +26,7 @@ import (
 // common error values.
 var (
 	errNotExist = errors.E(errors.NotExist)
+	errPrivate  = errors.E(errors.Private)
 	errReadOnly = errors.E(errors.Permission, errors.Str("tree is read only"))
 )
 
@@ -195,7 +196,7 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 			return s.lookup(op, p, entryMustBeClean, o)
 		}
 		// Non-owners cannot see other people's snapshots.
-		return nil, errors.E(op, name, errNotExist)
+		return nil, errors.E(op, name, errPrivate)
 	}
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
@@ -206,6 +207,13 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return s.errLink(op, entry, o)
 	}
 	if err != nil {
+		if errors.Match(errNotExist, err) {
+			if canList, _, err := s.hasRight(access.List, p, o); err != nil {
+				return nil, err
+			} else if !canList {
+				return nil, errors.E(op, name, errors.Private)
+			}
+		}
 		return nil, err // s.lookup wraps err already.
 	}
 
@@ -279,7 +287,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if isSnapshotUser(p.User()) {
 		if !isSnapshotOwner(s.userName, p.User()) {
 			// Non-owners can't even see the snapshot.
-			return nil, errors.E(op, entry.Name, errNotExist)
+			return nil, errors.E(op, entry.Name, errPrivate)
 		}
 		if isSnapshotControlFile(p) {
 			err = isValidSnapshotControlEntry(entry)
@@ -663,7 +671,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !hasAny {
-		return nil, errors.E(op, errors.NotExist, name)
+		return nil, errors.E(op, errors.Private, name)
 	}
 
 	return s.whichAccess(p, o)
@@ -811,8 +819,8 @@ func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
 		// Some error other than ErrFollowLink.
 		return errors.E(op, err)
 	} else if !hasAny {
-		// User does not have Any right. Pretend it doesn't exist.
-		return errors.E(op, p.Path(), errors.NotExist)
+		// User does not have Any right. Return a 'Private' error.
+		return errors.E(op, p.Path(), errors.Private)
 	}
 	return errors.E(op, p.Path(), access.ErrPermissionDenied)
 }
@@ -833,8 +841,8 @@ func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) (*up
 		// User has Any right on the link. Let them follow it.
 		return link, upspin.ErrFollowLink
 	}
-	// Denied. User has no right on link. Pretend it doesn't exist.
-	return nil, errors.E(op, p.Path(), errors.NotExist)
+	// Denied. User has no right on link. Return a 'Private' error.
+	return nil, errors.E(op, p.Path(), errors.Private)
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
