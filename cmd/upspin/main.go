@@ -40,24 +40,25 @@ import (
 )
 
 var commands = map[string]func(*State, ...string){
-	"countersign": (*State).countersign,
-	"cp":          (*State).cp,
-	"get":         (*State).get,
-	"info":        (*State).info,
-	"keygen":      (*State).keygen,
-	"link":        (*State).link,
-	"ls":          (*State).ls,
-	"mkdir":       (*State).mkdir,
-	"put":         (*State).put,
-	"repack":      (*State).repack,
-	"rotate":      (*State).rotate,
-	"rm":          (*State).rm,
-	"share":       (*State).share,
-	"signup":      (*State).signup,
-	"tar":         (*State).tar,
-	"untar":       (*State).untar,
-	"user":        (*State).user,
-	"whichaccess": (*State).whichAccess,
+	"countersign":   (*State).countersign,
+	"cp":            (*State).cp,
+	"deletestorage": (*State).deletestorage,
+	"get":           (*State).get,
+	"info":          (*State).info,
+	"keygen":        (*State).keygen,
+	"link":          (*State).link,
+	"ls":            (*State).ls,
+	"mkdir":         (*State).mkdir,
+	"put":           (*State).put,
+	"repack":        (*State).repack,
+	"rotate":        (*State).rotate,
+	"rm":            (*State).rm,
+	"share":         (*State).share,
+	"signup":        (*State).signup,
+	"tar":           (*State).tar,
+	"untar":         (*State).untar,
+	"user":          (*State).user,
+	"whichaccess":   (*State).whichAccess,
 }
 
 type State struct {
@@ -193,6 +194,109 @@ See the description for rotate for information about updating keys.
 	s.countersignCommand(fs)
 }
 
+func (s *State) cp(args ...string) {
+	const help = `
+Cp copies files into, out of, and within Upspin. If the final
+argument is a directory, the files are placed inside it.  The other
+arguments must not be directories unless the -R flag is set.
+
+If the final argument is not a directory, cp requires exactly two
+path names and copies the contents of the first to the second.
+The -R flag requires that the final argument be a directory.
+
+When copying from one Upspin path to another Upspin path, cp can be
+very efficient, copying only the references to the data rather than
+the data itself.
+`
+	fs := flag.NewFlagSet("cp", flag.ExitOnError)
+	fs.Bool("v", false, "log each file as it is copied")
+	fs.Bool("R", false, "recursively copy directories")
+	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
+	if fs.NArg() < 2 {
+		fs.Usage()
+	}
+
+	nSrc := fs.NArg() - 1
+	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
+	s.copyCommand(fs, src, dest)
+}
+
+func (s *State) deletestorage(args ...string) {
+	const help = `
+Deletestorage deletes blocks from the store. It is given
+either a list of path names, in which case it deletes all blocks
+referenced by those names, or a list of references, in which case
+it deletes the blocks with those references.
+
+WARNING! Deletestorage is dangerous and should not be used unless
+the user can guarantee that the blocks that will be deleted are not
+referenced by another path name in any other directory tree, including
+snapshots.
+
+Exactly one of the -path or -ref flags must be specified.
+
+For -path, only regular items (not links or directories) can be
+processed. Each block will be removed from the store on which it
+resides, which in exceptional circumstances may be different from
+the user's store.
+
+For -ref, the reference must exactly match the reference's full
+value, such as is presented by the info command. The reference is
+assumed to refer to the store defined in the user's context.
+`
+	fs := flag.NewFlagSet("deletestorage", flag.ExitOnError)
+	byPath := fs.Bool("path", false, "delete all blocks referenced by the path names")
+	byRef := fs.Bool("ref", false, "delete individual blocks with the specified references")
+	s.parseFlags(fs, args, help, "deletestorage [-path path... | -ref reference...]")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	if *byRef == *byPath { // Exactly one must be set.
+		fs.Usage()
+	}
+
+	if *byRef {
+		// All references refer to this store.
+		store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
+		if err != nil {
+			s.exit(err)
+		}
+		for _, arg := range fs.Args() {
+			err := store.Delete(upspin.Reference(arg))
+			if err != nil {
+				s.exit(err)
+			}
+		}
+		return
+	}
+
+	var prevEndpoint upspin.Endpoint
+	var store upspin.StoreServer
+	for _, arg := range fs.Args() {
+		entry, err := s.DirServer().Lookup(upspin.PathName(arg))
+		if err != nil {
+			s.exit(err)
+		}
+		if entry.Attr != upspin.AttrNone {
+			s.exitf("%s is not a plain file", arg)
+		}
+		for _, block := range entry.Blocks {
+			if block.Location.Endpoint != prevEndpoint {
+				prevEndpoint = block.Location.Endpoint
+				store, err = bind.StoreServer(s.context, prevEndpoint)
+				if err != nil {
+					s.exit(err)
+				}
+			}
+			err := store.Delete(block.Location.Reference)
+			if err != nil {
+				s.exit(err)
+			}
+		}
+	}
+	return
+}
+
 func (s *State) get(args ...string) {
 	const help = `
 Get writes to standard output the contents identified by the Upspin path.
@@ -230,33 +334,6 @@ TODO: Delete in favor of cp?
 	if err != nil {
 		s.exitf("Copying to output failed: %v", err)
 	}
-}
-
-func (s *State) cp(args ...string) {
-	const help = `
-Cp copies files into, out of, and within Upspin. If the final
-argument is a directory, the files are placed inside it.  The other
-arguments must not be directories unless the -R flag is set.
-
-If the final argument is not a directory, cp requires exactly two
-path names and copies the contents of the first to the second.
-The -R flag requires that the final argument be a directory.
-
-When copying from one Upspin path to another Upspin path, cp can be
-very efficient, copying only the references to the data rather than
-the data itself.
-`
-	fs := flag.NewFlagSet("cp", flag.ExitOnError)
-	fs.Bool("v", false, "log each file as it is copied")
-	fs.Bool("R", false, "recursively copy directories")
-	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
-	if fs.NArg() < 2 {
-		fs.Usage()
-	}
-
-	nSrc := fs.NArg() - 1
-	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
-	s.copyCommand(fs, src, dest)
 }
 
 func (s *State) info(args ...string) {
@@ -468,12 +545,12 @@ func (s *State) repack(args ...string) {
 Repack rewrites the data referred to by each path , storing it again using the
 packing specificied by its -pack option, ee by default. If the data is already
 packed with the specified packing, the data is untouched unless the -f (force)
-flag is specified, which would be helpful if the data was to be repacked using a
+flag is specified, which can be helpful if the data is to be repacked using a
 fresh key.
+
+Repack does not delete the old storage. See the deletestorage command
+for more information.
 `
-
-	// TODO: Do we want a --deletestorage flag?
-
 	fs := flag.NewFlagSet("repack", flag.ExitOnError)
 	fs.Bool("f", false, "force repack even if the file is already packed as requested")
 	fs.String("pack", "ee", "packing to use when rewriting")
@@ -534,7 +611,14 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 
 func (s *State) rm(args ...string) {
 	const help = `
-Rm removes Upspin files and directories.
+Rm removes Upspin files and directories from the name space.
+
+Rm does not delete the associated storage, which is rarely necessary
+or wise: storage can be shared between items and unused storage is
+better recovered by automatic means.
+
+See the deletestorage command for more information about deleting
+storage.
 `
 	fs := flag.NewFlagSet("rm", flag.ExitOnError)
 	s.parseFlags(fs, args, help, "rm path...")
