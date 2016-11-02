@@ -21,6 +21,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -374,9 +375,9 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 		// The parent must exist.
 		entry, err = s.lookup(op, parsed.Drop(1), true)
 		if err != nil {
-			// Always say NotExist to avoid giving information away. (That's almost
-			// certainly what it is anyway.) We know it's not a link.
-			return nil, errors.E(op, pathName, errors.NotExist)
+			// Always say Private to avoid giving information away.
+			// We know it's not a link.
+			return nil, errors.E(op, pathName, errors.Private)
 		}
 	}
 	// Now we know the path is valid in our space, with no links.
@@ -387,7 +388,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	}
 	if !canKnow {
 		// Don't tell the user this path exists.
-		return nil, errors.E(op, pathName, errors.NotExist)
+		return nil, errors.E(op, pathName, errors.Private)
 	}
 	accessFile := s.whichAccess(parsed)
 	if accessFile == nil {
@@ -482,13 +483,22 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	log.Debug.Println("name:", pathName)
 	entry, err := s.lookup(op, parsed, true)
 	if err != nil {
+		if errors.Match(notExist, err) {
+			if canList, err := s.can(access.List, parsed); err != nil {
+				return nil, errors.E(err)
+			} else if !canList {
+				return nil, errors.E(op, pathName, errors.Private)
+			}
+		}
 		return s.errLink(op, entry, err)
 	}
 	// There were no links.
 	canRead, err := s.can(access.Read, parsed)
 	if err != nil {
+		log.Debug.Println("here?", err)
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
@@ -690,7 +700,7 @@ func (s *server) can(right access.Right, parsed path.Parsed) (bool, error) {
 
 // errPerm checks whether the user has any right to the
 // given path, and if so returns a Permission error.
-// Otherwise it returns a NotExist error.
+// Otherwise it returns a Private error.
 // This is used to prevent probing of the name space.
 func (s *server) errPerm(op string, parsed path.Parsed) error {
 	canKnow, err := s.can(access.AnyRight, parsed)
@@ -698,7 +708,7 @@ func (s *server) errPerm(op string, parsed path.Parsed) error {
 		return errors.E(op, parsed.Path(), err)
 	}
 	if !canKnow {
-		return errors.E(op, parsed.Path(), errors.NotExist)
+		return errors.E(op, parsed.Path(), errors.Private)
 	}
 	return errors.E(op, parsed.Path(), errors.Permission)
 }
@@ -708,7 +718,7 @@ func (s *server) errPerm(op string, parsed path.Parsed) error {
 // are just returned. Otherwise, it checks whether the user
 // has any right to the given entry, and if so returns the entry
 // and ErrFollowLink. If the use has no rights, it returns a
-// NotExist error.
+// Private error.
 func (s *server) errLink(op string, entry *upspin.DirEntry, errArg error) (*upspin.DirEntry, error) {
 	if errArg != upspin.ErrFollowLink {
 		return entry, errArg
@@ -722,7 +732,7 @@ func (s *server) errLink(op string, entry *upspin.DirEntry, errArg error) (*upsp
 		return nil, errors.E(op, errors.Internal, parsed.Path(), err)
 	}
 	if !canKnow {
-		return nil, errors.E(op, parsed.Path(), errors.NotExist)
+		return nil, errors.E(op, parsed.Path(), errors.Private)
 	}
 	return entry, errArg
 }

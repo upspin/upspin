@@ -37,6 +37,7 @@ var (
 	errExist      = errors.E(errors.Exist)
 	errNotExist   = errors.E(errors.NotExist)
 	errPermission = errors.E(errors.Permission)
+	errPrivate    = errors.E(errors.Private)
 
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
@@ -66,7 +67,7 @@ func testNoReadersAllowed(t *testing.T, r *testenv.Runner) {
 
 	r.As(readerName)
 	r.Get(fileName)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -173,13 +174,13 @@ func testGlobWithLimitedAccess(t *testing.T, r *testenv.Runner) {
 
 	// but not /dir2/
 	r.Glob(dir2Pat)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
 	// Without list access to the root, the reader can't glob /dir*.
 	r.Glob(bothPat)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 

@@ -14,19 +14,19 @@ import (
 
 const writerName = readerName
 
-// testGetErrors checks that the client receives 'not exist' or
-// 'permission' errors where appropriate. In particular, it
-// makes sure that the DirServer implementations do not allow
-// unauthorized users to probe the name space. The rule of thumb
-// is that users should receive 'not exist' for any path
-// to which they have no rights.
+// testGetErrors checks that the client receives 'not exist', 'permission', or
+// 'private' errors where appropriate. In particular, it makes sure that the
+// DirServer implementations do not allow unauthorized users to probe the name
+// space. The rule of thumb is that users should receive 'private' for any
+// path to which they have no rights.
 func testGetErrors(t *testing.T, r *testenv.Runner) {
 	const (
-		base    = ownerName + "/get-errors"
-		dir     = base + "/dir"
-		file    = dir + "/file"
-		access  = dir + "/Access"
-		content = "hello, gophers"
+		base        = ownerName + "/get-errors"
+		dir         = base + "/dir"
+		file        = dir + "/file"
+		missingFile = dir + "/missing"
+		access      = dir + "/Access"
+		content     = "hello, gophers"
 	)
 	r.As(ownerName)
 	r.MakeDirectory(base)
@@ -36,12 +36,16 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
+	r.Get(missingFile)
+	if !r.Match(errNotExist) {
+		t.Fatal(r.Diag())
+	}
 
-	// We expect a "not exist" error for a reader that has no rights
+	// We expect a "private" error for a reader that has no rights
 	// to the file, as they cannot even know that it exists.
 	r.As(readerName)
 	r.Get(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -54,7 +58,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(readerName)
 	r.Get(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -71,15 +75,32 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
+
+		r.Get(missingFile)
+		if right == "list" {
+			// Can only see if the file exists with list rights.
+			if !r.Match(errNotExist) {
+				t.Fatal(r.Diag())
+			}
+		} else {
+			// Without list rights cannot probe the name space.
+			if !r.Match(errPrivate) {
+				t.Fatal(r.Diag())
+			}
+		}
 	}
 
-	// Give the reader the "read" right and it works.
+	// Give the reader the "list,read" rights and it works.
 	r.As(ownerName)
-	r.Put(access, "*:"+ownerName+"\nread:"+readerName)
+	r.Put(access, "*:"+ownerName+"\nlist,read:"+readerName)
 	r.Put(file, content) // Put the file again to wrap the keys.
 	r.As(readerName)
 	r.Get(file)
 	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.Get(missingFile)
+	if !r.Match(errNotExist) {
 		t.Fatal(r.Diag())
 	}
 }
@@ -119,14 +140,14 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 
 	// As a user with no rights over the link,
-	// we should get a 'not exist' error.
+	// we should get a 'private' error.
 	r.As(readerName)
 	r.Get(link)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.DirLookup(link)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -142,11 +163,11 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 	r.Get(link)
-	if !r.Match(errors.E(errors.NotExist, upspin.PathName(link))) {
+	if !r.Match(errors.E(errors.Private, upspin.PathName(link))) {
 		t.Fatal(r.Diag())
 	}
 	r.DirLookup(link)
-	if !r.Match(errors.E(errors.NotExist, upspin.PathName(link))) {
+	if !r.Match(errors.E(errors.Private, upspin.PathName(link))) {
 		t.Fatal(r.Diag())
 	}
 
@@ -165,12 +186,12 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 
 	// Remove the user's rights to the link target,
-	// now a get of the link should fail with 'not exist' for the target.
+	// now a get of the link should fail with 'private' for the target.
 	r.As(ownerName)
 	r.Delete(dstAccess)
 	r.As(readerName)
 	r.Get(link)
-	if !r.Match(errors.E(errors.NotExist, upspin.PathName(file))) {
+	if !r.Match(errors.E(errors.Private, upspin.PathName(file))) {
 		t.Fatal(r.Diag())
 	}
 
@@ -203,11 +224,11 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// We expect a "not exist" error for a writer that has no rights
+	// We expect a 'private' error for a writer that has no rights
 	// to the directory, as they cannot even know that it exists.
 	r.As(writerName)
 	r.Put(file, content)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -220,7 +241,7 @@ func testPutErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(writerName)
 	r.Put(file, content)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -338,10 +359,10 @@ func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 	for _, c := range cases {
 		// As a user with no rights over the link,
-		// we should get a 'not exist' error.
+		// we should get a 'private' error.
 		r.As(writerName)
 		r.Put(c.fileThroughLink, content)
-		if !r.Match(errNotExist) {
+		if !r.Match(errPrivate) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -357,7 +378,7 @@ func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
 			t.Fatal(c.op, r.Diag())
 		}
 		r.Put(c.fileThroughLink, content)
-		if !r.Match(errors.E(errors.NotExist, upspin.PathName(c.link))) {
+		if !r.Match(errors.E(errors.Private, upspin.PathName(c.link))) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -375,13 +396,13 @@ func testPutLinkErrors(t *testing.T, r *testenv.Runner) {
 		}
 
 		// Remove the user's rights to the file, now a put through the
-		// link should fail with 'not exist' for the file.
+		// link should fail with 'private' for the file.
 		r.As(ownerName)
 		r.Put(srcAccess, "list:"+writerName)
 		r.Delete(dstAccess)
 		r.As(writerName)
 		r.Put(c.fileThroughLink, content)
-		if !r.Match(errors.E(errors.NotExist, upspin.PathName(file))) {
+		if !r.Match(errors.E(errors.Private, upspin.PathName(file))) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -428,11 +449,11 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 		t.Error(r.Diag())
 	}
 
-	// We expect a "not exist" error for a writer that has no rights
+	// We expect a 'private' error for a writer that has no rights
 	// to the directory, as they cannot even know that it exists.
 	r.As(writerName)
 	r.MakeDirectory(subdir)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -445,7 +466,7 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 	}
 	r.As(writerName)
 	r.MakeDirectory(subdir)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -541,10 +562,10 @@ func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 	for _, c := range cases {
 		// As a user with no rights over the link,
-		// we should get a 'not exist' error.
+		// we should get a 'private' error.
 		r.As(writerName)
 		r.MakeDirectory(c.dirThroughLink)
-		if !r.Match(errNotExist) {
+		if !r.Match(errPrivate) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -560,7 +581,7 @@ func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
 			t.Fatal(c.op, r.Diag())
 		}
 		r.MakeDirectory(c.dirThroughLink)
-		if !r.Match(errors.E(errors.NotExist, upspin.PathName(c.link))) {
+		if !r.Match(errors.E(errors.Private, upspin.PathName(c.link))) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -578,14 +599,14 @@ func testMakeDirectoryLinkErrors(t *testing.T, r *testenv.Runner) {
 		}
 
 		// Remove the user's rights to the directory, now a
-		// MakeDirectory through the link should fail with 'not
-		// exist' for the dir.
+		// MakeDirectory through the link should fail with
+		// 'private' for the dir.
 		r.As(ownerName)
 		r.Put(srcAccess, "list:"+writerName)
 		r.Delete(dstAccess)
 		r.As(writerName)
 		r.MakeDirectory(c.dirThroughLink)
-		if !r.Match(errors.E(errors.NotExist, upspin.PathName(dir))) {
+		if !r.Match(errors.E(errors.Private, upspin.PathName(dir))) {
 			t.Fatal(c.op, r.Diag())
 		}
 
@@ -634,10 +655,10 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("got entry %q, expected nil", r.Entry.Name)
 	}
 
-	// A reader with no rights should get 'not exist' for the same.
+	// A reader with no rights should get 'private' for the same.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -649,10 +670,10 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// While the reader should still get not exist.
+	// While the reader should still get 'private'.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -667,7 +688,7 @@ func testWhichAccessErrors(t *testing.T, r *testenv.Runner) {
 	// The reader still gets bupkis.
 	r.As(readerName)
 	r.DirWhichAccess(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -720,10 +741,10 @@ func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
 	}
 
-	// A reader with no rights should get 'not exist'.
+	// A reader with no rights should get 'private'.
 	r.As(readerName)
 	r.DirWhichAccess(link)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -736,10 +757,10 @@ func testWhichAccessLinkErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("expected ErrFollowLink, got: %v", r.Diag())
 	}
 
-	// The reader should still get not exist.
+	// The reader should still get 'private'.
 	r.As(readerName)
 	r.DirWhichAccess(link)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -787,15 +808,15 @@ func testGlobErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// The reader should get an error
+	// The reader should get a 'private' error
 	// because they can't see the base of the glob.
 	r.As(readerName)
 	r.Glob(base + "/*")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(base + "/*/*")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -860,11 +881,11 @@ func testGlobErrors(t *testing.T, r *testenv.Runner) {
 	r.Delete(baseAccess)
 	r.As(readerName)
 	r.Glob(base + "/*")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(base + "/*/*")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(dir + "/*")
@@ -955,15 +976,15 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	// The reader can see nothing.
 	r.As(readerName)
 	r.Glob(base + "/*/file")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(base + "/dir1/*")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(base + "/dir1/*link/file")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
@@ -971,9 +992,9 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
 	r.Put(dir1access, "*:"+readerName)
 	r.As(readerName)
-	// The reader cannot list the root, so they still get 'not exist'.
+	// The reader cannot list the root, so they still get 'private'.
 	r.Glob(base + "/*/file")
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 	// The reader can list /dir1, so they see its contents.
