@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_37ee024a",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-02T19:50:02Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand the intent here.  We\u0027re to merge snapshots for adg@ and adg+thermostat@?   (I guess not, because that would fail at the existing snapshotUser\ntest below.)   So maybe this is for people who don\u0027t know their own email address?",
+      "revId": "89638ae442defc47136ff6c3b0d504e6efe6ab62",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
