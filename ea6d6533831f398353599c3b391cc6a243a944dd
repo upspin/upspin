@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_4e95e721",
+        "filename": "pack/ee/export_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T16:50:07Z",
+      "side": 1,
+      "message": "I\u0027d add a comment here under the package name to explain why this necessary.\n\n// Exports to tests originally unexported functions from package ee.",
+      "revId": "ea6d6533831f398353599c3b391cc6a243a944dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
