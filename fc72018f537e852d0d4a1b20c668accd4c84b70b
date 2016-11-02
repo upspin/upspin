@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_cb3549a4",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T05:10:39Z",
+      "side": 1,
+      "message": "Make this comment similar to the one above (line 796)",
+      "revId": "fc72018f537e852d0d4a1b20c668accd4c84b70b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_2b1b4535",
+        "filename": "test/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T05:10:39Z",
+      "side": 1,
+      "message": "It looks like there are no more errNotExist errors left in this file (unless polygerrit lied to me). There should be, since it\u0027s an important error. Add a few?",
+      "revId": "fc72018f537e852d0d4a1b20c668accd4c84b70b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
