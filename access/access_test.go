@@ -290,9 +290,14 @@ func TestHasAccessWithGroups(t *testing.T) {
 			"w: writer@foo.bar\n" +
 			"d: family"
 
+		// This access file mentions a group that does not exist.
+		missingGroupAccessText = "r: aMissingGroup, family\n"
+
 		// This is a simple group for a family.
 		groupName = upspin.PathName("me@here.com/Group/family")
 		groupText = "# My family\n sister@me.com, brother@me.com\n"
+
+		missingGroupName = upspin.PathName("me@here.com/Group/aMissingGroup")
 	)
 
 	loadTest := func(name upspin.PathName) ([]byte, error) {
@@ -309,8 +314,10 @@ func TestHasAccessWithGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	var checkErr error
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
 		ok, err := a.Can(user, right, file, loadTest)
+		checkErr = err
 		if ok == truth {
 			return
 		}
@@ -350,6 +357,21 @@ func TestHasAccessWithGroups(t *testing.T) {
 	}
 	if len(missingGroups) != 1 {
 		t.Fatalf("Expected one missing group, got %d", len(missingGroups))
+	}
+
+	// Now operate on the Access file that mentions a non-existent group.
+	a, err = Parse(testFile, []byte(missingGroupAccessText))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Family group should work.
+	check("sister@me.com", Read, "me@here.com/foo/bar", true)
+
+	// Unknown member should get an error about the missing group.
+	check("aunt@me.com", Read, "me@here.com/foo/bar", false)
+	if errors.Match(errors.E(missingGroupName), err) {
+		t.Errorf("expected error about aMissingGroup, got %v", err)
 	}
 }
 
