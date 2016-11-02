@@ -8,6 +8,7 @@ package gcp
 
 import (
 	"encoding/json"
+	"strings"
 	"sync"
 
 	"upspin.io/cloud/storage"
@@ -80,17 +81,13 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 func (s *server) Put(u *upspin.User) error {
 	const op = "key/gcp.Put"
 	if s.user == "" {
-		return errors.E(op, errors.Invalid, errors.Str("not bound to user"))
+		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
 	}
 	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
 	}
-	name, _, _, err := user.Parse(u.Name)
-	if err != nil {
-		return errors.E(op, err)
-	}
-	if name == "*" {
-		return errors.E(op, errors.Invalid, u.Name, errors.Str("user has wildcard '*' in name"))
+	if err := s.canPut(op, u.Name); err != nil {
+		return err
 	}
 
 	// Retrieve info about the user we want to Put.
@@ -100,37 +97,61 @@ func (s *server) Put(u *upspin.User) error {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
 	case err != nil:
-		return errors.E(op, err)
+		return err
 	default:
 		// User exists.
 		isAdmin = entry.IsAdmin
 	}
 
-	// Is the user operating on his/her own record?
-	if u.Name != s.user {
-		// Not operating on own record, so we need to ensure context.UserName is an admin.
-		// First, retrieve the user entry for the context user.
-		entry, err := s.fetchUserEntry(op, s.user)
-		if err != nil {
-			return errors.E(op, err)
-		}
-		if !entry.IsAdmin {
-			return errors.E(op, errors.Permission, errors.Str("not an administrator"))
-		}
-		// Is admin. Proceed.
-	}
-
-	// Put puts, it does not update, so we simply overwrite what's there if it exists.
 	// Set IsAdmin to what it was before or false by default.
 	return s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
 }
 
+// canPut reports whether the current logged in user can Put the target user.
+func (s *server) canPut(op string, target upspin.UserName) error {
+	name, suffix, domain, err := user.Parse(target)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	// Do not allow * wildcard in name.
+	if name == "*" {
+		return errors.E(op, errors.Invalid, target, errors.Str("user has wildcard '*' in name"))
+	}
+	// If the current user is the same as target, it can proceed.
+	if s.user == target {
+		return nil
+	}
+	// For suffixed users, if the current user is the canonical user for
+	// target, let it proceed.
+	if suffix != "" {
+		index := strings.Index(name, "+")
+		if index <= 0 {
+			return errors.E(op, errors.Internal, target, errors.Str("suffixed user but no '+' found"))
+		}
+		name = name[:index]
+		if s.user == upspin.UserName(name+"@"+domain) {
+			// Current user is the owner of target.
+			return nil
+		}
+	}
+	// Finally, check whether the current user is an admin.
+	entry, err := s.fetchUserEntry(op, s.user)
+	if err != nil {
+		return err
+	}
+	if !entry.IsAdmin {
+		return errors.E(op, errors.Permission, s.user, errors.Str("not an administrator"))
+	}
+	// Is admin. Proceed.
+	return nil
+}
+
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
 func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
-	log.Debug.Printf("%v: fetch %q", op, name)
+	log.Debug.Printf("%s: %s", op, name)
 	b, err := s.storage.Download(string(name))
 	if err != nil {
-		log.Debug.Printf("%v: error fetching %q: %v", op, name, err)
+		log.Error.Printf("%s: error fetching %q: %v", op, name, err)
 		return nil, errors.E(op, name, err)
 	}
 	var entry userEntry
@@ -142,7 +163,7 @@ func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, er
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
 func (s *server) putUserEntry(op string, entry *userEntry) error {
-	log.Debug.Printf("%v: put %v", op, entry.User.Name)
+	log.Debug.Printf("%s: %s", op, entry.User.Name)
 	if entry == nil {
 		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
 	}

@@ -7,7 +7,6 @@ package gcp
 import (
 	"encoding/json"
 	"reflect"
-	"strings"
 	"testing"
 
 	"upspin.io/cloud/storage/storagetest"
@@ -17,19 +16,54 @@ import (
 
 const isAdmin = true
 
-func TestInvalidUser(t *testing.T) {
+func TestLookupInvalidUser(t *testing.T) {
+	userName := upspin.UserName("a")
+
 	u := newDummyKeyServer()
-	_, err := u.Lookup("a")
-	if err == nil {
-		t.Fatal("Expected an error")
-	}
-	expected := "invalid operation"
-	if !strings.Contains(err.Error(), expected) {
-		t.Errorf("Expected %q, got %q", expected, err)
+	_, err := u.Lookup(userName)
+	expectedErr := errors.E(errors.Invalid, errors.E(errors.E(userName)))
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want = %s", err, expectedErr)
 	}
 }
 
-func TestPutOtherUserNotAdmin(t *testing.T) {
+func TestLookup(t *testing.T) {
+	const (
+		myName    = "user@example.com"
+		otherUser = "other@domain.org"
+	)
+
+	user := &upspin.User{
+		Name: otherUser,
+		Dirs: []upspin.Endpoint{
+			{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("there.co.uk"),
+			},
+		},
+		Stores: []upspin.Endpoint{
+			{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("down-under.au"),
+			},
+		},
+		PublicKey: upspin.PublicKey("my key"),
+	}
+	buf := marshalUser(t, user, !isAdmin)
+
+	// Create a server authenticated with myName and with a pre-existing User entry for myName.
+	u, _ := newKeyServerWithMocking(myName, otherUser, buf)
+
+	retUser, err := u.Lookup(otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(*retUser, *user) {
+		t.Errorf("returned = %v, want = %v", retUser, user)
+	}
+}
+
+func TestNotAdminPutOther(t *testing.T) {
 	const (
 		myName    = "cool@dude.com"
 		otherUser = "uncool@buddy.com"
@@ -50,11 +84,9 @@ func TestPutOtherUserNotAdmin(t *testing.T) {
 		PublicKey: upspin.PublicKey("going to change your key, haha"),
 	}
 	err := u.Put(otherU)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !strings.Contains(err.Error(), "permission denied") {
-		t.Errorf("Expected permission denied error, got: %v", err)
+	expectedErr := errors.E(errors.Permission, upspin.UserName(myName), errors.Str("not an administrator"))
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %s, want = %s", err, expectedErr)
 	}
 	// Check that indeed we did not write to GCP.
 	if len(mockGCP.PutRef) != 0 {
@@ -62,7 +94,7 @@ func TestPutOtherUserNotAdmin(t *testing.T) {
 	}
 }
 
-func TestPutOtherUserIsAdmin(t *testing.T) {
+func TestIsAdminPutOther(t *testing.T) {
 	const (
 		myName    = "cool@dude.com"
 		otherUser = "uncool@buddy.com"
@@ -84,25 +116,25 @@ func TestPutOtherUserIsAdmin(t *testing.T) {
 	}
 	err := u.Put(otherU)
 	if err != nil {
-		t.Fatal("Expected no error")
+		t.Fatal(err)
 	}
 	// Check new user was written to GCP
 	if len(mockGCP.PutRef) != 1 {
 		t.Fatalf("Expected one write, got %d", len(mockGCP.PutRef))
 	}
 	if mockGCP.PutRef[0] != otherUser {
-		t.Errorf("Expected write to user %q, wrote to %q", otherUser, mockGCP.PutRef[0])
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], otherUser)
 	}
 	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
 	if !reflect.DeepEqual(*savedUser, *otherU) {
-		t.Errorf("Expected Put to store User %v, but it stored %v", otherU, savedUser)
+		t.Errorf("saved = %v, want = %v", savedUser, otherU)
 	}
 	if isAdmin {
 		t.Error("Expected user not to be an admin")
 	}
 }
 
-func TestPutNewUserSelf(t *testing.T) {
+func TestPutSelf(t *testing.T) {
 	const myName = "cool@dude.com"
 
 	// New server for myName.
@@ -131,27 +163,27 @@ func TestPutNewUserSelf(t *testing.T) {
 
 	// Verify that GCP received the Put.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
-		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
 	}
 	if mockGCP.PutRef[0] != myName {
-		t.Errorf("Expected write to %q, wrote to %q", myName, mockGCP.PutRef)
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], myName)
 	}
 	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
 	if !reflect.DeepEqual(*savedUser, *user) {
-		t.Errorf("Expected Put to store User %v, but it stored %v", user, savedUser)
+		t.Errorf("saved = %v, want = %v", savedUser, user)
 	}
 	if isAdmin {
 		t.Error("Expected user not to be an admin")
 	}
 }
 
-func TestPutNewUserSelfIsAdmin(t *testing.T) {
+func TestIsAdminPutExistingSelf(t *testing.T) {
 	const myName = "cool@dude.com"
 
 	user := &upspin.User{
 		Name: myName,
 		Stores: []upspin.Endpoint{
-			upspin.Endpoint{
+			{
 				Transport: upspin.Remote,
 				NetAddr:   upspin.NetAddr("some.place:443"),
 			},
@@ -176,17 +208,57 @@ func TestPutNewUserSelfIsAdmin(t *testing.T) {
 
 	// Verify that GCP received the Put.
 	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
-		t.Fatalf("Expected 1 call to GCP.Put, got %d", len(mockGCP.PutRef))
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
 	}
 	if mockGCP.PutRef[0] != myName {
-		t.Errorf("Expected write to %q, wrote to %q", myName, mockGCP.PutRef)
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], myName)
 	}
 	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
 	if !reflect.DeepEqual(*savedUser, *user) {
-		t.Errorf("Expected Put to store User %v, but it stored %v", user, savedUser)
+		t.Errorf("saved = %v, want = %v", savedUser, user)
 	}
 	if !isAdmin {
 		t.Error("Expected user to be an admin")
+	}
+}
+
+func TestNotAdminPutSuffixedSelf(t *testing.T) {
+	const (
+		myName    = "cool@dude.com"
+		otherUser = "cool+suffix@dude.com"
+	)
+
+	// Pre-existing user: myName, who is not an admin.
+	user := &upspin.User{
+		Name: myName,
+	}
+	buf := marshalUser(t, user, !isAdmin)
+
+	// Create a server authenticated with myName and with a pre-existing User entry for myName.
+	u, mockGCP := newKeyServerWithMocking(myName, myName, buf)
+
+	// myName now attempts to write somebody else's information.
+	otherU := &upspin.User{
+		Name:      otherUser,
+		PublicKey: upspin.PublicKey("new key"),
+	}
+	err := u.Put(otherU)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check new user was written to GCP
+	if len(mockGCP.PutRef) != 1 {
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != otherUser {
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], otherUser)
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *otherU) {
+		t.Errorf("saved = %v, want = %v", savedUser, user)
+	}
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
 	}
 }
 
