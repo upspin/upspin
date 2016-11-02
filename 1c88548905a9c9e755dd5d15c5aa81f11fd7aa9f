@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "467aa269_d676c447",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-02T04:52:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ce5aee_4b6af9cb",
+      "revId": "1c88548905a9c9e755dd5d15c5aa81f11fd7aa9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_cb94298d",
         "filename": "cloud/docker/dirserver/Dockerfile",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-02T03:11:43Z",
       "side": 1,
       "message": "Hmm, okay, but where does this come from?",
+      "revId": "1c88548905a9c9e755dd5d15c5aa81f11fd7aa9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0670aa87_946c447e",
+        "filename": "cloud/docker/dirserver/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-02T04:52:39Z",
+      "side": 1,
+      "message": "The same place as the \"golang\" one (it\u0027s what that image is built on).\n\nhttps://hub.docker.com/_/buildpack-deps/\nhttps://hub.docker.com/_/golang/",
+      "parentUuid": "86ce5aee_cb94298d",
       "revId": "1c88548905a9c9e755dd5d15c5aa81f11fd7aa9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
