@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_4b6af9cb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T03:11:43Z",
+      "side": 1,
+      "message": "required",
+      "revId": "1c88548905a9c9e755dd5d15c5aa81f11fd7aa9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_cb94298d",
+        "filename": "cloud/docker/dirserver/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T03:11:43Z",
+      "side": 1,
+      "message": "Hmm, okay, but where does this come from?",
+      "revId": "1c88548905a9c9e755dd5d15c5aa81f11fd7aa9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
