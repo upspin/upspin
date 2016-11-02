@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_17e3fe20",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T20:17:40Z",
+      "side": 1,
+      "message": "I think we discussed making this option confirm with the user. Perhaps we could list all refs and ask \"Do you really want to proceed?\" here.\n\nJust a suggestion.",
+      "revId": "1527cf4321af6dd50531eada48f231195b09bf94",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
