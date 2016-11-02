@@ -579,9 +579,15 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 // correct Access file to the question, and separately to verify
 // issues such as attempts to write to a directory rather than a file.
 //
-// The method loads group files as needed by
+// The method loads Group files as needed by
 // calling the provided function to read each file's contents.
+//
+// If a Group file cannot be loaded or parsed that failure is
+// reported only if the requester does not match any names that
+// can be found in the Access file or other Group files.
 func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName, load func(upspin.PathName) ([]byte, error)) (bool, error) {
+	var groupErr error
+	var failedGroups []upspin.PathName
 	for {
 		granted, missing, err := a.canNoGroupLoad(requester, right, pathName)
 		if err != nil {
@@ -590,17 +596,40 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 		if missing == nil {
 			return granted, nil
 		}
+
+		loaded := false
+	missingLoop:
 		for _, group := range missing {
-			data, err := load(group)
-			if err != nil {
-				return false, err
+			// Don't load this group if it failed
+			// in a previous iteration.
+			for _, g := range failedGroups {
+				if g == group {
+					continue missingLoop
+				}
 			}
-			err = AddGroup(group, data)
-			if err != nil {
-				return false, err
+
+			// Load and parse the group.
+			data, err := load(group)
+			if err == nil {
+				err = AddGroup(group, data)
+				if err == nil {
+					loaded = true
+					continue
+				}
+			}
+
+			// Remember failures.
+			failedGroups = append(failedGroups, group)
+			if groupErr != nil {
+				groupErr = err
 			}
 		}
+		// We have tried and failed to retrieve all of missing. Give up.
+		if !loaded {
+			break
+		}
 	}
+	return false, groupErr
 }
 
 // expandGroups expands a list of groups to the user names they represent.
