@@ -95,7 +95,7 @@ func TestGroupFileMultiDir(t *testing.T) {
 	// MiddleName tries to access a file by owner, without success.
 	r.As(middleName)
 	r.Get(file)
-	if !r.Match(errNotExist) {
+	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
 
