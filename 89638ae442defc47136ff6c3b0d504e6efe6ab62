@@ -16,6 +16,24 @@
       "revId": "89638ae442defc47136ff6c3b0d504e6efe6ab62",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_97488e7d",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T19:54:31Z",
+      "side": 1,
+      "message": "That\u0027s a good point. The original idea was that user@example.com would trigger the creation of user+snapshot@example.com. But user+camera@example.com would only attempt to create user+snapshot@example.com (and if it existed, leave it alone). \n\nCurrently, there\u0027s no support for user+camera+snapshot@example.com.\n\nIf we want that, we need to change a few other things here and in DirServer. Let\u0027s talk about the exact semantics at the meeting.\n\nThanks.",
+      "parentUuid": "86ce5aee_37ee024a",
+      "revId": "89638ae442defc47136ff6c3b0d504e6efe6ab62",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
