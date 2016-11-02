@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_8b9a31b9",
+        "filename": "cloud/docker/base/ca-certificates.crt",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T03:11:43Z",
+      "side": 0,
+      "message": "s/KCA/bYz\n\nJust kidding :-)",
+      "revId": "aab9a56f7bd0c7c4527ba5e454f1eb6d89dbae73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
