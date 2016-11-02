@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "86ce5aee_ae4d833e",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-02T16:39:56Z",
+      "side": 1,
+      "message": "Removed.    The tests still pass, I was just worried this might fail in some other circumstance.  But we can fix that someday if needed.",
+      "parentUuid": "86ce5aee_aef103ec",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_4e0687fa",
         "filename": "pack/ee/ee_test.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "86ce5aee_6e0f0be0",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-02T16:39:56Z",
+      "side": 1,
+      "message": "The ee. prefix is only used in three places, and, at least for me, this export_test.go trick is new enough that I think the naive reader like me will appreciate the handhold of the prefix.\n\nOr maybe most people use an IDE that helps them follow which symbols link where.  I\u0027ll follow which style people here prefer.  Maybe we should get p@ or edpin@ to comment.",
+      "parentUuid": "86ce5aee_4e0687fa",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_6e09cb0a",
         "filename": "pack/ee/export_test.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2016-11-02T16:18:56Z",
       "side": 1,
       "message": "needs a copyright notice",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_4e0cc7e9",
+        "filename": "pack/ee/export_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-02T16:39:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ce5aee_6e09cb0a",
       "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
