@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_aef103ec",
+        "filename": "context/initcontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-02T16:18:56Z",
+      "side": 1,
+      "message": "i wonder if we need \"plain\" here. i think it\u0027s just a holdover from when plain was the default and we needed it here to load the implementation. do the tests fail if it is removed?",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_4e0687fa",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-02T16:18:56Z",
+      "side": 1,
+      "message": "this is fine, but more usual is to use a \u0027dot import\u0027\n\n. \"upspin.io/pack/ee\"\n\nand then drop the ee. prefix of the symbols from that package.",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_6e09cb0a",
+        "filename": "pack/ee/export_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-02T16:18:56Z",
+      "side": 1,
+      "message": "needs a copyright notice",
+      "revId": "e6762490d2dc1ef65a268047e0eb5d8fc2985aa8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
