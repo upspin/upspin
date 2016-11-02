@@ -13,12 +13,13 @@ import (
 )
 
 func (s *State) shell(args ...string) {
+	const promptPlaceholder = "<username>"
 	const help = `
 Shell runs an interactive session for upspin subcommands.
 When running the shell, the leading "upspin" is assumed on each command.
 `
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
-	promptFlag := fs.String("prompt", "u> ", "interactive prompt")
+	promptFlag := fs.String("prompt", promptPlaceholder, "interactive `prompt`")
 	verbose := fs.Bool("v", false, "verbose; print to stderr each command before execution")
 	s.parseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
 	if fs.NArg() != 0 {
@@ -28,6 +29,9 @@ When running the shell, the leading "upspin" is assumed on each command.
 		if len(*promptFlag) > 0 {
 			fmt.Print(*promptFlag)
 		}
+	}
+	if *promptFlag == promptPlaceholder {
+		*promptFlag = string(s.context.UserName()) + ">"
 	}
 	s.interactive = true
 	defer func() { s.interactive = false }()
