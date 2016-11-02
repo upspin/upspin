@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "86ce5aee_9121bebd",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T17:40:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ce5aee_b19de2f4",
+      "revId": "c424c896588d62583d5e804f97920377ecd9bc74",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_31557236",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "86ce5aee_f1263ad1",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T17:40:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ce5aee_31557236",
+      "revId": "c424c896588d62583d5e804f97920377ecd9bc74",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_d185f6a1",
         "filename": "key/gcp/gcp_test.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-11-02T17:32:39Z",
       "side": 1,
       "message": "this expected error seems too intricate, depending too much on how the error is wrapped internally. conversely, one might ask why the returned error is so intricate. if the user name is bad, shouldn\u0027t the name be closer to the top?",
+      "revId": "c424c896588d62583d5e804f97920377ecd9bc74",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_5138e6e7",
+        "filename": "key/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-02T17:40:49Z",
+      "side": 1,
+      "message": "I debated bringing it up. It\u0027s because we wrap valid.User which wraps user.Parse. Fixed.\nDone.",
+      "parentUuid": "86ce5aee_d185f6a1",
       "revId": "c424c896588d62583d5e804f97920377ecd9bc74",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
