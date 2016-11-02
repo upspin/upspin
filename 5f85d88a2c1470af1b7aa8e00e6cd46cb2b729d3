@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_516aa6cb",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-02T17:45:27Z",
+      "side": 1,
+      "message": "it\u0027s a little scary to overwrite name here. how about a new variable?\n\nuserName :\u003d name[]...",
+      "revId": "5f85d88a2c1470af1b7aa8e00e6cd46cb2b729d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
