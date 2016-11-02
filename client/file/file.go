@@ -6,6 +6,8 @@
 package file
 
 import (
+	"io"
+
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/pack"
@@ -119,8 +121,11 @@ func (f *File) readAt(op string, dst []byte, off int64) (n int, err error) {
 	if off < 0 {
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
 	}
-	if off >= f.size {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("offset beyond end of file"))
+	if off > f.size {
+		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("offset (%d) beyond end of file (%d)", off, f.size))
+	}
+	if off == f.size {
+		return 0, io.EOF
 	}
 
 	// Iterate over blocks that contain the data we're interested in,
