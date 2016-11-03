@@ -5,6 +5,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -15,6 +16,28 @@ import (
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
+
+func (s *State) info(args ...string) {
+	const help = `
+Info prints to standard output a thorough description of all the
+information about named paths, including information provided by
+ls but also storage references, sizes, and other metadata.
+`
+	fs := flag.NewFlagSet("info", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "info path...")
+
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+	for _, name := range s.globAllUpspin(fs.Args()) {
+		// We don't want to follow links, so don't use Client.
+		entry, err := s.DirServer().Lookup(name)
+		if err != nil {
+			s.exit(err)
+		}
+		s.printInfo(entry)
+	}
+}
 
 // infoDirEntry wraps a DirEntry to allow new methods for easy formatting.
 // It also has fields that hold relevant information as we acquire it.

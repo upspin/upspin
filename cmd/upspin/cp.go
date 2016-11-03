@@ -16,6 +16,33 @@ import (
 	"upspin.io/upspin"
 )
 
+func (s *State) cp(args ...string) {
+	const help = `
+Cp copies files into, out of, and within Upspin. If the final
+argument is a directory, the files are placed inside it.  The other
+arguments must not be directories unless the -R flag is set.
+
+If the final argument is not a directory, cp requires exactly two
+path names and copies the contents of the first to the second.
+The -R flag requires that the final argument be a directory.
+
+When copying from one Upspin path to another Upspin path, cp can be
+very efficient, copying only the references to the data rather than
+the data itself.
+`
+	fs := flag.NewFlagSet("cp", flag.ExitOnError)
+	fs.Bool("v", false, "log each file as it is copied")
+	fs.Bool("R", false, "recursively copy directories")
+	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
+	if fs.NArg() < 2 {
+		fs.Usage()
+	}
+
+	nSrc := fs.NArg() - 1
+	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
+	s.copyCommand(fs, src, dest)
+}
+
 type copyState struct {
 	state   *State
 	flagSet *flag.FlagSet // Used only to call Usage.

@@ -15,6 +15,30 @@ import (
 	"upspin.io/upspin"
 )
 
+func (s *State) repack(args ...string) {
+	const help = `
+Repack rewrites the data referred to by each path , storing it again using the
+packing specificied by its -pack option, ee by default. If the data is already
+packed with the specified packing, the data is untouched unless the -f (force)
+flag is specified, which can be helpful if the data is to be repacked using a
+fresh key.
+
+Repack does not delete the old storage. See the deletestorage command
+for more information.
+`
+	fs := flag.NewFlagSet("repack", flag.ExitOnError)
+	fs.Bool("f", false, "force repack even if the file is already packed as requested")
+	fs.String("pack", "ee", "packing to use when rewriting")
+	fs.Bool("r", false, "recur into subdirectories")
+	fs.Bool("v", false, "verbose: log progress")
+	s.parseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+
+	s.repackCommand(fs)
+}
+
 // repackCommand implements the repack command. It builds a temporary client
 // with the new packing and iterates over the files.
 func (s *State) repackCommand(fs *flag.FlagSet) {
