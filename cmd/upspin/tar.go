@@ -4,9 +4,6 @@
 
 package main
 
-// This file implements archiver, which archives and unarchives an Upspin tree
-// in tar format.
-
 // TODOs:
 // - Better regexp matching (support sed-like behavior).
 // - Keep time from original archive.
@@ -27,6 +24,38 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+func (s *State) tar(args ...string) {
+	const help = `
+Tar archives an Upspin tree into a local tar file.
+`
+	fs := flag.NewFlagSet("tar", flag.ExitOnError)
+	fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "tar upspin_directory local_file")
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
+	s.tarCommand(fs)
+}
+
+func (s *State) untar(args ...string) {
+	const help = `
+Untar unarchives a local tar file into Upspin.
+
+Untar allows the prefix of the Upspin path contained in the tar file to
+be matched and replaced using the flags -match and -replace.
+The destination Upspin prefix must exist.
+`
+	fs := flag.NewFlagSet("untar", flag.ExitOnError)
+	fs.String("match", "", "if present, extracts from the tar file only those pathname prefixes that match")
+	fs.String("replace", "", "if present, replaces the pathnames matched by flag -match with this value")
+	fs.Bool("v", false, "verbose output")
+	s.parseFlags(fs, args, help, "untar local_file")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	s.untarCommand(fs)
+}
 
 // archiver implements archiving and unarchiving to/from Upspin tree and a local
 // file system.

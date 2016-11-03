@@ -22,6 +22,38 @@ import (
 	"upspin.io/upspin"
 )
 
+func (s *State) share(args ...string) {
+	const help = `
+Share reports the user names that have access to each of the argument
+paths, and what access rights each has. If the access rights do not
+agree with the keys stored in the directory metadata for a path,
+that is also reported. Given the -fix flag, share updates the keys
+to resolve any such inconsistency. Given both -fix and -force, it
+updates the keys regardless. The -d and -r flags apply to directories;
+-r states whether the share command should descend into subdirectories.
+
+See the description for rotate for information about updating keys.
+`
+	fs := flag.NewFlagSet("share", flag.ExitOnError)
+	fix := fs.Bool("fix", false, "repair incorrect share settings")
+	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
+	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
+	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
+	fs.Bool("q", false, "suppress output. Default is to show state for every file")
+	s.parseFlags(fs, args, help, "share path...")
+	if fs.NArg() == 0 {
+		fs.Usage()
+	}
+
+	if *recur {
+		*isDir = true
+	}
+	if *force {
+		*fix = true
+	}
+	s.shareCommand(fs)
+}
+
 // Sharer holds the state for the share calculation. It holds some caches to
 // avoid calling on the server too much.
 type Sharer struct {
