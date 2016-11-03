@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_e5a83178",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T17:44:51Z",
+      "side": 1,
+      "message": "i would do more checking here and also send the direntry instead of the user, as it\u0027s more general in principle.\n\nchecking includes: path name is right (already done), file is plain, file is zero length. maybe more.\n\nbut the general approach looks good.",
+      "revId": "4c86efe049925cf430829cc99c66174c4bfa7a35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
