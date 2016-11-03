@@ -40,6 +40,7 @@ func (t *Tree) store(n *node) error {
 	n.entry.Blocks = nil // if any blocks existed, their references are lost as we're packing dirEntry again.
 	n.entry.Packing = t.context.Packing()
 	n.entry.Time = upspin.Now()
+	n.entry.Writer = t.context.UserName()
 	n.entry.Sequence++
 
 	// Start packing.
