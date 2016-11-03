@@ -17,9 +17,14 @@ import (
 	"upspin.io/user"
 )
 
+// TODOs:
+// * getSnapshotConfig should return only one snapshotConfig per user. The need
+//   for more did not materialize.
+
 const (
 	snapshotSuffix            = "snapshot"
 	snapshotGlob              = "*+" + snapshotSuffix + "@*"
+	snapshotControlFile       = "TakeSnapshot"
 	snapshotDefaultDateFormat = "2006/01/02"
 	snapshotDefaultInterval   = 12 * time.Hour
 	snapshotWorkerInterval    = 2 * time.Hour
@@ -61,17 +66,17 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) ([]snapshotConfig, 
 }
 
 func (s *server) startSnapshotLoop() {
-	if s.stopSnapshot != nil {
+	if s.snapshotControl != nil {
 		log.Error.Printf("dir/server: Attempting to restart snapshot worker")
 		return
 	}
-	s.stopSnapshot = make(chan bool)
+	s.snapshotControl = make(chan upspin.UserName)
 	go s.snapshotLoop()
 }
 
 func (s *server) stopSnapshotLoop() {
-	if s.stopSnapshot != nil {
-		close(s.stopSnapshot)
+	if s.snapshotControl != nil {
+		close(s.snapshotControl)
 	}
 }
 
@@ -87,8 +92,12 @@ func (s *server) snapshotLoop() {
 		select {
 		case <-ticker.C:
 			s.snapshotAll() // returned error is already logged.
-		case <-s.stopSnapshot:
-			return
+		case userName := <-s.snapshotControl:
+			if userName == "" {
+				// Closing the channel.
+				return
+			}
+			s.takeSnapshotFor(userName)
 		}
 	}
 }
@@ -133,15 +142,25 @@ func (s *server) snapshotAll() error {
 	return firstErr
 }
 
+// snapshotDir returns the destination path for a snapshot given its
+// configuration.
+func (s *server) snapshotDir(cfg snapshotConfig) (path.Parsed, error) {
+	date := s.now().Go().UTC().Format(cfg.dateFormat)
+	dstDir := path.Join(cfg.dstDir, date)
+
+	p, err := path.Parse(dstDir)
+	if err != nil {
+		return path.Parsed{}, err
+	}
+	return p, nil
+}
+
 // shouldSnapshot reports whether it's time to snapshot the given configuration.
 // It also returns the parsed path of where the snapshot will be made.
 func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 	const op = "dir/server.shouldSnapshot"
-	now := time.Now()
-	date := now.UTC().Format(cfg.dateFormat)
-	dstDir := path.Join(cfg.dstDir, date)
 
-	p, err := path.Parse(dstDir)
+	p, err := s.snapshotDir(cfg)
 	if err != nil {
 		return false, path.Parsed{}, errors.E(op, err)
 	}
@@ -158,14 +177,27 @@ func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 		}
 		// Ok, proceed.
 	} else {
-		// Is entry too old that a new snapshot is now warranted?
-		if entry.Time.Go().Add(cfg.interval).After(now) {
+		// Is entry so old that a new snapshot is now warranted?
+		if entry.Time.Go().Add(cfg.interval).After(s.now().Go()) {
 			// Not time yet. Nothing to do.
 			return false, p, nil
 		}
 		// Ok, proceed.
 	}
 	return true, p, nil
+}
+
+// takeSnapshotFor takes a snapshot for a user.
+func (s *server) takeSnapshotFor(user upspin.UserName) error {
+	cfgs, err := s.getSnapshotConfig(user)
+	if err != nil {
+		return err
+	}
+	dstDir, err := s.snapshotDir(cfgs[0])
+	if err != nil {
+		return err
+	}
+	return s.takeSnapshot(dstDir, cfgs[0].srcDir)
 }
 
 // takeSnapshot takes a snapshot to dstDir from srcDir.
@@ -310,4 +342,19 @@ func isSnapshotOwner(userName upspin.UserName, snapshotUser upspin.UserName) boo
 	// userName is the owner if and only if adding the snapshot suffix makes
 	// it the snapshotUser.
 	return u+"+"+snapshotSuffix+"@"+domain == string(snapshotUser)
+}
+
+// isSnapshotControlFile reports whether the path name is for an entry in the
+// root named snapshotControlFile.
+func isSnapshotControlFile(p path.Parsed) bool {
+	return p.NElem() == 1 && p.Elem(0) == snapshotControlFile
+}
+
+// isValidSnapshotControlEntry reports whether an entry correctly represents the
+// control entry we expect in order to start a new snapshot.
+func isValidSnapshotControlEntry(entry *upspin.DirEntry) error {
+	if len(entry.Blocks) != 0 || entry.Packing != upspin.PlainPack || entry.IsLink() || entry.IsDir() {
+		return errors.E(errors.Invalid, entry.Name, errors.Str("snapshot control entry must be an empty plain-packed file"))
+	}
+	return nil
 }
