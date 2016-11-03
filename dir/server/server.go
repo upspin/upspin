@@ -80,8 +80,10 @@ type server struct {
 	// touch a user.
 	userLocks [numUserLocks]sync.Mutex
 
-	// stopSnapshot is a channel for shutting down the snapshot loop.
-	stopSnapshot chan bool
+	// snapshotControl is a channel for passing control messages to the
+	// snapshot loop. Possible control messages are: the username to
+	// snapshot or close the channel to stop the snapshot loop.
+	snapshotControl chan upspin.UserName
 
 	// now returns the time now. It's usually just upspin.Now but is
 	// overridden for tests.
@@ -271,6 +273,15 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		if !isSnapshotOwner(s.userName, p.User()) {
 			// Non-owners can't even see the snapshot.
 			return nil, errors.E(op, entry.Name, errNotExist)
+		}
+		if isSnapshotControlFile(p) {
+			err = isValidSnapshotControlEntry(entry)
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			// Start a snapshot for this user.
+			s.snapshotControl <- p.User()
+			return entry, nil // Confirm snapshot has been started.
 		}
 		if !p.IsRoot() {
 			// Not root: owner can't mutate anything else.
@@ -696,9 +707,6 @@ func (s *server) Close() {
 		// TODO: return an error when Close expects it.
 		log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
 	}
-
-	s.defaultAccess = nil
-	s.stopSnapshotLoop()
 }
 
 func (s *server) closeTree(user upspin.UserName) error {

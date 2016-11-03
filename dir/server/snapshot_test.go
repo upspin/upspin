@@ -5,8 +5,10 @@
 package server
 
 import (
+	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -166,6 +168,116 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	}
 	if ents[0].Time >= ents[1].Time {
 		t.Errorf("time = %d, want < %d", ents[0].Time, ents[1].Time)
+	}
+}
+
+func TestForceSnapshot(t *testing.T) {
+	s := newDirServerForTesting(t, snapshotUser)
+
+	ents, err := s.Glob(snapshotUser + "/*/*/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Some pre-existing entries exists.
+	preExisting := len(ents)
+	if preExisting == 0 {
+		t.Fatalf("got = %d pre-existing entries, want > 0", preExisting)
+	}
+
+	// Force a snapshot to be taken for canonicalUser.
+	err = s.takeSnapshotFor(snapshotUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ents, err = s.Glob(snapshotUser + "/*/*/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(ents), preExisting+1; got != want {
+		t.Fatalf("got = %d entries, want = %d", got, want)
+	}
+}
+
+func TestTriggerSnapshotWithPut(t *testing.T) {
+	s := newDirServerForTesting(t, snapshotUser)
+
+	ents, err := s.Glob(snapshotUser + "/*/*/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Some pre-existing entries exists.
+	preExisting := len(ents)
+	if preExisting == 0 {
+		t.Fatalf("got = %d pre-existing entries, want > 0", preExisting)
+	}
+
+	// Put a special DirEntry to trigger the background snapshot.
+	de := &upspin.DirEntry{
+		Name:       snapshotUser + "/" + snapshotControlFile,
+		SignedName: snapshotUser + "/" + snapshotControlFile,
+	}
+
+	entry, err := s.Put(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(entry, de) {
+		t.Fatalf("got = %v, want = %v", entry, de)
+	}
+
+	// Poll looking for the extra entry.
+	var numEnts int
+	for i := 0; i < 10; i++ {
+		time.Sleep(10 * time.Millisecond)
+		ents, err := s.Glob(snapshotUser + "/*/*/*")
+		if err != nil {
+			t.Fatal(err)
+		}
+		numEnts = len(ents)
+		if numEnts != preExisting {
+			break
+		}
+	}
+	if numEnts != preExisting+1 {
+		t.Errorf("got = %d entries, want = %d", numEnts, preExisting+1)
+	}
+
+	// Check some errors.
+
+	// Wrong packing
+	de.Packing = upspin.EEPack
+	_, err = s.Put(de)
+	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Empty blocks.
+	de.Packing = upspin.PlainPack
+	de.Blocks = []upspin.DirBlock{
+		{
+			Size: 32,
+		},
+	}
+	_, err = s.Put(de)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Link.
+	de.Blocks = nil
+	de.Attr = upspin.AttrLink
+	_, err = s.Put(de)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Directory.
+	de.Attr = upspin.AttrDirectory
+	_, err = s.Put(de)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
 	}
 }
 
