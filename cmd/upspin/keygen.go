@@ -8,6 +8,7 @@ package main
 
 import (
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -18,6 +19,60 @@ import (
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
 )
+
+func (s *State) keygen(args ...string) {
+	const help = `
+Keygen creates a new Upspin key pair and stores the pair in local
+files secret.upspinkey and public.upspinkey in $HOME/.ssh. Existing
+key pairs are appended to $HOME/.ssh/secret2.upspinkey. Keygen does
+not update the information in the key server; use the user -put
+command for that.
+
+New users should instead use the signup command to create their
+first key. Keygen can be used to create new keys.
+
+See the description for rotate for information about updating keys.
+`
+	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
+	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	where := fs.String("where", "", "`directory` to store keys; default $HOME/.ssh")
+	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
+	if fs.NArg() != 0 {
+		fs.Usage()
+	}
+	switch *curveName {
+	case "p256":
+	case "p384":
+	case "p521":
+		// ok
+	default:
+		log.Printf("no such curve %q", *curveName)
+		fs.Usage()
+	}
+
+	public, private, proquintStr, err := createKeys(*curveName, *secret)
+	if err != nil {
+		s.exitf("creating keys: %v", err)
+	}
+
+	keyDir := *where
+	if keyDir == "" {
+		home := os.Getenv("HOME")
+		if len(home) == 0 {
+			log.Fatal("no home directory")
+		}
+		keyDir = filepath.Join(home, ".ssh")
+	}
+	err = saveKeys(keyDir)
+	if err != nil {
+		s.exitf("saving previous keys failed(%v); keys not generated", err)
+	}
+	err = writeKeys(keyDir, public, private, proquintStr)
+	if err != nil {
+		s.exitf("writing keys: %v", err)
+	}
+}
 
 func createKeys(curveName, secret string) (public string, private, proquintStr string, err error) {
 	// Pick secret 128 bits.

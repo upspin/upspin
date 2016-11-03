@@ -4,8 +4,7 @@
 
 package main
 
-// Countersign has utility functions for updating signatures of encrypted items
-// after writers update their keys.  Invoke before publishing the new keys.
+// This file has the implementation of the countersign command.  Invoke before publishing the new keys.
 
 import (
 	"flag"
@@ -16,6 +15,22 @@ import (
 	"upspin.io/pack/ee"
 	"upspin.io/upspin"
 )
+
+func (s *State) countersign(args ...string) {
+	const help = `
+Countersign updates the signatures and encrypted data for all items
+owned by the user. It is intended to be run after a user has changed
+keys.
+
+See the description for rotate for information about updating keys.
+`
+	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
+	s.parseFlags(fs, args, help, "countersign")
+	if fs.NArg() != 0 {
+		fs.Usage()
+	}
+	s.countersignCommand(fs)
+}
 
 // Countersigner holds the state for the countersign calculation.
 type Countersigner struct {
