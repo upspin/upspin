@@ -301,6 +301,9 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	return err
 }
 
+// TODO: isSnapshotUser and isSnapshotOwner should be combined and simplified to
+// avoid calling parse every time.
+
 // isSnapshotUser reports whether the userName contains the snapshot suffix.
 func isSnapshotUser(userName upspin.UserName) bool {
 	_, suffix, _, err := user.Parse(userName)

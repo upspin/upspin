@@ -265,10 +265,17 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	o, m := newOptMetric(op)
 	defer m.Done()
 
+	err := valid.DirEntry(entry)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	p, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err)
 	}
+	ownerCreatingSnapshotRoot := false
+	// TODO: isSnapshotUser and isSnapshotOwner are calling parse
+	// repeatedly. Clean up.
 	if isSnapshotUser(p.User()) {
 		if !isSnapshotOwner(s.userName, p.User()) {
 			// Non-owners can't even see the snapshot.
@@ -287,7 +294,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			// Not root: owner can't mutate anything else.
 			return nil, errors.E(op, entry.Name, errReadOnly)
 		}
-		// Else: isOwner && putting the root -> OK.
+		// Else: isOwner && putting the root -> OK, if root does not
+		// exist yet.
+		ownerCreatingSnapshotRoot = true
 	}
 
 	isAccess := access.IsAccessFile(p.Path())
@@ -325,26 +334,6 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 
-	return s.put(op, p, entry, o)
-}
-
-// put implements the bulk of Put.
-func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
-	o, ss := subspan("put", opts)
-	defer ss.End()
-
-	if p.Path() != entry.Name {
-		return nil, errors.E(op, p.Path(), errors.Str("path name is not clean"))
-	}
-	err := valid.DirEntry(entry)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	tree, err := s.loadTreeFor(p.User(), o)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
 	// Check for links along the path.
 	existingEntry, err := s.lookup(op, p, !entryMustBeClean, o)
 	if err == upspin.ErrFollowLink {
@@ -353,15 +342,19 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 
 	if errors.Match(errNotExist, err) {
 		// OK; entry not found as expected. Can we create it?
-		canCreate, _, err := s.hasRight(access.Create, p, o)
-		if err == upspin.ErrFollowLink {
-			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
-		}
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		if !canCreate {
-			return nil, s.errPerm(op, p, o)
+		if ownerCreatingSnapshotRoot {
+			// OK, can create.
+		} else {
+			canCreate, _, err := s.hasRight(access.Create, p, o)
+			if err == upspin.ErrFollowLink {
+				return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
+			}
+			if err != nil {
+				return nil, errors.E(op, err)
+			}
+			if !canCreate {
+				return nil, s.errPerm(op, p, o)
+			}
 		}
 		// New file should have a valid sequence number, if user didn't pick one already.
 		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
@@ -424,6 +417,19 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 				log.Error.Printf("%s: Error removing group file: %s", op, err)
 			}
 		}
+	}
+
+	return s.put(op, p, entry, o)
+}
+
+// put performs Put on the user's tree.
+func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
+	o, ss := subspan("put", opts)
+	defer ss.End()
+
+	tree, err := s.loadTreeFor(p.User(), o)
+	if err != nil {
+		return nil, errors.E(op, err)
 	}
 
 	entry, err = tree.Put(p, entry)
@@ -749,7 +755,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	if err != nil {
 		return nil, err
 	}
-	if !hasLog && s.userName != user {
+	if !hasLog && !s.canCreateRoot(user) {
 		// Tree for user does not exist and the logged-in user is not
 		// allowed to create it.
 		return nil, errNotExist
@@ -781,6 +787,18 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 	// Add to the cache and return
 	s.userTrees.Add(user, tree)
 	return tree, nil
+}
+
+// canCreateRoot reports whether the current user can create a root for the
+// named user.
+func (s *server) canCreateRoot(user upspin.UserName) bool {
+	if s.userName == user {
+		return true
+	}
+	if isSnapshotUser(user) && isSnapshotOwner(s.userName, user) {
+		return true
+	}
+	return false
 }
 
 // errPerm checks whether the user has any right to the given path, and if so

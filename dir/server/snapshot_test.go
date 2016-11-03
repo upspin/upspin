@@ -33,12 +33,14 @@ var defaultEnt = upspin.DirEntry{
 
 func TestSnapshot(t *testing.T) {
 	s := newDirServerForTesting(t, canonicalUser)
+	snap := newDirServerForTesting(t, snapshotUser)
+
 	create(t, s, canonicalUser+"/", isDir)
 	create(t, s, canonicalUser+"/dir", isDir)
 	create(t, s, canonicalUser+"/file.pdf", !isDir)
 
-	snap := newDirServerForTesting(t, snapshotUser)
-	create(t, snap, snapshotUser+"/", isDir)
+	// Ensures owner's server s can create snapshotUser.
+	create(t, s, snapshotUser+"/", isDir)
 
 	// Nothing exists under snapshotUser yet.
 	ents, err := snap.Glob(snapshotUser + "/*")
@@ -369,15 +371,18 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 	}
 }
 
+func TestSnapshotUserCanCreateSnapshotRoot(t *testing.T) {
+	s := newDirServerForTesting(t, "user+snapshot@example.com")
+	create(t, s, "user+snapshot@example.com/", isDir)
+}
+
 func create(t *testing.T, s *server, name upspin.PathName, isDir bool) {
 	var err error
 	if isDir {
-		var p path.Parsed
-		p, err = path.Parse(name)
+		_, err = makeDirectory(s, name)
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = s.mkDirIfNotExist(p)
 	} else {
 		entry := defaultEnt
 		entry.Name = name
