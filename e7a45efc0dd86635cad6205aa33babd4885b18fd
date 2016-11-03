@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_83568d6d",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T20:02:07Z",
+      "side": 1,
+      "message": "// comment",
+      "revId": "e7a45efc0dd86635cad6205aa33babd4885b18fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_434c95e3",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T20:02:07Z",
+      "side": 1,
+      "message": "s/too/so/",
+      "revId": "e7a45efc0dd86635cad6205aa33babd4885b18fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_036a9d2e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T20:02:07Z",
+      "side": 1,
+      "message": "this function\u0027s signature and body would read better if you s/name/user/",
+      "revId": "e7a45efc0dd86635cad6205aa33babd4885b18fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_e34149a9",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T20:02:07Z",
+      "side": 1,
+      "message": "// comment (might as well)",
+      "revId": "e7a45efc0dd86635cad6205aa33babd4885b18fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_2365215e",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-03T20:02:07Z",
+      "side": 1,
+      "message": "do it all in one:\n\nif len(entry.Blocks) \u003e 0 || entry.Packing etc etc {\n  return errors.E(errors.Invalid, entry.Name, errors.Str(\"snapshot control file must be empty plain file\")\n}",
+      "revId": "e7a45efc0dd86635cad6205aa33babd4885b18fd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
