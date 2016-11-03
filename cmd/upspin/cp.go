@@ -202,7 +202,7 @@ func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile)
 	// If both are in Upspin, we can avoid touching the data by copying
 	// just the references.
 	if src.isUpspin && dst.isUpspin {
-		cs.logf("try fast copy to %s", dst)
+		cs.logf("try fast copy to %v", dst)
 		err := s.fastCopy(upspin.PathName(src.path), upspin.PathName(dst.path))
 		if err == nil {
 			return
