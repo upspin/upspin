@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_a36d91e4",
+        "filename": "cmd/upspin/deletestorage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-03T20:41:25Z",
+      "side": 1,
+      "message": "Maybe this is not the CL for this, but it occurred to me today that we should let the user know that deleting all of their entries and references will NOT make the store empty. They should expect left over references from unreachable versions of directory entries, even if they don\u0027t have snapshots turned on.\n\n// Deleting all references from a tree does not guarantee the store will be empty. \n\nJust a thought.",
+      "revId": "dcdeae62cd938481c0a87b7e6a29aec853880041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
