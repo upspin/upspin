@@ -38,7 +38,8 @@ func TestSnapshot(t *testing.T) {
 	create(t, s, canonicalUser+"/file.pdf", !isDir)
 
 	snap := newDirServerForTesting(t, snapshotUser)
-	create(t, snap, snapshotUser+"/", isDir)
+	create(t, s, snapshotUser+"/", isDir)
+	//create(t, snap, snapshotUser+"/", isDir)
 
 	// Nothing exists under snapshotUser yet.
 	ents, err := snap.Glob(snapshotUser + "/*")
