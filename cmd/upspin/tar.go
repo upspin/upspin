@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"flag"
+
 	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -27,32 +28,26 @@ import (
 
 func (s *State) tar(args ...string) {
 	const help = `
-Tar archives an Upspin tree into a local tar file.
+Tar archives an Upspin tree into a local tar file, or with the
+-extract flag, unpacks a a local tar file into an Upspin tree.
+
+When extracting, the -match and -replace flags cause the extracted
+file to have any prefix that matches be replaced by substitute text.
+Whether or not these flags are used, the destination path must
+always be in Upspin.
 `
 	fs := flag.NewFlagSet("tar", flag.ExitOnError)
+	extract := fs.Bool("extract", false, "extract from archive")
+	match := fs.String("match", "", "extract from the archive only those pathnames that match the `prefix`")
+	replace := fs.String("replace", "", "replace -match prefix with the replacement `text`")
 	fs.Bool("v", false, "verbose output")
-	s.parseFlags(fs, args, help, "tar upspin_directory local_file")
-	if fs.NArg() != 2 {
-		fs.Usage()
-	}
-	s.tarCommand(fs)
-}
-
-func (s *State) untar(args ...string) {
-	const help = `
-Untar unarchives a local tar file into Upspin.
-
-Untar allows the prefix of the Upspin path contained in the tar file to
-be matched and replaced using the flags -match and -replace.
-The destination Upspin prefix must exist.
-`
-	fs := flag.NewFlagSet("untar", flag.ExitOnError)
-	fs.String("match", "", "if present, extracts from the tar file only those pathname prefixes that match")
-	fs.String("replace", "", "if present, replaces the pathnames matched by flag -match with this value")
-	fs.Bool("v", false, "verbose output")
-	s.parseFlags(fs, args, help, "untar local_file")
-	if fs.NArg() != 1 {
-		fs.Usage()
+	s.parseFlags(fs, args, help, "tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file")
+	if !*extract {
+		if *match != "" || *replace != "" {
+			fs.Usage()
+		}
+		s.tarCommand(fs)
+		return
 	}
 	s.untarCommand(fs)
 }
@@ -73,6 +68,9 @@ type archiver struct {
 }
 
 func (s *State) tarCommand(fs *flag.FlagSet) {
+	if fs.NArg() != 2 {
+		fs.Usage()
+	}
 	a, err := s.newArchiver(boolFlag(fs, "v"))
 	if err != nil {
 		s.exit(err)
@@ -84,6 +82,9 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 }
 
 func (s *State) untarCommand(fs *flag.FlagSet) {
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
 	a, err := s.newArchiver(boolFlag(fs, "v"))
 	if err != nil {
 		s.exit(err)

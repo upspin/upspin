@@ -53,7 +53,6 @@ var commands = map[string]func(*State, ...string){
 	"share":         (*State).share,
 	"signup":        (*State).signup,
 	"tar":           (*State).tar,
-	"untar":         (*State).untar,
 	"user":          (*State).user,
 	"whichaccess":   (*State).whichAccess,
 }
