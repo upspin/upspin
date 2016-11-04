@@ -14,6 +14,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/pack"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -22,6 +23,10 @@ func (s *State) info(args ...string) {
 Info prints to standard output a thorough description of all the
 information about named paths, including information provided by
 ls but also storage references, sizes, and other metadata.
+
+If the path names an Access or Group file, it is also checked for
+validity. If it is a link, the command attempts to access the target
+of the link.
 `
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
 	s.parseFlags(fs, args, help, "info path...")
@@ -32,10 +37,16 @@ ls but also storage references, sizes, and other metadata.
 	for _, name := range s.globAllUpspin(fs.Args()) {
 		// We don't want to follow links, so don't use Client.
 		entry, err := s.DirServer().Lookup(name)
-		if err != nil {
+		if err != nil && err != upspin.ErrFollowLink {
 			s.exit(err)
 		}
 		s.printInfo(entry)
+		switch {
+		case access.IsAccessFile(name):
+			s.checkAccessFile(name)
+		case access.IsGroupFile(name):
+			s.checkGroupFile(name)
+		}
 	}
 }
 
@@ -153,6 +164,17 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 	if writer.Flush() != nil {
 		s.exitf("flushing template output: %v", err)
 	}
+	if !entry.IsLink() {
+		return
+	}
+	// Check and print information about the link target.
+	target, err := s.client.Lookup(entry.Link, true)
+	if err != nil {
+		// Print the whole error indented, starting on the next line. This helps it stand out.
+		s.exitf("Error: link %s has invalid target %s:\n\t%v", entry.Name, entry.Link, err)
+	}
+	fmt.Printf("Target of link %s:\n", entry.Name)
+	s.printInfo(target)
 }
 
 func attrFormat(attr upspin.Attribute) string {
@@ -186,3 +208,119 @@ const infoText = `{{.Name}}
 	{{range $index, $block := .Blocks -}}
 	{{$index}}	{{.Offset}}	{{.Size}}	{{.Location}}
 	{{end}}`
+
+// checkGroupFile diagnoses likely problems with the contents and rights
+// of the Group file.
+// TODO: We could check that packing is Plain but that should never be a problem.
+func (s *State) checkGroupFile(name upspin.PathName) {
+	parsed, err := path.Parse(name) // Should never happen.
+	if err != nil {
+		s.exit(err)
+	}
+	groupSeen := make(map[upspin.PathName]bool)
+	userSeen := make(map[upspin.UserName]bool)
+	s.doCheckGroupFile(parsed, groupSeen, userSeen)
+}
+
+// doCheckGroupFile is the inner, recursive implementation of checkGroupFile.
+func (s *State) doCheckGroupFile(parsed path.Parsed, groupSeen map[upspin.PathName]bool, userSeen map[upspin.UserName]bool) {
+	group := parsed.Path()
+	if groupSeen[group] {
+		return
+	}
+	groupSeen[group] = true
+	data, err := s.client.Get(group)
+	if err != nil {
+		s.exitf("cannot read Group file: %v", err)
+	}
+
+	// Get the Access file, if any, that applies.
+	// TODO: We've already got it in earlier code, so could save it.
+	whichAccess, err := s.DirServer().WhichAccess(group)
+	if err != nil {
+		s.exitf("unexpected error finding Access file for Group file %s: %v", group, err)
+	}
+	var accessFile *access.Access
+	if whichAccess == nil {
+		accessFile, err = access.New(group)
+		if err != nil {
+			s.exitf("cannot create default Access file: %v", err)
+		}
+	} else {
+		data, err := s.client.Get(whichAccess.Name)
+		if err != nil {
+			s.exitf("cannot get Access file: %v", err)
+		}
+		accessFile, err = access.Parse(whichAccess.Name, data)
+		if err != nil {
+			s.exitf("cannot parse Access file: %v", err)
+		}
+	}
+
+	// Each member should be either a plain user or a group and be able to access the Group file.
+	members, err := access.ParseGroup(parsed, data)
+	if err != nil {
+		s.exitf("error parsing Group file %s: %v", group, err)
+	}
+	for _, member := range members {
+		if member.IsRoot() {
+			// Normal user. Does user exist?
+			user := member.User()
+			if !s.userExists(user, userSeen) {
+				s.failf("user %s in Group file %s not found in key server", user, group)
+				continue
+			}
+			// Member must be able to read the Group file.
+			// TODO: worth remembering users we've already checked for this file?
+			canRead, err := accessFile.Can(user, access.Read, group, s.client.Get)
+			if err != nil {
+				s.exitf("error checking permissions in Group file %s for user %s: %v", group, user, err)
+				continue
+			}
+			if !canRead {
+				s.failf("user %s is missing read access for group %s", user, group)
+			}
+			continue
+		}
+		if !access.IsGroupFile(member.Path()) {
+			s.failf("do not understand member %s of Group file %s", member, parsed) // Should never happen.
+			continue
+		}
+		// Member is a group. Recur using Group file.
+		s.doCheckGroupFile(member, groupSeen, userSeen)
+	}
+}
+
+func (s *State) checkAccessFile(name upspin.PathName) {
+	data, err := s.client.Get(name)
+	if err != nil {
+		s.exitf("cannot get Access file: %v", err)
+	}
+	accessFile, err := access.Parse(name, data)
+	if err != nil {
+		s.exitf("cannot parse Access file: %v", err)
+	}
+	users, err := accessFile.Users(access.AnyRight, s.client.Get)
+	if err != nil {
+		s.exitf("cannot get full user list for Access file %s: %v", name, err)
+	}
+
+	// Access.Users expands the groups for us.
+	// TODO: We could check the groups it references manually.
+	userSeen := make(map[upspin.UserName]bool)
+	for _, user := range users {
+		// Normal user. Does user exist?
+		if !s.userExists(user, userSeen) {
+			s.failf("user %s in Access file %s not found in key server", user, name)
+		}
+	}
+}
+
+func (s *State) userExists(user upspin.UserName, userSeen map[upspin.UserName]bool) bool {
+	if userSeen[user] || user == access.AllUsers { // all@upspin.io is baked in.
+		return true // Previous answer will do.
+	}
+	userSeen[user] = true
+	_, err := s.KeyServer().Lookup(user)
+	return err == nil
+}

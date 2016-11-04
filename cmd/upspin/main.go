@@ -174,7 +174,7 @@ func (s *State) parseFlags(fs *flag.FlagSet, args []string, help, usage string) 
 	}
 }
 
-// readAll reads all contents from an input file name or from stdin if
+// readAll reads all contents from a local input file or from stdin if
 // the input file name is empty
 func (s *State) readAll(fileName string) []byte {
 	var input *os.File
@@ -182,10 +182,7 @@ func (s *State) readAll(fileName string) []byte {
 	if fileName == "" {
 		input = os.Stdin
 	} else {
-		input, err = os.Open(fileName)
-		if err != nil {
-			s.exit(err)
-		}
+		input = s.openLocal(fileName)
 		defer input.Close()
 	}
 
