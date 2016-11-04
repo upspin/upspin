@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
@@ -96,7 +97,8 @@ func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// From address is valid. Further errors can be replied by email.
 
-	// Parse the contents of the email
+	// Parse the contents of the email. The returned user name is guaranteed
+	// to be a valid Upspin user name.
 	userName, pubKey, sig, err := inbound.ParseBody(body)
 	if err != nil {
 		m.sendErrorMail(from, "Invalid email contents", err)
@@ -112,20 +114,13 @@ func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		m.sendErrorMail(from, "Error validating signature", err)
 		return
 	}
+	// Username and email must match. We don't allow email signups to come
+	// from different accounts or to use a suffix (for suffixes, the owner
+	// of the canonical user can use 'upspin user -put' to create it).
 	if string(userName) != from {
-		// Maybe they don't match because of a suffix.
-		// Test that hypothesis here.
-		u, _, domain, err := user.Parse(userName)
-		if err != nil {
-			m.sendErrorMail(from, "Error validating email address", err)
-			return
-		}
-		if from != fmt.Sprintf("%s@%s", u, domain) {
-			m.sendErrorMail(from, "Error validating email address",
-				errors.Errorf("email was sent from %q, but contents mention %q.", from, userName))
-			return
-		}
-		// Otherwise, it's okay. The user owns the suffixed user name.
+		m.sendErrorMail(from, "Error validating email address",
+			errors.Errorf("email was sent from %q, but contents mention %q.", from, userName))
+		return
 	}
 
 	// Lookup userName. It must not exist yet.
@@ -146,8 +141,7 @@ func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.sendMail(from, "Welcome to Upspin",
-		fmt.Sprintf("Your account %q with public key\n%s\nhas been created.", userName, pubKey))
+	m.sendWelcomeEmail(userName, pubKey)
 }
 
 func (m *mailHandler) createUser(name upspin.UserName, pubKey upspin.PublicKey) error {
@@ -164,17 +158,10 @@ func (m *mailHandler) createUser(name upspin.UserName, pubKey upspin.PublicKey) 
 		return err
 	}
 
-	// Attempt to create a "+snapshot" user.
-	user, suffix, domain, err := user.Parse(name)
+	snapshotUser, err := snapshotUser(name)
 	if err != nil {
 		return err
 	}
-	if suffix != "" {
-		// Nothing to do when we're already a suffixed used.
-		return nil
-	}
-
-	snapshotUser := upspin.UserName(user + "+snapshot@" + domain)
 
 	// Lookup snapshotUser to ensure we don't overwrite an existing one.
 	_, err = m.key.Lookup(snapshotUser)
@@ -243,6 +230,19 @@ func (m *mailHandler) sendErrorMail(to, reason string, err error) {
 	m.sendMail(to, "Sign-up error", body)
 }
 
+// sendWelcomeEmail sends a welcome email to the user confirming the creation of
+// the account with a given public key.
+func (m *mailHandler) sendWelcomeEmail(user upspin.UserName, pubKey upspin.PublicKey) {
+	snapUser, _ := snapshotUser(user) // ignore error, user is known valid.
+
+	m.sendMail(string(user), "Welcome to Upspin",
+		fmt.Sprintf(mailTemplate, user, pubKey, user, snapUser))
+
+	// Send a note to our internal list, so we're aware of signups.
+	m.sendMail("upspin-sendgrid@google.com", "New signup: "+string(user),
+		fmt.Sprintf("%s successfully signed up at %s", user, time.Now().Format(time.UnixDate)))
+}
+
 func parseConfigFile(name string) (apiKey, userName, password string, err error) {
 	data, err := ioutil.ReadFile(name)
 	if err != nil {
@@ -257,3 +257,31 @@ func parseConfigFile(name string) (apiKey, userName, password string, err error)
 	password = strings.TrimSpace(lines[2])
 	return
 }
+
+// snapshotUser returns the snapshot username for the named user.
+func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
+	// Attempt to create a "+snapshot" user.
+	name, suffix, domain, err := user.Parse(u)
+	if err != nil {
+		return "", err
+	}
+	if suffix != "" {
+		name = name[:len(name)-len(suffix)-1]
+	}
+	return upspin.UserName(name + "+snapshot@" + domain), nil
+}
+
+// mailTemplate is the email message we send back to the user when their Upspin
+// account has been created. It must be filled in with: userName, pubKey,
+// userName and snapshotUser, in this order.
+const mailTemplate = `
+Your account %q with public key\n%s\nhas been created.
+
+You can now create your new root:
+
+   cmd/upspin mkdir %s/
+
+And optionally enable snapshots:
+
+   cmd/upspin mkdir %s/
+`
