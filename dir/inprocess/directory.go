@@ -12,8 +12,6 @@ package inprocess
 // For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
 
 import (
-	goPath "path"
-
 	"strings"
 	"sync"
 
@@ -21,8 +19,10 @@ import (
 	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/valid"
 
@@ -478,6 +478,7 @@ func (s *server) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
 // Lookup implements upspin.DirServer.Lookup.
 func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/inprocess.Lookup"
+	log.Debug.Println("Lookup", pathName)
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -553,141 +554,71 @@ func (s *server) lookup(op string, parsed path.Parsed, followFinal bool) (*upspi
 // TODO: Test access control for this method.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "dir/inprocess.Glob"
-	parsed, err := path.Parse(upspin.PathName(pattern))
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	s.db.mu.RLock()
-	rootEntry, ok := s.db.root[parsed.User()]
-	s.db.mu.RUnlock()
-	if !ok {
-		return nil, errors.E(op, upspin.PathName(pattern), errors.NotExist, errors.Str("no such user"))
-	}
+	log.Debug.Print(pattern)
 
-	// If the pattern contains a link before the first metacharacter,
-	// do no processing and return the link.
-	firstGlobElem := 0
-	for ; firstGlobElem < parsed.NElem(); firstGlobElem++ {
-		if isGlobPattern(parsed.Elem(firstGlobElem)) {
-			break
-		}
+	entries, err := serverutil.Glob(pattern, s.Lookup, s.listDir)
+	if err != nil && err != upspin.ErrFollowLink {
+		err = errors.E(op, err)
 	}
-	basePath := parsed.First(firstGlobElem)
-	entry, err := s.lookup(op, basePath, false)
-	if err == nil && entry.IsLink() {
-		entry, err = s.errLink(op, entry, upspin.ErrFollowLink)
-		if entry == nil {
-			return nil, err
-		}
-		return []*upspin.DirEntry{entry}, err
-	} else if err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	// Loop elementwise along the path, growing the list of candidates breadth-first.
-	this := make([]*upspin.DirEntry, 0, 100)
-	next := make([]*upspin.DirEntry, 1, 100)
-	// Make placeholder entry for the root to bootstrap the loop. It doesn't need the block data.
-	// Make a copy of the entry so we don't overwrite the root if we wipe the data before returning.
-	e := *rootEntry
-	next[0] = &e
-	var links []*upspin.DirEntry // Will collect links we encounter.
-	for i := 0; i < parsed.NElem(); i++ {
-		elem := parsed.Elem(i)
-		this, next = next, this[:0]
-		// Invariant: There are no links in the list to be processed this iteration.
-		for _, ent := range this {
-			// ent must refer to a directory.
-			if !ent.IsDir() {
-				continue
-			}
-			// Need to check List permission.
-			// Permission check is done for any intermediate step
-			// (directory) if it's matched by a pattern,
-			// and for the final entry always.
-			if isGlobPattern(elem) || i == parsed.NElem()-1 {
-				p, _ := path.Parse(ent.Name) // should always succeed
-				if ok, err := s.can(access.List, p); err != nil {
-					return nil, errors.E(op, upspin.PathName(pattern), err)
-				} else if !ok {
-					// If this is the first glob element in
-					// the path and we have no list permission,
-					// return a permission error.
-					if i == firstGlobElem {
-						return nil, s.errPerm(op, parsed.First(i))
-					}
-					// Otherwise, skip this entry when matching.
-					continue
-				}
-			}
-			// Fetch the directory's contents.
-			payload, err := s.readAll(ent)
-			if err != nil {
-				return nil, errors.E(op, ent.Name, errors.Internal, errors.Str("invalid reference: "+err.Error()))
-			}
-			for len(payload) > 0 {
-				var nextEntry upspin.DirEntry
-				remaining, err := nextEntry.Unmarshal(payload)
-				if err != nil {
-					return nil, errors.E(op, ent.Name, err)
-				}
-				payload = remaining
-				nextParsed, err := path.Parse(nextEntry.Name)
-				if err != nil {
-					return nil, errors.E(op, ent.Name, err)
-				}
-				matched, err := goPath.Match(elem, nextParsed.Elem(nextParsed.NElem()-1))
-				if err != nil {
-					return nil, errors.E(op, upspin.PathName(pattern), errors.Invalid, err)
-				}
-				if !matched {
-					continue
-				}
-				// Do not return ErrFollowLink if the link is the last element. The result
-				// of the glob operation is the link itself in that case.
-				if i != parsed.NElem()-1 && nextEntry.IsLink() {
-					// Remove it from consideration. Will be restored after the loop.
-					links = append(links, &nextEntry)
-				} else {
-					next = append(next, &nextEntry)
-				}
-			}
-		}
-	}
-
-	// Now iterate over the parsed entries and clear out the location
-	// information for entries we can't read.
-	// We only need do the check once per directory.
-
-	// checked and canRead apply to all files in checkedPrefix.
-	var checked, canRead bool
-	var checkedPrefix upspin.PathName
-
-	next = append(next, links...)
-	upspin.SortDirEntries(next, false)
-	for _, entry := range next {
-		parsed, _ := path.Parse(entry.Name) // should always work
-		if parent := parsed.Drop(1).Path(); !parsed.IsRoot() && checkedPrefix != parent {
-			checkedPrefix = parent
-			checked = false
-		}
-		if !checked {
-			canRead, _ = s.can(access.Read, parsed)
-			checked = true
-		}
-		if !canRead {
-			entry.MarkIncomplete()
-		}
-	}
-
-	if len(links) > 0 {
-		return next, upspin.ErrFollowLink
-	}
-	return next, nil
+	return entries, err
 }
 
 func isGlobPattern(elem string) bool {
 	return strings.ContainsAny(elem, `*?[]`)
+}
+
+// listDir implements serverutil.ListFunc.
+// dirName should always be a directory.
+func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
+	const op = "dir/inprocess.Glob" // The only (indirect) caller of this function.
+	log.Debug.Println("listDir", dirName)
+
+	parsed, err := path.Parse(dirName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Fetch the directory's DirEntry.
+	dir, err := s.lookup(op, parsed, true)
+	if err == upspin.ErrFollowLink {
+		return []*upspin.DirEntry{dir}, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !dir.IsDir() {
+		return nil, errors.E(op, dir.Name, errors.NotDir)
+	}
+
+	// Check that we have list rights for any file in the directory.
+	canList, err := s.can(access.List, parsed)
+	if err != nil {
+		// TODO(adg): this error needs sanitizing
+		return nil, errors.E(op, dirName, err)
+	}
+	if !canList {
+		return nil, errors.E(op, dirName, errors.Private)
+	}
+
+	// Fetch the directory's contents.
+	payload, err := s.readAll(dir)
+	if err != nil {
+		return nil, errors.E(op, dir.Name, errors.Internal, errors.Str("invalid reference: "+err.Error()))
+	}
+	canRead, _ := s.can(access.Read, parsed)
+	var results []*upspin.DirEntry
+	for len(payload) > 0 {
+		var e upspin.DirEntry
+		payload, err = e.Unmarshal(payload)
+		if err != nil {
+			return nil, errors.E(op, dir.Name, err)
+		}
+		if !canRead {
+			e.MarkIncomplete()
+		}
+		results = append(results, &e)
+	}
+	return results, nil
 }
 
 // can reports whether the calling user (defined by s.context.UserName()) has the
