@@ -6,7 +6,6 @@ package server
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"upspin.io/dir/server/tree"
@@ -16,10 +15,6 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
-
-// TODOs:
-// * getSnapshotConfig should return only one snapshotConfig per user. The need
-//   for more did not materialize.
 
 const (
 	snapshotSuffix            = "snapshot"
@@ -41,7 +36,7 @@ type snapshotConfig struct {
 
 // getSnapshotConfig retrieves all configured snapshots for a user and domain
 // pair, as returned by user.Parse.
-func (s *server) getSnapshotConfig(userName upspin.UserName) ([]snapshotConfig, error) {
+func (s *server) getSnapshotConfig(userName upspin.UserName) (*snapshotConfig, error) {
 	uname, suffix, domain, err := user.Parse(userName)
 	if err != nil {
 		return nil, err
@@ -52,17 +47,14 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) ([]snapshotConfig, 
 	}
 
 	// Strip the suffix from the username.
-	idx := strings.Index(uname, "+")
-	if idx > 0 {
-		uname = uname[:idx]
-	}
+	uname = uname[:len(uname)-len(snapshotSuffix)-1]
 
-	return []snapshotConfig{{
+	return &snapshotConfig{
 		srcDir:     upspin.PathName(uname + "@" + domain + "/"),
 		dstDir:     upspin.PathName(userName),
 		dateFormat: snapshotDefaultDateFormat,
 		interval:   snapshotDefaultInterval,
-	}}, nil
+	}, nil
 }
 
 func (s *server) startSnapshotLoop() {
@@ -119,24 +111,22 @@ func (s *server) snapshotAll() error {
 		return err
 	}
 	for _, userName := range users {
-		cfgs, err := s.getSnapshotConfig(userName)
+		cfg, err := s.getSnapshotConfig(userName)
 		if check(err) != nil {
 			log.Error.Printf("%s: can't get config for user %q", op, userName)
 			continue
 		}
-		for _, cfg := range cfgs {
-			ok, dstPath, err := s.shouldSnapshot(cfg)
-			if check(err) != nil {
-				log.Error.Printf("%s: error checking whether to snapshot: %s", op, err)
-				continue
-			}
-			if !ok {
-				continue
-			}
-			err = s.takeSnapshot(dstPath, cfg.srcDir)
-			if check(err) != nil {
-				log.Error.Printf("%s: error snapshotting: %s", op, err)
-			}
+		ok, dstPath, err := s.shouldSnapshot(cfg)
+		if check(err) != nil {
+			log.Error.Printf("%s: error checking whether to snapshot: %s", op, err)
+			continue
+		}
+		if !ok {
+			continue
+		}
+		err = s.takeSnapshot(dstPath, cfg.srcDir)
+		if check(err) != nil {
+			log.Error.Printf("%s: error snapshotting: %s", op, err)
 		}
 	}
 	return firstErr
@@ -144,7 +134,7 @@ func (s *server) snapshotAll() error {
 
 // snapshotDir returns the destination path for a snapshot given its
 // configuration.
-func (s *server) snapshotDir(cfg snapshotConfig) (path.Parsed, error) {
+func (s *server) snapshotDir(cfg *snapshotConfig) (path.Parsed, error) {
 	date := s.now().Go().UTC().Format(cfg.dateFormat)
 	dstDir := path.Join(cfg.dstDir, date)
 
@@ -157,7 +147,7 @@ func (s *server) snapshotDir(cfg snapshotConfig) (path.Parsed, error) {
 
 // shouldSnapshot reports whether it's time to snapshot the given configuration.
 // It also returns the parsed path of where the snapshot will be made.
-func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
+func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) {
 	const op = "dir/server.shouldSnapshot"
 
 	p, err := s.snapshotDir(cfg)
@@ -189,15 +179,15 @@ func (s *server) shouldSnapshot(cfg snapshotConfig) (bool, path.Parsed, error) {
 
 // takeSnapshotFor takes a snapshot for a user.
 func (s *server) takeSnapshotFor(user upspin.UserName) error {
-	cfgs, err := s.getSnapshotConfig(user)
+	cfg, err := s.getSnapshotConfig(user)
 	if err != nil {
 		return err
 	}
-	dstDir, err := s.snapshotDir(cfgs[0])
+	dstDir, err := s.snapshotDir(cfg)
 	if err != nil {
 		return err
 	}
-	return s.takeSnapshot(dstDir, cfgs[0].srcDir)
+	return s.takeSnapshot(dstDir, cfg.srcDir)
 }
 
 // takeSnapshot takes a snapshot to dstDir from srcDir.
