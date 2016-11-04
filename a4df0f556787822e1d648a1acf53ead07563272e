@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b0a0f5f_788f550b",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "if name is always a directory, say so in the comment and call it dirName or something like that",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_987cb926",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "i would use dir/inprocess.Glob if Glob is the only caller",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_189a8949",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "if name/foo exists and is a directory, this will be the wrong answer.\nfoo is too easy a name for that test. use something more obscure.\n\n\nbut: if name is a directory, listing name is the question you should be asking, isn\u0027t it?",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_15b094dc",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "s/that/that one/",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_75a5a09e",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "s/Glob/\u0026 operation/ ? invocation?",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_959be458",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "s/do/just do/",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_f598705d",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "s/is/has/",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_b59ee848",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:52:25Z",
+      "side": 1,
+      "message": "s/]//",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
