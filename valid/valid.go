@@ -111,6 +111,7 @@ func Endpoint(endpoint upspin.Endpoint) error {
 // - Name is equal to SignedName
 // - blocks may be present only if Attr == AttrNone
 // - Link may be present only if Attr == AttrLink
+// - Attr must not include AttrIncomplete
 // - Packing must be known
 // - Sequence must have a known special value or be non-negative
 func DirEntry(entry *upspin.DirEntry) error {
@@ -122,6 +123,11 @@ func DirEntry(entry *upspin.DirEntry) error {
 	// Name must match.
 	if entry.Name != entry.SignedName {
 		return errors.E(op, errors.Invalid, entry.Name, errors.Str("Name and SignedName must match"))
+	}
+	// Is the entry incomplete? Servers must not accept such entries.
+	// (Although they may return them.)
+	if entry.IsIncomplete() {
+		return errors.E(op, errors.Invalid, entry.Name, errors.Str("entry must not be incomplete"))
 	}
 
 	// Attribute must be valid and consistent with entry.

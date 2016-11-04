@@ -67,7 +67,7 @@ assumed to refer to the store defined in the user's context.
 		if err != nil {
 			s.exit(err)
 		}
-		if entry.Attr != upspin.AttrNone {
+		if !entry.IsRegular() {
 			s.exitf("%s is not a plain file", arg)
 		}
 		for _, block := range entry.Blocks {

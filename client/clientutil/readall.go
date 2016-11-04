@@ -20,7 +20,10 @@ func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 	const op = "client/clientutil.ReadAll"
 
 	if entry.IsLink() {
-		return nil, errors.E(op, errors.Invalid, errors.Str("can't read a link entry"))
+		return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("can't read a link entry"))
+	}
+	if entry.IsIncomplete() {
+		return nil, errors.E(op, entry.Name, errors.Permission)
 	}
 
 	var data []byte
