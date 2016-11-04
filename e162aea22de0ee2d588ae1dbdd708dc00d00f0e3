@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86ce5aee_94c361f2",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T00:22:58Z",
+      "side": 1,
+      "message": "ok. please don\u0027t delete. this is protected by -v so it\u0027s not noisy unless you ask it to be",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_d4cb1908",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T00:22:58Z",
+      "side": 1,
+      "message": "i don\u0027t know what the %s is going to refer to.\n\nhow about\n\nSnapshot requests the system to take a snapshot of the user\u0027s\ndirectory tree as soon as possible. Snapshots are created only if\nthe directory server for the user\u0027s root supports them.",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86ce5aee_34dd55c6",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T00:22:58Z",
+      "side": 1,
+      "message": "// Note: This is a hack, but it works. See dir/server/XXX for the mechanism.\n// TODO: Find a cleaner mechanism?",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
