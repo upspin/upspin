@@ -499,7 +499,14 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		return nil, s.errPerm(op, parsed)
+		canList, err := s.can(access.List, parsed)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !canList {
+			return nil, s.errPerm(op, parsed)
+		}
+		entry.MarkIncomplete()
 	}
 	return entry, nil
 }
@@ -669,8 +676,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 			checked = true
 		}
 		if !canRead {
-			entry.Blocks = nil
-			entry.Packdata = nil
+			entry.MarkIncomplete()
 		}
 	}
 

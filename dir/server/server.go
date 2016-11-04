@@ -226,7 +226,14 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		return nil, s.errPerm(op, p, o)
+		canList, _, err := s.hasRight(access.List, p, o)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !canList {
+			return nil, s.errPerm(op, p, o)
+		}
+		entry.MarkIncomplete()
 	}
 	return entry, nil
 }
@@ -558,8 +565,7 @@ func (s *server) glob(op string, p path.Parsed, overrideAccessCheck bool, opts .
 						// Make a shallow copy, since we need to clean
 						// the entry.
 						eCopy := *e
-						eCopy.Packdata = nil
-						eCopy.Blocks = nil
+						eCopy.MarkIncomplete()
 						entries = append(entries, &eCopy)
 					}
 				} else {
