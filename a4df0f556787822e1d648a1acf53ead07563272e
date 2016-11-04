@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "6b0a0f5f_f28c06c4",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T20:55:40Z",
+      "side": 1,
+      "message": "comment",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_15b094dc",
         "filename": "serverutil/glob.go",
         "patchSetId": 3
@@ -98,6 +115,23 @@
       "writtenOn": "2016-11-04T19:52:25Z",
       "side": 1,
       "message": "s/do/just do/",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_b2fd5ec4",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T20:55:40Z",
+      "side": 1,
+      "message": "Ah, I see why you filed issue #95. Note that LookupFunc does not need to be DirServer.Lookup exactly. It could be a true an internal version that does the right thing.\n\nOr, for more work, this can also be List(p.Drop(1)) + pick the entry you want.\n\nOr, it could simply not do the optimization.",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
