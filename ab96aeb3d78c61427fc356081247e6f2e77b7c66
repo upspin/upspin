@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b0a0f5f_75fac09d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:36:28Z",
+      "side": 1,
+      "message": "you\u0027re calling user.Parse a lot. it\u0027s not too expensive but maybe the parsed user should be prepped first, and then the helper functions become trivial. isSnapshotUser becomes just suffix \u003d\u003d \"+snapshot\", for instance.\n\nalso the two helpers do some other work repeatedly as well. \n\nfor another CL if you prefer.",
+      "revId": "ab96aeb3d78c61427fc356081247e6f2e77b7c66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_f50d10e7",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 796,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-04T19:36:28Z",
+      "side": 1,
+      "message": "again here. this is too much repeated parsing when the question is a trivial string operation",
+      "revId": "ab96aeb3d78c61427fc356081247e6f2e77b7c66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
