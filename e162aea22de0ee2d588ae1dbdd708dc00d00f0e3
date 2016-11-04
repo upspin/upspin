@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6b0a0f5f_3295ee1b",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T16:16:47Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "86ce5aee_94c361f2",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_d4cb1908",
         "filename": "cmd/upspin/snapshot.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "6b0a0f5f_728f760b",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T16:16:47Z",
+      "side": 1,
+      "message": "It referred to your suffixed user. Changed.\nDone.",
+      "parentUuid": "86ce5aee_d4cb1908",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86ce5aee_34dd55c6",
         "filename": "cmd/upspin/snapshot.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-11-04T00:22:58Z",
       "side": 1,
       "message": "// Note: This is a hack, but it works. See dir/server/XXX for the mechanism.\n// TODO: Find a cleaner mechanism?",
+      "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_f2a24682",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T16:16:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ce5aee_34dd55c6",
       "revId": "e162aea22de0ee2d588ae1dbdd708dc00d00f0e3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
