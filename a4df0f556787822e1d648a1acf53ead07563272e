@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_153f14ce",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_788f550b",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_987cb926",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-04T19:52:25Z",
       "side": 1,
       "message": "i would use dir/inprocess.Glob if Glob is the only caller",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_754a0875",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_987cb926",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_35449065",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "fixed as per our discussion",
+      "parentUuid": "6b0a0f5f_189a8949",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_f28c06c4",
         "filename": "serverutil/glob.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-04T20:55:40Z",
       "side": 1,
       "message": "comment",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_152634d4",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_f28c06c4",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_352b309b",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_15b094dc",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_75a5a09e",
         "filename": "serverutil/glob.go",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-11-04T19:52:25Z",
       "side": 1,
       "message": "s/Glob/\u0026 operation/ ? invocation?",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_d52f5ca3",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_75a5a09e",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_f52cd8b0",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_959be458",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_b2fd5ec4",
         "filename": "serverutil/glob.go",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2016-11-04T20:55:40Z",
       "side": 1,
       "message": "Ah, I see why you filed issue #95. Note that LookupFunc does not need to be DirServer.Lookup exactly. It could be a true an internal version that does the right thing.\n\nOr, for more work, this can also be List(p.Drop(1)) + pick the entry you want.\n\nOr, it could simply not do the optimization.",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_9539e4ed",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "It\u0027s not really an optimization; it\u0027s just the most straightforward way of doing it.\n\nI\u0027d rather that lookup be exactly DirServer.Lookup, access checks and all, that way there is only one method that server authors need to implement correctly.",
+      "parentUuid": "6b0a0f5f_b2fd5ec4",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_b53660fb",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_f598705d",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_b59ee848",
         "filename": "serverutil/glob.go",
         "patchSetId": 3
@@ -166,6 +328,24 @@
       "writtenOn": "2016-11-04T19:52:25Z",
       "side": 1,
       "message": "s/]//",
+      "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_55458c63",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-04T21:53:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_b59ee848",
       "revId": "a4df0f556787822e1d648a1acf53ead07563272e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
