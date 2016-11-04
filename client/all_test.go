@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/context"
+	"upspin.io/log"
 	"upspin.io/upspin"
 
 	dirserver "upspin.io/dir/inprocess"
@@ -548,10 +549,12 @@ func TestGlobLinks(t *testing.T) {
 		"linkglobber@google.com/dir/file") {
 		t.Error("glob failed")
 	}
+	log.SetLevel("debug")
 	if !globAndCheck(t, client, linkName+"/*",
 		"linkglobber@google.com/dir/file") {
 		t.Error("glob failed")
 	}
+	log.SetLevel("info")
 	// There is only one file, although there are two paths to it.
 	if !globAndCheck(t, client, root+"/*/*",
 		"linkglobber@google.com/dir/file") {
