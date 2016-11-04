@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6b0a0f5f_c392d6de",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-04T21:49:15Z",
+      "side": 1,
+      "message": "Yeah, I noticed this too. I\u0027m not very happy about it. I\u0027ve put a TODO to clean up.\n\nThanks.",
+      "parentUuid": "6b0a0f5f_75fac09d",
+      "revId": "ab96aeb3d78c61427fc356081247e6f2e77b7c66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_f50d10e7",
         "filename": "dir/server/server.go",
         "patchSetId": 2
