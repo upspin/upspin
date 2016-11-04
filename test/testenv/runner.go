@@ -199,6 +199,26 @@ func (r *Runner) GotEntry(p upspin.PathName) bool {
 	return false
 }
 
+// GotIncompleteEntry reports whether the Entry has attribute Incomplete and
+// does not have populated Blocks and Packdata fields.
+// If not, it notes the discrepancy as the last error state.
+func (r *Runner) GotIncompleteEntry(p upspin.PathName) bool {
+	if !r.GotEntry(p) {
+		return false
+	}
+	if !r.Entry.IsIncomplete() {
+		r.lastErr = errors.Str("does not have AttrIncomplete, should be set")
+	} else if r.Entry.Blocks != nil {
+		r.lastErr = errors.Str("has non-nil Blocks, want nil")
+	} else if r.Entry.Packdata != nil {
+		r.lastErr = errors.Str("has non-nil Packdata, want nil")
+	} else {
+		return true
+	}
+	_, r.errFile, r.errLine, _ = runtime.Caller(2)
+	return false
+}
+
 // GotEntryWithSequence reports whether the Entry has the given name
 // and sequence number and if not notes the discrepancy as the last error state.
 func (r *Runner) GotEntryWithSequence(p upspin.PathName, seq int64) bool {

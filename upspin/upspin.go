@@ -434,6 +434,9 @@ const (
 	// The target path is stored in the Link field of the DirEntry.
 	// A link DirEntry holds zero DirBlocks.
 	AttrLink = Attribute(1 << 1)
+	// AttrIncomplete identifies a DirEntry whose Blocks and Packdata
+	// fields are elided for access control purposes.
+	AttrIncomplete = Attribute(1 << 2)
 )
 
 // Special Sequence numbers.
