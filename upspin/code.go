@@ -362,21 +362,26 @@ func Now() Time {
 
 // IsDir reports whether the entry is a directory.
 func (d *DirEntry) IsDir() bool {
-	return d.Attr == AttrDirectory
+	return d.Attr&AttrDirectory != 0
 }
 
-// IsLink reports whether the entry is a link to
-// something perhaps outside of Upspin.
+// IsLink reports whether the entry is a link.
 func (d *DirEntry) IsLink() bool {
-	return d.Attr == AttrLink
+	return d.Attr&AttrLink != 0
+}
+
+// IsIncomplete reports whether the entry is incomplete,
+// and therefore does not have valid Blocks or Packdata.
+func (d *DirEntry) IsIncomplete() bool {
+	return d.Attr&AttrIncomplete != 0
 }
 
 // ErrIncompatible is returned by SetDir and SetRedirect to indicate the
 // current attribute bits are incompatible with a directory or redirect.
 var ErrIncompatible = errors.New("attribute incompatible with directory entry")
 
-// SetDir marks this entry as a directory. If any other bits are set,
-// it is an error.
+// SetDir marks this entry as a directory.
+// If any other bits are set, it is an error.
 func (d *DirEntry) SetDir() error {
 	if d.Attr|AttrDirectory != AttrDirectory {
 		return ErrIncompatible
@@ -385,14 +390,22 @@ func (d *DirEntry) SetDir() error {
 	return nil
 }
 
-// SetLink marks this entry as a link. If any other bits are set,
-// it is an error.
+// SetLink marks this entry as a link.
+// If any other bits are set, it is an error.
 func (d *DirEntry) SetLink() error {
 	if d.Attr|AttrLink != AttrLink {
 		return ErrIncompatible
 	}
 	d.Attr = AttrLink
 	return nil
+}
+
+// SetIncomplete marks this entry as incomplete
+// and zeroes the Blocks and Packdata fields.
+func (d *DirEntry) SetIncomplete() {
+	d.Attr |= AttrIncomplete
+	d.Blocks = nil
+	d.Packdata = nil
 }
 
 func (p Packing) String() string {

@@ -75,6 +75,12 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
+		if right == "list" {
+			r.DirLookup(file)
+			if !r.GotIncompleteEntry(file) {
+				t.Fatalf(r.Diag())
+			}
+		}
 
 		r.Get(missingFile)
 		if right == "list" {
@@ -1026,6 +1032,9 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	r.As(readerName)
 	r.Glob(base + "/dir1/*link/file")
 	if len(r.Entries) != 2 {
+		for i, e := range r.Entries {
+			t.Logf("got entry %d: %v", i, e.Name)
+		}
 		t.Fatalf("got %d entries, want 2", len(r.Entries))
 	}
 	if e0 := r.Entries[0]; e0.Name != dir2file {
