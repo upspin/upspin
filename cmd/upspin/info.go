@@ -264,14 +264,13 @@ func (s *State) doCheckGroupFile(parsed path.Parsed, groupSeen map[upspin.PathNa
 	}
 	for _, member := range members {
 		if member.IsRoot() {
-			// Normal user. Does user exist?
+			// Normal user.
 			user := member.User()
 			if !s.userExists(user, userSeen) {
 				s.failf("user %s in Group file %s not found in key server", user, group)
 				continue
 			}
 			// Member must be able to read the Group file.
-			// TODO: worth remembering users we've already checked for this file?
 			canRead, err := accessFile.Can(user, access.Read, group, s.client.Get)
 			if err != nil {
 				s.exitf("error checking permissions in Group file %s for user %s: %v", group, user, err)
@@ -300,19 +299,20 @@ func (s *State) checkAccessFile(name upspin.PathName) {
 	if err != nil {
 		s.exitf("cannot parse Access file: %v", err)
 	}
-	users, err := accessFile.Users(access.AnyRight, s.client.Get)
-	if err != nil {
-		s.exitf("cannot get full user list for Access file %s: %v", name, err)
-	}
+	users := accessFile.List(access.AnyRight)
 
-	// Access.Users expands the groups for us.
-	// TODO: We could check the groups it references manually.
+	groupSeen := make(map[upspin.PathName]bool)
 	userSeen := make(map[upspin.UserName]bool)
 	for _, user := range users {
-		// Normal user. Does user exist?
-		if !s.userExists(user, userSeen) {
-			s.failf("user %s in Access file %s not found in key server", user, name)
+		if user.IsRoot() {
+			// Normal user.
+			if !s.userExists(user.User(), userSeen) {
+				s.failf("user %s in Access file %s not found in key server", user.User(), name)
+			}
+			continue
 		}
+		// Member is a group.
+		s.doCheckGroupFile(user, groupSeen, userSeen)
 	}
 }
 

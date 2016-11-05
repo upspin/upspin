@@ -734,6 +734,29 @@ func (s sliceOfUserName) Len() int           { return len(s) }
 func (s sliceOfUserName) Less(i, j int) bool { return s[i] < s[j] }
 func (s sliceOfUserName) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
+// List returns the list of users and groups granted the specified right. Unlike
+// the Users method, List returns the original unexpanded members from the Access
+// file. In particular, groups appear as their original group names rather than as
+// the users they represent. The returned values are parsed path names. If they are
+// roots, they represent users; otherwise they represent groups. List is useful
+// mainly for diagnosing permission problems; the Users method has more quotidian
+// uses.
+func (a *Access) List(right Right) []path.Parsed {
+	// Make a copy to avoid the caller modifying the Access struct.
+	var list []path.Parsed
+	if right == AnyRight {
+		list = a.allUsers
+	} else {
+		list = a.list[right]
+	}
+	if list == nil {
+		return nil
+	}
+	out := make([]path.Parsed, len(list))
+	copy(out, list)
+	return out
+}
+
 // Users returns the user names granted a given right according to the rules
 // of the Access file. It also interprets the rule that the owner can always
 // Read and List.  Users loads group files as needed by calling the provided
