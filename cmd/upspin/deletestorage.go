@@ -62,7 +62,7 @@ assumed to refer to the store defined in the user's context.
 
 	var prevEndpoint upspin.Endpoint
 	var store upspin.StoreServer
-	for _, arg := range fs.Args() {
+	for _, arg := range s.globAllUpspin(fs.Args()) {
 		entry, err := s.DirServer().Lookup(upspin.PathName(arg))
 		if err != nil {
 			s.exit(err)
