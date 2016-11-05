@@ -15,17 +15,18 @@ argument and points to the second path argument.
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
 	s.parseFlags(fs, args, help, "link original_path link_path")
-	if fs.NArg() != 2 {
+	files := s.globAllUpspin(fs.Args())
+	if len(files) != 2 {
 		fs.Usage()
 	}
 
-	originalPath := s.globUpspin(fs.Arg(0))
-	linkPath := s.globUpspin(fs.Arg(1))
+	originalPath := files[0]
+	linkPath := files[1]
 	if len(originalPath) != 1 || len(linkPath) != 1 {
 		fs.Usage()
 	}
 
-	_, err := s.client.PutLink(originalPath[0], linkPath[0])
+	_, err := s.client.PutLink(originalPath, linkPath)
 	if err != nil {
 		s.exit(err)
 	}

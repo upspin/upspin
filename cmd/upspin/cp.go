@@ -34,13 +34,28 @@ the data itself.
 	fs.Bool("v", false, "log each file as it is copied")
 	fs.Bool("R", false, "recursively copy directories")
 	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
-	if fs.NArg() < 2 {
+
+	cs := &copyState{
+		state:   s,
+		flagSet: fs,
+		recur:   boolFlag(fs, "R"),
+		verbose: boolFlag(fs, "v"),
+	}
+
+	// Do all the glob processing here.
+	// Special one-at-time glob processing because each item may be local or Upspin.
+	var files []cpFile
+	for _, file := range fs.Args() {
+		files = append(files, cs.glob(file)...)
+	}
+
+	if len(files) < 2 {
 		fs.Usage()
 	}
 
-	nSrc := fs.NArg() - 1
-	src, dest := fs.Args()[:nSrc], fs.Args()[nSrc]
-	s.copyCommand(fs, src, dest)
+	nSrc := len(files) - 1
+	src, dest := files[:nSrc], files[nSrc]
+	s.copyCommand(cs, src, dest)
 }
 
 type copyState struct {
@@ -69,26 +84,13 @@ var (
 	errIsDir    = errors.E(errors.IsDir)
 )
 
-func (s *State) copyCommand(fs *flag.FlagSet, src []string, dst string) {
+func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	// TODO: Check for nugatory copies.
-	cs := &copyState{
-		state:   s,
-		flagSet: fs,
-		recur:   boolFlag(fs, "R"),
-		verbose: boolFlag(fs, "v"),
-	}
-	// Glob the paths.
-	var files []cpFile
-	for _, file := range src {
-		files = append(files, cs.glob(file)...)
-	}
-	files = append(files, cs.glob(dst)...)
-	srcFiles, dstFile := files[:len(files)-1], files[len(files)-1] // We are guaranteed at least two entries in files.
 	if s.isDir(dstFile) {
 		s.copyToDir(cs, srcFiles, dstFile)
 		return
 	}
-	if len(src) != 1 {
+	if len(srcFiles) != 1 {
 		s.failf("copying multiple files but %s is not a directory", dstFile.path)
 		cs.flagSet.Usage()
 	}

@@ -75,7 +75,9 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 	if err != nil {
 		s.exit(err)
 	}
-	err = a.archive(upspin.PathName(fs.Arg(0)), s.createLocal(fs.Arg(1)))
+	dir := s.globOneUpspin(fs.Arg(0))
+	file := s.globOneLocal(fs.Arg(1))
+	err = a.archive(dir, s.createLocal(file))
 	if err != nil {
 		s.exit(err)
 	}
@@ -90,7 +92,7 @@ func (s *State) untarCommand(fs *flag.FlagSet) {
 		s.exit(err)
 	}
 	a.matchReplace(stringFlag(fs, "match"), stringFlag(fs, "replace"))
-	err = a.unarchive(s.openLocal(fs.Arg(0)))
+	err = a.unarchive(s.openLocal(s.globOneLocal(fs.Arg(0))))
 	if err != nil {
 		s.exit(err)
 	}
