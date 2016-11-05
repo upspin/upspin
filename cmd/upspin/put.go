@@ -16,17 +16,14 @@ TODO: Delete in favor of cp?
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
 	s.parseFlags(fs, args, help, "put [-in=inputfile] path")
-	if fs.NArg() != 1 {
-		fs.Usage()
-	}
 
-	name := s.globUpspin(fs.Arg(0))
-	if len(name) != 1 {
+	names := s.globAllUpspin(fs.Args())
+	if len(names) != 1 {
 		fs.Usage()
 	}
 
 	data := s.readAll(*inFile)
-	_, err := s.client.Put(name[0], data)
+	_, err := s.client.Put(names[0], data)
 	if err != nil {
 		s.exit(err)
 	}

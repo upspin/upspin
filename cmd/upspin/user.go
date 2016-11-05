@@ -37,7 +37,7 @@ same JSON format printed by the command without the -put flag.
 		if fs.NArg() != 0 {
 			fs.Usage()
 		}
-		s.putUser(keyServer, *inFile, *force)
+		s.putUser(keyServer, s.globOneLocal(*inFile), *force)
 		return
 	}
 	if *inFile != "" {

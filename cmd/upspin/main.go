@@ -300,6 +300,16 @@ func (s *State) globUpspin(pattern string) []upspin.PathName {
 	return out
 }
 
+// globOneUpspin glob-expands the argument, which must result in a
+// single Upspin file name.
+func (s *State) globOneUpspin(pattern string) upspin.PathName {
+	strs := s.globUpspin(pattern)
+	if len(strs) != 1 {
+		s.exitf("more than one file matches %s", pattern)
+	}
+	return strs[0]
+}
+
 // globLocal glob-expands the argument, which should be a syntactically
 // valid glob pattern (including a plain file name).
 func (s *State) globLocal(pattern string) []string {
@@ -313,6 +323,16 @@ func (s *State) globLocal(pattern string) []string {
 		return []string{pattern}
 	}
 	return strs
+}
+
+// globOneLocal glob-expands the argument, which must result in a
+// single local file name.
+func (s *State) globOneLocal(pattern string) string {
+	strs := s.globLocal(pattern)
+	if len(strs) != 1 {
+		s.exitf("more than one file matches %s", pattern)
+	}
+	return strs[0]
 }
 
 func (s *State) openLocal(path string) *os.File {
