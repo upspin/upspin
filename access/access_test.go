@@ -52,11 +52,24 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	match(t, a.list[Read], []string{"a@b.co", "foo@bob.com", "reader@reader.org", "x@y.uk"})
-	match(t, a.list[Write], []string{"anotherwriter@a.bc", "writer@a.bc"})
-	match(t, a.list[List], []string{"lister@n.mn"})
-	match(t, a.list[Create], []string{"admin@c.com"})
-	match(t, a.list[Delete], []string{"admin@c.com"})
+	list := []string{"a@b.co", "foo@bob.com", "reader@reader.org", "x@y.uk"}
+	match(t, a.List(Read), list)
+	match(t, a.list[Read], list)
+	list = []string{"anotherwriter@a.bc", "writer@a.bc"}
+	match(t, a.List(Write), list)
+	match(t, a.list[Write], list)
+	list = []string{"lister@n.mn"}
+	match(t, a.List(List), list)
+	match(t, a.list[List], list)
+	list = []string{"admin@c.com"}
+	match(t, a.List(Create), list)
+	match(t, a.list[Create], list)
+	match(t, a.List(Delete), list)
+	match(t, a.list[Delete], list)
+
+	list = []string{"a@b.co", "foo@bob.com", "reader@reader.org", "x@y.uk", "anotherwriter@a.bc", "writer@a.bc", "lister@n.mn", "admin@c.com", "admin@c.com"}
+	match(t, a.List(AnyRight), list)
+	match(t, a.allUsers, list)
 }
 
 func TestParseEmpty(t *testing.T) {
@@ -66,6 +79,7 @@ func TestParseEmpty(t *testing.T) {
 	}
 	for i := Read; i < numRights; i++ {
 		match(t, a.list[i], nil)
+		match(t, a.List(i), nil)
 	}
 
 	// Nil should be OK too.
