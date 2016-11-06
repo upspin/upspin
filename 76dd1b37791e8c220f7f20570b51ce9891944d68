@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "6b0a0f5f_8430d4b5",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-06T00:24:41Z",
+      "side": 1,
+      "message": "It\u0027s exactly 80 columns as written. I use a tool to do this. If you tell me it needs to be 79 I will make you write all future code with a key punch.",
+      "parentUuid": "6b0a0f5f_04722491",
+      "revId": "76dd1b37791e8c220f7f20570b51ce9891944d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_e46e00ad",
         "filename": "access/access.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
       "writtenOn": "2016-11-05T22:48:00Z",
       "side": 1,
       "message": "worth a quick and easy test.",
+      "revId": "76dd1b37791e8c220f7f20570b51ce9891944d68",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b0a0f5f_6435f0a3",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-06T00:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_e46e00ad",
       "revId": "76dd1b37791e8c220f7f20570b51ce9891944d68",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
