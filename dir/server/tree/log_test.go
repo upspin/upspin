@@ -109,6 +109,27 @@ func TestAppendRead(t *testing.T) {
 	if got, want := string(entries[3].Entry.Name), "foo@bar.com/hello9"; got != want {
 		t.Errorf("entries[3].Entry.Name = %q, want = %q", got, want)
 	}
+
+	// Clone the log and ensure it's read-only.
+	clone, err := logger.Clone()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := clone.LastOffset(), logger.LastOffset(); got != want {
+		t.Errorf("LastOffset = %d, want = %d", got, want)
+	}
+	entries, nextOffset, err = clone.ReadAt(1, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(entries), 1; got != want {
+		t.Fatalf("len(entries) = %d, want = %d", got, want)
+	}
+	err = clone.Append(newLogEntry(upspin.PathName("foo@bar.com/yabbadabadoo")))
+	expectedErr := errors.E(errors.IO)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
+	}
 }
 
 func TestLogIndex(t *testing.T) {
@@ -167,6 +188,25 @@ func TestLogIndex(t *testing.T) {
 	}
 	if recoveredOffset != offset {
 		t.Errorf("recoveredOffset = %d, want = %d", recoveredOffset, offset)
+	}
+
+	// Clone the log index and ensure it's read-only.
+	clone, err := logIndex.Clone()
+	if err != nil {
+		t.Fatal(err)
+	}
+	offset, err = clone.ReadOffset()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := offset, recoveredOffset; got != want {
+		t.Errorf("LastOffset = %d, want = %d", got, want)
+	}
+	// Now write something and get an error.
+	err = clone.SaveOffset(999999)
+	expectedErr = errors.E(errors.IO)
+	if !errors.Match(expectedErr, err) {
+		t.Errorf("err = %v, want = %v", err, expectedErr)
 	}
 }
 
