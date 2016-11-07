@@ -38,9 +38,8 @@ type LogEntry struct {
 // Log represents the log of DirEntry changes. It is primarily used by
 // Tree (provided through its Config struct) to log changes.
 type Log struct {
-	user   upspin.UserName // user for whom this log is intended.
-	file   *os.File        // file descriptor for the log.
-	offset int64           // last position appended to the log (end of log).
+	user upspin.UserName // user for whom this log is intended.
+	file *os.File        // file descriptor for the log.
 }
 
 // LogIndex reads and writes from/to stable storage the log state information
@@ -68,14 +67,9 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
-	offset, err := loggerFile.Seek(0, io.SeekEnd)
-	if err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
-	}
 	l := &Log{
-		user:   user,
-		file:   loggerFile,
-		offset: offset,
+		user: user,
+		file: loggerFile,
 	}
 
 	rloc := rootFile(user, directory)
@@ -170,16 +164,14 @@ func (l *Log) Append(e *LogEntry) error {
 	if err != nil {
 		return err
 	}
-	offs, err := l.file.Seek(0, io.SeekEnd)
+	_, err = l.file.Seek(0, io.SeekEnd)
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	n, err := l.file.Write(buf)
+	_, err = l.file.Write(buf)
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	// n is == len(buf) when err != nil, so no need to check.
-	l.offset = offs + int64(n)
 	return nil
 }
 
@@ -187,9 +179,10 @@ func (l *Log) Append(e *LogEntry) error {
 // returns the next offset.
 func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"
-	if offset >= l.offset {
+	fileOffset := l.LastOffset()
+	if offset >= fileOffset {
 		// End of file.
-		return dst, l.offset, nil
+		return dst, fileOffset, nil
 	}
 	log.Debug.Printf("%s: seeking to offset %d, reading %d log entries", op, offset, n)
 	_, err = l.file.Seek(offset, io.SeekStart)
@@ -200,9 +193,9 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 	cbr := &countingByteReader{rd: bufio.NewReader(l.file)}
 	for i := 0; i < n; i++ {
 		var le LogEntry
-		if next == l.offset {
+		if next == fileOffset {
 			// End of file.
-			return dst, l.offset, nil
+			return dst, fileOffset, nil
 		}
 		err := le.unmarshal(cbr)
 		if err != nil {
@@ -214,10 +207,13 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 	return
 }
 
-// LastOffset returns the offset of the most-recently-appended entry or 0 if the
-// log is empty.
+// LastOffset returns the offset of the end of the file or -1 on error.
 func (l *Log) LastOffset() int64 {
-	return l.offset
+	offset, err := l.file.Seek(0, io.SeekEnd)
+	if err != nil {
+		return -1
+	}
+	return offset
 }
 
 // Truncate truncates the log at offset.
@@ -227,7 +223,6 @@ func (l *Log) Truncate(offset int64) error {
 	if err != nil {
 		return errors.E(op, err)
 	}
-	l.offset = offset
 	return nil
 }
 
@@ -351,6 +346,9 @@ func (li *LogIndex) ReadOffset() (int64, error) {
 // SaveOffset saves to stable storage the offset to process next.
 func (li *LogIndex) SaveOffset(offset int64) error {
 	const op = "dir/server/tree.LogIndex.SaveOffset"
+	if offset < 0 {
+		return errors.Invalid //.... tbd
+	}
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
 	return overwriteAndSync(op, li.indexFile, tmp[:n])

@@ -915,6 +915,50 @@ func TestFlushNewTree(t *testing.T) {
 	}
 }
 
+// Tests internal functionality that can be tricky.
+func TestRemoveDeadWatchers(t *testing.T) {
+	open := make(chan struct{})
+	closed := make(chan struct{})
+	close(closed)
+
+	for i, c := range []struct {
+		done []chan struct{}
+		open int
+	}{
+		{[]chan struct{}{}, 0},
+		{[]chan struct{}{nil}, 0},
+		{[]chan struct{}{open}, 1},
+		{[]chan struct{}{closed}, 0},
+		{[]chan struct{}{open, open}, 2},
+		{[]chan struct{}{open, closed}, 1},
+		{[]chan struct{}{closed, open}, 1},
+		{[]chan struct{}{closed, closed}, 0},
+		{[]chan struct{}{closed, open, closed}, 1},
+		{[]chan struct{}{open, closed, closed}, 1},
+		{[]chan struct{}{nil, closed, closed}, 0},
+	} {
+		var watchers []watcher
+
+		for _, d := range c.done {
+			watchers = append(watchers, watcher{
+				done: d,
+			})
+		}
+
+		n := &node{
+			watchers: watchers,
+		}
+		removeDeadWatchers(n)
+
+		// Verify that only open watchers remain and they match the
+		// expected.
+
+		if got, want := len(n.watchers), c.open; got != want {
+			t.Fatalf("%d: open = %d, want = %d", i, got, want)
+		}
+	}
+}
+
 var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {
@@ -932,6 +976,42 @@ func TestMain(m *testing.M) {
 
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
+
+func checkEvent(e *upspin.Event, expectedEntry *upspin.DirEntry, expectDelete bool, expectBlocks bool) error {
+	if e == nil {
+		return errors.Str("nil event")
+	}
+	if e.Entry == nil {
+		return errors.Str("nil event entry")
+	}
+	if e.Entry.SignedName != expectedEntry.SignedName {
+		return errors.Errorf("SignedName = %s, want = %s", e.Entry.SignedName, expectedEntry.SignedName)
+	}
+	if e.Delete {
+		if !expectDelete {
+			return errors.Errorf("got Delete event, expected not Delete")
+		}
+	} else if expectDelete {
+		return errors.Errorf("got not Delete event, expected Delete")
+	}
+	if len(e.Entry.Blocks) == 0 {
+		if expectBlocks {
+			return errors.Errorf("got zero blocks, expected non-zero")
+		}
+	} else if !expectBlocks {
+		return errors.Errorf("got blocks, expected zero")
+	}
+	return nil
+}
+
+func mkdir(t *testing.T, tree *Tree, ctx upspin.Context, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
+	p, entry := newDirEntry(name, isDir, ctx)
+	entry, err := tree.Put(p, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return p, entry
+}
 
 func checkDirList(got []*upspin.DirEntry, want map[upspin.PathName]upspin.PathName) error {
 	if len(got) != len(want) {
@@ -964,12 +1044,20 @@ func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path.Parsed, *upspin.DirEntry) {
 	var writer upspin.UserName
 	var attr upspin.Attribute
+	var blocks []upspin.DirBlock
 	if isDir {
 		writer = serverName
 		attr = upspin.AttrDirectory
 	} else {
 		writer = userName
 		attr = upspin.AttrNone
+		blocks = []upspin.DirBlock{
+			{
+				Offset:   0,
+				Size:     1024,
+				Packdata: []byte("sign"),
+			},
+		}
 	}
 	p, err := path.Parse(userName + name)
 	if err != nil {
@@ -982,6 +1070,7 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		Packing:    context.Packing(),
 		Writer:     writer,
 		Packdata:   []byte("1234"),
+		Blocks:     blocks,
 	}
 }
 
