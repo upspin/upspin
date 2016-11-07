@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -44,6 +45,13 @@ type envs struct {
 	secrets     string
 }
 
+var secretsDir string
+
+func init() {
+	cwd, _ := os.Getwd()
+	secretsDir = filepath.Join(cwd, "../key/testdata/user1")
+}
+
 func TestInitContext(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
@@ -51,6 +59,7 @@ func TestInitContext(t *testing.T) {
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		packing:     upspin.EEPack,
+		secrets:     secretsDir,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -60,6 +69,7 @@ func TestDefaults(t *testing.T) {
 		username:  "noone@nowhere.org",
 		keyserver: defaultKeyEndpoint,
 		packing:   upspin.EEPack,
+		secrets:   secretsDir,
 	}
 	testConfig(t, &expect, makeConfig(&expect))
 }
@@ -87,6 +97,7 @@ func TestEnv(t *testing.T) {
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
 		packing:     upspin.EEPack,
+		secrets:     secretsDir,
 	}
 
 	defer func() {
@@ -151,7 +162,7 @@ func TestEndpointDefaults(t *testing.T) {
 keyserver: key.example.com
 dirserver: remote,dir.example.com
 storeserver: store.example.com:8080
-`
+secrets: ` + secretsDir + "\n"
 	expect := expectations{
 		username:    "noone@nowhere.org",
 		packing:     upspin.EEPack,
