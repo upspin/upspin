@@ -7,7 +7,7 @@ and put it in your PATH.
 
 	https://github.com/google/protobuf/releases
 
-Use 'go get' to install the latest protoc-gen-go:
+Use 'go get' to install the latest protoc-gen-go (v4 at time of writing):
 
 	$ go get -u github.com/golang/protobuf/protoc-gen-go
 
@@ -16,7 +16,7 @@ Then, run 'go generate' from this directory to re-generate the package:
 	$ go generate
 
 If you encounter unexpected diffs, such as changes to the
-"ProtoPackageIsVersion2" or "SupportPackageIsVersion3" constants,
+"ProtoPackageIsVersion3" or "SupportPackageIsVersion4" constants,
 then you may be using the wrong versions of protoc or protoc-gen-go.
 To debug, run  'which protoc' and 'which protoc-gen-go' and check that the
 commands in your path are the ones you just installed.
