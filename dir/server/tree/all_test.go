@@ -933,6 +933,15 @@ func TestMain(m *testing.M) {
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
 
+func mkdir(t *testing.T, tree *Tree, ctx upspin.Context, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
+	p, entry := newDirEntry(name, isDir, ctx)
+	entry, err := tree.Put(p, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return p, entry
+}
+
 func checkDirList(got []*upspin.DirEntry, want map[upspin.PathName]upspin.PathName) error {
 	if len(got) != len(want) {
 		return errors.Errorf("len(got) = %d, want = %d", len(got), len(want))
@@ -964,12 +973,20 @@ func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path.Parsed, *upspin.DirEntry) {
 	var writer upspin.UserName
 	var attr upspin.Attribute
+	var blocks []upspin.DirBlock
 	if isDir {
 		writer = serverName
 		attr = upspin.AttrDirectory
 	} else {
 		writer = userName
 		attr = upspin.AttrNone
+		blocks = []upspin.DirBlock{
+			{
+				Offset:   0,
+				Size:     1024,
+				Packdata: []byte("sign"),
+			},
+		}
 	}
 	p, err := path.Parse(userName + name)
 	if err != nil {
@@ -982,6 +999,7 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		Packing:    context.Packing(),
 		Writer:     writer,
 		Packdata:   []byte("1234"),
+		Blocks:     blocks,
 	}
 }
 
