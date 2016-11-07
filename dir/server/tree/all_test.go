@@ -898,6 +898,81 @@ func TestFlushNewTree(t *testing.T) {
 	}
 }
 
+func TestWatch(t *testing.T) {
+	const (
+		isDelete  = true
+		hasBlocks = true
+	)
+
+	context, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p, _ := mkdir(t, tree, context, "/")
+
+	ch, err := tree.Watch(p, 0, make(chan struct{}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Put something under the root and observe a notification.
+	dirPath, dir := mkdir(t, tree, context, "/dir")
+
+	event := <-ch
+	err = checkEvent(event, dir, !isDelete, !hasBlocks)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Put something under dir and observe another notification.
+	subdirPath, subdir := mkdir(t, tree, context, "/dir/subdir")
+
+	event = <-ch
+	err = checkEvent(event, subdir, !isDelete, !hasBlocks)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Delete an entry and observe the notification.
+	_, err = tree.Delete(subdirPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	event = <-ch
+	err = checkEvent(event, subdir, isDelete, !hasBlocks)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Add a watcher to dir.
+	ch2, err := tree.Watch(dirPath, 0, make(chan struct{}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Put a file under dir. Watch two updates, one on each channel.
+	p, entry := newDirEntry("/dir/fileA.txt", !isDir, context)
+	_, err = tree.Put(p, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	event = <-ch
+	err = checkEvent(event, entry, !isDelete, hasBlocks)
+	if err != nil {
+		t.Error(err)
+	}
+
+	event = <-ch2
+	err = checkEvent(event, entry, !isDelete, hasBlocks)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {
@@ -915,6 +990,42 @@ func TestMain(m *testing.M) {
 
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
+
+func checkEvent(e *Event, expectedEntry *upspin.DirEntry, expectDelete bool, expectBlocks bool) error {
+	if e == nil {
+		return errors.Str("nil event")
+	}
+	if e.Entry == nil {
+		return errors.Str("nil event entry")
+	}
+	if e.Entry.SignedName != expectedEntry.SignedName {
+		return errors.Errorf("SignedName = %s, want = %s", e.Entry.SignedName, expectedEntry.SignedName)
+	}
+	if e.Delete {
+		if !expectDelete {
+			return errors.Errorf("got Delete event, expected not Delete")
+		}
+	} else if expectDelete {
+		return errors.Errorf("got not Delete event, expected Delete")
+	}
+	if len(e.Entry.Blocks) == 0 {
+		if expectBlocks {
+			return errors.Errorf("got zero blocks, expected non-zero")
+		}
+	} else if !expectBlocks {
+		return errors.Errorf("got blocks, expected zero")
+	}
+	return nil
+}
+
+func mkdir(t *testing.T, tree *Tree, ctx upspin.Context, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
+	p, entry := newDirEntry(name, isDir, ctx)
+	entry, err := tree.Put(p, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return p, entry
+}
 
 func checkDirList(got []*upspin.DirEntry, want map[upspin.PathName]upspin.PathName) error {
 	if len(got) != len(want) {
@@ -947,12 +1058,20 @@ func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path.Parsed, *upspin.DirEntry) {
 	var writer upspin.UserName
 	var attr upspin.Attribute
+	var blocks []upspin.DirBlock
 	if isDir {
 		writer = serverName
 		attr = upspin.AttrDirectory
 	} else {
 		writer = userName
 		attr = upspin.AttrNone
+		blocks = []upspin.DirBlock{
+			{
+				Offset:   0,
+				Size:     1024,
+				Packdata: []byte("sign"),
+			},
+		}
 	}
 	p, err := path.Parse(userName + name)
 	if err != nil {
@@ -965,6 +1084,7 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		Packing:    context.Packing(),
 		Writer:     writer,
 		Packdata:   []byte("1234"),
+		Blocks:     blocks,
 	}
 }
 
