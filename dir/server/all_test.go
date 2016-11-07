@@ -238,8 +238,8 @@ func TestLink(t *testing.T) {
 	// Get a server for otherUser, who has no right to see the link.
 	sOther := newDirServerForTesting(t, otherUser)
 	de2, err = sOther.Lookup(userName + "/mylink")
-	if !errors.Match(errNotExist, err) {
-		t.Errorf("err = %v, want = %v", err, errNotExist)
+	if !errors.Match(errPrivate, err) {
+		t.Errorf("err = %v, want = %v", err, errPrivate)
 	}
 
 	// Now give otherUser some right.
@@ -686,8 +686,8 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 
 	sReader := newDirServerForTesting(t, otherUser)
 	_, err = sReader.Lookup(accessFile)
-	if !errors.Match(errNotExist, err) {
-		t.Errorf("err = %s\nwant = %q", err, errNotExist)
+	if !errors.Match(errPrivate, err) {
+		t.Errorf("err = %s\nwant = %q", err, errPrivate)
 	}
 
 	// Simulate we loaded the family Group through some remote server.
@@ -711,8 +711,8 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 	// Lookup now fails because the Group file granting permission is not
 	// found (no server for foo@example.com).
 	_, err = sReader.Lookup(accessFile)
-	if !errors.Match(errNotExist, err) {
-		t.Errorf("err = %s, want = %q", err, errNotExist)
+	if !errors.Match(errPrivate, err) {
+		t.Errorf("err = %s, want = %q", err, errPrivate)
 	}
 }
 
