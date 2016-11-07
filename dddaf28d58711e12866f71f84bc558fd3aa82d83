@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "abd88709_fa059831",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-07T17:03:24Z",
+      "side": 1,
+      "message": "Yes, on the dashboard at SendGrid. I\u0027m not sure how long they\u0027re archived for. We may need to pay if we want a long history.",
+      "parentUuid": "6b0a0f5f_3e6e55e5",
+      "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_7e1c5d8c",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-04T22:52:37Z",
       "side": 1,
       "message": "This shouldn\u0027t ever happen.   Perhaps we should log it and investigate if it does.",
+      "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abd88709_faeef847",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-07T17:03:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0a0f5f_7e1c5d8c",
       "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "abd88709_1a565c1b",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-07T17:03:24Z",
+      "side": 1,
+      "message": "Ok. Should we create a new alias? Maybe it could be a public discussion list. What do you recommend?\n\nCurrently, we use keyserver@upspin.io as the sender. But that is not a real email address. Perhaps it should be? Should we signup upspin.io for a G-suite account?\n\nThat\u0027s something Rob would have to manage.",
+      "parentUuid": "6b0a0f5f_de5aa962",
+      "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b0a0f5f_fe8ccdc3",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-04T22:52:37Z",
       "side": 1,
       "message": "Don\u0027t they need to edit the auto-created upspin/rc first?",
+      "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abd88709_da4f747c",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-07T17:03:24Z",
+      "side": 1,
+      "message": "Yes, good call. I added some new language here. Please take a look.",
+      "parentUuid": "6b0a0f5f_fe8ccdc3",
       "revId": "dddaf28d58711e12866f71f84bc558fd3aa82d83",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
