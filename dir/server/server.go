@@ -600,7 +600,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 			return nil, errors.E(op, name, errReadOnly)
 		}
 		// Everyone else can't even see it.
-		return nil, errors.E(op, name, errNotExist)
+		return nil, errors.E(op, name, errPrivate)
 	}
 
 	canDelete, link, err := s.hasRight(access.Delete, p, o)
