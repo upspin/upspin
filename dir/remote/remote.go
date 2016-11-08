@@ -138,6 +138,11 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return op.entryError(resp, err)
 }
 
+// Watch implements upspin.DirServer.
+func (r *remote) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
