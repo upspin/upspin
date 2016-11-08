@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8bd3c31c_bdec38e1",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-08T18:19:55Z",
+      "side": 1,
+      "message": "i wonder if we need IsRegular or something. there is code that does Attr\u003d\u003dAttrNone (or whatever it is) and i\u0027m not sure if it\u0027s OK to leave it like this.",
+      "revId": "6ef13a4b1da05b3d67653efebf1a6d7edace6e15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bd3c31c_bd0358bc",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-08T18:19:55Z",
+      "side": 1,
+      "message": "why are all these comments folded and so short?",
+      "revId": "6ef13a4b1da05b3d67653efebf1a6d7edace6e15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
