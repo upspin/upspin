@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8bd3c31c_e0661748",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-08T18:44:20Z",
+      "side": 1,
+      "message": "I think it is OK as is.  The only time we really care about AttrNone is to check for whether or not the entry can have blocks on Put and this doesn\u0027t change that.",
+      "parentUuid": "8bd3c31c_bdec38e1",
+      "revId": "6ef13a4b1da05b3d67653efebf1a6d7edace6e15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bd3c31c_bd0358bc",
         "filename": "upspin/code.go",
         "patchSetId": 3
