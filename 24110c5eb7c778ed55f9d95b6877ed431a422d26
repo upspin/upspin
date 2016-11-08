@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_9857d96d",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-08T01:49:33Z",
+      "side": 1,
+      "message": "They\u0027re invoked by the yaml package, just like their JSON equivalents. Added a comment.\n\nAdded a test.",
+      "parentUuid": "8bd3c31c_9a2bfd98",
+      "revId": "24110c5eb7c778ed55f9d95b6877ed431a422d26",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bd3c31c_dab1052f",
         "filename": "upspin/endpoint.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-08T01:40:31Z",
       "side": 1,
       "message": "I don\u0027t understand why you\u0027re calling unmarshal on an empty string. Is the function supposed to know what to unmarshal? What function am I supposed to give to this? Maybe this is never called by users, but instead by yaml.Unmarshal(data, \u0026endpoint)? Is that how it works?",
+      "revId": "24110c5eb7c778ed55f9d95b6877ed431a422d26",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_b8541569",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-08T01:49:33Z",
+      "side": 1,
+      "message": "Yes, it\u0027s called by yaml.Unmarshal. You\u0027ll never call this yourself.",
+      "parentUuid": "8bd3c31c_dab1052f",
       "revId": "24110c5eb7c778ed55f9d95b6877ed431a422d26",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
