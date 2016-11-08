@@ -5,9 +5,10 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/factotum"
 	"upspin.io/upspin"
@@ -16,7 +17,7 @@ import (
 
 func (s *State) user(args ...string) {
 	const help = `
-User prints in JSON format the user record stored in the key server
+User prints in YAML format the user record stored in the key server
 for the specified user, by default the current user.
 
 With the -put flag, user writes or replaces the information stored
@@ -24,7 +25,7 @@ for the current user. It can be used to update keys for the user;
 for new users see the signup command. The information is read
 from standard input or from the file provided with the -in flag.
 It must be the complete record for the user, and must be in the
-same JSON format printed by the command without the -put flag.
+same YAML format printed by the command without the -put flag.
 `
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
 	put := fs.Bool("put", false, "write new user record")
@@ -63,7 +64,7 @@ same JSON format printed by the command without the -put flag.
 		if err != nil {
 			s.exit(err)
 		}
-		blob, err := json.MarshalIndent(u, "", "\t")
+		blob, err := yaml.Marshal(u)
 		if err != nil {
 			// TODO(adg): better error message?
 			s.exit(err)
@@ -75,7 +76,7 @@ same JSON format printed by the command without the -put flag.
 func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 	data := s.readAll(inFile)
 	userStruct := new(upspin.User)
-	err := json.Unmarshal(data, userStruct)
+	err := yaml.Unmarshal(data, userStruct)
 	if err != nil {
 		// TODO(adg): better error message?
 		s.exit(err)
