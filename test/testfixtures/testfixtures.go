@@ -110,3 +110,8 @@ func (d *DummyDirServer) Delete(name upspin.PathName) (*upspin.DirEntry, error) 
 func (d *DummyDirServer) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
 }
+
+// Watch implements upspin.DirServer.
+func (d *DummyDirServer) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
