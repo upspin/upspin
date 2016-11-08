@@ -93,6 +93,17 @@ func TestPutNodes(t *testing.T) {
 		t.Errorf("de = %v, want %v", de, dir3)
 	}
 
+	de, dirty, err := tree.Lookup(mkpath(t, userName+"/dir"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !dirty {
+		t.Errorf("dirty = %v, want %v", dirty, true)
+	}
+	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
+		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	}
+
 	// Flush to later build a new tree and verify new is equivalent to old.
 	err = tree.Flush()
 	if err != nil {
@@ -127,9 +138,12 @@ func TestPutNodes(t *testing.T) {
 
 	// Verify that the entry for the directory now has an incremented
 	// sequence number.
-	de, _, err = tree.Lookup(mkpath(t, userName+"dir/"))
+	de, dirty, err = tree.Lookup(mkpath(t, userName+"/dir/"))
 	if err != nil {
 		t.Fatal(err)
+	}
+	if dirty {
+		t.Errorf("dirty = %v, want %v", dirty, false)
 	}
 	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
 		t.Errorf("de.Sequence = %d, want = %d", got, want)

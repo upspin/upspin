@@ -41,7 +41,7 @@ func (t *Tree) store(n *node) error {
 	n.entry.Packing = t.context.Packing()
 	n.entry.Time = upspin.Now()
 	n.entry.Writer = t.context.UserName()
-	n.entry.Sequence++
+	// Sequence number is already up-to-date (see setNodeDirtyAt).
 
 	// Start packing.
 	bp, err := packer.Pack(t.context, &n.entry)
