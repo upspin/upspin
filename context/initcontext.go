@@ -129,9 +129,9 @@ func FromFile(name string) (upspin.Context, error) {
 // in this case, the returned context will not include a Factotum
 // and the returned error is ErrNoFactotum.
 //
-// The tlscerts key specifies a directory containing PEM certificates that will
-// be added to the certificate pool (in addition to the root certificates
-// provided by the system) used for verifying client TLS connections.
+// The tlscerts key specifies a directory containing PEM certificates define
+// the certificate pool used for verifying client TLS connections,
+// replacing the root certificate list provided by the operating system.
 // Files without the suffix ".pem" are ignored.
 // The default value for tlscerts is the empty string,
 // in which case just the system roots are used.
@@ -280,9 +280,8 @@ func valsFromEnvironment(vals map[string]string) error {
 	return nil
 }
 
-// certPoolFromDir parses any PEM files in the provided directory,
-// adds them to the system root certificate pool, and returns
-// the resulting pool.
+// certPoolFromDir parses any PEM files in the provided directory
+// and returns the resulting pool.
 func certPoolFromDir(dir string) (*x509.CertPool, error) {
 	var pool *x509.CertPool
 	fis, err := ioutil.ReadDir(dir)
@@ -299,10 +298,7 @@ func certPoolFromDir(dir string) (*x509.CertPool, error) {
 			return nil, errors.Errorf("reading TLS Certificate %q: %v", name, err)
 		}
 		if pool == nil {
-			pool, err = x509.SystemCertPool()
-			if err != nil {
-				return nil, err
-			}
+			pool = x509.NewCertPool()
 		}
 		pool.AppendCertsFromPEM(pem)
 	}
