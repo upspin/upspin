@@ -281,6 +281,15 @@ type PublicKey string
 // DirEntry.
 var ErrFollowLink = errors.New("action incomplete: must follow link")
 
+// ErrTimeout indicates that a client calling Watch did not consume the event
+// stream quickly enough and tha the server will subsequently close the event
+// channel.
+var ErrTimeout = errors.New("watch failed: client fell behind")
+
+// ErrNotSupported indicates that the server does not support the requested
+// operation.
+var ErrNotSupported = errors.New("not supported")
+
 // MaxLinkHops is the maximum number of links that will be followed
 // when evaluating a single path name.
 const MaxLinkHops = 20
@@ -381,6 +390,40 @@ type DirServer interface {
 	// ErrFollowLink. Otherwise, in the case of error the returned
 	// DirEntry will be nil.
 	WhichAccess(name PathName) (*DirEntry, error)
+
+	// Watch returns a channel of Events that affect the specified path and
+	// any of its descendents, beginning at the specified order (an opaque,
+	// monotonic value that denotes a position in the event log).
+	// If order is zero, all events known to the DirServer are sent.
+	// If order is -1, the current entry for the specified path is sent.
+	// When the provided done channel is closed, the watch is stopped
+	// and the event channel will be closed by the server.
+	//
+	// If the caller does not consume events in a timely fashion
+	// the server will send an Event contaning an ErrTimeout.
+	//
+	// If this server does not support watches it returns
+	// ErrNotSupported.
+	Watch(name PathName, order int64, done <-chan struct{}) (<-chan Event, error)
+}
+
+// Event represents the creation, modification, or deletion of a DirEntry
+// within a DirServer.
+type Event struct {
+	// Entry is the DirEntry to which the event pertains.
+	Entry *DirEntry
+
+	// Order is an opaque, monotonic value that denotes the position
+	// of this event in the event log.
+	Order int64
+
+	// Delete is true only if the entry is being deleted,
+	// otherwise it is being created or modified.
+	Delete bool
+
+	// Error is non-nil if an error occurred while watching for events.
+	// In that case, all other fields are their zero values.
+	Error error
 }
 
 // Time represents a timestamp in units of seconds since

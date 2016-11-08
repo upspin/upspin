@@ -683,6 +683,11 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	return s.whichAccess(p, o)
 }
 
+// Watch implements upspin.DirServer.Watch.
+func (s *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
 // Dial implements upspin.Dialer.
 func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/server.Dial"

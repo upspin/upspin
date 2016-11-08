@@ -422,6 +422,11 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 	}
 }
 
+// Watch implements upspin.DirServer.Watch.
+func (s *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
 // readAll retrieves the data for the entry.
 func (s *server) readAll(entry *upspin.DirEntry) ([]byte, error) {
 	return clientutil.ReadAll(s.db.dirContext, entry)

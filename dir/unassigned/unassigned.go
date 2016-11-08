@@ -50,6 +50,11 @@ func (Server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
+// Watch implements upspin.DirServer.Watch.
+func (Server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
 // Endpoint implements upspin.Service.
 func (u Server) Endpoint() upspin.Endpoint {
 	return u.endpoint

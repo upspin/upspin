@@ -217,6 +217,11 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	return e, nil
 }
 
+// Watch implements upspin.DirServer.
+func (d *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
 func (s *server) Ping() bool {
 	return true
 }
