@@ -327,6 +327,7 @@ func (t *Tree) setNodeDirtyAt(level int, n *node) {
 		t.dirtyNodes[level] = make(map[*node]bool)
 	}
 	t.dirtyNodes[level][n] = true // repetitions don't matter.
+	n.entry.Sequence++
 }
 
 // loadPath ensures the tree contains all nodes up to p and returns p's node.
@@ -345,6 +346,9 @@ func (t *Tree) loadPath(p path.Parsed) (*node, error) {
 		if err != nil {
 			return node, err // err could be upspin.ErrFollowLink.
 		}
+	}
+	if node.entry.Name != p.Path() {
+		return nil, errors.E(errors.NotExist, p.Path())
 	}
 	return node, nil
 }
