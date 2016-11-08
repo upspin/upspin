@@ -81,3 +81,25 @@ func (ep *Endpoint) UnmarshalJSON(data []byte) error {
 	*ep = *p
 	return nil
 }
+
+// MarshalYAML implements yaml.Marshaler.
+// See https://godoc.org/gopkg.in/yaml.v2#Marshaler.
+func (ep Endpoint) MarshalYAML() (interface{}, error) {
+	s, err := ep.toString()
+	return s, err
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+// See https://godoc.org/gopkg.in/yaml.v2#Unmarshaler.
+func (ep *Endpoint) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+	p, err := ParseEndpoint(s)
+	if err != nil {
+		return err
+	}
+	*ep = *p
+	return nil
+}

@@ -5,6 +5,7 @@
 package upspin
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -72,5 +73,33 @@ func TestJSON(t *testing.T) {
 	}
 	if e != *newE {
 		t.Errorf("Expected %q, got %q", e, newE)
+	}
+}
+
+// TestYAML tests the marshaling/unmarshaling an Endpoint as a YAML string.
+func TestYAML(t *testing.T) {
+	e := Endpoint{Transport: Remote, NetAddr: "host.example.com"}
+	v, err := e.MarshalYAML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, ok := v.(string)
+	if !ok {
+		t.Fatalf("unmarshaled into %T, want string", v)
+	}
+	unmarshal := func(dst interface{}) error {
+		d, ok := dst.(*string)
+		if !ok {
+			return fmt.Errorf("unmarshal passed %T, want *string", dst)
+		}
+		*d = s
+		return nil
+	}
+	e2 := Endpoint{}
+	if err := e2.UnmarshalYAML(unmarshal); err != nil {
+		t.Fatal(err)
+	}
+	if e2 != e {
+		t.Fatalf("got %v, want %v", e2, e)
 	}
 }

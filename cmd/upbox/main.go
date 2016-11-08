@@ -95,7 +95,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -106,6 +105,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/upspin"
 )
@@ -160,7 +161,7 @@ func (cfg *Config) Run() error {
 	// Generate keys.
 	// Write an empty RC file for use by 'upspin keygen'.
 	rcKeygen := filepath.Join(tmpDir, "rc.keygen")
-	if err := ioutil.WriteFile(rcKeygen, nil, 0644); err != nil {
+	if err := ioutil.WriteFile(rcKeygen, []byte("secrets: none"), 0644); err != nil {
 		return err
 	}
 	for _, u := range cfg.Users {
@@ -273,7 +274,7 @@ func (cfg *Config) Run() error {
 			Stores:    []upspin.Endpoint{*store},
 			PublicKey: upspin.PublicKey(pk),
 		}
-		userJSON, err := json.Marshal(user)
+		userYAML, err := yaml.Marshal(user)
 		if err != nil {
 			return err
 		}
@@ -282,7 +283,7 @@ func (cfg *Config) Run() error {
 			"-log="+*logLevel,
 			"user", "-put",
 		)
-		cmd.Stdin = bytes.NewReader(userJSON)
+		cmd.Stdin = bytes.NewReader(userYAML)
 		cmd.Stdout = prefix("key-bootstrap:\t", os.Stdout)
 		cmd.Stderr = prefix("key-bootstrap:\t", os.Stderr)
 		if err := cmd.Run(); err != nil {
