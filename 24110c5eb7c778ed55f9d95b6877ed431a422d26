@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8bd3c31c_9a2bfd98",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-08T01:40:31Z",
+      "side": 1,
+      "message": "Where is this used? It deserves a test.",
+      "revId": "24110c5eb7c778ed55f9d95b6877ed431a422d26",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bd3c31c_dab1052f",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-08T01:40:31Z",
+      "side": 1,
+      "message": "I don\u0027t understand why you\u0027re calling unmarshal on an empty string. Is the function supposed to know what to unmarshal? What function am I supposed to give to this? Maybe this is never called by users, but instead by yaml.Unmarshal(data, \u0026endpoint)? Is that how it works?",
+      "revId": "24110c5eb7c778ed55f9d95b6877ed431a422d26",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
