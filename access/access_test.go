@@ -198,7 +198,8 @@ func TestHasAccessNoGroups(t *testing.T) {
 		owner = upspin.UserName("me@here.com")
 
 		// This access file defines readers and writers but no other rights.
-		text = "r: reader@r.com, reader@foo.bar, *@nsa.gov\n" +
+		text = "l: *@google.com\n" +
+			"r: reader@r.com, reader@foo.bar, *@nsa.gov\n" +
 			"w: writer@foo.bar\n"
 	)
 	a, err := Parse(testFile, []byte(text))
@@ -274,6 +275,8 @@ func TestHasAccessNoGroups(t *testing.T) {
 	check("joe@nsa.gov", AnyRight, "me@here.com/foo/barx", true)
 	check("joe@nsa.gov", Read, "me@here.com/Access", true)
 	check("joe@nsa.gov", AnyRight, "me@here.com/Access", true)
+	check("bob@google.com", List, "me@here.com/", true)
+	check("ana@google.com", AnyRight, "me@here.com/", true)
 
 	// Wildcard that should not match.
 	check("*@nasa.gov", Read, "me@here.com/foo/bar", false)
