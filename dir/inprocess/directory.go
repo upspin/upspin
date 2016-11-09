@@ -610,7 +610,7 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 			return nil, errors.E(op, dir.Name, err)
 		}
 		if !canRead {
-			entry.MarkIncomplete()
+			e.MarkIncomplete()
 		}
 		results = append(results, &e)
 	}
