@@ -178,18 +178,19 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 }
 
 func attrFormat(attr upspin.Attribute) string {
+	a := attr
 	tail := ""
-	if attr | upspin.AttrIncomplete {
+	if a|upspin.AttrIncomplete > 0 {
 		tail = " (incomplete)"
-		attr ^= upspin.AttrIncomplete
+		a ^= upspin.AttrIncomplete
 	}
-	switch {
+	switch a {
 	case upspin.AttrNone:
-		return "none (plain file)"
+		return "none (plain file)" + tail
 	case upspin.AttrDirectory:
-		return "directory"
+		return "directory" + tail
 	case upspin.AttrLink:
-		return "link"
+		return "link" + tail
 	}
 	return fmt.Sprintf("attribute(%#x)", attr)
 }
