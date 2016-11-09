@@ -69,6 +69,24 @@
       "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bb823f7_7805c177",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-09T01:19:13Z",
+      "side": 1,
+      "message": "it doesn\u0027t have to be, does it? seems odd to transcode there.",
+      "parentUuid": "2b7f379a_1877497f",
+      "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
