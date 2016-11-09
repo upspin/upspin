@@ -87,6 +87,24 @@
       "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6bbdafe5_17557463",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-09T01:20:37Z",
+      "side": 1,
+      "message": "The keyserver stores json blobs in GCS. It can be changed, but I think it\u0027s low value right now and it probably shouldn\u0027t be done in this CL. Just my two cents.",
+      "parentUuid": "8bb823f7_7805c177",
+      "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
