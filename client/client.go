@@ -239,7 +239,11 @@ func (c *Client) addReaders(op string, entry, accessEntry *upspin.DirEntry, pack
 	}
 
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-	readersPublicKey[0] = c.context.Factotum().PublicKey()
+	f := c.context.Factotum()
+	if f == nil {
+		return errors.E(op, name, errors.Permission, errors.Str("no factotum available"))
+	}
+	readersPublicKey[0] = f.PublicKey()
 	n := 1
 	for _, r := range readers {
 		key, err := bind.KeyServer(c.context, c.context.KeyEndpoint())

@@ -301,11 +301,15 @@ func signUser(ctx upspin.Context, magic string) ([]string, error) {
 	if ctx == nil {
 		return nil, errors.Str("nil context")
 	}
+	f := ctx.Factotum()
+	if f == nil {
+		return nil, errors.Str("no factotum available")
+	}
 
 	// Discourage replay attacks.
 	now := time.Now().UTC().Format(time.ANSIC)
 	userString := string(ctx.UserName())
-	sig, err := ctx.Factotum().UserSign([]byte(userString + magic + now))
+	sig, err := f.UserSign([]byte(userString + magic + now))
 	if err != nil {
 		log.Error.Printf("proxyRequest signing server user: %v", err)
 		return nil, err

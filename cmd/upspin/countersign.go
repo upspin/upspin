@@ -49,6 +49,9 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 		oldKey: u.PublicKey,
 	}
 	newF := s.context.Factotum()
+	if newF == nil {
+		s.exitf("no factotum available")
+	}
 
 	lastCtx := s.context
 	s.context = context.SetFactotum(s.context, s.context.Factotum().Pop())
