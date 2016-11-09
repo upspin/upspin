@@ -88,7 +88,7 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 	)
 	r.As(owner)
 	r.Put(accessFile, accessText)
-	r.Put(publicFile, contentsOfPublic) // Put again to ensure re-wrapping of keys. TODO: fix.
+	r.Put(publicFile, contentsOfPublic) // Put again to ensure re-wrapping of keys.
 
 	// With Access file, every item is still readable by owner.
 	r.Get(privateFile)
@@ -240,6 +240,23 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 	}
 	r.Get(publicFile)
 	if !r.Match(errPrivate) {
+		t.Fatal(r.Diag())
+	}
+
+	// Test *@domain permission.
+	const (
+		wildcardDomain = "l: *@google.com\n"
+	)
+	r.As(owner)
+	r.Put(accessFile, wildcardDomain)
+
+	r.As(user)
+	r.DirWhichAccess(publicFile)
+	if !r.GotEntry(accessFile) {
+		t.Fatal(r.Diag())
+	}
+	r.Glob(publicFile)
+	if !r.GotEntries(false, publicFile) {
 		t.Fatal(r.Diag())
 	}
 
