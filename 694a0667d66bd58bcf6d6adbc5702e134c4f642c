@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2b7f379a_7882fd25",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-09T00:37:04Z",
+      "side": 1,
+      "message": "this is where goimports puts it, and where it is in other files in our tree",
+      "parentUuid": "8bd3c31c_16e7c1fc",
+      "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8bd3c31c_f6e97dcf",
         "filename": "upspin/endpoint.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-08T21:41:50Z",
       "side": 1,
       "message": "do you plan to delete these and other JSON bits in a followup?",
+      "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b7f379a_1877497f",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-09T00:37:04Z",
+      "side": 1,
+      "message": "no, they\u0027re used by the keyserver",
+      "parentUuid": "8bd3c31c_f6e97dcf",
       "revId": "694a0667d66bd58bcf6d6adbc5702e134c4f642c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
