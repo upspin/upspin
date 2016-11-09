@@ -99,10 +99,14 @@ should take those two addresses as arguments.
 		s.exit(err)
 	}
 
-	pubKey := strings.TrimSpace(string(ctx.Factotum().PublicKey()))
+	f := ctx.Factotum()
+	if f == nil {
+		s.exitf("no factotum available")
+	}
+	pubKey := strings.TrimSpace(string(f.PublicKey()))
 
 	// Sign the username and key.
-	sig, err := ctx.Factotum().UserSign([]byte(string(ctx.UserName()) + pubKey))
+	sig, err := f.UserSign([]byte(string(ctx.UserName()) + pubKey))
 	if err != nil {
 		s.exit(err)
 	}

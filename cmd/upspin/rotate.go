@@ -39,6 +39,9 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 	}
 
 	f := s.context.Factotum() // save latest factotum
+	if f == nil {
+		s.exitf("no factotum available")
+	}
 	lastCtx := s.context
 	s.context = context.SetFactotum(s.context, f.Pop()) // context now defaults to old key
 	defer func() { s.context = lastCtx }()

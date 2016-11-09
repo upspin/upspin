@@ -203,7 +203,7 @@ func newState(op string) *State {
 		return s
 	}
 	ctx, err := context.FromFile(flags.Context)
-	if err != nil {
+	if err != nil && err != context.ErrNoFactotum {
 		s.exit(err)
 	}
 	transports.Init(ctx)

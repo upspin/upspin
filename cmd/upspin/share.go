@@ -228,8 +228,11 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 			thisUser, ok = s.userByHash[h]
 			if !ok {
 				// Check old keys in Factotum.
-				_, err := s.state.context.Factotum().PublicKeyFromHash(hash)
-				if err == nil {
+				f := s.state.context.Factotum()
+				if f == nil {
+					s.state.exitf("no factotum available")
+				}
+				if _, err := f.PublicKeyFromHash(hash); err == nil {
 					thisUser = s.state.context.UserName()
 					ok = true
 					self = true
