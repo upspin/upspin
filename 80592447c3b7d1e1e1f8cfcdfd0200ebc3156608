@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab888773_bdc78a32",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-10T04:35:45Z",
+      "side": 1,
+      "message": "In my mind -1 means: \"if anything changes from now on\". But not the current entry. If you really need it now, Lookup is the right API. \n\nWatching a directory means you get all entries that get changed for paths under \"name\". So, if you\u0027re watching a directory and order\u003d-1, \"current entry\" would not mean the DirEntry for the directory, but it and all its descendent DirEntries.\n\nMaybe:\n// If order is -1, all future changes will be sent.",
+      "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
