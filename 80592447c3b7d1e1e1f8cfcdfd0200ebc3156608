@@ -52,6 +52,24 @@
       "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ebf7df07_7b085f06",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-10T22:23:04Z",
+      "side": 1,
+      "message": "Think of a storeserver that wants to watch a permissions file. It wants the current state of the StoreWriters file, and any future changes. I think this will be a common use case, and it\u0027s at least the one we have now.\n\n1. That assumes they\u0027re already watching. Not an option.\n2. Inefficient if the caller does not care what happened before now.\n3. There\u0027s a race condition here, if changes happen between the Lookup and the Watch.\n\nI think the API as specified here is the easiest one to use correctly and efficiently.",
+      "parentUuid": "ab888773_3d539a2b",
+      "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
