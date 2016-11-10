@@ -72,9 +72,7 @@ func WrapStore(ctx upspin.Context, store upspin.StoreServer) *Store {
 		StoreServer: store,
 		serverCtx:   ctx,
 		user:        ctx.UserName(),
-		perm: &perm{
-			writers: make(map[upspin.UserName]bool),
-		},
+		perm:        &perm{},
 	}
 	s.perm.firstRun.Add(1)
 	go s.updateLoop()
@@ -117,19 +115,22 @@ func (s *Store) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service,
 // updateLoop continuously looks for updates on this StoreServer's permissions.
 // It must be run in a goroutine before calling IsMutationAllowed.
 func (s *Store) updateLoop() {
-	err := s.update()
-	if err != nil {
-		log.Error.Printf("Error updating StoreServer's writers: %s", err)
+	lastErr := s.update()
+	if lastErr != nil {
+		log.Error.Printf("store/perm: error updating StoreServer's writers: %s", lastErr)
 	}
 	s.perm.firstRun.Done()
 
 	for {
-		err = s.update()
+		err := s.update()
 		if err != nil {
-			log.Error.Printf("Error updating StoreServer's writers: %s", err)
+			if lastErr == nil || err.Error() != lastErr.Error() {
+				log.Error.Printf("store/perm: error updating StoreServer's writers: %s", err)
+			}
 			time.Sleep(retryTimeout)
 			continue
 		}
+		lastErr = err
 		time.Sleep(pollInterval)
 	}
 }
