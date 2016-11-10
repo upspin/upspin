@@ -34,6 +34,24 @@
       "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab888773_3d539a2b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-10T06:02:44Z",
+      "side": 1,
+      "message": "three options:\n1) The client needs to have memory and remember the last update it got. Then start from that update and catch up.\n2) Ask for 0 (all that the server has)\n3) Do a Lookup and then Watch(-1).",
+      "parentUuid": "ebf7df07_3b053779",
+      "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
