@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab888773_66a99467",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-10T01:12:49Z",
+      "side": 1,
+      "message": "that",
+      "revId": "bd26c5484f663f9ec093b5df22e7951a0430c70f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab888773_c693a033",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-10T01:12:49Z",
+      "side": 1,
+      "message": "group these vars?",
+      "revId": "bd26c5484f663f9ec093b5df22e7951a0430c70f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab888773_c6e5e0c6",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-10T01:12:49Z",
+      "side": 1,
+      "message": "\"the watch\"?",
+      "revId": "bd26c5484f663f9ec093b5df22e7951a0430c70f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab888773_46d250e6",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-10T01:12:49Z",
+      "side": 1,
+      "message": "s/watches/this method/",
+      "revId": "bd26c5484f663f9ec093b5df22e7951a0430c70f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab888773_c6cc0057",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-10T01:12:49Z",
+      "side": 1,
+      "message": "i know cheney\u0027s all gaga about the struct{} thing but honestly i\u0027d prefer bool or int even though its value is ignored.\n\nbut i won\u0027t insist.",
+      "revId": "bd26c5484f663f9ec093b5df22e7951a0430c70f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
