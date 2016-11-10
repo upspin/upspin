@@ -16,6 +16,24 @@
       "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ebf7df07_3b053779",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-10T04:51:08Z",
+      "side": 1,
+      "message": "If we adopted you suggestion, how would I get the current state of the file and any future updates without missing anything?",
+      "parentUuid": "ab888773_bdc78a32",
+      "revId": "80592447c3b7d1e1e1f8cfcdfd0200ebc3156608",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
