@@ -141,17 +141,21 @@ func TestGCPErrorsOut(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	_, err := New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = New("dance=the macarena")
+	_, err := New("dance=the macarena")
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
 	expected := "invalid operation"
 	if !strings.Contains(err.Error(), expected) {
 		t.Errorf("Expected %q, got %q", expected, err)
+	}
+
+	if testing.Short() {
+		t.Skip("skipping part of test when network unavailable; depends on credential availability")
+	}
+	_, err = New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
