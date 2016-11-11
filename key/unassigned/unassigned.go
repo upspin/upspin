@@ -32,6 +32,12 @@ func (Server) Put(user *upspin.User) error {
 	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
+// Log implements upspin.KeyServer.
+func (Server) Log(offset int64) ([]byte, int64, error) {
+	const op = "key/Server.Log"
+	return nil, 0, errors.E(op, errors.Invalid, unassignedErr)
+}
+
 // Endpoint implements upspin.Service.
 func (u Server) Endpoint() upspin.Endpoint {
 	return u.endpoint

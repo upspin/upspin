@@ -113,13 +113,25 @@ message KeyPutResponse {
     bytes error = 1;
 }
 
+message KeyLogRequest {
+    int64 offset = 1;
+}
+
+message KeyLogResponse {
+    bytes log = 1;
+    int64 size = 2;
+    bytes error = 3;
+}
+
 service Key {
     // Service methods:
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
     rpc Ping (PingRequest) returns (PingResponse) {}
 
+    // KeyServer methods:
     rpc Lookup (KeyLookupRequest) returns (KeyLookupResponse) {}
     rpc Put(KeyPutRequest) returns (KeyPutResponse) {}
+    rpc Log(KeyLogRequest) returns (KeyLogResponse) {}
 }
 
 // The DirServer interface.

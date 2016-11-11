@@ -89,6 +89,12 @@ func (s *server) Put(u *upspin.User) error {
 	return nil
 }
 
+// Log implements upspin.KeyServer.
+func (s *server) Log(offset int64) ([]byte, int64, error) {
+	const op = "key/inprocess.Log"
+	return nil, 0, errors.E(op, errors.Invalid, errors.Str("not supported"))
+}
+
 // Endpoint implements upspin.server.
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{

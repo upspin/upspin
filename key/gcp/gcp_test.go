@@ -321,6 +321,7 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 	}
 	s := &server{
 		storage: mockGCP,
+		logger:  &logger{storage: mockGCP},
 		user:    user,
 	}
 	return s, mockGCP

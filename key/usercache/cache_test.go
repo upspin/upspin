@@ -277,6 +277,10 @@ func (s *service) Put(user *upspin.User) error {
 	return nil
 }
 
+func (s *service) Log(int64) ([]byte, int64, error) {
+	return nil, 0, errors.Str("not implemented")
+}
+
 func (s *service) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
 	s.dials++
 	s.context = ctx

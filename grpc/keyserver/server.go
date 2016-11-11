@@ -99,6 +99,31 @@ func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
 }
 
+// Log implements proto.KeyServer.
+func (s *server) Log(ctx gContext.Context, req *proto.KeyLogRequest) (*proto.KeyLogResponse, error) {
+	op := logf("Log %v", req)
+
+	key, err := s.keyFor(ctx)
+	if err != nil {
+		op.log(err)
+		return logError(err), nil
+	}
+
+	log, size, err := key.Log(req.Offset)
+	if err != nil {
+		op.log(err)
+		return logError(err), nil
+	}
+	return &proto.KeyLogResponse{
+		Log:  log,
+		Size: size,
+	}, nil
+}
+
+func logError(err error) *proto.KeyLogResponse {
+	return &proto.KeyLogResponse{Error: errors.MarshalError(err)}
+}
+
 // Endpoint implements proto.KeyServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 	return &proto.EndpointResponse{

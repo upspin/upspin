@@ -90,6 +90,7 @@ func main() {
 	proto.RegisterKeyServer(grpcSecureServer.GRPCServer(), s)
 
 	http.Handle("/", grpcSecureServer.GRPCServer())
+	http.Handle("/log", logHandler{key: key})
 	if *mailConfigFile != "" {
 		mailHandler, err := newMailHandler(key, *mailConfigFile)
 		if err != nil {

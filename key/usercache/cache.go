@@ -115,6 +115,19 @@ func (c *userCacheServer) Put(user *upspin.User) error {
 	return nil
 }
 
+// Log implements upspin.KeyServer.
+func (c *userCacheServer) Log(offset int64) ([]byte, int64, error) {
+	const op = "key/usercache.Log"
+	if err := c.dial(); err != nil {
+		return nil, 0, errors.E(op, err)
+	}
+	log, size, err := c.dialed.Log(offset)
+	if err != nil {
+		return nil, 0, errors.E(op, err)
+	}
+	return log, size, nil
+}
+
 // Endpoint implements upspin.Service.
 func (c *userCacheServer) Endpoint() upspin.Endpoint {
 	// We don't want Endpoint to trigger a Dial.

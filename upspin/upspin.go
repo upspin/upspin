@@ -267,6 +267,11 @@ type KeyServer interface {
 	// match the authenticated user.
 	// TODO: Provide full documentation.
 	Put(user *User) error
+
+	// Log returns the log of all mutations to the server from the given
+	// offset. The returned size is the total size of the log, and should
+	// be used for subsequent, incremental calls to Log.
+	Log(offset int64) (log []byte, size int64, err error)
 }
 
 // A PublicKey can be given to anyone and used for authenticating a user.

@@ -81,6 +81,21 @@ func (r *remote) Put(user *upspin.User) error {
 	return nil
 }
 
+// Log implements upspin.Key.Log.
+func (r *remote) Log(offset int64) ([]byte, int64, error) {
+	op := opf("Log", "%v", offset)
+
+	req := &proto.KeyLogRequest{Offset: offset}
+	resp, err := r.keyClient.Log(gContext.Background(), req)
+	if err != nil {
+		return nil, 0, op.error(errors.IO, err)
+	}
+	if len(resp.Error) != 0 {
+		return nil, 0, op.error(errors.UnmarshalError(resp.Error))
+	}
+	return resp.Log, resp.Size, nil
+}
+
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
