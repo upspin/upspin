@@ -62,17 +62,14 @@ assumed to refer to the store defined in the user's context.
 
 	var prevEndpoint upspin.Endpoint
 	var store upspin.StoreServer
-	for _, arg := range s.globAllUpspin(fs.Args()) {
-		entry, err := s.DirServer().Lookup(upspin.PathName(arg))
-		if err != nil {
-			s.exit(err)
-		}
+	for _, entry := range s.globAllUpspin(fs.Args()) {
 		if !entry.IsRegular() {
-			s.exitf("%s is not a plain file", arg)
+			s.exitf("%s is not a plain file", entry.Name)
 		}
 		for _, block := range entry.Blocks {
 			if block.Location.Endpoint != prevEndpoint {
 				prevEndpoint = block.Location.Endpoint
+				var err error
 				store, err = bind.StoreServer(s.context, prevEndpoint)
 				if err != nil {
 					s.exit(err)

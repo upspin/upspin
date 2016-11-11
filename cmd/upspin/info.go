@@ -34,18 +34,21 @@ of the link.
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
+	for _, name := range fs.Args() {
 		// We don't want to follow links, so don't use Client.
-		entry, err := s.DirServer().Lookup(name)
+		entries, err := s.DirServer().Glob(name)
+		// ErrFollowLink is OK; we still get the relevant entry.
 		if err != nil && err != upspin.ErrFollowLink {
 			s.exit(err)
 		}
-		s.printInfo(entry)
-		switch {
-		case access.IsAccessFile(name):
-			s.checkAccessFile(name)
-		case access.IsGroupFile(name):
-			s.checkGroupFile(name)
+		for _, entry := range entries {
+			s.printInfo(entry)
+			switch {
+			case access.IsAccessFile(entry.Name):
+				s.checkAccessFile(entry.Name)
+			case access.IsGroupFile(entry.Name):
+				s.checkGroupFile(entry.Name)
+			}
 		}
 	}
 }

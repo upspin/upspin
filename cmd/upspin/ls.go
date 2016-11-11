@@ -29,24 +29,25 @@ to learn about the targets of links.
 	done := map[upspin.PathName]bool{}
 	if fs.NArg() == 0 {
 		userRoot := upspin.PathName(s.context.UserName())
-		s.list(userRoot, done, *longFormat, *followLinks, *recur)
+		rootEntry, err := s.DirServer().Lookup(userRoot)
+		if err != nil {
+			s.exit(err)
+		}
+		s.list(rootEntry, done, *longFormat, *followLinks, *recur)
 		return
 	}
 	// The done map marks a directory we have listed, so we don't recur endlessly
 	// when given a chain of links with -L.
-	for _, name := range s.globAllUpspin(fs.Args()) {
-		s.list(name, done, *longFormat, *followLinks, *recur)
+	for _, entry := range s.globAllUpspin(fs.Args()) {
+		s.list(entry, done, *longFormat, *followLinks, *recur)
 	}
 }
 
-func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
-	done[name] = true
-	entry, err := s.client.Lookup(name, followLinks)
-	if err != nil {
-		s.exit(err)
-	}
+func (s *State) list(entry *upspin.DirEntry, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
+	done[entry.Name] = true
 
 	var dirContents []*upspin.DirEntry
+	var err error
 	if entry.IsDir() {
 		dirContents, err = s.client.Glob(upspin.AllFilesGlob(entry.Name))
 		if err != nil {
@@ -68,7 +69,7 @@ func (s *State) list(name upspin.PathName, done map[upspin.PathName]bool, longFo
 	for _, entry := range dirContents {
 		if entry.IsDir() && !done[entry.Name] {
 			fmt.Printf("\n%s:\n", entry.Name)
-			s.list(entry.Name, done, longFormat, followLinks, recur)
+			s.list(entry, done, longFormat, followLinks, recur)
 		}
 	}
 }

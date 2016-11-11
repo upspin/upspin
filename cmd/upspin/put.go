@@ -17,13 +17,12 @@ TODO: Delete in favor of cp?
 	inFile := fs.String("in", "", "input file (default standard input)")
 	s.parseFlags(fs, args, help, "put [-in=inputfile] path")
 
-	names := s.globAllUpspin(fs.Args())
-	if len(names) != 1 {
+	if fs.NArg() != 1 {
 		fs.Usage()
 	}
 
 	data := s.readAll(*inFile)
-	_, err := s.client.Put(names[0], data)
+	_, err := s.client.Put(s.globOneUpspinPath(fs.Arg(0)), data)
 	if err != nil {
 		s.exit(err)
 	}

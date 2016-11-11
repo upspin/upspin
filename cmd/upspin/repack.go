@@ -51,21 +51,18 @@ func (s *State) repackCommand(fs *flag.FlagSet) {
 	s.client = client.New(context.SetPacking(s.context, packer.Packing()))
 	defer func() { s.client = prevClient }()
 
-	for _, name := range s.globAllUpspin(fs.Args()) {
-		s.repackFileOrDir(name, packer, boolFlag(fs, "f"), boolFlag(fs, "r"), boolFlag(fs, "v"))
+	for _, entry := range s.globAllUpspin(fs.Args()) {
+		s.repackFileOrDir(entry, packer, boolFlag(fs, "f"), boolFlag(fs, "r"), boolFlag(fs, "v"))
 	}
 }
 
 // repackFileOrDir repacks its argument. If it is a directory and the -r flag is set, it descends.
 // The implementation makes a copy and then does some renaming to avoid wiping the
 // original if something goes wrong, but it is not foolproof.
-func (s *State) repackFileOrDir(name upspin.PathName, packer upspin.Packer, force, recur, verbose bool) {
+func (s *State) repackFileOrDir(entry *upspin.DirEntry, packer upspin.Packer, force, recur, verbose bool) {
+	name := entry.Name
 	if verbose {
 		log.Printf("repack %s", name)
-	}
-	entry, err := s.client.Lookup(name, true) // Note: hard to make this work unless we follow links.
-	if err != nil {
-		s.exit(err)
 	}
 	if entry.IsDir() {
 		if !recur {
@@ -76,7 +73,7 @@ func (s *State) repackFileOrDir(name upspin.PathName, packer upspin.Packer, forc
 			s.exit(err)
 		}
 		for _, entry := range entries {
-			s.repackFileOrDir(entry.Name, packer, force, true, verbose)
+			s.repackFileOrDir(entry, packer, force, true, verbose)
 		}
 		return
 	}

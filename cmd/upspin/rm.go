@@ -22,7 +22,7 @@ storage.
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
+	for _, name := range s.globAllUpspinPath(fs.Args()) {
 		err := s.client.Delete(name)
 		if err != nil {
 			s.exit(err)

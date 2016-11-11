@@ -91,7 +91,7 @@ func newSharer(s *State) *Sharer {
 
 // shareCommand is the main function for the share subcommand.
 func (s *State) shareCommand(fs *flag.FlagSet) {
-	names := s.globAllUpspin(fs.Args())
+	names := s.globAllUpspinPath(fs.Args())
 	s.sharer.fix = boolFlag(fs, "fix")
 	s.sharer.force = boolFlag(fs, "force")
 	s.sharer.isDir = boolFlag(fs, "d")

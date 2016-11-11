@@ -21,7 +21,7 @@ that controls permissions for each of the argument paths.
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
+	for _, name := range s.globAllUpspinPath(fs.Args()) {
 		acc, err := s.whichAccessFollowLinks(name)
 		if err != nil {
 			s.exit(err)
