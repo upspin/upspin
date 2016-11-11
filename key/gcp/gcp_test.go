@@ -406,6 +406,7 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 		storage:   mockGCP,
 		user:      user,
 		lookupTXT: mockLookupTXT,
+		logger:    &noopLogger{},
 	}
 	return s, mockGCP
 }

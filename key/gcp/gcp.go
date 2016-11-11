@@ -45,6 +45,7 @@ func New(options ...string) (upspin.KeyServer, error) {
 		storage:   s,
 		refCount:  &refCount{count: 1},
 		lookupTXT: net.LookupTXT,
+		logger:    &loggerImpl{storage: s},
 	}, nil
 }
 
@@ -52,6 +53,9 @@ func New(options ...string) (upspin.KeyServer, error) {
 type server struct {
 	storage storage.Storage
 	*refCount
+
+	// A text log of all mutations to the key server.
+	logger
 
 	// The name of the user accessing this server, set by Dial.
 	user upspin.UserName
@@ -117,8 +121,20 @@ func (s *server) Put(u *upspin.User) error {
 		return err
 	}
 
-	// Set IsAdmin to what it was before or false by default.
-	return s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
+	if err := s.logger.PutAttempt(s.user, u); err != nil {
+		return errors.E(op, err)
+	}
+
+	err = s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
+	if err != nil {
+		return err
+	}
+
+	if err := s.logger.PutSuccess(s.user, u); err != nil {
+		return errors.E(op, err)
+	}
+
+	return nil
 }
 
 // canPut reports whether the current logged-in user can Put the (new or
@@ -243,6 +259,17 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 		}
 	}
 	return lastErr
+}
+
+// Log implements Logger.
+func (s *server) Log() ([]byte, error) {
+	const op = "key/gcp.Log"
+
+	data, err := s.logger.ReadAll()
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return data, nil
 }
 
 // Dial implements upspin.Service.

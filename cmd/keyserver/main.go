@@ -75,6 +75,9 @@ func main() {
 	httpStore := keyserver.New(cfg, key, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Key/", httpStore)
 
+	if logger, ok := key.(gcp.Logger); ok {
+		http.Handle("/log", logHandler{logger: logger})
+	}
 	if *mailConfigFile != "" {
 		mailHandler, err := newMailHandler(key, *mailConfigFile)
 		if err != nil {
