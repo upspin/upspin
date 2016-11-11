@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0b1ef349_44376e11",
+        "filename": "key/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-11T10:27:23Z",
+      "side": 1,
+      "message": "Sure.",
+      "parentUuid": "0b97d3c5_162bcc9a",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b97d3c5_16210cca",
         "filename": "key/gcp/log.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-11T06:39:53Z",
       "side": 1,
       "message": "Why use actor when user is what we\u0027ve been using all along? Is it because the user might not be an official user yet? If so, PutSuccess should acknowledge it\u0027s now an official user and s/actor/user/. If it\u0027s some other reason, I\u0027m curious to know too.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_243a72fa",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-11T10:27:23Z",
+      "side": 1,
+      "message": "The actor is the user making the change. If it were \u0027user\u0027, how would that distinguish between the user making the change and the user being changed?",
+      "parentUuid": "0b97d3c5_16210cca",
       "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "0b1ef349_e4277ae4",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-11T10:27:23Z",
+      "side": 1,
+      "message": "Sure.",
+      "parentUuid": "0b97d3c5_96699cd7",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b97d3c5_36efe845",
         "filename": "key/gcp/log.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-11T06:39:53Z",
       "side": 1,
       "message": "The log can grow arbitrarily large and become too unwieldy. We should use chunking.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_043d76f1",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-11T10:27:23Z",
+      "side": 1,
+      "message": "I don\u0027t think we need to worry about this now. Each update is about ~500 bytes. We\u0027d need to have handled 2000 changes for this to even reach 1MB. I\u0027d rather file an issue and deal with it when we\u0027re successful enough for it to be a problem. :-)",
+      "parentUuid": "0b97d3c5_36efe845",
       "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
