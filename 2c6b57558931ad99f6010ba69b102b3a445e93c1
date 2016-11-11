@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b97d3c5_162bcc9a",
+        "filename": "key/gcp/gcp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-11T06:39:53Z",
+      "side": 1,
+      "message": "An actual test would be nice.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b97d3c5_16210cca",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-11T06:39:53Z",
+      "side": 1,
+      "message": "Why use actor when user is what we\u0027ve been using all along? Is it because the user might not be an official user yet? If so, PutSuccess should acknowledge it\u0027s now an official user and s/actor/user/. If it\u0027s some other reason, I\u0027m curious to know too.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b97d3c5_96699cd7",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-11T06:39:53Z",
+      "side": 1,
+      "message": "You should use storage.Download here. The GCS bucket for the keyserver is not publicly readable. When something is not public, you can\u0027t \"Get\" an href for it. But you can \"Download\".\n\n(Though, there\u0027s currently a bug in the keyserver because the latest users created via email were marked public. I filed issue #105. It\u0027s a trivial fix, but we need to resolve the above first or things won\u0027t work).",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b97d3c5_36efe845",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-11T06:39:53Z",
+      "side": 1,
+      "message": "The log can grow arbitrarily large and become too unwieldy. We should use chunking.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
