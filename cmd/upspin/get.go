@@ -19,7 +19,7 @@ TODO: Delete in favor of cp?
 	outFile := fs.String("out", "", "output file (default standard output)")
 	s.parseFlags(fs, args, help, "get [-out=outputfile] path")
 
-	names := s.globAllUpspin(fs.Args())
+	names := s.globAllUpspinPath(fs.Args())
 	if len(names) != 1 {
 		fs.Usage()
 	}

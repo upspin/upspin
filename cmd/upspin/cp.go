@@ -263,7 +263,7 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err == nil {
 		// It's an Upspin path.
-		for _, path := range cs.state.globUpspin(parsed.String()) {
+		for _, path := range cs.state.globUpspinPath(parsed.String()) {
 			files = append(files, cpFile{
 				path:     string(path),
 				isUpspin: true,

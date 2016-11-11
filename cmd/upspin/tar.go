@@ -75,7 +75,7 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 	if err != nil {
 		s.exit(err)
 	}
-	dir := s.globOneUpspin(fs.Arg(0))
+	dir := s.globOneUpspinPath(fs.Arg(0))
 	file := s.globOneLocal(fs.Arg(1))
 	err = a.archive(dir, s.createLocal(file))
 	if err != nil {

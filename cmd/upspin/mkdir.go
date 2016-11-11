@@ -15,7 +15,7 @@ Mkdir creates Upspin directories.
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspin(fs.Args()) {
+	for _, name := range s.globAllUpspinPath(fs.Args()) {
 		_, err := s.client.MakeDirectory(name)
 		if err != nil {
 			s.exit(err)

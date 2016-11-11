@@ -269,18 +269,53 @@ func hasGlobChar(pattern string) bool {
 
 // globAllUpspin processes the arguments, which should be Upspin paths,
 // expanding glob patterns.
-func (s *State) globAllUpspin(args []string) []upspin.PathName {
+func (s *State) globAllUpspin(args []string) []*upspin.DirEntry {
+	entries := make([]*upspin.DirEntry, 0, len(args))
+	for _, arg := range args {
+		entries = append(entries, s.globUpspin(arg)...)
+	}
+	return entries
+}
+
+// globAllUpspinPath processes the arguments, which should be Upspin paths,
+// expanding glob patterns. It returns just the paths.
+func (s *State) globAllUpspinPath(args []string) []upspin.PathName {
 	paths := make([]upspin.PathName, 0, len(args))
 	for _, arg := range args {
-		paths = append(paths, s.globUpspin(arg)...)
+		paths = append(paths, s.globUpspinPath(arg)...)
 	}
 	return paths
 }
 
 // globUpspin glob-expands the argument, which must be a syntactically
-// valid Upspin glob pattern (including a plain path name).
-func (s *State) globUpspin(pattern string) []upspin.PathName {
+// valid Upspin glob pattern (including a plain path name). If the path does
+// not exist, the function exits.
+func (s *State) globUpspin(pattern string) []*upspin.DirEntry {
 	// Must be a valid Upspin path.
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		s.exit(err)
+	}
+	// If it has no metacharacters, look it up to be sure it exists.
+	if !hasGlobChar(pattern) {
+		entry, err := s.client.Lookup(upspin.PathName(pattern), true)
+		if err != nil {
+			s.exit(err)
+		}
+		return []*upspin.DirEntry{entry}
+	}
+	entries, err := s.client.Glob(parsed.String())
+	if err != nil {
+		s.exit(err)
+	}
+	return entries
+}
+
+// globUpspinPath glob-expands the argument, which must be a syntactically
+// valid Upspin glob pattern (including a plain path name). It returns just
+// the path names.
+func (s *State) globUpspinPath(pattern string) []upspin.PathName {
+	// Note: We could call globUpspin but that might do an unnecessary Lookup.
 	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err != nil {
 		s.exit(err)
@@ -289,25 +324,46 @@ func (s *State) globUpspin(pattern string) []upspin.PathName {
 	if !hasGlobChar(pattern) {
 		return []upspin.PathName{path.Clean(upspin.PathName(pattern))}
 	}
-	var out []upspin.PathName
 	entries, err := s.client.Glob(parsed.String())
 	if err != nil {
 		s.exit(err)
 	}
-	for _, entry := range entries {
-		out = append(out, entry.Name)
+	names := make([]upspin.PathName, len(entries))
+	for i, entry := range entries {
+		names[i] = entry.Name
 	}
-	return out
+	return names
 }
 
 // globOneUpspin glob-expands the argument, which must result in a
 // single Upspin path.
-func (s *State) globOneUpspin(pattern string) upspin.PathName {
-	strs := s.globUpspin(pattern)
-	if len(strs) != 1 {
+func (s *State) globOneUpspinPath(pattern string) upspin.PathName {
+	entries := s.globUpspin(pattern)
+	if len(entries) != 1 {
 		s.exitf("more than one file matches %s", pattern)
 	}
-	return strs[0]
+	return entries[0].Name
+}
+
+// globOneUpspinNoLinks glob-expands the argument, which must result in a
+// single Upspin path. The result must not be a link, but it's OK if it does not
+// exist at all.
+func (s *State) globOneUpspinNoLinks(pattern string) upspin.PathName {
+	entries, err := s.DirServer().Glob(pattern) // Use Dir not Client to catch links.
+	if err == upspin.ErrFollowLink {
+		s.exitf("%s is a link", entries[0].Name)
+	}
+	if err != nil {
+		s.exit(err)
+	}
+	if len(entries) > 1 {
+		s.exitf("more than one file matches %s", pattern)
+	}
+	if len(entries) == 0 {
+		// No matches; file does not exist. That's OK.
+		return upspin.PathName(pattern)
+	}
+	return entries[0].Name
 }
 
 // globLocal glob-expands the argument, which should be a syntactically
