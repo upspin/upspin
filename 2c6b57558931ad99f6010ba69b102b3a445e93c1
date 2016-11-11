@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "0b97d3c5_716c1ae6",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-11T16:17:41Z",
+      "side": 1,
+      "message": "All since start of this execution of the key server or all since the dawn of time?\n\nFor scalability, perhaps on /log give a checkpoint at (re)start of the logging and then the mutations, but save the archival log to cloud storage somewhere.\n\nWhat you have is fine for version 1, though it would be ideal to pick an API design now that allows a future internal implementation to deal with the eventual large number of keys.",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b97d3c5_162bcc9a",
         "filename": "key/gcp/gcp_test.go",
         "patchSetId": 1
@@ -66,6 +83,23 @@
       "side": 1,
       "message": "The actor is the user making the change. If it were \u0027user\u0027, how would that distinguish between the user making the change and the user being changed?",
       "parentUuid": "0b97d3c5_16210cca",
+      "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b97d3c5_9169a6d7",
+        "filename": "key/gcp/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-11T16:17:41Z",
+      "side": 1,
+      "message": "If we do go with a snapshot for scalability, as I mentioned in another comment, then the starting hash also needs to be preserved from the previous log.  That is, a reset of the server should preserve hashes.  The goal is that two people watching the logs can compare hashes to confirm they\u0027re both seeing exactly the same log.",
       "revId": "2c6b57558931ad99f6010ba69b102b3a445e93c1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
