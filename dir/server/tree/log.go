@@ -57,8 +57,10 @@ type LogIndex struct {
 // contains a Log and/or a LogIndex for the user they are opened and returned.
 // Otherwise one is created.
 //
-// Only one Log and LogIndex for a user in the same directory can be opened.
-// If two are opened and used simultaneously, results will be unpredictable.
+// Only one pair of read-write Log and LogIndex for a user in the same
+// directory can be opened. If two are opened and used simultaneously, results
+// will be unpredictable. This limitation does not apply to read-only clones
+// created by Clone.
 func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	const op = "dir/server/tree.NewLogs"
 	loc := logFile(user, directory)
@@ -229,6 +231,18 @@ func (l *Log) Truncate(offset int64) error {
 	return nil
 }
 
+// Clone makes a read-only copy of the log.
+func (l *Log) Clone() (*Log, error) {
+	const op = "dir/server/tree.Log.Clone"
+	f, err := os.Open(l.file.Name())
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	newLog := *l
+	newLog.file = f
+	return &newLog, nil
+}
+
 // User returns the user name who owns the root of the tree that this
 // log index represents.
 func (li *LogIndex) User() upspin.UserName {
@@ -270,6 +284,23 @@ func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
 func (li *LogIndex) DeleteRoot() error {
 	const op = "dir/server/tree.LogIndex.DeleteRoot"
 	return overwriteAndSync(op, li.rootFile, []byte{})
+}
+
+// Clone makes a read-only copy of the log index.
+func (li *LogIndex) Clone() (*LogIndex, error) {
+	const op = "dir/server/tree.LogIndex.Clone"
+	idx, err := os.Open(li.indexFile.Name())
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	root, err := os.Open(li.rootFile.Name())
+	if err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+	newLog := *li
+	newLog.indexFile = idx
+	newLog.rootFile = root
+	return &newLog, nil
 }
 
 func overwriteAndSync(op string, f *os.File, buf []byte) error {
